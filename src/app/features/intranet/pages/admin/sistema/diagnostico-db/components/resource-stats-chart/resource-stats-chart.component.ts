@@ -22,7 +22,7 @@ const CHART_COLORS = {
 	red: '#ef4444',
 } as const;
 
-function buildDataset(label: string, data: number[], color: string) {
+function buildDataset(label: string, data: { x: number; y: number }[], color: string) {
 	return {
 		label,
 		data,
@@ -35,9 +35,11 @@ function buildDataset(label: string, data: number[], color: string) {
 	};
 }
 
-function formatTimestamp(ts: string): string {
-	return new Date(ts).toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
+function formatAxisTick(ms: number): string {
+	return new Date(ms).toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
 }
+
+const CHART_WINDOW_MS = 60 * 60 * 1000;
 
 @Component({
 	selector: 'app-resource-stats-chart',
@@ -88,15 +90,17 @@ export class ResourceStatsChartComponent implements AfterViewInit {
 		const gridColor = getComputedStyle(document.documentElement)
 			.getPropertyValue('--surface-300').trim() || '#e2e8f0';
 
+		const toPoints = (values: (d: ResourceStatsSnapshotDto) => number) =>
+			data.map((d) => ({ x: new Date(d.timestamp).getTime(), y: values(d) }));
+
 		this.chart = new Chart(canvas, {
 			type: 'line',
 			data: {
-				labels: data.map((d) => formatTimestamp(d.timestamp)),
 				datasets: [
-					buildDataset('CPU %', data.map((d) => d.cpuPercent), CHART_COLORS.blue),
-					buildDataset('Data IO %', data.map((d) => d.dataIoPercent), CHART_COLORS.orange),
-					buildDataset('Log Write %', data.map((d) => d.logWritePercent), CHART_COLORS.red),
-					buildDataset('Memoria %', data.map((d) => d.memoryUsagePercent), CHART_COLORS.green),
+					buildDataset('CPU %', toPoints((d) => d.cpuPercent), CHART_COLORS.blue),
+					buildDataset('Data IO %', toPoints((d) => d.dataIoPercent), CHART_COLORS.orange),
+					buildDataset('Log Write %', toPoints((d) => d.logWritePercent), CHART_COLORS.red),
+					buildDataset('Memoria %', toPoints((d) => d.memoryUsagePercent), CHART_COLORS.green),
 				],
 			},
 			options: {
@@ -107,7 +111,13 @@ export class ResourceStatsChartComponent implements AfterViewInit {
 					legend: { labels: { color: textColor, boxWidth: 12, padding: 12 } },
 				},
 				scales: {
-					x: { ticks: { color: textColor, maxTicksLimit: 10 }, grid: { color: gridColor } },
+					x: {
+						type: 'linear',
+						min: Date.now() - CHART_WINDOW_MS,
+						max: Date.now(),
+						ticks: { color: textColor, maxTicksLimit: 10, callback: (v) => formatAxisTick(Number(v)) },
+						grid: { color: gridColor },
+					},
 					y: {
 						min: 0,
 						max: 100,
@@ -127,16 +137,23 @@ export class ResourceStatsChartComponent implements AfterViewInit {
 			return;
 		}
 
-		this.chart.data.labels = data.map((d) => formatTimestamp(d.timestamp));
+		const toPoints = (values: (d: ResourceStatsSnapshotDto) => number) =>
+			data.map((d) => ({ x: new Date(d.timestamp).getTime(), y: values(d) }));
+
 		const values = [
-			data.map((d) => d.cpuPercent),
-			data.map((d) => d.dataIoPercent),
-			data.map((d) => d.logWritePercent),
-			data.map((d) => d.memoryUsagePercent),
+			toPoints((d) => d.cpuPercent),
+			toPoints((d) => d.dataIoPercent),
+			toPoints((d) => d.logWritePercent),
+			toPoints((d) => d.memoryUsagePercent),
 		];
 		values.forEach((v, i) => {
 			if (this.chart!.data.datasets[i]) this.chart!.data.datasets[i].data = v;
 		});
+
+		const xScale = this.chart.options.scales!['x']!;
+		xScale.min = Date.now() - CHART_WINDOW_MS;
+		xScale.max = Date.now();
+
 		this.chart.update('none');
 	}
 
