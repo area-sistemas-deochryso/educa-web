@@ -37,9 +37,11 @@ describe('ErrorGroupsService', () => {
 
 	it('getList llama GET con todos los params filtros + paginación', () => {
 		const expected: ErrorGroupLista[] = [];
-		service.getList('NUEVO', 'CRITICAL', 'BACKEND', 'foo', 2, 30).subscribe((r) => {
-			expect(r).toEqual(expected);
-		});
+		service
+			.getList('NUEVO', 'CRITICAL', 'BACKEND', 'foo', 5, true, 'severidad', 'asc', 2, 30)
+			.subscribe((r) => {
+				expect(r).toEqual(expected);
+			});
 		const req = httpMock.expectOne(
 			(r) =>
 				r.url === apiBase &&
@@ -47,6 +49,10 @@ describe('ErrorGroupsService', () => {
 				r.params.get('severidad') === 'CRITICAL' &&
 				r.params.get('origen') === 'BACKEND' &&
 				r.params.get('q') === 'foo' &&
+				r.params.get('ocurrenciasMin') === '5' &&
+				r.params.get('excluirRuido') === 'true' &&
+				r.params.get('ordenarPor') === 'severidad' &&
+				r.params.get('direccion') === 'asc' &&
 				r.params.get('pagina') === '2' &&
 				r.params.get('pageSize') === '30',
 		);
@@ -55,16 +61,21 @@ describe('ErrorGroupsService', () => {
 	});
 
 	it('getList sin filtros omite params opcionales', () => {
-		service.getList(null, null, null, null, 1, 20).subscribe();
+		service.getList(null, null, null, null, null, false, 'ultimaFecha', 'desc', 1, 20).subscribe();
 		const req = httpMock.expectOne(
-			(r) => r.url === apiBase && !r.params.has('estado') && !r.params.has('severidad'),
+			(r) =>
+				r.url === apiBase &&
+				!r.params.has('estado') &&
+				!r.params.has('severidad') &&
+				!r.params.has('ocurrenciasMin') &&
+				!r.params.has('excluirRuido'),
 		);
 		expect(req.request.params.get('pagina')).toBe('1');
 		req.flush([]);
 	});
 
 	it('getCount llama GET /count y retorna number', () => {
-		service.getCount('NUEVO', null, null, 'q').subscribe((n) => {
+		service.getCount('NUEVO', null, null, 'q', null, false).subscribe((n) => {
 			expect(n).toBe(42);
 		});
 		const req = httpMock.expectOne(

@@ -1,15 +1,21 @@
+/* eslint-disable max-lines -- Razón: store cohesivo de error-groups (listado + filtros + drawer/dialog +
+   ocurrencias + selección múltiple + trend + heatmap + event view). Brief 429 agregó sort +
+   ocurrenciasMin + excluirRuido (4 signals + 4 lecturas + 3 setters), empujando el archivo sobre 300.
+   Partir el store por sub-dominio es un refactor mayor fuera de alcance de este brief. */
 import { Injectable, computed, signal } from '@angular/core';
 
 import {
 	ErrorGroupDetalle,
 	ErrorGroupEstado,
 	ErrorGroupLista,
+	ErrorGroupSortField,
 	ErrorLogCompleto,
 	ErrorOrigen,
 	ErrorSeveridad,
 	HeatmapCalendarCell,
 	HeatmapCell,
 	OcurrenciaLista,
+	SortDireccion,
 } from '../models';
 
 /**
@@ -45,6 +51,16 @@ export class ErrorGroupsStore {
 	 * documentada en el plan: el BE acepta solo 1 estado).
 	 */
 	private readonly _hideResolvedIgnored = signal(false);
+	private readonly _filterOcurrenciasMin = signal<number | null>(null);
+	/**
+	 * Toggle "Ocultar ruido de infra" — a diferencia de hideResolvedIgnored, este
+	 * filtro SÍ dispara refetch server-side (excluirRuido en el BE) porque necesita
+	 * que pagination/conteo reflejen el filtro real, no solo ocultar filas de la
+	 * página ya traída (brief 429).
+	 */
+	private readonly _excluirRuido = signal(false);
+	private readonly _sortField = signal<ErrorGroupSortField>('ultimaFecha');
+	private readonly _sortDireccion = signal<SortDireccion>('desc');
 	// #endregion
 
 	// #region Estado privado — drawer + dialog + ocurrencias
@@ -107,6 +123,10 @@ export class ErrorGroupsStore {
 	readonly filterOrigen = this._filterOrigen.asReadonly();
 	readonly searchTerm = this._searchTerm.asReadonly();
 	readonly hideResolvedIgnored = this._hideResolvedIgnored.asReadonly();
+	readonly filterOcurrenciasMin = this._filterOcurrenciasMin.asReadonly();
+	readonly excluirRuido = this._excluirRuido.asReadonly();
+	readonly sortField = this._sortField.asReadonly();
+	readonly sortDireccion = this._sortDireccion.asReadonly();
 	// #endregion
 
 	// #region Lecturas públicas — drawer + dialog + ocurrencias
@@ -294,12 +314,34 @@ export class ErrorGroupsStore {
 		this._hideResolvedIgnored.set(hide);
 	}
 
+	setFilterOcurrenciasMin(min: number | null): void {
+		this._filterOcurrenciasMin.set(min);
+	}
+
+	setExcluirRuido(excluir: boolean): void {
+		this._excluirRuido.set(excluir);
+	}
+
+	/** Mismo campo → toggle asc/desc. Campo distinto → arranca en desc. */
+	setSort(field: ErrorGroupSortField): void {
+		if (this._sortField() === field) {
+			this._sortDireccion.set(this._sortDireccion() === 'asc' ? 'desc' : 'asc');
+		} else {
+			this._sortField.set(field);
+			this._sortDireccion.set('desc');
+		}
+	}
+
 	clearFilters(): void {
 		this._filterEstado.set(null);
 		this._filterSeveridad.set(null);
 		this._filterOrigen.set(null);
 		this._searchTerm.set('');
 		this._hideResolvedIgnored.set(false);
+		this._filterOcurrenciasMin.set(null);
+		this._excluirRuido.set(false);
+		this._sortField.set('ultimaFecha');
+		this._sortDireccion.set('desc');
 	}
 	// #endregion
 

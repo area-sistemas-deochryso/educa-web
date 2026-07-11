@@ -93,6 +93,46 @@ describe('ErrorGroupsStore', () => {
 		expect(store.hideResolvedIgnored()).toBe(false);
 	});
 
+	// #region Sort + ocurrenciasMin + excluirRuido (brief 429 — P68 F7)
+	it('sortField/sortDireccion default a ultimaFecha/desc', () => {
+		expect(store.sortField()).toBe('ultimaFecha');
+		expect(store.sortDireccion()).toBe('desc');
+	});
+
+	it('setSort con campo nuevo arranca en desc', () => {
+		store.setSort('severidad');
+		expect(store.sortField()).toBe('severidad');
+		expect(store.sortDireccion()).toBe('desc');
+	});
+
+	it('setSort con el mismo campo togglea asc/desc', () => {
+		store.setSort('contadorTotal');
+		expect(store.sortDireccion()).toBe('desc');
+		store.setSort('contadorTotal');
+		expect(store.sortDireccion()).toBe('asc');
+		store.setSort('contadorTotal');
+		expect(store.sortDireccion()).toBe('desc');
+	});
+
+	it('setFilterOcurrenciasMin y setExcluirRuido actualizan sus signals', () => {
+		store.setFilterOcurrenciasMin(5);
+		store.setExcluirRuido(true);
+		expect(store.filterOcurrenciasMin()).toBe(5);
+		expect(store.excluirRuido()).toBe(true);
+	});
+
+	it('clearFilters resetea ocurrenciasMin, excluirRuido y sort al default', () => {
+		store.setFilterOcurrenciasMin(10);
+		store.setExcluirRuido(true);
+		store.setSort('severidad');
+		store.clearFilters();
+		expect(store.filterOcurrenciasMin()).toBeNull();
+		expect(store.excluirRuido()).toBe(false);
+		expect(store.sortField()).toBe('ultimaFecha');
+		expect(store.sortDireccion()).toBe('desc');
+	});
+	// #endregion
+
 	it('openDrawer + closeDrawer sincronizan visibility y selectedGroup', () => {
 		const grp = makeGroup({ id: 7 });
 		store.openDrawer(grp);

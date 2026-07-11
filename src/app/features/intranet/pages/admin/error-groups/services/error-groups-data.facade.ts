@@ -60,6 +60,10 @@ export class ErrorGroupsDataFacade {
 				this.store.filterSeveridad(),
 				this.store.filterOrigen(),
 				this.store.searchTerm() || null,
+				this.store.filterOcurrenciasMin(),
+				this.store.excluirRuido(),
+				this.store.sortField(),
+				this.store.sortDireccion(),
 				this.store.page(),
 				this.store.pageSize(),
 			)
@@ -87,6 +91,8 @@ export class ErrorGroupsDataFacade {
 				this.store.filterSeveridad(),
 				this.store.filterOrigen(),
 				this.store.searchTerm() || null,
+				this.store.filterOcurrenciasMin(),
+				this.store.excluirRuido(),
 			)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
@@ -109,6 +115,10 @@ export class ErrorGroupsDataFacade {
 				this.store.filterSeveridad(),
 				this.store.filterOrigen(),
 				this.store.searchTerm() || null,
+				this.store.filterOcurrenciasMin(),
+				this.store.excluirRuido(),
+				this.store.sortField(),
+				this.store.sortDireccion(),
 				this.store.page(),
 				this.store.pageSize(),
 			)
@@ -137,6 +147,10 @@ export class ErrorGroupsDataFacade {
 				this.store.filterSeveridad(),
 				this.store.filterOrigen(),
 				this.store.searchTerm() || null,
+				this.store.filterOcurrenciasMin(),
+				this.store.excluirRuido(),
+				this.store.sortField(),
+				this.store.sortDireccion(),
 			)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({

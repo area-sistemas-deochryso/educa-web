@@ -84,13 +84,13 @@ export class MonitoreoHubBadgesFacade {
 			firstValueFrom(this.outboxApi.estadisticas()),
 			firstValueFrom(this.outboxApi.deferFailStatus()),
 			firstValueFrom(this.monitoreoApi.getCandidatosBlacklist()),
-			firstValueFrom(this.errorGroups.getCount('NUEVO', null, null, null)),
+			firstValueFrom(this.errorGroups.getCount('NUEVO', null, null, null, null, false)),
 			firstValueFrom(this.feedback.obtenerEstadisticas()),
 			firstValueFrom(this.rateLimit.getStats(1)),
 			firstValueFrom(this.outboxApi.estadisticas(today, today)),
 			firstValueFrom(this.outboxApi.estadisticas(yesterday, yesterday)),
-			firstValueFrom(this.errorGroups.getCount('NUEVO', null, null, null, today, today)),
-			firstValueFrom(this.errorGroups.getCount('NUEVO', null, null, null, yesterday, yesterday)),
+			firstValueFrom(this.errorGroups.getCount('NUEVO', null, null, null, null, false, today, today)),
+			firstValueFrom(this.errorGroups.getCount('NUEVO', null, null, null, null, false, yesterday, yesterday)),
 		]);
 
 		const next: HubBadges = {

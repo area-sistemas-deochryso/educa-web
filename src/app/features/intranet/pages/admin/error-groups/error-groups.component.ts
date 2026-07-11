@@ -14,6 +14,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogModule } from 'primeng/dialog';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
+import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { SelectModule } from 'primeng/select';
@@ -49,6 +50,7 @@ import {
 	CambiarEstadoErrorGroup,
 	ErrorGroupEstado,
 	ErrorGroupLista,
+	ErrorGroupSortField,
 	ErrorLogCompleto,
 	ErrorOrigen,
 	ErrorSeveridad,
@@ -74,6 +76,7 @@ import {
 		DialogModule,
 		IconFieldModule,
 		InputIconModule,
+		InputNumberModule,
 		InputTextModule,
 		PaginatorModule,
 		SelectModule,
@@ -116,6 +119,10 @@ export class ErrorGroupsComponent implements OnInit {
 	readonly filterOrigen = this.store.filterOrigen;
 	readonly searchTerm = this.store.searchTerm;
 	readonly hideResolvedIgnored = this.store.hideResolvedIgnored;
+	readonly filterOcurrenciasMin = this.store.filterOcurrenciasMin;
+	readonly excluirRuido = this.store.excluirRuido;
+	readonly sortField = this.store.sortField;
+	readonly sortDireccion = this.store.sortDireccion;
 	readonly drawerVisible = this.store.drawerVisible;
 	readonly selectedGroup = this.store.selectedGroup;
 	readonly selectedDetalle = this.store.selectedDetalle;
@@ -292,6 +299,25 @@ export class ErrorGroupsComponent implements OnInit {
 
 	onHideResolvedIgnoredChange(hide: boolean): void {
 		this.store.setHideResolvedIgnored(hide);
+	}
+
+	onFilterOcurrenciasMinChange(min: number | null): void {
+		this.store.setFilterOcurrenciasMin(min);
+		this.store.setPage(1);
+		this.dataFacade.loadData();
+	}
+
+	/** A diferencia de hideResolvedIgnored, excluirRuido SÍ dispara refetch (brief 429). */
+	onExcluirRuidoChange(excluir: boolean): void {
+		this.store.setExcluirRuido(excluir);
+		this.store.setPage(1);
+		this.dataFacade.loadData();
+	}
+
+	onSortChange(field: ErrorGroupSortField): void {
+		this.store.setSort(field);
+		this.store.setPage(1);
+		this.dataFacade.loadData();
 	}
 
 	onClearFilters(): void {

@@ -9,6 +9,7 @@ import {
 	ErrorGroupDetalle,
 	ErrorGroupEstado,
 	ErrorGroupLista,
+	ErrorGroupSortField,
 	ErrorGroupTrendDto,
 	ErrorLogCompleto,
 	ErrorLogFull,
@@ -17,6 +18,7 @@ import {
 	HeatmapCalendarCell,
 	HeatmapCell,
 	OcurrenciaLista,
+	SortDireccion,
 } from '../models';
 
 @Injectable({ providedIn: 'root' })
@@ -32,14 +34,22 @@ export class ErrorGroupsService {
 		severidad: ErrorSeveridad | null,
 		origen: ErrorOrigen | null,
 		q: string | null,
+		ocurrenciasMin: number | null,
+		excluirRuido: boolean,
+		ordenarPor: ErrorGroupSortField,
+		direccion: SortDireccion,
 		pagina = 1,
 		pageSize = 20,
 	): Observable<ErrorGroupLista[]> {
-		const params: Record<string, string | number> = { pagina, pageSize };
+		const params: Record<string, string | number | boolean> = {
+			pagina, pageSize, ordenarPor, direccion,
+		};
 		if (estado) params['estado'] = estado;
 		if (severidad) params['severidad'] = severidad;
 		if (origen) params['origen'] = origen;
 		if (q) params['q'] = q;
+		if (ocurrenciasMin !== null && ocurrenciasMin > 0) params['ocurrenciasMin'] = ocurrenciasMin;
+		if (excluirRuido) params['excluirRuido'] = true;
 		return this.http.get<ErrorGroupLista[]>(this.apiUrl, { params });
 	}
 
@@ -48,14 +58,18 @@ export class ErrorGroupsService {
 		severidad: ErrorSeveridad | null,
 		origen: ErrorOrigen | null,
 		q: string | null,
+		ocurrenciasMin: number | null,
+		excluirRuido: boolean,
 		fechaDesde?: string | null,
 		fechaHasta?: string | null,
 	): Observable<number> {
-		const params: Record<string, string> = {};
+		const params: Record<string, string | boolean | number> = {};
 		if (estado) params['estado'] = estado;
 		if (severidad) params['severidad'] = severidad;
 		if (origen) params['origen'] = origen;
 		if (q) params['q'] = q;
+		if (ocurrenciasMin !== null && ocurrenciasMin > 0) params['ocurrenciasMin'] = ocurrenciasMin;
+		if (excluirRuido) params['excluirRuido'] = true;
 		if (fechaDesde) params['fechaDesde'] = fechaDesde;
 		if (fechaHasta) params['fechaHasta'] = fechaHasta;
 		return this.http.get<number>(`${this.apiUrl}/count`, { params });
@@ -153,12 +167,18 @@ export class ErrorGroupsService {
 		severidad: ErrorSeveridad | null,
 		origen: ErrorOrigen | null,
 		q: string | null,
+		ocurrenciasMin: number | null,
+		excluirRuido: boolean,
+		ordenarPor: ErrorGroupSortField,
+		direccion: SortDireccion,
 	): Observable<Blob> {
-		const params: Record<string, string> = {};
+		const params: Record<string, string | boolean> = { ordenarPor, direccion };
 		if (estado) params['estado'] = estado;
 		if (severidad) params['severidad'] = severidad;
 		if (origen) params['origen'] = origen;
 		if (q) params['q'] = q;
+		if (ocurrenciasMin !== null && ocurrenciasMin > 0) params['ocurrenciasMin'] = String(ocurrenciasMin);
+		if (excluirRuido) params['excluirRuido'] = true;
 		return this.http.get(`${this.apiUrl}/export`, { params, responseType: 'blob' });
 	}
 

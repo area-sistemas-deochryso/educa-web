@@ -137,6 +137,15 @@
 			placeholder="Origen"
 			appendTo="body"
 		/>
+		<p-inputNumber
+			[ngModel]="filterOcurrenciasMin()"
+			(ngModelChange)="onFilterOcurrenciasMinChange($event)"
+			placeholder="Ocurrencias mín."
+			[useGrouping]="false"
+			[min]="0"
+			[showButtons]="false"
+			styleClass="ocurrencias-min-input"
+		/>
 	</div>
 
 	<div class="filter-toggle">
@@ -148,6 +157,18 @@
 		/>
 		<label for="hideResolvedIgnored" class="toggle-label">
 			Ocultar resueltos / ignorados
+		</label>
+	</div>
+
+	<div class="filter-toggle" pTooltip="Oculta NETWORK_REVALIDATION_FAILED siempre, y SLOW_REQUEST solo cuando pega contra endpoints de diagnóstico pesados por diseño (ej. db-diagnostics). Fuera de eso, una request lenta sigue siendo señal real." tooltipPosition="top">
+		<p-checkbox
+			inputId="excluirRuido"
+			[ngModel]="excluirRuido()"
+			(ngModelChange)="onExcluirRuidoChange($event)"
+			[binary]="true"
+		/>
+		<label for="excluirRuido" class="toggle-label">
+			Ocultar ruido de infra
 		</label>
 	</div>
 
@@ -286,13 +307,37 @@
 							(onChange)="toggleSelectAll()"
 						/>
 					</th>
-					<th>Severidad</th>
+					<th class="sortable-header" (click)="onSortChange('severidad')">
+						Severidad
+						<i class="pi sort-icon"
+							[class.pi-sort-amount-up-alt]="sortField() === 'severidad' && sortDireccion() === 'asc'"
+							[class.pi-sort-amount-down]="sortField() === 'severidad' && sortDireccion() === 'desc'"
+							[class.pi-sort-alt]="sortField() !== 'severidad'"
+							[class.sort-icon--active]="sortField() === 'severidad'"
+						></i>
+					</th>
 					<th>Estado</th>
 					<th>Mensaje</th>
-					<th>Ocurrencias</th>
+					<th class="sortable-header" (click)="onSortChange('contadorTotal')">
+						Ocurrencias
+						<i class="pi sort-icon"
+							[class.pi-sort-amount-up-alt]="sortField() === 'contadorTotal' && sortDireccion() === 'asc'"
+							[class.pi-sort-amount-down]="sortField() === 'contadorTotal' && sortDireccion() === 'desc'"
+							[class.pi-sort-alt]="sortField() !== 'contadorTotal'"
+							[class.sort-icon--active]="sortField() === 'contadorTotal'"
+						></i>
+					</th>
 					<th>Tendencia 30d</th>
 					<th>Origen</th>
-					<th>Última fecha</th>
+					<th class="sortable-header" (click)="onSortChange('ultimaFecha')">
+						Última fecha
+						<i class="pi sort-icon"
+							[class.pi-sort-amount-up-alt]="sortField() === 'ultimaFecha' && sortDireccion() === 'asc'"
+							[class.pi-sort-amount-down]="sortField() === 'ultimaFecha' && sortDireccion() === 'desc'"
+							[class.pi-sort-alt]="sortField() !== 'ultimaFecha'"
+							[class.sort-icon--active]="sortField() === 'ultimaFecha'"
+						></i>
+					</th>
 					<th>Acciones</th>
 				</tr>
 			</ng-template>

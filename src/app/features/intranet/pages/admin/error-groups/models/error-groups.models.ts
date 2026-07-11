@@ -14,6 +14,11 @@ export const ERROR_GROUP_ESTADOS = [
 ] as const;
 export type ErrorGroupEstado = (typeof ERROR_GROUP_ESTADOS)[number];
 
+/** Brief 429 (P68 F7) — espejo de `ordenarPor` en Educa.API `ErrorGroupController`. */
+export const ERROR_GROUP_SORT_FIELDS = ['ultimaFecha', 'severidad', 'contadorTotal'] as const;
+export type ErrorGroupSortField = (typeof ERROR_GROUP_SORT_FIELDS)[number];
+export type SortDireccion = 'asc' | 'desc';
+
 export const BREADCRUMB_TIPOS_ACCION = [
 	'NAVIGATION',
 	'API_CALL',

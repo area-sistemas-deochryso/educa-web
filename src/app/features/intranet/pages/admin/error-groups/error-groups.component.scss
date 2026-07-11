@@ -163,6 +163,28 @@
 	cursor: pointer;
 }
 
+.sortable-header {
+	cursor: pointer;
+	user-select: none;
+	white-space: nowrap;
+
+	.sort-icon {
+		margin-left: 0.35rem;
+		font-size: 0.75rem;
+		color: var(--text-color-secondary);
+		opacity: 0.5;
+
+		&--active {
+			opacity: 1;
+			color: var(--primary-color);
+		}
+	}
+
+	&:hover .sort-icon {
+		opacity: 0.85;
+	}
+}
+
 .selection-toolbar {
 	display: flex;
 	align-items: center;
