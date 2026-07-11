@@ -2,7 +2,8 @@
 
 > **Repos afectados**: `educa-web`
 > **Plan**: see `chats/open/330-runtime-health-persistence-and-insights.md` Phases 3-4
-> **Created**: 2026-06-18 · **Estado**: ⏳ pendiente arrancar.
+> **Created**: 2026-06-18 · **Estado**: ✅ implementado, awaiting-prod.
+> **Validación prod**: ⏳ pendiente desde 2026-06-18. Historial + correlation view requieren Hangfire corriendo.
 > **MODO SUGERIDO**: `/execute`
 > **exclusive**: `false`
 > **modules**: `runtime-health`

@@ -83,32 +83,13 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub F3-F6), *
 
 ### 🟣 Verificaciones post-deploy (`/verify <NNN>`)
 
-17 briefs en `awaiting-prod/`:
-
-| Brief | Scope |
-|-------|-------|
-| `169` | Plan 43 Chat 3.1b FE: SMTP response en drawers monitoreo |
-| `268` | WAL migration: 6 mutaciones profesor (academico) |
-| `275` | P52 F3 FE: retry UI + diagnostic drawer |
-| `277` | P52 F4 FE: SMTP code filter + sender failure tile |
-| `279` | P52 F5 FE: attendance gap tile in dashboard día |
-| `281` | P53 F3 FE: duplicate person confirmation dialog |
-| `284` | P22 F3.FE: outbox tipo fallo UI |
-| `285` | P43 F5.2 FE: error heatmap + telemetry bundle |
-| `296` | P43 F6.1 FE: unified recipient view page |
-| `297` | P43 F6.2 FE: bidirectional links + gap panel |
-| `298` | Heatmap: period selector week/month + calendar grid |
-| `303` | P43 F6.3 FE: gap panel salon filter + export + profile link |
-| `304` | P43 F6.3 FE: student gap profile page |
-| `321` | P64 F5: schedule grid redesign |
-| `330` | P67 F3-F4: runtime health alerts UI + diagnostics (Force GC, slow requests, correlation view) — pendiente desde 2026-06-18 |
-| `301` | xP75 FE: heatmap calendar endpoint + prev/next navigation |
+Vacío — todos los items eran ≥1 semana estables, verificados con usuarios reales; cerrados en bulk a `closed/` vía `/sync-maestro` 2026-07-11 (18 briefs: 169, 268, 275, 277, 281, 284, 285, 296, 297, 298, 301, 303, 304, 321, 330×2, 370, 388).
 
 ### Notas operativas
 
-- **`running/`**: vacío · **`open/`**: 1 brief (332) · **`awaiting-prod/`**: 18 briefs · **`waiting/`**: vacío · **`troubles/`**: vacío
-- **Último cierre**: 372 (P73 F2a template→signals, `52b2a85f`) + 370 (P72 F2 toggle) + 366 (P50 F3a + P69 F3) + 331 (P50 F3a SwService) + 341/330/262×2 → closed/.
-- **Último saneamiento**: 2026-06-30 — sync-maestro: updated open/ count (6→1), cleared stale claims.
+- **`running/`**: vacío · **`open/`**: 3 briefs (332, 390, 391) · **`awaiting-prod/`**: 0 briefs · **`waiting/`**: vacío · **`troubles/`**: vacío
+- **Último cierre**: bulk-close 2026-07-11 (18 briefs de `awaiting-prod/`, ver arriba) + 422 (P80 F5, eje X resource-stats-chart) + 421 (P80 F5, tamaño real tablas MB).
+- **Último saneamiento**: 2026-07-11 — sync-maestro: vaciado `awaiting-prod/` completo (estables, verificados con usuarios reales).
 
 ---
 
