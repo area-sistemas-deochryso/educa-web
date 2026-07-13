@@ -23,10 +23,13 @@ import {
  * Estado de la carga del trend por grupo. `loaded` con `data: []` significa
  * que el endpoint respondió pero no hay actividad reciente — distinto de
  * `loading` o `error` (en error caemos al placeholder pero NO reintentamos).
+ * `data` son timestamps epoch ms de cada ocurrencia individual (no más
+ * conteos diarios). `truncado` refleja si el BE recortó a 300 ocurrencias.
  */
 export interface TrendCacheEntry {
 	status: 'loading' | 'loaded' | 'error';
 	data: number[];
+	truncado: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -426,10 +429,15 @@ export class ErrorGroupsStore {
 	// #endregion
 
 	// #region Comandos — Trend cache + dialog ampliado
-	setTrendStatus(grupoId: number, status: TrendCacheEntry['status'], data: number[] = []): void {
+	setTrendStatus(
+		grupoId: number,
+		status: TrendCacheEntry['status'],
+		data: number[] = [],
+		truncado = false,
+	): void {
 		this._trendCache.update((map) => {
 			const next = new Map(map);
-			next.set(grupoId, { status, data });
+			next.set(grupoId, { status, data, truncado });
 			return next;
 		});
 	}

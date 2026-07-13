@@ -1,0 +1,19 @@
+:host {
+	display: inline-flex;
+	align-items: center;
+	min-width: 0;
+	width: 100%;
+}
+
+.timeline-container {
+	position: relative;
+	width: 100%;
+	min-width: 0;
+}
+
+.timeline-empty {
+	font-size: 0.7rem;
+	color: var(--text-color-secondary);
+	font-style: italic;
+	letter-spacing: 0.02em;
+}

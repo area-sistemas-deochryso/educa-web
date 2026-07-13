@@ -32,20 +32,20 @@
 
 <div class="card-sparkline">
 	@if (trendLoading()) {
-		<span class="card-sparkline__loading" aria-label="Cargando tendencia">…</span>
+		<span class="card-sparkline__loading" aria-label="Cargando ocurrencias">…</span>
 	} @else {
 		<button
 			type="button"
 			class="card-sparkline__btn"
 			(click)="onSparklineClick($event)"
-			[attr.aria-label]="'Ver tendencia 30 días ampliada de ' + group().mensajeRepresentativo"
-			pTooltip="Ver tendencia 30 días ampliada"
+			[attr.aria-label]="'Ver ocurrencias 30 días ampliado de ' + group().mensajeRepresentativo"
+			pTooltip="Ver ocurrencias 30 días ampliado"
 			tooltipPosition="top"
 		>
-			<app-mini-sparkline
+			<app-error-occurrence-timeline
 				[data]="trendData()"
 				[height]="28"
-				[ariaLabel]="'Tendencia 30 días de ' + group().mensajeRepresentativo"
+				[ariaLabel]="'Ocurrencias de los últimos 30 días de ' + group().mensajeRepresentativo"
 			/>
 		</button>
 	}

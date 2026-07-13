@@ -23,7 +23,6 @@ import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { ErrorGroupsViewMode } from '@core/services/storage';
-import { MiniSparklineComponent } from '@intranet-shared/components';
 import { PageHeaderComponent } from '@intranet-shared/components';
 import { TableSkeletonComponent } from '@intranet-shared/components/table-skeleton';
 
@@ -34,6 +33,7 @@ import { ErrorGroupDetailDrawerComponent } from './components/error-group-detail
 import { ErrorGroupsKanbanBoardComponent } from './components/error-groups-kanban-board';
 import { ErrorGroupsViewToggleComponent } from './components/error-groups-view-toggle';
 import { ErrorHeatmapComponent } from './components/error-heatmap';
+import { ErrorOccurrenceTimelineComponent } from './components/error-occurrence-timeline';
 import { ErrorParetoChartComponent } from './components/error-pareto-chart';
 import { ErrorOccurrenceDrawerComponent } from './components/error-occurrence-drawer';
 import {
@@ -84,7 +84,7 @@ import {
 		TableModule,
 		TagModule,
 		TooltipModule,
-		MiniSparklineComponent,
+		ErrorOccurrenceTimelineComponent,
 		PageHeaderComponent,
 		TableSkeletonComponent,
 		ErrorGroupDetailDrawerComponent,
@@ -152,6 +152,7 @@ export class ErrorGroupsComponent implements OnInit {
 		return g ? this.trendCache().get(g.id) : undefined;
 	});
 	readonly trendDialogData = computed<readonly number[]>(() => this.trendDialogEntry()?.data ?? []);
+	readonly trendDialogTruncado = computed(() => this.trendDialogEntry()?.truncado ?? false);
 
 	readonly page = this.store.page;
 	readonly pageSize = this.store.pageSize;

@@ -133,12 +133,12 @@ export class ErrorGroupsService {
 	}
 
 	/**
-	 * Trend 30d para sparkline (Plan 43 Chat 1.2). Endpoint BE pendiente —
-	 * mientras tanto la response 404/500 cae a array vacío vía catchError en
-	 * el caller, y el componente renderiza el placeholder "sin actividad".
+	 * Timeline de ocurrencias 30d para el gráfico de dispersión (Plan 43 Chat 1.2).
+	 * Si el endpoint falla, el caller cae a cache vacío y el componente renderiza
+	 * el placeholder "sin actividad".
 	 */
-	getTrend(grupoId: number): Observable<ErrorGroupTrendDto[]> {
-		return this.http.get<ErrorGroupTrendDto[]>(`${this.apiUrl}/${grupoId}/trend`);
+	getTrend(grupoId: number): Observable<ErrorGroupTrendDto> {
+		return this.http.get<ErrorGroupTrendDto>(`${this.apiUrl}/${grupoId}/trend`);
 	}
 
 	getHeatmap(days = 7, endDate?: string): Observable<HeatmapCell[]> {

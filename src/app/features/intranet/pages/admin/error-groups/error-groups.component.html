@@ -330,7 +330,7 @@
 							[class.sort-icon--active]="sortField() === 'contadorTotal'"
 						></i>
 					</th>
-					<th>Tendencia 30d</th>
+					<th>Ocurrencias 30d</th>
 					<th>Origen</th>
 					<th class="sortable-header" (click)="onSortChange('ultimaFecha')">
 						Última fecha
@@ -387,14 +387,14 @@
 						<button
 							type="button"
 							class="sparkline-cell-btn"
-							pTooltip="Ver tendencia 30 días ampliada"
+							pTooltip="Ver ocurrencias 30 días ampliado"
 							tooltipPosition="top"
-							[attr.aria-label]="'Ver tendencia 30 días ampliada de ' + item.mensajeRepresentativo"
+							[attr.aria-label]="'Ver ocurrencias 30 días ampliado de ' + item.mensajeRepresentativo"
 						>
-							<app-mini-sparkline
+							<app-error-occurrence-timeline
 								[data]="trendCache().get(item.id)?.data ?? []"
 								[height]="24"
-								[ariaLabel]="'Tendencia 30 días de ' + item.mensajeRepresentativo"
+								[ariaLabel]="'Ocurrencias de los últimos 30 días de ' + item.mensajeRepresentativo"
 							/>
 						</button>
 					</td>
@@ -502,19 +502,24 @@
 	[draggable]="false"
 	[resizable]="false"
 	[style]="{ width: '720px', maxWidth: '95vw' }"
-	[header]="trendDialogGroup() ? 'Tendencia 30 días — ' + trendDialogGroup()!.mensajeRepresentativo : 'Tendencia 30 días'"
+	[header]="trendDialogGroup() ? 'Ocurrencias 30 días — ' + trendDialogGroup()!.mensajeRepresentativo : 'Ocurrencias 30 días'"
 >
 	@if (trendDialogGroup()) {
 		<div class="trend-dialog-content">
-			<app-mini-sparkline
+			<app-error-occurrence-timeline
 				[data]="trendDialogData()"
 				[height]="200"
 				color="var(--p-primary-color)"
-				[ariaLabel]="'Tendencia 30 días ampliada de ' + trendDialogGroup()!.mensajeRepresentativo"
+				[ariaLabel]="'Ocurrencias de los últimos 30 días ampliado de ' + trendDialogGroup()!.mensajeRepresentativo"
 			/>
 			<p class="trend-dialog-hint">
-				Ocurrencias por día — últimos 30 días. El último punto destacado corresponde a hoy.
+				Cada punto es una ocurrencia individual — últimos 30 días.
 			</p>
+			@if (trendDialogTruncado()) {
+				<small class="trend-dialog-truncated">
+					Mostrando las últimas 300 ocurrencias
+				</small>
+			}
 		</div>
 	}
 </p-dialog>

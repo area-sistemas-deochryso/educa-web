@@ -39,18 +39,19 @@ export class ErrorGroupsTrendQueue {
 	private fetchTrendNow(grupoId: number): void {
 		this.trendInFlight++;
 		this.takeUntilDestroyed(this.api.getTrend(grupoId)).subscribe({
-			next: (trend: ErrorGroupTrendDto[]) => {
+			next: (trend: ErrorGroupTrendDto) => {
 				this.store.setTrendStatus(
 					grupoId,
 					'loaded',
-					(trend ?? []).map((p) => p.count),
+					(trend?.timestamps ?? []).map((t) => new Date(t).getTime()),
+					trend?.truncado ?? false,
 				);
 				this.trendInFlight--;
 				this.drainTrendQueue();
 			},
 			error: (err) => {
 				logger.warn(`[ErrorGroupsTrendQueue] Trend ${grupoId} no disponible`, err);
-				this.store.setTrendStatus(grupoId, 'error', []);
+				this.store.setTrendStatus(grupoId, 'error', [], false);
 				this.trendInFlight--;
 				this.drainTrendQueue();
 			},

@@ -1,0 +1,17 @@
+@if (data().length > 0) {
+	<div class="timeline-container" [style.height.px]="height()">
+		<canvas
+			#timelineChart
+			role="img"
+			[attr.aria-label]="ariaLabel() ?? 'Ocurrencias en los últimos 30 días'"
+		></canvas>
+	</div>
+} @else {
+	<span
+		class="timeline-empty"
+		role="img"
+		[attr.aria-label]="ariaLabel() ?? 'Sin actividad en los últimos 30 días'"
+	>
+		sin actividad
+	</span>
+}

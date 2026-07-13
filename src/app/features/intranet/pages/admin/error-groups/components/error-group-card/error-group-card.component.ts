@@ -11,8 +11,6 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { MiniSparklineComponent } from '@intranet-shared/components';
-
 import {
 	ErrorGroupLista,
 	ErrorOrigen,
@@ -21,6 +19,7 @@ import {
 	SEVERIDAD_SEVERITY_MAP,
 } from '../../models';
 import type { TrendCacheEntry } from '../../services';
+import { ErrorOccurrenceTimelineComponent } from '../error-occurrence-timeline';
 
 /**
  * Card presentacional para la vista Kanban del feature `error-groups`.
@@ -31,7 +30,7 @@ import type { TrendCacheEntry } from '../../services';
 	selector: 'app-error-group-card',
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [CommonModule, DatePipe, TagModule, TooltipModule, MiniSparklineComponent],
+	imports: [CommonModule, DatePipe, TagModule, TooltipModule, ErrorOccurrenceTimelineComponent],
 	templateUrl: './error-group-card.component.html',
 	styleUrl: './error-group-card.component.scss',
 	host: {

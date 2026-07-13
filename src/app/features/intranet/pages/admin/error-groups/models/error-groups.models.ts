@@ -91,17 +91,18 @@ export interface CambiarEstadoErrorGroup {
 }
 
 /**
- * Punto diario del trend 30d (Plan 43 Chat 1.2).
- * Espejo del DTO BE `ErrorGroupTrendDto` cuando el endpoint
- * `GET /api/sistema/error-groups/{id}/trend` esté disponible.
+ * Timeline de ocurrencias individuales en la ventana de 30d (Plan 43 Chat 1.2,
+ * actualizado para timeline/strip-plot). Espejo del DTO BE `ErrorGroupTrendDto`
+ * de `GET /api/sistema/error-groups/{id}/trend`.
  *
- * Contrato esperado: array de exactamente 30 elementos en orden cronológico
- * ascendente (día 1 = hace 29 días, día 30 = hoy). Si el endpoint todavía no
- * existe, el componente cae al placeholder "sin actividad".
+ * Contrato: `timestamps` son las fechas ISO de cada ocurrencia individual del
+ * grupo en la ventana de 30 días, en orden cronológico ascendente, capadas a
+ * un máximo de 300. `truncado=true` indica que el grupo tiene más de 300
+ * ocurrencias en la ventana y el array fue recortado.
  */
 export interface ErrorGroupTrendDto {
-	fecha: string;
-	count: number;
+	timestamps: string[];
+	truncado: boolean;
 }
 
 export interface HeatmapCell {
