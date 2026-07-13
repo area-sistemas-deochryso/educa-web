@@ -2,7 +2,9 @@ import {
 	ChangeDetectionStrategy,
 	Component,
 	OnInit,
+	effect,
 	inject,
+	input,
 	output,
 	signal,
 } from '@angular/core';
@@ -36,6 +38,13 @@ export class ErrorGroupsViewToggleComponent implements OnInit {
 
 	readonly modeChange = output<ErrorGroupsViewMode>();
 
+	/**
+	 * Sync visual desde afuera (drill-down del heatmap, brief 432 P68 F8.2):
+	 * refleja un cambio de vista programático sin pasar por `onModeChange`,
+	 * así NO se persiste como preferencia default del usuario.
+	 */
+	readonly activeMode = input<ErrorGroupsViewMode | null>(null);
+
 	readonly viewMode = signal<ErrorGroupsViewMode>('kanban');
 
 	readonly options: ToggleOption[] = [
@@ -45,6 +54,15 @@ export class ErrorGroupsViewToggleComponent implements OnInit {
 		{ label: 'Heatmap', value: 'heatmap', icon: 'pi pi-calendar' },
 		{ label: 'Priorización', value: 'pareto', icon: 'pi pi-chart-bar' },
 	];
+
+	constructor() {
+		effect(() => {
+			const mode = this.activeMode();
+			if (mode && mode !== this.viewMode()) {
+				this.viewMode.set(mode);
+			}
+		});
+	}
 
 	ngOnInit(): void {
 		const persisted = this.storage.getErrorGroupsViewMode();

@@ -94,4 +94,18 @@ describe('ErrorGroupsViewToggleComponent', () => {
 		expect(component.viewMode()).toBe('table');
 		expect(spy).not.toHaveBeenCalled();
 	});
+
+	// #region Sync visual (drill-down del heatmap, brief 432 P68 F8.2)
+	it('activeMode sincroniza el signal visual sin persistir en localStorage', () => {
+		build();
+		expect(component.viewMode()).toBe('kanban');
+
+		fixture.componentRef.setInput('activeMode', 'table');
+		fixture.detectChanges();
+
+		expect(component.viewMode()).toBe('table');
+		const prefs = TestBed.inject(StorageService);
+		expect(prefs.getErrorGroupsViewMode()).toBe('kanban');
+	});
+	// #endregion
 });

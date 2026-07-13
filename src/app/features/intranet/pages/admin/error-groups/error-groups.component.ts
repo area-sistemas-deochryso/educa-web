@@ -173,6 +173,9 @@ export class ErrorGroupsComponent implements OnInit {
 	readonly viewMode = signal<ErrorGroupsViewMode>('kanban');
 	readonly hubFiltered = signal(false);
 	readonly hubFilterMessage = signal('');
+	/** Drill-down del heatmap (brief 432, P68 F8.2). */
+	readonly drillFiltered = signal(false);
+	readonly drillFilterMessage = signal('');
 
 	readonly eventItems = this.store.eventItems;
 	readonly eventLoading = this.store.eventLoading;
@@ -330,12 +333,26 @@ export class ErrorGroupsComponent implements OnInit {
 		this.store.clearFilters();
 		this.store.setPage(1);
 		this.hubFiltered.set(false);
+		this.drillFiltered.set(false);
 		this.dataFacade.loadData();
 		this.syncUrl();
 	}
 
 	clearHubFilter(): void {
 		this.onClearFilters();
+	}
+
+	/** Drill-down del heatmap (brief 432, P68 F8.2) — reusa la vista tabla existente. */
+	onHeatmapCellClick(dateIso: string): void {
+		this.store.setFilterOcurrenciaFecha(dateIso);
+		this.store.setPage(1);
+		this.viewMode.set('table');
+		this.drillFiltered.set(true);
+		const fechaLabel = new Date(`${dateIso}T00:00:00`).toLocaleDateString('es-PE', {
+			day: '2-digit', month: '2-digit', year: 'numeric',
+		});
+		this.drillFilterMessage.set(`Filtrado desde el heatmap — mostrando errores del ${fechaLabel}`);
+		this.dataFacade.loadData();
 	}
 
 	onPageChange(event: PaginatorState): void {

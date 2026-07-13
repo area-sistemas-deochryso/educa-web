@@ -6,6 +6,14 @@
 	/>
 }
 
+@if (drillFiltered()) {
+	<app-hub-context-banner
+		[level]="null"
+		[message]="drillFilterMessage()"
+		(clearFilter)="onClearFilters()"
+	/>
+}
+
 <!-- #region Header -->
 <app-page-header
 	icon="pi pi-bolt"
@@ -13,7 +21,7 @@
 	subtitle="Grupos de errores agrupados por fingerprint con cambio de estado y triage"
 >
 	<div class="header-actions">
-		<app-error-groups-view-toggle (modeChange)="onViewModeChange($event)" />
+		<app-error-groups-view-toggle [activeMode]="viewMode()" (modeChange)="onViewModeChange($event)" />
 		<button
 			pButton
 			icon="pi pi-download"
@@ -183,6 +191,7 @@
 		[endDate]="store.heatmapEndDate()"
 		(periodChange)="onHeatmapPeriodChange($event)"
 		(endDateChange)="onHeatmapEndDateChange($event)"
+		(cellClick)="onHeatmapCellClick($event)"
 	/>
 } @else if (viewMode() === 'events') {
 	<!-- Vista por eventos individuales (Plan 45 F2.2) -->

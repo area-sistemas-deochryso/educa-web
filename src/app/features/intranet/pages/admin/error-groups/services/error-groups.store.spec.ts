@@ -133,6 +133,19 @@ describe('ErrorGroupsStore', () => {
 	});
 	// #endregion
 
+	// #region Drill-down del heatmap (brief 432 — P68 F8.2)
+	it('setFilterOcurrenciaFecha actualiza el signal', () => {
+		store.setFilterOcurrenciaFecha('2026-07-10');
+		expect(store.filterOcurrenciaFecha()).toBe('2026-07-10');
+	});
+
+	it('clearFilters resetea filterOcurrenciaFecha al default', () => {
+		store.setFilterOcurrenciaFecha('2026-07-10');
+		store.clearFilters();
+		expect(store.filterOcurrenciaFecha()).toBeNull();
+	});
+	// #endregion
+
 	it('openDrawer + closeDrawer sincronizan visibility y selectedGroup', () => {
 		const grp = makeGroup({ id: 7 });
 		store.openDrawer(grp);

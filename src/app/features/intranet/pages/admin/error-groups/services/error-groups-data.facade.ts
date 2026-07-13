@@ -74,6 +74,7 @@ export class ErrorGroupsDataFacade {
 				this.store.sortDireccion(),
 				this.store.page(),
 				this.store.pageSize(),
+				this.store.filterOcurrenciaFecha(),
 			)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
@@ -101,6 +102,9 @@ export class ErrorGroupsDataFacade {
 				this.store.searchTerm() || null,
 				this.store.filterOcurrenciasMin(),
 				this.store.excluirRuido(),
+				null,
+				null,
+				this.store.filterOcurrenciaFecha(),
 			)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
@@ -129,6 +133,7 @@ export class ErrorGroupsDataFacade {
 				this.store.sortDireccion(),
 				this.store.page(),
 				this.store.pageSize(),
+				this.store.filterOcurrenciaFecha(),
 			)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
@@ -159,6 +164,7 @@ export class ErrorGroupsDataFacade {
 				this.store.excluirRuido(),
 				this.store.sortField(),
 				this.store.sortDireccion(),
+				this.store.filterOcurrenciaFecha(),
 			)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({

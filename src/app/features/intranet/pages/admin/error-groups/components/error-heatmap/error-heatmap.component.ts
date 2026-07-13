@@ -24,6 +24,7 @@ interface GridCell {
 
 interface CalendarGridCell {
 	date: Date | null;
+	dateIso: string | null;
 	count: number;
 	avgDuration: number;
 	intensity: number;
@@ -53,6 +54,8 @@ export class ErrorHeatmapComponent {
 
 	readonly periodChange = output<7 | 30>();
 	readonly endDateChange = output<Date | null>();
+	/** Drill-down (brief 432, P68 F8.2) — solo celdas del calendario con count > 0. */
+	readonly cellClick = output<string>();
 
 	readonly periodOptions: HeatmapPeriodOption[] = [
 		{ label: 'Semanal', value: 7 },
@@ -138,7 +141,7 @@ export class ErrorHeatmapComponent {
 
 		const allDays: CalendarGridCell[] = [];
 		for (let i = 0; i < firstDow; i++) {
-			allDays.push({ date: null, count: 0, avgDuration: 0, intensity: 0, tooltip: '', dayLabel: '' });
+			allDays.push({ date: null, dateIso: null, count: 0, avgDuration: 0, intensity: 0, tooltip: '', dayLabel: '' });
 		}
 
 		const cursor = new Date(start);
@@ -150,10 +153,11 @@ export class ErrorHeatmapComponent {
 			const intensity = count / maxCount;
 			const dayNum = cursor.getDate();
 			const tooltip = count > 0
-				? `${dayNum} — ${count} error${count !== 1 ? 'es' : ''}, ${Math.round(avgDuration)}ms prom.`
+				? `${dayNum} — ${count} error${count !== 1 ? 'es' : ''}, ${Math.round(avgDuration)}ms prom. (click para ver los grupos)`
 				: `${dayNum} — sin errores`;
 			allDays.push({
 				date: new Date(cursor),
+				dateIso: dateStr,
 				count,
 				avgDuration,
 				intensity,
@@ -169,11 +173,16 @@ export class ErrorHeatmapComponent {
 		}
 		const lastWeek = weeks[weeks.length - 1];
 		while (lastWeek.length < 7) {
-			lastWeek.push({ date: null, count: 0, avgDuration: 0, intensity: 0, tooltip: '', dayLabel: '' });
+			lastWeek.push({ date: null, dateIso: null, count: 0, avgDuration: 0, intensity: 0, tooltip: '', dayLabel: '' });
 		}
 
 		return weeks;
 	});
+
+	onCalendarCellClick(cell: CalendarGridCell): void {
+		if (!cell.dateIso || cell.count === 0) return;
+		this.cellClick.emit(cell.dateIso);
+	}
 
 	onPeriodChange(value: 7 | 30): void {
 		this.periodChange.emit(value);

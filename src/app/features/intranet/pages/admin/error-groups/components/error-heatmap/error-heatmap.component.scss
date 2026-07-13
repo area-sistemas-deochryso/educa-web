@@ -188,6 +188,15 @@
 			outline: none;
 		}
 	}
+
+	&--clickable {
+		cursor: pointer;
+
+		&:focus-visible {
+			outline: 2px solid var(--p-primary-color);
+			outline-offset: 1px;
+		}
+	}
 }
 
 .calendar-day-number {

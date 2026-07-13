@@ -97,11 +97,16 @@
 						@if (cell.date) {
 							<span
 								class="calendar-cell"
-								role="cell"
+								[class.calendar-cell--clickable]="cell.count > 0"
+								[attr.role]="cell.count > 0 ? 'button' : 'cell'"
+								[attr.tabindex]="cell.count > 0 ? 0 : null"
 								[style.background-color]="getCellColor(cell.intensity)"
 								[pTooltip]="cell.tooltip"
 								tooltipPosition="top"
 								[attr.aria-label]="cell.tooltip"
+								(click)="onCalendarCellClick(cell)"
+								(keydown.enter)="onCalendarCellClick(cell)"
+								(keydown.space)="$event.preventDefault(); onCalendarCellClick(cell)"
 							>
 								<span class="calendar-day-number">{{ cell.dayLabel }}</span>
 							</span>

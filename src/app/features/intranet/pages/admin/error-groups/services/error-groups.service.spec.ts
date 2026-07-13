@@ -74,6 +74,16 @@ describe('ErrorGroupsService', () => {
 		req.flush([]);
 	});
 
+	it('getList con ocurrenciaFecha (drill-down del heatmap) agrega el param', () => {
+		service
+			.getList(null, null, null, null, null, false, 'ultimaFecha', 'desc', 1, 20, '2026-07-10')
+			.subscribe();
+		const req = httpMock.expectOne(
+			(r) => r.url === apiBase && r.params.get('ocurrenciaFecha') === '2026-07-10',
+		);
+		req.flush([]);
+	});
+
 	it('getCount llama GET /count y retorna number', () => {
 		service.getCount('NUEVO', null, null, 'q', null, false).subscribe((n) => {
 			expect(n).toBe(42);

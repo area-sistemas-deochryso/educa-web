@@ -65,6 +65,12 @@ export class ErrorGroupsStore {
 	private readonly _excluirRuido = signal(false);
 	private readonly _sortField = signal<ErrorGroupSortField>('ultimaFecha');
 	private readonly _sortDireccion = signal<SortDireccion>('desc');
+	/**
+	 * Drill-down del heatmap (brief 432, P68 F8.2) — `YYYY-MM-DD` del día
+	 * clickeado. Dispara refetch server-side igual que el resto de los
+	 * filtros (F7); el BE filtra por "el grupo tuvo ≥1 ocurrencia ese día".
+	 */
+	private readonly _filterOcurrenciaFecha = signal<string | null>(null);
 	// #endregion
 
 	// #region Estado privado — drawer + dialog + ocurrencias
@@ -136,6 +142,7 @@ export class ErrorGroupsStore {
 	readonly excluirRuido = this._excluirRuido.asReadonly();
 	readonly sortField = this._sortField.asReadonly();
 	readonly sortDireccion = this._sortDireccion.asReadonly();
+	readonly filterOcurrenciaFecha = this._filterOcurrenciaFecha.asReadonly();
 	// #endregion
 
 	// #region Lecturas públicas — drawer + dialog + ocurrencias
@@ -356,6 +363,11 @@ export class ErrorGroupsStore {
 		this._excluirRuido.set(false);
 		this._sortField.set('ultimaFecha');
 		this._sortDireccion.set('desc');
+		this._filterOcurrenciaFecha.set(null);
+	}
+
+	setFilterOcurrenciaFecha(fecha: string | null): void {
+		this._filterOcurrenciaFecha.set(fecha);
 	}
 	// #endregion
 

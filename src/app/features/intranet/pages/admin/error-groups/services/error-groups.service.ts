@@ -41,6 +41,7 @@ export class ErrorGroupsService {
 		direccion: SortDireccion,
 		pagina = 1,
 		pageSize = 20,
+		ocurrenciaFecha?: string | null,
 	): Observable<ErrorGroupLista[]> {
 		const params: Record<string, string | number | boolean> = {
 			pagina, pageSize, ordenarPor, direccion,
@@ -51,6 +52,7 @@ export class ErrorGroupsService {
 		if (q) params['q'] = q;
 		if (ocurrenciasMin !== null && ocurrenciasMin > 0) params['ocurrenciasMin'] = ocurrenciasMin;
 		if (excluirRuido) params['excluirRuido'] = true;
+		if (ocurrenciaFecha) params['ocurrenciaFecha'] = ocurrenciaFecha;
 		return this.http.get<ErrorGroupLista[]>(this.apiUrl, { params });
 	}
 
@@ -63,6 +65,7 @@ export class ErrorGroupsService {
 		excluirRuido: boolean,
 		fechaDesde?: string | null,
 		fechaHasta?: string | null,
+		ocurrenciaFecha?: string | null,
 	): Observable<number> {
 		const params: Record<string, string | boolean | number> = {};
 		if (estado) params['estado'] = estado;
@@ -73,6 +76,7 @@ export class ErrorGroupsService {
 		if (excluirRuido) params['excluirRuido'] = true;
 		if (fechaDesde) params['fechaDesde'] = fechaDesde;
 		if (fechaHasta) params['fechaHasta'] = fechaHasta;
+		if (ocurrenciaFecha) params['ocurrenciaFecha'] = ocurrenciaFecha;
 		return this.http.get<number>(`${this.apiUrl}/count`, { params });
 	}
 
@@ -179,6 +183,7 @@ export class ErrorGroupsService {
 		excluirRuido: boolean,
 		ordenarPor: ErrorGroupSortField,
 		direccion: SortDireccion,
+		ocurrenciaFecha?: string | null,
 	): Observable<Blob> {
 		const params: Record<string, string | boolean> = { ordenarPor, direccion };
 		if (estado) params['estado'] = estado;
@@ -187,6 +192,7 @@ export class ErrorGroupsService {
 		if (q) params['q'] = q;
 		if (ocurrenciasMin !== null && ocurrenciasMin > 0) params['ocurrenciasMin'] = String(ocurrenciasMin);
 		if (excluirRuido) params['excluirRuido'] = true;
+		if (ocurrenciaFecha) params['ocurrenciaFecha'] = ocurrenciaFecha;
 		return this.http.get(`${this.apiUrl}/export`, { params, responseType: 'blob' });
 	}
 
