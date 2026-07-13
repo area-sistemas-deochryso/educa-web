@@ -1,7 +1,8 @@
 import { Injectable, inject, DestroyRef } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { environment } from '@config/environment';
-import { logger, withRetry } from '@core/helpers';
+import { logger, parseProblemDetails, withRetry } from '@core/helpers';
 import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
 import { UI_SUMMARIES, UI_ESTUDIANTE_ERROR_DETAILS, UI_ATTACHMENT_MESSAGES } from '@shared/constants';
 import { SmartNotificationService, ActividadSnapshot } from '@core/services/notifications';
@@ -212,15 +213,19 @@ export class EstudianteCursosFacade {
 		file: File,
 		register: (blob: { url: string }) => import('rxjs').Observable<T>,
 		onRegistered: (result: T) => void,
+		onRegisterError?: (err: HttpErrorResponse) => boolean,
 	): void {
 		this.store.setSaving(true);
 		this.api.uploadFile(file).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
 			next: (blob) => {
 				register(blob).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
 					next: (result) => { onRegistered(result); this.store.setSaving(false); },
-					error: (err) => {
+					error: (err: HttpErrorResponse) => {
 						logger.error('EstudianteCursosFacade: Error al registrar', err);
-						this.errorHandler.showError(UI_SUMMARIES.error, UI_ATTACHMENT_MESSAGES.registerFailed);
+						const handled = onRegisterError?.(err) ?? false;
+						if (!handled) {
+							this.errorHandler.showError(UI_SUMMARIES.error, UI_ATTACHMENT_MESSAGES.registerFailed);
+						}
 						this.store.setSaving(false);
 					},
 				});
@@ -289,7 +294,22 @@ export class EstudianteCursosFacade {
 			file,
 			(blob) => this.api.registrarTareaArchivo(tareaId, this.buildTareaRequest(file, blob.url)),
 			(archivo) => this.store.addMiTareaArchivo(tareaId, archivo),
+			(err) => this.handleTareaRegisterError(err),
 		);
+	}
+
+	/**
+	 * INV-T04 (brief 412 Paso 2): el periodo del salón puede cerrarse entre que el
+	 * estudiante abre el diálogo y sube el archivo — el BE es la fuente de verdad.
+	 * Devuelve true si mostró feedback específico (el llamador no debe mostrar el genérico).
+	 */
+	private handleTareaRegisterError(err: HttpErrorResponse): boolean {
+		const problem = parseProblemDetails(err);
+		if (problem.errorCode === 'TAREA_PERIODO_CERRADO') {
+			this.errorHandler.showError(UI_SUMMARIES.error, problem.detail ?? UI_ATTACHMENT_MESSAGES.periodoCerrado);
+			return true;
+		}
+		return false;
 	}
 
 	private buildTareaRequest(file: File, url: string): RegistrarEstudianteTareaArchivoRequest {

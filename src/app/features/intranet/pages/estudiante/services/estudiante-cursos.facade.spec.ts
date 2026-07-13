@@ -1,8 +1,9 @@
 // * Tests for EstudianteCursosFacade — validates student course orchestration.
 // #region Imports
 import { TestBed } from '@angular/core/testing';
+import { HttpErrorResponse } from '@angular/common/http';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 
 import { EstudianteCursosFacade } from './estudiante-cursos.facade';
 import { EstudianteCursosStore } from './estudiante-cursos.store';
@@ -32,6 +33,8 @@ function createMockApi() {
 		getMisNotas: vi.fn().mockReturnValue(of([])),
 		getMisNotasCurso: vi.fn().mockReturnValue(of(null)),
 		getMiAsistencia: vi.fn().mockReturnValue(of(null)),
+		uploadFile: vi.fn().mockReturnValue(of({ url: 'https://blob.test/entrega.pdf' })),
+		registrarTareaArchivo: vi.fn(),
 	};
 }
 // #endregion
@@ -106,6 +109,40 @@ describe('EstudianteCursosFacade', () => {
 			facade.loadMisArchivos(1);
 
 			expect(api.getMisArchivos).not.toHaveBeenCalled();
+		});
+	});
+	// #endregion
+
+	// #region uploadTareaArchivo — INV-T04 (brief 412 Paso 2)
+	describe('uploadTareaArchivo', () => {
+		it('should show the backend message when the period is closed (TAREA_PERIODO_CERRADO)', () => {
+			const errorHandler = TestBed.inject(ErrorHandlerService);
+			const httpError = new HttpErrorResponse({
+				status: 400,
+				error: {
+					errorCode: 'TAREA_PERIODO_CERRADO',
+					detail: 'No se puede entregar esta tarea: el periodo académico ya está cerrado.',
+				},
+			});
+			api.registrarTareaArchivo.mockReturnValue(throwError(() => httpError));
+
+			facade.uploadTareaArchivo(100, new File(['x'], 'entrega.pdf'));
+
+			expect(errorHandler.showError).toHaveBeenCalledWith(
+				expect.any(String),
+				'No se puede entregar esta tarea: el periodo académico ya está cerrado.',
+			);
+		});
+
+		it('should show the generic message for other register errors', () => {
+			const errorHandler = TestBed.inject(ErrorHandlerService);
+			api.registrarTareaArchivo.mockReturnValue(
+				throwError(() => new HttpErrorResponse({ status: 500, error: {} })),
+			);
+
+			facade.uploadTareaArchivo(100, new File(['x'], 'entrega.pdf'));
+
+			expect(errorHandler.showError).toHaveBeenCalledWith(expect.any(String), 'No se pudo registrar el archivo');
 		});
 	});
 	// #endregion

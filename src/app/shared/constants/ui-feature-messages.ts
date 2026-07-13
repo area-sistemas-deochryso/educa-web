@@ -75,6 +75,7 @@ export const UI_ATTACHMENT_MESSAGES = {
 	deleteFailed: 'No se pudo eliminar el archivo',
 	loadStudentFilesFailed: 'No se pudo cargar los archivos de estudiantes',
 	loadSubmissionsFailed: 'No se pudo cargar las entregas de estudiantes',
+	periodoCerrado: 'No se puede entregar: el periodo académico ya está cerrado',
 } as const;
 
 // #endregion
