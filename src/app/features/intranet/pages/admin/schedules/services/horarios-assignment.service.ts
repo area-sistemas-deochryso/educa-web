@@ -1,4 +1,5 @@
 import { inject, Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { facadeErrorHandler } from '@core/helpers';
 import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
@@ -25,6 +26,7 @@ export class SchedulesAssignmentService {
   private api = inject(SchedulesApiService);
   private store = inject(SchedulesStore);
   private errorHandler = inject(ErrorHandlerService);
+  private router = inject(Router);
 
   private wal = inject(WalFacadeHelper);
   private readonly apiUrl = `${environment.apiUrl}/api/horario`;
@@ -32,6 +34,7 @@ export class SchedulesAssignmentService {
     tag: 'SchedulesAssignmentService',
     errorHandler: this.errorHandler,
     policy: HORARIO_ERROR_POLICY,
+    router: this.router,
   });
 
   // #region Asignar

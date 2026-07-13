@@ -39,10 +39,22 @@ Reproducido en `/admin/horarios` → detalle de un horario en salón "Tutor plen
 
 ## Criterio de cierre
 
-- [ ] El error `INV_AS01_TUTOR_PLENO` disparado desde el drawer de Horarios muestra la misma acción navegable que en Salones.
-- [ ] FE: lint + build + tests OK.
-- [ ] Verificado visualmente en browser.
+- [x] El error `INV_AS01_TUTOR_PLENO` disparado desde el drawer de Horarios muestra la misma acción navegable que en Salones.
+- [x] FE: lint + build + tests OK.
+- [x] Verificado visualmente en browser.
 
 ## Tiempo estimado
 
 ~30-45 min (una vez confirmado el mecanismo exacto del panel de error local).
+
+## Resolución (2026-07-13)
+
+Causa raíz confirmada: `SchedulesAssignmentService.asignarProfesor()` usa `WalFacadeHelper.execute()`, que marca sus requests con `X-Skip-Error-Toast` — el interceptor HTTP global (`errorInterceptor` → `ErrorHandlerService.handleHttpError()`, el que sí resuelve `suggestedAction`) se salta esas requests a propósito, delegando el toast al `onError` local del facade. Ese `onError` llamaba a `facadeErrorHandler.handle()` (`@core/helpers/error-policy.ts`), que solo hacía `errorHandler.showError(summary, message)` **sin** acción — el mismo `showError`/`showWarning` sí acepta un parámetro `action`, simplemente nadie lo estaba calculando en esa capa.
+
+Fix (`src/app/core/helpers/error-policy.ts`): `facadeErrorHandler` ahora acepta un `router` opcional en su config; cuando se provee, `handle()` resuelve la misma `suggestedAction` (BE vía `parseProblemDetails`, INV-PD05, con fallback a `UI_ERROR_CODE_ACTIONS`) que ya resuelve `handleHttpError()`, y la pasa como `action` a `showError`/`showWarning`. Cambio no rompe consumidores existentes de `facadeErrorHandler` que no pasan `router` (comportamiento idéntico al actual).
+
+`src/app/features/intranet/pages/admin/schedules/services/horarios-assignment.service.ts`: inyecta `Router` y lo pasa a su `facadeErrorHandler({..., router: this.router})`. Único consumidor tocado — el resto de facades que usan `facadeErrorHandler` quedan sin cambios de comportamiento (scope acotado al drawer de Horarios, per brief).
+
+Verificado en vivo (browser, TEST DB `UseTestEnv=true`): salón "INICIAL 3 AÑOS A" (modo Tutor pleno, tutor RAMOS VERA DURBY ANGELICA) → asignar profesor distinto desde `/admin/horarios` → toast "En este salón (tutor pleno), el profesor del horario debe ser el tutor asignado" con botón **"Asignar tutor en Salones"** visible (confirmado 2 veces, antes ausente). Sin errores de consola.
+
+Lint + build + suite completa (225 archivos, 2343 tests) OK tras el fix. Un fix de test inicial: mi primer intento pasaba `undefined, undefined` explícitos a `showError`/`showWarning` cuando no había acción, lo que rompía 2 specs con `toHaveBeenCalledWith` estricto (`email-outbox-data.facade.spec.ts`); corregido llamando con la aridad exacta según si hay `action` o no.

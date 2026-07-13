@@ -1,9 +1,11 @@
 import { HttpErrorResponse } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 import { ErrorHandlerService } from '@core/services/error';
-import { UI_ERROR_CODES, UI_SUMMARIES } from '@app/shared/constants';
+import { UI_ERROR_CODE_ACTIONS, UI_ERROR_CODES, UI_SUMMARIES } from '@app/shared/constants';
 import { logger } from './logs/logger';
 import { extractErrorMessage } from './error.utils';
+import { parseProblemDetails } from './problem-details.adapter';
 
 // #region Types
 
@@ -30,6 +32,13 @@ export interface FacadeErrorHandlerConfig {
 	errorHandler: ErrorHandlerService;
 	/** Política custom. Si no se provee, usa la default. */
 	policy?: ErrorPolicy;
+	/**
+	 * Router inyectado en el facade. Si se provee, `handle()` resuelve la misma
+	 * `suggestedAction` (BE vía ProblemDetails, INV-PD05, con fallback a
+	 * `UI_ERROR_CODE_ACTIONS`) que ya resuelve `ErrorHandlerService.handleHttpError()`
+	 * para errores que pasan por el interceptor global.
+	 */
+	router?: Router;
 }
 
 export interface FacadeErrorHandler {
@@ -137,10 +146,33 @@ export function facadeErrorHandler(config: FacadeErrorHandlerConfig): FacadeErro
 
 			logger.error(`${config.tag}: Error al ${accion}`, err);
 
+			// Doble capa (INV-PD05): mismo mecanismo que ErrorHandlerService.handleHttpError().
+			// Sin esto, errores manejados localmente por un facade (ej: requests WAL con
+			// X-Skip-Error-Toast) pierden el botón de acción navegable que el interceptor
+			// global sí adjunta.
+			const router = config.router;
+			let action: import('@core/services/error').ErrorNotificationAction | undefined;
+			if (router && err instanceof HttpErrorResponse) {
+				const errorCode = err.error?.errorCode as string | undefined;
+				const suggestedAction = parseProblemDetails(err).suggestedAction;
+				const actionCfg = suggestedAction ?? (errorCode ? UI_ERROR_CODE_ACTIONS[errorCode] : undefined);
+				if (actionCfg) {
+					action = { label: actionCfg.label, callback: () => router.navigate([actionCfg.route]) };
+				}
+			}
+
 			if (severity === 'error') {
-				config.errorHandler.showError(summary, message);
+				if (action) {
+					config.errorHandler.showError(summary, message, undefined, action);
+				} else {
+					config.errorHandler.showError(summary, message);
+				}
 			} else {
-				config.errorHandler.showWarning(summary, message);
+				if (action) {
+					config.errorHandler.showWarning(summary, message, undefined, action);
+				} else {
+					config.errorHandler.showWarning(summary, message);
+				}
 			}
 
 			cleanup?.();
