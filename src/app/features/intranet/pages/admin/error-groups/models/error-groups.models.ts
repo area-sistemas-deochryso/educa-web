@@ -117,6 +117,21 @@ export interface HeatmapCalendarCell {
 	avgDurationMs: number;
 }
 
+/**
+ * Fila del Pareto de priorización (brief 433, P68 F8.3). Espejo de `ErrorGroupParetoDto`
+ * (BE) — cubre todos los grupos activos (NUEVO/VISTO/EN_PROGRESO), sin paginar,
+ * ordenados desc por `score`. El % acumulado se calcula 100% en el FE.
+ */
+export interface ErrorGroupPareto {
+	id: number;
+	fingerprintCorto: string;
+	mensajeRepresentativo: string;
+	severidad: ErrorSeveridad;
+	contadorTotal: number;
+	ultimaFecha: string;
+	score: number;
+}
+
 // #endregion
 
 // #region Matriz de transiciones (espejo BE INV-ET07)

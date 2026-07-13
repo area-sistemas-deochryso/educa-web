@@ -1,0 +1,25 @@
+<section class="pareto-container">
+	<header class="pareto-header">
+		<h3 class="pareto-title">
+			<i class="pi pi-chart-bar"></i>
+			Priorización (Pareto 80/20)
+		</h3>
+		<span class="pareto-hint">Score = severidad × frecuencia × recencia — ordenado desc</span>
+	</header>
+
+	@if (loading()) {
+		<div class="pareto-loading">
+			<i class="pi pi-spinner pi-spin"></i>
+			<span>Cargando priorización...</span>
+		</div>
+	} @else if (items().length === 0) {
+		<div class="pareto-empty">
+			<i class="pi pi-info-circle"></i>
+			<span>Sin grupos activos para priorizar.</span>
+		</div>
+	} @else {
+		<div class="pareto-chart-container">
+			<canvas #paretoChart></canvas>
+		</div>
+	}
+</section>

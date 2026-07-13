@@ -172,7 +172,7 @@
 <!-- #endregion -->
 
 <!-- #region Vista (Kanban, Tabla, Eventos o Heatmap) -->
-@if (!tableReady() && viewMode() !== 'events' && viewMode() !== 'heatmap') {
+@if (!tableReady() && viewMode() !== 'events' && viewMode() !== 'heatmap' && viewMode() !== 'pareto') {
 	<app-table-skeleton [columns]="tableSkeletonColumns" [rows]="10" />
 } @else if (viewMode() === 'heatmap') {
 	<app-error-heatmap
@@ -276,6 +276,11 @@
 		(cardClick)="onRowClick($event)"
 		(sparklineClick)="onSparklineClick($event)"
 		(cardDropped)="onKanbanCardDropped($event)"
+	/>
+} @else if (viewMode() === 'pareto') {
+	<app-error-pareto-chart
+		[items]="store.paretoItems()"
+		[loading]="store.paretoLoading()"
 	/>
 } @else {
 	<section class="table-section">

@@ -56,9 +56,9 @@ const PREFERENCES_KEYS = {
 	RUNTIME_HEALTH_WIDGET_COLLAPSED: 'educa_pref_runtime_health_widget_collapsed',
 } as const;
 
-export type ErrorGroupsViewMode = 'kanban' | 'table' | 'events' | 'heatmap';
+export type ErrorGroupsViewMode = 'kanban' | 'table' | 'events' | 'heatmap' | 'pareto';
 
-const ERROR_GROUPS_VIEW_MODES: readonly ErrorGroupsViewMode[] = ['kanban', 'table', 'events', 'heatmap'];
+const ERROR_GROUPS_VIEW_MODES: readonly ErrorGroupsViewMode[] = ['kanban', 'table', 'events', 'heatmap', 'pareto'];
 
 export type CorrelationViewMode = 'timeline' | 'section';
 
@@ -572,7 +572,7 @@ export class PreferencesStorageService {
 	// #region ERROR GROUPS VIEW MODE (Plan 34 Chat 5)
 
 	/**
-	 * View mode for the admin "error-groups" page (kanban/table/events/heatmap).
+	 * View mode for the admin "error-groups" page (kanban/table/events/heatmap/pareto).
 	 * Defaults to 'kanban' first time — el admin entra al Kanban directo.
 	 */
 	getErrorGroupsViewMode(): ErrorGroupsViewMode {

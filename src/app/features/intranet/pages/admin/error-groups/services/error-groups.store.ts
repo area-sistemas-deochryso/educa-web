@@ -8,6 +8,7 @@ import {
 	ErrorGroupDetalle,
 	ErrorGroupEstado,
 	ErrorGroupLista,
+	ErrorGroupPareto,
 	ErrorGroupSortField,
 	ErrorLogCompleto,
 	ErrorOrigen,
@@ -107,6 +108,11 @@ export class ErrorGroupsStore {
 	private readonly _heatmapCalendarCells = signal<HeatmapCalendarCell[]>([]);
 	// #endregion
 
+	// #region Estado privado — pareto (brief 433, P68 F8.3)
+	private readonly _paretoItems = signal<ErrorGroupPareto[]>([]);
+	private readonly _paretoLoading = signal(false);
+	// #endregion
+
 	// #region Lecturas públicas — listado
 	readonly items = this._items.asReadonly();
 	readonly loading = this._loading.asReadonly();
@@ -172,6 +178,11 @@ export class ErrorGroupsStore {
 	readonly heatmapDays = this._heatmapDays.asReadonly();
 	readonly heatmapEndDate = this._heatmapEndDate.asReadonly();
 	readonly heatmapCalendarCells = this._heatmapCalendarCells.asReadonly();
+	// #endregion
+
+	// #region Lecturas públicas — pareto
+	readonly paretoItems = this._paretoItems.asReadonly();
+	readonly paretoLoading = this._paretoLoading.asReadonly();
 	// #endregion
 
 	// #region Computed
@@ -457,6 +468,16 @@ export class ErrorGroupsStore {
 
 	setHeatmapCalendarCells(cells: HeatmapCalendarCell[]): void {
 		this._heatmapCalendarCells.set(cells);
+	}
+	// #endregion
+
+	// #region Comandos — Pareto
+	setParetoItems(items: ErrorGroupPareto[]): void {
+		this._paretoItems.set(items);
+	}
+
+	setParetoLoading(loading: boolean): void {
+		this._paretoLoading.set(loading);
 	}
 	// #endregion
 

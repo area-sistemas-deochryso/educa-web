@@ -34,6 +34,7 @@ import { ErrorGroupDetailDrawerComponent } from './components/error-group-detail
 import { ErrorGroupsKanbanBoardComponent } from './components/error-groups-kanban-board';
 import { ErrorGroupsViewToggleComponent } from './components/error-groups-view-toggle';
 import { ErrorHeatmapComponent } from './components/error-heatmap';
+import { ErrorParetoChartComponent } from './components/error-pareto-chart';
 import { ErrorOccurrenceDrawerComponent } from './components/error-occurrence-drawer';
 import {
 	ESTADO_OPTIONS,
@@ -92,6 +93,7 @@ import {
 		ErrorGroupsKanbanBoardComponent,
 		ErrorGroupsViewToggleComponent,
 		ErrorHeatmapComponent,
+		ErrorParetoChartComponent,
 		HubContextBannerComponent,
 	],
 	templateUrl: './error-groups.component.html',
@@ -312,6 +314,9 @@ export class ErrorGroupsComponent implements OnInit {
 		this.store.setExcluirRuido(excluir);
 		this.store.setPage(1);
 		this.dataFacade.loadData();
+		if (this.viewMode() === 'pareto') {
+			this.dataFacade.loadPareto();
+		}
 	}
 
 	onSortChange(field: ErrorGroupSortField): void {
@@ -397,6 +402,9 @@ export class ErrorGroupsComponent implements OnInit {
 		this.viewMode.set(mode);
 		if (mode === 'events' && this.eventItems().length === 0) {
 			this.dataFacade.loadEventData();
+		}
+		if (mode === 'pareto' && this.store.paretoItems().length === 0) {
+			this.dataFacade.loadPareto();
 		}
 	}
 	onKanbanCardDropped(payload: {

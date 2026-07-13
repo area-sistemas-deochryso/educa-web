@@ -69,9 +69,17 @@ describe('ErrorGroupsViewToggleComponent', () => {
 		expect(component.viewMode()).toBe('heatmap');
 	});
 
-	it('incluye las 4 opciones de vista, con heatmap al final', () => {
+	it('inicializa con pareto cuando localStorage tiene pareto', () => {
+		const prefs = TestBed.inject(StorageService);
+		prefs.setErrorGroupsViewMode('pareto');
+
 		build();
-		expect(component.options.map((o) => o.value)).toEqual(['kanban', 'table', 'events', 'heatmap']);
+		expect(component.viewMode()).toBe('pareto');
+	});
+
+	it('incluye las 5 opciones de vista, con pareto al final', () => {
+		build();
+		expect(component.options.map((o) => o.value)).toEqual(['kanban', 'table', 'events', 'heatmap', 'pareto']);
 	});
 
 	it('ignora null al cambiar modo (no emite, no persiste)', () => {

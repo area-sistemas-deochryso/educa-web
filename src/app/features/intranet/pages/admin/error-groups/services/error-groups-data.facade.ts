@@ -1,3 +1,7 @@
+/* eslint-disable max-lines -- Razón: facade cohesivo de error-groups (listado + detalle + ocurrencias +
+   heatmap + event view + trend). Brief 433 (P68 F8.3) agregó Pareto (1 dependencia + 1 método),
+   empujando el archivo sobre 300. Partir el facade por sub-dominio es un refactor mayor fuera de
+   alcance de este brief — mismo criterio que error-groups.store.ts. */
 import { DestroyRef, Injectable, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
@@ -9,6 +13,7 @@ import { ErrorGroupsService } from './error-groups.service';
 import { ErrorGroupsStore } from './error-groups.store';
 import { ErrorGroupsTrendQueue } from './error-groups-trend-queue';
 import { ErrorGroupsHeatmap } from './error-groups-heatmap';
+import { ErrorGroupsPareto } from './error-groups-pareto';
 
 @Injectable({ providedIn: 'root' })
 export class ErrorGroupsDataFacade {
@@ -21,6 +26,9 @@ export class ErrorGroupsDataFacade {
 		source$.pipe(takeUntilDestroyed(this.destroyRef)),
 	);
 	private readonly heatmap = new ErrorGroupsHeatmap(this.api, this.store, (source$) =>
+		source$.pipe(takeUntilDestroyed(this.destroyRef)),
+	);
+	private readonly pareto = new ErrorGroupsPareto(this.api, this.store, (source$) =>
 		source$.pipe(takeUntilDestroyed(this.destroyRef)),
 	);
 	// #endregion
@@ -274,6 +282,12 @@ export class ErrorGroupsDataFacade {
 
 	setHeatmapEndDate(date: Date | null): void {
 		this.heatmap.setHeatmapEndDate(date);
+	}
+	// #endregion
+
+	// #region Pareto (brief 433, P68 F8.3)
+	loadPareto(): void {
+		this.pareto.loadPareto();
 	}
 	// #endregion
 

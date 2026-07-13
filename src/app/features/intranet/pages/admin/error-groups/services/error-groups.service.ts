@@ -9,6 +9,7 @@ import {
 	ErrorGroupDetalle,
 	ErrorGroupEstado,
 	ErrorGroupLista,
+	ErrorGroupPareto,
 	ErrorGroupSortField,
 	ErrorGroupTrendDto,
 	ErrorLogCompleto,
@@ -147,6 +148,13 @@ export class ErrorGroupsService {
 			`${environment.apiUrl}/api/sistema/error-monitoreo/heatmap`,
 			{ params },
 		);
+	}
+
+	/** Pareto de priorización (brief 433, P68 F8.3) — todos los grupos activos, sin paginar. */
+	getPareto(excluirRuido: boolean): Observable<ErrorGroupPareto[]> {
+		const params: Record<string, boolean> = {};
+		if (excluirRuido) params['excluirRuido'] = true;
+		return this.http.get<ErrorGroupPareto[]>(`${this.apiUrl}/pareto`, { params });
 	}
 
 	getHeatmapCalendar(days = 30, endDate?: string): Observable<HeatmapCalendarCell[]> {

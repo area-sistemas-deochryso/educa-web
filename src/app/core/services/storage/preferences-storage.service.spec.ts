@@ -184,6 +184,11 @@ describe('PreferencesStorageService', () => {
 			service.setErrorGroupsViewMode('heatmap');
 			expect(service.getErrorGroupsViewMode()).toBe('heatmap');
 		});
+
+		it('should set and get pareto mode', () => {
+			service.setErrorGroupsViewMode('pareto');
+			expect(service.getErrorGroupsViewMode()).toBe('pareto');
+		});
 	});
 	// #endregion
 
