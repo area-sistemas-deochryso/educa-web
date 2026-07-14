@@ -32,20 +32,38 @@ const GENERIC_FN_NAMES = /^(next|error|subscribe|run|invoke|handle|emit|push|cal
  */
 export function parseSourceLocation(stack: string): SourceLocation | null {
 	const readable: string[] = [];
+	let location: { archivo: string; linea: number; columna: number } | null = null;
+
 	for (const line of stack.split('\n')) {
 		const trimmed = line.trim();
 		if (!trimmed.startsWith('at ')) continue;
-		const match = /at\s+([A-Za-z_$][\w$.]+(?:\.\w+)*)\s+\(/.exec(trimmed);
-		if (!match) continue;
-		let fn = match[1].replace(/^Object\./, '').replace(/\.prototype\./, '.');
+
+		// "at fnName (file:line:col)" — frame con nombre de función legible
+		const withFn = /at\s+([A-Za-z_$][\w$.]+(?:\.\w+)*)\s+\((.+):(\d+):(\d+)\)/.exec(trimmed);
+		// "at file:line:col" — frame anónimo/minificado, sin nombre de función
+		const bare = !withFn ? /at\s+(.+):(\d+):(\d+)$/.exec(trimmed) : null;
+
+		if (!location) {
+			if (withFn) location = { archivo: withFn[2], linea: Number(withFn[3]), columna: Number(withFn[4]) };
+			else if (bare) location = { archivo: bare[1], linea: Number(bare[2]), columna: Number(bare[3]) };
+		}
+
+		if (!withFn) continue;
+		let fn = withFn[1].replace(/^Object\./, '').replace(/\.prototype\./, '.');
 		fn = fn.replace(/^[a-z]{1,2}\./, '');
 		if (fn.length <= 2) continue;
 		if (GENERIC_FN_NAMES.test(fn)) continue;
 		readable.push(fn);
 		if (readable.length >= 3) break;
 	}
-	if (readable.length === 0) return null;
-	return { funcion: readable.join(' ← '), archivo: null, linea: null, columna: null };
+
+	if (readable.length === 0 && !location) return null;
+	return {
+		funcion: readable.length > 0 ? readable.join(' ← ') : null,
+		archivo: location?.archivo ?? null,
+		linea: location?.linea ?? null,
+		columna: location?.columna ?? null,
+	};
 }
 
 /** Captura el call site actual para errores HTTP que no tienen stack propio */

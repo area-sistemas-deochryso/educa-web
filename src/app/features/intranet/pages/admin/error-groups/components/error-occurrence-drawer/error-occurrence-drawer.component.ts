@@ -244,11 +244,16 @@ export class ErrorOccurrenceDrawerComponent {
 		const err = this._errorCompleto();
 		if (!err) return null;
 		const origenSev = err.origen === 'BACKEND' ? 'warn' as const : err.origen === 'NETWORK' ? 'danger' as const : 'info' as const;
+		const parsedLocation = parseSourceLocation(err.sourceLocation);
+		const fileRef = parsedLocation?.archivo
+			? `${parsedLocation.archivo}${parsedLocation.linea ? `:${parsedLocation.linea}` : ''}${parsedLocation.columna ? `:${parsedLocation.columna}` : ''}`
+			: '';
 		return {
 			origenIcon: this.origenIcon[err.origen as ErrorOrigen] ?? 'pi pi-question',
 			origenLabel: this.origenLabel[err.origen as ErrorOrigen] ?? err.origen,
 			origenSeverity: origenSev,
-			sourceLocation: parseSourceLocation(err.sourceLocation)?.funcion ?? '',
+			sourceLocation: parsedLocation?.funcion ?? '',
+			sourceLocationFile: fileRef,
 			hasReproduction: !!(err.requestBody || err.responseBody || err.requestHeaders),
 			formattedHeaders: this.formatJsonValue(err.requestHeaders),
 			formattedRequestBody: this.formatJsonValue(err.requestBody),

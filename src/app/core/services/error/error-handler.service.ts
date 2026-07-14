@@ -111,9 +111,10 @@ export class ErrorHandlerService {
 		// Report errors to backend with breadcrumbs + reproduction context
 		if (error.status >= 400) {
 			const correlationId = (context?.['requestId'] as string) ?? undefined;
+			const initiationStack = (context?.['initiationStack'] as string) ?? undefined;
 			this.errorReporter.reportHttpError(
 				error.status, error.url ?? '', method, errorCode, correlationId,
-				undefined, context?.['body'], error.error,
+				initiationStack, context?.['body'], error.error,
 			);
 			// El toast se acaba de mostrar → registrar para que el dialog de feedback
 			// pueda ofrecer enlazar este reporte manual con este error específico.

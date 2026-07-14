@@ -48,12 +48,17 @@
 			</div>
 
 			<!-- Cadena de llamadas (siempre visible, fuera de tabs) -->
-			@if (ed?.sourceLocation; as callChain) {
+			@if (ed?.sourceLocation || ed?.sourceLocationFile) {
 				<div class="source-location-card">
 					<i class="pi pi-sitemap"></i>
 					<div class="source-location-content">
 						<span class="source-location-label">Cadena de llamadas</span>
-						<code class="source-location-value">{{ callChain }}</code>
+						@if (ed?.sourceLocation) {
+							<code class="source-location-value">{{ ed?.sourceLocation }}</code>
+						}
+						@if (ed?.sourceLocationFile) {
+							<code class="source-location-value source-location-value--file">{{ ed?.sourceLocationFile }}</code>
+						}
 					</div>
 				</div>
 			}

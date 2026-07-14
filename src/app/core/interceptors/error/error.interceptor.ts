@@ -50,6 +50,10 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 	const forceLogout = inject(ForceLogoutSignal);
 	const authApi = inject(AuthApiService);
 	const requestId = req.headers.get('X-Request-Id') ?? undefined;
+	// Capturado ANTES de next(req): refleja el call site real que disparó el
+	// request. Capturarlo recién en catchError da el stack interno de RxJS/
+	// zone.js del propio pipeline de interceptores, no el código de negocio.
+	const initiationStack = new Error().stack;
 
 	return next(req).pipe(
 		catchError((error: HttpErrorResponse | Error) => {
@@ -84,7 +88,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 				if (httpError.status >= 500 || httpError.status === 0) {
 					errorReporter.reportHttpError(
 						httpError.status, req.url, req.method, undefined, requestId,
-						undefined, req.body, httpError.error);
+						initiationStack, req.body, httpError.error);
 				}
 				return throwError(() => httpError);
 			}
@@ -101,7 +105,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 				if (httpError.status >= 500 || httpError.status === 0) {
 					errorReporter.reportHttpError(
 						httpError.status, req.url, req.method, undefined, requestId,
-						undefined, req.body, httpError.error);
+						initiationStack, req.body, httpError.error);
 				}
 				return throwError(() => httpError);
 			}
@@ -110,7 +114,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 			if (errorClass === 'server-unreachable') {
 				logger.error('[ErrorInterceptor] Server unreachable:', req.url);
 				errorHandler.showError('Sin respuesta', 'El servidor no está disponible. Reintentá en unos minutos.');
-				errorReporter.reportHttpError(0, req.url, req.method, undefined, requestId, undefined, req.body, undefined);
+				errorReporter.reportHttpError(0, req.url, req.method, undefined, requestId, initiationStack, req.body, undefined);
 				return throwError(() => httpError);
 			}
 
@@ -125,6 +129,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 				requestId,
 				traceId: problem.traceId ?? undefined,
 				errorCode: problem.errorCode ?? undefined,
+				initiationStack,
 			});
 
 			// Re-lanzar para que los callers puedan reaccionar si lo necesitan.

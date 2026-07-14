@@ -47,6 +47,9 @@ export const requestTraceInterceptor: HttpInterceptorFn = (req, next) => {
 	}
 
 	const startedAtPerf = performance.now();
+	// Capturado en el punto de disparo del request, no en finalize(): ahí el
+	// stack ya perdió el call site real (quedó el de RxJS/zone.js interno).
+	const initiationStack = new Error().stack;
 
 	// Skip breadcrumb tracking for the error reporter itself to avoid loops
 	const isErrorEndpoint = tracedReq.url.includes('/api/sistema/errors');
@@ -83,7 +86,7 @@ export const requestTraceInterceptor: HttpInterceptorFn = (req, next) => {
 			if (!isErrorEndpoint && !ok && durationMs >= SLOW_REQUEST_THRESHOLD_MS) {
 				errorReporter.reportHttpError(
 					status ?? 0, tracedReq.url, tracedReq.method,
-					'SLOW_REQUEST_FAILED', requestId,
+					'SLOW_REQUEST_FAILED', requestId, initiationStack,
 				);
 			}
 

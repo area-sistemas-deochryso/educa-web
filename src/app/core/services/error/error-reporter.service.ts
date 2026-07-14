@@ -74,9 +74,12 @@ export class ErrorReporterService {
 		const origen = classifyHttpOrigin(status, this.isBrowser);
 		const breadcrumbKey = getBreadcrumbKey(status);
 		const maxBreadcrumbs = BREADCRUMB_LIMITS[breadcrumbKey] ?? BREADCRUMB_LIMITS['default'];
-		const isNetworkError = origen === 'NETWORK';
-		const sourceLocation = !isNetworkError && stack ? parseSourceLocation(stack) : null;
-		const effectiveStack = isNetworkError ? null : (stack ?? captureCallSite());
+		// `stack` ahora es el call site real capturado al iniciar el request
+		// (no un stack de excepción server-side) — es información legítima
+		// para NETWORK también: indica desde qué componente/servicio se
+		// disparó el request que terminó fallando.
+		const sourceLocation = stack ? parseSourceLocation(stack) : null;
+		const effectiveStack = stack ?? captureCallSite();
 
 		this.send(this.buildPayload({
 			origen,
