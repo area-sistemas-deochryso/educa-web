@@ -1,5 +1,6 @@
 /* eslint-disable max-lines -- Razón: componente de página cohesivo (CRUD + filtros + dialogs + drawer + import). 307 líneas — 7 sobre el límite por el filtro de completitud (sin profesor/sin estudiantes). */
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, effect, inject } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 
 import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
@@ -67,8 +68,29 @@ export class SchedulesComponent implements OnInit {
 	private crudFacade = inject(SchedulesCrudFacade);
 	private uiFacade = inject(SchedulesUiFacade);
 	private confirmationService = inject(ConfirmationService);
+	private route = inject(ActivatedRoute);
 
 	readonly vm = this.dataFacade.vm;
+
+	// #region Auto-filtro por salonId (brief 436)
+	private pendingSalonId: number | null = null;
+
+	constructor() {
+		const salonIdParam = this.route.snapshot.queryParamMap.get('salonId');
+		this.pendingSalonId = salonIdParam ? Number(salonIdParam) : null;
+
+		effect(() => {
+			const pendingId = this.pendingSalonId;
+			if (pendingId === null) return;
+			if (this.vm().loading) return;
+			if (!this.vm().salonEntities.some((e) => e.id === pendingId)) return;
+
+			this.dataFacade.setVistaActual('salon');
+			this.dataFacade.selectEntity(pendingId);
+			this.pendingSalonId = null;
+		});
+	}
+	// #endregion
 
 	readonly dependencyChecks = computed<DependencyCheck[]>(() => [
 		{

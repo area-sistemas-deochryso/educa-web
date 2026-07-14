@@ -59,3 +59,55 @@ export interface CerrarPeriodoResultDto {
 	estudiantesPendientes: number;
 }
 // #endregion
+
+// #region Nuevo Salón (brief 436)
+export interface CrearSalonDto {
+	gradoId: number;
+	seccionId: number;
+	sedeId: number;
+	anio: number;
+}
+
+export interface SeccionSimpleDto {
+	id: number;
+	nombre: string;
+}
+// #endregion
+
+// #region Gestión de estudiantes en curso (brief 436)
+export interface SalonEstudianteListDto {
+	estudianteId: number;
+	dni: string;
+	nombreCompleto: string;
+	estadoMatricula: string;
+}
+
+export interface EstudianteDisponibleDto {
+	estudianteId: number;
+	dni: string;
+	nombreCompleto: string;
+}
+
+export interface TransferirEstudianteSalonDto {
+	salonDestinoId: number;
+	confirmar: boolean;
+}
+
+export interface RetirarEstudianteSalonDto {
+	motivo: string;
+	confirmar: boolean;
+}
+
+export interface AccionEstudianteSalonResponseDto {
+	ejecutado: boolean;
+	requiereConfirmacion: boolean;
+	advertencias: string[];
+}
+
+export const MOTIVOS_RETIRO = [
+	{ value: 'CAMBIO_COLEGIO', label: 'Cambio de colegio' },
+	{ value: 'ERROR_MATRICULA', label: 'Error de matrícula' },
+	{ value: 'MUDANZA', label: 'Mudanza' },
+	{ value: 'OTRO', label: 'Otro' },
+] as const;
+// #endregion

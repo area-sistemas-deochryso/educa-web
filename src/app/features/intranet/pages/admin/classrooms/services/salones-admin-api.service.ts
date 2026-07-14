@@ -19,6 +19,8 @@ import {
 	AprobarEstudianteDto,
 	AprobacionMasivaDto,
 	BatchCommandResult,
+	CrearSalonDto,
+	SeccionSimpleDto,
 } from '../models';
 
 @Injectable({ providedIn: 'root' })
@@ -34,6 +36,20 @@ export class ClassroomsAdminApiService {
 		if (nivel) url += `&nivel=${nivel}`;
 		return this.http
 			.get<SalonAdminListDto[]>(url)
+			.pipe(map((data) => (Array.isArray(data) ? data : [])));
+	}
+
+	crearSalon(dto: CrearSalonDto): Observable<boolean> {
+		return this.http
+			.post<unknown>(`${this.baseUrl}/api/sistema/salones/crear`, dto)
+			.pipe(map(() => true));
+	}
+	// #endregion
+
+	// #region Catálogos
+	getSecciones(): Observable<SeccionSimpleDto[]> {
+		return this.http
+			.get<SeccionSimpleDto[]>(`${this.baseUrl}/api/sistema/secciones`)
 			.pipe(map((data) => (Array.isArray(data) ? data : [])));
 	}
 	// #endregion

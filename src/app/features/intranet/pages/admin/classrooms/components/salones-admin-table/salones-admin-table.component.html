@@ -83,6 +83,32 @@
 						},
 					}"
 				></button>
+				<button
+					pButton
+					icon="pi pi-calendar"
+					class="p-button-rounded p-button-text p-button-sm"
+					pTooltip="Ver horarios de este salón"
+					tooltipPosition="top"
+					(click)="goToHorarios.emit(salon.id)"
+					[pt]="{
+						root: {
+							'aria-label': 'Ver horarios de este salón',
+						},
+					}"
+				></button>
+				<button
+					pButton
+					icon="pi pi-users"
+					class="p-button-rounded p-button-text p-button-sm"
+					pTooltip="Ver usuarios de este salón"
+					tooltipPosition="top"
+					(click)="goToUsuarios.emit(salon.id)"
+					[pt]="{
+						root: {
+							'aria-label': 'Ver usuarios de este salón',
+						},
+					}"
+				></button>
 			</td>
 		</tr>
 	</ng-template>

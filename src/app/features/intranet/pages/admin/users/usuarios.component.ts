@@ -132,6 +132,7 @@ export class UsersComponent implements AfterViewInit {
 		this.dataFacade.loadData();
 		this.initAutoOpen();
 		this.initTabFromQueryParams();
+		this.initSalonFilterFromQueryParams();
 		this.initMigrationTimer();
 
 		effect(() => {
@@ -412,6 +413,14 @@ export class UsersComponent implements AfterViewInit {
 		const tabParam = this.route.snapshot.queryParamMap.get('tab');
 		if (tabParam && ['estudiantes', 'profesores', 'admin'].includes(tabParam)) {
 			this.dataFacade.setActiveTab(tabParam as RoleTab);
+		}
+	}
+
+	/** Filtra por salón cuando se llega desde "Gestión de Salones" (brief 436). */
+	private initSalonFilterFromQueryParams(): void {
+		const salonIdParam = this.route.snapshot.queryParamMap.get('salonId');
+		if (salonIdParam) {
+			this.dataFacade.setFilterSalonId(Number(salonIdParam));
 		}
 	}
 

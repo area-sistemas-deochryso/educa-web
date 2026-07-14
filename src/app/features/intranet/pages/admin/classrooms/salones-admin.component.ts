@@ -1,4 +1,5 @@
-import { Component, ChangeDetectionStrategy, inject, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, OnInit, computed } from '@angular/core';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -22,7 +23,9 @@ import {
 	ActualizarConfiguracionCalificacionDto,
 	AprobarEstudianteDto,
 	AprobacionMasivaDto,
+	CrearSalonDto,
 } from './models';
+import { NuevoSalonDialogComponent } from './components/nuevo-salon-dialog/nuevo-salon-dialog.component';
 
 @Component({
 	selector: 'app-classrooms-admin',
@@ -41,6 +44,7 @@ import {
 		ConfigGradeDialogComponent,
 		ClosePeriodDialogComponent,
 		ClassroomDetailDialogComponent,
+		NuevoSalonDialogComponent,
 	],
 	providers: [MessageService],
 	templateUrl: './salones-admin.component.html',
@@ -50,10 +54,21 @@ import {
 export class ClassroomsAdminComponent implements OnInit {
 	// #region Dependencias
 	private facade = inject(ClassroomsAdminFacade);
+	private router = inject(Router);
 	// #endregion
 
 	// #region Estado del facade
 	readonly vm = this.facade.vm;
+	// #endregion
+
+	// #region Computed — brief 436
+	/** Salones candidatos como destino de transferencia: todos menos el actualmente abierto. */
+	readonly salonesDisponibles = computed(() => {
+		const actualId = this.vm().selectedSalonId;
+		return this.vm()
+			.salones.filter((s) => s.id !== actualId)
+			.map((s) => ({ id: s.id, label: `${s.grado} ${s.seccion} — ${s.sede}` }));
+	});
 	// #endregion
 
 	// #region Estado local
@@ -97,6 +112,30 @@ export class ClassroomsAdminComponent implements OnInit {
 	// #region Event handlers — Salones
 	onSelectSalon(salonId: number): void {
 		this.facade.openSalonDialog(salonId);
+	}
+
+	onGoToHorarios(salonId: number): void {
+		this.router.navigate(['/intranet/admin/horarios'], { queryParams: { salonId } });
+	}
+
+	onGoToUsuarios(salonId: number): void {
+		this.router.navigate(['/intranet/admin/usuarios'], { queryParams: { salonId } });
+	}
+	// #endregion
+
+	// #region Event handlers — Nuevo salón
+	onOpenNuevoSalonDialog(): void {
+		this.facade.openNuevoSalonDialog();
+	}
+
+	onNuevoSalonDialogVisibleChange(visible: boolean): void {
+		if (!visible) {
+			this.facade.closeNuevoSalonDialog();
+		}
+	}
+
+	onCrearSalon(dto: CrearSalonDto): void {
+		this.facade.crearSalon(dto);
 	}
 	// #endregion
 

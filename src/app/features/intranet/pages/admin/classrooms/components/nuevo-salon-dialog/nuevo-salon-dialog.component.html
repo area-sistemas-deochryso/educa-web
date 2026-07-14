@@ -1,0 +1,76 @@
+<p-dialog
+	header="Nuevo Salón"
+	[visible]="visible()"
+	(visibleChange)="onVisibleChange($event)"
+	[modal]="true"
+	[style]="{ width: '420px' }"
+>
+	<div class="form-field">
+		<label for="nuevoSalonGrado">Grado</label>
+		<p-select
+			id="nuevoSalonGrado"
+			[options]="grados()"
+			[ngModel]="gradoId()"
+			(ngModelChange)="gradoId.set($event)"
+			optionLabel="nombre"
+			optionValue="id"
+			placeholder="Seleccionar grado"
+			appendTo="body"
+			[style]="{ width: '100%' }"
+		/>
+	</div>
+
+	<div class="form-field">
+		<label for="nuevoSalonSeccion">Sección</label>
+		<p-select
+			id="nuevoSalonSeccion"
+			[options]="secciones()"
+			[ngModel]="seccionId()"
+			(ngModelChange)="seccionId.set($event)"
+			optionLabel="nombre"
+			optionValue="id"
+			placeholder="Seleccionar sección"
+			appendTo="body"
+			[style]="{ width: '100%' }"
+		/>
+	</div>
+
+	<div class="form-field">
+		<label for="nuevoSalonSede">Sede</label>
+		<p-select
+			id="nuevoSalonSede"
+			[options]="sedes()"
+			[ngModel]="sedeId()"
+			(ngModelChange)="sedeId.set($event)"
+			optionLabel="nombre"
+			optionValue="id"
+			placeholder="Seleccionar sede"
+			appendTo="body"
+			[style]="{ width: '100%' }"
+		/>
+	</div>
+
+	<div class="form-field">
+		<label for="nuevoSalonAnio">Año</label>
+		<p-inputNumber
+			id="nuevoSalonAnio"
+			[ngModel]="anio()"
+			(ngModelChange)="anio.set($event)"
+			[useGrouping]="false"
+			[min]="2020"
+			[max]="2030"
+			[style]="{ width: '100%' }"
+		/>
+	</div>
+
+	<ng-template #footer>
+		<button pButton label="Cancelar" class="p-button-text" (click)="onVisibleChange(false)"></button>
+		<button
+			pButton
+			label="Crear"
+			[loading]="loading()"
+			[disabled]="!isFormValid()"
+			(click)="onSave()"
+		></button>
+	</ng-template>
+</p-dialog>

@@ -23,6 +23,8 @@ export class ClassroomsAdminTableComponent {
 	readonly loading = input(false);
 
 	readonly selectSalon = output<number>();
+	readonly goToHorarios = output<number>();
+	readonly goToUsuarios = output<number>();
 	// #endregion
 
 	// #region Helpers

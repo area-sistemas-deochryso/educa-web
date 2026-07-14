@@ -8,6 +8,8 @@ import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
 
+import { Observable } from 'rxjs';
+
 import { logger, withRetry } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
 import {
@@ -17,6 +19,8 @@ import {
 	UI_SALONES_CONFIRM_HEADERS,
 	UI_ADMIN_ERROR_DETAILS,
 } from '@shared/constants';
+import { SedesApiService } from '@features/intranet/pages/admin/users/services/sedes-api.service';
+import { SedeSimpleDto } from '@features/intranet/pages/admin/users/models';
 
 import { ClassroomsAdminApiService } from './salones-admin-api.service';
 import { ClassroomsAdminStore } from './salones-admin.store';
@@ -27,6 +31,8 @@ import {
 	AprobarEstudianteDto,
 	AprobacionMasivaDto,
 	CrearPeriodoAcademicoDto,
+	CrearSalonDto,
+	SeccionSimpleDto,
 } from '../models';
 
 /**
@@ -55,6 +61,7 @@ import {
 export class ClassroomsAdminFacade {
 	// #region Dependencias
 	private api = inject(ClassroomsAdminApiService);
+	private sedesApi = inject(SedesApiService);
 	private store = inject(ClassroomsAdminStore);
 	private errorHandler = inject(ErrorHandlerService);
 	private destroyRef = inject(DestroyRef);
@@ -391,6 +398,46 @@ export class ClassroomsAdminFacade {
 	}
 	closeConfirmDialog(): void {
 		this.store.closeConfirmDialog();
+	}
+	openNuevoSalonDialog(): void {
+		this.store.openNuevoSalonDialog();
+	}
+	closeNuevoSalonDialog(): void {
+		this.store.closeNuevoSalonDialog();
+	}
+
+	/** Catálogo de secciones para el formulario de "Nuevo Salón". */
+	getSecciones(): Observable<SeccionSimpleDto[]> {
+		return this.api.getSecciones();
+	}
+
+	/** Catálogo de sedes para el formulario de "Nuevo Salón". */
+	getSedes(): Observable<SedeSimpleDto[]> {
+		return this.sedesApi.listar();
+	}
+
+	crearSalon(dto: CrearSalonDto): void {
+		this.store.setLoading(true);
+
+		this.api
+			.crearSalon(dto)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (ok) => {
+					if (ok) {
+						this.errorHandler.showSuccess(UI_SALONES_CONFIRM_HEADERS.salonCreated, UI_SALONES_SUCCESS_MESSAGES.salonCreated);
+						this.store.closeNuevoSalonDialog();
+						this.loadAll();
+					} else {
+						this.errorHandler.showError(UI_SUMMARIES.error, UI_SALONES_ERROR_DETAILS.createSalon);
+					}
+					this.store.setLoading(false);
+				},
+				error: () => {
+					this.errorHandler.showError(UI_SUMMARIES.error, UI_SALONES_ERROR_DETAILS.createSalon);
+					this.store.setLoading(false);
+				},
+			});
 	}
 
 	openSalonDialog(salonId: number): void {

@@ -48,6 +48,7 @@ export class ClassroomsAdminStore {
 	private readonly _cerrarPeriodoDialogVisible = signal(false);
 	private readonly _salonDialogVisible = signal(false);
 	private readonly _confirmDialogVisible = signal(false);
+	private readonly _nuevoSalonDialogVisible = signal(false);
 	// #endregion
 
 	// #region Lecturas públicas (readonly)
@@ -78,6 +79,7 @@ export class ClassroomsAdminStore {
 	readonly cerrarPeriodoDialogVisible = this._cerrarPeriodoDialogVisible.asReadonly();
 	readonly salonDialogVisible = this._salonDialogVisible.asReadonly();
 	readonly confirmDialogVisible = this._confirmDialogVisible.asReadonly();
+	readonly nuevoSalonDialogVisible = this._nuevoSalonDialogVisible.asReadonly();
 	// #endregion
 
 	// #region Computed — filtrado por nivel
@@ -145,6 +147,7 @@ export class ClassroomsAdminStore {
 		cerrarPeriodoDialogVisible: this._cerrarPeriodoDialogVisible(),
 		salonDialogVisible: this._salonDialogVisible(),
 		confirmDialogVisible: this._confirmDialogVisible(),
+		nuevoSalonDialogVisible: this._nuevoSalonDialogVisible(),
 	}));
 
 	readonly salonDetailVm = computed(() => ({
@@ -261,6 +264,14 @@ export class ClassroomsAdminStore {
 
 	closeConfigDialog(): void {
 		this._configDialogVisible.set(false);
+	}
+
+	openNuevoSalonDialog(): void {
+		this._nuevoSalonDialogVisible.set(true);
+	}
+
+	closeNuevoSalonDialog(): void {
+		this._nuevoSalonDialogVisible.set(false);
 	}
 
 	openCerrarPeriodoDialog(): void {

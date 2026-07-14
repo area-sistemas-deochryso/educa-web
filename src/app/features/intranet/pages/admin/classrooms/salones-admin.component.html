@@ -23,6 +23,12 @@
 			},
 		}"
 	></button>
+	<button
+		pButton
+		label="Nuevo Salón"
+		icon="pi pi-plus"
+		(click)="onOpenNuevoSalonDialog()"
+	></button>
 </app-page-header>
 <!-- #endregion -->
 
@@ -119,6 +125,8 @@
 					[salones]="vm().salones"
 					[loading]="vm().loading"
 					(selectSalon)="onSelectSalon($event)"
+					(goToHorarios)="onGoToHorarios($event)"
+					(goToUsuarios)="onGoToUsuarios($event)"
 				/>
 			</p-tabpanel>
 		}
@@ -161,11 +169,20 @@
 	[notasLoading]="vm().notasLoading"
 	[horarios]="vm().salonHorarios"
 	[horariosLoading]="vm().horariosLoading"
+	[salonesDisponibles]="salonesDisponibles()"
 	(visibleChange)="onSalonDialogVisibleChange($event)"
 	(aprobar)="onAprobarEstudiante($event)"
 	(aprobarMasivo)="onAprobarMasivo($event)"
 	(loadAsistencia)="onLoadAsistencia($event)"
 	(loadNotas)="onLoadNotas($event)"
+/>
+
+<app-nuevo-salon-dialog
+	[visible]="vm().nuevoSalonDialogVisible"
+	[anioDefault]="vm().filtroAnio"
+	[loading]="vm().loading"
+	(visibleChange)="onNuevoSalonDialogVisibleChange($event)"
+	(crear)="onCrearSalon($event)"
 />
 <!-- #endregion -->
 

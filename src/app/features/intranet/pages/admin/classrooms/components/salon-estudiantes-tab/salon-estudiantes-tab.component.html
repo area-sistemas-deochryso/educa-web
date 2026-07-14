@@ -1,0 +1,136 @@
+<!-- #region Agregar estudiante -->
+<div class="agregar-row">
+	<p-autoComplete
+		[suggestions]="vm().disponibles"
+		[ngModel]="selectedDisponible()"
+		(completeMethod)="onSearchDisponibles($event)"
+		(onSelect)="onSelectDisponible($event.value)"
+		optionLabel="nombreCompleto"
+		placeholder="Buscar estudiante sin salón por nombre o DNI..."
+		[minLength]="2"
+		[style]="{ width: '100%' }"
+		[inputStyle]="{ width: '100%' }"
+	>
+		<ng-template let-estudiante pTemplate="item">
+			<div class="estudiante-suggestion">
+				<span class="font-semibold">{{ estudiante.nombreCompleto }}</span>
+				<span class="text-color-secondary">{{ estudiante.dni }}</span>
+			</div>
+		</ng-template>
+	</p-autoComplete>
+</div>
+<!-- #endregion -->
+
+@if (vm().error) {
+	<div class="error-banner">
+		<i class="pi pi-exclamation-triangle"></i>
+		<span>{{ vm().error }}</span>
+	</div>
+}
+
+<!-- #region Tabla de estudiantes -->
+<p-table [value]="vm().estudiantes" [loading]="vm().loading" styleClass="p-datatable-sm">
+	<ng-template #header>
+		<tr>
+			<th>DNI</th>
+			<th>Nombre</th>
+			<th style="width: 140px">Estado</th>
+			<th style="width: 260px" class="text-center">Acciones</th>
+		</tr>
+	</ng-template>
+	<ng-template #body let-estudiante>
+		<tr>
+			<td>{{ estudiante.dni }}</td>
+			<td>{{ estudiante.nombreCompleto }}</td>
+			<td><p-tag [value]="estudiante.estadoMatricula" /></td>
+			<td class="text-center">
+				@if (activeRowAction()?.estudianteId !== estudiante.estudianteId) {
+					<button
+						pButton
+						icon="pi pi-arrow-right-arrow-left"
+						class="p-button-rounded p-button-text p-button-sm"
+						pTooltip="Transferir a otro salón"
+						(click)="openTransferir(estudiante.estudianteId)"
+					></button>
+					<button
+						pButton
+						icon="pi pi-user-minus"
+						class="p-button-rounded p-button-text p-button-sm p-button-danger"
+						pTooltip="Retirar del salón"
+						(click)="openRetirar(estudiante.estudianteId)"
+					></button>
+				}
+			</td>
+		</tr>
+
+		@if (activeRowAction(); as accion) {
+			@if (accion.estudianteId === estudiante.estudianteId) {
+				<tr class="accion-row">
+					<td colspan="4">
+						@if (vm().pendingConfirm && vm().pendingConfirm?.estudianteId === estudiante.estudianteId) {
+							<p-message severity="warn" [closable]="false">
+								<div class="advertencias">
+									@for (advertencia of vm().pendingConfirm?.advertencias; track advertencia) {
+										<div>{{ advertencia }}</div>
+									}
+								</div>
+								<div class="advertencias-actions">
+									<button pButton label="Confirmar de todos modos" class="p-button-sm p-button-warning" (click)="confirmarPendienteConAdvertencia()"></button>
+									<button pButton label="Cancelar" class="p-button-sm p-button-text" (click)="cancelarPendiente()"></button>
+								</div>
+							</p-message>
+						} @else if (accion.tipo === 'transferir') {
+							<div class="accion-form">
+								<p-select
+									[options]="salonesDisponibles()"
+									[ngModel]="selectedSalonDestino()"
+									(ngModelChange)="selectedSalonDestino.set($event)"
+									optionLabel="label"
+									optionValue="id"
+									appendTo="body"
+									placeholder="Salón destino"
+									[style]="{ minWidth: '220px' }"
+								/>
+								<button
+									pButton
+									label="Transferir"
+									class="p-button-sm"
+									[disabled]="!selectedSalonDestino() || vm().actionLoading"
+									(click)="confirmarTransferir(estudiante.estudianteId)"
+								></button>
+								<button pButton label="Cancelar" class="p-button-sm p-button-text" (click)="cancelarAccion()"></button>
+							</div>
+						} @else {
+							<div class="accion-form">
+								<p-select
+									[options]="motivos"
+									[ngModel]="selectedMotivo()"
+									(ngModelChange)="selectedMotivo.set($event)"
+									optionLabel="label"
+									optionValue="value"
+									appendTo="body"
+									placeholder="Motivo de retiro"
+									[style]="{ minWidth: '220px' }"
+								/>
+								<button
+									pButton
+									label="Retirar"
+									class="p-button-sm p-button-danger"
+									[disabled]="!selectedMotivo() || vm().actionLoading"
+									(click)="confirmarRetirar(estudiante.estudianteId)"
+								></button>
+								<button pButton label="Cancelar" class="p-button-sm p-button-text" (click)="cancelarAccion()"></button>
+							</div>
+						}
+					</td>
+				</tr>
+			}
+		}
+	</ng-template>
+	<ng-template #emptymessage>
+		<tr>
+			<td colspan="4" class="text-center p-4">No hay estudiantes matriculados en este salón.</td>
+		</tr>
+	</ng-template>
+</p-table>
+<!-- #endregion -->

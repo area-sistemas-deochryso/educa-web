@@ -87,6 +87,10 @@ export const UI_SALONES_SUCCESS_MESSAGES = {
 	configCreated: 'Configuración creada correctamente',
 	periodoCreated: (nivel: string): string => `Periodo de ${nivel} creado correctamente`,
 	periodoClosed: 'Periodo cerrado correctamente',
+	salonCreated: 'Salón creado correctamente',
+	estudianteAgregado: 'Estudiante agregado al salón',
+	estudianteTransferido: 'Estudiante transferido correctamente',
+	estudianteRetirado: 'Estudiante retirado correctamente',
 } as const;
 
 export const UI_SALONES_ERROR_DETAILS = {
@@ -97,6 +101,12 @@ export const UI_SALONES_ERROR_DETAILS = {
 	loadAprobaciones: 'No se pudieron cargar las aprobaciones',
 	aprobarEstudiante: 'No se pudo completar la aprobación',
 	aprobarMasivo: 'No se pudo completar la aprobación masiva',
+	createSalon: 'No se pudo crear el salón',
+	agregarEstudiante: 'No se pudo agregar el estudiante al salón',
+	transferirEstudiante: 'No se pudo transferir al estudiante',
+	retirarEstudiante: 'No se pudo retirar al estudiante',
+	loadEstudiantesSalon: 'No se pudieron cargar los estudiantes del salón',
+	buscarEstudiantesSinSalon: 'No se pudo completar la búsqueda de estudiantes',
 } as const;
 
 export const UI_SALONES_CONFIRM_HEADERS = {
@@ -104,6 +114,10 @@ export const UI_SALONES_CONFIRM_HEADERS = {
 	configUpdated: 'Configuración actualizada',
 	periodoCreated: 'Periodo creado',
 	aprobacionMasiva: 'Aprobación masiva completada',
+	salonCreated: 'Salón creado',
+	estudianteAgregado: 'Estudiante agregado',
+	estudianteTransferido: 'Estudiante transferido',
+	estudianteRetirado: 'Estudiante retirado',
 } as const;
 
 // #endregion

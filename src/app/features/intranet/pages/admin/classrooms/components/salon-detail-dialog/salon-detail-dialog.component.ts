@@ -18,6 +18,7 @@ import {
 import { ClassroomApprovalTabComponent } from '../salon-aprobacion-tab/salon-aprobacion-tab.component';
 import { ClassroomAttendanceTabComponent } from '../salon-attendance-tab/salon-attendance-tab.component';
 import { ClassroomGradesTabComponent } from '../salon-notas-tab/salon-notas-tab.component';
+import { ClassroomStudentsTabComponent, SalonOption } from '../salon-estudiantes-tab/salon-estudiantes-tab.component';
 
 @Component({
 	selector: 'app-classroom-detail-dialog',
@@ -31,6 +32,7 @@ import { ClassroomGradesTabComponent } from '../salon-notas-tab/salon-notas-tab.
 		ClassroomApprovalTabComponent,
 		ClassroomAttendanceTabComponent,
 		ClassroomGradesTabComponent,
+		ClassroomStudentsTabComponent,
 	],
 	templateUrl: './salon-detail-dialog.component.html',
 	styleUrl: './salon-detail-dialog.component.scss',
@@ -59,6 +61,10 @@ export class ClassroomDetailDialogComponent {
 	readonly notasLoading = input(false);
 	readonly horarios = input<HorarioResponseDto[]>([]);
 	readonly horariosLoading = input(false);
+	// #endregion
+
+	// #region Inputs — estudiantes (brief 436)
+	readonly salonesDisponibles = input<SalonOption[]>([]);
 	// #endregion
 
 	// #region Outputs

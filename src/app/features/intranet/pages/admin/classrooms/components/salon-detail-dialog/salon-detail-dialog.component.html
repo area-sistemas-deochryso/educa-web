@@ -27,6 +27,7 @@
 				<p-tab value="0"><i class="pi pi-check-square tab-icon"></i>Aprobación</p-tab>
 				<p-tab value="1"><i class="pi pi-calendar tab-icon"></i>Asistencias</p-tab>
 				<p-tab value="2"><i class="pi pi-chart-bar tab-icon"></i>Notas</p-tab>
+				<p-tab value="3"><i class="pi pi-users tab-icon"></i>Estudiantes</p-tab>
 			</p-tablist>
 
 			<p-tabpanels>
@@ -65,6 +66,12 @@
 						[horariosLoading]="horariosLoading()"
 						(cursoChange)="onCursoChange($event)"
 					/>
+				</p-tabpanel>
+				<!-- #endregion -->
+
+				<!-- #region Tab Estudiantes -->
+				<p-tabpanel value="3">
+					<app-classroom-students-tab [salonId]="s.id" [salonesDisponibles]="salonesDisponibles()" />
 				</p-tabpanel>
 				<!-- #endregion -->
 			</p-tabpanels>

@@ -1,0 +1,11 @@
+.form-field {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	margin-bottom: 1rem;
+
+	label {
+		font-weight: 600;
+		font-size: 0.875rem;
+	}
+}
