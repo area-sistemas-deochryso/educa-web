@@ -1,4 +1,24 @@
 import { HttpErrorResponse } from '@angular/common/http';
+// eslint-disable-next-line layer-enforcement/imports-error -- DEBT: xrepo-87 F443
+import { UI_ERROR_CODES } from '@shared/constants';
+
+/**
+ * Resuelve el mensaje de error priorizando `errorCode` del backend contra
+ * `UI_ERROR_CODES`. Si el backend no manda `errorCode` o no está catalogado,
+ * usa `fallback`.
+ *
+ * Reemplaza al patrón ad-hoc repetido en facades que atrapan el error ellos
+ * mismos en vez de delegar al interceptor central (`error.interceptor.ts`).
+ *
+ * @example
+ * catch (err) {
+ *   const msg = resolveErrorMessage(err, 'No se pudo guardar');
+ * }
+ */
+export function resolveErrorMessage(err: unknown, fallback: string): string {
+	const errorCode = err instanceof HttpErrorResponse ? (err.error?.errorCode as string | undefined) : undefined;
+	return (errorCode && UI_ERROR_CODES[errorCode]) || fallback;
+}
 
 /**
  * Extrae un mensaje legible de un error HTTP o genérico.

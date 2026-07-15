@@ -2,7 +2,7 @@ import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
 
-import { logger, withRetry, getEstadoToggleDeltas, getEstadoRollbackDeltas } from '@core/helpers';
+import { logger, withRetry, getEstadoToggleDeltas, getEstadoRollbackDeltas, resolveErrorMessage } from '@core/helpers';
 import { ErrorHandlerService, SwService, WalFacadeHelper, WalCrossTabRefetchService } from '@core/services';
 import { environment } from '@env/environment';
 import {
@@ -58,8 +58,9 @@ export class NotificacionesAdminFacade {
 				},
 				error: (err) => {
 					logger.error('Error al cargar notificaciones:', err);
-					this.errorHandler.showError(UI_SUMMARIES.error, 'No se pudieron cargar las notificaciones');
-					this.store.setError('No se pudieron cargar las notificaciones');
+					const message = resolveErrorMessage(err, 'No se pudieron cargar las notificaciones');
+					this.errorHandler.showError(UI_SUMMARIES.error, message);
+					this.store.setError(message);
 					this.store.setLoading(false);
 				},
 			});
@@ -91,7 +92,7 @@ export class NotificacionesAdminFacade {
 			onCommit: () => this.refreshItemsOnly(),
 			onError: (err) => {
 				logger.error('Error al crear notificación:', err);
-				this.errorHandler.showError(UI_SUMMARIES.error, 'No se pudo crear la notificación');
+				this.errorHandler.showError(UI_SUMMARIES.error, resolveErrorMessage(err, 'No se pudo crear la notificación'));
 			},
 		});
 	}
@@ -172,7 +173,7 @@ export class NotificacionesAdminFacade {
 			onCommit: () => this.refreshItemsOnly(),
 			onError: (err) => {
 				logger.error('Error al actualizar notificación:', err);
-				this.errorHandler.showError(UI_SUMMARIES.error, 'No se pudo actualizar la notificación');
+				this.errorHandler.showError(UI_SUMMARIES.error, resolveErrorMessage(err, 'No se pudo actualizar la notificación'));
 			},
 		});
 	}
@@ -203,7 +204,7 @@ export class NotificacionesAdminFacade {
 			onCommit: () => {},
 			onError: (err) => {
 				logger.error('Error al cambiar estado:', err);
-				this.errorHandler.showError(UI_SUMMARIES.error, 'No se pudo cambiar el estado');
+				this.errorHandler.showError(UI_SUMMARIES.error, resolveErrorMessage(err, 'No se pudo cambiar el estado'));
 			},
 		});
 	}
@@ -236,7 +237,7 @@ export class NotificacionesAdminFacade {
 			onCommit: () => {},
 			onError: (err) => {
 				logger.error('Error al eliminar notificación:', err);
-				this.errorHandler.showError(UI_SUMMARIES.error, 'No se pudo eliminar la notificación');
+				this.errorHandler.showError(UI_SUMMARIES.error, resolveErrorMessage(err, 'No se pudo eliminar la notificación'));
 			},
 		});
 	}

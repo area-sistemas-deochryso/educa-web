@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin, Observable } from 'rxjs';
 
 import {
-	logger, withRetry, getEstadoToggleDeltas,
+	logger, withRetry, getEstadoToggleDeltas, resolveErrorMessage,
 	facadeErrorHandler, type FacadeErrorHandler,
 } from '@core/helpers';
 // eslint-disable-next-line layer-enforcement/imports-error -- DEBT: xrepo-50-F3a
@@ -125,8 +125,9 @@ export abstract class BaseCrudFacade<
 				},
 				error: (err) => {
 					logger.error(`${this.config.tag}: Error al cargar:`, err);
-					this.errorHandler.showError(UI_SUMMARIES.error, this.config.loadErrorMessage);
-					this.store.setError(this.config.loadErrorMessage);
+					const message = resolveErrorMessage(err, this.config.loadErrorMessage);
+					this.errorHandler.showError(UI_SUMMARIES.error, message);
+					this.store.setError(message);
 					this.store.setLoading(false);
 				},
 			});
@@ -191,7 +192,10 @@ export abstract class BaseCrudFacade<
 				},
 				error: (err) => {
 					logger.error(`${this.config.tag}: Error al refrescar:`, err);
-					this.errorHandler.showError(UI_SUMMARIES.error, UI_ADMIN_ERROR_DETAILS.refreshData);
+					this.errorHandler.showError(
+						UI_SUMMARIES.error,
+						resolveErrorMessage(err, UI_ADMIN_ERROR_DETAILS.refreshData),
+					);
 					if (!silent) {
 						this.store.setLoading(false);
 					}
@@ -218,7 +222,10 @@ export abstract class BaseCrudFacade<
 				next: (stats) => this.store.setEstadisticas(stats),
 				error: (err) => {
 					logger.error(`${this.config.tag}: Error al refrescar estadísticas:`, err);
-					this.errorHandler.showError(UI_SUMMARIES.error, UI_ADMIN_ERROR_DETAILS.refreshData);
+					this.errorHandler.showError(
+						UI_SUMMARIES.error,
+						resolveErrorMessage(err, UI_ADMIN_ERROR_DETAILS.refreshData),
+					);
 				},
 			});
 	}

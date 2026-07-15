@@ -1,7 +1,7 @@
 import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { logger } from '@core/helpers';
+import { logger, resolveErrorMessage } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
 import { UI_SUMMARIES, UI_SALONES_SUCCESS_MESSAGES, UI_SALONES_ERROR_DETAILS, UI_SALONES_CONFIRM_HEADERS } from '@shared/constants';
 
@@ -39,7 +39,7 @@ export class ClassroomStudentsFacade {
 				},
 				error: (err) => {
 					logger.error('Error al cargar estudiantes del salón:', err);
-					this.store.setError(UI_SALONES_ERROR_DETAILS.loadEstudiantesSalon);
+					this.store.setError(resolveErrorMessage(err, UI_SALONES_ERROR_DETAILS.loadEstudiantesSalon));
 					this.store.setLoading(false);
 				},
 			});
@@ -62,7 +62,7 @@ export class ClassroomStudentsFacade {
 				},
 				error: (err) => {
 					logger.error('Error al buscar estudiantes sin salón:', err);
-					this.errorHandler.showError(UI_SUMMARIES.error, UI_SALONES_ERROR_DETAILS.buscarEstudiantesSinSalon);
+					this.errorHandler.showError(UI_SUMMARIES.error, resolveErrorMessage(err, UI_SALONES_ERROR_DETAILS.buscarEstudiantesSinSalon));
 					this.store.setSearchLoading(false);
 				},
 			});
@@ -85,7 +85,7 @@ export class ClassroomStudentsFacade {
 				},
 				error: (err) => {
 					logger.error('Error al agregar estudiante al salón:', err);
-					this.errorHandler.showError(UI_SUMMARIES.error, UI_SALONES_ERROR_DETAILS.agregarEstudiante);
+					this.errorHandler.showError(UI_SUMMARIES.error, resolveErrorMessage(err, UI_SALONES_ERROR_DETAILS.agregarEstudiante));
 					this.store.setActionLoading(false);
 				},
 			});
@@ -115,7 +115,7 @@ export class ClassroomStudentsFacade {
 				},
 				error: (err) => {
 					logger.error('Error al transferir estudiante:', err);
-					this.errorHandler.showError(UI_SUMMARIES.error, UI_SALONES_ERROR_DETAILS.transferirEstudiante);
+					this.errorHandler.showError(UI_SUMMARIES.error, resolveErrorMessage(err, UI_SALONES_ERROR_DETAILS.transferirEstudiante));
 					this.store.setActionLoading(false);
 				},
 			});
@@ -145,7 +145,7 @@ export class ClassroomStudentsFacade {
 				},
 				error: (err) => {
 					logger.error('Error al retirar estudiante:', err);
-					this.errorHandler.showError(UI_SUMMARIES.error, UI_SALONES_ERROR_DETAILS.retirarEstudiante);
+					this.errorHandler.showError(UI_SUMMARIES.error, resolveErrorMessage(err, UI_SALONES_ERROR_DETAILS.retirarEstudiante));
 					this.store.setActionLoading(false);
 				},
 			});

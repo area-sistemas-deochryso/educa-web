@@ -1,7 +1,7 @@
 import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Observable, forkJoin } from 'rxjs';
-import { logger, withRetry, downloadBlob } from '@core/helpers';
+import { logger, resolveErrorMessage, withRetry, downloadBlob } from '@core/helpers';
 import { ErrorHandlerService, WalFacadeHelper, WalCrossTabRefetchService } from '@core/services';
 import { environment } from '@config';
 import { SmartNotificationService } from '@core/services/notifications';
@@ -69,11 +69,9 @@ export class ProfesorFacade {
 				},
 				error: (err) => {
 					logger.error('ProfesorFacade: Error al cargar datos', err);
-					this.errorHandler.showError(
-						UI_SUMMARIES.error,
-						UI_ADMIN_ERROR_DETAILS.loadProfesorData,
-					);
-					this.store.setError(UI_ADMIN_ERROR_DETAILS.loadProfesorData);
+					const message = resolveErrorMessage(err, UI_ADMIN_ERROR_DETAILS.loadProfesorData);
+					this.errorHandler.showError(UI_SUMMARIES.error, message);
+					this.store.setError(message);
 					this.store.setLoading(false);
 				},
 			});
@@ -112,7 +110,7 @@ export class ProfesorFacade {
 					logger.error('ProfesorFacade: Error al cargar estudiantes del salón', err);
 					this.errorHandler.showError(
 						UI_SUMMARIES.error,
-						UI_ADMIN_ERROR_DETAILS.loadEstudiantesSalon,
+						resolveErrorMessage(err, UI_ADMIN_ERROR_DETAILS.loadEstudiantesSalon),
 					);
 					this.store.setSalonDialogLoading(false);
 				},
@@ -208,8 +206,11 @@ export class ProfesorFacade {
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: (blob) => downloadBlob(blob, `Boleta_${nombreEstudiante}.pdf`),
-				error: () =>
-					this.errorHandler.showError(UI_SUMMARIES.error, 'No se pudo descargar la boleta'),
+				error: (err) =>
+					this.errorHandler.showError(
+						UI_SUMMARIES.error,
+						resolveErrorMessage(err, 'No se pudo descargar la boleta'),
+					),
 			});
 	}
 
@@ -219,10 +220,10 @@ export class ProfesorFacade {
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: (blob) => downloadBlob(blob, `Boletas_${salonNombre}.pdf`),
-				error: () =>
+				error: (err) =>
 					this.errorHandler.showError(
 						UI_SUMMARIES.error,
-						'No se pudo descargar las boletas del salón',
+						resolveErrorMessage(err, 'No se pudo descargar las boletas del salón'),
 					),
 			});
 	}

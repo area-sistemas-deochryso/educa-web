@@ -4,7 +4,13 @@ import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 import { ErrorHandlerService } from '@core/services';
-import { logger, withRetry, facadeErrorHandler, type FacadeErrorHandler } from '@core/helpers';
+import {
+	logger,
+	withRetry,
+	facadeErrorHandler,
+	resolveErrorMessage,
+	type FacadeErrorHandler,
+} from '@core/helpers';
 import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@app/shared/constants';
 import { resolveModoAsignacion } from '@data/models';
 import { UsuarioDetalle, UsuarioLista } from '../models';
@@ -51,7 +57,7 @@ export class UsersUiFacade {
 					logger.error('Error al cargar detalle de usuario:', err);
 					this.errorHandler.showError(
 						UI_SUMMARIES.error,
-						UI_ADMIN_ERROR_DETAILS.loadUsuarios,
+						resolveErrorMessage(err, UI_ADMIN_ERROR_DETAILS.loadUsuarios),
 					);
 				},
 			});
@@ -86,7 +92,7 @@ export class UsersUiFacade {
 					logger.error('Error al cargar datos para edicion:', err);
 					this.errorHandler.showError(
 						UI_SUMMARIES.error,
-						UI_ADMIN_ERROR_DETAILS.loadUsuarios,
+						resolveErrorMessage(err, UI_ADMIN_ERROR_DETAILS.loadUsuarios),
 					);
 				},
 			});
@@ -157,7 +163,7 @@ export class UsersUiFacade {
 				},
 				error: (err) => {
 					logger.error('Error al asignar cursos:', err);
-					this.errorHandler.showError('Error', 'No se pudieron asignar los cursos');
+					this.errorHandler.showError('Error', resolveErrorMessage(err, 'No se pudieron asignar los cursos'));
 					this.store.setProfesorCursosLoading(false);
 				},
 			});
@@ -178,7 +184,7 @@ export class UsersUiFacade {
 				},
 				error: (err) => {
 					logger.error('Error al desasignar curso:', err);
-					this.errorHandler.showError('Error', 'No se pudo desasignar el curso');
+					this.errorHandler.showError('Error', resolveErrorMessage(err, 'No se pudo desasignar el curso'));
 					this.store.setProfesorCursosLoading(false);
 				},
 			});

@@ -2,7 +2,7 @@ import { Injectable, inject, DestroyRef } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { environment } from '@config/environment';
-import { logger, parseProblemDetails, withRetry } from '@core/helpers';
+import { logger, parseProblemDetails, resolveErrorMessage, withRetry } from '@core/helpers';
 import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
 import { UI_SUMMARIES, UI_ESTUDIANTE_ERROR_DETAILS, UI_ATTACHMENT_MESSAGES } from '@shared/constants';
 import { SmartNotificationService, ActividadSnapshot } from '@core/services/notifications';
@@ -50,8 +50,9 @@ export class EstudianteCursosFacade {
 				},
 				error: (err) => {
 					logger.error('EstudianteCursosFacade: Error al cargar horarios', err);
-					this.errorHandler.showError(UI_SUMMARIES.error, UI_ESTUDIANTE_ERROR_DETAILS.loadCursos);
-					this.store.setError(UI_ESTUDIANTE_ERROR_DETAILS.loadCursos);
+					const message = resolveErrorMessage(err, UI_ESTUDIANTE_ERROR_DETAILS.loadCursos);
+					this.errorHandler.showError(UI_SUMMARIES.error, message);
+					this.store.setError(message);
 					this.store.setLoading(false);
 				},
 			});
@@ -78,7 +79,7 @@ export class EstudianteCursosFacade {
 				},
 				error: (err) => {
 					logger.error('EstudianteCursosFacade: Error al cargar contenido', err);
-					this.errorHandler.showError(UI_SUMMARIES.error, UI_ESTUDIANTE_ERROR_DETAILS.loadContenido);
+					this.errorHandler.showError(UI_SUMMARIES.error, resolveErrorMessage(err, UI_ESTUDIANTE_ERROR_DETAILS.loadContenido));
 					this.store.setContentLoading(false);
 				},
 			});
@@ -224,7 +225,10 @@ export class EstudianteCursosFacade {
 						logger.error('EstudianteCursosFacade: Error al registrar', err);
 						const handled = onRegisterError?.(err) ?? false;
 						if (!handled) {
-							this.errorHandler.showError(UI_SUMMARIES.error, UI_ATTACHMENT_MESSAGES.registerFailed);
+							this.errorHandler.showError(
+								UI_SUMMARIES.error,
+								resolveErrorMessage(err, UI_ATTACHMENT_MESSAGES.registerFailed),
+							);
 						}
 						this.store.setSaving(false);
 					},
@@ -232,7 +236,10 @@ export class EstudianteCursosFacade {
 			},
 			error: (err) => {
 				logger.error('EstudianteCursosFacade: Error al subir archivo', err);
-				this.errorHandler.showError(UI_SUMMARIES.error, UI_ATTACHMENT_MESSAGES.uploadFailed);
+				this.errorHandler.showError(
+					UI_SUMMARIES.error,
+					resolveErrorMessage(err, UI_ATTACHMENT_MESSAGES.uploadFailed),
+				);
 				this.store.setSaving(false);
 			},
 		});

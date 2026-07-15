@@ -1,6 +1,6 @@
 import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { logger, withRetry, facadeErrorHandler } from '@core/helpers';
+import { logger, resolveErrorMessage, withRetry, facadeErrorHandler } from '@core/helpers';
 import { ErrorHandlerService, WalFacadeHelper, WalCrossTabRefetchService } from '@core/services';
 import { UI_SUMMARIES, UI_ADMIN_ERROR_DETAILS } from '@shared/constants';
 import { environment } from '@config';
@@ -91,8 +91,9 @@ export class CursoContenidoDataFacade {
 				},
 				error: (err) => {
 					logger.error('CursoContenidoDataFacade: Error al cargar contenido', err);
-					this.errorHandler.showError(UI_SUMMARIES.error, UI_ADMIN_ERROR_DETAILS.loadContenido);
-					this.store.setError(UI_ADMIN_ERROR_DETAILS.loadContenido);
+					const message = resolveErrorMessage(err, UI_ADMIN_ERROR_DETAILS.loadContenido);
+					this.errorHandler.showError(UI_SUMMARIES.error, message);
+					this.store.setError(message);
 					this.store.setLoading(false);
 				},
 			});

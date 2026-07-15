@@ -4,7 +4,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 
 import { environment } from '@config/environment';
-import { downloadBlob, logger, toLocalIso } from '@core/helpers';
+import { downloadBlob, logger, resolveErrorMessage, toLocalIso } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services/error';
 import {
 	ActualizarEstadoReporteRequest,
@@ -189,7 +189,7 @@ export class FeedbackReportsFacade {
 					logger.error('[FeedbackReportsFacade] Error exportando CSV', err);
 					this.errorHandler.showError(
 						'No se pudo exportar',
-						'Ocurrió un error al generar el archivo CSV.',
+						resolveErrorMessage(err, 'Ocurrió un error al generar el archivo CSV.'),
 					);
 				},
 			});
@@ -308,7 +308,7 @@ export class FeedbackReportsFacade {
 					this.store.setItems(snapshot);
 					this.errorHandler.showError(
 						'No se pudo eliminar',
-						'Ocurrió un error al eliminar el reporte. Se restauró la lista.',
+						resolveErrorMessage(err, 'Ocurrió un error al eliminar el reporte. Se restauró la lista.'),
 					);
 				},
 			});

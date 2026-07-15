@@ -1,7 +1,7 @@
 import { DestroyRef, Injectable, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { downloadBlob, logger } from '@core/helpers';
+import { downloadBlob, logger, resolveErrorMessage } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services/error';
 
 import {
@@ -122,7 +122,7 @@ export class RateLimitEventsFacade {
 					logger.error('[RateLimitEventsFacade] Error exportando CSV', err);
 					this.errorHandler.showError(
 						'No se pudo exportar',
-						'Ocurrió un error al generar el archivo CSV.',
+						resolveErrorMessage(err, 'Ocurrió un error al generar el archivo CSV.'),
 					);
 				},
 			});

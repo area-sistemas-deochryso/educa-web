@@ -2,7 +2,7 @@ import { DestroyRef, Injectable, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 
-import { logger } from '@core/helpers';
+import { logger, resolveErrorMessage } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services/error';
 
 import { AuditoriaCorreoAsistenciaDto, TipoOrigenAuditoria } from '../models';
@@ -42,7 +42,7 @@ export class AuditoriaCorreosFacade {
 					this.store.setLoading(false);
 					this.store.setTableReady(true);
 					this.errorHandler.showError(
-						'No se pudo cargar la validación de datos',
+						resolveErrorMessage(err, 'No se pudo cargar la validación de datos'),
 						'Intenta refrescar. Si el problema persiste, revisa la consola.',
 					);
 				},

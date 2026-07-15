@@ -3,7 +3,7 @@ import { DestroyRef, inject, Injectable } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
 
-import { logger, withRetry } from '@core/helpers';
+import { logger, withRetry, resolveErrorMessage } from '@core/helpers';
 import { ErrorHandlerService, SwService, WalCrossTabRefetchService } from '@core/services';
 import {
   UI_ADMIN_ERROR_DETAILS,
@@ -88,11 +88,12 @@ export class SchedulesDataFacade {
         },
         error: (err) => {
           logger.error('Error al cargar horarios por salón:', err);
+          const message = resolveErrorMessage(err, UI_ADMIN_ERROR_DETAILS.loadHorariosSalon);
           this.errorHandler.showError(
             UI_SUMMARIES.error,
-            UI_ADMIN_ERROR_DETAILS.loadHorariosSalon
+            message
           );
-          this.store.setError(UI_ADMIN_ERROR_DETAILS.loadHorariosSalon);
+          this.store.setError(message);
           this.store.setLoading(false);
         },
       });
@@ -120,11 +121,12 @@ export class SchedulesDataFacade {
         },
         error: (err) => {
           logger.error('Error al cargar horarios por profesor:', err);
+          const message = resolveErrorMessage(err, UI_ADMIN_ERROR_DETAILS.loadHorariosProfesor);
           this.errorHandler.showError(
             UI_SUMMARIES.error,
-            UI_ADMIN_ERROR_DETAILS.loadHorariosProfesor
+            message
           );
-          this.store.setError(UI_ADMIN_ERROR_DETAILS.loadHorariosProfesor);
+          this.store.setError(message);
           this.store.setLoading(false);
         },
       });
@@ -165,7 +167,7 @@ export class SchedulesDataFacade {
           logger.error('Error al cargar detalle de horario:', err);
           this.errorHandler.showError(
             UI_SUMMARIES.error,
-            UI_ADMIN_ERROR_DETAILS.horarioDetailLoad
+            resolveErrorMessage(err, UI_ADMIN_ERROR_DETAILS.horarioDetailLoad)
           );
           this.store.setDetailLoading(false);
           this.store.closeDetailDrawer();
@@ -337,11 +339,12 @@ export class SchedulesDataFacade {
         },
         error: (err) => {
           logger.error('Error al cargar datos:', err);
+          const message = resolveErrorMessage(err, UI_ADMIN_ERROR_DETAILS.loadHorariosData);
           this.errorHandler.showError(
             UI_SUMMARIES.error,
-            UI_ADMIN_ERROR_DETAILS.loadHorariosData
+            message
           );
-          this.store.setError(UI_ADMIN_ERROR_DETAILS.loadHorariosData);
+          this.store.setError(message);
           this.store.setLoading(false);
           this.store.setOptionsLoading(false);
         },
@@ -372,11 +375,12 @@ export class SchedulesDataFacade {
         },
         error: (err) => {
           logger.error('Error al cargar horarios del profesor:', err);
+          const message = resolveErrorMessage(err, UI_ADMIN_ERROR_DETAILS.loadHorariosData);
           this.errorHandler.showError(
             UI_SUMMARIES.error,
-            UI_ADMIN_ERROR_DETAILS.loadHorariosData
+            message
           );
-          this.store.setError(UI_ADMIN_ERROR_DETAILS.loadHorariosData);
+          this.store.setError(message);
           this.store.setLoading(false);
           this.store.setOptionsLoading(false);
         },

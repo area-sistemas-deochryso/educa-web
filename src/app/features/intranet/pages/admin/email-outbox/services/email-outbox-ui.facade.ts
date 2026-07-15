@@ -3,7 +3,7 @@ import { DestroyRef, inject, Injectable } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { ErrorHandlerService } from '@core/services/error';
-import { logger } from '@core/helpers';
+import { logger, resolveErrorMessage } from '@core/helpers';
 import { EmailOutboxLista } from '@data/models';
 
 import { EmailOutboxApiService } from './email-outbox.service';
@@ -174,7 +174,7 @@ export class EmailOutboxUiFacade {
 					this.store.setExportLoading(false);
 					this.errorHandler.showError(
 						'Error al exportar',
-						'No se pudo obtener los datos del caso.',
+						resolveErrorMessage(err, 'No se pudo obtener los datos del caso.'),
 					);
 					this.store.setExportDrawerVisible(false);
 				},

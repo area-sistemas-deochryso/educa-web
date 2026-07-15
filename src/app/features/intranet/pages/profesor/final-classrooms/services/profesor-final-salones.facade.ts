@@ -2,7 +2,7 @@ import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
 
-import { logger, withRetry } from '@core/helpers';
+import { logger, resolveErrorMessage, withRetry } from '@core/helpers';
 import { ErrorHandlerService, WalFacadeHelper, WalCrossTabRefetchService } from '@core/services';
 import { environment } from '@config';
 
@@ -71,8 +71,9 @@ export class TeacherFinalClassroomsFacade {
 				},
 				error: (err) => {
 					logger.error('Error al cargar salones del profesor:', err);
-					this.errorHandler.showError('Error', 'No se pudieron cargar los datos');
-					this.store.setError('No se pudieron cargar los datos');
+					const message = resolveErrorMessage(err, 'No se pudieron cargar los datos');
+					this.errorHandler.showError('Error', message);
+					this.store.setError(message);
 					this.store.setLoading(false);
 				},
 			});

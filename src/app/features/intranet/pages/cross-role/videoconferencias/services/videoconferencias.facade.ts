@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { logger, withRetry } from '@core/helpers';
+import { logger, resolveErrorMessage, withRetry } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
 import { UserProfileService } from '@core/services/user';
 import { environment } from '@config/environment';
@@ -70,8 +70,9 @@ export class VideoconferenciasFacade {
 				},
 				error: (err) => {
 					logger.error('VideoconferenciasFacade: Error al cargar cursos', err);
-					this.errorHandler.showError('Error', 'No se pudieron cargar los cursos');
-					this.store.setError('No se pudieron cargar los cursos');
+					const message = resolveErrorMessage(err, 'No se pudieron cargar los cursos');
+					this.errorHandler.showError('Error', message);
+					this.store.setError(message);
 					this.store.setLoading(false);
 				},
 			});

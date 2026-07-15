@@ -2,7 +2,7 @@ import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
 
-import { logger, withRetry, facadeErrorHandler } from '@core/helpers';
+import { logger, withRetry, facadeErrorHandler, resolveErrorMessage } from '@core/helpers';
 import {
 	ErrorHandlerService,
 	PermissionsService,
@@ -65,8 +65,9 @@ export class PermissionsRolesFacade {
 				},
 				error: (err) => {
 					logger.error('Error loading role capabilities:', err);
-					this.errorHandler.showError(UI_SUMMARIES.error, 'No se pudieron cargar las capabilities por rol');
-					this.store.setError('No se pudieron cargar las capabilities por rol');
+					const message = resolveErrorMessage(err, 'No se pudieron cargar las capabilities por rol');
+					this.errorHandler.showError(UI_SUMMARIES.error, message);
+					this.store.setError(message);
 					this.store.setLoading(false);
 				},
 			});

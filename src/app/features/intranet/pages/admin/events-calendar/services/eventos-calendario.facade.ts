@@ -2,7 +2,13 @@ import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
 
-import { logger, withRetry, getEstadoToggleDeltas, getEstadoRollbackDeltas } from '@core/helpers';
+import {
+	logger,
+	withRetry,
+	getEstadoToggleDeltas,
+	getEstadoRollbackDeltas,
+	resolveErrorMessage,
+} from '@core/helpers';
 import { ErrorHandlerService, SwService, WalFacadeHelper, WalCrossTabRefetchService } from '@core/services';
 import { environment } from '@env/environment';
 import {
@@ -62,8 +68,8 @@ export class EventsCalendarFacade {
 				},
 				error: (err) => {
 					logger.error('Error al cargar eventos:', err);
-					this.errorHandler.showError(UI_SUMMARIES.error, 'No se pudieron cargar los eventos');
-					this.store.setError('No se pudieron cargar los eventos');
+					this.errorHandler.showError(UI_SUMMARIES.error, resolveErrorMessage(err, 'No se pudieron cargar los eventos'));
+					this.store.setError(resolveErrorMessage(err, 'No se pudieron cargar los eventos'));
 					this.store.setLoading(false);
 				},
 			});
@@ -95,7 +101,7 @@ export class EventsCalendarFacade {
 			onCommit: () => this.refreshItemsOnly(),
 			onError: (err) => {
 				logger.error('Error al crear evento:', err);
-				this.errorHandler.showError(UI_SUMMARIES.error, 'No se pudo crear el evento');
+				this.errorHandler.showError(UI_SUMMARIES.error, resolveErrorMessage(err, 'No se pudo crear el evento'));
 			},
 		});
 	}
@@ -166,7 +172,7 @@ export class EventsCalendarFacade {
 			onCommit: () => this.refreshItemsOnly(),
 			onError: (err) => {
 				logger.error('Error al actualizar evento:', err);
-				this.errorHandler.showError(UI_SUMMARIES.error, 'No se pudo actualizar el evento');
+				this.errorHandler.showError(UI_SUMMARIES.error, resolveErrorMessage(err, 'No se pudo actualizar el evento'));
 			},
 		});
 	}
@@ -197,7 +203,7 @@ export class EventsCalendarFacade {
 			onCommit: () => {},
 			onError: (err) => {
 				logger.error('Error al cambiar estado:', err);
-				this.errorHandler.showError(UI_SUMMARIES.error, 'No se pudo cambiar el estado');
+				this.errorHandler.showError(UI_SUMMARIES.error, resolveErrorMessage(err, 'No se pudo cambiar el estado'));
 			},
 		});
 	}
@@ -230,7 +236,7 @@ export class EventsCalendarFacade {
 			onCommit: () => {},
 			onError: (err) => {
 				logger.error('Error al eliminar evento:', err);
-				this.errorHandler.showError(UI_SUMMARIES.error, 'No se pudo eliminar el evento');
+				this.errorHandler.showError(UI_SUMMARIES.error, resolveErrorMessage(err, 'No se pudo eliminar el evento'));
 			},
 		});
 	}

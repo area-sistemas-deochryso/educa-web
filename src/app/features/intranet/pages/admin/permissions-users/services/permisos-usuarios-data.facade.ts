@@ -2,7 +2,7 @@ import { Injectable, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
 
-import { logger, withRetry, facadeErrorHandler } from '@core/helpers';
+import { logger, withRetry, facadeErrorHandler, resolveErrorMessage } from '@core/helpers';
 import {
 	PermissionsService,
 	ErrorHandlerService,
@@ -62,8 +62,9 @@ export class PermissionsUsersDataFacade {
 				},
 				error: (err) => {
 					logger.error('Error loading capabilities data:', err);
-					this.errorHandler.showError(UI_SUMMARIES.error, 'No se pudieron cargar los datos de capabilities');
-					this.store.setError('No se pudieron cargar los datos');
+					const message = resolveErrorMessage(err, 'No se pudieron cargar los datos de capabilities');
+					this.errorHandler.showError(UI_SUMMARIES.error, message);
+					this.store.setError(message);
 					this.store.setLoading(false);
 				},
 			});
