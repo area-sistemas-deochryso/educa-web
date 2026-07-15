@@ -6,6 +6,7 @@
    clase para detalles. Un rollback local sería inseguro. */
 import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { HttpErrorResponse } from '@angular/common/http';
 import { forkJoin } from 'rxjs';
 
 import { Observable } from 'rxjs';
@@ -18,6 +19,7 @@ import {
 	UI_SALONES_ERROR_DETAILS,
 	UI_SALONES_CONFIRM_HEADERS,
 	UI_ADMIN_ERROR_DETAILS,
+	UI_ERROR_CODES,
 } from '@shared/constants';
 import { SedesApiService } from '@features/intranet/pages/admin/users/services/sedes-api.service';
 import { SedeSimpleDto } from '@features/intranet/pages/admin/users/models';
@@ -433,8 +435,12 @@ export class ClassroomsAdminFacade {
 					}
 					this.store.setLoading(false);
 				},
-				error: () => {
-					this.errorHandler.showError(UI_SUMMARIES.error, UI_SALONES_ERROR_DETAILS.createSalon);
+				error: (err: unknown) => {
+					const errorCode =
+						err instanceof HttpErrorResponse ? (err.error?.errorCode as string | undefined) : undefined;
+					const message =
+						(errorCode && UI_ERROR_CODES[errorCode]) || UI_SALONES_ERROR_DETAILS.createSalon;
+					this.errorHandler.showError(UI_SUMMARIES.error, message);
 					this.store.setLoading(false);
 				},
 			});
