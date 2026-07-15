@@ -1,10 +1,11 @@
 import { DestroyRef, Injectable, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { HttpErrorResponse } from '@angular/common/http';
 
 import { environment } from '@config';
 import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
 import { DebugService, logger, getEstadoToggleDeltas, getEstadoRollbackDeltas } from '@core/helpers';
-import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@app/shared/constants';
+import { UI_ADMIN_ERROR_DETAILS, UI_ERROR_CODES, UI_SUMMARIES } from '@app/shared/constants';
 import { formatFullName } from '@shared/pipes';
 import {
 	ActualizarUsuarioRequest,
@@ -298,10 +299,11 @@ export class UsersCrudFacade {
 					return;
 				}
 				logger.error('Error:', err);
-				this.errorHandler.showError(
-					UI_SUMMARIES.error,
-					UI_ADMIN_ERROR_DETAILS.updateUsuario,
-				);
+				const errorCode =
+					err instanceof HttpErrorResponse ? (err.error?.errorCode as string | undefined) : undefined;
+				const message =
+					(errorCode && UI_ERROR_CODES[errorCode]) || UI_ADMIN_ERROR_DETAILS.updateUsuario;
+				this.errorHandler.showError(UI_SUMMARIES.error, message);
 				this.store.setLoading(false);
 			},
 			optimistic: {
