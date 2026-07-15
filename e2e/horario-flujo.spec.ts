@@ -5,8 +5,8 @@ import { test, expect, type Page } from '@playwright/test';
 // Flow:
 //   1. Log in as an admin/coordinator (role "Administrador").
 //   2. Go to /intranet/admin/horarios, open "Nuevo Horario", pick day/time/salon/curso
-//      that shouldn't conflict with existing data (Saturday afternoon slot — least likely
-//      to already be occupied by regular weekday classes), save.
+//      that shouldn't conflict with existing data (only Lunes-Viernes and 07:00-17:00 are
+//      selectable; the last slot of the day is least likely to already be occupied), save.
 //   3. Assert the new horario shows up in the "Por Salón" grid for the chosen salon.
 //   4. Go to /intranet/admin/salones and use the "Ver horarios de este salón" action
 //      (salones-admin-table.component.html) to navigate back to /intranet/admin/horarios
@@ -38,7 +38,8 @@ async function login(page: Page): Promise<void> {
 	await page.getByRole('option', { name: 'Administrador' }).click();
 
 	await page.getByRole('button', { name: /Iniciar sesión|Ingresar/i }).click();
-	await expect(page).toHaveURL(/\/intranet\/admin/, { timeout: 15_000 });
+	// Post-login lands on the dashboard (/intranet), not directly under /intranet/admin.
+	await expect(page).toHaveURL(/\/intranet(\/|$)/, { timeout: 15_000 });
 }
 
 test.describe('Curso -> Horario -> Salon (happy path)', () => {
@@ -53,19 +54,35 @@ test.describe('Curso -> Horario -> Salon (happy path)', () => {
 		await login(page);
 
 		// #region Step 1: create horario
-		await page.goto('/intranet/admin/horarios');
+		// Navigate via the app's own nav (not page.goto) — a hard reload drops the in-memory
+		// auth/session state and bounces back to the login screen.
+		await page.locator('a[href="/intranet/admin/horarios"]').first().click();
+		await expect(page).toHaveURL(/\/intranet\/admin\/horarios/);
 		await expect(page.getByRole('button', { name: 'Nuevo Horario' })).toBeVisible();
 		await page.getByRole('button', { name: 'Nuevo Horario' }).click();
 
 		const dialog = page.getByRole('dialog').filter({ hasText: 'Crear Horario' });
 		await expect(dialog).toBeVisible();
 
-		// Sabado tarde: slot poco usado por clases regulares de semana, para minimizar
-		// conflicto de horario con datos ya sembrados.
+		// Viernes 16:00-17:00: solo Lunes-Viernes están disponibles como opción (no hay fin
+		// de semana), y el form valida que la hora de inicio caiga dentro de HORAS_DIA
+		// (07:00-17:00, el rango que la grilla semanal realmente renderiza) — la última
+		// franja del día es la menos probable de chocar con datos ya sembrados.
 		await dialog.locator('#diaSemana').click();
-		await page.getByRole('option', { name: 'Sábado' }).click();
-		await dialog.locator('#horaInicio').fill('15:00');
-		await dialog.locator('#horaFin').fill('16:00');
+		await page.getByRole('option', { name: 'Viernes' }).click();
+
+		// These are masked 12h HH:MM AM/PM time inputs — .fill() sets the raw value without
+		// the keystroke events the mask needs, leaving the form invalid. Typing the literal
+		// colon confuses the mask's auto-advance (it reorders digits); typing digits + the
+		// AM/PM suffix (the mask inserts the colon itself) is what actually works.
+		const horaInicio = dialog.locator('#horaInicio');
+		await horaInicio.click();
+		await horaInicio.press('Home');
+		await horaInicio.pressSequentially('0400PM', { delay: 150 });
+		const horaFin = dialog.locator('#horaFin');
+		await horaFin.click();
+		await horaFin.press('Home');
+		await horaFin.pressSequentially('0500PM', { delay: 150 });
 
 		// Salon: open the filterable p-select and take the first available option.
 		await dialog.locator('#salon').click();
@@ -79,27 +96,47 @@ test.describe('Curso -> Horario -> Salon (happy path)', () => {
 		const cursoDialog = page.getByRole('dialog').filter({ hasText: 'Seleccionar Curso por Nivel Educativo' });
 		await expect(cursoDialog).toBeVisible();
 		await cursoDialog.getByRole('tab', { name: /Primaria/i }).click();
-		await cursoDialog.locator('.curso-card').first().click();
-		await cursoDialog.getByRole('button', { name: 'Confirmar' }).click();
+		// Every level's tabpanel stays in the DOM (only the active one is visible), so
+		// scoping to the tabpanel by name avoids matching a hidden .curso-card elsewhere.
+		const primariaPanel = cursoDialog.getByRole('tabpanel', { name: /Primaria/i });
+		// Clicking a card selects the course and auto-closes the picker dialog —
+		// there's no separate "Confirmar" step for single selection.
+		await primariaPanel.locator('.curso-card').first().click();
+		await expect(cursoDialog).toBeHidden();
 
-		await dialog.getByRole('button', { name: 'Crear' }).click();
+		// The "Salon" options refresh async against day/time, which briefly keeps the form
+		// pending after the last field is filled — give the submit button time to enable.
+		const crearButton = dialog.getByRole('button', { name: 'Crear' });
+		await expect(crearButton).toBeEnabled({ timeout: 10_000 });
+		await crearButton.click();
 		await expect(dialog).toBeHidden();
 		// #endregion
 
 		// #region Step 2: verify it shows up in the "Por Salón" grid
 		await page.getByRole('button', { name: 'Por Salón' }).click();
-		await expect(page.getByText(salonLabel!).first()).toBeVisible();
-		// The newly-created block for Sabado 15:00-16:00 should render somewhere in the grid.
-		await expect(page.getByText('15:00', { exact: false }).first()).toBeVisible();
+		await page.getByText(salonLabel!).first().click();
+		// The newly-created block for Viernes 16:00-17:00 should render somewhere in the grid.
+		await expect(page.getByText('16:00', { exact: false }).first()).toBeVisible();
 		// #endregion
 
 		// #region Step 3: from Salones, navigate to the horarios filtered by that salon
-		await page.goto('/intranet/admin/salones');
-		const salonRow = page.locator('table tr', { hasText: salonLabel ?? '' }).first();
-		await salonRow.getByRole('button', { name: 'Ver horarios de este salón' }).click();
+		// The nav-bar "Administración" link only reveals its dropdown items (Salones,
+		// Horarios, etc.) once opened — it's not a persistently-visible sidebar.
+		await page.getByRole('button', { name: 'Administración', exact: false }).click();
+		await page.locator('a[href="/intranet/admin/salones"]').first().click();
+		await expect(page).toHaveURL(/\/intranet\/admin\/salones/);
+		// The salones table splits grado/sección/sede into separate cells — salonLabel's
+		// " - Sede X" formatting (from the horario dialog's p-select) has no literal match
+		// in the row's concatenated text, so match on the grado+sección prefix only.
+		const salonRowText = salonLabel!.split(' - ')[0];
+		const salonRow = page.getByRole('row', { name: new RegExp(salonRowText) }).first();
+		const verHorariosButton = salonRow.getByRole('button', { name: 'Ver horarios de este salón' });
+		// The Acciones column sits past the table's horizontal scroll edge at default viewport width.
+		await verHorariosButton.scrollIntoViewIfNeeded();
+		await verHorariosButton.click();
 
 		await expect(page).toHaveURL(/\/intranet\/admin\/horarios\?salonId=/);
-		await expect(page.getByText('15:00', { exact: false }).first()).toBeVisible();
+		await expect(page.getByText('16:00', { exact: false }).first()).toBeVisible();
 		// #endregion
 	});
 });
