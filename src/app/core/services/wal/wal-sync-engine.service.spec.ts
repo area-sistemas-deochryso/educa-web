@@ -483,7 +483,7 @@ describe('WalSyncEngine', () => {
 	// #region handleError — 4 paths
 
 	describe('handleError — error dispatch (post-DS1)', () => {
-		it('CONFLICT path: 409 marks conflict, deletes callback, no rollback', async () => {
+		it('CONFLICT path: 409 marks conflict, invalidates cache, rollback + onError', async () => {
 			const { engine, mocks } = setupEngine();
 			await flushAsync();
 			const entry = makeEntry({ id: 'conf' });
@@ -502,8 +502,9 @@ describe('WalSyncEngine', () => {
 			const result = await engine.processEntry(entry);
 
 			expect(mocks.wal.markConflict).toHaveBeenCalledWith('conf');
-			expect(rollback).not.toHaveBeenCalled();
-			expect(onError).not.toHaveBeenCalled();
+			expect(mocks.invalidator.invalidateForEntry).toHaveBeenCalledWith(entry);
+			expect(rollback).toHaveBeenCalledTimes(1);
+			expect(onError).toHaveBeenCalled();
 			expect(result).toMatchObject({ status: 'CONFLICT', entryId: 'conf' });
 		});
 

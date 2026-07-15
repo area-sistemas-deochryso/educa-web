@@ -353,9 +353,12 @@ export class WalSyncEngine {
 	): Promise<WalProcessResult> {
 		const classified = classifyWalError(error);
 
-		// 409 Conflict → mark conflict, no retry
+		// 409 Conflict → mark conflict, no retry, surface to the user like a permanent error
 		if (classified.kind === 'conflict') {
 			await this.wal.markConflict(entry.id);
+			await this.cacheInvalidator.invalidateForEntry(entry);
+			cb?.rollback?.();
+			cb?.onError(error);
 			this.callbacks.delete(entry.id);
 			const result: WalProcessResult = { status: 'CONFLICT', entryId: entry.id };
 			this._entryProcessed$.next(result);
