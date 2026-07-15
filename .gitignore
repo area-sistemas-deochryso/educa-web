@@ -93,3 +93,7 @@ track-dev-log/
 
 # Worktree manifest (local coordination state — ephemeral)
 .claude/.locks/
+
+# Playwright e2e output (generated)
+/playwright-report/
+/test-results/
