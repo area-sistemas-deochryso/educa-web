@@ -145,6 +145,28 @@
 	}
 }
 
+.day-empty-state {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	color: var(--text-color-secondary);
+	pointer-events: none;
+
+	i {
+		font-size: 1.75rem;
+		opacity: 0.3;
+	}
+
+	p {
+		margin: 0;
+		font-size: 0.85rem;
+	}
+}
+
 // #endregion
 // #region Horario blocks
 .horario-block {

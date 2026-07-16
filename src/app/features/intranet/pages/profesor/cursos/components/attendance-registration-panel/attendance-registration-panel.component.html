@@ -39,6 +39,14 @@
 		<span>
 			La fecha elegida no corresponde al día de horario del curso ({{ diaSemanaEsperadoDescripcion() }}).
 		</span>
+		<button
+			pButton
+			type="button"
+			label="Ir a fecha válida"
+			icon="pi pi-calendar"
+			class="p-button-text p-button-sm"
+			(click)="irAFechaValida()"
+		></button>
 	</div>
 }
 <!-- #endregion -->

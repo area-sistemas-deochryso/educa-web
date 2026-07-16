@@ -113,7 +113,7 @@ function formatCountdown(remainingMs: number): string {
 }
 
 /** Calculate the next occurrence date for a block's day+time relative to now */
-function getNextOccurrence(block: HorarioBlock, now: Date): Date {
+export function getNextOccurrence(block: HorarioBlock, now: Date): Date {
 	const jsDay = now.getDay();
 	const todayDia = jsDay >= 1 && jsDay <= 5 ? jsDay : 0;
 	const nowMinutes = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
@@ -140,6 +140,14 @@ function getNextOccurrence(block: HorarioBlock, now: Date): Date {
 	fallback.setDate(fallback.getDate() + 7);
 	fallback.setHours(Math.floor(startMin / 60), startMin % 60, 0, 0);
 	return fallback;
+}
+
+/** Formatea una fecha como "yyyy-mm-dd" (formato esperado por los endpoints de asistencia). */
+export function formatDateISO(date: Date): string {
+	const y = date.getFullYear();
+	const m = String(date.getMonth() + 1).padStart(2, '0');
+	const d = String(date.getDate()).padStart(2, '0');
+	return `${y}-${m}-${d}`;
 }
 
 /**
