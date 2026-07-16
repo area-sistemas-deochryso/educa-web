@@ -138,11 +138,11 @@ describe('IntranetLayoutComponent', () => {
 		expect(sessionActivity.start).toHaveBeenCalled();
 	});
 
-	it('calls forceLogout on logout()', () => {
+	it('calls forceLogout with reason "manual" on logout()', () => {
 		const sessionActivity = TestBed.inject(SessionActivityService);
 		fixture.detectChanges();
 		component.logout();
-		expect(sessionActivity.forceLogout).toHaveBeenCalled();
+		expect(sessionActivity.forceLogout).toHaveBeenCalledWith('manual');
 	});
 
 	it('selectModulo changes selectedModuloId', () => {
