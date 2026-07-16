@@ -149,16 +149,4 @@ export const HORAS_DIA = [
   '16:00',
   '17:00',
 ];
-
-// Colores para diferenciar cursos en vista semanal
-export const CURSO_COLORS = [
-  '#3B82F6', // blue
-  '#10B981', // green
-  '#F59E0B', // amber
-  '#EF4444', // red
-  '#8B5CF6', // violet
-  '#EC4899', // pink
-  '#14B8A6', // teal
-  '#F97316', // orange
-];
 // #endregion

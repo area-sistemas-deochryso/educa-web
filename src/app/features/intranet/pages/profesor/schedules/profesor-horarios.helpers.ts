@@ -1,4 +1,5 @@
 import { HorarioProfesorDto } from '../models';
+import { cursoColorFor } from '@intranet-shared/config/curso-colors';
 
 // #region Types
 export interface HorarioBlock {
@@ -26,11 +27,6 @@ export interface CountdownInfo {
 // #endregion
 
 // #region Constants
-const CURSO_COLORS = [
-	'#3B82F6', '#10B981', '#F59E0B', '#EF4444',
-	'#8B5CF6', '#EC4899', '#14B8A6', '#F97316',
-];
-
 const HORA_INICIO_DIA = 7 * 60; // 07:00 en minutos
 const PX_PER_HOUR = 60;
 // #endregion
@@ -50,22 +46,14 @@ export function buildBlocks(
 	horarios: HorarioProfesorDto[],
 	estudiantesPorSalon: Map<number, number>,
 ): HorarioBlock[] {
-	const colorMap = new Map<number, string>();
-	let colorIdx = 0;
-
 	return horarios.map((h) => {
-		if (!colorMap.has(h.cursoId)) {
-			colorMap.set(h.cursoId, CURSO_COLORS[colorIdx % CURSO_COLORS.length]);
-			colorIdx++;
-		}
-
 		const [hi, mi] = h.horaInicio.split(':').map(Number);
 		const [hf, mf] = h.horaFin.split(':').map(Number);
 		const startMin = hi * 60 + mi;
 		const endMin = hf * 60 + mf;
 		const duration = endMin - startMin;
 		const offset = startMin - HORA_INICIO_DIA;
-		const color = colorMap.get(h.cursoId) || CURSO_COLORS[0];
+		const color = cursoColorFor(h.cursoId);
 
 		return {
 			id: h.id,

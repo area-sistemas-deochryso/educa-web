@@ -8,6 +8,7 @@ import { SkeletonLoaderComponent } from '@shared/components';
 import { StudentSchedulesFacade } from './services/estudiante-horarios.facade';
 import { EstudianteFacade } from '../services/estudiante.facade';
 import { HorarioProfesorDto } from '../models';
+import { cursoColorFor } from '@intranet-shared/config/curso-colors';
 
 // #endregion
 // #region Block interface
@@ -36,14 +37,6 @@ interface CountdownInfo {
 
 // #endregion
 // #region Helpers
-// Excepción legítima a `rules/design-system.md` §8: paleta rotativa decorativa
-// consumida por `darkenColor()` que opera con parseInt(hex) bitwise — requiere
-// literales hex, no resuelve `var()`.
-const CURSO_COLORS = [
-	'#3B82F6', '#10B981', '#F59E0B', '#EF4444',
-	'#8B5CF6', '#EC4899', '#14B8A6', '#F97316',
-];
-
 function darkenColor(hex: string): string {
 	const num = parseInt(hex.replace('#', ''), 16);
 	const r = Math.max(0, (num >> 16) - 40);
@@ -56,22 +49,14 @@ const HORA_INICIO_DIA = 7 * 60;
 const PX_PER_HOUR = 60;
 
 function buildBlocks(horarios: HorarioProfesorDto[]): HorarioBlock[] {
-	const colorMap = new Map<number, string>();
-	let colorIdx = 0;
-
 	return horarios.map((h) => {
-		if (!colorMap.has(h.cursoId)) {
-			colorMap.set(h.cursoId, CURSO_COLORS[colorIdx % CURSO_COLORS.length]);
-			colorIdx++;
-		}
-
 		const [hi, mi] = h.horaInicio.split(':').map(Number);
 		const [hf, mf] = h.horaFin.split(':').map(Number);
 		const startMin = hi * 60 + mi;
 		const endMin = hf * 60 + mf;
 		const duration = endMin - startMin;
 		const offset = startMin - HORA_INICIO_DIA;
-		const color = colorMap.get(h.cursoId) || CURSO_COLORS[0];
+		const color = cursoColorFor(h.cursoId);
 
 		return {
 			id: h.id,

@@ -1,5 +1,5 @@
 import type { HorarioResponseDto, HorarioWeeklyBlock } from '../models/horario.interface';
-import { CURSO_COLORS } from '../models/horario.interface';
+import { cursoColorFor } from '@intranet-shared/config/curso-colors';
 
 const HORA_INICIO_DIA = 7 * 60; // 07:00 AM en minutos
 
@@ -25,21 +25,11 @@ export function calcularPosicionVertical(horaInicio: string): number {
  * Asigna un color por curso de forma determinística.
  */
 export function buildWeeklyBlocks(horarios: HorarioResponseDto[]): HorarioWeeklyBlock[] {
-	const cursoColorMap = new Map<number, string>();
-	let colorIndex = 0;
-
-	return horarios.map((horario) => {
-		if (!cursoColorMap.has(horario.cursoId)) {
-			cursoColorMap.set(horario.cursoId, CURSO_COLORS[colorIndex % CURSO_COLORS.length]);
-			colorIndex++;
-		}
-
-		return {
-			horario,
-			dia: horario.diaSemana,
-			color: cursoColorMap.get(horario.cursoId) || CURSO_COLORS[0],
-			duracionMinutos: calcularDuracionMinutos(horario.horaInicio, horario.horaFin),
-			posicionVertical: calcularPosicionVertical(horario.horaInicio),
-		};
-	});
+	return horarios.map((horario) => ({
+		horario,
+		dia: horario.diaSemana,
+		color: cursoColorFor(horario.cursoId),
+		duracionMinutos: calcularDuracionMinutos(horario.horaInicio, horario.horaFin),
+		posicionVertical: calcularPosicionVertical(horario.horaInicio),
+	}));
 }
