@@ -56,6 +56,8 @@
 					id="eval-peso"
 					[ngModel]="formData().peso"
 					(ngModelChange)="updateField('peso', $event)"
+					(onInput)="onPesoInput($event)"
+					(onBlur)="onPesoBlur()"
 					[min]="PESO_MINIMO"
 					[max]="PESO_MAXIMO"
 					[minFractionDigits]="2"
@@ -139,7 +141,7 @@
 				[label]="isEditing() ? 'Guardar' : 'Crear'"
 				icon="pi pi-check"
 				[loading]="saving()"
-				[disabled]="!isFormValid()"
+				[disabled]="!isFormValid() || saving()"
 				(click)="onSave()"
 			></button>
 		</div>
