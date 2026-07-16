@@ -154,6 +154,10 @@ export class SchedulesDataFacade {
         next: (detalle) => {
           if (detalle) {
             this.store.setHorarioDetalle(detalle);
+            const modo = this.store.optionsStore.resolveModoForSalon(detalle.salonId);
+            if (modo === 'PorCurso') {
+              this.loadProfesoresCurso(detalle.cursoId, detalle.anio);
+            }
           } else {
             this.errorHandler.showError(
               UI_SUMMARIES.error,

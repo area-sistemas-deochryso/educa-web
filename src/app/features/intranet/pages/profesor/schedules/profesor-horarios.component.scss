@@ -189,6 +189,28 @@ $debug-accent-label: #89b4fa;
 	}
 }
 
+.day-empty-state {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	color: var(--text-color-secondary);
+	pointer-events: none;
+
+	i {
+		font-size: 1.75rem;
+		opacity: 0.3;
+	}
+
+	p {
+		margin: 0;
+		font-size: 0.85rem;
+	}
+}
+
 // #endregion
 // #region Horario blocks
 .horario-block {
@@ -434,6 +456,60 @@ $debug-accent-label: #89b4fa;
 			animation: pulse-countdown 1.5s ease-in-out infinite;
 		}
 	}
+}
+
+// #endregion
+// #region Popover de detalle de clase
+.popover-content {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	min-width: 220px;
+	max-width: 280px;
+	padding: 0.25rem;
+}
+
+.popover-header {
+	display: flex;
+	flex-direction: column;
+	gap: 0.15rem;
+
+	.popover-curso {
+		font-weight: 700;
+		font-size: 0.95rem;
+		color: var(--text-color);
+	}
+
+	.popover-horario {
+		font-size: 0.8rem;
+		color: var(--text-color-secondary);
+	}
+}
+
+.popover-details {
+	display: flex;
+	flex-direction: column;
+	gap: 0.3rem;
+
+	span {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+		font-size: 0.82rem;
+		color: var(--text-color-secondary);
+
+		i {
+			font-size: 0.75rem;
+			width: 16px;
+			text-align: center;
+		}
+	}
+}
+
+.popover-actions {
+	display: flex;
+	flex-direction: column;
+	gap: 0.4rem;
 }
 
 // #endregion

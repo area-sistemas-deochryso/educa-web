@@ -278,27 +278,27 @@
 // #endregion
 // #region Danger link
 .danger-link {
-	display: flex;
+	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	gap: 0.4rem;
-	font-size: 0.78rem;
-	color: #ef4444;
+	gap: 0.35rem;
+	font-size: 0.75rem;
+	color: var(--text-color-secondary);
 	cursor: pointer;
 	background: none;
-	border: 1px solid rgba(239, 68, 68, 0.2);
-	border-radius: 8px;
-	padding: 0.6rem 1rem;
-	transition: all 0.15s;
-	width: 100%;
+	border: none;
+	border-radius: 6px;
+	padding: 0.35rem 0.5rem;
+	margin-top: 1rem;
+	transition: color 0.15s;
 
 	i {
-		font-size: 0.75rem;
+		font-size: 0.7rem;
 	}
 
 	&:hover {
-		background: rgba(239, 68, 68, 0.04);
-		border-color: rgba(239, 68, 68, 0.35);
+		color: #ef4444;
+		text-decoration: underline;
 	}
 }
 

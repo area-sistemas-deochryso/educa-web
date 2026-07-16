@@ -154,6 +154,7 @@ import { EstadoAsistenciaCurso } from '../models';
 									[stats]="asistenciaVm().registroStats"
 									[diaSemanaEsperado]="selectedHorarioDiaSemana()"
 									[diaSemanaEsperadoDescripcion]="selectedHorarioDiaDescripcion()"
+									[initialFecha]="initialFecha()"
 									(fechaChange)="onFechaChange($event)"
 									(estadoChange)="onEstadoChange($event)"
 									(justificacionChange)="onJustificacionChange($event)"
@@ -227,10 +228,14 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
 
 	// #region Lifecycle
 	private readonly pendingHorarioId = signal<number | null>(null);
+	/** Fecha (yyyy-mm-dd) recibida por queryParam, ej. desde el popover de "Mi Horario". */
+	readonly initialFecha = signal<string | null>(null);
+	private pendingFecha: string | null = null;
 
 	constructor() {
 		const qpHorarioId = Number(this.route.snapshot.queryParamMap.get('horarioId'));
 		if (qpHorarioId > 0) this.pendingHorarioId.set(qpHorarioId);
+		this.pendingFecha = this.route.snapshot.queryParamMap.get('fecha');
 
 		effect(() => {
 			const opts = this.cursoOptions();
@@ -239,6 +244,12 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
 				this.pendingHorarioId.set(null);
 				this.selectedHorarioId.set(pending);
 				this.onCursoChange(pending);
+
+				if (this.pendingFecha) {
+					this.initialFecha.set(this.pendingFecha);
+					this.asistenciaFacade.loadRegistro(this.pendingFecha, pending);
+					this.pendingFecha = null;
+				}
 			}
 		});
 	}

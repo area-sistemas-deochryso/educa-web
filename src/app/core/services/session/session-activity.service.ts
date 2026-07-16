@@ -152,16 +152,24 @@ export class SessionActivityService {
 	 *
 	 * Safe to call multiple times (e.g. concurrent 401s) — only the first
 	 * call executes, subsequent calls are no-ops.
+	 *
+	 * @param reason - 'expired' (default) shows the "session expired" warning;
+	 * 'manual' shows a neutral confirmation toast instead. Cleanup is identical
+	 * either way — only the message shown to the user changes.
 	 */
-	forceLogout(): void {
+	forceLogout(reason: 'expired' | 'manual' = 'expired'): void {
 		if (this._isLoggingOut) return;
 		this._isLoggingOut = true;
 
-		this.errorHandler.showWarning(
-			'Sesión expirada',
-			'Tu sesión expiró. Iniciá sesión de nuevo.',
-			5000,
-		);
+		if (reason === 'manual') {
+			this.errorHandler.showSuccess('Sesión cerrada correctamente', 'Hasta pronto.', 3000);
+		} else {
+			this.errorHandler.showWarning(
+				'Sesión expirada',
+				'Tu sesión expiró. Iniciá sesión de nuevo.',
+				5000,
+			);
+		}
 
 		this.coordinator.broadcast({ type: 'logout' });
 		this.stop();

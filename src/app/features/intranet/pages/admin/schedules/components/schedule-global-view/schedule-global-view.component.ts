@@ -8,7 +8,7 @@ import type { HorarioResponseDto } from '../../models/horario.interface';
 import { DIAS_SEMANA } from '../../models/horario.interface';
 
 interface ProblemGroup {
-  type: 'no-profesor' | 'conflict';
+  type: 'no-profesor' | 'sin-estudiantes' | 'conflict';
   icon: string;
   label: string;
   severity: string;
@@ -56,6 +56,26 @@ export class ScheduleGlobalViewComponent {
           dia: this.getDiaLabel(h.diaSemana),
           hora: `${h.horaInicio} - ${h.horaFin}`,
           detail: `${h.cantidadEstudiantes} estudiantes sin profesor`,
+        })),
+      });
+    }
+
+    const sinEstudiantes = all.filter((h) => h.estado && h.cantidadEstudiantes === 0);
+    if (sinEstudiantes.length > 0) {
+      groups.push({
+        type: 'sin-estudiantes',
+        icon: 'pi pi-user-slash',
+        label: 'Sin Estudiantes Asignados',
+        severity: 'warning',
+        items: sinEstudiantes.map((h) => ({
+          horarioId: h.id,
+          curso: h.cursoNombre,
+          salon: h.salonDescripcion,
+          dia: this.getDiaLabel(h.diaSemana),
+          hora: `${h.horaInicio} - ${h.horaFin}`,
+          detail: h.profesorNombreCompleto
+            ? `Sin estudiantes (profesor: ${h.profesorNombreCompleto})`
+            : 'Sin estudiantes asignados',
         })),
       });
     }

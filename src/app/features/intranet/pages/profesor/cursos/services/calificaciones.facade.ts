@@ -2,8 +2,9 @@
 import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
-import { withRetry, facadeErrorHandler } from '@core/helpers';
+import { withRetry, facadeErrorHandler, detectarNivel } from '@core/helpers';
 import { ErrorHandlerService, WalFacadeHelper, WalCrossTabRefetchService } from '@core/services';
+import { CalificacionConfigService } from '@intranet-shared/services/calificacion-config';
 import { environment } from '@config';
 import { ProfesorApiService } from '../../services/profesor-api.service';
 import { CursoContenidoStore } from './curso-contenido.store';
@@ -29,6 +30,7 @@ export class CalificacionesFacade {
 	private readonly errorHandler = inject(ErrorHandlerService);
 	private readonly wal = inject(WalFacadeHelper);
 	private readonly crossTabRefetch = inject(WalCrossTabRefetchService);
+	private readonly calificacionConfigService = inject(CalificacionConfigService);
 	private readonly destroyRef = inject(DestroyRef);
 	private readonly calificacionUrl = `${environment.apiUrl}/api/Calificacion`;
 	private readonly errHandler = facadeErrorHandler({
@@ -81,6 +83,7 @@ export class CalificacionesFacade {
 					this.store.setPeriodos(result.periodos);
 					if ('salon' in result && result.salon) {
 						this.store.setSalonEstudiantes(result.salon.estudiantes);
+						this.loadCalificacionConfig(result.salon.grado);
 					}
 					this.store.setLoading(false);
 				},
@@ -365,6 +368,23 @@ export class CalificacionesFacade {
 	// #endregion
 
 	// #region Helpers privados
+
+	/**
+	 * Resuelve el nivel educativo del salón (a partir del nombre de grado, ej. "1ro Primaria")
+	 * y fetchea su ConfiguracionCalificacionListDto (umbral de aprobación real, no el default 11/20).
+	 */
+	private loadCalificacionConfig(grado: string): void {
+		const nivel = detectarNivel(grado);
+		if (!nivel) {
+			this.store.setCalificacionConfig(null);
+			return;
+		}
+
+		this.calificacionConfigService
+			.getConfig(nivel)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe((config) => this.store.setCalificacionConfig(config));
+	}
 
 	/** Refetch calificaciones after mutation (needed for nested notas). */
 	private refreshCalificaciones(contenidoId: number): void {

@@ -4,14 +4,29 @@ import { validateTimeRange } from '@shared/models';
 const PRIMERA_HORA_VISIBLE = HORAS_DIA[0];
 const ULTIMA_HORA_VISIBLE = HORAS_DIA[HORAS_DIA.length - 1];
 
+/** Duración máxima de un bloque horario, en minutos (4 horas). */
+const MAX_DURACION_MINUTOS = 240;
+
+function toMinutes(hora: string): number {
+	const [h, m] = hora.split(':').map(Number);
+	return h * 60 + m;
+}
+
 /**
  * La grilla semanal solo renderiza filas para HORAS_DIA (07:00–17:00), ubicando cada
- * bloque por la hora de HorInicio. Un horario que empieza fuera de ese rango se guarda
- * pero desaparece de la grilla sin ningún aviso — este chequeo evita ese estado inválido.
+ * bloque por la hora de HoraInicio. Un horario que empieza o termina fuera de ese rango
+ * se guarda pero desaparece de la grilla sin ningún aviso — este chequeo evita ese estado
+ * inválido. También limita la duración de un bloque a MAX_DURACION_MINUTOS.
  */
-function validateHoraInicioEnRangoVisible(horaInicio: string): string | null {
+export function validateRangoYDuracion(horaInicio: string, horaFin: string): string | null {
 	if (horaInicio < PRIMERA_HORA_VISIBLE || horaInicio > ULTIMA_HORA_VISIBLE) {
 		return `La hora de inicio debe estar entre ${PRIMERA_HORA_VISIBLE} y ${ULTIMA_HORA_VISIBLE}`;
+	}
+	if (horaFin < PRIMERA_HORA_VISIBLE || horaFin > ULTIMA_HORA_VISIBLE) {
+		return `La hora de fin debe estar entre ${PRIMERA_HORA_VISIBLE} y ${ULTIMA_HORA_VISIBLE}`;
+	}
+	if (toMinutes(horaFin) - toMinutes(horaInicio) > MAX_DURACION_MINUTOS) {
+		return `El horario no puede durar más de ${MAX_DURACION_MINUTOS / 60} horas`;
 	}
 	return null;
 }
@@ -30,7 +45,7 @@ export function validateHorarioForm(formData: HorarioFormData, wizardStep: numbe
 			formData.salonId !== null &&
 			formData.cursoId !== null &&
 			validateTimeRange(formData.horaInicio, formData.horaFin) === null &&
-			validateHoraInicioEnRangoVisible(formData.horaInicio) === null
+			validateRangoYDuracion(formData.horaInicio, formData.horaFin) === null
 		);
 	}
 
@@ -47,7 +62,7 @@ export function validateHoraInicio(horaInicio: string, horaFin: string): string 
 	if (error) {
 		return error.field === 'horaInicio' || error.field === 'range' ? error.message : null;
 	}
-	return validateHoraInicioEnRangoVisible(horaInicio);
+	return validateRangoYDuracion(horaInicio, horaFin);
 }
 
 /**
@@ -56,6 +71,8 @@ export function validateHoraInicio(horaInicio: string, horaFin: string): string 
  */
 export function validateHoraFin(horaFin: string, horaInicio: string): string | null {
 	const error = validateTimeRange(horaInicio, horaFin);
-	if (!error) return null;
-	return error.field === 'horaFin' || error.field === 'range' ? error.message : null;
+	if (error) {
+		return error.field === 'horaFin' || error.field === 'range' ? error.message : null;
+	}
+	return validateRangoYDuracion(horaInicio, horaFin);
 }

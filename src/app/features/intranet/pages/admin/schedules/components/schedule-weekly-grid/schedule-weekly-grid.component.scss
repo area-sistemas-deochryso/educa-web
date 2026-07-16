@@ -37,11 +37,26 @@
 }
 
 .day-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
   color: var(--intranet-accent-color-blue);
   border-right: 1px solid var(--surface-border);
 
   &:last-child {
     border-right: none;
+  }
+}
+
+.day-empty-hint {
+  display: inline-flex;
+  align-items: center;
+
+  i {
+    font-size: 0.8rem;
+    opacity: 0.55;
+    color: var(--text-color-secondary);
   }
 }
 

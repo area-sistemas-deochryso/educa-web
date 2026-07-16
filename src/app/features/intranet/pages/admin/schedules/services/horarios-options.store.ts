@@ -34,6 +34,8 @@ export class SchedulesOptionsStore {
 	// #region Lecturas públicas
 	readonly optionsLoading = this._optionsLoading.asReadonly();
 	readonly esVerano = this._esVerano.asReadonly();
+	/** Asignaciones ProfesorCurso activas cargadas (modo PorCurso). Usado por el drawer. */
+	readonly profesoresCurso = this._profesoresCurso.asReadonly();
 	// #endregion
 
 	// #region Computed - Salones

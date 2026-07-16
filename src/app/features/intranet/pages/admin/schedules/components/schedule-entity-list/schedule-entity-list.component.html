@@ -30,9 +30,9 @@
             ></i>
           </div>
           <div class="entity-info">
-            <span class="entity-name">{{ entity.label }}</span>
+            <span class="entity-name" [pTooltip]="entity.label" [title]="entity.label" tooltipPosition="top">{{ entity.label }}</span>
             @if (entity.subtitle) {
-              <span class="entity-subtitle">{{ entity.subtitle }}</span>
+              <span class="entity-subtitle" [pTooltip]="entity.subtitle" [title]="entity.subtitle" tooltipPosition="top">{{ entity.subtitle }}</span>
             }
           </div>
           <div class="entity-badge">

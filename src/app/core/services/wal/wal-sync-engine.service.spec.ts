@@ -529,16 +529,13 @@ describe('WalSyncEngine', () => {
 
 			const result = await engine.processEntry(entry);
 
-			expect(mocks.wal.markFailed).toHaveBeenCalledWith(
-				'perm',
-				expect.stringContaining('400'),
-			);
+			expect(mocks.wal.markFailed).toHaveBeenCalledWith('perm', 'invalid');
 			expect(mocks.invalidator.invalidateForEntry).toHaveBeenCalledWith(entry);
 			expect(rollback).toHaveBeenCalledTimes(1);
 			expect(onError).toHaveBeenCalledWith(httpError);
 			expect(result.status).toBe('FAILED');
 			if (result.status === 'FAILED') {
-				expect(result.error).toContain('400');
+				expect(result.error).toBe('invalid');
 			}
 		});
 

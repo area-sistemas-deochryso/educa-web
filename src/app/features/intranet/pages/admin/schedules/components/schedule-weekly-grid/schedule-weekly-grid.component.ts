@@ -54,6 +54,11 @@ export class ScheduleWeeklyGridComponent {
     return this.getBlocksForSlot(dia, hora).length === 0;
   }
 
+  /** true si ninguna hora del día tiene bloques asignados (columna completa vacía). */
+  isDayEmpty(dia: number): boolean {
+    return !this.blocks().some((block) => block.dia === dia);
+  }
+
   hasNoProfesor(block: HorarioWeeklyBlock): boolean {
     return block.horario.profesorId === null;
   }

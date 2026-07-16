@@ -12,11 +12,12 @@ import {
 import { formatNotaConConfig } from '@intranet-shared/services/calificacion-config';
 import type { ConfiguracionCalificacionListDto } from '@data/models';
 import { SkeletonLoaderComponent } from '@shared/components';
+import { PluralizePipe } from '@intranet-shared/pipes';
 
 @Component({
 	selector: 'app-calificaciones-panel',
 	standalone: true,
-	imports: [CommonModule, ButtonModule, TooltipModule, TagModule, SkeletonLoaderComponent],
+	imports: [CommonModule, ButtonModule, TooltipModule, TagModule, SkeletonLoaderComponent, PluralizePipe],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './calificaciones-panel.component.html',
 	styleUrl: './calificaciones-panel.component.scss',

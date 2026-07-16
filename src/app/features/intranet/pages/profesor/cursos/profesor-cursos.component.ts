@@ -7,6 +7,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { filter, take } from 'rxjs';
 import { PageHeaderComponent } from '@intranet-shared/components';
+import { PluralizePipe } from '@intranet-shared/pipes';
 import { buildCursoColorMap } from '@intranet-shared/config/curso-colors';
 import { ProfesorFacade } from '../services/profesor.facade';
 import { CursoContenidoDataFacade } from './services/curso-contenido-data.facade';
@@ -25,6 +26,7 @@ import { HorarioProfesorDto, CrearCursoContenidoRequest } from '../models';
 		ProgressSpinnerModule,
 		RouterLink,
 		PageHeaderComponent,
+		PluralizePipe,
 		CursoContentDialogComponent,
 		CursoBuilderDialogComponent,
 	],
@@ -90,7 +92,7 @@ import { HorarioProfesorDto, CrearCursoContenidoRequest } from '../models';
 								</div>
 								<div class="flex align-items-center gap-2">
 									<i class="pi pi-users text-xs"></i>
-									<span>{{ horario.cantidadEstudiantes }} estudiantes</span>
+									<span>{{ horario.cantidadEstudiantes | pluralize: 'estudiante' }}</span>
 								</div>
 							</div>
 						</div>

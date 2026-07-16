@@ -3,7 +3,14 @@
     <!-- Header row -->
     <div class="grid-header time-header">Hora</div>
     @for (dia of DIAS; track dia.value) {
-      <div class="grid-header day-header">{{ dia.label }}</div>
+      <div class="grid-header day-header">
+        {{ dia.label }}
+        @if (!isAdmin() && isDayEmpty(dia.value)) {
+          <span class="day-empty-hint" [pTooltip]="'Sin horarios este día'" tooltipPosition="top">
+            <i class="pi pi-calendar-times"></i>
+          </span>
+        }
+      </div>
     }
 
     <!-- Time slots -->

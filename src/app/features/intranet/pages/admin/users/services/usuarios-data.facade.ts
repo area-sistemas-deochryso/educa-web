@@ -1,7 +1,7 @@
 /* eslint-disable max-lines -- Razón: data facade de usuarios cohesivo (carga + filtros + búsqueda + cache refresh cross-tab). Partirlo fragmentaría el pipeline de forkJoin sin ganancia real. */
 import { DestroyRef, Injectable, effect, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { catchError, debounceTime, distinctUntilChanged, filter, switchMap, tap } from 'rxjs/operators';
+import { catchError, debounceTime, distinctUntilChanged, filter, map, switchMap, tap } from 'rxjs/operators';
 import { forkJoin, from, of, Subject } from 'rxjs';
 
 import { ErrorHandlerService, SwService, WalFacadeHelper, WalCrossTabRefetchService } from '@core/services';
@@ -38,6 +38,24 @@ export class UsersDataFacade {
 	private lastCrudMutationTime = 0;
 	private static readonly CACHE_COOLDOWN_MS = 3000;
 
+	/**
+	 * Guard de stale-response: `loadData()`, `refreshUsuariosOnly()` y el pipeline
+	 * de búsqueda escriben `store.setItems()` de forma independiente (sin
+	 * cancelarse entre sí). Cada request de lista de usuarios reserva un id
+	 * incremental antes de disparar la llamada; al resolver, solo escribe el
+	 * store si sigue siendo la última request emitida (evita que una respuesta
+	 * lenta y desactualizada pise el resultado de una búsqueda más reciente).
+	 */
+	private latestItemsRequestId = 0;
+
+	private beginItemsRequest(): number {
+		return ++this.latestItemsRequestId;
+	}
+
+	private isCurrentItemsRequest(requestId: number): boolean {
+		return requestId === this.latestItemsRequestId;
+	}
+
 	// Expone ViewModel del store
 	readonly vm = this.store.vm;
 
@@ -68,6 +86,7 @@ export class UsersDataFacade {
 		const estado = (this.store.filterEstado() as boolean | null) ?? undefined;
 		const search = this.store.searchTerm() || undefined;
 		const salonId = this.store.filterSalonId() ?? undefined;
+		const itemsRequestId = this.beginItemsRequest();
 
 		forkJoin({
 			estadisticas: this.usuariosService.obtenerEstadisticas().pipe(
@@ -119,8 +138,10 @@ export class UsersDataFacade {
 				this.store.setSalonesFilter(salones);
 				this.store.setSedes(sedes);
 
-				this.store.setItems(usuarios.data);
-				this.store.setPaginationData(usuarios.page, usuarios.pageSize, usuarios.total);
+				if (this.isCurrentItemsRequest(itemsRequestId)) {
+					this.store.setItems(usuarios.data);
+					this.store.setPaginationData(usuarios.page, usuarios.pageSize, usuarios.total);
+				}
 				this.store.setTableReady(true);
 				this.store.setLoading(false);
 
@@ -208,6 +229,7 @@ export class UsersDataFacade {
 		const estado = (this.store.filterEstado() as boolean | null) ?? undefined;
 		const search = this.store.searchTerm() || undefined;
 		const salonId = this.store.filterSalonId() ?? undefined;
+		const itemsRequestId = this.beginItemsRequest();
 
 		this.usuariosService
 			.listarUsuariosPaginado(page, pageSize, rol, estado, search, salonId)
@@ -229,8 +251,10 @@ export class UsersDataFacade {
 				takeUntilDestroyed(this.destroyRef),
 			)
 			.subscribe((result) => {
-				this.store.setItems(result.data);
-				this.store.setPaginationData(result.page, result.pageSize, result.total);
+				if (this.isCurrentItemsRequest(itemsRequestId)) {
+					this.store.setItems(result.data);
+					this.store.setPaginationData(result.page, result.pageSize, result.total);
+				}
 				if (!silent) {
 					this.store.setLoading(false);
 				}
@@ -301,6 +325,7 @@ export class UsersDataFacade {
 					const rol = this.store.filterRol() ?? undefined;
 					const estado = (this.store.filterEstado() as boolean | null) ?? undefined;
 					const salonId = this.store.filterSalonId() ?? undefined;
+					const itemsRequestId = this.beginItemsRequest();
 
 					return this.usuariosService
 						.listarUsuariosPaginado(page, pageSize, rol, estado, search || undefined, salonId)
@@ -319,13 +344,16 @@ export class UsersDataFacade {
 									hasPreviousPage: false,
 								});
 							}),
+							map((result) => ({ result, itemsRequestId })),
 						);
 				}),
 				takeUntilDestroyed(this.destroyRef),
 			)
-			.subscribe((result) => {
-				this.store.setItems(result.data);
-				this.store.setPaginationData(result.page, result.pageSize, result.total);
+			.subscribe(({ result, itemsRequestId }) => {
+				if (this.isCurrentItemsRequest(itemsRequestId)) {
+					this.store.setItems(result.data);
+					this.store.setPaginationData(result.page, result.pageSize, result.total);
+				}
 				this.store.setLoading(false);
 			});
 	}

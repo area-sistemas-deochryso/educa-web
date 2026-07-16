@@ -2,7 +2,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { describe, expect, it } from 'vitest';
 
-import { classifyWalError } from './wal-error.utils';
+import { classifyWalError, extractErrorMessage } from './wal-error.utils';
 
 describe('classifyWalError', () => {
 	it('clasifica 409 Conflict como kind=conflict', () => {
@@ -10,7 +10,7 @@ describe('classifyWalError', () => {
 		expect(classifyWalError(err)).toEqual({ kind: 'conflict' });
 	});
 
-	it('clasifica 400 Bad Request como kind=permanent con mensaje extraído', () => {
+	it('clasifica 400 Bad Request como kind=permanent con mensaje curado del backend, sin prefijo HTTP', () => {
 		const err = new HttpErrorResponse({
 			status: 400,
 			statusText: 'Bad Request',
@@ -18,8 +18,7 @@ describe('classifyWalError', () => {
 		});
 		const result = classifyWalError(err);
 		expect(result.kind).toBe('permanent');
-		expect((result as { kind: 'permanent'; message: string }).message).toContain('400');
-		expect((result as { kind: 'permanent'; message: string }).message).toContain(
+		expect((result as { kind: 'permanent'; message: string }).message).toBe(
 			'Validación fallida',
 		);
 	});
@@ -53,5 +52,58 @@ describe('classifyWalError', () => {
 		expect(classifyWalError(new Error('boom'))).toEqual({ kind: 'retryable' });
 		expect(classifyWalError('string error')).toEqual({ kind: 'retryable' });
 		expect(classifyWalError(null)).toEqual({ kind: 'retryable' });
+	});
+});
+
+describe('extractErrorMessage', () => {
+	it('usa `detail` (RFC 7807 ProblemDetails) sin prefijo HTTP', () => {
+		const err = new HttpErrorResponse({
+			status: 400,
+			statusText: 'Bad Request',
+			error: { detail: 'La suma de pesos excede 100%...' },
+		});
+		expect(extractErrorMessage(err)).toBe('La suma de pesos excede 100%...');
+	});
+
+	it('usa `message` (legacy ApiResponse) como fallback de `detail`, sin prefijo HTTP', () => {
+		const err = new HttpErrorResponse({
+			status: 400,
+			statusText: 'Bad Request',
+			error: { message: 'Validación fallida' },
+		});
+		expect(extractErrorMessage(err)).toBe('Validación fallida');
+	});
+
+	it('usa `mensaje` como fallback, sin prefijo HTTP', () => {
+		const err = new HttpErrorResponse({
+			status: 400,
+			statusText: 'Bad Request',
+			error: { mensaje: 'Mensaje en español' },
+		});
+		expect(extractErrorMessage(err)).toBe('Mensaje en español');
+	});
+
+	it('sin mensaje curado, cae a `error.error` con prefijo HTTP', () => {
+		const err = new HttpErrorResponse({
+			status: 400,
+			statusText: 'Bad Request',
+			error: { error: 'raw error string' },
+		});
+		expect(extractErrorMessage(err)).toBe('HTTP 400: raw error string');
+	});
+
+	it('sin body de error, cae a statusText con prefijo HTTP', () => {
+		const err = new HttpErrorResponse({ status: 500, statusText: 'Server Error' });
+		expect(extractErrorMessage(err)).toBe('HTTP 500: Server Error');
+	});
+
+	it('status=0 devuelve "Network error"', () => {
+		const err = new HttpErrorResponse({ status: 0, statusText: '' });
+		expect(extractErrorMessage(err)).toBe('Network error');
+	});
+
+	it('errores no-HTTP delegan a Error.message o String(error)', () => {
+		expect(extractErrorMessage(new Error('boom'))).toBe('boom');
+		expect(extractErrorMessage('string error')).toBe('string error');
 	});
 });
