@@ -244,7 +244,7 @@ export class IntranetLayoutComponent implements OnInit, OnDestroy {
 	}
 
 	logout(): void {
-		this.sessionActivity.forceLogout();
+		this.sessionActivity.forceLogout('manual');
 	}
 	// #endregion
 
