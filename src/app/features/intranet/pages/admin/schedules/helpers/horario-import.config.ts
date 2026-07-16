@@ -1,5 +1,6 @@
 import type { DiaSemana } from '@data/models';
 import { timeRangesOverlap } from '@shared/models';
+import { validateRangoYDuracion } from './horario-form.utils';
 
 // #region Tipos de importacion
 
@@ -138,6 +139,16 @@ export function parseId(value: unknown): number | null {
 	if (value == null || value === '') return null;
 	const num = Number(value);
 	return !isNaN(num) && Number.isInteger(num) && num > 0 ? num : null;
+}
+
+/**
+ * Valida el rango horario de una fila importada contra el mismo validador centralizado
+ * que usa el formulario manual (rango operativo 07:00-17:00 + duración máxima 4h).
+ * Sin este chequeo, la importación masiva era la vía más fácil para colar un horario
+ * anómalo (ej. un bloque de 14 horas) porque solo se validaba solape, no rango/duración.
+ */
+export function validateImportRowRango(horaInicio: string, horaFin: string): string | null {
+	return validateRangoYDuracion(horaInicio, horaFin);
 }
 
 // #endregion
