@@ -1,5 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 
+import { parseProblemDetails } from '@core/helpers';
+
 /**
  * Checks if error is a 409 Conflict (idempotency / concurrency).
  */
@@ -30,12 +32,15 @@ export function isPermanentError(error: unknown): boolean {
 
 /**
  * Extract a human-readable error message from an HTTP or generic error.
+ * Reuses `parseProblemDetails` (RFC 7807 + legacy ApiResponse + ValidationProblemDetails)
+ * so a curated backend `detail` is shown as-is, without the technical `HTTP {status}:` prefix.
  */
 export function extractErrorMessage(error: unknown): string {
 	if (error instanceof HttpErrorResponse) {
 		if (error.status === 0) return 'Network error';
-		const serverMsg =
-			error.error?.message || error.error?.error || error.statusText;
+		const { detail } = parseProblemDetails(error);
+		if (detail) return detail;
+		const serverMsg = error.error?.error || error.statusText;
 		return `HTTP ${error.status}: ${serverMsg}`;
 	}
 	if (error instanceof Error) return error.message;
