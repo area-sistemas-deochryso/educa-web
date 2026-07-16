@@ -12,6 +12,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { SkeletonModule } from 'primeng/skeleton';
 import { CheckboxModule } from 'primeng/checkbox';
 import { ConfirmationService } from 'primeng/api';
+import { ErrorHandlerService } from '@core/services';
 import {
 	GrupoContenidoDto,
 	GrupoEstudianteDto,
@@ -53,6 +54,7 @@ interface DropListData {
 })
 export class SalonGruposTabComponent {
 	private readonly confirmationService = inject(ConfirmationService);
+	private readonly errorHandler = inject(ErrorHandlerService);
 
 	// #region Inputs
 	readonly grupos = input<GrupoContenidoDto[]>([]);
@@ -194,7 +196,18 @@ export class SalonGruposTabComponent {
 
 	onMaxInputChange(value: number | string | null): void {
 		const num = typeof value === 'string' ? parseInt(value, 10) : value;
-		this._maxInputValue.set(num && !isNaN(num) ? Math.min(Math.max(num, 1), 50) : null);
+		if (num === null || num === undefined || isNaN(num)) {
+			this._maxInputValue.set(null);
+			return;
+		}
+		const clamped = Math.min(Math.max(num, 1), 50);
+		if (clamped !== num) {
+			this.errorHandler.showWarning(
+				'Límite ajustado',
+				`El mínimo por grupo es 1 y el máximo es 50, se ajustó automáticamente a ${clamped}.`,
+			);
+		}
+		this._maxInputValue.set(clamped);
 	}
 
 	onSaveMax(): void {
