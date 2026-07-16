@@ -32,6 +32,8 @@
 					id="horaInicio"
 					type="time"
 					pInputText
+					min="07:00"
+					max="17:00"
 					[(ngModel)]="formData().horaInicio"
 					class="w-full"
 				/>
@@ -44,6 +46,8 @@
 					id="horaFin"
 					type="time"
 					pInputText
+					min="07:00"
+					max="17:00"
 					[(ngModel)]="formData().horaFin"
 					class="w-full"
 				/>

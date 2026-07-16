@@ -18,6 +18,7 @@ import {
 	parseDiaSemana,
 	parseHora,
 	parseId,
+	validateImportRowRango,
 } from '../../helpers/horario-import.config';
 
 // #endregion
@@ -177,7 +178,12 @@ export class SchedulesImportDialogComponent {
 			if (!horaFin) errors.push('Hora fin');
 			if (!salonId) errors.push('Salon ID');
 			if (!cursoId) errors.push('Curso ID');
-			if (horaInicio && horaFin && horaInicio >= horaFin) errors.push('Inicio >= Fin');
+			if (horaInicio && horaFin && horaInicio >= horaFin) {
+				errors.push('Inicio >= Fin');
+			} else if (horaInicio && horaFin) {
+				const rangoError = validateImportRowRango(horaInicio, horaFin);
+				if (rangoError) errors.push(rangoError);
+			}
 
 			const valido = errors.length === 0;
 
