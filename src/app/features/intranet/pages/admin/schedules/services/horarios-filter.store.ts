@@ -58,6 +58,42 @@ export class SchedulesFilterStore {
 	);
 	// #endregion
 
+	// #region Computed - Conteos por opción de filtro
+	// * Conteos sobre la fuente completa (sin aplicar filtros) para que coincidan
+	// * con las tarjetas de métricas de arriba (Total/Activos/Sin profesor/...).
+
+	/** Cantidad de horarios activos por salón (salonId → count). */
+	readonly salonActiveCounts = computed<ReadonlyMap<number, number>>(() => {
+		const counts = new Map<number, number>();
+		for (const h of this._horariosSource()) {
+			if (!h.estado) continue;
+			counts.set(h.salonId, (counts.get(h.salonId) ?? 0) + 1);
+		}
+		return counts;
+	});
+
+	/** Cantidad de horarios activos por día de la semana (diaSemana → count). */
+	readonly diaActiveCounts = computed<ReadonlyMap<number, number>>(() => {
+		const counts = new Map<number, number>();
+		for (const h of this._horariosSource()) {
+			if (!h.estado) continue;
+			counts.set(h.diaSemana, (counts.get(h.diaSemana) ?? 0) + 1);
+		}
+		return counts;
+	});
+
+	/** Conteo de horarios por estado (activos / inactivos) sobre la fuente completa. */
+	readonly estadoCounts = computed<{ activos: number; inactivos: number }>(() => {
+		let activos = 0;
+		let inactivos = 0;
+		for (const h of this._horariosSource()) {
+			if (h.estado) activos++;
+			else inactivos++;
+		}
+		return { activos, inactivos };
+	});
+	// #endregion
+
 	// #region Computed - Entity lists
 	readonly salonEntities = computed<ScheduleEntityItem[]>(() => {
 		const horarios = this.horariosFiltrados();

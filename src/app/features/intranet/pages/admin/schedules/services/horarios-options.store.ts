@@ -96,21 +96,39 @@ export class SchedulesOptionsStore {
 	});
 
 	/**
-	 * Profesores filtrados según el modo de asignación:
+	 * Profesores filtrados según el modo de asignación del salón seleccionado en el formulario.
+	 * Delega en {@link profesoresParaSalon} — ver ahí el criterio de filtrado por modo.
+	 */
+	readonly profesoresParaAsignacion = computed<ProfesorOption[]>(() =>
+		this.profesoresParaSalon(this.formStore.formData().salonId ?? null),
+	);
+
+	/** Resuelve el modo de asignación para un salonId arbitrario (usado por el drawer). */
+	resolveModoForSalon(salonId: number): ModoAsignacion | null {
+		const salon = this._salonesDisponibles().find((s) => s.salonId === salonId);
+		if (!salon) return null;
+		return resolveModoAsignacion(salon.gradoOrden, salon.seccion);
+	}
+
+	/**
+	 * Profesores elegibles para un salonId arbitrario, según su modo de asignación:
 	 * - TutorPleno: solo el tutor del salón
 	 * - PorCurso: profesores con ProfesorCurso activo para el curso seleccionado
-	 * - Flexible: todos los profesores activos
-	 * - null (sin salón): todos los profesores activos
+	 * - Flexible / sin salón: todos los profesores activos
+	 * Usado tanto por el formulario (vía {@link profesoresParaAsignacion}) como por el detail drawer.
 	 */
-	readonly profesoresParaAsignacion = computed<ProfesorOption[]>(() => {
-		const modo = this.modoAsignacion();
+	profesoresParaSalon(salonId: number | null): ProfesorOption[] {
 		const allProfesores = this.profesoresOptions();
+		if (!salonId) return allProfesores;
 
+		const salon = this._salonesDisponibles().find((s) => s.salonId === salonId);
+		if (!salon) return allProfesores;
+
+		const modo = resolveModoAsignacion(salon.gradoOrden, salon.seccion);
 		if (!modo || modo === 'Flexible') return allProfesores;
 
 		if (modo === 'TutorPleno') {
-			const salon = this.salonSeleccionado();
-			if (!salon?.tutorNombre) return [];
+			if (!salon.tutorNombre) return [];
 			// Filtrar por nombre del tutor (match parcial por nombre completo)
 			return allProfesores.filter((p) => p.label === salon.tutorNombre);
 		}
@@ -120,13 +138,6 @@ export class SchedulesOptionsStore {
 		if (profesoresCurso.length === 0) return [];
 		const profesorIds = new Set(profesoresCurso.map((pc) => pc.profesorId));
 		return allProfesores.filter((p) => profesorIds.has(p.value));
-	});
-
-	/** Resuelve el modo de asignación para un salonId arbitrario (usado por el drawer). */
-	resolveModoForSalon(salonId: number): ModoAsignacion | null {
-		const salon = this._salonesDisponibles().find((s) => s.salonId === salonId);
-		if (!salon) return null;
-		return resolveModoAsignacion(salon.gradoOrden, salon.seccion);
 	}
 	// #endregion
 

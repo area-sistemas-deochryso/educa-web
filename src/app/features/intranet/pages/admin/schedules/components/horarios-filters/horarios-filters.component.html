@@ -6,7 +6,7 @@
 			<label for="filtroSalon">Salón</label>
 			<p-select
 				id="filtroSalon"
-				[options]="salonesOptions()"
+				[options]="salonesOptionsConCount()"
 				[ngModel]="filtroSalonId()"
 				(ngModelChange)="onSalonChange($event)"
 				placeholder="Todos los salones"
@@ -30,7 +30,7 @@
 			<label for="filtroDia">Día</label>
 			<p-select
 				id="filtroDia"
-				[options]="diasOptions"
+				[options]="diasOptionsConCount()"
 				[ngModel]="filtroDiaSemana()"
 				(ngModelChange)="onDiaChange($event)"
 				placeholder="Todos los días"
@@ -53,7 +53,7 @@
 			<label for="filtroEstado">Estado</label>
 			<p-select
 				id="filtroEstado"
-				[options]="estadoOptions"
+				[options]="estadoOptionsConCount()"
 				[ngModel]="filtroEstadoActivo()"
 				(ngModelChange)="onEstadoChange($event)"
 				placeholder="Todos"

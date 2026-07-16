@@ -90,6 +90,7 @@
 										<i class="pi pi-users text-xs" title="Evaluación grupal"></i>
 									}
 									<span [title]="eval.titulo">{{ eval.titulo | slice : 0 : 8 }}</span>
+									<span class="eval-peso">{{ eval.peso * 100 | number: '1.0-0' }}%</span>
 								</div>
 							</th>
 						}
@@ -124,6 +125,7 @@
 										<i class="pi pi-users text-xs" title="Evaluación grupal"></i>
 									}
 									<span [title]="eval.titulo">{{ eval.titulo | slice : 0 : 8 }}</span>
+									<span class="eval-peso">{{ eval.peso * 100 | number: '1.0-0' }}%</span>
 								</div>
 							</th>
 						}

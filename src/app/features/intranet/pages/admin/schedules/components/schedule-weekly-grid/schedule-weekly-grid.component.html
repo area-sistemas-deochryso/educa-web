@@ -1,4 +1,15 @@
 <div class="grid-container">
+  @if (!loading() && blocks().length > 0 && (compressEmptyHours() || hasCompressibleGaps())) {
+    <div class="grid-toolbar">
+      <p-toggleswitch
+        inputId="compress-empty-hours"
+        [ngModel]="compressEmptyHours()"
+        (ngModelChange)="onToggleCompress($event)"
+      />
+      <label for="compress-empty-hours">Comprimir horas sin clases</label>
+    </div>
+  }
+
   <div class="weekly-grid">
     <!-- Header row -->
     <div class="grid-header time-header">Hora</div>
@@ -14,13 +25,27 @@
     }
 
     <!-- Time slots -->
-    @for (hora of HORAS; track hora; let i = $index) {
-      <!-- Time label -->
-      <div class="time-label">{{ hora }}</div>
+    @for (row of displayRows(); track row.key) {
+      @if (row.kind === 'collapsed') {
+        <!-- Collapsed run of empty hours -->
+        <button
+          type="button"
+          class="collapsed-row"
+          (click)="expandRun(row.startIndex)"
+          [pTooltip]="'Mostrar estas horas'"
+          tooltipPosition="top"
+        >
+          <i class="pi pi-angle-down"></i>
+          <span>{{ row.count }} horas sin clases ({{ row.from }}–{{ row.to }})</span>
+        </button>
+      } @else {
+        @let hora = row.hora;
+        <!-- Time label -->
+        <div class="time-label">{{ hora }}</div>
 
-      <!-- Day cells for this hour -->
-      @for (dia of DIAS; track dia.value) {
-        @let slotBlocks = getBlocksForSlot(dia.value, hora);
+        <!-- Day cells for this hour -->
+        @for (dia of DIAS; track dia.value) {
+          @let slotBlocks = getBlocksForSlot(dia.value, hora);
         <div
           class="grid-cell"
           [class.empty-slot]="slotBlocks.length === 0"
@@ -88,6 +113,7 @@
             </div>
           }
         </div>
+        }
       }
     }
   </div>

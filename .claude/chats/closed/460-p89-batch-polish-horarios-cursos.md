@@ -22,10 +22,12 @@ Brief 446 (design) priorizó 5 propuestas de rediseño UX. La #3 (color por curs
 **Out of scope**: cambiar `HORAS_DIA` en sí (el rango 07:00-17:00 ya fue validado por brief 455, no tocar esa constante).
 
 **Criterio de cierre**:
-- [ ] Toggle visible y funcional que reduce el espacio muerto en salones con pocas clases.
-- [ ] Preferencia persiste entre sesiones (localStorage).
-- [ ] No rompe la vista para salones con horario denso (grilla completa sigue disponible/toggle-able de vuelta).
-- [ ] Build + lint + tests OK. Verificado en vivo contra un salón con pocas clases en TEST DB.
+- [x] Toggle visible y funcional que reduce el espacio muerto en salones con pocas clases.
+- [x] Preferencia persiste entre sesiones (localStorage).
+- [x] No rompe la vista para salones con horario denso (grilla completa sigue disponible/toggle-able de vuelta).
+- [x] Build + lint + tests OK. Verificado en vivo contra un salón con pocas clases en TEST DB.
+
+**Resultado**: ✅ Implementado y verificado en vivo.
 
 ## Punto 4 — Dropdowns de filtro sin conteo (admin, Gestión de Horarios)
 
@@ -38,9 +40,12 @@ Brief 446 (design) priorizó 5 propuestas de rediseño UX. La #3 (color por curs
 **Out of scope**: cambiar el comportamiento de filtrado en sí, solo el label mostrado.
 
 **Criterio de cierre**:
-- [ ] Los 3 dropdowns (Salón, Día, Estado) muestran el conteo junto a cada opción.
-- [ ] El conteo coincide con las tarjetas de métricas de arriba (Total/Activos/Sin profesor/Sin estudiantes).
-- [ ] Build + lint + tests OK. Verificado en vivo.
+- [x] Los 3 dropdowns (Salón, Día, Estado) muestran el conteo junto a cada opción.
+- [x] El conteo coincide con las tarjetas de métricas de arriba (Total/Activos/Sin profesor/Sin estudiantes) — mismo cálculo/fuente confirmado por lectura de código.
+- [x] Build + lint + tests OK.
+- [ ] ~~Verificado en vivo~~ — **no aplica**: `SchedulesFiltersComponent` no está referenciado en ningún lado del app hoy (código huérfano). La página real "Gestión de Horarios" solo tiene dropdowns Estado/Completitud inline, sin Salón/Día. Confirmado en vivo que la página real no tiene estos selectores.
+
+**Resultado**: ⚠️ Bloqueado — implementación correcta pero sobre componente sin UI viva. Decisión del usuario: cerrar como bloqueado/gap, no wirear (sería scope creep) ni descartar el cambio.
 
 ## Punto 5 — Indicador de progreso en tarjetas "Mis Cursos"
 
@@ -56,9 +61,13 @@ Brief 446 (design) priorizó 5 propuestas de rediseño UX. La #3 (color por curs
 **Out of scope**: cualquier cambio a la lógica de click/affordance ya resuelta por 454.
 
 **Criterio de cierre**:
-- [ ] Si el dato está disponible client-side: indicador de progreso visible en la tarjeta, verificado en vivo.
-- [ ] Si el dato NO está disponible: brief cerrado como "bloqueado, requiere cambio de contrato BE" con el gap documentado, sin implementación parcial a medias.
-- [ ] Build + lint + tests OK (aplica solo si hubo cambio de código).
+- [ ] ~~Si el dato está disponible client-side: indicador de progreso visible en la tarjeta~~ — no aplica, dato no disponible.
+- [x] Dato NO disponible: brief cerrado como "bloqueado, requiere cambio de contrato BE" con el gap documentado, sin implementación parcial a medias.
+- [x] Build + lint + tests OK — no aplica, sin cambio de código.
+
+**Gap documentado**: `GET /api/Horario/profesor/{profesorId}` (`HorarioProfesorDto`) no trae agregado de progreso (`semanasConContenido`/`totalSemanas`). El dato solo existe on-demand vía `GET /api/CursoContenido/horario/{horarioId}`, que traerlo en la lista requeriría N+1 requests nuevos. No existe análogo `estudiante-cursos` en el FE.
+
+**Resultado**: ⚠️ Bloqueado — gap de contrato BE documentado, sin código tocado.
 
 ## Punto 8 — Peso de evaluación inline en Notas del Salón
 
@@ -73,9 +82,11 @@ El tooltip con el peso **ya existe** (preexistente, no tocar esa parte). Falta m
 **Out of scope**: cambiar el tooltip existente o el cálculo de "General".
 
 **Criterio de cierre**:
-- [ ] Peso visible inline en el header de cada columna de evaluación, en ambas variantes del componente si son independientes (admin y profesor).
-- [ ] Tooltip existente sin cambios.
-- [ ] Build + lint + tests OK. Verificado en vivo.
+- [x] Peso visible inline en el header de cada columna de evaluación, en ambas variantes del componente (admin y profesor son independientes, mismo selector pero código separado).
+- [x] Tooltip existente sin cambios.
+- [x] Build + lint + tests OK. Verificado en vivo (variante admin, navegador; variante profesor code-reviewed, no verificada por navegador en esta sesión).
+
+**Resultado**: ✅ Implementado y verificado en vivo (admin).
 
 ## Orquestación sugerida (un solo chat, agentes en paralelo)
 
@@ -84,6 +95,24 @@ El tooltip con el peso **ya existe** (preexistente, no tocar esa parte). Falta m
 3. Lanzar un agente por worktree en paralelo, con el scope de su punto únicamente.
 4. Integrar cada branch a `main` vía rama de integración (`/wt-merge` o equivalente), validar build+lint+tests, verificar en vivo contra TEST DB antes de cerrar cada uno.
 5. El punto 5 puede cerrar "bloqueado" en vez de "resuelto" si el dato de progreso no está disponible sin backend nuevo — no fuerces ese punto a medias.
+
+## Punto 11 (agregado en chat) — Filtro de profesor por modo TutorPleno sin aplicar
+
+**Prioridad**: Media (bug de correctness, no polish UX). **Costo**: Chico.
+
+**Hallazgo**: en el drawer de asignar/cambiar profesor (`horario-detail-drawer.component.html:206-249`), el selector se alimenta de `SchedulesStore.profesoresParaAsignacionDetalle` (`horarios.store.ts:97-112`), que filtra correctamente en modo `PorCurso` (solo profesores con `ProfesorCurso` activo) pero **no filtra en modo `TutorPleno`** — muestra todos los profesores activos del sistema en vez de restringir al tutor del salón. Esto era una decisión de diseño explícita en el comentario del código, confirmada como bug en este chat.
+
+Existe una segunda implementación correcta y completa (`SchedulesOptionsStore.profesoresParaAsignacion`, `horarios-options.store.ts:105-123`) que sí filtra los 3 modos (`TutorPleno`/`PorCurso`/`Flexible`), pero está **muerta** — nunca conectada a ningún selector de la UI.
+
+**Scope**: adaptar `profesoresParaAsignacionDetalle` (`SchedulesStore`) para reusar/replicar la lógica de filtrado TutorPleno ya escrita en `SchedulesOptionsStore.profesoresParaAsignacion`, y eliminar la duplicación muerta una vez consolidado.
+
+**Criterio de cierre**:
+- [x] En un salón modo TutorPleno, el selector de "asignar/cambiar profesor" restringe las opciones al tutor del salón. Verificado en vivo: salón "3RO PRIMARIA A" (TutorPleno), el dropdown solo ofrece "NOTUTORVALIDACION TEST FRICCION" (el tutor).
+- [x] Modo `PorCurso` sigue funcionando igual que antes (sin cambio de lógica, misma rama de código reusada vía `profesoresParaSalon`).
+- [x] Código muerto consolidado: `profesoresParaAsignacion` (form) y `profesoresParaAsignacionDetalle` (drawer) ahora delegan en un único método `SchedulesOptionsStore.profesoresParaSalon(salonId)` — sin duplicación de la lógica de filtrado por modo.
+- [x] Build + lint + tests OK. Verificado en vivo en TEST DB.
+
+**Resultado**: ✅ Implementado y verificado en vivo.
 
 ## Out of scope (todo el brief)
 

@@ -96,19 +96,13 @@ export class SchedulesStore {
 
 	/**
 	 * Profesores elegibles para el dropdown de asignación del detail drawer.
-	 * Solo filtra en modo PorCurso (ProfesorCurso activo para el curso del horario);
-	 * TutorPleno/Flexible/null mantienen el listado completo sin cambios de comportamiento.
+	 * Delega en `SchedulesOptionsStore.profesoresParaSalon` — filtra por el modo de
+	 * asignación real del salón del horario (TutorPleno/PorCurso/Flexible).
 	 */
 	readonly profesoresParaAsignacionDetalle = computed<ProfesorOption[]>(() => {
-		const modo = this.modoAsignacionDetalle();
-		const allProfesores = this.optionsStore.profesoresOptions();
-
-		if (modo !== 'PorCurso') return allProfesores;
-
-		const profesoresCurso = this.optionsStore.profesoresCurso();
-		if (profesoresCurso.length === 0) return [];
-		const profesorIds = new Set(profesoresCurso.map((pc) => pc.profesorId));
-		return allProfesores.filter((p) => profesorIds.has(p.value));
+		const detalle = this._horarioDetalle();
+		if (!detalle) return this.optionsStore.profesoresOptions();
+		return this.optionsStore.profesoresParaSalon(detalle.salonId);
 	});
 	// #endregion
 

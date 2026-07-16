@@ -48,7 +48,8 @@
 						pTooltip="{{ eval.titulo }} — {{ eval.tipo }} ({{ eval.peso * 100 | number: '1.0-0' }}%)"
 						tooltipPosition="top"
 					>
-						{{ eval.titulo }}
+						<span class="eval-titulo">{{ eval.titulo }}</span>
+						<span class="eval-peso">{{ eval.peso * 100 | number: '1.0-0' }}%</span>
 					</th>
 				}
 				@for (periodo of periodoColumns(); track periodo.nombre) {

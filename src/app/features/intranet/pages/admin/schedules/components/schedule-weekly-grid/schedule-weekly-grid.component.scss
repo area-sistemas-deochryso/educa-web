@@ -8,6 +8,22 @@
   min-height: 400px;
 }
 
+// #region Toolbar
+.grid-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+
+  label {
+    font-size: 0.85rem;
+    color: var(--text-color-secondary);
+    cursor: pointer;
+    user-select: none;
+  }
+}
+
+// #endregion
 // #region CSS Grid layout
 .weekly-grid {
   display: grid;
@@ -115,6 +131,40 @@
     color: var(--intranet-accent-color-blue);
     font-size: 0.875rem;
     opacity: 0.5;
+  }
+}
+
+// #endregion
+// #region Collapsed empty-hours row
+.collapsed-row {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 100%;
+  padding: 0.3rem 0.5rem;
+  border: none;
+  border-bottom: 1px solid var(--surface-border);
+  background: repeating-linear-gradient(
+    45deg,
+    var(--surface-50),
+    var(--surface-50) 8px,
+    var(--surface-100) 8px,
+    var(--surface-100) 16px
+  );
+  color: var(--text-color-secondary);
+  font-size: 0.75rem;
+  font-style: italic;
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:hover {
+    color: var(--intranet-accent-color-blue);
+  }
+
+  i {
+    font-size: 0.75rem;
   }
 }
 
