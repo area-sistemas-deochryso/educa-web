@@ -57,12 +57,32 @@ app-user-profile-menu {
 }
 // #endregion
 
-// #region Nav links (exactly 3 visible via circularSlice)
+// #region Nav links (overflow medido: los grupos que no entran caen al pill "Más")
 .nav-links {
 	display: flex;
 	align-items: center;
 	gap: 0.25rem;
+	flex: 1 1 auto;
+	min-width: 0;
+	// * overflow visible a propósito: el dropdown de cada pill (incl. "Más") se posiciona
+	// absoluto dentro de este contenedor. El recorte de qué grupos entran ya lo resuelve
+	// visibleNavItems()/recomputeVisibleCount() en TS — acá nunca hay más pills de los que caben.
 	overflow: visible;
+}
+
+// Fila gemela invisible, fuera de flujo, usada solo para medir el ancho natural de cada pill.
+.nav-links--measure {
+	position: absolute;
+	visibility: hidden;
+	pointer-events: none;
+	top: -9999px;
+	left: -9999px;
+	flex: 0 0 auto;
+}
+
+.nav-links__measure-item {
+	display: flex;
+	flex-shrink: 0;
 }
 
 .nav-item {

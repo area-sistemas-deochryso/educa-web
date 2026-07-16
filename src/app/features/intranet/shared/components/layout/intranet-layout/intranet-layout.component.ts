@@ -1,5 +1,5 @@
 // #region Imports
-import { ChangeDetectionStrategy, Component, HostListener, inject, OnInit, OnDestroy, DestroyRef, signal, effect, computed, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener, inject, OnInit, OnDestroy, AfterViewInit, DestroyRef, signal, effect, computed, viewChild, viewChildren, ElementRef, afterRenderEffect } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink, RouterOutlet, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs';
@@ -31,24 +31,15 @@ import { ConnectionStatusIndicatorComponent } from '@intranet-shared/components/
 // #endregion
 
 // #region Helpers
-const VISIBLE_NAV = 2;
-
 /** Nivel de un tramo del breadcrumb — determina qué acción dispara el click. */
 export interface BreadcrumbPart {
 	label: string;
 	kind: 'modulo' | 'grupo' | 'pagina';
 }
 
-function circularSlice<T>(items: T[], center: number, count: number): T[] {
-	const len = items.length;
-	if (len <= count) return [...items];
-	const half = Math.floor(count / 2);
-	const result: T[] = [];
-	for (let i = -half; i <= half; i++) {
-		result.push(items[((center + i) % len + len) % len]);
-	}
-	return result;
-}
+/** Ancho aproximado (px) del pill "Más" reservado durante el cálculo de overflow. */
+const MORE_PILL_RESERVE = 90;
+const NAV_GAP = 4;
 // #endregion
 
 // #region Implementation
@@ -76,7 +67,7 @@ function circularSlice<T>(items: T[], center: number, count: number): T[] {
 	templateUrl: './intranet-layout.component.html',
 	styleUrl: './intranet-layout.component.scss',
 })
-export class IntranetLayoutComponent implements OnInit, OnDestroy {
+export class IntranetLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
 	private userPermissionsService = inject(UserPermissionsService);
 	private authService = inject(AuthService);
 	private destroyRef = inject(DestroyRef);
@@ -124,18 +115,51 @@ export class IntranetLayoutComponent implements OnInit, OnDestroy {
 		return groupNode?.children ?? [];
 	});
 
-	// Todas las items del módulo seleccionado (sin recortar).
+	// Todas las items (grupos) del módulo seleccionado, sin recortar.
 	private readonly _allItems = computed((): NavMenuItem[] => {
 		const id = this._selectedModuloId();
 		if (id === 'inicio') return [];
 		return this._modulos().find((m) => m.id === id)?.items ?? [];
 	});
 
-	// Ventana circular de nav items.
-	private readonly _navCenter = signal(0);
-	readonly visibleNavItems = computed(() =>
-		circularSlice(this._allItems(), this._navCenter(), VISIBLE_NAV),
-	);
+	// #region Overflow del menú de navegación (reemplaza la antigua ventana circular)
+	// * Grupo activo según la URL actual — se pinea siempre visible aunque no entre por ancho.
+	private readonly _activeGroupIndex = computed(() => {
+		const url = this._currentUrl();
+		return this._allItems().findIndex(
+			(item) =>
+				(item.route && url.startsWith(item.route)) ||
+				(item.children?.some((c) => c.route && url.startsWith(c.route)) ?? false),
+		);
+	});
+
+	// * Cantidad de grupos que entran en el ancho disponible, medida contra la fila oculta de medición.
+	private readonly _visibleCount = signal(2);
+
+	private readonly navLinksEl = viewChild<ElementRef<HTMLElement>>('navLinks');
+	// Template ref sobre un <div> nativo: el read por defecto ya es ElementRef.
+	private readonly measureItems = viewChildren<ElementRef<HTMLElement>>('measureItem');
+	private resizeObserver?: ResizeObserver;
+
+	readonly visibleNavItems = computed((): NavMenuItem[] => {
+		const items = this._allItems();
+		const count = Math.min(this._visibleCount(), items.length);
+		const activeIdx = this._activeGroupIndex();
+		if (count > 0 && activeIdx >= count) {
+			// El grupo activo quedó fuera de la ventana visible: lo pineamos reemplazando el último slot.
+			return [...items.slice(0, count - 1), items[activeIdx]];
+		}
+		return items.slice(0, count);
+	});
+
+	readonly overflowNavItems = computed((): NavMenuItem[] => {
+		const visible = new Set(this.visibleNavItems());
+		return this._allItems().filter((item) => !visible.has(item));
+	});
+
+	// * Alias público: la fila de medición del template necesita leerlo (strictTemplates).
+	readonly allNavItems = this._allItems;
+	// #endregion
 	// #endregion
 
 	// #region Feature flags
@@ -170,6 +194,20 @@ export class IntranetLayoutComponent implements OnInit, OnDestroy {
 				}
 				this._groupDropdownOpen.set(false);
 			});
+
+		// Recalcula qué grupos entran en el ancho disponible cada vez que cambia
+		// el módulo activo (la fila de medición oculta se re-renderiza con sus items).
+		afterRenderEffect(() => {
+			this._allItems();
+			this.recomputeVisibleCount();
+		});
+	}
+
+	ngAfterViewInit(): void {
+		const nav = this.navLinksEl()?.nativeElement;
+		if (!nav) return;
+		this.resizeObserver = new ResizeObserver(() => this.recomputeVisibleCount());
+		this.resizeObserver.observe(nav);
 	}
 
 	@HostListener('document:click', ['$event'])
@@ -206,21 +244,15 @@ export class IntranetLayoutComponent implements OnInit, OnDestroy {
 	ngOnDestroy(): void {
 		this.keyboardService.unregister('open-feedback-report');
 		this.keyboardService.unregister('open-command-palette');
+		this.resizeObserver?.disconnect();
 	}
 
 	// #region Acciones
 	selectModulo(id: ModuloId): void {
 		this._selectedModuloId.set(id);
-		this._navCenter.set(0);
 		if (id === 'inicio') {
 			this.router.navigate(['/intranet']);
 		}
-	}
-
-	/** Al hacer clic en un nav item visible, centrarlo en la ventana. */
-	onNavItemClick(item: NavMenuItem): void {
-		const idx = this._allItems().findIndex((i) => i.route === item.route);
-		if (idx >= 0) this._navCenter.set(idx);
 	}
 
 	onStarClick(event: Event, route: string): void {
@@ -230,8 +262,11 @@ export class IntranetLayoutComponent implements OnInit, OnDestroy {
 	}
 
 	/** Click en un tramo navegable del breadcrumb (todo salvo el último, "página actual"). */
-	onBreadcrumbClick(part: BreadcrumbPart): void {
+	onBreadcrumbClick(event: MouseEvent, part: BreadcrumbPart): void {
 		if (part.kind === 'modulo') {
+			// Evita que el click siga burbujeando a document: el listener de click-outside
+			// del module-selector lo cerraría en el mismo tick en que open() lo abre.
+			event.stopPropagation();
 			this._groupDropdownOpen.set(false);
 			this.moduleSelector()?.open();
 		} else if (part.kind === 'grupo') {
@@ -252,10 +287,34 @@ export class IntranetLayoutComponent implements OnInit, OnDestroy {
 	private applySelection(id: ModuloId, modulos: ModuloMenu[], url: string): void {
 		this._selectedModuloId.set(id);
 		this._currentUrl.set(url);
+	}
 
-		const items = id === 'inicio' ? [] : (modulos.find((m) => m.id === id)?.items ?? []);
-		const navIdx = items.findIndex((i) => i.route && url.startsWith(i.route));
-		this._navCenter.set(navIdx >= 0 ? navIdx : 0);
+	/**
+	 * Mide el ancho natural de cada grupo contra la fila oculta de medición y calcula
+	 * cuántos entran en el ancho real disponible de `.nav-links`, reservando espacio
+	 * para el pill "Más" cuando sobra al menos un grupo.
+	 */
+	private recomputeVisibleCount(): void {
+		const nav = this.navLinksEl()?.nativeElement;
+		const items = this.measureItems();
+		if (!nav || items.length === 0) return;
+
+		const available = nav.clientWidth;
+		const totalItems = items.length;
+		let used = 0;
+		let count = 0;
+
+		for (let i = 0; i < totalItems; i++) {
+			const width = items[i].nativeElement.offsetWidth;
+			const isLast = i === totalItems - 1;
+			const reserve = isLast ? 0 : MORE_PILL_RESERVE + NAV_GAP;
+			const gap = count > 0 ? NAV_GAP : 0;
+			if (used + gap + width + reserve > available) break;
+			used += gap + width;
+			count++;
+		}
+
+		this._visibleCount.set(count);
 	}
 	// #endregion
 }

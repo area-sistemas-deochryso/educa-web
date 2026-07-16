@@ -24,8 +24,8 @@
 			(moduloSelected)="selectModulo($event)"
 		/>
 
-		<!-- * Nav items of selected module (circular window of 2, with dropdown support). -->
-		<nav class="nav-links">
+		<!-- * Grupos del módulo activo que entran en el ancho disponible; el resto cae en "Más". -->
+		<nav class="nav-links" #navLinks>
 			@for (item of visibleNavItems(); track item.label) {
 				<app-nav-item
 					[route]="item.route"
@@ -34,8 +34,19 @@
 					[exact]="item.exact ?? false"
 					[queryParams]="item.queryParams"
 					[children]="item.children"
-					(click)="onNavItemClick(item)"
 				/>
+			}
+			@if (overflowNavItems().length > 0) {
+				<app-nav-item label="Más" icon="pi pi-ellipsis-h" [children]="overflowNavItems()" />
+			}
+		</nav>
+
+		<!-- * Fila de medición: mismos pills fuera de pantalla, usados solo para calcular anchos naturales. -->
+		<nav class="nav-links nav-links--measure" aria-hidden="true">
+			@for (item of allNavItems(); track item.label) {
+				<div #measureItem class="nav-links__measure-item">
+					<app-nav-item [label]="item.label" [icon]="item.icon" [children]="item.children" />
+				</div>
 			}
 		</nav>
 
@@ -57,7 +68,7 @@
 								class="breadcrumb-part breadcrumb-part--clickable"
 								[attr.aria-haspopup]="part.kind === 'grupo' ? 'true' : null"
 								[attr.aria-expanded]="part.kind === 'grupo' ? groupDropdownOpen() : null"
-								(click)="onBreadcrumbClick(part)"
+								(click)="onBreadcrumbClick($event, part)"
 							>
 								{{ part.label }}
 							</button>
@@ -121,7 +132,7 @@
 								class="breadcrumb-part breadcrumb-part--clickable"
 								[attr.aria-haspopup]="part.kind === 'grupo' ? 'true' : null"
 								[attr.aria-expanded]="part.kind === 'grupo' ? groupDropdownOpen() : null"
-								(click)="onBreadcrumbClick(part)"
+								(click)="onBreadcrumbClick($event, part)"
 							>
 								{{ part.label }}
 							</button>
