@@ -1,4 +1,5 @@
 import { Injectable, computed, signal } from '@angular/core';
+import type { ConfiguracionCalificacionListDto } from '@data/models';
 import {
 	CalificacionConNotasDto,
 	PeriodoCalificacionDto,
@@ -12,6 +13,8 @@ interface CalificacionesState {
 	periodos: PeriodoCalificacionDto[];
 	salonEstudiantes: ProfesorEstudianteSalonDto[];
 	gruposForCalificar: GrupoContenidoDto[];
+	/** Config de escala/umbral del nivel del salón actual — null hasta resolverse o si no hay salón. */
+	calificacionConfig: ConfiguracionCalificacionListDto | null;
 	loading: boolean;
 	saving: boolean;
 	// #region Dialog state
@@ -28,6 +31,7 @@ const initialState: CalificacionesState = {
 	periodos: [],
 	salonEstudiantes: [],
 	gruposForCalificar: [],
+	calificacionConfig: null,
 	loading: false,
 	saving: false,
 	calificacionDialogVisible: false,
@@ -48,6 +52,7 @@ export class CalificacionesStore {
 	readonly periodos = computed(() => this._state().periodos);
 	readonly salonEstudiantes = computed(() => this._state().salonEstudiantes);
 	readonly gruposForCalificar = computed(() => this._state().gruposForCalificar);
+	readonly calificacionConfig = computed(() => this._state().calificacionConfig);
 	readonly loading = computed(() => this._state().loading);
 	readonly saving = computed(() => this._state().saving);
 	readonly calificacionDialogVisible = computed(() => this._state().calificacionDialogVisible);
@@ -80,6 +85,7 @@ export class CalificacionesStore {
 		periodos: this.periodos(),
 		salonEstudiantes: this.salonEstudiantes(),
 		gruposForCalificar: this.gruposForCalificar(),
+		calificacionConfig: this.calificacionConfig(),
 		loading: this.loading(),
 		saving: this.saving(),
 		totalEvaluaciones: this.totalEvaluaciones(),
@@ -106,6 +112,10 @@ export class CalificacionesStore {
 
 	setGruposForCalificar(grupos: GrupoContenidoDto[]): void {
 		this._state.update((s) => ({ ...s, gruposForCalificar: grupos }));
+	}
+
+	setCalificacionConfig(config: ConfiguracionCalificacionListDto | null): void {
+		this._state.update((s) => ({ ...s, calificacionConfig: config }));
 	}
 
 	setLoading(loading: boolean): void {

@@ -74,7 +74,12 @@
 							Sem {{ group.semana }}
 						</th>
 					}
-					<th rowspan="2" class="general-header">General</th>
+					<th
+						rowspan="2"
+						class="general-header"
+						pTooltip="Promedio ponderado por el peso de cada evaluación — no es un promedio simple de las notas."
+						tooltipPosition="top"
+					>General</th>
 				</tr>
 				<tr>
 					@for (group of evaluacionesPorSemana(); track group.semana) {
@@ -103,7 +108,12 @@
 							{{ group.periodo.nombre }}
 						</th>
 					}
-					<th rowspan="2" class="general-header">General</th>
+					<th
+						rowspan="2"
+						class="general-header"
+						pTooltip="Promedio ponderado por el peso de cada evaluación — no es un promedio simple de las notas."
+						tooltipPosition="top"
+					>General</th>
 				</tr>
 				<tr>
 					@for (group of evaluacionesPorPeriodo(); track group.periodo.id) {
@@ -128,7 +138,11 @@
 					<th style="min-width: 40px">#</th>
 					<th style="min-width: 100px">DNI</th>
 					<th style="min-width: 160px">Estudiante</th>
-					<th class="general-header">General</th>
+					<th
+						class="general-header"
+						pTooltip="Promedio ponderado por el peso de cada evaluación — no es un promedio simple de las notas."
+						tooltipPosition="top"
+					>General</th>
 				</tr>
 			}
 		</ng-template>
