@@ -5,6 +5,7 @@ import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { PageHeaderComponent, PeriodToggleComponent } from '@intranet-shared/components';
+import { PluralizePipe } from '@intranet-shared/pipes';
 import { SalonCursoInfo, VistaPromedio, ActualizarGrupoDto, ProfesorSalonConEstudiantes } from '../models';
 import { ProfesorFacade } from '../services/profesor.facade';
 import { GruposFacade } from './services/grupos.facade';
@@ -24,6 +25,7 @@ import { NotaSaveEvent } from './components/salon-notas-estudiante-tab/salon-not
 		ProgressSpinnerModule,
 		PageHeaderComponent,
 		PeriodToggleComponent,
+		PluralizePipe,
 		SalonEstudiantesDialogComponent,
 	],
 	changeDetection: ChangeDetectionStrategy.OnPush,

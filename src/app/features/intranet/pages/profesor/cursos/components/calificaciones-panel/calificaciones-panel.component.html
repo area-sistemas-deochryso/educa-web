@@ -2,7 +2,7 @@
 <div class="calificaciones-header">
 	<div class="header-left">
 		<h4><i class="pi pi-chart-bar"></i> Calificaciones</h4>
-		<span class="text-sm text-color-secondary">{{ totalEvaluaciones() }} evaluaciones</span>
+		<span class="text-sm text-color-secondary">{{ totalEvaluaciones() | pluralize: 'evaluación' : 'evaluaciones' }}</span>
 	</div>
 	<div class="header-actions">
 		<button
