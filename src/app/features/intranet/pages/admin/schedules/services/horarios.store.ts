@@ -10,7 +10,7 @@ import {
 	type HorarioResponseDto,
 	type HorariosEstadisticas,
 } from '../models/horario.interface';
-import { ProfesorListDto } from '../models/profesor.interface';
+import { ProfesorListDto, ProfesorOption } from '../models/profesor.interface';
 import { SalonListDto } from '../models/salon.interface';
 import { SchedulesFormStore } from './horarios-form.store';
 import { SchedulesFilterStore } from './horarios-filter.store';
@@ -93,6 +93,23 @@ export class SchedulesStore {
 		if (!detalle) return null;
 		return this.optionsStore.resolveModoForSalon(detalle.salonId);
 	});
+
+	/**
+	 * Profesores elegibles para el dropdown de asignación del detail drawer.
+	 * Solo filtra en modo PorCurso (ProfesorCurso activo para el curso del horario);
+	 * TutorPleno/Flexible/null mantienen el listado completo sin cambios de comportamiento.
+	 */
+	readonly profesoresParaAsignacionDetalle = computed<ProfesorOption[]>(() => {
+		const modo = this.modoAsignacionDetalle();
+		const allProfesores = this.optionsStore.profesoresOptions();
+
+		if (modo !== 'PorCurso') return allProfesores;
+
+		const profesoresCurso = this.optionsStore.profesoresCurso();
+		if (profesoresCurso.length === 0) return [];
+		const profesorIds = new Set(profesoresCurso.map((pc) => pc.profesorId));
+		return allProfesores.filter((p) => profesorIds.has(p.value));
+	});
 	// #endregion
 
 	// #region Computed - Estadísticas derivadas
@@ -144,6 +161,7 @@ export class SchedulesStore {
 		importLoading: this._importLoading(),
 		importResult: this._importResult(),
 		modoAsignacionDetalle: this.modoAsignacionDetalle(),
+		profesoresParaAsignacionDetalle: this.profesoresParaAsignacionDetalle(),
 	}));
 
 	readonly formVm = computed(() => ({
@@ -332,6 +350,7 @@ export class SchedulesStore {
 	closeDetailDrawer(): void {
 		this.formStore.closeDetailDrawer();
 		this._horarioDetalle.set(null);
+		this.optionsStore.clearProfesoresCurso();
 	}
 	// #endregion
 
