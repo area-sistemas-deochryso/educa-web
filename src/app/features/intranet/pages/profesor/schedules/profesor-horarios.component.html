@@ -129,6 +129,13 @@
 								<div class="hour-line"></div>
 							}
 
+							@if (getBlocksForDay(dia.value).length === 0) {
+								<div class="day-empty-state">
+									<i class="pi pi-calendar-times"></i>
+									<p>Sin clases este día</p>
+								</div>
+							}
+
 							<!-- Bloques de horario -->
 							<div class="blocks-container">
 								@for (block of getBlocksForDay(dia.value); track block.id) {
@@ -137,7 +144,7 @@
 										[ngStyle]="getBlockStyle(block)"
 										[pTooltip]="getTooltipContent(block)"
 										tooltipPosition="top"
-										(click)="verAsistencia(block)"
+										(click)="onBlockClick($event, block, detailPopover)"
 									>
 										<div class="block-content">
 											<div class="curso-nombre">{{ block.cursoNombre }}</div>
@@ -164,6 +171,48 @@
 						</div>
 					</div>
 				}
+
+				<!-- Popover de detalle de clase (desktop) -->
+				<p-popover #detailPopover appendTo="body" styleClass="class-detail-popover">
+					@if (selectedBlock(); as block) {
+						<div class="popover-content">
+							<div class="popover-header">
+								<span class="popover-curso">{{ block.cursoNombre }}</span>
+								<span class="popover-horario">{{ block.horaInicio }} - {{ block.horaFin }}</span>
+							</div>
+							<div class="popover-details">
+								<span><i class="pi pi-building"></i> {{ block.salonDescripcion }}</span>
+								<span><i class="pi pi-users"></i> {{ block.cantidadEstudiantes }} estudiantes</span>
+							</div>
+							<div class="popover-actions">
+								<button
+									pButton
+									type="button"
+									icon="pi pi-check-square"
+									label="Asistencia"
+									class="p-button-sm"
+									(click)="irAAsistencia(detailPopover)"
+								></button>
+								<button
+									pButton
+									type="button"
+									icon="pi pi-book"
+									label="Contenido"
+									class="p-button-sm p-button-outlined"
+									(click)="irAContenido(detailPopover)"
+								></button>
+								<button
+									pButton
+									type="button"
+									icon="pi pi-chart-bar"
+									label="Calificaciones"
+									class="p-button-sm p-button-outlined"
+									(click)="irACalificaciones(detailPopover)"
+								></button>
+							</div>
+						</div>
+					}
+				</p-popover>
 			</div>
 		</div>
 	</div>

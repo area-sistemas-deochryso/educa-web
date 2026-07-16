@@ -3,6 +3,8 @@ import { Component, ChangeDetectionStrategy, inject, OnInit, computed, signal, D
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { TooltipModule } from 'primeng/tooltip';
+import { Popover } from 'primeng/popover';
+import { ButtonModule } from 'primeng/button';
 import { PageHeaderComponent } from '@intranet-shared/components';
 import { environment } from '@config/environment';
 import { ProfesorFacade } from '../services/profesor.facade';
@@ -11,6 +13,8 @@ import {
 	CountdownInfo,
 	buildBlocks,
 	buildCountdownMap,
+	getNextOccurrence,
+	formatDateISO,
 } from './profesor-horarios.helpers';
 
 // #endregion
@@ -18,7 +22,7 @@ import {
 @Component({
 	selector: 'app-teacher-schedules',
 	standalone: true,
-	imports: [CommonModule, TooltipModule, PageHeaderComponent],
+	imports: [CommonModule, TooltipModule, Popover, ButtonModule, PageHeaderComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './profesor-horarios.component.html',
 	styleUrl: './profesor-horarios.component.scss',
@@ -247,7 +251,48 @@ export class TeacherSchedulesComponent implements OnInit {
 	}
 
 	// #endregion
-	// #region Event handlers
+	// #region Popover de detalle (desktop)
+	/** Bloque seleccionado para el popover de detalle. Solo aplica a la vista desktop. */
+	readonly selectedBlock = signal<HorarioBlock | null>(null);
+
+	onBlockClick(event: Event, block: HorarioBlock, popover: Popover): void {
+		this.selectedBlock.set(block);
+		popover.toggle(event);
+	}
+
+	/** Próxima ocurrencia válida del bloque seleccionado, usada al navegar a Asistencia. */
+	private nextOccurrenceFor(block: HorarioBlock): Date {
+		return getNextOccurrence(block, new Date(this._now() + this._serverOffset()));
+	}
+
+	irAAsistencia(popover: Popover): void {
+		const block = this.selectedBlock();
+		if (!block) return;
+		popover.hide();
+		this.router.navigate(['/intranet/profesor/asistencia'], {
+			queryParams: { horarioId: block.id, fecha: formatDateISO(this.nextOccurrenceFor(block)) },
+		});
+	}
+
+	irAContenido(popover: Popover): void {
+		const block = this.selectedBlock();
+		if (!block) return;
+		popover.hide();
+		this.router.navigate(['/intranet/profesor/cursos'], {
+			queryParams: { horarioId: block.id },
+		});
+	}
+
+	irACalificaciones(popover: Popover): void {
+		const block = this.selectedBlock();
+		if (!block) return;
+		popover.hide();
+		this.router.navigate(['/intranet/profesor/calificaciones'], {
+			queryParams: { horarioId: block.id },
+		});
+	}
+	// #endregion
+	// #region Event handlers (mobile — navegación directa sin popover)
 	verAsistencia(block: HorarioBlock): void {
 		this.router.navigate(['/intranet/profesor/asistencia'], {
 			queryParams: { horarioId: block.id },

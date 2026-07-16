@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, input, output, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, output, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
@@ -13,6 +13,7 @@ import {
 	ESTADO_ASISTENCIA_SEVERITIES,
 	ESTADO_ASISTENCIA_ICONS,
 } from '@features/intranet/pages/profesor/models';
+import { findNearestValidDate } from './attendance-registration-panel.helpers';
 
 @Component({
 	selector: 'app-attendance-registration-panel',
@@ -44,6 +45,8 @@ export class AttendanceRegistrationPanelComponent {
 	/** día de semana (0=domingo, 1=lunes...5=viernes) esperado según el horario del curso — null si no aplica. */
 	readonly diaSemanaEsperado = input<number | null>(null);
 	readonly diaSemanaEsperadoDescripcion = input<string | null>(null);
+	/** Fecha inicial en formato "yyyy-mm-dd" (ej. al llegar desde el popover de "Mi Horario"). */
+	readonly initialFecha = input<string | null>(null);
 	// #endregion
 
 	// #region Outputs
@@ -55,7 +58,20 @@ export class AttendanceRegistrationPanelComponent {
 
 	// #region Estado local
 	selectedDate: Date = new Date();
+	private lastAppliedInitialFecha: string | null = null;
 	// #endregion
+
+	constructor() {
+		// * Aplica `initialFecha` (llegada desde el popover de "Mi Horario") sin pisar
+		// * ediciones posteriores del usuario en el datepicker.
+		effect(() => {
+			const fecha = this.initialFecha();
+			if (!fecha || fecha === this.lastAppliedInitialFecha) return;
+			this.lastAppliedInitialFecha = fecha;
+			const [y, m, d] = fecha.split('-').map(Number);
+			this.selectedDate = new Date(y, m - 1, d);
+		});
+	}
 
 	// #region Computed
 	readonly hasEstudiantes = computed(() => this.estudiantes().length > 0);
@@ -91,6 +107,14 @@ export class AttendanceRegistrationPanelComponent {
 		const dia = this.diaSemanaEsperado();
 		if (dia === null) return false;
 		return this.selectedDate.getDay() !== dia;
+	}
+
+	/** Busca la fecha válida más cercana (adelante o atrás) y dispara la búsqueda. */
+	irAFechaValida(): void {
+		const dia = this.diaSemanaEsperado();
+		if (dia === null) return;
+		this.selectedDate = findNearestValidDate(this.selectedDate, dia);
+		this.onDateSelect();
 	}
 	// #endregion
 
