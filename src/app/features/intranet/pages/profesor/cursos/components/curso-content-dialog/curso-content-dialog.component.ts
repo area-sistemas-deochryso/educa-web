@@ -349,9 +349,8 @@ export class CursoContentDialogComponent {
 	onDeleteContenido(): void {
 		const contenido = this.vm().contenido;
 		if (!contenido) return;
-
 		this.confirmationService.confirm({
-			message: '¿Eliminar todo el contenido de este curso? Esta acción no se puede deshacer.',
+			message: `¿Eliminar todo el contenido de este curso? Esta acción no se puede deshacer. Se perderán ${this.vm().totalArchivos} archivo${this.vm().totalArchivos === 1 ? '' : 's'} y ${this.vm().totalTareas} tarea${this.vm().totalTareas === 1 ? '' : 's'}.`,
 			header: 'Eliminar Contenido',
 			icon: 'pi pi-exclamation-triangle',
 			acceptLabel: 'Eliminar',
