@@ -48,7 +48,36 @@
 		<div class="header-container active-section-breadcrumb desktop-header">
 			<nav aria-label="Sección activa">
 				@for (part of breadcrumb(); track $index; let last = $last) {
-					<span class="breadcrumb-part" [class.breadcrumb-part--current]="last">{{ part }}</span>
+					@if (last) {
+						<span class="breadcrumb-part breadcrumb-part--current">{{ part.label }}</span>
+					} @else {
+						<div class="breadcrumb-group-wrapper" [class.open]="part.kind === 'grupo' && groupDropdownOpen()">
+							<button
+								type="button"
+								class="breadcrumb-part breadcrumb-part--clickable"
+								[attr.aria-haspopup]="part.kind === 'grupo' ? 'true' : null"
+								[attr.aria-expanded]="part.kind === 'grupo' ? groupDropdownOpen() : null"
+								(click)="onBreadcrumbClick(part)"
+							>
+								{{ part.label }}
+							</button>
+							@if (part.kind === 'grupo' && groupDropdownOpen()) {
+								<div class="dropdown-menu">
+									@for (child of activeGroupItems(); track child.route) {
+										<a
+											class="dropdown-item"
+											[routerLink]="child.route"
+											[queryParams]="child.queryParams"
+											(click)="closeGroupDropdown()"
+										>
+											<i [class]="child.icon"></i>
+											{{ child.label }}
+										</a>
+									}
+								</div>
+							}
+						</div>
+					}
 					@if (!last) {
 						<i class="pi pi-angle-right breadcrumb-sep"></i>
 					}
@@ -83,7 +112,36 @@
 		<div class="header-container active-section-breadcrumb mobile-only">
 			<nav aria-label="Sección activa">
 				@for (part of breadcrumb(); track $index; let last = $last) {
-					<span class="breadcrumb-part" [class.breadcrumb-part--current]="last">{{ part }}</span>
+					@if (last) {
+						<span class="breadcrumb-part breadcrumb-part--current">{{ part.label }}</span>
+					} @else {
+						<div class="breadcrumb-group-wrapper" [class.open]="part.kind === 'grupo' && groupDropdownOpen()">
+							<button
+								type="button"
+								class="breadcrumb-part breadcrumb-part--clickable"
+								[attr.aria-haspopup]="part.kind === 'grupo' ? 'true' : null"
+								[attr.aria-expanded]="part.kind === 'grupo' ? groupDropdownOpen() : null"
+								(click)="onBreadcrumbClick(part)"
+							>
+								{{ part.label }}
+							</button>
+							@if (part.kind === 'grupo' && groupDropdownOpen()) {
+								<div class="dropdown-menu">
+									@for (child of activeGroupItems(); track child.route) {
+										<a
+											class="dropdown-item"
+											[routerLink]="child.route"
+											[queryParams]="child.queryParams"
+											(click)="closeGroupDropdown()"
+										>
+											<i [class]="child.icon"></i>
+											{{ child.label }}
+										</a>
+									}
+								</div>
+							}
+						</div>
+					}
 					@if (!last) {
 						<i class="pi pi-angle-right breadcrumb-sep"></i>
 					}

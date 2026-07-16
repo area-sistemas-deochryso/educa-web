@@ -1,5 +1,5 @@
 // #region Imports
-import { ChangeDetectionStrategy, Component, inject, OnInit, OnDestroy, DestroyRef, signal, effect, computed, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener, inject, OnInit, OnDestroy, DestroyRef, signal, effect, computed, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink, RouterOutlet, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs';
@@ -32,6 +32,12 @@ import { ConnectionStatusIndicatorComponent } from '@intranet-shared/components/
 
 // #region Helpers
 const VISIBLE_NAV = 2;
+
+/** Nivel de un tramo del breadcrumb — determina qué acción dispara el click. */
+export interface BreadcrumbPart {
+	label: string;
+	kind: 'modulo' | 'grupo' | 'pagina';
+}
 
 function circularSlice<T>(items: T[], center: number, count: number): T[] {
 	const len = items.length;
@@ -97,13 +103,25 @@ export class IntranetLayoutComponent implements OnInit, OnDestroy {
 	// Único indicador consistente entre pantallas cuyo grupo de menú difiere (ej. Cursos/Horarios
 	// bajo "Administración" en Académico, Usuarios bajo "Gestión" en Sistema).
 	private readonly _currentUrl = signal('');
-	readonly breadcrumb = computed(() => {
+	readonly breadcrumb = computed((): BreadcrumbPart[] => {
 		const modulo = MODULOS[this._selectedModuloId()];
 		const item = findMenuItemDefByUrl(this._currentUrl());
-		const parts = [modulo.label];
-		if (item?.group) parts.push(item.group.label);
-		if (item) parts.push(item.label);
+		const parts: BreadcrumbPart[] = [{ label: modulo.label, kind: 'modulo' }];
+		if (item?.group) parts.push({ label: item.group.label, kind: 'grupo' });
+		if (item) parts.push({ label: item.label, kind: 'pagina' });
 		return parts;
+	});
+
+	// Páginas del grupo activo (ej. Cursos/Salones/Horarios bajo "Administración"),
+	// para el mini-dropdown que se abre al clickear el tramo "grupo" del breadcrumb.
+	private readonly _groupDropdownOpen = signal(false);
+	readonly groupDropdownOpen = this._groupDropdownOpen.asReadonly();
+
+	readonly activeGroupItems = computed((): NavMenuItem[] => {
+		const item = findMenuItemDefByUrl(this._currentUrl());
+		if (!item?.group) return [];
+		const groupNode = this._allItems().find((n) => n.label === item.group!.label && n.children);
+		return groupNode?.children ?? [];
 	});
 
 	// Todas las items del módulo seleccionado (sin recortar).
@@ -150,7 +168,16 @@ export class IntranetLayoutComponent implements OnInit, OnDestroy {
 					const id = detectModuloFromUrl(url, modulos);
 					this.applySelection(id, modulos, url);
 				}
+				this._groupDropdownOpen.set(false);
 			});
+	}
+
+	@HostListener('document:click', ['$event'])
+	onDocumentClick(event: MouseEvent): void {
+		const target = event.target as HTMLElement;
+		if (!target.closest?.('.active-section-breadcrumb')) {
+			this._groupDropdownOpen.set(false);
+		}
 	}
 
 	ngOnInit(): void {
@@ -200,6 +227,20 @@ export class IntranetLayoutComponent implements OnInit, OnDestroy {
 		event.preventDefault();
 		event.stopPropagation();
 		this.favoritesService.toggleFavorite(route);
+	}
+
+	/** Click en un tramo navegable del breadcrumb (todo salvo el último, "página actual"). */
+	onBreadcrumbClick(part: BreadcrumbPart): void {
+		if (part.kind === 'modulo') {
+			this._groupDropdownOpen.set(false);
+			this.moduleSelector()?.open();
+		} else if (part.kind === 'grupo') {
+			this._groupDropdownOpen.update((open) => !open);
+		}
+	}
+
+	closeGroupDropdown(): void {
+		this._groupDropdownOpen.set(false);
 	}
 
 	logout(): void {
