@@ -147,8 +147,8 @@ describe('IntranetLayoutComponent', () => {
 
 	it('selectModulo changes selectedModuloId', () => {
 		fixture.detectChanges();
-		component.selectModulo('academico');
-		expect(component.selectedModuloId()).toBe('academico');
+		component.selectModulo('estudiante');
+		expect(component.selectedModuloId()).toBe('estudiante');
 	});
 
 	it('selectModulo inicio navigates to /intranet', () => {

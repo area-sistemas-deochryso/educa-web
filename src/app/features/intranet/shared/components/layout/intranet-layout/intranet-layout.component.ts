@@ -105,7 +105,7 @@ export class IntranetLayoutComponent implements OnInit, OnDestroy {
 	private readonly _currentUrl = signal('');
 	readonly breadcrumb = computed((): BreadcrumbPart[] => {
 		const modulo = MODULOS[this._selectedModuloId()];
-		const item = findMenuItemDefByUrl(this._currentUrl());
+		const item = findMenuItemDefByUrl(this._currentUrl(), this._selectedModuloId());
 		const parts: BreadcrumbPart[] = [{ label: modulo.label, kind: 'modulo' }];
 		if (item?.group) parts.push({ label: item.group.label, kind: 'grupo' });
 		if (item) parts.push({ label: item.label, kind: 'pagina' });
@@ -118,7 +118,7 @@ export class IntranetLayoutComponent implements OnInit, OnDestroy {
 	readonly groupDropdownOpen = this._groupDropdownOpen.asReadonly();
 
 	readonly activeGroupItems = computed((): NavMenuItem[] => {
-		const item = findMenuItemDefByUrl(this._currentUrl());
+		const item = findMenuItemDefByUrl(this._currentUrl(), this._selectedModuloId());
 		if (!item?.group) return [];
 		const groupNode = this._allItems().find((n) => n.label === item.group!.label && n.children);
 		return groupNode?.children ?? [];
