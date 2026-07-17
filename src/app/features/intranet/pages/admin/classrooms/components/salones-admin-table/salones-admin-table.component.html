@@ -1,6 +1,7 @@
 <!-- #region Tabla de salones -->
 <p-table
 	[value]="salones()"
+	[dataKey]="'id'"
 	[loading]="loading()"
 	[paginator]="salones().length > 10"
 	[rows]="10"

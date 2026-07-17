@@ -22,7 +22,7 @@
 			<p>Sin correos en el outbox con este correlation id.</p>
 		</div>
 	} @else {
-		<p-table [value]="items()" class="p-datatable-sm" [scrollable]="true" scrollHeight="flex">
+		<p-table [value]="items()" [dataKey]="'id'" class="p-datatable-sm" [scrollable]="true" scrollHeight="flex">
 			<ng-template #header>
 				<tr>
 					<th style="width: 130px">Tipo</th>

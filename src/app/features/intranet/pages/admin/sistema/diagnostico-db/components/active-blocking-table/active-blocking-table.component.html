@@ -28,7 +28,7 @@
 	}
 
 	@if (sessions().length > 0) {
-		<p-table [value]="sessions()" [tableStyle]="{ 'min-width': '45rem' }" [sortField]="'waitTimeMs'" [sortOrder]="-1">
+		<p-table [value]="sessions()" [dataKey]="'sessionId'" [tableStyle]="{ 'min-width': '45rem' }" [sortField]="'waitTimeMs'" [sortOrder]="-1">
 			<ng-template #header>
 				<tr>
 					<th pSortableColumn="sessionId" style="width: 7rem">Session <p-sortIcon field="sessionId" /></th>

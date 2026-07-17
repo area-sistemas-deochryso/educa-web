@@ -29,7 +29,7 @@
 }
 
 <!-- #region Tabla de estudiantes -->
-<p-table [value]="vm().estudiantes" [loading]="vm().loading" styleClass="p-datatable-sm">
+<p-table [value]="vm().estudiantes" [dataKey]="'estudianteId'" [loading]="vm().loading" styleClass="p-datatable-sm">
 	<ng-template #header>
 		<tr>
 			<th>DNI</th>

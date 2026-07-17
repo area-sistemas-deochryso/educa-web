@@ -15,6 +15,8 @@ export interface HorarioBlock {
 	borderColor: string;
 	topPx: number;
 	heightPx: number;
+	style: Record<string, string>;
+	tooltip: string;
 }
 
 export type CountdownUrgency = 'normal' | 'warning' | 'danger-low' | 'danger';
@@ -54,6 +56,9 @@ export function buildBlocks(
 		const duration = endMin - startMin;
 		const offset = startMin - HORA_INICIO_DIA;
 		const color = cursoColorFor(h.cursoId);
+		const borderColor = darkenColor(color);
+		const topPx = (offset / 60) * PX_PER_HOUR;
+		const heightPx = (duration / 60) * PX_PER_HOUR;
 
 		return {
 			id: h.id,
@@ -65,9 +70,16 @@ export function buildBlocks(
 			cantidadEstudiantes: estudiantesPorSalon.get(h.salonId) ?? h.cantidadEstudiantes,
 			dia: h.diaSemana,
 			color,
-			borderColor: darkenColor(color),
-			topPx: (offset / 60) * PX_PER_HOUR,
-			heightPx: (duration / 60) * PX_PER_HOUR,
+			borderColor,
+			topPx,
+			heightPx,
+			style: {
+				top: `${topPx}px`,
+				height: `${heightPx}px`,
+				background: color,
+				borderLeft: `4px solid ${borderColor}`,
+			},
+			tooltip: `${h.horaInicio} - ${h.horaFin}\n${h.salonDescripcion}`,
 		};
 	});
 }

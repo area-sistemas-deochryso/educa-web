@@ -118,6 +118,7 @@
 	<section class="table-section">
 		<p-table
 			[value]="vm().cursos"
+			[dataKey]="'id'"
 			[lazy]="true"
 			(onLazyLoad)="onLazyLoad($any($event))"
 			[paginator]="true"

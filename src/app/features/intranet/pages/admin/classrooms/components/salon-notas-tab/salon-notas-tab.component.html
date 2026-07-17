@@ -18,6 +18,7 @@
 @if (notasData(); as data) {
 	<p-table
 		[value]="data.estudiantes"
+		[dataKey]="'estudianteId'"
 		[loading]="loading()"
 		[scrollable]="true"
 		scrollHeight="400px"

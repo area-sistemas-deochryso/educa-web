@@ -36,7 +36,7 @@
 	</header>
 
 	@if (editableRows().length > 0) {
-		<p-table [value]="editableRows()" [tableStyle]="{ 'min-width': '40rem' }">
+		<p-table [value]="editableRows()" [dataKey]="'metricKey'" [tableStyle]="{ 'min-width': '40rem' }">
 			<ng-template #header>
 				<tr>
 					<th>Métrica</th>
@@ -82,7 +82,7 @@
 			</ng-template>
 		</p-table>
 	} @else if (hasData()) {
-		<p-table [value]="thresholds()" [tableStyle]="{ 'min-width': '40rem' }">
+		<p-table [value]="thresholds()" [dataKey]="'metricKey'" [tableStyle]="{ 'min-width': '40rem' }">
 			<ng-template #header>
 				<tr>
 					<th>Métrica</th>

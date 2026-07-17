@@ -23,6 +23,7 @@
 	@if (slowRequests().length > 0) {
 		<p-table
 			[value]="slowRequests()"
+			[dataKey]="'path'"
 			[tableStyle]="{ 'min-width': '40rem' }"
 			[sortField]="'p95'"
 			[sortOrder]="-1"

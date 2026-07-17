@@ -183,6 +183,7 @@
 				@if (resultHasErrors()) {
 					<p-table
 						[value]="result()!.errores"
+						[dataKey]="'fila'"
 						styleClass="p-datatable-sm error-table"
 						[scrollable]="true"
 						scrollHeight="220px"

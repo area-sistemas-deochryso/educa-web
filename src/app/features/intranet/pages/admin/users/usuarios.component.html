@@ -83,8 +83,8 @@
 <app-user-form-dialog
 	[visible]="vm().dialogVisible"
 	[isEditing]="vm().isEditing"
-	[formData]="formData"
-	[errors]="formErrors"
+	[formData]="formData()"
+	[errors]="formErrors()"
 	[isFormValid]="vm().isFormValid"
 	[loading]="vm().loading"
 	[salones]="vm().salones"

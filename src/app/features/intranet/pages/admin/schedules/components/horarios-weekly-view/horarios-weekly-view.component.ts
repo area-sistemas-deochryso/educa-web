@@ -1,6 +1,6 @@
 // #region Imports
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
@@ -51,36 +51,50 @@ export class SchedulesWeeklyViewComponent {
     '17:00',
   ];
 
-  // * Helpers
-  getBlocksForDay(dia: number): HorarioWeeklyBlock[] {
-    return this.blocks().filter((b) => b.dia === dia);
-  }
+  // * Blocks agrupados por día, calculado una sola vez por cambio de input.
+  readonly blocksByDay = computed<Map<number, HorarioWeeklyBlock[]>>(() => {
+    const map = new Map<number, HorarioWeeklyBlock[]>();
+    for (const b of this.blocks()) {
+      const list = map.get(b.dia);
+      if (list) list.push(b);
+      else map.set(b.dia, [b]);
+    }
+    return map;
+  });
 
-  getBlockStyle(block: HorarioWeeklyBlock): Record<string, string> {
-    // Calcular altura basada en duración (1 hora = 60px)
-    const heightPx = (block.duracionMinutos / 60) * 60;
+  // * Estilo + tooltip precalculados por bloque, keyed por horario.id.
+  readonly blockStyleMap = computed<Map<number, Record<string, string>>>(() => {
+    const map = new Map<number, Record<string, string>>();
+    for (const block of this.blocks()) {
+      const heightPx = (block.duracionMinutos / 60) * 60;
+      const topPx = (block.posicionVertical / 60) * 60;
+      map.set(block.horario.id, {
+        top: `${topPx}px`,
+        height: `${heightPx}px`,
+        background: block.color,
+        borderLeft: `4px solid ${this.darkenColor(block.color)}`,
+      });
+    }
+    return map;
+  });
 
-    // Calcular posición top basada en offset desde las 07:00
-    const topPx = (block.posicionVertical / 60) * 60;
-
-    return {
-      top: `${topPx}px`,
-      height: `${heightPx}px`,
-      background: block.color,
-      borderLeft: `4px solid ${this.darkenColor(block.color)}`,
-    };
-  }
-
-  getTooltipContent(block: HorarioWeeklyBlock): string {
-    const h = block.horario;
-    return `
+  readonly blockTooltipMap = computed<Map<number, string>>(() => {
+    const map = new Map<number, string>();
+    for (const block of this.blocks()) {
+      const h = block.horario;
+      map.set(
+        block.horario.id,
+        `
       ${h.cursoNombre}
       ${h.horaInicio} - ${h.horaFin}
       Salón: ${h.salonDescripcion}
       ${h.profesorNombreCompleto ? `Profesor: ${h.profesorNombreCompleto}` : 'Sin profesor asignado'}
       ${h.cantidadEstudiantes} estudiantes
-    `.trim();
-  }
+    `.trim(),
+      );
+    }
+    return map;
+  });
 
   onBlockClick(block: HorarioWeeklyBlock): void {
     this.blockClick.emit(block.horario.id);

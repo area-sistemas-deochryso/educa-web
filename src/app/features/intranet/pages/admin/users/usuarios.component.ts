@@ -1,6 +1,6 @@
 /* eslint-disable max-lines -- Razón: god-page admin/usuarios concentra CRUD + dev migration + validation dialog + excel export + autoOpen (Plan 43 A13). Extracciones aplicadas (helpers/, services/payload.builder, helpers/auto-open-from-query). Resto requiere refactor mayor fuera del scope del brief 147. */
 // #region Imports
-import { AfterViewInit, ChangeDetectionStrategy, Component, DestroyRef, effect, inject, signal } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, DestroyRef, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
@@ -114,19 +114,15 @@ export class UsersComponent implements AfterViewInit {
 		]),
 	};
 
-	get formData(): UsuarioFormData {
-		return this.vm().formData as UsuarioFormData;
-	}
+	readonly formData = computed<UsuarioFormData>(() => this.vm().formData as UsuarioFormData);
 
-	get formErrors(): FormValidationErrors {
-		return {
-			dniError: this.vm().dniError,
-			correoError: this.vm().correoError,
-			correoApoderadoError: this.vm().correoApoderadoError,
-			nombreApoderadoError: this.vm().nombreApoderadoError,
-			telefonoApoderadoError: this.vm().telefonoApoderadoError,
-		};
-	}
+	readonly formErrors = computed<FormValidationErrors>(() => ({
+		dniError: this.vm().dniError,
+		correoError: this.vm().correoError,
+		correoApoderadoError: this.vm().correoApoderadoError,
+		nombreApoderadoError: this.vm().nombreApoderadoError,
+		telefonoApoderadoError: this.vm().telefonoApoderadoError,
+	}));
 
 	constructor() {
 		this.dataFacade.loadData();

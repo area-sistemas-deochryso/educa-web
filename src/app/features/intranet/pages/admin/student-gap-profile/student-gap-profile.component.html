@@ -96,7 +96,7 @@
 				<p>Sin correos registrados para este estudiante.</p>
 			</div>
 		} @else {
-			<p-table [value]="emails()" [rows]="10" [paginator]="emails().length > 10" styleClass="p-datatable-sm">
+			<p-table [value]="emails()" [dataKey]="'id'" [rows]="10" [paginator]="emails().length > 10" styleClass="p-datatable-sm">
 				<ng-template #header>
 					<tr>
 						<th>Asunto</th>

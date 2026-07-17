@@ -28,7 +28,7 @@
 	}
 
 	@if (tables().length > 0) {
-		<p-table [value]="tables()" [tableStyle]="{ 'min-width': '30rem' }" [sortField]="'reservedMb'" [sortOrder]="-1">
+		<p-table [value]="tables()" [dataKey]="'tableName'" [tableStyle]="{ 'min-width': '30rem' }" [sortField]="'reservedMb'" [sortOrder]="-1">
 			<ng-template #header>
 				<tr>
 					<th pSortableColumn="tableName">Tabla <p-sortIcon field="tableName" /></th>

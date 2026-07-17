@@ -25,12 +25,12 @@
 
           <!-- * Bloques de horarios -->
           <div class="blocks-container">
-            @for (block of getBlocksForDay(dia.value); track trackByBlockId($index, block)) {
+            @for (block of (blocksByDay().get(dia.value) ?? []); track trackByBlockId($index, block)) {
               <div
                 class="horario-block"
-                [ngStyle]="getBlockStyle(block)"
+                [ngStyle]="blockStyleMap().get(block.horario.id)"
                 [class.inactive]="!block.horario.estado"
-                [pTooltip]="getTooltipContent(block)"
+                [pTooltip]="blockTooltipMap().get(block.horario.id)"
                 tooltipPosition="top"
                 (click)="onBlockClick(block)"
               >

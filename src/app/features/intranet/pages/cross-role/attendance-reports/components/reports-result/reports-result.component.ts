@@ -205,9 +205,5 @@ export class ReportsResultComponent {
 	private salonKey(s: SalonReporteFiltrado): string {
 		return `${s.grado}|${s.seccion}`;
 	}
-
-	esFeriado(dia: number): boolean {
-		return this.feriadosSet().has(dia);
-	}
 	// #endregion
 }

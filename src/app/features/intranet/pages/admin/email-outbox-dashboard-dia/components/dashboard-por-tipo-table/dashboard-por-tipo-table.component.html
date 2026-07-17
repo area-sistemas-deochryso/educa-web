@@ -5,7 +5,7 @@
 		<span class="section-subtitle">Agregación por <code>EO_Tipo</code></span>
 	</header>
 
-	<p-table [value]="data()" class="p-datatable-sm" styleClass="p-datatable-gridlines">
+	<p-table [value]="data()" [dataKey]="'tipo'" class="p-datatable-sm" styleClass="p-datatable-gridlines">
 		<ng-template #header>
 			<tr>
 				<th class="label-uppercase">Tipo</th>

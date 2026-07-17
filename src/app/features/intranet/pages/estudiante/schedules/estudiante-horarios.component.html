@@ -99,7 +99,9 @@
 								<div class="hour-line"></div>
 							}
 
-							@if (getBlocksForDay(dia.value).length === 0) {
+							@let dayBlocks = blocksByDay().get(dia.value) ?? [];
+
+							@if (dayBlocks.length === 0) {
 								<div class="day-empty-state">
 									<i class="pi pi-calendar-times"></i>
 									<p>Sin clases este día</p>
@@ -107,11 +109,11 @@
 							}
 
 							<div class="blocks-container">
-								@for (block of getBlocksForDay(dia.value); track block.id) {
+								@for (block of dayBlocks; track block.id) {
 									<div
 										class="horario-block"
-										[ngStyle]="getBlockStyle(block)"
-										[pTooltip]="getTooltipContent(block)"
+										[ngStyle]="block.style"
+										[pTooltip]="block.tooltip"
 										tooltipPosition="top"
 										(click)="verCursoContenido(block)"
 									>

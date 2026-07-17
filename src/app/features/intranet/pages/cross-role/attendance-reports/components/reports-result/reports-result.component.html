@@ -39,13 +39,13 @@
 								<th class="matrix-frozen matrix-col-num" rowspan="2">#</th>
 								<th class="matrix-frozen matrix-col-name" rowspan="2">Nombre Completo</th>
 								@for (dia of diasColumnas(); track dia) {
-									<th class="matrix-col-day" [class.holiday-col]="esFeriado(dia)">{{ dia }}</th>
+									<th class="matrix-col-day" [class.holiday-col]="feriadosSet().has(dia)">{{ dia }}</th>
 								}
 								<th class="matrix-col-total matrix-total-header" colspan="4">Resultados</th>
 							</tr>
 							<tr>
 								@for (label of diasSemanaLabels(); track $index) {
-									<th class="matrix-col-day matrix-weekday" [class.holiday-col]="esFeriado(diasColumnas()[$index])">{{ label }}</th>
+									<th class="matrix-col-day matrix-weekday" [class.holiday-col]="feriadosSet().has(diasColumnas()[$index])">{{ label }}</th>
 								}
 								<th class="matrix-col-total total-A">A</th>
 								<th class="matrix-col-total total-F">F</th>
@@ -88,6 +88,7 @@
 			} @else {
 				<p-table
 					[value]="salon.estudiantes"
+					dataKey="dni"
 					[paginator]="true"
 					[rows]="10"
 					[rowsPerPageOptions]="[5, 10, 25, 50]"
@@ -149,13 +150,13 @@
 							<th class="matrix-frozen matrix-col-num" rowspan="2">#</th>
 							<th class="matrix-frozen matrix-col-name" rowspan="2">Nombre Completo</th>
 							@for (dia of diasColumnas(); track dia) {
-								<th class="matrix-col-day" [class.holiday-col]="esFeriado(dia)">{{ dia }}</th>
+								<th class="matrix-col-day" [class.holiday-col]="feriadosSet().has(dia)">{{ dia }}</th>
 							}
 							<th class="matrix-col-total matrix-total-header" colspan="5">Resultados</th>
 						</tr>
 						<tr>
 							@for (label of diasSemanaLabels(); track $index) {
-								<th class="matrix-col-day matrix-weekday" [class.holiday-col]="esFeriado(diasColumnas()[$index])">{{ label }}</th>
+								<th class="matrix-col-day matrix-weekday" [class.holiday-col]="feriadosSet().has(diasColumnas()[$index])">{{ label }}</th>
 							}
 							<th class="matrix-col-total total-A">A</th>
 							<th class="matrix-col-total total-F">F</th>
@@ -187,6 +188,7 @@
 		} @else {
 			<p-table
 				[value]="profesores()"
+				dataKey="dni"
 				[paginator]="true"
 				[rows]="10"
 				[rowsPerPageOptions]="[5, 10, 25, 50]"
@@ -247,13 +249,13 @@
 							<th class="matrix-frozen matrix-col-num" rowspan="2">#</th>
 							<th class="matrix-frozen matrix-col-name" rowspan="2">Nombre Completo</th>
 							@for (dia of diasColumnas(); track dia) {
-								<th class="matrix-col-day" [class.holiday-col]="esFeriado(dia)">{{ dia }}</th>
+								<th class="matrix-col-day" [class.holiday-col]="feriadosSet().has(dia)">{{ dia }}</th>
 							}
 							<th class="matrix-col-total matrix-total-header" colspan="5">Resultados</th>
 						</tr>
 						<tr>
 							@for (label of diasSemanaLabels(); track $index) {
-								<th class="matrix-col-day matrix-weekday" [class.holiday-col]="esFeriado(diasColumnas()[$index])">{{ label }}</th>
+								<th class="matrix-col-day matrix-weekday" [class.holiday-col]="feriadosSet().has(diasColumnas()[$index])">{{ label }}</th>
 							}
 							<th class="matrix-col-total total-A">A</th>
 							<th class="matrix-col-total total-F">F</th>
@@ -285,6 +287,7 @@
 		} @else {
 			<p-table
 				[value]="asistentesAdmin()"
+				dataKey="dni"
 				[paginator]="true"
 				[rows]="10"
 				[rowsPerPageOptions]="[5, 10, 25, 50]"
@@ -343,13 +346,13 @@
 							<th class="matrix-frozen matrix-col-num" rowspan="2">#</th>
 							<th class="matrix-frozen matrix-col-name" rowspan="2">Nombre Completo</th>
 							@for (dia of diasColumnas(); track dia) {
-								<th class="matrix-col-day" [class.holiday-col]="esFeriado(dia)">{{ dia }}</th>
+								<th class="matrix-col-day" [class.holiday-col]="feriadosSet().has(dia)">{{ dia }}</th>
 							}
 							<th class="matrix-col-total matrix-total-header" colspan="5">Resultados</th>
 						</tr>
 						<tr>
 							@for (label of diasSemanaLabels(); track $index) {
-								<th class="matrix-col-day matrix-weekday" [class.holiday-col]="esFeriado(diasColumnas()[$index])">{{ label }}</th>
+								<th class="matrix-col-day matrix-weekday" [class.holiday-col]="feriadosSet().has(diasColumnas()[$index])">{{ label }}</th>
 							}
 							<th class="matrix-col-total total-A">A</th>
 							<th class="matrix-col-total total-F">F</th>
@@ -379,7 +382,7 @@
 				</table>
 			</div>
 		} @else {
-			<p-table [value]="coordinadores()" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[5, 10, 25, 50]" [showCurrentPageReport]="true" currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}" styleClass="p-datatable-sm">
+			<p-table [value]="coordinadores()" dataKey="dni" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[5, 10, 25, 50]" [showCurrentPageReport]="true" currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}" styleClass="p-datatable-sm">
 				<ng-template #header>
 					<tr>
 						<th style="width: 70px">#</th>
@@ -425,13 +428,13 @@
 							<th class="matrix-frozen matrix-col-num" rowspan="2">#</th>
 							<th class="matrix-frozen matrix-col-name" rowspan="2">Nombre Completo</th>
 							@for (dia of diasColumnas(); track dia) {
-								<th class="matrix-col-day" [class.holiday-col]="esFeriado(dia)">{{ dia }}</th>
+								<th class="matrix-col-day" [class.holiday-col]="feriadosSet().has(dia)">{{ dia }}</th>
 							}
 							<th class="matrix-col-total matrix-total-header" colspan="5">Resultados</th>
 						</tr>
 						<tr>
 							@for (label of diasSemanaLabels(); track $index) {
-								<th class="matrix-col-day matrix-weekday" [class.holiday-col]="esFeriado(diasColumnas()[$index])">{{ label }}</th>
+								<th class="matrix-col-day matrix-weekday" [class.holiday-col]="feriadosSet().has(diasColumnas()[$index])">{{ label }}</th>
 							}
 							<th class="matrix-col-total total-A">A</th>
 							<th class="matrix-col-total total-F">F</th>
@@ -461,7 +464,7 @@
 				</table>
 			</div>
 		} @else {
-			<p-table [value]="promotores()" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[5, 10, 25, 50]" [showCurrentPageReport]="true" currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}" styleClass="p-datatable-sm">
+			<p-table [value]="promotores()" dataKey="dni" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[5, 10, 25, 50]" [showCurrentPageReport]="true" currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}" styleClass="p-datatable-sm">
 				<ng-template #header>
 					<tr>
 						<th style="width: 70px">#</th>

@@ -50,6 +50,16 @@ export class TeacherSchedulesComponent implements OnInit {
 		buildBlocks(this.vm().horarios, this.estudiantesPorSalon()),
 	);
 
+	readonly blocksByDay = computed<Map<number, HorarioBlock[]>>(() => {
+		const map = new Map<number, HorarioBlock[]>();
+		for (const b of this.weeklyBlocks()) {
+			const list = map.get(b.dia);
+			if (list) list.push(b);
+			else map.set(b.dia, [b]);
+		}
+		return map;
+	});
+
 	// #endregion
 	// #region Mobile view
 	readonly selectedDay = signal(this.getCurrentWeekday());
@@ -229,25 +239,6 @@ export class TeacherSchedulesComponent implements OnInit {
 		if (drift > 20 * 60_000) {
 			this.syncServerTime();
 		}
-	}
-
-	// #endregion
-	// #region Helpers
-	getBlocksForDay(dia: number): HorarioBlock[] {
-		return this.weeklyBlocks().filter((b) => b.dia === dia);
-	}
-
-	getBlockStyle(block: HorarioBlock): Record<string, string> {
-		return {
-			top: `${block.topPx}px`,
-			height: `${block.heightPx}px`,
-			background: block.color,
-			borderLeft: `4px solid ${block.borderColor}`,
-		};
-	}
-
-	getTooltipContent(block: HorarioBlock): string {
-		return `${block.horaInicio} - ${block.horaFin}\n${block.salonDescripcion}`;
 	}
 
 	// #endregion

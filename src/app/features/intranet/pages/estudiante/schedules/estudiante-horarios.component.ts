@@ -25,6 +25,8 @@ interface HorarioBlock {
 	borderColor: string;
 	topPx: number;
 	heightPx: number;
+	style: Record<string, string>;
+	tooltip: string;
 }
 
 type CountdownUrgency = 'normal' | 'warning' | 'danger-low' | 'danger';
@@ -57,6 +59,9 @@ function buildBlocks(horarios: HorarioProfesorDto[]): HorarioBlock[] {
 		const duration = endMin - startMin;
 		const offset = startMin - HORA_INICIO_DIA;
 		const color = cursoColorFor(h.cursoId);
+		const borderColor = darkenColor(color);
+		const topPx = (offset / 60) * PX_PER_HOUR;
+		const heightPx = (duration / 60) * PX_PER_HOUR;
 
 		return {
 			id: h.id,
@@ -68,9 +73,16 @@ function buildBlocks(horarios: HorarioProfesorDto[]): HorarioBlock[] {
 			cantidadEstudiantes: h.cantidadEstudiantes,
 			dia: h.diaSemana,
 			color,
-			borderColor: darkenColor(color),
-			topPx: (offset / 60) * PX_PER_HOUR,
-			heightPx: (duration / 60) * PX_PER_HOUR,
+			borderColor,
+			topPx,
+			heightPx,
+			style: {
+				top: `${topPx}px`,
+				height: `${heightPx}px`,
+				background: color,
+				borderLeft: `4px solid ${borderColor}`,
+			},
+			tooltip: `${h.horaInicio} - ${h.horaFin}\n${h.salonDescripcion}`,
 		};
 	});
 }
@@ -169,6 +181,16 @@ export class StudentSchedulesComponent implements OnInit {
 	readonly weeklyBlocks = computed<HorarioBlock[]>(() =>
 		buildBlocks(this.vm().horarios),
 	);
+
+	readonly blocksByDay = computed<Map<number, HorarioBlock[]>>(() => {
+		const map = new Map<number, HorarioBlock[]>();
+		for (const b of this.weeklyBlocks()) {
+			const list = map.get(b.dia);
+			if (list) list.push(b);
+			else map.set(b.dia, [b]);
+		}
+		return map;
+	});
 
 	// #endregion
 	// #region Countdown (server-synced)
@@ -281,25 +303,6 @@ export class StudentSchedulesComponent implements OnInit {
 		if (drift > 20 * 60_000) {
 			this.syncServerTime();
 		}
-	}
-
-	// #endregion
-	// #region Helpers
-	getBlocksForDay(dia: number): HorarioBlock[] {
-		return this.weeklyBlocks().filter((b) => b.dia === dia);
-	}
-
-	getBlockStyle(block: HorarioBlock): Record<string, string> {
-		return {
-			top: `${block.topPx}px`,
-			height: `${block.heightPx}px`,
-			background: block.color,
-			borderLeft: `4px solid ${block.borderColor}`,
-		};
-	}
-
-	getTooltipContent(block: HorarioBlock): string {
-		return `${block.horaInicio} - ${block.horaFin}\n${block.salonDescripcion}`;
 	}
 
 	// #endregion
