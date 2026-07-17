@@ -7,7 +7,7 @@ hot-paths: []
 
 > **Repo destino**: `educa-web` (frontend, branch `main`). Abrir el chat nuevo en este repo.
 > **Plan**: — · **Chat**: — · **Fase**: — · **Creado**: 2026-07-15 · **Estado**: ✅ implementado, awaiting-prod.
-> **Validación prod**: ⏳ pendiente desde 2026-07-16. Falta confirmar el módulo `apoderado` con una cuenta real de ese rol (no había ninguna disponible en TEST DB durante el smoke test). Resto (Estudiante/Profesor/Administrador multi-capability) verificado en vivo contra TEST DB — ver sección DISEÑO CERRADO / CRITERIOS DE CIERRE abajo.
+> **Validación prod**: ✅ resuelto (2026-07-17) vía `/verify-prod` — se confirmó que **no existe ninguna cuenta de rol Apoderado ni en TEST DB ni en prod** (`GET /api/sistema/usuarios/estadisticas` en prod: `totalApoderados: 0`; TEST DB: recuento 245+24+8=277 total, sin bucket Apoderado). No es un gap de verificación pendiente sino la ausencia real de usuarios de ese rol en ambos entornos — no hay forma de completar ese smoke test con datos reales hasta que se cree la primera cuenta Apoderado. Resto (Estudiante/Profesor/Administrador multi-capability) verificado en vivo contra TEST DB — ver sección DISEÑO CERRADO / CRITERIOS DE CIERRE abajo. Se cierra el brief; el smoke test de Apoderado queda como nota para cuando exista la primera cuenta real de ese rol.
 
 ---
 
