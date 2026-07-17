@@ -82,7 +82,7 @@
 		.p-datatable-table-container,
 		.p-datatable-wrapper,
 		&.p-datatable {
-			overflow-x: hidden !important;
+			overflow-x: auto !important;
 			width: 100%;
 		}
 

@@ -29,12 +29,12 @@
 		}
 	}
 
-	// #region PrimeNG overrides — elimina scroll horizontal + permite wrap
+	// #region PrimeNG overrides — permite scroll horizontal + wrap
 	:host ::ng-deep .fallos-table {
 		.p-datatable-table-container,
 		.p-datatable-wrapper,
 		.p-datatable {
-			overflow-x: hidden !important;
+			overflow-x: auto !important;
 			width: 100%;
 		}
 
