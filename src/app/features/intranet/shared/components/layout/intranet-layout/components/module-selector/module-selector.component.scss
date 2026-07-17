@@ -34,6 +34,12 @@
 		border-color: #5c7a28;
 		background: rgba(92, 122, 40, 0.06);
 	}
+
+	// El panel es fixed/full-height y no depende del layout del trigger — ocultarlo
+	// evita el residuo visual que quedaba solapado con el borde del panel al abrir.
+	&--hidden {
+		visibility: hidden;
+	}
 }
 
 .trigger-icon {

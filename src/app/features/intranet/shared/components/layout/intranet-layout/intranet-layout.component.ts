@@ -99,7 +99,10 @@ export class IntranetLayoutComponent implements OnInit, AfterViewInit, OnDestroy
 		const item = findMenuItemDefByUrl(this._currentUrl(), this._selectedModuloId());
 		const parts: BreadcrumbPart[] = [{ label: modulo.label, kind: 'modulo' }];
 		if (item?.group) parts.push({ label: item.group.label, kind: 'grupo' });
-		if (item) parts.push({ label: item.label, kind: 'pagina' });
+		// Sin grupo, "página" puede repetir el label del módulo (ej. Inicio > Inicio) — no aporta información.
+		if (item && !(!item.group && item.label === modulo.label)) {
+			parts.push({ label: item.label, kind: 'pagina' });
+		}
 		return parts;
 	});
 

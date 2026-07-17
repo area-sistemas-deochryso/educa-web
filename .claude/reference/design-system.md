@@ -1048,7 +1048,7 @@ El tema PrimeNG Aura expone variables CSS de paleta completas (`--red-50..900`, 
 ### Estado de migración (Plan 20 F4, 2026-04-17)
 
 - **Admin pages**: migradas (usuarios, error-logs, feedback-reports, classrooms, schedules, campus, ctest-k6).
-- **Shared**: migrado (form-field-error, feedback-report-dialog, voice-button, user-profile-menu, floating-notification-bell).
+- **Shared**: migrado (form-field-error, feedback-report-dialog, voice-button, user-profile-menu, floating-notification-bell, feedback-report-launcher — brief 463).
 - **Cross-role + profesor + estudiante**: migrados (reports, attendance widgets, home widgets, student tabs, health-justification-list).
 - **Excepciones activas**: 3 archivos con hex literal justificado (notification-quick-access Sass, campus-minimap Canvas, mensajería/foro avatar palettes).
 

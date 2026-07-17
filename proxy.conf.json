@@ -1,23 +1,23 @@
 {
 	"/api": {
-		"target": "https://localhost:7102",
+		"target": "http://localhost:5139",
 		"secure": false,
 		"changeOrigin": true
 	},
 	"/chathub": {
-		"target": "https://localhost:7102",
+		"target": "http://localhost:5139",
 		"secure": false,
 		"changeOrigin": true,
 		"ws": true
 	},
 	"/asistenciahub": {
-		"target": "https://localhost:7102",
+		"target": "http://localhost:5139",
 		"secure": false,
 		"changeOrigin": true,
 		"ws": true
 	},
 	"/hubs": {
-		"target": "https://localhost:7102",
+		"target": "http://localhost:5139",
 		"secure": false,
 		"changeOrigin": true,
 		"ws": true

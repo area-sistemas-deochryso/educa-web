@@ -159,14 +159,19 @@
 	font-weight: 600;
 	font-size: 0.95rem;
 	color: var(--text-color);
-	white-space: nowrap;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
 	overflow: hidden;
-	text-overflow: ellipsis;
+	word-break: break-word;
 }
 
 .session-role {
 	font-size: 0.8rem;
 	color: var(--text-color-secondary);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 .use-other-account {
@@ -214,7 +219,16 @@
 		margin: 1rem;
 	}
 
-	// On mobile, always show action buttons (no hover)
+	// El calc(100% - 5rem) de arriba está pensado para centrar la lista en desktop;
+	// en mobile angosta demasiado el card y causa overflow + solape ícono/texto.
+	.stored-sessions {
+		width: 100%;
+	}
+}
+
+// Touch (tablets incluidas): no hay :hover confiable, mostrar acciones siempre.
+// Independiente del ancho de viewport — un tablet en landscape puede superar los 576px.
+@media (hover: none), (pointer: coarse) {
 	.session-actions {
 		opacity: 1;
 		transform: translateX(0);

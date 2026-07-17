@@ -13,7 +13,7 @@
 					<div class="session-card">
 						<span class="session-avatar">{{ session.nombreCompleto | initials }}</span>
 						<span class="session-info">
-							<span class="session-name">{{ session.nombreCompleto }}</span>
+							<span class="session-name" [title]="session.nombreCompleto">{{ session.nombreCompleto }}</span>
 							<span class="session-role">{{ session.rol }}</span>
 						</span>
 						<!-- Actions: visible on hover -->

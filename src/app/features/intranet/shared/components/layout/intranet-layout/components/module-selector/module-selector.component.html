@@ -3,6 +3,7 @@
 	type="button"
 	class="selector-trigger"
 	[class.open]="isOpen()"
+	[class.selector-trigger--hidden]="isOpen()"
 	(click)="toggle()"
 	[attr.aria-expanded]="isOpen()"
 	aria-haspopup="listbox"
