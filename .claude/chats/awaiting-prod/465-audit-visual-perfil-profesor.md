@@ -1,5 +1,6 @@
 # 465 — Auditoría visual + funcional: Perfil Profesor
 
+> **Validación prod**: ⏳ pendiente desde 2026-07-18 — QA en vivo en TEST DB del escenario real (`MENDO CALDERON MARIELA`, curso Arte, salón `INICIAL 3 AÑOS B`), no se hizo browser QA en la sesión de cierre.
 > **Repo destino**: `educa-web`
 > **Creado**: 2026-07-17 · **Modo sugerido**: `/investigate` (el hallazgo #1 necesita confirmar causa exacta antes de poder diseñar el fix)
 > **Plan**: —
@@ -48,10 +49,14 @@ Ya documentado en profundidad en brief 458 (actualizado en esta sesión). Resume
 
 ## Criterio de cierre
 
-- [ ] Causa de la discrepancia de estudiantes en "Mi Asistencia" identificada (`/investigate`) y, si es bug, corregida.
-- [ ] Decisión tomada sobre el título de la página "Notas y Asistencia" / "Mis Salones" (unificar o documentar por qué se mantiene separado).
-- [ ] Confirmado que brief 458 cubre el fix del bug de clasificación (no se requiere trabajo adicional en este brief para ese punto).
-- [ ] Build + lint OK. Verificado en vivo contra el mismo escenario (`MENDO CALDERON MARIELA`, curso `Arte`, TEST DB).
+- [x] Causa de la discrepancia de estudiantes en "Mi Asistencia" identificada (`/investigate`) y, si es bug, corregida.
+  **Causa confirmada**: `AsistenciaCursoRepository.ObtenerEstudiantesDeHorarioAsync` leía de `HorarioEstudiante` (roster curado manualmente por horario, poblado una vez vía `AsignarEstudiantesAsync`/`AsignarTodosEstudiantesSalonAsync`), mientras que Calificaciones y Grupos leen de `EstudianteSalon` (matrícula real). Ni `EstudianteSalonManagementService.AgregarAsync` ni `TransferirAsync` tocan `HorarioEstudiante` — no existe sync alguno. Resultado: estudiantes matriculados **después** de que un horario ya tuviera su roster poblado quedan invisibles en Asistencia por Curso, aunque sí aparezcan en Salones/Calificaciones.
+  **Fix aplicado** (Educa.API): `ObtenerEstudiantesDeHorarioAsync` y `EstaEstudianteEnHorarioAsync` ahora leen de `EstudianteSalon` vía `Horario.HorSalonCodId`, mismo patrón que `GrupoContenidoRepository.ObtenerEstudiantesPorContenidoAsync`. Cambia el tipo de retorno de `List<HorarioEstudiante>` a `List<Estudiante>` — se actualizaron `IAsistenciaCursoRepository` y los 3 call sites en `AsistenciaCursoService` (`ObtenerPorFechaAsync`, `ObtenerResumenAsync`, `RegistrarAsync`). `HorarioEstudiante` se mantiene intacta para sus otros usos (cruce de horarios, conteos) — no se tocó `HorarioRepository` ni `HorarioAsignacionService`.
+  Decisión del usuario: no enganchar el fix en el flujo de matrícula (`AgregarAsync`/`TransferirAsync`) porque esa funcionalidad todavía no está completamente implementada — se prefirió hacer que Asistencia lea la misma fuente de verdad que el resto del sistema.
+- [x] Decisión tomada sobre el título de la página "Notas y Asistencia" / "Mis Salones" (unificar o documentar por qué se mantiene separado).
+  Renombrado el `<h1>` de `profesor-final-salones.component.html` de "Mis Salones" a "Notas y Asistencia" (mismo texto que el label del menú), ícono actualizado a `pi-th-large` (icono del menú) para dejar "Mis Salones" + `pi-building` exclusivo de la ruta `/intranet/profesor/salones`.
+- [x] Confirmado que brief 458 cubre el fix del bug de clasificación (no se requiere trabajo adicional en este brief para ese punto).
+- [x] Build + lint OK (BE: `dotnet build` 0 errores, `dotnet test` 11/11 en AsistenciaCurso; FE: `ng build` + `eslint` limpios). **Pendiente**: verificación en vivo en TEST DB contra el escenario real (`MENDO CALDERON MARIELA`, curso `Arte`) — no se hizo browser QA en esta sesión, recomendado antes de mergear.
 
 ## Tiempo estimado
 

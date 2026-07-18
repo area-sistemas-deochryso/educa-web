@@ -83,12 +83,12 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub F3-F6), *
 
 ### 🟣 Verificaciones post-deploy (`/verify <NNN>`)
 
-Vacío — todos los items eran ≥1 semana estables, verificados con usuarios reales; cerrados en bulk a `closed/` vía `/sync-maestro` 2026-07-11 (18 briefs: 169, 268, 275, 277, 281, 284, 285, 296, 297, 298, 301, 303, 304, 321, 330×2, 370, 388).
+- ⏳ **465** — audit visual+funcional Profesor: fix `AsistenciaCursoRepository` (lee `EstudianteSalon` en vez de `HorarioEstudiante`) + rename `<h1>` "Mis Salones" → "Notas y Asistencia". Pendiente: QA en vivo en TEST DB del escenario real (`MENDO CALDERON MARIELA`, curso Arte) — no se hizo browser QA en la sesión de cierre.
 
 ### Notas operativas
 
-- **`running/`**: vacío · **`open/`**: 3 briefs (332, 390, 391) · **`awaiting-prod/`**: 0 briefs · **`waiting/`**: vacío · **`troubles/`**: vacío
-- **Último cierre**: bulk-close 2026-07-11 (18 briefs de `awaiting-prod/`, ver arriba) + 422 (P80 F5, eje X resource-stats-chart) + 421 (P80 F5, tamaño real tablas MB).
+- **`running/`**: vacío · **`open/`**: 6 briefs (332, 390, 391, 458, 462, 467) · **`awaiting-prod/`**: 1 brief (465) · **`waiting/`**: vacío · **`troubles/`**: vacío
+- **Último cierre**: 465 (audit Profesor, fix asistencia por matrícula tardía) → `awaiting-prod/`, 2026-07-18.
 - **Último saneamiento**: 2026-07-11 — sync-maestro: vaciado `awaiting-prod/` completo (estables, verificados con usuarios reales).
 
 ---
