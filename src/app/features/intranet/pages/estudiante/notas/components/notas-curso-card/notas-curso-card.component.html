@@ -7,6 +7,12 @@
 		</span>
 		<span class="hero-curso">{{ curso().cursoNombre }}</span>
 		<span class="text-sm text-color-secondary">{{ curso().salonDescripcion }}</span>
+		@if (porcentajeEvaluado() < 100) {
+			<span class="hero-evaluado-note">
+				<i class="pi pi-info-circle mr-1"></i>
+				{{ porcentajeEvaluado() }}% del curso evaluado
+			</span>
+		}
 	</div>
 	<!-- #endregion -->
 
@@ -22,14 +28,16 @@
 				/>
 			</div>
 		}
-		<div class="periodo-chip periodo-general">
-			<span class="periodo-name">General</span>
-			<p-tag
-				[value]="formatNota(promedioGeneral())"
-				[severity]="promedioSeverity()"
-				[rounded]="true"
-			/>
-		</div>
+		@if (curso().periodos.length > 0) {
+			<div class="periodo-chip periodo-general">
+				<span class="periodo-name">General</span>
+				<p-tag
+					[value]="formatNota(promedioGeneral())"
+					[severity]="promedioSeverity()"
+					[rounded]="true"
+				/>
+			</div>
+		}
 	</div>
 	<!-- #endregion -->
 

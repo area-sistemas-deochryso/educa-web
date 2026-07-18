@@ -1,14 +1,17 @@
 import type { CalificacionDto, NotaResumenDto, PeriodoCalificacionDto, PromedioDto } from '@data/models';
 import { MESES_LIMITE_EDICION } from '../models';
 
+/**
+ * INV-C04: Promedio = Σ(nota × peso). Los pesos son fracciones absolutas
+ * (ej: 0.20 = 20%) y NO se normalizan dividiendo entre la suma de pesos —
+ * mirrors Educa.API/Domain/Calificacion/Calculators/PromedioPonderadoCalculator.
+ */
 export function calcularPromedioPonderado(
 	notas: { nota: number; peso: number }[],
 ): number | null {
 	if (notas.length === 0) return null;
-	const sumaPesos = notas.reduce((acc, n) => acc + n.peso, 0);
-	if (sumaPesos === 0) return null;
 	const suma = notas.reduce((acc, n) => acc + n.nota * n.peso, 0);
-	return Math.round((suma / sumaPesos) * 10) / 10;
+	return Math.round(suma * 10) / 10;
 }
 
 /**

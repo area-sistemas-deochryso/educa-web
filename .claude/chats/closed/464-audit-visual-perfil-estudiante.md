@@ -71,12 +71,27 @@ Mensaje de bienvenida del foro (y su reflejo en Mensajería): `"Bienvenidos al f
 
 ## Criterio de cierre
 
-- [ ] Decisión tomada y aplicada sobre la ruta de "Mis Calificaciones" (ruta dedicada vs. redirección explícita comunicada al usuario).
-- [ ] Simulador de Notas calcula el mismo promedio (mismo algoritmo/normalización) que la vista real cuando no se modifica ninguna nota.
-- [ ] Chip "General" duplicado eliminado — un solo chip por grupo/período.
-- [ ] Indicador de "% de peso evaluado" visible junto al promedio cuando el curso está parcialmente evaluado (criterio de umbral a definir en `/design`).
-- [ ] Separador decimal consistente (punto o coma, no ambos) en el Simulador de Notas.
-- [ ] Build + lint OK. Verificado en vivo contra el mismo escenario (`RIVERA PEYRONE ALVARO`, curso `Arte`, TEST DB).
+- [x] Decisión tomada y aplicada sobre la ruta de "Mis Calificaciones": **ruta dedicada reactivada** (`estudiante/notas`), no redirección. Ver Decisiones tomadas abajo.
+- [x] Simulador de Notas calcula el mismo promedio (mismo algoritmo/normalización) que la vista real cuando no se modifica ninguna nota. Verificado en vivo: 18.0 sin modificar → 3.6 (coincide con Promedio General); 17.5 modificado → 3.5.
+- [x] Chip "General" duplicado eliminado — un solo chip por grupo/período. Verificado en vivo.
+- [x] Indicador de "% de peso evaluado" visible junto al promedio cuando el curso está parcialmente evaluado (criterio: binario, `<100%`). Verificado en vivo: "20% del curso evaluado".
+- [x] Separador decimal consistente (punto) en el Simulador de Notas. Verificado en vivo (`17.5`, no `17,5`).
+- [x] Build + lint OK (`npm run build`, `npm run lint`, 2360 tests OK). Verificado en vivo contra el mismo escenario (`RIVERA PEYRONE ALVARO`, curso `Arte`, TEST DB, vía switcher de sesiones guardadas + backend local levantado en `:5139`).
+
+## Decisiones tomadas en `/design`
+
+1. **Ruteo "Mis Calificaciones"**: la ruta dedicada `estudiante/notas` ya existía (componente `EstudianteNotasComponent` con soporte standalone/embedded) y fue desactivada intencionalmente en `P83 F5` (commit `22ebf782`, 2026-07-08) a favor de un `redirectTo: 'estudiante/salones'`. Se revirtió esa decisión: `intranet.routes.ts` vuelve a `loadComponent`, y `intranet-menu.config.ts:68` apunta a `/intranet/estudiante/notas`. El modo embebido (tab "Notas" del diálogo de salón) queda intacto — conviven ambas vistas (global y contextual).
+2. **Fix de `calcularPromedioPonderado`**: causa raíz confirmada contra `INV-C04` (backend, `PromedioPonderadoCalculator.Calcular`: "Σ(nota × peso), pesos NO se normalizan"). La función FE en `profesor/utils/calificacion.utils.ts` normalizaba dividiendo entre `sumaPesos` — violaba el invariante documentado. El bug no era exclusivo del Simulador de Estudiante: la misma función alimenta el simulador de notas del Profesor (`salon-notas-estudiante-tab.component.ts`). Se corrigió una sola vez (root cause compartido), beneficiando ambos roles. Se reescribió `calificacion.utils.spec.ts` (el comentario y los tests afirmaban la fórmula incorrecta).
+3. **Umbral "% evaluado"**: binario — se muestra siempre que `% evaluado < 100`, oculto si el curso está 100% evaluado. Calculado client-side desde `evaluaciones[].peso`/`.nota` (no requirió cambio de backend).
+
+## Archivos modificados
+
+- `src/app/features/intranet/intranet.routes.ts` — ruta `estudiante/notas` de `redirectTo` a `loadComponent`.
+- `src/app/features/intranet/shared/config/intranet-menu.config.ts` — item de menú apunta a `estudiante/notas`.
+- `src/app/features/intranet/pages/profesor/utils/calificacion.utils.ts` — `calcularPromedioPonderado` sin normalización (INV-C04).
+- `src/app/features/intranet/pages/profesor/utils/calificacion.utils.spec.ts` — tests reescritos para reflejar INV-C04 correctamente.
+- `src/app/features/intranet/pages/estudiante/notas/components/notas-curso-card/notas-curso-card.component.{ts,html,scss}` — chip "General" condicional + indicador "% evaluado".
+- `src/app/features/intranet/pages/estudiante/notas/components/simulador-notas/simulador-notas.component.html` — `locale="en-US"` en `p-inputNumber`.
 
 ## Tiempo estimado
 

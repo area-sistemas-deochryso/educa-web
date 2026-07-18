@@ -46,6 +46,16 @@ export class NotasCursoCardComponent {
 		this.getNotaSeverity(this.promedioGeneral()),
 	);
 
+	/** % del peso total del curso que ya tiene nota registrada (INV-C04: pesos no se normalizan). */
+	readonly porcentajeEvaluado = computed(() => {
+		const evaluaciones = this.curso().evaluaciones;
+		if (evaluaciones.length === 0) return 100;
+		const pesoEvaluado = evaluaciones
+			.filter((e) => e.nota !== null)
+			.reduce((acc, e) => acc + e.peso, 0);
+		return Math.round(pesoEvaluado * 100);
+	});
+
 	readonly periodoGroups = computed<PeriodoGroup[]>(() => {
 		const curso = this.curso();
 
