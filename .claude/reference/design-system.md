@@ -1020,7 +1020,7 @@ readonly isDev = !environment.production;
 
 > **"Ningún color hex literal sobre fondo plano de la intranet. Siempre token."**
 
-El tema PrimeNG Aura expone variables CSS de paleta completas (`--red-50..900`, `--blue-50..900`, `--green-50..900`, `--yellow-50..900`, etc.). Son la fuente de verdad para colores semánticos en la intranet.
+> ⚠️ **Corrección (brief 467, 2026-07-18)**: el tema PrimeNG Aura (v18+, ver `app.config.ts`) expone sus tokens **con prefijo `--p-`** (`--p-red-500`, `--p-blue-800`, `--p-surface-300`, `--p-text-color`, etc.) — **no** con el naming sin prefijo documentado abajo. Los nombres `--red-500`, `--blue-800`, `--surface-300`, `--text-color`, etc. **nunca fueron definidos por PrimeNG en este proyecto** y resolvían vacío en ~229 archivos `.scss` (~2598 usos) hasta que se agregó un alias de compatibilidad en `src/styles.scss` (bloque "PRIMENG TOKEN COMPATIBILITY SHIM") que reenvía cada nombre legacy a su `--p-*` real. **Seguí usando los nombres sin prefijo de la tabla de abajo** — funcionan gracias al shim — pero si necesitás un token que no está en la tabla, buscá el nombre real con prefijo `--p-` (inspeccionar `getComputedStyle(document.documentElement)` en devtools), no asumas que existe la variante sin prefijo.
 
 ### Mapa canónico
 
@@ -1051,6 +1051,22 @@ El tema PrimeNG Aura expone variables CSS de paleta completas (`--red-50..900`, 
 - **Shared**: migrado (form-field-error, feedback-report-dialog, voice-button, user-profile-menu, floating-notification-bell, feedback-report-launcher — brief 463).
 - **Cross-role + profesor + estudiante**: migrados (reports, attendance widgets, home widgets, student tabs, health-justification-list).
 - **Excepciones activas**: 3 archivos con hex literal justificado (notification-quick-access Sass, campus-minimap Canvas, mensajería/foro avatar palettes).
+
+### Shim de compatibilidad de tokens (brief 467, 2026-07-18)
+
+Los nombres sin prefijo (`--red-600`, `--surface-300`, `--text-color`, etc.) resuelven vía un alias `:root` en `src/styles.scss` que reenvía a su equivalente real `--p-*`. Cubre paleta completa (blue/green/orange/purple/red/yellow/primary/surface 0-950) + `--text-color`/`--text-color-secondary`/`--primary-color-text`.
+
+**5 tokens semánticos con mapeo best-effort** (PrimeNG v18 no tiene equivalente 1:1, el concepto fue renombrado — verificar visualmente si se nota drift sutil):
+
+| Legacy | Alias aplicado |
+|---|---|
+| `--surface-card` | `var(--p-content-background)` |
+| `--surface-ground` | `var(--p-surface-50)` |
+| `--surface-hover` | `var(--p-content-hover-background)` |
+| `--surface-overlay` | `var(--p-overlay-modal-background)` |
+| `--surface-border` | `var(--p-content-border-color)` |
+
+**No cubierto por el shim** (bugs preexistentes, separados de este root cause — no tocar sin brief dedicado): `--primary-color-rgb` (1 uso, `features/public/contact`, necesita triplete RGB no un hex), `--border-radius`, `--font-family-mono`/`--font-family-monospace`, `--font-weight-medium`, `--menu-font-size`, `--intranet-accent-color-blue-hover`/`--intranet-accent-color-red`/`--intranet-border-color`/`--intranet-primary-color`.
 
 Buscar tokens hardcoded restantes:
 

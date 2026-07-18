@@ -7,7 +7,7 @@
 export const environment = {
 	production: false,
 
-	// API Configuration - same-origin via proxy (proxy.conf.json redirige /api → localhost:7102)
+	// API Configuration - same-origin via proxy (proxy.conf.json redirige /api → localhost:5139)
 	apiUrl: '',
 
 	// Feature flags

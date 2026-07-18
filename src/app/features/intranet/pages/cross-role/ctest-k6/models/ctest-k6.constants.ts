@@ -5,7 +5,7 @@ export { PRESET_ENDPOINTS } from './ctest-k6.preset-endpoints';
 
 // #region Base URL Options
 export const BASE_URL_OPTIONS = [
-	{ label: 'Local (localhost:7102)', value: 'https://localhost:7102' },
+	{ label: 'Local (localhost:5139)', value: 'http://localhost:5139' },
 	{ label: 'Producción (Azure)', value: 'https://educacom.azurewebsites.net' },
 ];
 // #endregion
@@ -120,7 +120,7 @@ export const DEFAULT_CONFIG: K6TestConfig = {
 	testName: 'test-concurrencia',
 	baseUrl: environment.production
 		? 'https://educacom.azurewebsites.net'
-		: 'https://localhost:7102',
+		: 'http://localhost:5139',
 	testType: 'load',
 	vus: 100,
 	duration: '3m',

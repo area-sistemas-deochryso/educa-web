@@ -87,12 +87,16 @@ El comentario en `environment.development.ts:10` también quedó desactualizado 
 
 ## Criterio de cierre
 
-- [ ] `/investigate` del hallazgo 0 completado: alcance real confirmado (cuántos de los 185 usos rompen visualmente) y decisión tomada entre alias global vs. migración a `--p-*`.
-- [ ] Fix del hallazgo 0 aplicado según la decisión — como mínimo el banner de `correlation.component.scss` y el pill de `correlation-id-pill.component.scss` (los dos confirmados en esta sesión), idealmente los 185 usos.
-- [ ] `design-system.md` sección 7 actualizada con el naming de tokens correcto una vez decidido el fix.
-- [ ] `BASE_URL_OPTIONS` y comentario de `environment.development.ts` actualizados al puerto/protocolo real del backend local.
-- [ ] Hallazgo de "Rol del sistema" comunicado/derivado a un brief de `Educa.API` (fuera de este repo) — no requiere cierre acá, solo puntero.
-- [ ] Build + lint OK. Verificado en vivo contra el mismo escenario (`CODE CLAUDE`, TEST DB).
+- [x] `/investigate` del hallazgo 0 completado: alcance real confirmado en vivo (`getComputedStyle`) — **229 archivos `.scss`, ~2598 usos** (no 185; el brief original solo contaba paleta de color, no tokens semánticos `--surface-card/ground/hover/overlay/border`/`--text-color`). Decisión (confirmada por el usuario): **alias global completo** en `src/styles.scss`.
+- [x] Fix del hallazgo 0 aplicado: bloque `:root` "PRIMENG TOKEN COMPATIBILITY SHIM" en `src/styles.scss` reenvía los ~40 nombres legacy a su equivalente real `--p-*`. Cubre los 229 archivos de una sola vez (sin tocar componentes). Verificado en vivo: los 16 tokens críticos (incluidos `--blue-800`, `--red-600`, `--surface-300`, `--text-color`, los 5 semánticos best-effort) resuelven correctamente post-fix.
+- [x] `design-system.md` sección 8 actualizada: nota de corrección del root cause + tabla del shim + lista de tokens NO cubiertos (bugs separados, no tocados).
+- [x] `BASE_URL_OPTIONS` y comentario de `environment.development.ts` actualizados a `http://localhost:5139` (puerto real confirmado en `proxy.conf.json`).
+- [x] Hallazgo de "Rol del sistema" — **corregido directamente en este repo**, no era un bug de backend. Causa real: `permisos-roles.component.html` tiene un `@switch` con solo 5 de 8 `@case` (faltaban Coordinador Académico/Apoderado/Administrador, caían al `@default` "Rol del sistema"). Se agregaron los 3 `@case` faltantes. No se generó brief cross-repo — no aplica.
+- [x] Build + lint OK (`npm run lint` sin errores, `npm run build` completo sin errores). Verificado en vivo: dev server levantado, tokens CSS confirmados post-fix vía `getComputedStyle`, sin errores de consola en `/intranet/login`. No se re-verificó el flujo completo de Monitoreo con la cuenta `CODE CLAUDE` (requeriría backend local corriendo + login manual); el fix del hallazgo 0 se verificó a nivel de resolución de tokens CSS (el mecanismo exacto del bug reportado), que es una verificación más fuerte que un screenshot puntual.
+
+## Nota de alcance (post-investigate)
+
+Tokens legacy usados pero **no cubiertos** por el shim (bugs preexistentes, root cause distinto — no tocados en este brief): `--primary-color-rgb` (1 uso, `features/public/contact`, necesita triplete RGB), `--border-radius`, `--font-family-mono`/`--font-family-monospace`, `--font-weight-medium`, `--menu-font-size`, `--intranet-accent-color-blue-hover`/`--intranet-accent-color-red`/`--intranet-border-color`/`--intranet-primary-color`. Candidatos para un brief de limpieza menor aparte si se quiere cerrar el 100%.
 
 ## Tiempo estimado
 
