@@ -73,9 +73,16 @@ El template (`reports-filters.component.html:66-103`) no tiene ningún mensaje a
 
 ## Criterio de cierre
 
-- [ ] `Director` (y decisión sobre `ADMIN_PERMISOS_SALUD`) agregado a `LABEL_OVERRIDE_POR_ROL` — labels de menú y breadcrumb sin sufijo "(admin)" crudo.
-- [ ] Mensaje de ayuda visible en "Reportes de Asistencia" cuando el reporte requiere salones y no hay ninguno seleccionado.
-- [ ] Build + lint OK. Verificado en vivo contra el mismo escenario (`SANCHEZ QUISPE MARIA OTILIA`, TEST DB).
+- [x] `Director` (y `ADMIN_PERMISOS_SALUD`) agregado a `LABEL_OVERRIDE_POR_ROL` — labels de menú y breadcrumb sin sufijo "(admin)" crudo.
+  **Causa raíz ampliada durante la investigación**: el mapa estaba keyed por `capability`, no por ítem — "Gestión (admin)" y "Reportes (admin)" comparten `ADMIN_ASISTENCIAS`, así que cualquier override pisaba el label de ambos ítems con el mismo texto. Esto ya afectaba silenciosamente a los 3 roles previamente cubiertos (Asistente Administrativo, Coordinador Académico, Promotor), no solo a Director.
+  **Investigación BE (agente)**: confirmado con BD (`SELECT * FROM Capability`) que `ADMIN_ASISTENCIAS` es una única fila con una sola ruta — no hay capability separada para reportes a nivel de menú (existe `REPORTES_ASISTENCIA` en BD pero es del módulo legacy `Asistencia`, usado para autorización de endpoints C#, no para el catálogo de menú). Se descartó tocar BD/BE — el fix correcto es 100% FE.
+  **Fix aplicado** (`intranet-menu.config.ts`): `LABEL_OVERRIDE_POR_ROL` ahora se indexa por `item.label` (label base) en vez de `capability`. Se agregó `Director` a los 3 ítems (Gestión/Reportes/Permisos Salud) y se separaron los overrides de Gestión vs Reportes para los 3 roles existentes.
+  **Extensión no prevista**: el breadcrumb (`intranet-layout.component.ts`) resolvía el label de la página vía `findMenuItemDefByUrl` directo sobre `MENU_ITEMS`, sin pasar por el override — mostraba el label crudo "(admin)" aunque el menú ya mostrara el correcto. Se extrajo `resolveMenuItemLabel(item, rol)` como helper exportado y se reutiliza en `buildModuloMenus` y en el breadcrumb. Fuera de alcance (no tocado): el breadcrumb sigue sin distinguir la pestaña activa (Gestión vs Reportes) — siempre resuelve el primer `MenuItemDef` que matchea la ruta por longitud, ignorando `queryParams.tab`; esto es un bug preexistente distinto al del sufijo "(admin)" y no estaba en el criterio de cierre original.
+  **Verificado en vivo** (browser QA, cuenta `SANCHEZ QUISPE MARIA OTILIA`): dropdown "Asistencia" y breadcrumb muestran "Gestión (dirección)", "Permisos Salud (dirección)", "Reportes (dirección)" — sin sufijo crudo. Auditados los 13 ítems del menú Administrador, sin regresiones.
+- [x] Mensaje de ayuda visible en "Reportes de Asistencia" cuando el reporte requiere salones y no hay ninguno seleccionado.
+  Agregado `<small class="field-hint">Selecciona al menos un salón para generar el reporte</small>` bajo el `p-multiselect` de Salones (`reports-filters.component.html`), visible solo cuando `selectedSalones().length === 0`. Mismo patrón `field-hint` usado en `cursos.component.html`. Verificado en vivo: el hint desaparece y "Visualizar tabla" se habilita al seleccionar un salón.
+- [x] Build + lint OK. Verificado en vivo contra el mismo escenario (`SANCHEZ QUISPE MARIA OTILIA`, TEST DB).
+  Lint limpio (0 errores/warnings en los 4 archivos tocados). Build FE OK. QA en vivo hecho en esta sesión (dev server local + BE con `UseTestEnv` local temporal, revertido antes de cerrar) — no queda pendiente de verificación post-deploy para este brief, a diferencia del 465.
 
 ## Tiempo estimado
 

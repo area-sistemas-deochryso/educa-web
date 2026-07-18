@@ -88,7 +88,7 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub F3-F6), *
 ### Notas operativas
 
 - **`running/`**: vacío · **`open/`**: 6 briefs (332, 390, 391, 458, 462, 467) · **`awaiting-prod/`**: 1 brief (465) · **`waiting/`**: vacío · **`troubles/`**: vacío
-- **Último cierre**: 465 (audit Profesor, fix asistencia por matrícula tardía) → `awaiting-prod/`, 2026-07-18.
+- **Último cierre**: 466 (audit Director, fix labels menú/breadcrumb + hint reportes) → `closed/`, 2026-07-18.
 - **Último saneamiento**: 2026-07-11 — sync-maestro: vaciado `awaiting-prod/` completo (estables, verificados con usuarios reales).
 
 ---

@@ -19,7 +19,7 @@ import {
 	NavMenuItem,
 } from './components';
 import { ModuloMenu, buildModuloMenus, detectModuloFromUrl } from './intranet-menu.config';
-import { findMenuItemDefByUrl } from '@intranet-shared/config/intranet-menu.config';
+import { findMenuItemDefByUrl, resolveMenuItemLabel } from '@intranet-shared/config/intranet-menu.config';
 import { ModuloId, MODULOS } from '@shared/constants';
 import { FeatureFlagsFacade } from '@core/services/feature-flags';
 import { QuickAccessFavoritesService } from '@intranet-shared/services';
@@ -101,7 +101,7 @@ export class IntranetLayoutComponent implements OnInit, AfterViewInit, OnDestroy
 		if (item?.group) parts.push({ label: item.group.label, kind: 'grupo' });
 		// Sin grupo, "página" puede repetir el label del módulo (ej. Inicio > Inicio) — no aporta información.
 		if (item && !(!item.group && item.label === modulo.label)) {
-			parts.push({ label: item.label, kind: 'pagina' });
+			parts.push({ label: resolveMenuItemLabel(item, this.authService.currentUser?.rol), kind: 'pagina' });
 		}
 		return parts;
 	});

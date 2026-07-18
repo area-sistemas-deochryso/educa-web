@@ -84,6 +84,9 @@
 						[maxSelectedLabels]="3"
 						selectedItemsLabel="{0} salones"
 					/>
+					@if (selectedSalones().length === 0) {
+						<small class="field-hint">Selecciona al menos un salón para generar el reporte</small>
+					}
 				</div>
 			</div>
 		</div>

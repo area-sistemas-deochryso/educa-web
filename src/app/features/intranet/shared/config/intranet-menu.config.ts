@@ -127,15 +127,39 @@ export const MENU_ITEMS: MenuItemDef[] = [
 /**
  * Override de label por rol para ítems compartidos entre roles con responsabilidades distintas
  * (ej. "Gestión (admin)" de asistencia significa cosas distintas para Asistente/Coordinador/Promotor).
- * Solo cubre los casos detectados en la auditoría 417-F6; roles no listados usan el label base.
+ * Keyed por label base (no por capability): varios MenuItemDef pueden compartir `capability`
+ * (ej. "Gestión (admin)" y "Reportes (admin)" comparten `ADMIN_ASISTENCIAS`) y necesitan overrides
+ * independientes — keyear por capability les pisaría el mismo texto a ambos (brief 466).
+ * Solo cubre los casos detectados en las auditorías 417-F6 y 466; roles/ítems no listados usan el label base.
  */
-const LABEL_OVERRIDE_POR_ROL: Partial<Record<CapabilityCode, Partial<Record<UserRole, string>>>> = {
-	ADMIN_ASISTENCIAS: {
+const LABEL_OVERRIDE_POR_ROL: Partial<Record<string, Partial<Record<UserRole, string>>>> = {
+	'Gestión (admin)': {
 		'Asistente Administrativo': 'Gestión (secretaría)',
 		'Coordinador Académico': 'Gestión (académica)',
 		Promotor: 'Gestión (dirección)',
+		Director: 'Gestión (dirección)',
+	},
+	'Reportes (admin)': {
+		'Asistente Administrativo': 'Reportes (secretaría)',
+		'Coordinador Académico': 'Reportes (académica)',
+		Promotor: 'Reportes (dirección)',
+		Director: 'Reportes (dirección)',
+	},
+	'Permisos Salud (admin)': {
+		Director: 'Permisos Salud (dirección)',
 	},
 };
+
+/**
+ * Resuelve el label a mostrar para un `MenuItemDef` según el rol activo, aplicando
+ * `LABEL_OVERRIDE_POR_ROL` si corresponde. Fuente única para el menú (`buildModuloMenus`)
+ * y el breadcrumb (`findMenuItemDefByUrl` + este helper) — evita que el breadcrumb muestre
+ * el label crudo mientras el menú ya muestra el override (brief 466).
+ */
+export function resolveMenuItemLabel(item: Pick<MenuItemDef, 'label'>, rol?: UserRole): string {
+	const override = rol && LABEL_OVERRIDE_POR_ROL[item.label]?.[rol];
+	return override ?? item.label;
+}
 
 // #region Builder
 export function buildModuloMenus(userCapabilities: Set<string>, rol?: UserRole): ModuloMenu[] {
@@ -152,10 +176,7 @@ export function buildModuloMenus(userCapabilities: Set<string>, rol?: UserRole):
 						userCapabilities.has(item.capability) && (!item.soloParaRol || (rol && item.soloParaRol.includes(rol))),
 				)
 			: enabledItems
-	).map((item) => {
-		const override = rol && LABEL_OVERRIDE_POR_ROL[item.capability]?.[rol];
-		return override ? { ...item, label: override } : item;
-	});
+	).map((item) => ({ ...item, label: resolveMenuItemLabel(item, rol) }));
 
 	const itemsByModulo = new Map<ModuloId, MenuItemDef[]>();
 	for (const item of permittedItems) {
