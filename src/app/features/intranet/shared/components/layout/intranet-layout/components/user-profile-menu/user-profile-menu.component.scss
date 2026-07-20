@@ -4,7 +4,7 @@
 	align-items: center;
 	gap: 0.75rem;
 	padding: 0.5rem 0.75rem;
-	background: var(--surface-card);
+	background: var(--intranet-background-color, #eeeeee);
 	border: 1px solid var(--surface-border);
 	border-radius: var(--border-radius);
 	cursor: pointer;
@@ -173,7 +173,6 @@
 	align-items: center;
 	gap: 0.875rem;
 	padding: 1.25rem;
-	background: linear-gradient(135deg, var(--surface-50) 0%, var(--surface-100) 100%);
 }
 
 :host ::ng-deep .popover-avatar {
@@ -245,14 +244,18 @@
 	}
 
 	&:hover {
-		color: var(--primary-color);
+		/* var(--primary-color) (#86d7f5, celeste de marca) como color de
+		   texto/ícono sobre fondo claro no contrasta — casi ilegible. Mismo
+		   indigo accesible que .profile-avatar/.popover-avatar en este
+		   archivo. */
+		color: #4338ca;
 
 		&::before {
 			opacity: 1;
 		}
 
 		i {
-			color: var(--primary-color);
+			color: #4338ca;
 			transform: translateX(-2px);
 		}
 

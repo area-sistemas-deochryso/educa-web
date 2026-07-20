@@ -36,8 +36,11 @@
 			display: flex;
 			align-items: center;
 			justify-content: center;
-			background: var(--primary-color);
-			color: var(--primary-color-text);
+			/* Mismo indigo con contraste WCAG AA que .profile-avatar del header
+			   (ver user-profile-menu.component.scss) — var(--primary-color)
+			   (#86d7f5, celeste claro) con texto blanco no cumple 4.5:1. */
+			background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+			color: #ffffff;
 			border-radius: 50%;
 			font-weight: 700;
 			font-size: 0.75rem;
@@ -100,12 +103,19 @@
 		}
 	}
 
-	.action-deactivate:hover {
+	/* Paleta estándar de acciones de tabla (2026-07-20): editar=verde,
+	   activar=azul, desactivar=naranja, copiar=gris (sin cambio),
+	   eliminar=rojo (ya consistente en otras tablas). */
+	.action-edit {
+		color: var(--green-600) !important;
+	}
+
+	.action-deactivate {
 		color: var(--orange-600) !important;
 	}
 
-	.action-activate:hover {
-		color: var(--green-600) !important;
+	.action-activate {
+		color: var(--blue-600, #2563eb) !important;
 	}
 
 	.empty-message {

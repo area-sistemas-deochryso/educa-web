@@ -32,7 +32,7 @@ import { EstudianteSalonDialogComponent } from './components/estudiante-salon-di
 			border-radius: 8px;
 			border: 1px solid var(--p-surface-200);
 			border-left: 4px solid var(--p-primary-color);
-			background: var(--p-surface-0);
+			background: var(--surface-card, #fcfdfe);
 			padding: 1rem 1.25rem;
 			cursor: pointer;
 			transition: box-shadow 0.15s, border-color 0.15s;

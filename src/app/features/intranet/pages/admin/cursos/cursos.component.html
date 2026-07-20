@@ -227,7 +227,7 @@
 							<button
 								pButton
 								icon="pi pi-pencil"
-								class="p-button-rounded p-button-text p-button-info"
+								class="p-button-rounded p-button-text p-button-success"
 								pTooltip="Editar"
 								(click)="editCurso(curso)"
 								[pt]="{
@@ -243,7 +243,7 @@
 								[icon]="curso.estado | estadoToggleIcon"
 								class="p-button-rounded p-button-text"
 								[class.p-button-warning]="curso.estado"
-								[class.p-button-success]="!curso.estado"
+								[class.p-button-info]="!curso.estado"
 								[pTooltip]="curso.estado | estadoToggleLabel"
 								(click)="toggleEstado(curso)"
 								[pt]="{

@@ -776,7 +776,7 @@
 	padding: 0.5rem 0.75rem;
 	border-radius: var(--p-border-radius);
 	border: 1px solid var(--p-surface-200);
-	background: var(--p-surface-0);
+	background: var(--surface-card, #fcfdfe);
 	transition: background 0.15s;
 
 	&--current {

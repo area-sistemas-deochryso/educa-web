@@ -17,7 +17,6 @@
 	align-items: center;
 	gap: 1rem;
 	padding: 1.25rem 1.5rem;
-	background: linear-gradient(135deg, var(--surface-50) 0%, var(--surface-100) 100%);
 	border-bottom: 1px solid var(--surface-border);
 }
 
@@ -166,7 +165,7 @@
 	transition: color 0.2s ease;
 
 	&:hover {
-		color: var(--primary-color);
+		color: #4338ca;
 	}
 
 	i {

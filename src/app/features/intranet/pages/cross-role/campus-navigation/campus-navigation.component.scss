@@ -16,7 +16,7 @@
 	border: 1px solid var(--surface-border);
 	border-radius: 8px;
 	padding: 1rem;
-	background: var(--surface-0);
+	background: var(--surface-card, #fcfdfe);
 	overflow-y: auto;
 	max-height: calc(100vh - 140px);
 }
@@ -55,7 +55,7 @@
 	padding: 8px 16px;
 	border: 1.5px solid var(--surface-300);
 	border-radius: 8px;
-	background: var(--surface-0);
+	background: var(--surface-card, #fcfdfe);
 	color: var(--text-color);
 	font-size: 13px;
 	font-weight: 600;
@@ -66,7 +66,7 @@
 	&:hover {
 		border-color: var(--primary-color);
 		background: var(--primary-50, #eef2ff);
-		color: var(--primary-color);
+		color: #4338ca;
 	}
 
 	&--active {

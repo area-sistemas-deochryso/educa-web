@@ -3,7 +3,7 @@
 	padding: 0.6rem 0.75rem;
 	border: 1px solid var(--surface-300);
 	border-radius: 8px;
-	background: var(--surface-0);
+	background: var(--surface-card, #fcfdfe);
 	cursor: pointer;
 	transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
 	user-select: none;

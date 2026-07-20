@@ -63,7 +63,13 @@
 	--green-color: #73a140;
 	--blue-light-color: #5ac3f0;
 
+	/* RGB del --primary-color de arriba (#86d7f5), para composición con rgba() */
+	--primary-color-rgb: 134, 215, 245;
+
 	--body-font-family: 'League Spartan', sans-serif;
+	--font-family-mono:
+		ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+	--font-family-monospace: var(--font-family-mono);
 
 	--h1-font-size: 62px;
 	--h2-font-size: 48px;
@@ -74,6 +80,7 @@
 	--p-font-size: 20px;
 	--btn-font-size: 16px;
 	--copyright-font-size: 14px;
+	--menu-font-size: 1rem;
 
 	--border-radius-large: 100px;
 	--border-radius-medium: 30px;
@@ -82,6 +89,7 @@
 	--font-weight-thin: 100;
 	--font-weight-light: 300;
 	--font-weight-normal: 400;
+	--font-weight-medium: 500;
 	--font-weight-semibold: 600;
 	--font-weight-bold: 700;
 
@@ -105,6 +113,11 @@
 	--intranet-accent-color-yellow: #ffcc0c;
 	--intranet-accent-color-green: #77a02d;
 	--intranet-accent-color-blue: #253470;
+	--intranet-accent-color-blue-hover: #3a4a8a;
+	--intranet-accent-color-red: #dc2626;
+
+	--intranet-border-color: #e5e5e5;
+	--intranet-primary-color: #3b82f6;
 
 	--intranet-border-radius-default: 0;
 }
@@ -126,6 +139,8 @@
   effort, verificado en vivo contra el theme activo.
 -----------------------------------------*/
 :root {
+	--border-radius: var(--p-border-radius-md);
+
 	--blue-50: var(--p-blue-50);
 	--blue-100: var(--p-blue-100);
 	--blue-400: var(--p-blue-400);
@@ -183,8 +198,15 @@
 	--primary-color-text: var(--p-primary-contrast-color);
 
 	--surface-0: var(--p-surface-0);
-	--surface-50: var(--p-surface-50);
-	--surface-100: var(--p-surface-100);
+	/* --surface-50/100 neutros (familia --intranet-background-color #eeeeee),
+	   no la escala azulada de PrimeNG — mismo criterio que --surface-card/
+	   --surface-ground más abajo. Se usan crudos en ~76 archivos (hover
+	   states, headers de tabla/grilla, franjas). --surface-50 referencia
+	   --surface-card directo para no duplicar el tono y evitar que se
+	   desalineen de nuevo (pasó: --surface-card bajó a #f0f0f0 y --surface-50
+	   se quedó en #f5f5f5, mismo componente visual con 2 tonos distintos). */
+	--surface-50: var(--surface-card);
+	--surface-100: #e3e3e3;
 	--surface-200: var(--p-surface-200);
 	--surface-300: var(--p-surface-300);
 	--surface-400: var(--p-surface-400);
@@ -195,11 +217,67 @@
 	--text-color-secondary: var(--p-text-muted-color);
 
 	/* Sin equivalente 1:1 — mapeo semántico best-effort */
-	--surface-card: var(--p-content-background);
-	--surface-ground: var(--p-surface-50);
+	/* --surface-card / --surface-ground usan gris neutro propio (familia
+	   --intranet-background-color #eeeeee), NO la escala azulada casi-blanca
+	   de PrimeNG (--p-surface-0/50/100) — probada y descartada por ser
+	   demasiado clara para uso prolongado (feedback directo del usuario).
+	   --surface-card más claro que --surface-ground a propósito: una tarjeta
+	   elevada debe ser más clara que su fondo, no al revés — ~20 componentes
+	   usan ambas variables juntas para esa jerarquía.
+	   --p-dialog-background (usado por .p-dialog) usa su propio tono
+	   --surface-dialog, definido más abajo junto al resto de overrides de
+	   PrimeNG — ver ese bloque. */
+	--surface-card: #f0f0f0;
+	--surface-ground: #eeeeee;
 	--surface-hover: var(--p-content-hover-background);
 	--surface-overlay: var(--p-overlay-modal-background);
 	--surface-border: var(--p-content-border-color);
+
+}
+
+/*---------------------------------------
+  PRIMENG COMPONENT TOKENS — blanco puro fuera de la escala neutra
+  --p-content-background / --p-overlay-popover-background /
+  --p-overlay-select-background / --p-overlay-modal-background derivan de
+  --p-surface-0 (#ffffff literal, ver preset Aura) y alimentan accordion,
+  tabs, popovers (p-popover, menús), overlays de p-select/p-multiselect/
+  p-autocomplete y .p-dialog (vía --p-dialog-background →
+  --p-overlay-modal-background). Los diálogos usan un tono propio
+  (--surface-dialog) un poco más claro que las tarjetas normales — se
+  mantienen "elevados" sin ser blanco puro (decisión 2026-07-20, antes
+  se dejaban en blanco puro a propósito; se revirtió por pedido explícito).
+
+  PrimeNG inyecta sus propios <style> con estos tokens en :root DESPUÉS de
+  este stylesheet (orden de carga, no de especificidad) — un :root plano
+  acá pierde el empate de cascada. Se usa html:root para forzar mayor
+  especificidad y ganar sin importar el orden de inyección.
+-----------------------------------------*/
+html:root {
+	--surface-dialog: #f7f7f7;
+	--p-content-background: var(--surface-card);
+	--p-overlay-popover-background: var(--surface-card);
+	--p-overlay-select-background: var(--surface-card);
+	--p-overlay-modal-background: var(--surface-dialog);
+
+	/* p-togglebutton (filtros tipo "Estudiantes/Profesores/...") — fondo
+	   inactivo en --p-surface-100 (azulado) y pill activo en --p-surface-0
+	   (blanco puro), ninguno pasa por --p-content-background. */
+	--p-togglebutton-background: var(--surface-100);
+	--p-togglebutton-checked-background: var(--surface-100);
+	--p-togglebutton-hover-background: var(--surface-100);
+	--p-togglebutton-border-color: var(--surface-100);
+	--p-togglebutton-checked-border-color: var(--surface-100);
+	--p-togglebutton-content-checked-background: var(--surface-card);
+}
+
+/*---------------------------------------
+  P-DIALOG — clip de esquinas redondeadas
+  El panel tiene border-radius pero overflow: visible;
+  header/content/footer (border-radius: 0) sobresalen del
+  contorno redondeado en las esquinas superiores/inferiores.
+-----------------------------------------*/
+.p-dialog {
+	overflow: hidden;
 }
 
 /*---------------------------------------
@@ -752,6 +830,32 @@ app-intranet-layout {
 			color: var(--white-color);
 		}
 	}
+
+	/* BOTONES DE ACCIÓN REDONDOS EN TABLAS (columna "Acciones") — paleta
+	   estándar 2026-07-20: editar=verde, activar=azul, desactivar=naranja,
+	   eliminar=rojo. El .p-button-text catch-all de arriba pisaba el color
+	   de severidad y los dejaba todos en gris (excepto success, que además
+	   queda con fondo sólido por otra regla — no aplica acá, ícono con
+	   fondo transparente y color de severidad directo, sin depender de
+	   blanco-sobre-relleno). */
+	.p-button-rounded.p-button-text {
+		&.p-button-success {
+			color: var(--green-600, #16a34a);
+			background: transparent;
+		}
+
+		&.p-button-warning {
+			color: var(--orange-600, #ea580c);
+		}
+
+		&.p-button-info {
+			color: var(--blue-600, #2563eb);
+		}
+
+		&.p-button-danger {
+			color: var(--red-600, #dc2626);
+		}
+	}
 }
 
 /*---------------------------------------
@@ -901,6 +1005,10 @@ app-intranet-layout {
 .p-popover.profile-popover {
 	// Mover el popover a la izquierda para alinear la flecha con el chevron
 	margin-left: -3rem !important;
+
+	// Blanco puro (--p-popover-background) contrasta demasiado fuerte contra
+	// el header (--intranet-background-color, #eeeeee); usar surface-50 en vez.
+	--p-popover-background: var(--p-surface-50);
 
 	// Mover la flecha al lado derecho (cerca del chevron)
 	&::before,

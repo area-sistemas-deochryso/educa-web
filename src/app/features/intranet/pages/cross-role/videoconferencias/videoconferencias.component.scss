@@ -37,7 +37,11 @@
 
 	&:hover {
 		box-shadow: var(--shadow-3);
-		border-color: var(--primary-color);
+		/* --primary-color (#86d7f5, celeste de marca) no tiene suficiente
+		   contraste contra --surface-card (#f0f0f0) como borde. --green-500
+		   coincide con el acento del botón "Unirse a Sala" de esta misma
+		   tarjeta y sí contrasta. Cambio puntual, no --primary-color global. */
+		border-color: var(--green-500);
 		transform: translateY(-2px);
 	}
 }

@@ -76,7 +76,10 @@
 	transition: border-color 0.2s, box-shadow 0.2s;
 
 	&:hover {
-		border-color: var(--primary-color);
+		/* var(--primary-color) (#86d7f5, celeste de marca) sin contraste
+		   suficiente como acento de hover — mismo indigo que el resto de
+		   la intranet (ver user-profile-menu.component.scss). */
+		border-color: #4338ca;
 		box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
 	}
 }
@@ -86,7 +89,10 @@
 	align-items: center;
 	gap: 0.4rem;
 	flex-shrink: 0;
-	opacity: 0;
+	/* Visibles desde el inicio (0 confundía "sin acciones" con "hay que
+	   hacer hover para descubrirlas") pero atenuados para no competir con
+	   el nombre/rol de la sesión — suben a opacidad completa en hover. */
+	opacity: 0.45;
 	transform: translateX(6px);
 	transition: opacity 0.25s ease, transform 0.25s ease;
 
