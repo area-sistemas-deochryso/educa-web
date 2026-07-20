@@ -70,7 +70,7 @@ export const QUICK_ACCESS_BY_ROLE: Record<UserRole, QuickAccessItem[]> = {
 	Estudiante: [
 		{ route: '/intranet/estudiante/horarios', label: 'Mi Horario', icon: 'pi-clock', capability: 'ESTUDIANTE_HORARIOS', description: 'Ver tu horario semanal de clases', preview: 'week-schedule' },
 		{ route: '/intranet/estudiante/cursos', label: 'Mis Cursos', icon: 'pi-book', capability: 'ESTUDIANTE_CURSOS', description: 'Contenido y materiales de tus cursos', preview: 'course-cards' },
-		{ route: '/intranet/estudiante/notas', label: 'Mis Notas', icon: 'pi-chart-bar', capability: 'ESTUDIANTE_NOTAS', description: 'Consultar tus calificaciones', preview: 'grades' },
+		{ route: '/intranet/estudiante/notas', label: 'Mis Calificaciones', icon: 'pi-chart-bar', capability: 'ESTUDIANTE_NOTAS', description: 'Consultar tus calificaciones', preview: 'grades' },
 		{ route: '/intranet/estudiante/asistencia', label: 'Mi Asistencia', icon: 'pi-check-square', capability: 'ESTUDIANTE_ASISTENCIA', description: 'Revisar tu registro de asistencia', preview: 'attendance' },
 		{ route: '/intranet/estudiante/foro', label: 'Mi Foro', icon: 'pi-comments', capability: 'ESTUDIANTE_FORO', description: 'Participar en discusiones del aula', preview: 'forum' },
 		{ route: '/intranet/estudiante/mensajeria', label: 'Mi Mensajeria', icon: 'pi-envelope', capability: 'ESTUDIANTE_MENSAJERIA', description: 'Enviar y recibir mensajes', preview: 'messaging' },

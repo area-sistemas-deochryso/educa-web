@@ -25,7 +25,7 @@
 
 	<!-- #region Header -->
 	@if (!embedded()) {
-		<app-page-header icon="pi pi-chart-bar" title="Mis Notas">
+		<app-page-header icon="pi pi-chart-bar" title="Mis Calificaciones">
 			<button
 				pButton
 				label="Simular"
@@ -33,6 +33,8 @@
 				class="p-button-outlined p-button-help"
 				(click)="onOpenSimulador()"
 				[disabled]="!vm().selectedCurso"
+				pTooltip="Simular qué nota necesitás para aprobar"
+				tooltipPosition="bottom"
 			></button>
 		</app-page-header>
 	}

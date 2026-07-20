@@ -15,6 +15,7 @@ import { FormsModule } from '@angular/forms';
 import { NavigationEnd, Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, startWith } from 'rxjs/operators';
+import { TooltipModule } from 'primeng/tooltip';
 
 import { ModuloMenu } from '../../intranet-menu.config';
 import { ModuloId } from '@shared/constants';
@@ -54,7 +55,7 @@ export interface TreeSection {
 	selector: 'app-module-selector',
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [FormsModule],
+	imports: [FormsModule, TooltipModule],
 	templateUrl: './module-selector.component.html',
 	styleUrl: './module-selector.component.scss',
 })

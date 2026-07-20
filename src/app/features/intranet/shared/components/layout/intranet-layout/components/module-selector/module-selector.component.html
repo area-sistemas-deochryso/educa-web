@@ -8,6 +8,8 @@
 	[attr.aria-expanded]="isOpen()"
 	aria-haspopup="listbox"
 	aria-label="Buscar página (Ctrl+K)"
+	pTooltip="Buscar página (Ctrl+K)"
+	tooltipPosition="bottom"
 >
 	@if (selectedModulo(); as mod) {
 		<i [class]="mod.icon" class="trigger-icon"></i>
@@ -16,7 +18,6 @@
 		<i class="pi pi-th-large trigger-icon"></i>
 		<span class="trigger-label">Módulos</span>
 	}
-	<span class="trigger-shortcut">Ctrl+K</span>
 </button>
 <!-- #endregion -->
 

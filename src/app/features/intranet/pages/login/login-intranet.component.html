@@ -86,6 +86,8 @@
 						[class.pi-lock]="!showPassword()"
 						[class.pi-lock-open]="showPassword()"
 						(click)="togglePasswordVisibility()"
+						pTooltip="Mostrar contraseña"
+						tooltipPosition="top"
 					></i>
 					<input
 						[type]="showPassword() ? 'text' : 'password'"
@@ -112,6 +114,7 @@
 						[disabled]="isDisabled"
 						[tabindex]="0"
 						class="w-full"
+						scrollHeight="360px"
 					/>
 				</app-login-role-selector>
 
