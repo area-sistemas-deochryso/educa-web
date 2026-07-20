@@ -46,6 +46,7 @@ export class NotificationsService implements OnDestroy {
 	// #endregion
 
 	// #region Private state
+	private readonly _apiNotifications = signal<SeasonalNotification[]>([]);
 	private readonly _activeNotifications = signal<SeasonalNotification[]>([]);
 	private readonly _dismissedNotifications = signal<SeasonalNotification[]>([]);
 	private readonly _readIds = signal<Set<string>>(new Set());
@@ -113,11 +114,13 @@ export class NotificationsService implements OnDestroy {
 		this.timerManager.setInterval(() => this.checkNotifications(), Duration.minutes(5).ms);
 	}
 
-	// Re-check notifications once smart data finishes loading from IndexedDB.
+	// Re-merge (no re-fetch) once smart data finishes loading from IndexedDB —
+	// checkNotifications() already fetched the API side; this only needs to
+	// recombine it with the now-available smart notifications.
 	private watchSmartInit(): void {
 		effect(() => {
 			if (this.smartService.initialized()) {
-				this.checkNotifications();
+				this.applyNotifications(this._apiNotifications());
 			}
 		});
 	}
@@ -131,6 +134,7 @@ export class NotificationsService implements OnDestroy {
 			.subscribe({
 				next: (response) => {
 					const apiNotifications = (response ?? []).map((n) => this.mapApiToSeasonal(n));
+					this._apiNotifications.set(apiNotifications);
 					this.applyNotifications(apiNotifications);
 				},
 				error: () => {

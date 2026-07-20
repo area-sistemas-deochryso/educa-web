@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, shareReplay, catchError, throwError } from 'rxjs';
 import { environment } from '@config/environment';
 import { FileUploadBuilder } from '@core/helpers';
 import {
@@ -23,8 +23,22 @@ export class EstudianteApiService {
 
 	// #region Consultas
 
+	// Session-cached: attendance/foro/mensajeria/notas/horarios/salones each call this
+	// on their own init, so without caching the same horarios get re-fetched on every
+	// route the student navigates to. Reset on error so a failed attempt retries.
+	private misHorarios$: Observable<HorarioProfesorDto[]> | null = null;
+
 	getMisHorarios(): Observable<HorarioProfesorDto[]> {
-		return this.http.get<HorarioProfesorDto[]>(`${this.baseUrl}/mis-horarios`);
+		if (!this.misHorarios$) {
+			this.misHorarios$ = this.http.get<HorarioProfesorDto[]>(`${this.baseUrl}/mis-horarios`).pipe(
+				shareReplay(1),
+				catchError((err) => {
+					this.misHorarios$ = null;
+					return throwError(() => err);
+				}),
+			);
+		}
+		return this.misHorarios$;
 	}
 
 	getContenido(horarioId: number): Observable<CursoContenidoDetalleDto | null> {
