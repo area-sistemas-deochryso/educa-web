@@ -32,6 +32,15 @@ export interface MenuItemDef {
 	featureFlag?: FeatureFlag;
 	queryParams?: Record<string, string>;
 	group?: { label: string; icon: string };
+	/**
+	 * Cadena de sub-agrupaciones dentro de `group` (niveles 2+ de anidamiento) — cada elemento
+	 * es un nivel de submenú. Ej. `[{label:'Admin'}, {label:'Asistencias'}]` anida el item dos
+	 * niveles: `group` → "Admin" → "Asistencias" → item. Usado tanto para juntar páginas
+	 * relacionadas bajo un wrapper (Admin: Asistencias + Permisos Salud) como para colapsar tabs
+	 * de una misma página en un único submenú (Asistencias: Gestión + Reportes), en vez de que
+	 * todo aparezca como entradas sueltas al mismo nivel que páginas hermanas reales.
+	 */
+	subgroup?: { label: string; icon: string }[];
 	preview?: PreviewLayout;
 	description?: string;
 	/**
@@ -93,9 +102,9 @@ export const MENU_ITEMS: MenuItemDef[] = [
 	{ route: '/intranet/admin/cursos', label: 'Cursos', icon: 'pi pi-book', capability: 'ADMIN_CURSOS', modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Académico', icon: 'pi pi-graduation-cap' }, preview: 'admin-table', description: 'Administrar cursos y materias' },
 	{ route: '/intranet/admin/salones', label: 'Salones', icon: 'pi pi-building', capability: 'ADMIN_SALONES', modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Académico', icon: 'pi pi-graduation-cap' }, preview: 'salon-tabs', description: 'Gestionar aulas y secciones' },
 	{ route: '/intranet/admin/horarios', label: 'Horarios', icon: 'pi pi-calendar', capability: 'ADMIN_HORARIOS', modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Académico', icon: 'pi pi-graduation-cap' }, preview: 'admin-schedule', description: 'Configurar horarios escolares' },
-	{ route: '/intranet/admin/asistencias', label: 'Gestión (admin)', icon: 'pi pi-cog', capability: 'ADMIN_ASISTENCIAS', modulo: 'administrador', soloParaRol: ADMIN_ROLES, queryParams: { tab: 'gestion' }, group: { label: 'Asistencia', icon: 'pi pi-clock' }, preview: 'attendance', description: 'Editar y corregir registros de asistencia' },
-	{ route: '/intranet/admin/asistencias', label: 'Reportes (admin)', icon: 'pi pi-chart-bar', capability: 'ADMIN_ASISTENCIAS', modulo: 'administrador', soloParaRol: ADMIN_ROLES, queryParams: { tab: 'reportes' }, group: { label: 'Asistencia', icon: 'pi pi-clock' }, preview: 'admin-table', description: 'Estadísticas y exportación de asistencia' },
-	{ route: '/intranet/admin/permisos-salud', label: 'Permisos Salud (admin)', icon: 'pi pi-heart', capability: 'ADMIN_PERMISOS_SALUD', modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Asistencia', icon: 'pi pi-clock' }, preview: 'admin-table', description: 'Permisos de salida y justificaciones médicas' },
+	{ route: '/intranet/admin/asistencias', label: 'Gestión', icon: 'pi pi-cog', capability: 'ADMIN_ASISTENCIAS', modulo: 'administrador', soloParaRol: ADMIN_ROLES, queryParams: { tab: 'gestion' }, group: { label: 'Asistencia', icon: 'pi pi-clock' }, subgroup: [{ label: 'Admin', icon: 'pi pi-cog' }, { label: 'Asistencias', icon: 'pi pi-clock' }], preview: 'attendance', description: 'Editar y corregir registros de asistencia' },
+	{ route: '/intranet/admin/asistencias', label: 'Reportes', icon: 'pi pi-chart-bar', capability: 'ADMIN_ASISTENCIAS', modulo: 'administrador', soloParaRol: ADMIN_ROLES, queryParams: { tab: 'reportes' }, group: { label: 'Asistencia', icon: 'pi pi-clock' }, subgroup: [{ label: 'Admin', icon: 'pi pi-cog' }, { label: 'Asistencias', icon: 'pi pi-clock' }], preview: 'admin-table', description: 'Estadísticas y exportación de asistencia' },
+	{ route: '/intranet/admin/permisos-salud', label: 'Permisos Salud', icon: 'pi pi-heart', capability: 'ADMIN_PERMISOS_SALUD', modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Asistencia', icon: 'pi pi-clock' }, subgroup: [{ label: 'Admin', icon: 'pi pi-cog' }], preview: 'admin-table', description: 'Permisos de salida y justificaciones médicas' },
 	{ route: '/intranet/admin/eventos-calendario', label: 'Eventos', icon: 'pi pi-calendar-plus', capability: 'ADMIN_EVENTOS_CALENDARIO', modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Calendario', icon: 'pi pi-calendar' }, preview: 'admin-table', description: 'Gestionar eventos del calendario' },
 	{ route: '/intranet/admin/notificaciones', label: 'Notificaciones', icon: 'pi pi-bell', capability: 'ADMIN_NOTIFICACIONES', modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Calendario', icon: 'pi pi-calendar' }, preview: 'admin-notif', description: 'Enviar avisos a la comunidad' },
 	{ route: '/intranet/admin/usuarios', label: 'Usuarios', icon: 'pi pi-user-edit', capability: 'ADMIN_USUARIOS', modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Gestión', icon: 'pi pi-cog' }, preview: 'admin-table', description: 'Gestionar cuentas de usuarios' },
@@ -126,26 +135,26 @@ export const MENU_ITEMS: MenuItemDef[] = [
 
 /**
  * Override de label por rol para ítems compartidos entre roles con responsabilidades distintas
- * (ej. "Gestión (admin)" de asistencia significa cosas distintas para Asistente/Coordinador/Promotor).
+ * (ej. "Gestión" de asistencia significa cosas distintas para Asistente/Coordinador/Promotor).
  * Keyed por label base (no por capability): varios MenuItemDef pueden compartir `capability`
- * (ej. "Gestión (admin)" y "Reportes (admin)" comparten `ADMIN_ASISTENCIAS`) y necesitan overrides
+ * (ej. "Gestión" y "Reportes" comparten `ADMIN_ASISTENCIAS`) y necesitan overrides
  * independientes — keyear por capability les pisaría el mismo texto a ambos (brief 466).
  * Solo cubre los casos detectados en las auditorías 417-F6 y 466; roles/ítems no listados usan el label base.
  */
 const LABEL_OVERRIDE_POR_ROL: Partial<Record<string, Partial<Record<UserRole, string>>>> = {
-	'Gestión (admin)': {
+	Gestión: {
 		'Asistente Administrativo': 'Gestión (secretaría)',
 		'Coordinador Académico': 'Gestión (académica)',
 		Promotor: 'Gestión (dirección)',
 		Director: 'Gestión (dirección)',
 	},
-	'Reportes (admin)': {
+	Reportes: {
 		'Asistente Administrativo': 'Reportes (secretaría)',
 		'Coordinador Académico': 'Reportes (académica)',
 		Promotor: 'Reportes (dirección)',
 		Director: 'Reportes (dirección)',
 	},
-	'Permisos Salud (admin)': {
+	'Permisos Salud': {
 		Director: 'Permisos Salud (dirección)',
 	},
 };
@@ -227,18 +236,18 @@ export function findMenuItemDefByUrl(url: string, moduloId?: ModuloId): MenuItem
 	return bestSameModulo ?? best;
 }
 
+/** Busca recursivamente (a cualquier profundidad de `children`) un item cuya route matchee la URL. */
+function treeHasMatch(items: NavMenuItem[], url: string): boolean {
+	return items.some(
+		(item) => (item.route && url.startsWith(item.route)) || (item.children && treeHasMatch(item.children, url)),
+	);
+}
+
 /** Dado un URL, detecta a qué módulo pertenece. Retorna 'inicio' si no hay match. */
 export function detectModuloFromUrl(url: string, modulos: ModuloMenu[]): ModuloId {
 	for (const modulo of modulos) {
 		if (modulo.id === 'inicio') continue;
-		for (const item of modulo.items) {
-			if (item.route && url.startsWith(item.route)) return modulo.id;
-			if (item.children) {
-				for (const child of item.children) {
-					if (child.route && url.startsWith(child.route)) return modulo.id;
-				}
-			}
-		}
+		if (treeHasMatch(modulo.items, url)) return modulo.id;
 	}
 	return 'inicio';
 }
@@ -262,6 +271,49 @@ export function modulosToNavItems(modulos: ModuloMenu[]): NavMenuItem[] {
 	return result;
 }
 
+/** Nodo hoja: item navegable sin hijos. */
+function toLeaf(item: MenuItemDef): NavMenuItem {
+	return {
+		route: item.route,
+		label: item.label,
+		icon: item.icon,
+		exact: item.exact,
+		queryParams: item.queryParams,
+	};
+}
+
+/**
+ * Arma los hijos de un grupo, anidando tantos niveles como indique `subgroup` (una cadena de
+ * `{label, icon}` por item — `depth` recorre esa cadena). Items sin más niveles a ese `depth`
+ * quedan como hoja; los que comparten el label del nivel actual se agrupan en un submenú y
+ * siguen recursando para el próximo nivel.
+ */
+function groupChildren(groupedItems: MenuItemDef[], depth = 0): NavMenuItem[] {
+	const flat: MenuItemDef[] = [];
+	const subgroups = new Map<string, { icon: string; items: MenuItemDef[] }>();
+
+	for (const item of groupedItems) {
+		const level = item.subgroup?.[depth];
+		if (level) {
+			const existing = subgroups.get(level.label);
+			if (existing) {
+				existing.items.push(item);
+			} else {
+				subgroups.set(level.label, { icon: level.icon, items: [item] });
+			}
+		} else {
+			flat.push(item);
+		}
+	}
+
+	const children: NavMenuItem[] = flat.map(toLeaf);
+	for (const [label, { icon, items: subItems }] of subgroups) {
+		children.push({ label, icon, children: groupChildren(subItems, depth + 1) });
+	}
+
+	return children.sort((a, b) => a.label.localeCompare(b.label, 'es'));
+}
+
 /** Agrupa items por `group.label` en NavMenuItem con children. Items sin group quedan flat. */
 function groupItems(items: MenuItemDef[]): NavMenuItem[] {
 	const result: NavMenuItem[] = [];
@@ -276,13 +328,7 @@ function groupItems(items: MenuItemDef[]): NavMenuItem[] {
 				groups.set(item.group.label, { icon: item.group.icon, items: [item] });
 			}
 		} else {
-			result.push({
-				route: item.route,
-				label: item.label,
-				icon: item.icon,
-				exact: item.exact,
-				queryParams: item.queryParams,
-			});
+			result.push(toLeaf(item));
 		}
 	}
 
@@ -290,15 +336,7 @@ function groupItems(items: MenuItemDef[]): NavMenuItem[] {
 		result.push({
 			label,
 			icon,
-			children: groupedItems
-				.sort((a, b) => a.label.localeCompare(b.label, 'es'))
-				.map((item) => ({
-					route: item.route,
-					label: item.label,
-					icon: item.icon,
-					exact: item.exact,
-					queryParams: item.queryParams,
-				})),
+			children: groupChildren(groupedItems),
 		});
 	}
 

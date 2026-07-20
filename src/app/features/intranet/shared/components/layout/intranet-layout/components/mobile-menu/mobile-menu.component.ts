@@ -100,18 +100,18 @@ export class MobileMenuComponent {
 	private readonly allResults = computed((): MobileSearchResult[] => {
 		const results: MobileSearchResult[] = [];
 
+		const collect = (item: NavMenuItem, modulo: ModuloMenu, groupLabel: string): void => {
+			if (item.route) {
+				results.push(this.toResult(item, modulo, groupLabel));
+			}
+			for (const child of item.children ?? []) {
+				collect(child, modulo, groupLabel || item.label);
+			}
+		};
+
 		for (const modulo of this.modulos()) {
 			for (const item of modulo.items) {
-				if (item.route) {
-					results.push(this.toResult(item, modulo, ''));
-				}
-				if (item.children) {
-					for (const child of item.children) {
-						if (child.route) {
-							results.push(this.toResult(child, modulo, item.label));
-						}
-					}
-				}
+				collect(item, modulo, '');
 			}
 		}
 

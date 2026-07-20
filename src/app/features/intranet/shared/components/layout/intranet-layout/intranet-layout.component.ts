@@ -115,8 +115,14 @@ export class IntranetLayoutComponent implements OnInit, AfterViewInit, OnDestroy
 		const item = findMenuItemDefByUrl(this._currentUrl(), this._selectedModuloId());
 		if (!item?.group) return [];
 		const groupNode = this._allItems().find((n) => n.label === item.group!.label && n.children);
-		return groupNode?.children ?? [];
+		// * El mini-dropdown del breadcrumb solo sabe renderizar links con route directo —
+		// aplana un eventual segundo nivel (subgroup, ej. tabs de una misma página) a hojas.
+		return this.flattenToLeaves(groupNode?.children ?? []);
 	});
+
+	private flattenToLeaves(items: NavMenuItem[]): NavMenuItem[] {
+		return items.flatMap((n) => (n.children && n.children.length > 0 ? this.flattenToLeaves(n.children) : [n]));
+	}
 
 	// Todas las items (grupos) del módulo seleccionado, sin recortar.
 	private readonly _allItems = computed((): NavMenuItem[] => {
@@ -129,12 +135,14 @@ export class IntranetLayoutComponent implements OnInit, AfterViewInit, OnDestroy
 	// * Grupo activo según la URL actual — se pinea siempre visible aunque no entre por ancho.
 	private readonly _activeGroupIndex = computed(() => {
 		const url = this._currentUrl();
-		return this._allItems().findIndex(
-			(item) =>
-				(item.route && url.startsWith(item.route)) ||
-				(item.children?.some((c) => c.route && url.startsWith(c.route)) ?? false),
-		);
+		return this._allItems().findIndex((item) => this.matchesUrl(item, url));
 	});
+
+	/** Recorre `item` y sus hijos (a cualquier profundidad) buscando una route que matchee la URL actual. */
+	private matchesUrl(item: NavMenuItem, url: string): boolean {
+		if (item.route && url.startsWith(item.route)) return true;
+		return item.children?.some((c) => this.matchesUrl(c, url)) ?? false;
+	}
 
 	// * Cantidad de grupos que entran en el ancho disponible, medida contra la fila oculta de medición.
 	private readonly _visibleCount = signal(2);
