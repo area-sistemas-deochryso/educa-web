@@ -62,17 +62,17 @@
 					@if (last) {
 						<span class="breadcrumb-part breadcrumb-part--current">{{ part.label }}</span>
 					} @else {
-						<div class="breadcrumb-group-wrapper" [class.open]="part.kind === 'grupo' && groupDropdownOpen()">
+						<div class="breadcrumb-group-wrapper" [class.open]="part.kind === 'grupo' && groupDropdownOpenIndex() === part.groupIndex">
 							<button
 								type="button"
 								class="breadcrumb-part breadcrumb-part--clickable"
 								[attr.aria-haspopup]="part.kind === 'grupo' ? 'true' : null"
-								[attr.aria-expanded]="part.kind === 'grupo' ? groupDropdownOpen() : null"
+								[attr.aria-expanded]="part.kind === 'grupo' ? groupDropdownOpenIndex() === part.groupIndex : null"
 								(click)="onBreadcrumbClick($event, part)"
 							>
 								{{ part.label }}
 							</button>
-							@if (part.kind === 'grupo' && groupDropdownOpen()) {
+							@if (part.kind === 'grupo' && groupDropdownOpenIndex() === part.groupIndex) {
 								<div class="dropdown-menu">
 									@for (child of activeGroupItems(); track child.route) {
 										<a
@@ -126,17 +126,17 @@
 					@if (last) {
 						<span class="breadcrumb-part breadcrumb-part--current">{{ part.label }}</span>
 					} @else {
-						<div class="breadcrumb-group-wrapper" [class.open]="part.kind === 'grupo' && groupDropdownOpen()">
+						<div class="breadcrumb-group-wrapper" [class.open]="part.kind === 'grupo' && groupDropdownOpenIndex() === part.groupIndex">
 							<button
 								type="button"
 								class="breadcrumb-part breadcrumb-part--clickable"
 								[attr.aria-haspopup]="part.kind === 'grupo' ? 'true' : null"
-								[attr.aria-expanded]="part.kind === 'grupo' ? groupDropdownOpen() : null"
+								[attr.aria-expanded]="part.kind === 'grupo' ? groupDropdownOpenIndex() === part.groupIndex : null"
 								(click)="onBreadcrumbClick($event, part)"
 							>
 								{{ part.label }}
 							</button>
-							@if (part.kind === 'grupo' && groupDropdownOpen()) {
+							@if (part.kind === 'grupo' && groupDropdownOpenIndex() === part.groupIndex) {
 								<div class="dropdown-menu">
 									@for (child of activeGroupItems(); track child.route) {
 										<a

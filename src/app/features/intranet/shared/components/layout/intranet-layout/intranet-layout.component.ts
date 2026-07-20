@@ -35,6 +35,8 @@ import { ConnectionStatusIndicatorComponent } from '@intranet-shared/components/
 export interface BreadcrumbPart {
 	label: string;
 	kind: 'modulo' | 'grupo' | 'pagina';
+	/** Para `kind: 'grupo'` — índice dentro de `_groupNodeChain`, identifica qué nivel de anidamiento es. */
+	groupIndex?: number;
 }
 
 /** Ancho aproximado (px) del pill "Más" reservado durante el cálculo de overflow. */
@@ -94,11 +96,34 @@ export class IntranetLayoutComponent implements OnInit, AfterViewInit, OnDestroy
 	// Único indicador consistente entre pantallas cuyo grupo de menú difiere (ej. Cursos/Horarios
 	// bajo "Administración" en Académico, Usuarios bajo "Gestión" en Sistema).
 	private readonly _currentUrl = signal('');
+
+	/**
+	 * Cadena de nodos de grupo/subgrupo del item activo (ej. para Gestión/Reportes:
+	 * [Asistencia, Admin, Asistencias]) — uno por cada nivel de anidamiento del menú,
+	 * en el mismo orden en que aparecen como tramos "grupo" del breadcrumb.
+	 */
+	private readonly _groupNodeChain = computed((): NavMenuItem[] => {
+		const item = findMenuItemDefByUrl(this._currentUrl(), this._selectedModuloId());
+		if (!item?.group) return [];
+		const chain: NavMenuItem[] = [];
+		const topNode = this._allItems().find((n) => n.label === item.group!.label && n.children);
+		if (!topNode) return [];
+		chain.push(topNode);
+		let siblings = topNode.children ?? [];
+		for (const level of item.subgroup ?? []) {
+			const node = siblings.find((n) => n.label === level.label && n.children);
+			if (!node) break;
+			chain.push(node);
+			siblings = node.children ?? [];
+		}
+		return chain;
+	});
+
 	readonly breadcrumb = computed((): BreadcrumbPart[] => {
 		const modulo = MODULOS[this._selectedModuloId()];
 		const item = findMenuItemDefByUrl(this._currentUrl(), this._selectedModuloId());
 		const parts: BreadcrumbPart[] = [{ label: modulo.label, kind: 'modulo' }];
-		if (item?.group) parts.push({ label: item.group.label, kind: 'grupo' });
+		this._groupNodeChain().forEach((node, groupIndex) => parts.push({ label: node.label, kind: 'grupo', groupIndex }));
 		// Sin grupo, "página" puede repetir el label del módulo (ej. Inicio > Inicio) — no aporta información.
 		if (item && !(!item.group && item.label === modulo.label)) {
 			parts.push({ label: resolveMenuItemLabel(item, this.authService.currentUser?.rol), kind: 'pagina' });
@@ -106,18 +131,19 @@ export class IntranetLayoutComponent implements OnInit, AfterViewInit, OnDestroy
 		return parts;
 	});
 
-	// Páginas del grupo activo (ej. Cursos/Salones/Horarios bajo "Administración"),
-	// para el mini-dropdown que se abre al clickear el tramo "grupo" del breadcrumb.
-	private readonly _groupDropdownOpen = signal(false);
-	readonly groupDropdownOpen = this._groupDropdownOpen.asReadonly();
+	// Páginas del nivel de grupo/subgrupo abierto, para el mini-dropdown que se abre al
+	// clickear un tramo "grupo" del breadcrumb (brief posterior a 466: ahora hay más de un
+	// nivel posible — ej. Asistencia > Admin > Asistencias — cada uno abre su propio dropdown).
+	private readonly _groupDropdownOpenIndex = signal<number | null>(null);
+	readonly groupDropdownOpenIndex = this._groupDropdownOpenIndex.asReadonly();
 
 	readonly activeGroupItems = computed((): NavMenuItem[] => {
-		const item = findMenuItemDefByUrl(this._currentUrl(), this._selectedModuloId());
-		if (!item?.group) return [];
-		const groupNode = this._allItems().find((n) => n.label === item.group!.label && n.children);
+		const idx = this._groupDropdownOpenIndex();
+		if (idx === null) return [];
+		const node = this._groupNodeChain()[idx];
 		// * El mini-dropdown del breadcrumb solo sabe renderizar links con route directo —
-		// aplana un eventual segundo nivel (subgroup, ej. tabs de una misma página) a hojas.
-		return this.flattenToLeaves(groupNode?.children ?? []);
+		// aplana cualquier nivel de anidamiento por debajo del nodo abierto a hojas.
+		return this.flattenToLeaves(node?.children ?? []);
 	});
 
 	private flattenToLeaves(items: NavMenuItem[]): NavMenuItem[] {
@@ -203,7 +229,7 @@ export class IntranetLayoutComponent implements OnInit, AfterViewInit, OnDestroy
 					const id = detectModuloFromUrl(url, modulos);
 					this.applySelection(id, modulos, url);
 				}
-				this._groupDropdownOpen.set(false);
+				this._groupDropdownOpenIndex.set(null);
 			});
 
 		// Recalcula qué grupos entran en el ancho disponible cada vez que cambia
@@ -225,7 +251,7 @@ export class IntranetLayoutComponent implements OnInit, AfterViewInit, OnDestroy
 	onDocumentClick(event: MouseEvent): void {
 		const target = event.target as HTMLElement;
 		if (!target.closest?.('.active-section-breadcrumb')) {
-			this._groupDropdownOpen.set(false);
+			this._groupDropdownOpenIndex.set(null);
 		}
 	}
 
@@ -278,15 +304,16 @@ export class IntranetLayoutComponent implements OnInit, AfterViewInit, OnDestroy
 			// Evita que el click siga burbujeando a document: el listener de click-outside
 			// del module-selector lo cerraría en el mismo tick en que open() lo abre.
 			event.stopPropagation();
-			this._groupDropdownOpen.set(false);
+			this._groupDropdownOpenIndex.set(null);
 			this.moduleSelector()?.open();
-		} else if (part.kind === 'grupo') {
-			this._groupDropdownOpen.update((open) => !open);
+		} else if (part.kind === 'grupo' && part.groupIndex !== undefined) {
+			const idx = part.groupIndex;
+			this._groupDropdownOpenIndex.update((open) => (open === idx ? null : idx));
 		}
 	}
 
 	closeGroupDropdown(): void {
-		this._groupDropdownOpen.set(false);
+		this._groupDropdownOpenIndex.set(null);
 	}
 
 	logout(): void {
