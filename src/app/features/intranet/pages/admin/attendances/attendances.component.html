@@ -18,6 +18,10 @@
 			<i class="pi pi-chart-bar mr-2"></i>
 			Reportes
 		</p-tab>
+		<p-tab value="panel">
+			<i class="pi pi-th-large mr-2"></i>
+			Panel
+		</p-tab>
 	</p-tablist>
 
 	<!-- Tab: Gestión -->
@@ -30,6 +34,18 @@
 		<span class="subtitle">Registro y corrección formal de asistencia diaria</span>
 	</div>
 	<div class="header-actions">
+		<button
+			pButton
+			icon="pi pi-th-large"
+			label="Ver resumen en Panel"
+			class="p-button-outlined p-button-secondary"
+			(click)="irAPanel()"
+			[pt]="{
+				root: {
+					'aria-label': 'Ver resumen en el tab Panel',
+				},
+			}"
+		></button>
 		@if (vm().selectedCount > 0) {
 			<button
 				pButton
@@ -628,7 +644,26 @@
 
 	<!-- Tab: Reportes -->
 	<p-tabpanel value="reportes">
+		<div class="reportes-panel-link">
+			<button
+				pButton
+				icon="pi pi-th-large"
+				label="Ver resumen en Panel"
+				class="p-button-outlined p-button-secondary p-button-sm"
+				(click)="irAPanel()"
+				[pt]="{
+					root: {
+						'aria-label': 'Ver resumen en el tab Panel',
+					},
+				}"
+			></button>
+		</div>
 		<app-attendance-reports />
+	</p-tabpanel>
+
+	<!-- Tab: Panel -->
+	<p-tabpanel value="panel">
+		<app-attendance-panel />
 	</p-tabpanel>
 </p-tabs>
 <!-- #endregion -->

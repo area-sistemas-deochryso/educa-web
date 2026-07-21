@@ -27,6 +27,14 @@
 }
 // #endregion
 
+// #region Reportes — drill-down a Panel
+.reportes-panel-link {
+	display: flex;
+	justify-content: flex-end;
+	margin-bottom: 1rem;
+}
+// #endregion
+
 // #region Stats — B3 canonical (content-left + icon-right 48×48)
 .stats-grid {
 	display: grid;

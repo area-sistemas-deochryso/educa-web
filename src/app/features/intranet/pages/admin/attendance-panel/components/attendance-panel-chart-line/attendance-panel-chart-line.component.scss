@@ -1,0 +1,17 @@
+.chart-section {
+	border: 1px solid var(--surface-300);
+	border-radius: 10px;
+	padding: 0.85rem 1rem;
+
+	.chart-header h3 {
+		margin: 0 0 0.65rem;
+		font-size: 0.95rem;
+		font-weight: 600;
+		color: var(--text-color);
+	}
+}
+
+.chart-canvas-wrap {
+	position: relative;
+	height: 260px;
+}

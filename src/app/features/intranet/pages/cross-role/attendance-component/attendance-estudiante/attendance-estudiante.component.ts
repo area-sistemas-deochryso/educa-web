@@ -6,6 +6,7 @@ import { logger } from '@core/helpers';
 
 import { AttendanceDataService } from '@features/intranet/services/attendance/attendance-data.service';
 import { AttendanceLegendComponent } from '@app/features/intranet/components/attendance/attendance-legend/attendance-legend.component';
+import { AttendanceMiniDashboardComponent } from './components/attendance-mini-dashboard/attendance-mini-dashboard.component';
 import { AttendanceScopeStudentNoticeComponent } from '@intranet-shared/components/attendance-scope-student-notice';
 import { AttendanceTable } from '../models/attendance.types';
 import { AttendanceHeatmapComponent } from '@features/intranet/components/attendance/attendance-heatmap/attendance-heatmap.component';
@@ -22,6 +23,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 	standalone: true,
 	imports: [
 		AttendanceHeatmapComponent,
+		AttendanceMiniDashboardComponent,
 		EmptyStateComponent,
 		AttendanceLegendComponent,
 		AttendanceScopeStudentNoticeComponent,

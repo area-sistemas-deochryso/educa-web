@@ -1,0 +1,22 @@
+<button
+	type="button"
+	class="kpi-tile"
+	(click)="onClick()"
+	[attr.aria-label]="disponible() ? label() + ': ' + valor() + sufijo() : label() + ': no disponible en este rango'"
+>
+	<i [class]="icono()" aria-hidden="true"></i>
+	<div class="kpi-tile__body">
+		<span class="kpi-tile__label">{{ label() }}</span>
+		@if (disponible()) {
+			<div class="kpi-tile__chart">
+				<canvas #kpiChart></canvas>
+			</div>
+			@if (!comparacionDisponible()) {
+				<span class="kpi-tile__delta is-neutral">Comparación no disponible</span>
+			}
+		} @else {
+			<span class="kpi-tile__valor kpi-tile__valor--na">—</span>
+			<span class="kpi-tile__delta is-neutral">No disponible en este rango</span>
+		}
+	</div>
+</button>

@@ -9,6 +9,23 @@
 		(reload)="onReload()"
 	/>
 
+	@if (canViewAdminPanel()) {
+		<div class="admin-panel-link">
+			<button
+				pButton
+				icon="pi pi-th-large"
+				label="Ver Panel Administrativo de Asistencias"
+				class="p-button-outlined p-button-sm"
+				(click)="irAPanelAdmin()"
+				[pt]="{
+					root: {
+						'aria-label': 'Ir al Panel Administrativo de Asistencias',
+					},
+				}"
+			></button>
+		</div>
+	}
+
 	<!-- * Componentes especializados por rol -->
 	@switch (userRole()) {
 		@case ('Apoderado') {

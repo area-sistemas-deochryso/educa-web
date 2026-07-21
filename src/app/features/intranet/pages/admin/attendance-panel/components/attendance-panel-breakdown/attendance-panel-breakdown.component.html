@@ -1,0 +1,11 @@
+<section class="breakdown" aria-label="Asistencia por tipo de persona">
+	<h3 class="breakdown__title">Por tipo de persona</h3>
+
+	@if (items().length === 0) {
+		<p class="breakdown__empty">Sin datos para el rango seleccionado.</p>
+	} @else {
+		<div class="breakdown__chart">
+			<canvas #breakdownChart></canvas>
+		</div>
+	}
+</section>

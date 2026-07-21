@@ -1,0 +1,50 @@
+// #region Styles
+.salones-summary {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: stretch;
+	gap: 1rem;
+	margin-bottom: 1.5rem;
+}
+
+.salones-summary__promedio {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 1rem;
+	border: 1px solid var(--intranet-alternative-text-color);
+	border-radius: 10px;
+	flex: 0 0 auto;
+	min-width: 160px;
+}
+
+.salones-summary__promedio-chart {
+	position: relative;
+	width: 140px;
+	height: 140px;
+}
+
+.salones-summary__label {
+	font-size: 0.8rem;
+	color: var(--intranet-alternative-text-color);
+}
+
+.salones-summary__chart {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	flex: 1 1 400px;
+	min-width: 260px;
+}
+
+.salones-summary__chart-canvas {
+	position: relative;
+}
+
+@media screen and (max-width: 768px) {
+	.salones-summary {
+		flex-direction: column;
+	}
+}
+// #endregion

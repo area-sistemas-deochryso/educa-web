@@ -3,6 +3,19 @@
 	<!-- Plan 27 · INV-C11: estudiante con GRA_Orden < 8 — reemplaza tablas y leyenda. -->
 	<app-attendance-scope-student-notice />
 } @else {
+	@if (hasData()) {
+		<!-- * Mini-dashboard: KPIs + gráfico, basados en el conteo de "Mis Ingresos". La animación de
+		     entrada solo debe arrancar cuando el usuario efectivamente lo ve. -->
+		@defer (on viewport) {
+			<app-attendance-mini-dashboard
+				[counts]="ingresos().counts"
+				[grandTotal]="ingresos().grandTotal"
+			/>
+		} @placeholder {
+			<div style="height: 260px;"></div>
+		}
+	}
+
 	<!-- * Shared legend for attendance codes -->
 	<app-attendance-legend />
 

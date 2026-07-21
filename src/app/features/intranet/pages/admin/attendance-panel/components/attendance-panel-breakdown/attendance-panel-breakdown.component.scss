@@ -1,0 +1,21 @@
+.breakdown {
+	padding: 1rem;
+	border: 1px solid var(--surface-border, #e5e7eb);
+	border-radius: 0.5rem;
+	background: transparent;
+}
+
+.breakdown__title {
+	margin: 0 0 0.75rem;
+	font-size: 0.95rem;
+}
+
+.breakdown__empty {
+	color: var(--text-color-secondary, #6b7280);
+	font-size: 0.85rem;
+}
+
+.breakdown__chart {
+	position: relative;
+	height: 220px;
+}

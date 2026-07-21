@@ -8,6 +8,12 @@
 	contain: layout style;
 }
 
+.admin-panel-link {
+	display: flex;
+	justify-content: flex-end;
+	margin-bottom: 1rem;
+}
+
 .salon-selector {
 	display: flex;
 	align-items: center;

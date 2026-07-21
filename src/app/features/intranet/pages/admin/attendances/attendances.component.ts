@@ -2,7 +2,7 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -28,6 +28,7 @@ import { ErrorStateComponent } from '@shared/components';
 import { SkeletonColumnDef, TableSkeletonComponent, StatsSkeletonComponent, PageHeaderComponent } from '@intranet-shared/components';
 import { AttendanceScopeBannerComponent } from '@intranet-shared/components/attendance-scope-banner';
 import { AttendanceReportsComponent } from '../../cross-role/attendance-reports';
+import { AttendancePanelComponent } from '../attendance-panel';
 import { CrossChexSyncStatusService } from '@core/services/signalr';
 import { CrossChexSyncBannerComponent } from './components/crosschex-sync-banner';
 import { SyncRangeDialogComponent, SyncRangePayload } from './components/sync-range-dialog';
@@ -83,6 +84,7 @@ import {
 		TabPanel,
 		AttendanceScopeBannerComponent,
 		AttendanceReportsComponent,
+		AttendancePanelComponent,
 		CrossChexSyncBannerComponent,
 		SyncRangeDialogComponent,
 		PageHeaderComponent,
@@ -105,6 +107,7 @@ export class AttendancesComponent implements OnInit {
 	private confirmationService = inject(ConfirmationService);
 	private messageService = inject(MessageService);
 	private route = inject(ActivatedRoute);
+	private router = inject(Router);
 	private destroyRef = inject(DestroyRef);
 	// #endregion
 
@@ -230,7 +233,7 @@ export class AttendancesComponent implements OnInit {
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe((params) => {
 				const tab = params.get('tab');
-				if (tab === 'gestion' || tab === 'reportes') this.activeTab.set(tab);
+				if (tab === 'gestion' || tab === 'reportes' || tab === 'panel') this.activeTab.set(tab);
 
 				const fecha = params.get('fecha');
 				if (fecha && isValidDateIso(fecha)) {
@@ -264,6 +267,14 @@ export class AttendancesComponent implements OnInit {
 	onSearch(event: Event): void {
 		const term = (event.target as HTMLInputElement).value;
 		this.dataFacade.onSearch(term);
+	}
+
+	// #endregion
+
+	// #region Event handlers — drill-down
+	/** Mirror inverso de `AttendancePanelComponent.irAGestion/irAReportes` — vuelve al tab Panel. */
+	irAPanel(): void {
+		void this.router.navigate([], { queryParams: { tab: 'panel' } });
 	}
 
 	// #endregion

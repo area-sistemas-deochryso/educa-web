@@ -1,0 +1,50 @@
+<section class="chart-section" aria-label="Mapa de calor de asistencia por tipo de persona y semana">
+	<header class="chart-header">
+		<div class="chart-title">
+			<h3>{{ titulo() }}</h3>
+		</div>
+		<div class="chart-legend">
+			<span class="legend-item"><span class="legend-swatch legend-swatch--bien"></span>Bien (≥{{ 90 }}%)</span>
+			<span class="legend-item"><span class="legend-swatch legend-swatch--regular"></span>Regular (≥{{ 75 }}%)</span>
+			<span class="legend-item"><span class="legend-swatch legend-swatch--mal"></span>Mal (&lt;{{ 75 }}%)</span>
+		</div>
+	</header>
+
+	@if (sinDatos()) {
+		<p class="chart-empty">Sin datos para este período.</p>
+	} @else {
+		<div class="heatmap-table-wrap">
+			<table class="heatmap-table">
+				<thead>
+					<tr>
+						<th scope="col" class="heatmap-table__row-header"></th>
+						@for (col of columnas(); track col) {
+							<th scope="col">{{ col }}</th>
+						}
+					</tr>
+				</thead>
+				<tbody>
+					@for (fila of filas(); track fila.tipoPersona) {
+						<tr>
+							<th scope="row" class="heatmap-table__row-header">{{ fila.label }}</th>
+							@for (celda of fila.celdas; track celda.columnaIndex) {
+								<td>
+									<span
+										class="heatmap-cell"
+										[class.heatmap-cell--bien]="celda.nivel === 'bien'"
+										[class.heatmap-cell--regular]="celda.nivel === 'regular'"
+										[class.heatmap-cell--mal]="celda.nivel === 'mal'"
+										[class.heatmap-cell--sin-datos]="celda.nivel === 'sin-datos'"
+										[title]="fila.label + ' — ' + celda.etiquetaColumna + ': ' + celda.porcentaje + '%'"
+									>
+										{{ celda.porcentaje }}%
+									</span>
+								</td>
+							}
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+	}
+</section>

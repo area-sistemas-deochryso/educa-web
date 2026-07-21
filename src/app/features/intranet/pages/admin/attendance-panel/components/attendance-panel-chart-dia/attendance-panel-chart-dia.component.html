@@ -1,0 +1,16 @@
+<section class="chart-section" aria-label="Llegadas por hora">
+	<header class="chart-header">
+		<div class="chart-title">
+			<h3>Llegadas por hora</h3>
+			<span class="chart-subtitle">pico: {{ maxValue() }} por hora</span>
+		</div>
+	</header>
+
+	@if (sinDatos()) {
+		<div class="chart-empty">Sin marcaciones para el día seleccionado</div>
+	} @else {
+		<div class="chart-canvas-wrap">
+			<canvas #panelDiaChart></canvas>
+		</div>
+	}
+</section>

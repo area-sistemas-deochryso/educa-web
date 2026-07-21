@@ -1,0 +1,24 @@
+<!-- #region Template -->
+@if (!loading() && resumenes().length > 0) {
+	<section class="salones-summary">
+		<div class="salones-summary__promedio">
+			<div class="salones-summary__promedio-chart">
+				<canvas
+					#promedioChart
+					[attr.aria-label]="'Asistencia promedio de todos mis salones: ' + promedioGeneral() + '%'"
+				></canvas>
+			</div>
+			<span class="salones-summary__label">Asistencia promedio (todos mis salones)</span>
+		</div>
+		<div class="salones-summary__chart">
+			<span class="salones-summary__label">% de asistencia por salón</span>
+			<div class="salones-summary__chart-canvas" [style.height.px]="resumenes().length * 40 + 20">
+				<canvas
+					#salonesChart
+					[attr.aria-label]="'Asistencia por salón, promedio general ' + promedioGeneral() + '%'"
+				></canvas>
+			</div>
+		</div>
+	</section>
+}
+<!-- #endregion -->

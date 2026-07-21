@@ -13,6 +13,7 @@ import { AttendanceDataService } from '@features/intranet/services/attendance/at
 import { AttendanceLegendComponent } from '@features/intranet/components/attendance/attendance-legend/attendance-legend.component';
 import { AttendanceHeatmapComponent } from '@features/intranet/components/attendance/attendance-heatmap/attendance-heatmap.component';
 import { EmptyStateComponent } from '@features/intranet/components/attendance/empty-state/empty-state.component';
+import { AttendanceMiniDashboardComponent } from '@features/intranet/pages/cross-role/attendance-component/attendance-estudiante/components/attendance-mini-dashboard/attendance-mini-dashboard.component';
 import { AttendanceTable } from '@features/intranet/pages/cross-role/attendance-component/models/attendance.types';
 import { AsistenciaProfesorApiService } from '@intranet-shared/services';
 import { logger } from '@core/helpers';
@@ -31,7 +32,12 @@ import { logger } from '@core/helpers';
 @Component({
 	selector: 'app-attendance-profesor-propia',
 	standalone: true,
-	imports: [AttendanceLegendComponent, AttendanceHeatmapComponent, EmptyStateComponent],
+	imports: [
+		AttendanceLegendComponent,
+		AttendanceHeatmapComponent,
+		EmptyStateComponent,
+		AttendanceMiniDashboardComponent,
+	],
 	templateUrl: './attendance-profesor-propia.component.html',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })

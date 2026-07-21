@@ -1,4 +1,14 @@
 <!-- #region Template -->
+@if (salones().length > 0) {
+	<!-- * Resumen agregado multi-salón (excepción autorizada: 1 llamada HTTP por salón). La animación
+	     de entrada de sus gráficos solo debe arrancar cuando el usuario efectivamente los ve. -->
+	@defer (on viewport) {
+		<app-attendance-salones-summary [salones]="salones()" [viewMode]="view.viewMode()" [fechaDia]="view.fechaDia()" />
+	} @placeholder {
+		<div style="height: 260px;"></div>
+	}
+}
+
 <!-- * Shared legend for attendance codes -->
 <app-attendance-legend />
 

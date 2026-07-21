@@ -39,6 +39,12 @@ export interface AsistenciaAdminEstadisticas {
 	completasEstudiantes: number;
 	completasProfesores: number;
 	completasAsistentesAdmin: number;
+	/** Roster real (Chat 474): incluye faltas sin registro. Solo poblado con sedeId concreto. */
+	asistio: number;
+	falta: number;
+	tardanza: number;
+	total: number;
+	porcentajeAsistencia: number;
 }
 
 export interface CrearEntradaManualRequest {

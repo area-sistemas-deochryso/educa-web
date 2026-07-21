@@ -1,0 +1,119 @@
+<div class="attendance-panel">
+	<!-- #region Filtros -->
+	<section class="attendance-panel__filters">
+		<div class="filter-field">
+			<label for="panel-sede">Sede</label>
+			<p-select
+				id="panel-sede"
+				[options]="sedeOptions()"
+				[ngModel]="vm().filters.sedeId"
+				(ngModelChange)="onSedeChange($event)"
+				[disabled]="sedeSelectorDisabled()"
+				optionLabel="label"
+				optionValue="value"
+				placeholder="Seleccionar sede"
+				[style]="{ minWidth: '14rem' }"
+			/>
+			@if (sedeSelectorDisabled()) {
+				<span class="filter-hint">Requiere permiso de administración para ver otra sede.</span>
+			}
+		</div>
+
+		<div class="filter-field">
+			<label for="panel-rango">Rango</label>
+			<p-selectbutton
+				id="panel-rango"
+				[options]="rangoOptions"
+				[ngModel]="vm().filters.rango"
+				(ngModelChange)="onRangoChange($event)"
+				optionLabel="label"
+				optionValue="value"
+			/>
+		</div>
+
+		<div class="filter-field">
+			<label for="panel-fecha">Fecha</label>
+			<p-datepicker
+				id="panel-fecha"
+				[ngModel]="vm().filters.fecha"
+				(ngModelChange)="onFechaChange($event)"
+				dateFormat="dd/mm/yy"
+				[showIcon]="true"
+			/>
+		</div>
+	</section>
+	<!-- #endregion -->
+
+	@if (vm().loading && !vm().hasData) {
+		<app-stats-skeleton [count]="3" />
+	} @else {
+		@if (vm().error) {
+			<p class="attendance-panel__error">{{ vm().error }}</p>
+		}
+
+		<!-- #region KPI tiles -->
+		<section class="attendance-panel__kpis">
+			<app-attendance-panel-kpi-tile
+				label="% Asistencia"
+				[valor]="vm().dto.kpis.porcentajeAsistencia"
+				[valorPrevio]="vm().dto.kpis.porcentajeAsistenciaPrevio"
+				[comparacionDisponible]="vm().dto.kpis.comparacionDisponible"
+				sufijo="%"
+				sentido="positivo"
+				icono="pi pi-check-circle"
+				(activar)="irAGestion()"
+			/>
+			<app-attendance-panel-kpi-tile
+				label="Ausencias"
+				[valor]="vm().dto.kpis.ausencias"
+				[valorPrevio]="vm().dto.kpis.ausenciasPrevio"
+				[disponible]="vm().dto.kpis.conteosDisponibles"
+				sentido="negativo"
+				icono="pi pi-times-circle"
+				(activar)="irAGestion()"
+			/>
+			<app-attendance-panel-kpi-tile
+				label="Tardanzas"
+				[valor]="vm().dto.kpis.tardanzas"
+				[valorPrevio]="vm().dto.kpis.tardanzasPrevio"
+				[disponible]="vm().dto.kpis.conteosDisponibles"
+				sentido="negativo"
+				icono="pi pi-clock"
+				(activar)="irAGestion()"
+			/>
+		</section>
+		<!-- #endregion -->
+
+		<!-- #region Chart central -->
+		<!-- * La animación de entrada de estos gráficos solo debe arrancar cuando el usuario
+		     efectivamente los ve. -->
+		<section class="attendance-panel__chart">
+			@defer (on viewport) {
+				@if (vm().filters.rango === 'dia') {
+					<app-attendance-panel-chart-dia [data]="vm().dto.horaBuckets" />
+				} @else {
+					<app-attendance-panel-chart-line
+						[series]="vm().dto.series"
+						[titulo]="vm().filters.rango === 'semana' ? 'Asistencia (%) por día' : 'Asistencia (%) por semana'"
+					/>
+					@if (vm().filters.rango === 'mes') {
+						<app-attendance-panel-chart-heatmap [series]="vm().dto.series" />
+					}
+				}
+			} @placeholder {
+				<div style="height: 320px;"></div>
+			}
+		</section>
+		<!-- #endregion -->
+
+		<!-- #region Breakdown -->
+		<section class="attendance-panel__breakdown">
+			@defer (on viewport) {
+				<app-attendance-panel-breakdown [items]="vm().dto.breakdown" (seleccionar)="irAReportes($event)" />
+			} @placeholder {
+				<div style="height: 220px;"></div>
+			}
+		</section>
+		<!-- #endregion -->
+	}
+</div>

@@ -36,6 +36,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { buildPdfExcelMenuItems } from '../../attendance-director/consolidated-pdf.helper';
 import { MonthSearchState } from '../../attendance-director/month-search-state';
+import { AttendanceSalonesSummaryComponent } from './components/attendance-salones-summary/attendance-salones-summary.component';
 
 /**
  * Vista "Mis estudiantes" del panel profesor (Plan 21 Chat 4).
@@ -65,6 +66,7 @@ import { MonthSearchState } from '../../attendance-director/month-search-state';
 		FormsModule,
 		Select,
 		SelectButton,
+		AttendanceSalonesSummaryComponent,
 	],
 	providers: [AttendanceViewController, AttendancePdfService, AttendanceStatsService],
 	templateUrl: './attendance-profesor-estudiantes.component.html',

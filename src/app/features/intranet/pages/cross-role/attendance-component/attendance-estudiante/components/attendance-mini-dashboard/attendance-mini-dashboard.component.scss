@@ -1,0 +1,19 @@
+// #region Styles
+.mini-dashboard {
+	display: flex;
+	justify-content: center;
+	margin-bottom: 1.5rem;
+}
+
+.mini-dashboard__chart {
+	flex: 1 1 320px;
+	max-width: 380px;
+	height: 280px;
+}
+
+@media screen and (max-width: 768px) {
+	.mini-dashboard__chart {
+		max-width: 100%;
+	}
+}
+// #endregion

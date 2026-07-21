@@ -5,13 +5,15 @@ import {
 	ViewMode,
 } from '@features/intranet/components/attendance/attendance-header/attendance-header.component';
 import { ChangeDetectionStrategy, Component, ViewChild, AfterViewInit, computed, inject, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ButtonModule } from 'primeng/button';
 
 import { AttendanceApoderadoComponent } from './attendance-apoderado/attendance-apoderado.component';
 import { AttendanceDirectorComponent } from './attendance-director/attendance-director.component';
 import { AttendanceEstudianteComponent } from './attendance-estudiante/attendance-estudiante.component';
 import { AttendanceProfesorComponent } from './attendance-profesor/attendance-profesor.component';
 import { UserProfileService } from '@core/services';
+import { UserPermissionsService } from '@core/services/permissions';
 
 /**
  * Componente Page/Route para asistencias.
@@ -35,6 +37,7 @@ import { UserProfileService } from '@core/services';
 		AttendanceProfesorComponent,
 		AttendanceDirectorComponent,
 		AttendanceEstudianteComponent,
+		ButtonModule,
 	],
 	templateUrl: './attendance.component.html',
 	styleUrl: './attendance.component.scss',
@@ -42,6 +45,11 @@ import { UserProfileService } from '@core/services';
 export class AttendanceComponent implements AfterViewInit {
 	private userProfile = inject(UserProfileService);
 	private route = inject(ActivatedRoute);
+	private router = inject(Router);
+	private userPermisos = inject(UserPermissionsService);
+
+	/** Gate del link "Ver Panel Administrativo de Asistencias" — mismo código que gatea el tab Panel en el admin. */
+	readonly canViewAdminPanel = computed(() => this.userPermisos.hasCapability('ADMIN_ASISTENCIAS'));
 
 	// * ViewChild refs are used to delegate reload/mode actions by role.
 	@ViewChild(AttendanceApoderadoComponent) apoderadoComponent?: AttendanceApoderadoComponent;
@@ -104,6 +112,11 @@ export class AttendanceComponent implements AfterViewInit {
 		} else if (role === 'Estudiante') {
 			this.estudianteComponent?.reload();
 		}
+	}
+
+	/** Drill-down al panel administrativo de asistencias (solo visible con `ADMIN_ASISTENCIAS`). */
+	irAPanelAdmin(): void {
+		void this.router.navigate(['/intranet/admin/asistencias'], { queryParams: { tab: 'panel' } });
 	}
 }
 // #endregion

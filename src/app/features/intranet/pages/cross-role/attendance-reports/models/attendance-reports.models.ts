@@ -128,6 +128,12 @@ export interface ReporteFilters {
 	fecha: Date;
 	salonesSeleccionados: string[];
 	tipoPersona: TipoPersonaReporte;
+	/**
+	 * Sede a consultar. `null`/`undefined` = sede propia del usuario (comportamiento actual,
+	 * sin cambios). Un valor distinto a la sede propia requiere `Capability.ADMIN_ASISTENCIAS`
+	 * en el BE — en caso contrario responde 403 `ASISTENCIA_SEDE_CRUZADA_NO_AUTORIZADA`.
+	 */
+	sedeId?: number | null;
 }
 
 export function getDefaultFilters(): ReporteFilters {
@@ -137,7 +143,26 @@ export function getDefaultFilters(): ReporteFilters {
 		fecha: new Date(),
 		salonesSeleccionados: [],
 		tipoPersona: 'E',
+		sedeId: null,
 	};
+}
+// #endregion
+
+// #region Tendencia (serie temporal por tipo de persona) — GET /api/ReportesAsistencia/tendencia
+export type TendenciaRangoTipo = Extract<RangoTipo, 'semana' | 'mes'>;
+
+export interface TendenciaPunto {
+	fecha: string;
+	fechaFin: string;
+	porcentajesPorTipo: Record<Exclude<TipoPersonaReporte, 'todos'>, number>;
+}
+
+export interface TendenciaAsistencia {
+	nombreSede: string;
+	rango: TendenciaRangoTipo;
+	fechaInicio: string;
+	fechaFin: string;
+	puntos: TendenciaPunto[];
 }
 // #endregion
 
