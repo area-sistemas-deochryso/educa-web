@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { calcPageFromLazyEvent } from '@core/helpers';
 
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
@@ -61,8 +60,6 @@ export class CursosComponent implements OnInit {
 	// #endregion
 
 	// #region Estado local
-	/** Guard para ignorar el onLazyLoad inicial (ngOnInit ya carga los datos) */
-	private initialLoadDone = signal(false);
 	showValidation = signal(false);
 	// #endregion
 
@@ -88,15 +85,6 @@ export class CursosComponent implements OnInit {
 	// #endregion
 
 	// #region Event handlers
-	onLazyLoad(event: { first?: number; rows?: number }): void {
-		if (!this.initialLoadDone()) {
-			this.initialLoadDone.set(true);
-			return;
-		}
-		const { page, rows } = calcPageFromLazyEvent(event);
-		this.facade.loadPage(page, rows);
-	}
-
 	refresh(): void {
 		this.facade.loadAll();
 	}

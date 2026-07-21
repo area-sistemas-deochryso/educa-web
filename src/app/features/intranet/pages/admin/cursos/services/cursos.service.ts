@@ -4,7 +4,6 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { environment } from '@config/environment';
-import { PaginatedResponse } from '@shared/models';
 import { Curso, CrearCursoRequest, ActualizarCursoRequest, CursosEstadisticas, CursoCompletitud } from '../models';
 import { ApiResponse } from '@shared/models';
 
@@ -18,23 +17,13 @@ export class CursosService {
 	private readonly apiUrl = `${environment.apiUrl}/api/sistema/cursos`;
 	private http = inject(HttpClient);
 
-	getCursos(): Observable<Curso[]> {
-		return this.http.get<Curso[]>(`${this.apiUrl}/listar`);
-	}
-
-	getCursosPaginated(
-		page: number,
-		pageSize: number,
-		search?: string,
-		estado?: boolean | null,
-		nivel?: string | null,
-	): Observable<PaginatedResponse<Curso>> {
-		const params: Record<string, string | number | boolean> = { page, pageSize };
+	getCursos(search?: string, estado?: boolean | null, nivel?: string | null): Observable<Curso[]> {
+		const params: Record<string, string | boolean> = {};
 		if (search) params['search'] = search;
 		if (estado !== undefined && estado !== null) params['estado'] = estado;
 		if (nivel) params['nivel'] = nivel;
 
-		return this.http.get<PaginatedResponse<Curso>>(`${this.apiUrl}/listar`, { params });
+		return this.http.get<Curso[]>(`${this.apiUrl}/listar`, { params });
 	}
 
 	getEstadisticas(): Observable<CursosEstadisticas> {

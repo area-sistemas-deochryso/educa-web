@@ -34,7 +34,7 @@ const mockCompletitud: CursoCompletitud[] = [
 
 function createMockApi() {
 	return {
-		getCursosPaginated: vi.fn().mockReturnValue(of({ data: mockCursos, page: 1, pageSize: 10, total: 2 })),
+		getCursos: vi.fn().mockReturnValue(of(mockCursos)),
 		getEstadisticas: vi.fn().mockReturnValue(of(mockStats)),
 		crearCurso: vi.fn().mockReturnValue(of({ mensaje: 'ok' })),
 		actualizarCurso: vi.fn().mockReturnValue(of({ mensaje: 'ok' })),
@@ -290,7 +290,7 @@ describe('CursosFacade', () => {
 
 			expect(store.searchTerm()).toBe('math');
 			expect(store.page()).toBe(1);
-			expect(api.getCursosPaginated).toHaveBeenCalled();
+			expect(api.getCursos).toHaveBeenCalled();
 		});
 
 		it('should clear all filters', () => {
@@ -310,25 +310,25 @@ describe('CursosFacade', () => {
 	// #region Cross-tab refetch (F-S06)
 	describe('cross-tab refetch on leader commit', () => {
 		it('refetches items when another tab commits an entry of the same resourceType', () => {
-			api.getCursosPaginated.mockClear();
+			api.getCursos.mockClear();
 
 			crossTab.emitCrossTabCommit('cursos');
 
-			expect(api.getCursosPaginated).toHaveBeenCalledTimes(1);
+			expect(api.getCursos).toHaveBeenCalledTimes(1);
 		});
 
 		it('ignores commits of other resourceTypes', () => {
-			api.getCursosPaginated.mockClear();
+			api.getCursos.mockClear();
 
 			crossTab.emitCrossTabCommit('Salon');
 			crossTab.emitCrossTabCommit('Vista');
 
-			expect(api.getCursosPaginated).not.toHaveBeenCalled();
+			expect(api.getCursos).not.toHaveBeenCalled();
 		});
 
 		it('does not toggle global loading flag (silent refetch)', () => {
 			store.setLoading(false);
-			api.getCursosPaginated.mockClear();
+			api.getCursos.mockClear();
 
 			crossTab.emitCrossTabCommit('cursos');
 

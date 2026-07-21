@@ -119,11 +119,8 @@
 		<p-table
 			[value]="vm().cursos"
 			[dataKey]="'id'"
-			[lazy]="true"
-			(onLazyLoad)="onLazyLoad($any($event))"
 			[paginator]="true"
-			[rows]="vm().pageSize"
-			[totalRecords]="vm().totalRecords"
+			[rows]="10"
 			[rowsPerPageOptions]="[5, 10, 25, 50]"
 			[showCurrentPageReport]="true"
 			[loading]="vm().loading"

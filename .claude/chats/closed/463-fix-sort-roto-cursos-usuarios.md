@@ -37,9 +37,15 @@ Auditoría de las 13 tablas `p-table` con `pSortableColumn` en `src/app/` (2026-
 
 ## Criterio de cierre
 
-- [ ] `/design` resuelto (contra de arriba validado).
-- [ ] `[lazy]` removido de `cursos.component`, sort+paginación client-side funcionando (verificar en vivo: click en header `id`/`nombre`/`estado` reordena visualmente).
-- [ ] Build + lint OK.
+- [x] `/design` resuelto (contra de arriba validado — no hay consumidores dependientes del modo `lazy`).
+- [x] `[lazy]` removido de `cursos.component`, sort+paginación client-side funcionando (verificado en vivo con sesión quick-login "CODE CLAUDE": sort asc/desc en NOMBRE reordena, filtro de búsqueda sigue server-side).
+- [x] Build + lint OK (lint ✅, build ✅, 227 archivos/2360 tests ✅).
+
+## Resolución
+
+Enfoque ajustado respecto a la propuesta original del brief: en vez de `getCursos()` sin filtros (que hubiera roto búsqueda/estado/nivel) o `getCursosPaginated` con `pageSize` grande, se extendió `getCursos(search, estado, nivel)` aprovechando que el backend (`CursosController.cs` + `QueryableExtensions.ToApiResponse`) ya devuelve la lista completa filtrada cuando se omiten `page`/`pageSize`. Patrón idéntico al de `vistas.facade.ts` (`fetchItems()` mapea a `PaginatedResult` client-side).
+
+Archivos tocados: `cursos.service.ts`, `cursos.facade.ts` (+ spec), `cursos.component.ts`, `cursos.component.html`.
 
 ## Tiempo estimado
 

@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
 import {
 	BaseCrudFacade,
@@ -45,13 +45,9 @@ export class CursosFacade extends BaseCrudFacade<Curso, CursoFormData, CursosEst
 
 	// #region API calls (abstract implementations)
 	protected fetchItems(): Observable<PaginatedResult<Curso>> {
-		return this.api.getCursosPaginated(
-			this.store.page(),
-			this.store.pageSize(),
-			this.store.searchTerm() || undefined,
-			this.store.filterEstado() as boolean | null,
-			this.store.filterNivel() || undefined,
-		);
+		return this.api
+			.getCursos(this.store.searchTerm() || undefined, this.store.filterEstado() as boolean | null, this.store.filterNivel())
+			.pipe(map((cursos) => ({ data: cursos, page: 1, pageSize: cursos.length || 50, total: cursos.length })));
 	}
 
 	protected fetchEstadisticas(): Observable<CursosEstadisticas> {
