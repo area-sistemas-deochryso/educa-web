@@ -82,6 +82,8 @@ export class UsersStore extends BaseCrudStore<UsuarioLista, UsuarioFormData, Usu
 	private readonly _filterSalonId = signal<number | null>(null);
 	private readonly _refreshCounter = signal(0);
 	private readonly _activeTab = signal<RoleTab>(null);
+	private readonly _sortField = signal<string | null>(null);
+	private readonly _sortOrder = signal<'asc' | 'desc' | null>(null);
 
 	// ProfesorCurso — cursos asignados al profesor en edición
 	private readonly _profesorCursos = signal<ProfesorCursoListaDto[]>([]);
@@ -105,6 +107,8 @@ export class UsersStore extends BaseCrudStore<UsuarioLista, UsuarioFormData, Usu
 	readonly filterSalonId = this._filterSalonId.asReadonly();
 	readonly refreshCounter = this._refreshCounter.asReadonly();
 	readonly activeTab = this._activeTab.asReadonly();
+	readonly sortField = this._sortField.asReadonly();
+	readonly sortOrder = this._sortOrder.asReadonly();
 	readonly profesorCursos = this._profesorCursos.asReadonly();
 	readonly cursosDisponibles = this._cursosDisponibles.asReadonly();
 	readonly profesorCursosLoading = this._profesorCursosLoading.asReadonly();
@@ -167,6 +171,8 @@ export class UsersStore extends BaseCrudStore<UsuarioLista, UsuarioFormData, Usu
 		filterEstado: this.filterEstado() as boolean | null,
 		filterSalonId: this._filterSalonId(),
 		activeTab: this._activeTab(),
+		sortField: this._sortField(),
+		sortOrder: this._sortOrder(),
 		// Form
 		formData: this.formData(),
 		isEditing: this.isEditing(),
@@ -220,6 +226,11 @@ export class UsersStore extends BaseCrudStore<UsuarioLista, UsuarioFormData, Usu
 
 	setActiveTab(tab: RoleTab): void {
 		this._activeTab.set(tab);
+	}
+
+	setSort(field: string | null, order: 'asc' | 'desc' | null): void {
+		this._sortField.set(field);
+		this._sortOrder.set(order);
 	}
 
 	setImportLoading(loading: boolean): void {

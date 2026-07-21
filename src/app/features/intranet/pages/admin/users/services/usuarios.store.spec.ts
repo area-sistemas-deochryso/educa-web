@@ -104,6 +104,19 @@ describe('UsersStore', () => {
 			expect(store.filterSalonId()).toBe(7);
 		});
 
+		it('setSort updates sortField and sortOrder together', () => {
+			expect(store.sortField()).toBeNull();
+			expect(store.sortOrder()).toBeNull();
+
+			store.setSort('nombreCompleto', 'asc');
+			expect(store.sortField()).toBe('nombreCompleto');
+			expect(store.sortOrder()).toBe('asc');
+
+			store.setSort(null, null);
+			expect(store.sortField()).toBeNull();
+			expect(store.sortOrder()).toBeNull();
+		});
+
 		it('manages import dialog state', () => {
 			store.setImportLoading(true);
 			store.setImportResult({ exitosos: 5, fallidos: 0 } as never);

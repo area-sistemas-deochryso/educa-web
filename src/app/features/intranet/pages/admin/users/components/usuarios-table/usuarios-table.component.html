@@ -17,13 +17,15 @@
 		[rowsPerPageOptions]="[5, 10, 25, 50]"
 		[showCurrentPageReport]="true"
 		currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} usuarios"
+		[sortField]="sortField()"
+		[sortOrder]="primeSortOrder()"
 		(onLazyLoad)="onLazyLoad($event)"
 		dataKey="id"
 		class="p-datatable-sm"
 	>
 		<ng-template #header>
 			<tr>
-				<th style="width: 100px" pSortableColumn="dni">DNI <p-sortIcon field="dni" /></th>
+				<th style="width: 100px">DNI</th>
 				<th pSortableColumn="nombreCompleto">
 					NOMBRE <p-sortIcon field="nombreCompleto" />
 				</th>

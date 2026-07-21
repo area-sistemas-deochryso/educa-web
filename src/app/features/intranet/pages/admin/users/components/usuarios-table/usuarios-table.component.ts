@@ -28,11 +28,23 @@ export class UsersTableComponent {
 	readonly rows = input(10);
 	readonly first = input(0);
 	readonly activeTab = input<RoleTab>(null);
+	readonly sortField = input<string | null>(null);
+	readonly sortOrder = input<'asc' | 'desc' | null>(null);
 
 	readonly edit = output<UsuarioLista>();
 	readonly toggleEstado = output<UsuarioLista>();
-	readonly lazyLoad = output<{ page: number; pageSize: number }>();
+	readonly lazyLoad = output<{
+		page: number;
+		pageSize: number;
+		sortField: string | null;
+		sortOrder: 'asc' | 'desc' | null;
+	}>();
 	readonly copyDni = output<string>();
+
+	readonly primeSortOrder = computed(() => {
+		const order = this.sortOrder();
+		return order === 'asc' ? 1 : order === 'desc' ? -1 : 0;
+	});
 
 	readonly colCount = () => {
 		const tab = this.activeTab();
@@ -96,6 +108,8 @@ export class UsersTableComponent {
 		const first = event.first ?? 0;
 		const rows = event.rows ?? this.rows();
 		const page = Math.floor(first / rows) + 1;
-		this.lazyLoad.emit({ page, pageSize: rows });
+		const sortField = Array.isArray(event.sortField) ? event.sortField[0] ?? null : event.sortField ?? null;
+		const sortOrder = event.sortOrder === 1 ? 'asc' : event.sortOrder === -1 ? 'desc' : null;
+		this.lazyLoad.emit({ page, pageSize: rows, sortField, sortOrder });
 	}
 }

@@ -71,6 +71,8 @@
 			[rows]="vm().pageSize"
 			[first]="(vm().page - 1) * vm().pageSize"
 			[activeTab]="vm().activeTab"
+			[sortField]="vm().sortField"
+			[sortOrder]="vm().sortOrder"
 			(edit)="onEditUsuario($event)"
 			(toggleEstado)="onToggleEstado($event)"
 			(lazyLoad)="onLazyLoad($event)"

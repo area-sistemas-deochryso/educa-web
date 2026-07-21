@@ -183,7 +183,9 @@ export class UsersComponent implements AfterViewInit {
 	}
 
 	onClearFilters(): void { this.dataFacade.clearFilters(); }
-	onLazyLoad(event: { page: number; pageSize: number }): void { this.dataFacade.loadPage(event.page, event.pageSize); }
+	onLazyLoad(event: { page: number; pageSize: number; sortField: string | null; sortOrder: 'asc' | 'desc' | null }): void {
+		this.dataFacade.loadPage(event.page, event.pageSize, event.sortField, event.sortOrder);
+	}
 	// #endregion
 
 	// #region UI handlers

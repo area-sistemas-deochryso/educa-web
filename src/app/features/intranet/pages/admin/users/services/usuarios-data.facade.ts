@@ -86,6 +86,8 @@ export class UsersDataFacade {
 		const estado = (this.store.filterEstado() as boolean | null) ?? undefined;
 		const search = this.store.searchTerm() || undefined;
 		const salonId = this.store.filterSalonId() ?? undefined;
+		const sortField = this.store.sortField();
+		const sortOrder = this.store.sortOrder();
 		const itemsRequestId = this.beginItemsRequest();
 
 		forkJoin({
@@ -110,7 +112,7 @@ export class UsersDataFacade {
 					return of([] as SedeSimpleDto[]);
 				}),
 			),
-			usuarios: this.usuariosService.listarUsuariosPaginado(page, pageSize, rol, estado, search, salonId).pipe(
+			usuarios: this.usuariosService.listarUsuariosPaginado(page, pageSize, rol, estado, search, salonId, sortField, sortOrder).pipe(
 				withRetry({ tag: 'UsuariosDataFacade:loadUsuarios' }),
 				catchError((err) => {
 					this.errHandler.handle(err, 'cargar usuarios');
@@ -159,9 +161,10 @@ export class UsersDataFacade {
 	}
 
 	/** Cargar una pagina especifica (llamado desde onLazyLoad de p-table) */
-	loadPage(page: number, pageSize: number): void {
+	loadPage(page: number, pageSize: number, sortField: string | null = null, sortOrder: 'asc' | 'desc' | null = null): void {
 		this.store.setPage(page);
 		this.store.setPageSize(pageSize);
+		this.store.setSort(sortField, sortOrder);
 		this.refreshUsuariosOnly();
 	}
 
@@ -229,10 +232,12 @@ export class UsersDataFacade {
 		const estado = (this.store.filterEstado() as boolean | null) ?? undefined;
 		const search = this.store.searchTerm() || undefined;
 		const salonId = this.store.filterSalonId() ?? undefined;
+		const sortField = this.store.sortField();
+		const sortOrder = this.store.sortOrder();
 		const itemsRequestId = this.beginItemsRequest();
 
 		this.usuariosService
-			.listarUsuariosPaginado(page, pageSize, rol, estado, search, salonId)
+			.listarUsuariosPaginado(page, pageSize, rol, estado, search, salonId, sortField, sortOrder)
 			.pipe(
 				withRetry({ tag: 'UsuariosDataFacade:refreshUsuariosOnly' }),
 				catchError((err) => {
@@ -325,10 +330,12 @@ export class UsersDataFacade {
 					const rol = this.store.filterRol() ?? undefined;
 					const estado = (this.store.filterEstado() as boolean | null) ?? undefined;
 					const salonId = this.store.filterSalonId() ?? undefined;
+					const sortField = this.store.sortField();
+					const sortOrder = this.store.sortOrder();
 					const itemsRequestId = this.beginItemsRequest();
 
 					return this.usuariosService
-						.listarUsuariosPaginado(page, pageSize, rol, estado, search || undefined, salonId)
+						.listarUsuariosPaginado(page, pageSize, rol, estado, search || undefined, salonId, sortField, sortOrder)
 						.pipe(
 							withRetry({ tag: 'UsuariosDataFacade:searchUsuarios' }),
 							catchError((err) => {
