@@ -10,6 +10,7 @@ import {
 	RuntimeHealthAlert,
 	RuntimeHealthHistoryResponse,
 	RuntimeHealthSnapshot,
+	RuntimeHealthStartup,
 	SlowRequestEntry,
 	ThresholdConfig,
 } from '../models/runtime-health.models';
@@ -58,6 +59,16 @@ export class RuntimeHealthService {
 
 	deleteAlerts(ids: number[]): Observable<number> {
 		return this.http.delete<number>(`${this.endpoint}/alerts`, { body: ids });
+	}
+	// #endregion
+
+	// #region F11 — Arranques de proceso (proxy de deploy)
+	getStartups(from: Date, to: Date): Observable<RuntimeHealthStartup[]> {
+		const params = new HttpParams()
+			.set('from', from.toISOString())
+			.set('to', to.toISOString());
+
+		return this.http.get<RuntimeHealthStartup[]>(`${this.endpoint}/startups`, { params });
 	}
 	// #endregion
 

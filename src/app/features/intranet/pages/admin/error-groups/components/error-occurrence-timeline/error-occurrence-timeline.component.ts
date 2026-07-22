@@ -7,7 +7,7 @@ import {
 	input,
 	viewChild,
 } from '@angular/core';
-import { Chart, registerables } from 'chart.js';
+import { Chart, Plugin, registerables } from 'chart.js';
 
 Chart.register(...registerables);
 
@@ -15,6 +15,9 @@ const DEFAULT_POINT_COLOR = 'var(--text-color-secondary)';
 const POINT_OPACITY = 0.5;
 /** Por encima de este alto (px) se muestran ticks en el eje X — debajo, el chart es compacto (tabla/kanban). */
 const TICKS_VISIBLE_MIN_HEIGHT = 100;
+const MARKER_DATASET_LABEL = 'Arranques';
+/** Fallback si `--orange-400` no resuelve vía `getComputedStyle` (tema no cargado aún). */
+const MARKER_LINE_COLOR = '#fb923c';
 
 function withOpacity(color: string, alpha: number): string {
 	// Colores en formato hex resuelto (getComputedStyle) o var() sin resolver — Chart.js acepta
@@ -49,6 +52,12 @@ export class ErrorOccurrenceTimelineComponent implements AfterViewInit {
 	readonly height = input<number>(32);
 	readonly color = input<string>();
 	readonly ariaLabel = input<string | undefined>(undefined);
+	/**
+	 * Timestamps epoch ms de arranques de proceso (proxy de deploy, brief
+	 * 473/BE 474) — se dibujan como línea vertical + marcador con tooltip
+	 * propio, superpuestos al scatter de ocurrencias.
+	 */
+	readonly markers = input<readonly number[]>([]);
 
 	readonly chartCanvas = viewChild<ElementRef<HTMLCanvasElement>>('timelineChart');
 
@@ -58,16 +67,17 @@ export class ErrorOccurrenceTimelineComponent implements AfterViewInit {
 	constructor() {
 		effect(() => {
 			const values = this.data();
-			if (this.initialized) this.renderChart(values);
+			const markers = this.markers();
+			if (this.initialized) this.renderChart(values, markers);
 		});
 	}
 
 	ngAfterViewInit(): void {
 		this.initialized = true;
-		this.renderChart(this.data());
+		this.renderChart(this.data(), this.markers());
 	}
 
-	private renderChart(values: readonly number[]): void {
+	private renderChart(values: readonly number[], markers: readonly number[]): void {
 		this.destroyChart();
 		const canvas = this.chartCanvas()?.nativeElement;
 		if (!canvas) return;
@@ -78,7 +88,33 @@ export class ErrorOccurrenceTimelineComponent implements AfterViewInit {
 				.getPropertyValue('--text-color-secondary').trim() ||
 			DEFAULT_POINT_COLOR;
 		const pointColor = withOpacity(resolvedColor, POINT_OPACITY);
+		const resolvedMarkerColor =
+			getComputedStyle(document.documentElement).getPropertyValue('--orange-400').trim() ||
+			MARKER_LINE_COLOR;
 		const showTicks = this.height() > TICKS_VISIBLE_MIN_HEIGHT;
+
+		const deployMarkerLinesPlugin: Plugin<'scatter'> = {
+			id: 'deployMarkerLines',
+			afterDatasetsDraw: (chart) => {
+				if (markers.length === 0) return;
+				const { ctx, chartArea, scales } = chart;
+				const xScale = scales['x'];
+				if (!chartArea || !xScale) return;
+				ctx.save();
+				ctx.strokeStyle = resolvedMarkerColor;
+				ctx.lineWidth = 1;
+				ctx.setLineDash([4, 3]);
+				for (const ts of markers) {
+					const x = xScale.getPixelForValue(ts);
+					if (x < chartArea.left || x > chartArea.right) continue;
+					ctx.beginPath();
+					ctx.moveTo(x, chartArea.top);
+					ctx.lineTo(x, chartArea.bottom);
+					ctx.stroke();
+				}
+				ctx.restore();
+			},
+		};
 
 		this.chart = new Chart(canvas, {
 			type: 'scatter',
@@ -92,8 +128,22 @@ export class ErrorOccurrenceTimelineComponent implements AfterViewInit {
 						pointRadius: 3,
 						showLine: false,
 					},
+					...(markers.length > 0
+						? [
+								{
+									label: MARKER_DATASET_LABEL,
+									data: markers.map((ts) => ({ x: ts, y: 0.85 })),
+									backgroundColor: resolvedMarkerColor,
+									borderColor: resolvedMarkerColor,
+									pointStyle: 'triangle' as const,
+									pointRadius: 5,
+									showLine: false,
+								},
+							]
+						: []),
 				],
 			},
+			plugins: [deployMarkerLinesPlugin],
 			options: {
 				responsive: true,
 				maintainAspectRatio: false,
@@ -101,7 +151,12 @@ export class ErrorOccurrenceTimelineComponent implements AfterViewInit {
 					legend: { display: false },
 					tooltip: {
 						callbacks: {
-							label: (ctx) => new Date(Number(ctx.parsed.x)).toLocaleString('es-AR'),
+							label: (ctx) => {
+								const fecha = new Date(Number(ctx.parsed.x)).toLocaleString('es-AR');
+								return ctx.dataset.label === MARKER_DATASET_LABEL
+									? `Arranque de proceso: ${fecha}`
+									: fecha;
+							},
 						},
 					},
 				},

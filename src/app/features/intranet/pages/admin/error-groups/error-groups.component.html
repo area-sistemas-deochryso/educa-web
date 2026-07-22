@@ -521,10 +521,14 @@
 				[data]="trendDialogData()"
 				[height]="200"
 				color="var(--p-primary-color)"
+				[markers]="deployMarkers()"
 				[ariaLabel]="'Ocurrencias de los últimos 30 días ampliado de ' + trendDialogGroup()!.mensajeRepresentativo"
 			/>
 			<p class="trend-dialog-hint">
 				Cada punto es una ocurrencia individual — últimos 30 días.
+				@if (deployMarkers().length > 0) {
+					La línea naranja marca un arranque de proceso (proxy de deploy).
+				}
 			</p>
 			@if (trendDialogTruncado()) {
 				<small class="trend-dialog-truncated">
