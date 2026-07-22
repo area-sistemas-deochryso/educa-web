@@ -6,6 +6,7 @@ import {
 	computed,
 	effect,
 	input,
+	output,
 	viewChild,
 } from '@angular/core';
 import { Chart, registerables } from 'chart.js';
@@ -47,10 +48,19 @@ export class ErrorParetoChartComponent implements AfterViewInit {
 	readonly items = input<ErrorGroupPareto[]>([]);
 	readonly loading = input(false);
 
+	/**
+	 * Cross-filter Heatmap↔Pareto (brief 471, P68 F9) — click en una barra
+	 * emite el grupo correspondiente. El caller decide cómo filtrar la lista
+	 * de abajo (mismo patrón que `ErrorHeatmapComponent.cellClick`).
+	 */
+	readonly barClick = output<ErrorGroupPareto>();
+
 	readonly chartCanvas = viewChild<ElementRef<HTMLCanvasElement>>('paretoChart');
 
 	private chart: Chart | null = null;
 	private initialized = false;
+	/** Barras realmente renderizadas (alineadas 1:1 con los `dataIndex` de Chart.js). */
+	private currentVisible: ErrorGroupPareto[] = [];
 
 	/** % acumulado sobre el total real (`items()` completo), no solo las barras visibles. */
 	private readonly cumulativePercents = computed<number[]>(() => {
@@ -83,6 +93,7 @@ export class ErrorParetoChartComponent implements AfterViewInit {
 
 		const visible = data.slice(0, MAX_BARS);
 		const cumulative = this.cumulativePercents().slice(0, MAX_BARS);
+		this.currentVisible = visible;
 
 		const textColor = getComputedStyle(document.documentElement)
 			.getPropertyValue('--text-color-secondary').trim() || '#94a3b8';
@@ -119,6 +130,16 @@ export class ErrorParetoChartComponent implements AfterViewInit {
 				responsive: true,
 				maintainAspectRatio: false,
 				interaction: { mode: 'index', intersect: false },
+				onClick: (_event, elements) => {
+					const index = elements[0]?.index;
+					if (index === undefined) return;
+					const group = this.currentVisible[index];
+					if (group) this.barClick.emit(group);
+				},
+				onHover: (event, elements) => {
+					const target = event.native?.target as HTMLElement | undefined;
+					if (target) target.style.cursor = elements.length > 0 ? 'pointer' : 'default';
+				},
 				plugins: {
 					legend: { labels: { color: textColor, boxWidth: 12, padding: 12 } },
 					tooltip: {

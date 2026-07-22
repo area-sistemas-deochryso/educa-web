@@ -237,6 +237,17 @@
 	}
 }
 
+.col-usuarios {
+	white-space: nowrap;
+	font-size: 0.85rem;
+	color: var(--text-color-secondary);
+
+	i {
+		margin-right: 0.25rem;
+		font-size: 0.8rem;
+	}
+}
+
 .col-url {
 	max-width: 200px;
 

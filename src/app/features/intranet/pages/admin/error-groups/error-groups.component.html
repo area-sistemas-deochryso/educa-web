@@ -168,6 +168,18 @@
 		</label>
 	</div>
 
+	<div class="filter-toggle" pTooltip="Oculta grupos de errores de negocio (4xx esperados) — no son bugs reales." tooltipPosition="top">
+		<p-checkbox
+			inputId="excluirNegocio"
+			[ngModel]="excluirNegocio()"
+			(ngModelChange)="onExcluirNegocioChange($event)"
+			[binary]="true"
+		/>
+		<label for="excluirNegocio" class="toggle-label">
+			Ocultar errores de negocio
+		</label>
+	</div>
+
 	<button
 		pButton
 		icon="pi pi-filter-slash"
@@ -291,6 +303,7 @@
 	<app-error-pareto-chart
 		[items]="store.paretoItems()"
 		[loading]="store.paretoLoading()"
+		(barClick)="onParetoBarClick($event)"
 	/>
 } @else {
 	<section class="table-section">
@@ -342,6 +355,7 @@
 						></i>
 					</th>
 					<th>Ocurrencias 30d</th>
+					<th pTooltip="Usuarios distintos afectados" tooltipPosition="top">Usuarios únicos</th>
 					<th>Origen</th>
 					<th class="sortable-header" (click)="onSortChange('ultimaFecha')">
 						Última fecha
@@ -388,9 +402,13 @@
 						<span class="contador">
 							{{ item.contadorTotal }}
 							@if (item.contadorPostResolucion > 0) {
-								<span class="post-res" pTooltip="Ocurrencias después de resolver">
-									(+{{ item.contadorPostResolucion }})
-								</span>
+								<p-tag
+									value="Reabierto"
+									severity="danger"
+									icon="pi pi-history"
+									[pTooltip]="'Reabierto — ' + item.contadorPostResolucion + ' ocurrencia(s) después de resolver'"
+									tooltipPosition="top"
+								/>
 							}
 						</span>
 					</td>
@@ -408,6 +426,10 @@
 								[ariaLabel]="'Ocurrencias de los últimos 30 días de ' + item.mensajeRepresentativo"
 							/>
 						</button>
+					</td>
+					<td class="col-usuarios" pTooltip="Usuarios únicos afectados">
+						<i class="pi pi-users"></i>
+						{{ item.usuariosUnicos }}
 					</td>
 					<td>
 						<p-tag [value]="item.origen" [icon]="getOrigenIcon(item.origen)" severity="info" />
@@ -446,7 +468,7 @@
 			</ng-template>
 			<ng-template #emptymessage>
 				<tr>
-					<td colspan="9" class="empty-message">
+					<td colspan="10" class="empty-message">
 						<i class="pi pi-check-circle"></i>
 						<span>No se encontraron grupos con los filtros seleccionados</span>
 					</td>

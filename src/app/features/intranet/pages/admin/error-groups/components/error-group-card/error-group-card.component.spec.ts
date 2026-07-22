@@ -20,6 +20,7 @@ function makeGroup(overrides: Partial<ErrorGroupLista> = {}): ErrorGroupLista {
 		ultimaFecha: '2026-04-25T11:00:00',
 		contadorTotal: 12,
 		contadorPostResolucion: 0,
+		usuariosUnicos: 0,
 		rowVersion: 'AAAAAAAAB9E=',
 		...overrides,
 	};
@@ -50,13 +51,13 @@ describe('ErrorGroupCardComponent', () => {
 		expect(text).toContain('INV-USR-01');
 	});
 
-	it('renderiza badge "+N" cuando contadorPostResolucion > 0', () => {
+	it('renderiza badge "Reabierto" cuando contadorPostResolucion > 0', () => {
 		componentRef.setInput('group', makeGroup({ contadorPostResolucion: 4 }));
 		fixture.detectChanges();
 
 		const text = fixture.nativeElement.textContent ?? '';
 		expect(component.hasPostResolucion()).toBe(true);
-		expect(text).toContain('+4');
+		expect(text).toContain('Reabierto');
 	});
 
 	it('emite cardClick al hacer click en el host', () => {

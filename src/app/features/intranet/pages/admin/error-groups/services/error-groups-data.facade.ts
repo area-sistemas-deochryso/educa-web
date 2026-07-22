@@ -75,6 +75,7 @@ export class ErrorGroupsDataFacade {
 				this.store.page(),
 				this.store.pageSize(),
 				this.store.filterOcurrenciaFecha(),
+				this.store.excluirNegocio(),
 			)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
@@ -105,6 +106,7 @@ export class ErrorGroupsDataFacade {
 				null,
 				null,
 				this.store.filterOcurrenciaFecha(),
+				this.store.excluirNegocio(),
 			)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
@@ -134,6 +136,7 @@ export class ErrorGroupsDataFacade {
 				this.store.page(),
 				this.store.pageSize(),
 				this.store.filterOcurrenciaFecha(),
+				this.store.excluirNegocio(),
 			)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
@@ -165,6 +168,7 @@ export class ErrorGroupsDataFacade {
 				this.store.sortField(),
 				this.store.sortDireccion(),
 				this.store.filterOcurrenciaFecha(),
+				this.store.excluirNegocio(),
 			)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({

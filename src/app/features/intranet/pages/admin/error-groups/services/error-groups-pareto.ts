@@ -22,8 +22,9 @@ export class ErrorGroupsPareto {
 		if (this.store.paretoLoading()) return;
 		this.store.setParetoLoading(true);
 		const excluirRuido = this.store.excluirRuido();
+		const excluirNegocio = this.store.excluirNegocio();
 
-		this.takeUntilDestroyed(this.api.getPareto(excluirRuido)).subscribe({
+		this.takeUntilDestroyed(this.api.getPareto(excluirRuido, excluirNegocio)).subscribe({
 			next: (items) => {
 				this.store.setParetoItems(items);
 				this.store.setParetoLoading(false);

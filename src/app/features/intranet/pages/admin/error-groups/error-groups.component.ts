@@ -22,7 +22,7 @@ import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { ErrorGroupsViewMode } from '@core/services/storage';
+import { ErrorGroupsViewMode, StorageService } from '@core/services/storage';
 import { PageHeaderComponent } from '@intranet-shared/components';
 import { TableSkeletonComponent } from '@intranet-shared/components/table-skeleton';
 
@@ -51,6 +51,7 @@ import {
 	CambiarEstadoErrorGroup,
 	ErrorGroupEstado,
 	ErrorGroupLista,
+	ErrorGroupPareto,
 	ErrorGroupSortField,
 	ErrorLogCompleto,
 	ErrorOrigen,
@@ -63,6 +64,14 @@ import {
 	ErrorGroupsStore,
 	ErrorGroupsUiFacade,
 } from './services';
+
+/**
+ * Umbral de la vista condicional por defecto (brief 471, P68 F9). Con ≤40
+ * grupos activos el Kanban (5 columnas) sigue siendo escaneable de un
+ * vistazo; por encima, la tabla paginada + sort es más eficiente. Punto
+ * medio del rango propuesto en el brief (~30-50).
+ */
+const VIEW_MODE_VOLUME_THRESHOLD = 40;
 
 @Component({
 	selector: 'app-error-groups',
@@ -110,6 +119,7 @@ export class ErrorGroupsComponent implements OnInit {
 	private readonly router = inject(Router);
 	private readonly destroyRef = inject(DestroyRef);
 	private readonly confirmationService = inject(ConfirmationService);
+	private readonly storage = inject(StorageService);
 
 	readonly items = this.store.visibleItems;
 	readonly stats = this.store.stats;
@@ -123,6 +133,7 @@ export class ErrorGroupsComponent implements OnInit {
 	readonly hideResolvedIgnored = this.store.hideResolvedIgnored;
 	readonly filterOcurrenciasMin = this.store.filterOcurrenciasMin;
 	readonly excluirRuido = this.store.excluirRuido;
+	readonly excluirNegocio = this.store.excluirNegocio;
 	readonly sortField = this.store.sortField;
 	readonly sortDireccion = this.store.sortDireccion;
 	readonly drawerVisible = this.store.drawerVisible;
@@ -173,9 +184,20 @@ export class ErrorGroupsComponent implements OnInit {
 	readonly viewMode = signal<ErrorGroupsViewMode>('kanban');
 	readonly hubFiltered = signal(false);
 	readonly hubFilterMessage = signal('');
-	/** Drill-down del heatmap (brief 432, P68 F8.2). */
+	/** Drill-down del heatmap (brief 432, P68 F8.2) / cross-filter del Pareto (brief 471, P68 F9). */
 	readonly drillFiltered = signal(false);
 	readonly drillFilterMessage = signal('');
+
+	/** Vista condicional por defecto (brief 471, P68 F9) — se aplica una sola vez, y solo si el usuario no tiene preferencia persistida. */
+	private readonly _viewModeAutoApplied = signal(false);
+	private readonly _defaultViewByVolume = effect(() => {
+		const total = this.totalCount();
+		if (total === null) return;
+		if (this._viewModeAutoApplied()) return;
+		this._viewModeAutoApplied.set(true);
+		if (this.storage.hasErrorGroupsViewModePreference()) return;
+		this.viewMode.set(total > VIEW_MODE_VOLUME_THRESHOLD ? 'table' : 'kanban');
+	});
 
 	readonly eventItems = this.store.eventItems;
 	readonly eventLoading = this.store.eventLoading;
@@ -323,6 +345,16 @@ export class ErrorGroupsComponent implements OnInit {
 		}
 	}
 
+	/** Igual que excluirRuido, excluirNegocio SÍ dispara refetch (brief 472/471, P68 F9). */
+	onExcluirNegocioChange(excluir: boolean): void {
+		this.store.setExcluirNegocio(excluir);
+		this.store.setPage(1);
+		this.dataFacade.loadData();
+		if (this.viewMode() === 'pareto') {
+			this.dataFacade.loadPareto();
+		}
+	}
+
 	onSortChange(field: ErrorGroupSortField): void {
 		this.store.setSort(field);
 		this.store.setPage(1);
@@ -353,6 +385,26 @@ export class ErrorGroupsComponent implements OnInit {
 		});
 		this.drillFilterMessage.set(`Filtrado desde el heatmap — mostrando errores del ${fechaLabel}`);
 		this.dataFacade.loadData();
+	}
+
+	/**
+	 * Cross-filter Heatmap↔Pareto (brief 471, P68 F9) — mismo patrón que
+	 * `onHeatmapCellClick()`: reusa `searchTerm` (el BE ya lo aplica como
+	 * `LIKE %q%` sobre `mensajeRepresentativo`) para acotar la tabla al grupo
+	 * clickeado sin necesitar un filtro nuevo por id/fingerprint en el store
+	 * ni en el BE. Cambia a vista Tabla porque Kanban no tiene un layout que
+	 * resalte "1 solo grupo".
+	 */
+	onParetoBarClick(group: ErrorGroupPareto): void {
+		this.store.setSearchTerm(group.mensajeRepresentativo);
+		this.store.setPage(1);
+		this.viewMode.set('table');
+		this.drillFiltered.set(true);
+		this.drillFilterMessage.set(
+			`Filtrado desde el Pareto — mostrando grupo "${group.mensajeRepresentativo}"`,
+		);
+		this.dataFacade.loadData();
+		this.syncUrl();
 	}
 
 	onPageChange(event: PaginatorState): void {

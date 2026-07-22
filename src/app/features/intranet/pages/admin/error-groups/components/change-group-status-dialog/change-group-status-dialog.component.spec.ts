@@ -21,6 +21,7 @@ function makeGroup(estado: 'NUEVO' | 'RESUELTO' | 'IGNORADO' | 'VISTO' = 'NUEVO'
 		ultimaFecha: '2026-04-25T11:00:00',
 		contadorTotal: 1,
 		contadorPostResolucion: 0,
+		usuariosUnicos: 0,
 		rowVersion: 'AAAA',
 	};
 }

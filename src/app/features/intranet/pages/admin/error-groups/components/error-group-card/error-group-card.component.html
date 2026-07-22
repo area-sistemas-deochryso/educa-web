@@ -1,20 +1,30 @@
 <div class="card-header">
-	<p-tag
-		[value]="group().severidad"
-		[severity]="severidadSeverity()"
-		styleClass="severity-tag"
-	/>
+	<div class="card-header-tags">
+		<p-tag
+			[value]="group().severidad"
+			[severity]="severidadSeverity()"
+			styleClass="severity-tag"
+		/>
+		@if (hasPostResolucion()) {
+			<p-tag
+				value="Reabierto"
+				severity="danger"
+				icon="pi pi-history"
+				styleClass="regresion-tag"
+				[pTooltip]="'Reabierto — ' + group().contadorPostResolucion + ' ocurrencia(s) después de resolver'"
+				tooltipPosition="top"
+			/>
+		}
+	</div>
 	<span class="counter" pTooltip="Ocurrencias totales" tooltipPosition="top">
 		<i class="pi pi-list"></i>
 		{{ group().contadorTotal }}
-		@if (hasPostResolucion()) {
-			<span
-				class="post-res-badge"
-				pTooltip="Ocurrencias después de resolver"
-				tooltipPosition="top"
-			>+{{ group().contadorPostResolucion }}</span>
-		}
 	</span>
+</div>
+
+<div class="card-usuarios" pTooltip="Usuarios únicos afectados" tooltipPosition="top">
+	<i class="pi pi-users"></i>
+	{{ group().usuariosUnicos }}
 </div>
 
 <div class="card-body">

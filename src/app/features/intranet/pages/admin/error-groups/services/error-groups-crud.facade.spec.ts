@@ -30,6 +30,7 @@ function makeGroup(estado: ErrorGroupEstado = 'NUEVO'): ErrorGroupLista {
 		ultimaFecha: '2026-04-25T11:00:00',
 		contadorTotal: 5,
 		contadorPostResolucion: 0,
+		usuariosUnicos: 0,
 		rowVersion: 'AAAAAAAAB9E=',
 	};
 }

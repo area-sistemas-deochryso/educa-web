@@ -365,6 +365,10 @@ export class StorageService {
 	setErrorGroupsViewMode(mode: ErrorGroupsViewMode): void {
 		this.preferences.setErrorGroupsViewMode(mode);
 	}
+
+	hasErrorGroupsViewModePreference(): boolean {
+		return this.preferences.hasErrorGroupsViewModePreference();
+	}
 	// #endregion
 
 	// #region CORRELATION HUB VIEW MODE (Plan 41 F1)
