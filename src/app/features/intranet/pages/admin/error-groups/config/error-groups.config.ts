@@ -41,6 +41,8 @@ export const TABLE_SKELETON_COLUMNS: SkeletonColumnDef[] = [
 	{ width: 'flex', cellType: 'text-subtitle' },
 	{ width: '90px', cellType: 'text' },
 	{ width: '90px', cellType: 'text' },
+	{ width: '80px', cellType: 'text' },
+	{ width: '90px', cellType: 'text' },
 	{ width: '120px', cellType: 'text' },
 	{ width: '100px', cellType: 'actions' },
 ];

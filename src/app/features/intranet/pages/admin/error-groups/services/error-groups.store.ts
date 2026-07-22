@@ -63,6 +63,12 @@ export class ErrorGroupsStore {
 	 * página ya traída (brief 429).
 	 */
 	private readonly _excluirRuido = signal(false);
+	/**
+	 * Toggle "Ocultar errores de negocio" (brief 472/471, P68 F9) — igual que
+	 * `excluirRuido`, dispara refetch server-side (`excluirNegocio` en el BE)
+	 * porque necesita que pagination/conteo/pareto reflejen el filtro real.
+	 */
+	private readonly _excluirNegocio = signal(false);
 	private readonly _sortField = signal<ErrorGroupSortField>('ultimaFecha');
 	private readonly _sortDireccion = signal<SortDireccion>('desc');
 	/**
@@ -140,6 +146,7 @@ export class ErrorGroupsStore {
 	readonly hideResolvedIgnored = this._hideResolvedIgnored.asReadonly();
 	readonly filterOcurrenciasMin = this._filterOcurrenciasMin.asReadonly();
 	readonly excluirRuido = this._excluirRuido.asReadonly();
+	readonly excluirNegocio = this._excluirNegocio.asReadonly();
 	readonly sortField = this._sortField.asReadonly();
 	readonly sortDireccion = this._sortDireccion.asReadonly();
 	readonly filterOcurrenciaFecha = this._filterOcurrenciaFecha.asReadonly();
@@ -343,6 +350,10 @@ export class ErrorGroupsStore {
 		this._excluirRuido.set(excluir);
 	}
 
+	setExcluirNegocio(excluir: boolean): void {
+		this._excluirNegocio.set(excluir);
+	}
+
 	/** Mismo campo → toggle asc/desc. Campo distinto → arranca en desc. */
 	setSort(field: ErrorGroupSortField): void {
 		if (this._sortField() === field) {
@@ -361,6 +372,7 @@ export class ErrorGroupsStore {
 		this._hideResolvedIgnored.set(false);
 		this._filterOcurrenciasMin.set(null);
 		this._excluirRuido.set(false);
+		this._excluirNegocio.set(false);
 		this._sortField.set('ultimaFecha');
 		this._sortDireccion.set('desc');
 		this._filterOcurrenciaFecha.set(null);

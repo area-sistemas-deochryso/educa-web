@@ -27,6 +27,7 @@ function makeGroup(
 		ultimaFecha,
 		contadorTotal: 3,
 		contadorPostResolucion: 0,
+		usuariosUnicos: 0,
 		rowVersion: `RV-${id}`,
 	};
 }

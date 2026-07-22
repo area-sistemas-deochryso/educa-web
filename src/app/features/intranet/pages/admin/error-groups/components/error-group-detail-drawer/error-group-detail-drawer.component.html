@@ -24,6 +24,19 @@
 						[severity]="grp.httpStatus >= 500 ? 'danger' : 'warn'"
 					/>
 				}
+				@if (grp.contadorPostResolucion > 0) {
+					<p-tag
+						value="Reabierto"
+						severity="danger"
+						icon="pi pi-history"
+						[pTooltip]="'Reabierto — ' + grp.contadorPostResolucion + ' ocurrencia(s) después de resolver'"
+						tooltipPosition="top"
+					/>
+				}
+				<span class="meta-usuarios" pTooltip="Usuarios únicos afectados" tooltipPosition="top">
+					<i class="pi pi-users"></i>
+					{{ grp.usuariosUnicos }}
+				</span>
 			</div>
 			<h3 class="group-header-mensaje" [pTooltip]="grp.mensajeRepresentativo" tooltipPosition="bottom">
 				{{ grp.mensajeRepresentativo }}
@@ -81,6 +94,10 @@
 							<div class="detail-row">
 								<span class="detail-label">Ocurrencias post-resolución</span>
 								<span class="detail-value">{{ det.contadorPostResolucion }}</span>
+							</div>
+							<div class="detail-row">
+								<span class="detail-label">Usuarios únicos</span>
+								<span class="detail-value">{{ grp.usuariosUnicos }}</span>
 							</div>
 							<div class="detail-row">
 								<span class="detail-label">Primera fecha</span>

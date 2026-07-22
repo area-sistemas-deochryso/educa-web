@@ -584,6 +584,17 @@ export class PreferencesStorageService {
 		this.setItem(PREFERENCES_KEYS.ERROR_GROUPS_VIEW_MODE, mode);
 	}
 
+	/**
+	 * Brief 471 (P68 F9) — distingue "el usuario ya eligió una vista" de "cae
+	 * al default 'kanban' de {@link getErrorGroupsViewMode}". Necesario para
+	 * que la vista condicional por volumen (kanban/tabla según `totalCount`)
+	 * solo se aplique la primera vez, sin pisar una preferencia explícita.
+	 */
+	hasErrorGroupsViewModePreference(): boolean {
+		const stored = this.getItem(PREFERENCES_KEYS.ERROR_GROUPS_VIEW_MODE) as ErrorGroupsViewMode | null;
+		return !!stored && ERROR_GROUPS_VIEW_MODES.includes(stored);
+	}
+
 	// #endregion
 	// #region CORRELATION HUB VIEW MODE (Plan 41 F1)
 

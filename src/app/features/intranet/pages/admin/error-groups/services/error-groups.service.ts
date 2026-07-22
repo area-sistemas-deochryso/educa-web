@@ -42,6 +42,7 @@ export class ErrorGroupsService {
 		pagina = 1,
 		pageSize = 20,
 		ocurrenciaFecha?: string | null,
+		excluirNegocio = false,
 	): Observable<ErrorGroupLista[]> {
 		const params: Record<string, string | number | boolean> = {
 			pagina, pageSize, ordenarPor, direccion,
@@ -53,6 +54,7 @@ export class ErrorGroupsService {
 		if (ocurrenciasMin !== null && ocurrenciasMin > 0) params['ocurrenciasMin'] = ocurrenciasMin;
 		if (excluirRuido) params['excluirRuido'] = true;
 		if (ocurrenciaFecha) params['ocurrenciaFecha'] = ocurrenciaFecha;
+		if (excluirNegocio) params['excluirNegocio'] = true;
 		return this.http.get<ErrorGroupLista[]>(this.apiUrl, { params });
 	}
 
@@ -66,6 +68,7 @@ export class ErrorGroupsService {
 		fechaDesde?: string | null,
 		fechaHasta?: string | null,
 		ocurrenciaFecha?: string | null,
+		excluirNegocio = false,
 	): Observable<number> {
 		const params: Record<string, string | boolean | number> = {};
 		if (estado) params['estado'] = estado;
@@ -77,6 +80,7 @@ export class ErrorGroupsService {
 		if (fechaDesde) params['fechaDesde'] = fechaDesde;
 		if (fechaHasta) params['fechaHasta'] = fechaHasta;
 		if (ocurrenciaFecha) params['ocurrenciaFecha'] = ocurrenciaFecha;
+		if (excluirNegocio) params['excluirNegocio'] = true;
 		return this.http.get<number>(`${this.apiUrl}/count`, { params });
 	}
 
@@ -155,9 +159,10 @@ export class ErrorGroupsService {
 	}
 
 	/** Pareto de priorización (brief 433, P68 F8.3) — todos los grupos activos, sin paginar. */
-	getPareto(excluirRuido: boolean): Observable<ErrorGroupPareto[]> {
+	getPareto(excluirRuido: boolean, excluirNegocio = false): Observable<ErrorGroupPareto[]> {
 		const params: Record<string, boolean> = {};
 		if (excluirRuido) params['excluirRuido'] = true;
+		if (excluirNegocio) params['excluirNegocio'] = true;
 		return this.http.get<ErrorGroupPareto[]>(`${this.apiUrl}/pareto`, { params });
 	}
 
@@ -184,6 +189,7 @@ export class ErrorGroupsService {
 		ordenarPor: ErrorGroupSortField,
 		direccion: SortDireccion,
 		ocurrenciaFecha?: string | null,
+		excluirNegocio = false,
 	): Observable<Blob> {
 		const params: Record<string, string | boolean> = { ordenarPor, direccion };
 		if (estado) params['estado'] = estado;
@@ -193,6 +199,7 @@ export class ErrorGroupsService {
 		if (ocurrenciasMin !== null && ocurrenciasMin > 0) params['ocurrenciasMin'] = String(ocurrenciasMin);
 		if (excluirRuido) params['excluirRuido'] = true;
 		if (ocurrenciaFecha) params['ocurrenciaFecha'] = ocurrenciaFecha;
+		if (excluirNegocio) params['excluirNegocio'] = true;
 		return this.http.get(`${this.apiUrl}/export`, { params, responseType: 'blob' });
 	}
 

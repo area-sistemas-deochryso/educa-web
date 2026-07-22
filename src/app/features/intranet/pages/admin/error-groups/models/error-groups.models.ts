@@ -45,6 +45,8 @@ export interface ErrorGroupLista {
 	ultimaFecha: string;
 	contadorTotal: number;
 	contadorPostResolucion: number;
+	/** Brief 472 (P68 F9) — COUNT(DISTINCT usuario) con usuario identificado en las ocurrencias del grupo. */
+	usuariosUnicos: number;
 	rowVersion: string;
 }
 
@@ -129,6 +131,10 @@ export interface ErrorGroupPareto {
 	mensajeRepresentativo: string;
 	severidad: ErrorSeveridad;
 	contadorTotal: number;
+	/** Brief 472 (P68 F9) — cantidad de ocurrencias posteriores a RESUELTO, flag de regresión. */
+	contadorPostResolucion: number;
+	/** Brief 472 (P68 F9) — COUNT(DISTINCT usuario) del grupo. */
+	usuariosUnicos: number;
 	ultimaFecha: string;
 	score: number;
 }
