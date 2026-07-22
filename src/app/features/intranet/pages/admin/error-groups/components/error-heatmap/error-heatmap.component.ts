@@ -8,6 +8,7 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { HeatmapCalendarCell, HeatmapCell } from '../../models';
+import { ErrorHeatmapSeverityChartComponent } from '../error-heatmap-severity-chart';
 
 const DAY_LABELS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 
@@ -22,16 +23,6 @@ interface GridCell {
 	tooltip: string;
 }
 
-interface CalendarGridCell {
-	date: Date | null;
-	dateIso: string | null;
-	count: number;
-	avgDuration: number;
-	intensity: number;
-	tooltip: string;
-	dayLabel: string;
-}
-
 export interface HeatmapPeriodOption {
 	label: string;
 	value: 7 | 30;
@@ -40,7 +31,16 @@ export interface HeatmapPeriodOption {
 @Component({
 	selector: 'app-error-heatmap',
 	standalone: true,
-	imports: [CommonModule, DatePipe, FormsModule, ButtonModule, DatePickerModule, SelectButtonModule, TooltipModule],
+	imports: [
+		CommonModule,
+		DatePipe,
+		FormsModule,
+		ButtonModule,
+		DatePickerModule,
+		SelectButtonModule,
+		TooltipModule,
+		ErrorHeatmapSeverityChartComponent,
+	],
 	templateUrl: './error-heatmap.component.html',
 	styleUrl: './error-heatmap.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -120,68 +120,13 @@ export class ErrorHeatmapComponent {
 		return result;
 	});
 
-	readonly calendarGrid = computed(() => {
-		const raw = this.calendarCells();
-		if (!raw.length) return [];
-
-		const lookup = new Map<string, HeatmapCalendarCell>();
-		for (const c of raw) {
-			lookup.set(c.date.slice(0, 10), c);
-		}
-
-		const maxCount = Math.max(1, ...raw.map((c) => c.count));
-
-		const days = this.totalDays();
-		const end = this.endDate() ?? new Date();
-		const start = new Date(end);
-		start.setDate(start.getDate() - days);
-		start.setDate(start.getDate() + 1);
-
-		const firstDow = (start.getDay() + 6) % 7;
-
-		const allDays: CalendarGridCell[] = [];
-		for (let i = 0; i < firstDow; i++) {
-			allDays.push({ date: null, dateIso: null, count: 0, avgDuration: 0, intensity: 0, tooltip: '', dayLabel: '' });
-		}
-
-		const cursor = new Date(start);
-		while (cursor <= end) {
-			const dateStr = cursor.toISOString().slice(0, 10);
-			const cell = lookup.get(dateStr);
-			const count = cell?.count ?? 0;
-			const avgDuration = cell?.avgDurationMs ?? 0;
-			const intensity = count / maxCount;
-			const dayNum = cursor.getDate();
-			const tooltip = count > 0
-				? `${dayNum} — ${count} error${count !== 1 ? 'es' : ''}, ${Math.round(avgDuration)}ms prom. (click para ver los grupos)`
-				: `${dayNum} — sin errores`;
-			allDays.push({
-				date: new Date(cursor),
-				dateIso: dateStr,
-				count,
-				avgDuration,
-				intensity,
-				tooltip,
-				dayLabel: String(dayNum),
-			});
-			cursor.setDate(cursor.getDate() + 1);
-		}
-
-		const weeks: CalendarGridCell[][] = [];
-		for (let i = 0; i < allDays.length; i += 7) {
-			weeks.push(allDays.slice(i, i + 7));
-		}
-		const lastWeek = weeks[weeks.length - 1];
-		while (lastWeek.length < 7) {
-			lastWeek.push({ date: null, dateIso: null, count: 0, avgDuration: 0, intensity: 0, tooltip: '', dayLabel: '' });
-		}
-
-		return weeks;
-	});
-
-	onCalendarCellClick(cell: CalendarGridCell): void {
-		if (!cell.dateIso || cell.count === 0) return;
-		this.cellClick.emit(cell.dateIso);
+	/**
+	 * Drill-down del heatmap-calendario (brief 432 P68 F8.2), reenviado tal cual desde
+	 * `ErrorHeatmapSeverityChartComponent` (brief 472 P68 F10 — reemplazo del grid por
+	 * area chart apilado por severidad).
+	 */
+	onSeverityChartCellClick(dateIso: string): void {
+		this.cellClick.emit(dateIso);
 	}
 
 	onPeriodChange(value: 7 | 30): void {

@@ -114,10 +114,19 @@ export interface HeatmapCell {
 	avgDuration: number;
 }
 
+/**
+ * Desglose por severidad de una celda del heatmap-calendario (brief 473 BE, P68 F10).
+ * Claves en MAYÚSCULA porque son claves de diccionario del BE (`Dictionary<string, int>`),
+ * no nombres de propiedad — no van a camelCase. Una severidad sin ocurrencias ese día está
+ * ausente del diccionario (tratar clave faltante como 0). La suma de los valores === `count`.
+ */
+export type CountPorSeveridad = Partial<Record<ErrorSeveridad, number>>;
+
 export interface HeatmapCalendarCell {
 	date: string;
 	count: number;
 	avgDurationMs: number;
+	countPorSeveridad: CountPorSeveridad;
 }
 
 /**

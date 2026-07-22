@@ -141,72 +141,6 @@
 }
 // #endregion
 
-// #region Calendar grid (monthly)
-.calendar-grid {
-	display: flex;
-	flex-direction: column;
-	gap: 2px;
-}
-
-.calendar-row {
-	display: grid;
-	grid-template-columns: repeat(7, 1fr);
-	gap: 2px;
-
-	&--header {
-		.calendar-header-cell {
-			font-size: 0.75rem;
-			font-weight: 500;
-			color: var(--p-text-muted-color);
-			text-align: center;
-			padding: 0.25rem 0;
-		}
-	}
-}
-
-.calendar-cell {
-	aspect-ratio: 1;
-	border-radius: 4px;
-	border: 1px solid var(--p-surface-200);
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	cursor: default;
-	transition: outline 0.15s;
-	position: relative;
-
-	&:hover {
-		outline: 2px solid var(--p-primary-color);
-		outline-offset: 1px;
-	}
-
-	&--empty {
-		border-color: transparent;
-		background: transparent;
-
-		&:hover {
-			outline: none;
-		}
-	}
-
-	&--clickable {
-		cursor: pointer;
-
-		&:focus-visible {
-			outline: 2px solid var(--p-primary-color);
-			outline-offset: 1px;
-		}
-	}
-}
-
-.calendar-day-number {
-	font-size: 0.6875rem;
-	font-weight: 500;
-	color: var(--p-text-color);
-	pointer-events: none;
-}
-// #endregion
-
 // #region Legend
 .heatmap-legend {
 	display: flex;
@@ -246,9 +180,5 @@
 		width: 1.5rem;
 		min-width: 1.5rem;
 		font-size: 0.625rem;
-	}
-
-	.calendar-day-number {
-		font-size: 0.5rem;
 	}
 }
