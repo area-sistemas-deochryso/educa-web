@@ -13,6 +13,9 @@ Chart.register(...registerables);
 
 const DEFAULT_POINT_COLOR = 'var(--text-color-secondary)';
 const POINT_OPACITY = 0.5;
+/** Bajo este span (ms) los ticks de solo-fecha caerían todos en el mismo día -- se agrega hora. */
+const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+const ONE_MINUTE_MS = 60 * 1000;
 /** Por encima de este alto (px) se muestran ticks en el eje X — debajo, el chart es compacto (tabla/kanban). */
 const TICKS_VISIBLE_MIN_HEIGHT = 100;
 const MARKER_DATASET_LABEL = 'Arranques';
@@ -31,13 +34,24 @@ function withOpacity(color: string, alpha: number): string {
 	return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
+interface OccurrencePoint {
+	x: number;
+	y: number;
+	/** Timestamp real de la ocurrencia (el `x` se snapea al centro del bin para el dot-histogram). */
+	realTs: number;
+}
+
 /**
- * Timeline/strip-plot de ocurrencias individuales (brief actual, reemplazo de
- * `MiniSparklineComponent` en `error-groups`). Grafica cada ocurrencia como un
- * punto en el eje temporal real (no agregación diaria) para detectar bursts
- * que un conteo por día esconde. Mismo esqueleto Chart.js directo que
- * `ErrorParetoChartComponent` — sin adapter de fechas (no instalado), eje X
- * `linear` con epoch ms.
+ * Timeline de ocurrencias individuales (brief actual, reemplazo de
+ * `MiniSparklineComponent` en `error-groups`). Renderiza un dot-histogram
+ * (Wilkinson): cada ocurrencia es un punto individual con su timestamp real
+ * (click/tooltip por ocurrencia, como un scatter), pero se agrupan en bins
+ * temporales y se apilan en Y -- la altura de la columna es el conteo exacto
+ * del bin, como un histograma. En rangos dispersos (pocas ocurrencias por
+ * bin) esto colapsa visualmente al scatter plano de antes; en bursts, la
+ * altura hace evidente la magnitud que un scatter con y=0 fijo esconde por
+ * overplotting. Mismo esqueleto Chart.js directo que `ErrorParetoChartComponent`
+ * — sin adapter de fechas (no instalado), eje X `linear` con epoch ms.
  */
 @Component({
 	selector: 'app-error-occurrence-timeline',
@@ -92,6 +106,31 @@ export class ErrorOccurrenceTimelineComponent implements AfterViewInit {
 			getComputedStyle(document.documentElement).getPropertyValue('--orange-400').trim() ||
 			MARKER_LINE_COLOR;
 		const showTicks = this.height() > TICKS_VISIBLE_MIN_HEIGHT;
+		const allTimestamps = [...values, ...markers];
+		const span =
+			allTimestamps.length > 1
+				? Math.max(...allTimestamps) - Math.min(...allTimestamps)
+				: 0;
+		const sameDayRange = span < ONE_DAY_MS;
+		const binWidthMs = sameDayRange ? ONE_MINUTE_MS : ONE_DAY_MS;
+
+		const bins = new Map<number, number[]>();
+		for (const ts of values) {
+			const binStart = Math.floor(ts / binWidthMs) * binWidthMs;
+			const bucket = bins.get(binStart);
+			if (bucket) bucket.push(ts);
+			else bins.set(binStart, [ts]);
+		}
+		let maxStack = 1;
+		const occurrencePoints: OccurrencePoint[] = [];
+		for (const [binStart, timestamps] of bins) {
+			const binCenter = binStart + binWidthMs / 2;
+			timestamps.forEach((realTs, i) => {
+				occurrencePoints.push({ x: binCenter, y: i + 1, realTs });
+			});
+			maxStack = Math.max(maxStack, timestamps.length);
+		}
+		const markerRowY = maxStack + 1;
 
 		const deployMarkerLinesPlugin: Plugin<'scatter'> = {
 			id: 'deployMarkerLines',
@@ -122,7 +161,7 @@ export class ErrorOccurrenceTimelineComponent implements AfterViewInit {
 				datasets: [
 					{
 						label: 'Ocurrencias',
-						data: values.map((ts) => ({ x: ts, y: 0 })),
+						data: occurrencePoints,
 						backgroundColor: pointColor,
 						borderColor: pointColor,
 						pointRadius: 3,
@@ -132,7 +171,7 @@ export class ErrorOccurrenceTimelineComponent implements AfterViewInit {
 						? [
 								{
 									label: MARKER_DATASET_LABEL,
-									data: markers.map((ts) => ({ x: ts, y: 0.85 })),
+									data: markers.map((ts) => ({ x: ts, y: markerRowY })),
 									backgroundColor: resolvedMarkerColor,
 									borderColor: resolvedMarkerColor,
 									pointStyle: 'triangle' as const,
@@ -152,7 +191,9 @@ export class ErrorOccurrenceTimelineComponent implements AfterViewInit {
 					tooltip: {
 						callbacks: {
 							label: (ctx) => {
-								const fecha = new Date(Number(ctx.parsed.x)).toLocaleString('es-AR');
+								const raw = ctx.raw as Partial<OccurrencePoint>;
+								const rawTs = raw.realTs ?? Number(ctx.parsed.x);
+								const fecha = new Date(rawTs).toLocaleString('es-AR');
 								return ctx.dataset.label === MARKER_DATASET_LABEL
 									? `Arranque de proceso: ${fecha}`
 									: fecha;
@@ -166,17 +207,22 @@ export class ErrorOccurrenceTimelineComponent implements AfterViewInit {
 						ticks: {
 							display: showTicks,
 							callback: (value) =>
-								new Date(Number(value)).toLocaleDateString('es-AR', {
-									day: '2-digit',
-									month: '2-digit',
-								}),
+								sameDayRange
+									? new Date(Number(value)).toLocaleTimeString('es-AR', {
+											hour: '2-digit',
+											minute: '2-digit',
+										})
+									: new Date(Number(value)).toLocaleDateString('es-AR', {
+											day: '2-digit',
+											month: '2-digit',
+										}),
 						},
 						grid: { display: showTicks },
 					},
 					y: {
 						display: false,
-						min: -1,
-						max: 1,
+						min: 0,
+						max: markerRowY + 0.5,
 					},
 				},
 			},
