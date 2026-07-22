@@ -1,0 +1,17 @@
+<div class="severity-chart-wrapper">
+	@if (loading()) {
+		<div class="severity-chart-loading">
+			<i class="pi pi-spinner pi-spin"></i>
+			<span>Cargando heatmap...</span>
+		</div>
+	} @else if (!hasData()) {
+		<div class="severity-chart-empty">
+			<i class="pi pi-info-circle"></i>
+			<span>Sin errores en el rango seleccionado.</span>
+		</div>
+	}
+
+	<div class="severity-chart-canvas" [class.severity-chart-canvas--hidden]="loading() || !hasData()">
+		<canvas #severityChart></canvas>
+	</div>
+</div>

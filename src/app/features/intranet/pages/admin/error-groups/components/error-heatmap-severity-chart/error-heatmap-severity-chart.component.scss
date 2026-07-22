@@ -1,0 +1,33 @@
+:host {
+	display: block;
+}
+
+.severity-chart-wrapper {
+	position: relative;
+}
+
+.severity-chart-loading,
+.severity-chart-empty {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	padding: 2rem;
+	color: var(--p-text-muted-color);
+	font-size: 0.875rem;
+}
+
+.severity-chart-canvas {
+	position: relative;
+	height: 260px;
+
+	&--hidden {
+		display: none;
+	}
+}
+
+@media (max-width: 768px) {
+	.severity-chart-canvas {
+		height: 200px;
+	}
+}
