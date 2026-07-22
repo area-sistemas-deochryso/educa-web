@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
-import { catchError, forkJoin, map, of, shareReplay, type Observable } from 'rxjs';
+import { forkJoin, map, shareReplay, type Observable } from 'rxjs';
 
-import { formatDateLocalIso, logger } from '@core/helpers';
+import { formatDateLocalIso } from '@core/helpers';
 import type { AsistenciaAdminEstadisticas } from '@data/models';
 import { AttendancesAdminService } from '../../attendances/services';
 import { AttendanceReportsApiService } from '@features/intranet/pages/cross-role/attendance-reports/services';
@@ -174,21 +174,13 @@ export class AttendancePanelService {
 		return this.getTendenciaCacheada(rango, filters.fecha, filters.sedeId);
 	}
 
-	// El período anterior es "best effort": si falla (BE 500 observado en Mes para ciertos rangos —
-	// "An item with the same key has already been added", Chat 2026-07-21), la comparación se
-	// marca no disponible en vez de tumbar todo el panel por un dato secundario.
 	private getTendenciaActualYPrevio(
 		filters: AttendancePanelFilters,
 	): Observable<{ actual: TendenciaAsistencia; previo: TendenciaAsistencia | null }> {
 		const rango: TendenciaRangoTipo = filters.rango === 'semana' ? 'semana' : 'mes';
 		return forkJoin({
 			actual: this.getTendenciaCacheada(rango, filters.fecha, filters.sedeId),
-			previo: this.getTendenciaCacheada(rango, this.fechaPeriodoAnterior(filters), filters.sedeId).pipe(
-				catchError((err) => {
-					logger.error('[AttendancePanel] Falló tendencia del período anterior (comparación omitida)', err);
-					return of(null);
-				}),
-			),
+			previo: this.getTendenciaCacheada(rango, this.fechaPeriodoAnterior(filters), filters.sedeId),
 		});
 	}
 

@@ -7,6 +7,7 @@
 > **touches**:
 >   - `Educa.API/Educa.API/Services/Asistencias/ReporteTendenciaAsistenciaService.cs` (o el archivo que agrupe por semana dentro de mes)
 >   - posiblemente `educa-web/.../attendance-panel/services/attendance-panel.service.ts` (una vez arreglado el backend, remover el `catchError` de contención)
+> **Validación prod**: ⏳ pendiente desde 2026-07-22 — smoke test manual de `GET /api/ReportesAsistencia/tendencia?rango=mes&fecha=2026-06-21&sedeId=1` (y otra fecha que cruce mes), confirmar 200 sin excepción.
 
 ## Contexto
 
@@ -43,3 +44,17 @@ Contenido, no bloqueante: el frontend (`attendance-panel.service.ts`) atrapa el 
 ## Tiempo estimado
 
 Chico — probablemente 1 query/cálculo puntual, no arquitectura nueva.
+
+## Hallazgos y cambios (2026-07-22)
+
+**Causa real** (no era el cálculo de `weekOfMonth`, que ya usaba `SortedDictionary` + `TryGetValue` de forma segura): `IndexarPorDia` en `ReporteTendenciaAsistenciaService.cs` usaba `.ToDictionary(r => r.Fecha.Date, ...)`, que explota con `ArgumentException` ("An item with the same key has already been added") si una persona tiene **dos registros de asistencia con la misma fecha** (dato real — ej. doble marcación), no un bug de cálculo de límites de mes/semana.
+
+El criterio ya establecido en `ProcesarSalonRango` (`ReporteFiltradoAsistenciaService.Estudiantes.cs`) tolera este caso con `foreach` + `TryAdd` en vez de `ToDictionary`. Se alineó `IndexarPorDia` con ese mismo patrón (conserva el primer registro del día, descarta duplicados en vez de tirar excepción).
+
+**Cambios**:
+- `Educa.API/Educa.API/Services/Asistencias/ReporteTendenciaAsistenciaService.cs` — `IndexarPorDia` reescrito con `TryAdd`.
+- `educa-web/src/app/features/intranet/pages/admin/attendance-panel/services/attendance-panel.service.ts` — removido `catchError` de contención en `getTendenciaActualYPrevio` (ya no hace falta, la causa raíz del 500 está resuelta) + imports sin uso (`catchError`, `of`, `logger`) limpiados.
+
+**Validado**: build `Educa.API` (proyecto principal) sin errores/warnings nuevos. `npm run lint` y `npm run build` de `educa-web` sin errores. Los 3 errores de `Educa.API.Tests` son preexistentes (constructor de otros controllers sin `capabilityService`, no relacionado a este cambio).
+
+**Pendiente para el criterio de cierre**: no se pudo probar el endpoint real `GET /api/ReportesAsistencia/tendencia?rango=mes&fecha=...` en vivo (sin server+DB corriendo en este chat) — recomendado un smoke test manual con `fecha=2026-06-21` antes de dar por cerrado el criterio de cierre "responde 200 sin excepción".

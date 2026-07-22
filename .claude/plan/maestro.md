@@ -84,10 +84,11 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub F3-F6), *
 ### 🟣 Verificaciones post-deploy (`/verify <NNN>`)
 
 - ⏳ **465** — audit visual+funcional Profesor: fix `AsistenciaCursoRepository` (lee `EstudianteSalon` en vez de `HorarioEstudiante`) + rename `<h1>` "Mis Salones" → "Notas y Asistencia". Pendiente: QA en vivo en TEST DB del escenario real (`MENDO CALDERON MARIELA`, curso Arte) — no se hizo browser QA en la sesión de cierre.
+- ⏳ **464** — fix 500 en `ReportesAsistencia/tendencia?rango=mes` al cruzar meses (`IndexarPorDia` con `ToDictionary` explotaba ante doble marcación en la misma fecha; alineado con `TryAdd` como en `ProcesarSalonRango`). Pendiente: smoke test en vivo con `fecha=2026-06-21` (y otra que cruce mes) confirmando 200 sin excepción.
 
 ### Notas operativas
 
-- **`running/`**: vacío · **`open/`**: 5 briefs (332, 390, 391, 458, 462) · **`awaiting-prod/`**: 1 brief (465) · **`waiting/`**: vacío · **`troubles/`**: vacío
+- **`running/`**: vacío · **`open/`**: 5 briefs (332, 390, 391, 458, 462) · **`awaiting-prod/`**: 2 briefs (464, 465) · **`waiting/`**: vacío · **`troubles/`**: vacío
 - **Último cierre**: 467 (audit Administrador — shim global de tokens PrimeNG sin prefijo `--p-` en 229 archivos, fix puerto k6, fix "Rol del sistema") → `closed/`, 2026-07-18.
 - **Último saneamiento**: 2026-07-11 — sync-maestro: vaciado `awaiting-prod/` completo (estables, verificados con usuarios reales).
 
