@@ -165,6 +165,14 @@ export interface RuntimeHealthAlert {
 	snapshotPattern: SaturationPattern;
 }
 
+/**
+ * Arranque de proceso detectado por el BE (proxy de deploy) — brief 474 (F11).
+ * Sin distinción de tipo (deploy real vs reinicio manual), es un dato proxy único.
+ */
+export interface RuntimeHealthStartup {
+	timestamp: string;
+}
+
 export const METRIC_LABELS: Record<string, string> = {
 	'requests.p95': 'Requests p95 (ms)',
 	'requests.p99': 'Requests p99 (ms)',

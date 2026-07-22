@@ -164,6 +164,8 @@ export class ErrorGroupsComponent implements OnInit {
 	});
 	readonly trendDialogData = computed<readonly number[]>(() => this.trendDialogEntry()?.data ?? []);
 	readonly trendDialogTruncado = computed(() => this.trendDialogEntry()?.truncado ?? false);
+	/** Marcadores de arranque de proceso (brief 473, F11) — `null` = no solicitados aún. */
+	readonly deployMarkers = computed<readonly number[]>(() => this.store.deployMarkers() ?? []);
 
 	readonly page = this.store.page;
 	readonly pageSize = this.store.pageSize;
@@ -494,6 +496,7 @@ export class ErrorGroupsComponent implements OnInit {
 
 	onSparklineClick(group: ErrorGroupLista): void {
 		this.uiFacade.openTrendDialog(group);
+		this.dataFacade.requestDeployMarkers();
 	}
 	onTrendDialogVisibleChange(visible: boolean): void {
 		if (!visible) this.uiFacade.closeTrendDialog();

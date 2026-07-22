@@ -8,12 +8,14 @@ import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 
 import { downloadBlob, logger } from '@core/helpers';
 import { WalCrossTabRefetchService } from '@core/services';
+import { RuntimeHealthService } from '@features/intranet/pages/admin/sistema/runtime-health/services/runtime-health.service';
 
 import { ErrorGroupsService } from './error-groups.service';
 import { ErrorGroupsStore } from './error-groups.store';
 import { ErrorGroupsTrendQueue } from './error-groups-trend-queue';
 import { ErrorGroupsHeatmap } from './error-groups-heatmap';
 import { ErrorGroupsPareto } from './error-groups-pareto';
+import { ErrorGroupsDeployMarkers } from './error-groups-deploy-markers';
 
 @Injectable({ providedIn: 'root' })
 export class ErrorGroupsDataFacade {
@@ -22,6 +24,7 @@ export class ErrorGroupsDataFacade {
 	private readonly store = inject(ErrorGroupsStore);
 	private readonly crossTabRefetch = inject(WalCrossTabRefetchService);
 	private readonly destroyRef = inject(DestroyRef);
+	private readonly runtimeHealthApi = inject(RuntimeHealthService);
 	private readonly trendQueue = new ErrorGroupsTrendQueue(this.api, this.store, (source$) =>
 		source$.pipe(takeUntilDestroyed(this.destroyRef)),
 	);
@@ -30,6 +33,11 @@ export class ErrorGroupsDataFacade {
 	);
 	private readonly pareto = new ErrorGroupsPareto(this.api, this.store, (source$) =>
 		source$.pipe(takeUntilDestroyed(this.destroyRef)),
+	);
+	private readonly deployMarkers = new ErrorGroupsDeployMarkers(
+		this.runtimeHealthApi,
+		this.store,
+		(source$) => source$.pipe(takeUntilDestroyed(this.destroyRef)),
 	);
 	// #endregion
 
@@ -368,6 +376,12 @@ export class ErrorGroupsDataFacade {
 	// #region Trend 30d (Plan 43 Chat 1.2)
 	requestTrend(grupoId: number): void {
 		this.trendQueue.requestTrend(grupoId);
+	}
+	// #endregion
+
+	// #region Marcadores de deploy (brief 473, F11)
+	requestDeployMarkers(): void {
+		this.deployMarkers.requestDeployMarkers();
 	}
 	// #endregion
 }

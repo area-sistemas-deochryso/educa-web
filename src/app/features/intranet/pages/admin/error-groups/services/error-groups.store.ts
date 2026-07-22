@@ -107,6 +107,17 @@ export class ErrorGroupsStore {
 	private readonly _trendDialogGroup = signal<ErrorGroupLista | null>(null);
 	// #endregion
 
+	// #region Estado privado — marcadores de deploy (brief 473, F11)
+	/**
+	 * Timestamps epoch ms de arranques de proceso (proxy de deploy) en la
+	 * misma ventana de 30d que el trend. `null` = todavía no solicitado;
+	 * `[]` = solicitado y sin arranques (o el endpoint no está disponible —
+	 * no distinguimos, el fallo es silencioso igual que el trend).
+	 */
+	private readonly _deployMarkers = signal<number[] | null>(null);
+	private readonly _deployMarkersLoading = signal(false);
+	// #endregion
+
 	// #region Estado privado — event view (Plan 45 F2.2)
 	private readonly _eventItems = signal<ErrorLogCompleto[]>([]);
 	private readonly _eventLoading = signal(false);
@@ -179,6 +190,11 @@ export class ErrorGroupsStore {
 	readonly trendCache = this._trendCache.asReadonly();
 	readonly trendDialogVisible = this._trendDialogVisible.asReadonly();
 	readonly trendDialogGroup = this._trendDialogGroup.asReadonly();
+	// #endregion
+
+	// #region Lecturas públicas — marcadores de deploy
+	readonly deployMarkers = this._deployMarkers.asReadonly();
+	readonly deployMarkersLoading = this._deployMarkersLoading.asReadonly();
 	// #endregion
 
 	// #region Lecturas públicas — event view
@@ -478,6 +494,17 @@ export class ErrorGroupsStore {
 	closeTrendDialog(): void {
 		this._trendDialogVisible.set(false);
 		this._trendDialogGroup.set(null);
+	}
+	// #endregion
+
+	// #region Comandos — marcadores de deploy
+	setDeployMarkersLoading(loading: boolean): void {
+		this._deployMarkersLoading.set(loading);
+	}
+
+	setDeployMarkers(timestamps: number[]): void {
+		this._deployMarkers.set(timestamps);
+		this._deployMarkersLoading.set(false);
 	}
 	// #endregion
 
