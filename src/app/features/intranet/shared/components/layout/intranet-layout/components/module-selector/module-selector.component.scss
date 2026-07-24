@@ -235,6 +235,15 @@
 	}
 }
 
+.panel-subgroup:has(.panel-item.is-current) {
+	border-color: #5c7a28;
+
+	> .panel-subgroup-toggle,
+	> .panel-subgroup-toggle .panel-subgroup-caret {
+		color: #5c7a28;
+	}
+}
+
 .panel-module-body {
 	padding-bottom: 0.5rem;
 }
@@ -261,6 +270,60 @@
 	letter-spacing: 0.02em;
 	text-transform: none;
 	line-height: 1;
+}
+
+// Subgrupo dentro de un .panel-group (ej. "Correos" dentro de "Monitoreo") — colapsable,
+// mismo espíritu que .panel-module pero anidado y más chico (evita listar los ~10 items
+// de un módulo con varios dominios, como Monitoreo, todos abiertos de entrada).
+.panel-subgroup {
+	margin: 0.25rem 0.5rem 0.25rem 0.75rem;
+	border-radius: 6px;
+
+	&.expanded {
+		background: rgba(0, 0, 0, 0.015);
+		border: 1px solid var(--surface-200, #e5e7eb);
+	}
+}
+
+.panel-subgroup-toggle {
+	display: flex;
+	align-items: center;
+	gap: 0.375rem;
+	width: 100%;
+	padding: 0.35rem 0.6rem;
+	border: none;
+	background: transparent;
+	cursor: pointer;
+	font-family: inherit;
+	font-size: 0.68rem;
+	font-weight: 600;
+	color: var(--text-color-secondary);
+	text-align: left;
+	border-radius: 6px;
+	transition: background 0.1s ease;
+
+	&:hover {
+		background: rgba(0, 0, 0, 0.04);
+	}
+}
+
+.panel-subgroup-caret {
+	font-size: 0.6rem !important;
+	transition: transform 0.15s ease;
+
+	&.open {
+		transform: rotate(90deg);
+	}
+}
+
+.panel-subgroup-legend {
+	flex: 1;
+}
+
+.panel-subgroup-count {
+	font-size: 0.65rem;
+	font-weight: 600;
+	opacity: 0.7;
 }
 
 .panel-divider {

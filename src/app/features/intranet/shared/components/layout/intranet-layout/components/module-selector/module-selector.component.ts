@@ -20,34 +20,9 @@ import { TooltipModule } from 'primeng/tooltip';
 import { ModuloMenu } from '../../intranet-menu.config';
 import { ModuloId } from '@shared/constants';
 import { QuickAccessFavoritesService } from '@intranet-shared/services';
-// #endregion
+import { buildAllResults, buildMegaColumns, scoreResult, SearchResult, TreeGroup } from './module-selector.helpers';
 
-// #region Types
-/** Flat search result — a single navigable page. */
-export interface SearchResult {
-	label: string;
-	route: string;
-	icon: string;
-	moduloId: ModuloId;
-	moduloLabel: string;
-	groupLabel: string;
-	queryParams?: Record<string, string>;
-	keywords: string;
-}
-
-/** Tree group — module or section header with its items. */
-export interface TreeGroup {
-	moduloId: ModuloId;
-	moduloLabel: string;
-	moduloIcon: string;
-	itemCount: number;
-	sections: TreeSection[];
-}
-
-export interface TreeSection {
-	label: string;
-	items: SearchResult[];
-}
+export type { SearchResult, TreeGroup, TreeSection, TreeSubsection } from './module-selector.helpers';
 // #endregion
 
 // #region Implementation
@@ -79,6 +54,13 @@ export class ModuleSelectorComponent {
 	private readonly _expandedModulos = signal<ReadonlySet<ModuloId>>(new Set());
 	readonly expandedModulos = this._expandedModulos.asReadonly();
 
+	/**
+	 * Subgrupos expandidos (ej. "Correos" dentro de Monitoreo), keyed por
+	 * `${moduloId}::${section}::${subgroup}`. Colapsados por default -- se listan muchos
+	 * subgrupos (Monitoreo tiene 3) y no hace falta verlos todos abiertos de entrada.
+	 */
+	private readonly _expandedSubgroups = signal<ReadonlySet<string>>(new Set());
+
 	/** Reactive current URL — used to highlight the page the user is on. */
 	private readonly currentUrl = toSignal(
 		this.router.events.pipe(
@@ -90,46 +72,8 @@ export class ModuleSelectorComponent {
 	);
 	// #endregion
 
-	// #region Computed — Flat index of all navigable pages
-	private readonly allResults = computed((): SearchResult[] => {
-		const results: SearchResult[] = [];
-
-		for (const modulo of this.modulos()) {
-			for (const item of modulo.items) {
-				if (item.route) {
-					results.push(this.toResult(item, modulo, ''));
-				}
-				if (item.children) {
-					this.collectLeaves(item.children, modulo, item.label, results);
-				}
-			}
-		}
-
-		return results;
-	});
-
-	/**
-	 * Recorre `children` a cualquier profundidad. `group` puede anidar más de un nivel via
-	 * `subgroup` (brief 458: "Admin" → "Asistencias" → Gestión/Reportes) — un recorrido de un
-	 * solo nivel de children perdía por completo cualquier item a 2+ niveles de anidamiento.
-	 * `groupLabel` se mantiene fijo al label del grupo de tope (no de cada subgrupo intermedio),
-	 * igual que el comportamiento previo de un solo nivel.
-	 */
-	private collectLeaves(
-		items: ModuloMenu['items'],
-		modulo: ModuloMenu,
-		groupLabel: string,
-		results: SearchResult[],
-	): void {
-		for (const item of items) {
-			if (item.route) {
-				results.push(this.toResult(item, modulo, groupLabel));
-			}
-			if (item.children) {
-				this.collectLeaves(item.children, modulo, groupLabel, results);
-			}
-		}
-	}
+	// #region Computed
+	private readonly allResults = computed((): SearchResult[] => buildAllResults(this.modulos()));
 
 	/** Flat view: alphabetical or ranked by search score. */
 	readonly filteredResults = computed((): SearchResult[] => {
@@ -140,20 +84,26 @@ export class ModuleSelectorComponent {
 
 		const words = term.split(/\s+/);
 		return this.allResults()
-			.map((r) => ({ result: r, score: this.score(r, words) }))
+			.map((r) => ({ result: r, score: scoreResult(r, words) }))
 			.filter((r) => r.score > 0)
 			.sort((a, b) => b.score - a.score)
 			.map((r) => r.result);
 	});
 
-	/** Flat list of all panel items in visual order (for keyboard nav). Solo módulos expandidos. */
+	/** Flat list of all panel items in visual order (for keyboard nav). Solo módulos/subgrupos expandidos. */
 	private readonly panelFlat = computed((): SearchResult[] => {
 		const flat: SearchResult[] = [...this.favoriteResults()];
-		const expanded = this._expandedModulos();
+		const expandedModulos = this._expandedModulos();
+		const expandedSubgroups = this._expandedSubgroups();
 		for (const col of this.megaColumns()) {
-			if (!expanded.has(col.moduloId)) continue;
+			if (!expandedModulos.has(col.moduloId)) continue;
 			for (const section of col.sections) {
 				flat.push(...section.items);
+				for (const sub of section.subsections) {
+					if (expandedSubgroups.has(this.subgroupKey(col.moduloId, section.label, sub.label))) {
+						flat.push(...sub.items);
+					}
+				}
 			}
 		}
 		return flat;
@@ -180,35 +130,7 @@ export class ModuleSelectorComponent {
 	readonly isSearching = computed(() => this.searchTerm().trim().length > 0);
 
 	/** Mega menu columns: todos los módulos, incluyendo 'inicio' (que tiene la página /intranet). */
-	readonly megaColumns = computed((): TreeGroup[] => {
-		const all = this.allResults();
-		const moduloMap = new Map<ModuloId, { id: ModuloId; label: string; icon: string; sections: Map<string, SearchResult[]> }>();
-
-		for (const r of all) {
-			let modEntry = moduloMap.get(r.moduloId);
-			if (!modEntry) {
-				const mod = this.modulos().find((m) => m.id === r.moduloId);
-				modEntry = { id: r.moduloId, label: r.moduloLabel, icon: mod?.icon ?? 'pi pi-folder', sections: new Map() };
-				moduloMap.set(r.moduloId, modEntry);
-			}
-			const sectionKey = r.groupLabel || '(General)';
-			const sectionItems = modEntry.sections.get(sectionKey) ?? [];
-			sectionItems.push(r);
-			modEntry.sections.set(sectionKey, sectionItems);
-		}
-
-		return Array.from(moduloMap.values()).map((entry) => {
-			const sections = Array.from(entry.sections.entries()).map(([label, items]) => ({ label, items }));
-			const itemCount = sections.reduce((acc, s) => acc + s.items.length, 0);
-			return {
-				moduloId: entry.id,
-				moduloLabel: entry.label,
-				moduloIcon: entry.icon,
-				itemCount,
-				sections,
-			};
-		});
-	});
+	readonly megaColumns = computed((): TreeGroup[] => buildMegaColumns(this.allResults(), this.modulos()));
 	// #endregion
 
 	// #region Click outside
@@ -227,6 +149,19 @@ export class ModuleSelectorComponent {
 		this.activeIndex.set(0);
 		// Por default, expandir solo el módulo activo (acordeón estilo C).
 		this._expandedModulos.set(new Set([this.selectedModuloId()]));
+		// Auto-expandir solo el/los subgrupo(s) que contienen la página actual -- el resto
+		// arranca colapsado, para no listar los ~10 items de Monitoreo de entrada.
+		const currentSubgroups = new Set<string>();
+		for (const col of this.megaColumns()) {
+			for (const section of col.sections) {
+				for (const sub of section.subsections) {
+					if (sub.items.some((item) => this.isCurrentRoute(item))) {
+						currentSubgroups.add(this.subgroupKey(col.moduloId, section.label, sub.label));
+					}
+				}
+			}
+		}
+		this._expandedSubgroups.set(currentSubgroups);
 		setTimeout(() => this.searchInput()?.nativeElement.focus(), 0);
 	}
 
@@ -251,6 +186,26 @@ export class ModuleSelectorComponent {
 
 	isModuloExpanded(id: ModuloId): boolean {
 		return this._expandedModulos().has(id);
+	}
+
+	subgroupKey(moduloId: ModuloId, sectionLabel: string, subLabel: string): string {
+		return `${moduloId}::${sectionLabel}::${subLabel}`;
+	}
+
+	toggleSubgroup(key: string): void {
+		this._expandedSubgroups.update((set) => {
+			const next = new Set(set);
+			if (next.has(key)) {
+				next.delete(key);
+			} else {
+				next.add(key);
+			}
+			return next;
+		});
+	}
+
+	isSubgroupExpanded(key: string): boolean {
+		return this._expandedSubgroups().has(key);
 	}
 
 	toggle(): void {
@@ -338,42 +293,6 @@ export class ModuleSelectorComponent {
 				this.close();
 				break;
 		}
-	}
-	// #endregion
-
-	// #region Helpers privados
-	private toResult(
-		item: { route?: string; label: string; icon: string; queryParams?: Record<string, string> },
-		modulo: ModuloMenu,
-		groupLabel: string,
-	): SearchResult {
-		const route = item.route!;
-		// Include route as-is (for "intranet/admin") AND with separators as spaces (for "admin horarios").
-		const routeExpanded = route.replace(/\//g, ' ').replace(/-/g, ' ');
-		const keywords = [item.label, modulo.label, groupLabel, route, routeExpanded].join(' ').toLowerCase();
-
-		return {
-			label: item.label,
-			route,
-			icon: item.icon,
-			moduloId: modulo.id,
-			moduloLabel: modulo.label,
-			groupLabel,
-			queryParams: item.queryParams,
-			keywords,
-		};
-	}
-
-	private score(result: SearchResult, words: string[]): number {
-		let total = 0;
-		for (const word of words) {
-			const labelMatch = result.label.toLowerCase().includes(word);
-			const keywordsMatch = result.keywords.includes(word);
-
-			if (!labelMatch && !keywordsMatch) return 0;
-			total += labelMatch ? 2 : 1;
-		}
-		return total;
 	}
 
 	private scrollActiveIntoView(): void {

@@ -147,6 +147,50 @@
 													</button>
 												</button>
 											}
+											@for (sub of section.subsections; track sub.label) {
+												@let subKey = subgroupKey(col.moduloId, section.label, sub.label);
+												@let subExpanded = isSubgroupExpanded(subKey);
+												<div class="panel-subgroup" [class.expanded]="subExpanded">
+													<button
+														type="button"
+														class="panel-subgroup-toggle"
+														[attr.aria-expanded]="subExpanded"
+														(click)="toggleSubgroup(subKey)"
+													>
+														<i class="pi pi-chevron-right panel-subgroup-caret" [class.open]="subExpanded"></i>
+														<span class="panel-subgroup-legend">{{ sub.label }}</span>
+														<span class="panel-subgroup-count">({{ sub.items.length }})</span>
+													</button>
+													@if (subExpanded) {
+														@for (item of sub.items; track item.route) {
+															<button
+																type="button"
+																class="panel-item panel-item--nested"
+																[class.active]="isActiveResult(item)"
+																[class.is-current]="isCurrentRoute(item)"
+																(click)="selectResult(item)"
+																(mouseenter)="setActiveFromResult(item)"
+																role="option"
+																[attr.aria-selected]="isActiveResult(item)"
+																[attr.aria-current]="isCurrentRoute(item) ? 'page' : null"
+															>
+																<i [class]="item.icon" class="panel-item-icon"></i>
+																<span class="panel-item-label">{{ item.label }}</span>
+																<button
+																	type="button"
+																	class="star-btn"
+																	[class.starred]="favorites.isFavorite(item.route)"
+																	[disabled]="!favorites.isFavorite(item.route) && !favorites.canAddMore()"
+																	(click)="onStarClick($event, item.route)"
+																	[attr.aria-label]="favorites.isFavorite(item.route) ? 'Quitar de accesos rápidos' : 'Agregar a accesos rápidos'"
+																>
+																	<i [class]="favorites.isFavorite(item.route) ? 'pi pi-star-fill' : 'pi pi-star'"></i>
+																</button>
+															</button>
+														}
+													}
+												</div>
+											}
 										</div>
 									} @else {
 										<!-- Items sueltos: cada uno se envuelve en su propio marco con su label como legend. -->
