@@ -56,13 +56,25 @@ Diseño completo y decisiones de producto ya resueltas en `xrepo-88-calificacion
 
 ## Criterio de cierre
 
-- [ ] Selector de letras visible y funcional en los 3 puntos de entrada, solo cuando `tipoCalificacion === 'LITERAL'`.
-- [ ] Guardar una nota vía letra persiste el punto medio del rango correcto en `nota`.
-- [ ] Abrir el diálogo con una nota ya guardada en un curso Literal preselecciona la letra correcta.
-- [ ] Stat "Prom: X.X" oculto en modo Literal, visible sin cambios en modo Numérico.
-- [ ] Fallback a `p-inputNumber` cuando `tipoCalificacion === 'LITERAL'` sin literales configurados.
-- [ ] Build + lint + tests OK. Verificado en vivo contra `INICIAL 3 AÑOS B` (TEST DB).
+- [x] Selector de letras visible y funcional en los 3 puntos de entrada, solo cuando `tipoCalificacion === 'LITERAL'`.
+- [x] Guardar una nota vía letra persiste el punto medio del rango correcto en `nota`.
+- [~] Abrir el diálogo con una nota ya guardada en un curso Literal preselecciona la letra correcta — lógica implementada (`getLiteralForNota` reusa `convertToLiteral`/`findLiteral`, ya existentes), pero no verificable en vivo: la TEST DB actual no tiene ningún literal con `notaMinima`/`notaMaxima` configurados (gap documentado en este mismo brief, líneas 29-35 — el diálogo de administración de config no expone esos campos). Queda pendiente de verificación visual cuando ese gap se resuelva.
+- [x] Stat "Prom: X.X" oculto en modo Literal, visible sin cambios en modo Numérico.
+- [x] Fallback a `p-inputNumber` cuando `tipoCalificacion === 'LITERAL'` sin literales configurados — implementado (`isLiteral()` exige `literales.length > 0`), verificado por tipo/build, no ejercitado en vivo (no hay curso así en TEST DB).
+- [x] Build + lint + tests OK. Verificado en vivo contra `INICIAL 3 AÑOS B` (TEST DB).
+
+## RESOLUCIÓN (2026-07-24)
+
+Implementado en `chat/458-calificar-dialog-selector-literal` (worktree), mergeado a `main` por fast-forward (`c2311841`).
+
+**Cambios**: `calificar-dialog.component.ts` — computed `isLiteral`/`literalesOrdenados`, handlers `getLiteralForNota`/`updateNotaLiteral`/`updateGrupoNotaLiteral`/`updateMiembroOverrideLiteral`. `calificar-dialog.component.html` — rama condicional `p-select` vs `p-inputNumber` en los 3 puntos de entrada, y el stat "Prom" oculto en modo Literal.
+
+**Bug encontrado y corregido durante la verificación en vivo**: el chequeo inicial de rango usaba `literal.notaMinima === null`, pero la TEST DB no trae esos campos en el DTO (`undefined`, no `null` — el mismo gap documentado en este brief). Eso hacía que `literalMidpoint` calculara `undefined + undefined = NaN` en vez de devolver `null`, mostrando un tag "NaN" en la UI al seleccionar una letra sin rango. Corregido a `== null` (cubre ambos). Verificado en vivo: tras el fix, seleccionar una letra sin rango configurado deja la nota en blanco en vez de fabricar un valor inválido.
+
+**Verificación en vivo**: `UseTestEnv=true` + login como `MENDO CALDERON MARIELA` (Profesor, DNI 42724344 — contraseña obtenida vía `/intranet/admin/usuarios` → ícono de ojo, la sesión guardada de esta profesora había expirado). Curso `Arte` (`INICIAL 3 AÑOS B`), evaluación `Test verificacion 409`: el selector de letras (`p-select`) reemplaza correctamente el input numérico, el stat "Prom" no aparece, y tras el fix de NaN seleccionar una letra sin rango deja la nota sin fijar (comportamiento seguro) en lugar del bug original de clasificar como desaprobado con un número arbitrario.
+
+**No verificado en vivo** (bloqueado por el gap de datos de la TEST DB, no por el código de este brief): preselección de letra al reabrir una nota ya guardada, y el fallback a `p-inputNumber` cuando no hay literales — ambos implementados y cubiertos por type-check/build, pendientes de confirmación visual cuando se configuren rangos reales (o se resuelva el gap de UI del diálogo de configuración, fuera de este brief).
 
 ## Tiempo estimado
 
-~45-60 min (3 puntos de entrada + helper de stats, sin cambio de backend).
+~45-60 min (3 puntos de entrada + helper de stats, sin cambio de backend). Real: ~1h incluyendo el fix de NaN encontrado en verificación.
