@@ -60,10 +60,12 @@
 			{{ stats().conNota }} calificados
 		</span>
 		@if (stats().conNota > 0) {
-			<span class="stat-item">
-				<i class="pi pi-chart-line"></i>
-				Prom: {{ stats().promedio.toFixed(1) }}
-			</span>
+			@if (!isLiteral()) {
+				<span class="stat-item">
+					<i class="pi pi-chart-line"></i>
+					Prom: {{ stats().promedio.toFixed(1) }}
+				</span>
+			}
 			<p-tag
 				[value]="stats().aprobados + ' aprobados'"
 				severity="success"
@@ -110,17 +112,28 @@
 						<td>
 							@if (row.esEditable) {
 								<div class="nota-cell">
-									<p-inputNumber
-										[ngModel]="row.nota"
-										(ngModelChange)="updateNota(row.estudianteId, $event)"
-										[min]="NOTA_MINIMA"
-										[max]="NOTA_MAXIMA"
-										[minFractionDigits]="1"
-										[maxFractionDigits]="1"
-										[step]="0.5"
-										mode="decimal"
-										[inputStyle]="{ width: '70px' }"
-									/>
+									@if (isLiteral()) {
+										<p-select
+											[ngModel]="getLiteralForNota(row.nota)"
+											(ngModelChange)="updateNotaLiteral(row.estudianteId, $event)"
+											[options]="literalesOrdenados()"
+											optionLabel="letra"
+											placeholder="Letra"
+											[style]="{ width: '90px' }"
+										/>
+									} @else {
+										<p-inputNumber
+											[ngModel]="row.nota"
+											(ngModelChange)="updateNota(row.estudianteId, $event)"
+											[min]="NOTA_MINIMA"
+											[max]="NOTA_MAXIMA"
+											[minFractionDigits]="1"
+											[maxFractionDigits]="1"
+											[step]="0.5"
+											mode="decimal"
+											[inputStyle]="{ width: '70px' }"
+										/>
+									}
 									@if (row.nota !== null && row.nota !== undefined) {
 										<p-tag
 											[value]="row.nota.toFixed(1)"
@@ -186,18 +199,29 @@
 								</span>
 							</div>
 							<div class="grupo-nota-input">
-								<p-inputNumber
-									[ngModel]="grupo.nota"
-									(ngModelChange)="updateGrupoNota(grupo.grupoId, $event)"
-									[min]="NOTA_MINIMA"
-									[max]="NOTA_MAXIMA"
-									[minFractionDigits]="1"
-									[maxFractionDigits]="1"
-									[step]="0.5"
-									mode="decimal"
-									[inputStyle]="{ width: '70px' }"
-									placeholder="Nota"
-								/>
+								@if (isLiteral()) {
+									<p-select
+										[ngModel]="getLiteralForNota(grupo.nota)"
+										(ngModelChange)="updateGrupoNotaLiteral(grupo.grupoId, $event)"
+										[options]="literalesOrdenados()"
+										optionLabel="letra"
+										placeholder="Letra"
+										[style]="{ width: '90px' }"
+									/>
+								} @else {
+									<p-inputNumber
+										[ngModel]="grupo.nota"
+										(ngModelChange)="updateGrupoNota(grupo.grupoId, $event)"
+										[min]="NOTA_MINIMA"
+										[max]="NOTA_MAXIMA"
+										[minFractionDigits]="1"
+										[maxFractionDigits]="1"
+										[step]="0.5"
+										mode="decimal"
+										[inputStyle]="{ width: '70px' }"
+										placeholder="Nota"
+									/>
+								}
 								@if (grupo.nota !== null && grupo.nota !== undefined) {
 									<p-tag
 										[value]="grupo.nota.toFixed(1)"
@@ -229,17 +253,28 @@
 									<span class="miembro-nombre text-sm">{{ miembro.nombre }}</span>
 									<div class="miembro-actions">
 										@if (miembro.esOverride) {
-											<p-inputNumber
-												[ngModel]="miembro.overrideNota"
-												(ngModelChange)="updateMiembroOverride(grupo.grupoId, miembro.estudianteId, $event)"
-												[min]="NOTA_MINIMA"
-												[max]="NOTA_MAXIMA"
-												[minFractionDigits]="1"
-												[maxFractionDigits]="1"
-												[step]="0.5"
-												mode="decimal"
-												[inputStyle]="{ width: '60px', fontSize: '0.85rem' }"
-											/>
+											@if (isLiteral()) {
+												<p-select
+													[ngModel]="getLiteralForNota(miembro.overrideNota)"
+													(ngModelChange)="updateMiembroOverrideLiteral(grupo.grupoId, miembro.estudianteId, $event)"
+													[options]="literalesOrdenados()"
+													optionLabel="letra"
+													placeholder="Letra"
+													[style]="{ width: '80px', fontSize: '0.85rem' }"
+												/>
+											} @else {
+												<p-inputNumber
+													[ngModel]="miembro.overrideNota"
+													(ngModelChange)="updateMiembroOverride(grupo.grupoId, miembro.estudianteId, $event)"
+													[min]="NOTA_MINIMA"
+													[max]="NOTA_MAXIMA"
+													[minFractionDigits]="1"
+													[maxFractionDigits]="1"
+													[step]="0.5"
+													mode="decimal"
+													[inputStyle]="{ width: '60px', fontSize: '0.85rem' }"
+												/>
+											}
 											@if (miembro.overrideNota !== null) {
 												<p-tag
 													[value]="miembro.overrideNota!.toFixed(1)"

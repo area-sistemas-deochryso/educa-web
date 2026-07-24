@@ -5,6 +5,7 @@ import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
+import { Select } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
@@ -21,8 +22,11 @@ import {
 	NotaRow,
 	GrupoNotaRow,
 } from '@features/intranet/pages/profesor/models';
-import { getNotaSeverity as getNotaSeverityFn } from '@intranet-shared/services/calificacion-config';
-import type { ConfiguracionCalificacionListDto } from '@data/models';
+import {
+	getNotaSeverity as getNotaSeverityFn,
+	convertToLiteral,
+} from '@intranet-shared/services/calificacion-config';
+import type { ConfiguracionCalificacionListDto, ConfiguracionLiteralDto } from '@data/models';
 import {
 	buildNotaRows,
 	buildGrupoNotaRows,
@@ -40,6 +44,7 @@ import {
 		ButtonModule,
 		InputNumberModule,
 		InputTextModule,
+		Select,
 		TableModule,
 		TagModule,
 		TooltipModule,
@@ -75,6 +80,15 @@ export class CalificarDialogComponent {
 
 	// #region Computed
 	readonly isGrupal = computed(() => !!this.calificacion()?.esGrupal);
+
+	readonly isLiteral = computed(() => {
+		const config = this.calificacionConfig();
+		return config?.tipoCalificacion === 'LITERAL' && config.literales.length > 0;
+	});
+
+	readonly literalesOrdenados = computed(() =>
+		[...(this.calificacionConfig()?.literales ?? [])].sort((a, b) => a.orden - b.orden),
+	);
 
 	readonly dialogTitle = computed(() => {
 		const cal = this.calificacion();
@@ -143,6 +157,31 @@ export class CalificarDialogComponent {
 		if (!visible) {
 			this.visibleChange.emit(false);
 		}
+	}
+
+	getLiteralForNota(nota: number | null): ConfiguracionLiteralDto | null {
+		return convertToLiteral(nota, this.calificacionConfig());
+	}
+
+	private literalMidpoint(literal: ConfiguracionLiteralDto | null): number | null {
+		if (!literal || literal.notaMinima == null || literal.notaMaxima == null) return null;
+		return Math.round(((literal.notaMinima + literal.notaMaxima) / 2) * 10) / 10;
+	}
+
+	updateNotaLiteral(estudianteId: number, literal: ConfiguracionLiteralDto | null): void {
+		this.updateNota(estudianteId, this.literalMidpoint(literal));
+	}
+
+	updateGrupoNotaLiteral(grupoId: number, literal: ConfiguracionLiteralDto | null): void {
+		this.updateGrupoNota(grupoId, this.literalMidpoint(literal));
+	}
+
+	updateMiembroOverrideLiteral(
+		grupoId: number,
+		estudianteId: number,
+		literal: ConfiguracionLiteralDto | null,
+	): void {
+		this.updateMiembroOverride(grupoId, estudianteId, this.literalMidpoint(literal));
 	}
 
 	updateNota(estudianteId: number, nota: number | null): void {
