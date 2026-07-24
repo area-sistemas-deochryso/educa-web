@@ -42,6 +42,7 @@ const NO_CACHE_PATTERNS = [
 	'/api/Auth/refresh',
 	'/api/Auth/verificar',
 	'/api/Auth/sessions',
+	'/api/auth/capabilities',
 ];
 
 // #region SCHEMA FINGERPRINT (Plan WAL Resilience M4)
@@ -640,6 +641,12 @@ async function handleFetch(request) {
 
 		return networkResponse;
 	} catch (error) {
+		// AbortError: el request fue cancelado (logout, navegacion, unsubscribe), no es
+		// una falla de red. Repropagar para que el caller lo vea como cancelacion real,
+		// no fabricar un 503 "offline" falso que contamina el error tracker.
+		if (error.name === 'AbortError') {
+			throw error;
+		}
 		console.log('[SW] Error de red y sin cache');
 		return createOfflineResponse();
 	}
