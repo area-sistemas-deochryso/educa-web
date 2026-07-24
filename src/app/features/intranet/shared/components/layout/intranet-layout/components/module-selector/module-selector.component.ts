@@ -287,11 +287,20 @@ export class ModuleSelectorComponent {
 	 * Check if a result corresponds to the page the user is currently on.
 	 * Matches by exact path or as a prefix of the current URL (e.g.
 	 * `/intranet/admin/monitoreo` highlights when on `/.../monitoreo/correos/bandeja`).
+	 * Items que comparten route pero difieren en `queryParams` (ej. Gestión/Reportes/Panel de
+	 * asistencias, todas en `/intranet/admin/asistencias?tab=...`) solo matchean si además el
+	 * `tab` (u otro queryParam declarado) coincide con el de la URL actual -- sin esto, las 3
+	 * quedaban resaltadas a la vez porque el path por sí solo no las distingue.
 	 */
 	isCurrentRoute(result: SearchResult): boolean {
-		const url = this.currentUrl().split('?')[0];
+		const [path, queryString] = this.currentUrl().split('?');
 		const r = result.route;
-		return url === r || url.startsWith(r + '/');
+		const pathMatches = path === r || path.startsWith(r + '/');
+		if (!pathMatches) return false;
+		if (!result.queryParams) return true;
+
+		const currentParams = new URLSearchParams(queryString ?? '');
+		return Object.entries(result.queryParams).every(([key, value]) => currentParams.get(key) === value);
 	}
 
 	/** Set active index from a result (used in tree view mouseenter). */

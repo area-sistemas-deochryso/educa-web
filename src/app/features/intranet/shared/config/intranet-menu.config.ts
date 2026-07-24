@@ -148,17 +148,10 @@ const LABEL_OVERRIDE_POR_ROL: Partial<Record<string, Partial<Record<UserRole, st
 	Gestión: {
 		'Asistente Administrativo': 'Gestión (secretaría)',
 		'Coordinador Académico': 'Gestión (académica)',
-		Promotor: 'Gestión (dirección)',
-		Director: 'Gestión (dirección)',
 	},
 	Reportes: {
 		'Asistente Administrativo': 'Reportes (secretaría)',
 		'Coordinador Académico': 'Reportes (académica)',
-		Promotor: 'Reportes (dirección)',
-		Director: 'Reportes (dirección)',
-	},
-	'Permisos Salud': {
-		Director: 'Permisos Salud (dirección)',
 	},
 };
 
