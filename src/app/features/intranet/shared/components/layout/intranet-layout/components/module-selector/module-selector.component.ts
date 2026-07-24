@@ -100,17 +100,36 @@ export class ModuleSelectorComponent {
 					results.push(this.toResult(item, modulo, ''));
 				}
 				if (item.children) {
-					for (const child of item.children) {
-						if (child.route) {
-							results.push(this.toResult(child, modulo, item.label));
-						}
-					}
+					this.collectLeaves(item.children, modulo, item.label, results);
 				}
 			}
 		}
 
 		return results;
 	});
+
+	/**
+	 * Recorre `children` a cualquier profundidad. `group` puede anidar más de un nivel via
+	 * `subgroup` (brief 458: "Admin" → "Asistencias" → Gestión/Reportes) — un recorrido de un
+	 * solo nivel de children perdía por completo cualquier item a 2+ niveles de anidamiento.
+	 * `groupLabel` se mantiene fijo al label del grupo de tope (no de cada subgrupo intermedio),
+	 * igual que el comportamiento previo de un solo nivel.
+	 */
+	private collectLeaves(
+		items: ModuloMenu['items'],
+		modulo: ModuloMenu,
+		groupLabel: string,
+		results: SearchResult[],
+	): void {
+		for (const item of items) {
+			if (item.route) {
+				results.push(this.toResult(item, modulo, groupLabel));
+			}
+			if (item.children) {
+				this.collectLeaves(item.children, modulo, groupLabel, results);
+			}
+		}
+	}
 
 	/** Flat view: alphabetical or ranked by search score. */
 	readonly filteredResults = computed((): SearchResult[] => {
