@@ -49,6 +49,15 @@ export interface LoginResponse {
 	sedeId: number;
 	/** Optional message from backend. */
 	mensaje: string;
+	/**
+	 * Dimension names (`Infraestructura`/`Profesorado`/`SituacionGeneral`) in
+	 * Crítico state for the user's sede. Only populated for Administrativo-tier
+	 * roles (Director, Asistente Administrativo, Promotor, Coordinador
+	 * Académico, Administrador) — the backend returns an empty list for any
+	 * other role, even if their sede has critical dimensions. See
+	 * `educa-coord/contracts/auth.md` § Alerta de salud crítica.
+	 */
+	dimensionesSaludCritica?: string[];
 }
 
 /**

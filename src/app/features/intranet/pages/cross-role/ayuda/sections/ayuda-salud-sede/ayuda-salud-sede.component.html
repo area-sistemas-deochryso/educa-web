@@ -1,0 +1,59 @@
+<!-- #region Estado vigente -->
+<section class="salud-sede-estado">
+	<h4>Estado actual de la sede</h4>
+
+	@if (loadingEstado()) {
+		<div class="salud-sede-estado__loading">
+			<p-progressSpinner styleClass="w-3rem h-3rem" strokeWidth="4" />
+		</div>
+	} @else if (errorEstado()) {
+		<p class="salud-sede-estado__error">No se pudo cargar el estado de la sede. Intenta de nuevo más tarde.</p>
+	} @else if (todoBien()) {
+		<p class="salud-sede-estado__ok">Todo está bien.</p>
+	} @else {
+		<ul class="salud-sede-estado__list">
+			@for (item of estadoPorDimension(); track item.dimension) {
+				<li class="salud-sede-estado__item" [class]="'salud-sede-estado__item--' + item.rating.toLowerCase()">
+					<span class="salud-sede-estado__dimension">{{ dimensionLabels[item.dimension] }}</span>
+					<span class="salud-sede-estado__rating">{{ ratingLabels[item.rating] }}</span>
+				</li>
+			}
+		</ul>
+	}
+</section>
+<!-- #endregion -->
+
+<!-- #region Formulario de reporte -->
+<section class="salud-sede-form">
+	<h4>Reportar salud de sede</h4>
+
+	<div class="salud-sede-form__fields">
+		<p-select
+			[options]="dimensionOptions"
+			optionLabel="label"
+			optionValue="value"
+			[ngModel]="selectedDimension()"
+			(ngModelChange)="onDimensionChange($event)"
+			placeholder="Dimensión"
+		/>
+
+		<p-select
+			[options]="ratingOptions"
+			optionLabel="label"
+			optionValue="value"
+			[ngModel]="selectedRating()"
+			(ngModelChange)="onRatingChange($event)"
+			placeholder="Severidad"
+		/>
+
+		<p-button label="Reportar" [disabled]="!canSubmit()" [loading]="submitting()" (onClick)="onSubmit()" />
+	</div>
+
+	@if (submitSuccess()) {
+		<p-message severity="success" text="Reporte enviado correctamente." />
+	}
+	@if (submitError()) {
+		<p-message severity="error" text="No se pudo enviar el reporte. Intenta de nuevo." />
+	}
+</section>
+<!-- #endregion -->

@@ -6,6 +6,7 @@ import { filter, Subject, take, takeUntil } from 'rxjs';
 
 // eslint-disable-next-line layer-enforcement/imports-error -- DEBT: AuthApiService is internal to auth/
 import { AuthApiService } from '@core/services/auth/auth-api.service';
+import { AuthService } from '@core/services/auth';
 import { SwService } from '@core/services/sw';
 import { TimerManager } from '@core/services/destroy';
 import { SessionCoordinatorService } from './session-coordinator.service';
@@ -47,6 +48,7 @@ const CROSS_TAB_REFRESH_COOLDOWN = Duration.minutes(2);
 export class SessionRefreshService {
 	// #region Dependencies
 	private authApi = inject(AuthApiService);
+	private authService = inject(AuthService);
 	private swService = inject(SwService);
 	private coordinator = inject(SessionCoordinatorService);
 	private destroyRef = inject(DestroyRef);
@@ -169,9 +171,10 @@ export class SessionRefreshService {
 
 	private doRefresh(): void {
 		this.authApi.refresh().subscribe({
-			next: () => {
+			next: (response) => {
 				const now = Date.now();
 				this._lastRefreshTime.set(now);
+				this.authService.setDimensionesSaludCritica(response.dimensionesSaludCritica);
 				this.coordinator.broadcast({ type: 'refresh-done', timestamp: now });
 				this.scheduleRefresh();
 				logger.log('[SessionRefresh] Token refreshed — next in', REFRESH_TIMER.minutes, 'min');
@@ -228,8 +231,9 @@ export class SessionRefreshService {
 	 */
 	private attemptRefreshOrLogout(): void {
 		this.authApi.refresh().subscribe({
-			next: () => {
+			next: (response) => {
 				this._lastRefreshTime.set(Date.now());
+				this.authService.setDimensionesSaludCritica(response.dimensionesSaludCritica);
 				this.scheduleRefresh();
 				logger.log('[SessionRefresh] Session recovered via refresh');
 			},
