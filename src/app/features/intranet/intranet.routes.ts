@@ -319,6 +319,16 @@ export const INTRANET_ROUTES: Routes = [
 				title: 'Intranet - Gestión de Usuarios',
 			},
 			{
+				// Panel de ayuda — administración de FAQ (xrepo-panel-ayuda-intranet F7b,
+				// brief 483). Ruta debe coincidir con la capability `AYUDA_MANAGE`
+				// seed en `Educa.API/Migrations/Manual/20260724_CreateFaqWizardTables.sql`
+				// ('intranet/admin/ayuda/faq').
+				path: 'admin/ayuda/faq',
+				loadComponent: () =>
+					import('./pages/admin/ayuda-faq').then((m) => m.AyudaFaqAdminComponent),
+				title: 'Intranet - Ayuda: Gestión de FAQ',
+			},
+			{
 				path: 'admin/cursos',
 				loadComponent: () =>
 					import('./pages/admin/cursos').then((m) => m.CursosComponent),
