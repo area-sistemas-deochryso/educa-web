@@ -15,7 +15,7 @@
 | xP22 | → Endurecimiento correos (coord) | F3.FE ✅ awaiting-prod (284) | ver P22 |
 | xP43 | → Monitoreo Cowork (coord) | F5:5.2 FE ✅ awaiting-prod (285) · F6.1 FE ✅ awaiting-prod (296) · F6.2 FE ✅ awaiting-prod (297) · F6.3 FE ✅ awaiting-prod (303) · F6.3 follow-up ✅ awaiting-prod (304) | ver P43 |
 | xP53 | → Duplicate person validation (coord) | F3 FE ✅ awaiting-prod (281) | ver P53 |
-| xPanelAyuda | → Panel de ayuda intranet (coord) | F1-F3 BE ✅ · F4 FE ✅ awaiting-prod (479, `chat/479-fe-panel-ayuda-qa-shell`) · F5 FE ✅ awaiting-prod (480, `chat/480-fe-panel-ayuda-ticket`) · F6 FE 🟡 en progreso (481, `chat/481-fe-panel-ayuda-salud-sede`) | ver xrepo-panel-ayuda-intranet |
+| xPanelAyuda | → Panel de ayuda intranet (coord) | F1-F3 BE ✅ · F4 FE ✅ awaiting-prod (479, `chat/479-fe-panel-ayuda-qa-shell`) · F5 FE ✅ awaiting-prod (480, `chat/480-fe-panel-ayuda-ticket`) · F6 FE ✅ awaiting-prod (481, `chat/481-fe-panel-ayuda-salud-sede`) | ver xrepo-panel-ayuda-intranet |
 <!-- INDEX:END -->
 
 ---
@@ -89,7 +89,7 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub F3-F6), *
 
 ### Notas operativas
 
-- **`running/`**: vacío en main (480 cerró; 481 activo en worktree propio, no cuenta contra este bucket) · **`open/`**: 5 briefs (332, 390, 391, 458, 462) · **`awaiting-prod/`**: 3 briefs (464, 465, 480) · **`waiting/`**: vacío · **`troubles/`**: vacío
+- **`running/`**: vacío en main · **`open/`**: 5 briefs (332, 390, 391, 458, 462) · **`awaiting-prod/`**: 4 briefs (464, 465, 480, 481) · **`waiting/`**: vacío · **`troubles/`**: vacío
 - **Último cierre**: 467 (audit Administrador — shim global de tokens PrimeNG sin prefijo `--p-` en 229 archivos, fix puerto k6, fix "Rol del sistema") → `closed/`, 2026-07-18.
 - **Último saneamiento**: 2026-07-11 — sync-maestro: vaciado `awaiting-prod/` completo (estables, verificados con usuarios reales).
 
