@@ -116,6 +116,7 @@ export const MENU_ITEMS: MenuItemDef[] = [
 	{ route: '/intranet/admin/usuarios', label: 'Usuarios', icon: 'pi pi-user-edit', capability: 'ADMIN_USUARIOS', modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Gestión', icon: 'pi pi-cog' }, preview: 'admin-table', description: 'Gestionar cuentas de usuarios' },
 	{ route: '/intranet/admin/permisos/roles', label: 'Por Rol', icon: 'pi pi-id-card', capability: 'ADMIN_PERMISOS_ROLES', modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Permisos', icon: 'pi pi-lock' }, preview: 'admin-table', description: 'Gestionar permisos por rol' },
 	{ route: '/intranet/admin/permisos/usuarios', label: 'Por Usuario', icon: 'pi pi-users', capability: 'ADMIN_PERMISOS_USUARIOS', modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Permisos', icon: 'pi pi-lock' }, preview: 'admin-table', description: 'Gestionar permisos por usuario' },
+	{ route: '/intranet/admin/ayuda/faq', label: 'FAQ (Ayuda)', icon: 'pi pi-question-circle', capability: 'AYUDA_MANAGE', modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Gestión', icon: 'pi pi-cog' }, preview: 'admin-table', description: 'Administrar preguntas frecuentes y wizards del panel de ayuda' },
 	// Monitoreo — hub con 3 dominios (Correos/Incidencias/Seguridad, ver monitoreo-hub.catalog.ts).
 	// "Resumen" es la landing del hub (tarjetas de los 3 dominios); cada dominio es un subgrupo
 	// con sus páginas propias, para que el menú/búsqueda lleguen directo sin pasar por el hub.

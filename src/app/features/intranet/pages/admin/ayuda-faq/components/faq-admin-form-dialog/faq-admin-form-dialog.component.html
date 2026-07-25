@@ -1,0 +1,173 @@
+<p-dialog
+	[header]="headerLabel()"
+	[visible]="visible()"
+	(visibleChange)="onHide()"
+	[modal]="true"
+	[style]="{ width: '40rem' }"
+	[draggable]="false"
+	appendTo="body"
+>
+	<div class="faq-form">
+		<div class="field">
+			<label for="faq-pregunta">Pregunta *</label>
+			<input
+				id="faq-pregunta"
+				type="text"
+				pInputText
+				class="w-full"
+				[ngModel]="pregunta()"
+				(ngModelChange)="pregunta.set($event)"
+				maxlength="300"
+			/>
+		</div>
+
+		<div class="field">
+			<label for="faq-respuesta">Respuesta *</label>
+			<textarea
+				id="faq-respuesta"
+				pTextarea
+				class="w-full"
+				[rows]="4"
+				[ngModel]="respuesta()"
+				(ngModelChange)="respuesta.set($event)"
+			></textarea>
+		</div>
+
+		<div class="field-row">
+			<div class="field">
+				<label for="faq-categoria">Categoría (opcional)</label>
+				<input
+					id="faq-categoria"
+					type="text"
+					pInputText
+					class="w-full"
+					[ngModel]="categoria()"
+					(ngModelChange)="categoria.set($event)"
+					maxlength="60"
+				/>
+			</div>
+
+			<div class="field">
+				<label for="faq-capability">Visible para</label>
+				<p-select
+					id="faq-capability"
+					[options]="capabilityOptions()"
+					optionLabel="label"
+					optionValue="value"
+					[ngModel]="capabilityId()"
+					(ngModelChange)="capabilityId.set($event)"
+					placeholder="Todos (sin capability)"
+					appendTo="body"
+					class="w-full"
+				/>
+			</div>
+		</div>
+
+		<div class="wizard-editor">
+			<div class="wizard-editor-header">
+				<h4>Wizard (opcional)</h4>
+				<button
+					pButton
+					type="button"
+					label="Agregar paso"
+					icon="pi pi-plus"
+					class="p-button-text p-button-sm"
+					(click)="addPaso()"
+				></button>
+			</div>
+
+			@if (pasos().length > 0) {
+				<div class="field">
+					<label for="faq-wizard-titulo">Título del wizard (opcional)</label>
+					<input
+						id="faq-wizard-titulo"
+						type="text"
+						pInputText
+						class="w-full"
+						[ngModel]="wizardTitulo()"
+						(ngModelChange)="wizardTitulo.set($event)"
+						maxlength="200"
+					/>
+				</div>
+
+				@for (paso of pasos(); track $index) {
+					<div class="wizard-step">
+						<div class="wizard-step-order">{{ $index + 1 }}</div>
+						<div class="wizard-step-fields">
+							<textarea
+								pTextarea
+								class="w-full"
+								[rows]="2"
+								placeholder="Texto del paso"
+								[ngModel]="paso.texto"
+								(ngModelChange)="updatePasoTexto($index, $event)"
+							></textarea>
+							<input
+								type="text"
+								pInputText
+								class="w-full"
+								placeholder="URL de imagen (opcional)"
+								[ngModel]="paso.imagenUrl"
+								(ngModelChange)="updatePasoImagen($index, $event)"
+							/>
+						</div>
+						<div class="wizard-step-actions">
+							<button
+								pButton
+								type="button"
+								icon="pi pi-arrow-up"
+								class="p-button-text p-button-sm"
+								pTooltip="Subir"
+								[disabled]="$index === 0"
+								(click)="movePaso($index, -1)"
+								[pt]="{ root: { 'aria-label': 'Subir paso ' + ($index + 1) } }"
+							></button>
+							<button
+								pButton
+								type="button"
+								icon="pi pi-arrow-down"
+								class="p-button-text p-button-sm"
+								pTooltip="Bajar"
+								[disabled]="$index === pasos().length - 1"
+								(click)="movePaso($index, 1)"
+								[pt]="{ root: { 'aria-label': 'Bajar paso ' + ($index + 1) } }"
+							></button>
+							<button
+								pButton
+								type="button"
+								icon="pi pi-trash"
+								class="p-button-text p-button-sm p-button-danger"
+								pTooltip="Quitar paso"
+								(click)="removePaso($index)"
+								[pt]="{ root: { 'aria-label': 'Quitar paso ' + ($index + 1) } }"
+							></button>
+						</div>
+					</div>
+				}
+			} @else {
+				<p class="wizard-empty">Sin pasos — la FAQ no tendrá wizard asociado.</p>
+			}
+		</div>
+	</div>
+
+	<ng-template pTemplate="footer">
+		<button
+			pButton
+			type="button"
+			label="Cancelar"
+			class="p-button-text"
+			(click)="onCancel()"
+			[pt]="{ root: { 'aria-label': 'Cancelar' } }"
+		></button>
+		<button
+			pButton
+			type="button"
+			label="Guardar"
+			icon="pi pi-check"
+			[disabled]="!isValid() || saving()"
+			[loading]="saving()"
+			(click)="onSave()"
+			[pt]="{ root: { 'aria-label': 'Guardar FAQ' } }"
+		></button>
+	</ng-template>
+</p-dialog>
