@@ -1,0 +1,55 @@
+<p-dialog
+	[visible]="visible()"
+	(visibleChange)="visibleChange.emit($event)"
+	[modal]="true"
+	[dismissableMask]="true"
+	[style]="{ width: '38rem' }"
+	[header]="wizard()?.titulo ?? 'Guía paso a paso'"
+	(onHide)="onHide()"
+>
+	@if (wizard(); as w) {
+		<p-stepper [value]="activeStep()" (valueChange)="goToStep($event ?? 0)">
+			<p-step-list>
+				@for (paso of w.pasos; track paso.orden; let i = $index) {
+					<p-step [value]="i">Paso {{ i + 1 }}</p-step>
+				}
+			</p-step-list>
+
+			<p-step-panels>
+				@for (paso of w.pasos; track paso.orden; let i = $index) {
+					<p-step-panel [value]="i">
+						<ng-template #content>
+							<div class="wizard-step">
+								@if (paso.imagenUrl) {
+									<img [src]="paso.imagenUrl" alt="" class="wizard-step__image" />
+								}
+								<p class="wizard-step__text">{{ paso.texto }}</p>
+							</div>
+						</ng-template>
+					</p-step-panel>
+				}
+			</p-step-panels>
+		</p-stepper>
+
+		<div class="wizard-actions">
+			<p-button
+				label="Anterior"
+				icon="pi pi-arrow-left"
+				severity="secondary"
+				[outlined]="true"
+				[disabled]="activeStep() === 0"
+				(onClick)="goToStep(activeStep() - 1)"
+			/>
+			@if (!isLastStep()) {
+				<p-button
+					label="Siguiente"
+					icon="pi pi-arrow-right"
+					iconPos="right"
+					(onClick)="goToStep(activeStep() + 1)"
+				/>
+			} @else {
+				<p-button label="Listo" icon="pi pi-check" (onClick)="onHide()" />
+			}
+		</div>
+	}
+</p-dialog>

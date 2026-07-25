@@ -1,0 +1,44 @@
+<!-- #region Filtros -->
+<div class="qa-filters">
+	<input
+		type="text"
+		pInputText
+		class="qa-filters__search"
+		placeholder="Buscar en preguntas frecuentes..."
+		[ngModel]="searchTerm()"
+		(ngModelChange)="onSearchChange($event)"
+	/>
+
+	<p-select
+		[options]="categoriaOptions()"
+		optionLabel="label"
+		optionValue="value"
+		[ngModel]="categoria()"
+		(ngModelChange)="onCategoriaChange($event)"
+		placeholder="Todas las categorías"
+		[showClear]="false"
+	/>
+</div>
+<!-- #endregion -->
+
+<!-- #region Contenido -->
+@if (loading()) {
+	<div class="qa-loading">
+		<p-progressSpinner styleClass="w-3rem h-3rem" strokeWidth="4" />
+	</div>
+} @else if (error()) {
+	<p class="qa-error">No se pudieron cargar las preguntas frecuentes. Intenta de nuevo más tarde.</p>
+} @else if (faqs().length === 0) {
+	<p class="qa-empty">No hay preguntas frecuentes para este filtro.</p>
+} @else {
+	<app-faq-list [faqs]="faqs()" (openWizard)="onOpenWizard($event)" />
+}
+<!-- #endregion -->
+
+<!-- #region Wizard -->
+<app-faq-wizard-dialog
+	[visible]="wizardVisible()"
+	[wizard]="wizardFaq()?.wizard ?? null"
+	(visibleChange)="onWizardVisibleChange($event)"
+/>
+<!-- #endregion -->

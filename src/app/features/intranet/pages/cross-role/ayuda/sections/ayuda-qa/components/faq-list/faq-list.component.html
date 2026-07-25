@@ -1,0 +1,24 @@
+<p-accordion [multiple]="true">
+	@for (faq of faqs(); track faq.id) {
+		<p-accordionpanel [value]="faq.id">
+			<p-accordionheader>
+				<span class="faq-question">{{ faq.pregunta }}</span>
+				@if (faq.categoria) {
+					<span class="faq-category">{{ faq.categoria }}</span>
+				}
+			</p-accordionheader>
+			<p-accordioncontent>
+				<p class="faq-answer">{{ faq.respuesta }}</p>
+				@if (faq.wizard) {
+					<p-button
+						label="Ver guía paso a paso"
+						icon="pi pi-arrow-right"
+						iconPos="right"
+						size="small"
+						(onClick)="onOpenWizard(faq, $event)"
+					/>
+				}
+			</p-accordioncontent>
+		</p-accordionpanel>
+	}
+</p-accordion>
