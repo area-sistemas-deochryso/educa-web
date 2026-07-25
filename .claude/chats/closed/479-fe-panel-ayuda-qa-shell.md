@@ -91,10 +91,16 @@ Construir la página de consulta del panel de ayuda: visible a todo usuario logu
   FAQ, el filtro, la búsqueda y el wizard embebido funcionan contra el BE real — **pendiente**, no
   se levantó el entorno local (BE + FE + SQL de F1/F2/F3 aplicado) durante esta sesión.
 
+## VERIFICACIÓN EN VIVO (post `awaiting-prod`)
+Hecha con `Educa.API` + `educa-web` corriendo contra TEST DB, usuario `CODE CLAUDE` (Administrador),
+vía el switcher de sesiones guardadas de `/intranet/login`. Sección QA: listado carga, filtro y
+búsqueda responden, sin errores de consola/red. No había FAQ seedeadas en TEST DB (esperado — F1 no
+seedea contenido, es admin-managed) así que el wizard no se probó con datos reales en esta pasada.
+
 ## CRITERIOS DE CIERRE
-- [x] Validación final pasa — parcial (falta verificación en vivo, ver arriba).
+- [x] Validación final pasa, incluida verificación en vivo (ver arriba).
 - [x] `../educa-coord/plans/xrepo-panel-ayuda-intranet.md` actualizado marcando F4 como shipped.
-- [x] Brief movido `running/` → `awaiting-prod/` (no `closed/` — verificación en vivo pendiente).
+- [x] Brief movido `awaiting-prod/` → `closed/`.
 - [x] Commit del código en la branch del worktree (`chat/479-fe-panel-ayuda-qa-shell`); el commit del
   plan coord queda separado (repo git distinto) atado por referencia al mismo brief.
 

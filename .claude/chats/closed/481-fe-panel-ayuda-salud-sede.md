@@ -92,10 +92,29 @@ Implementado en worktree `chat/481-fe-panel-ayuda-salud-sede`, commit `00ce6936`
 - `npm run test` — tests mínimos de arriba pasando, sin romper la suite existente.
 - Verificación en vivo diferida: por pedido explícito del usuario, la verificación en vivo de F4+F5+F6 se hace junta al final, después de que esta fase cierre — no hace falta levantar servidores acá.
 
+## VERIFICACIÓN EN VIVO (post `awaiting-prod`)
+Hecha con `Educa.API` + `educa-web` corriendo contra TEST DB (usuario `CODE CLAUDE`, Administrador).
+Reportar dimensión + severidad funcionó; el estado vigente pasó correctamente de "Todo está bien" a
+mostrar "Infraestructura: Crítico" tras el reporte. La alerta de sesión (visual+sonora) se confirmó
+end-to-end vía login real (`AuthService.login()` → `router.navigate`, no reload duro) — el efecto de
+`SaludSedeAlertService` reacciona correctamente al signal poblado por el BE.
+
+Dos gaps reales encontrados y corregidos en esta pasada:
+1. El switcher de sesiones guardadas (dev-only, `POST /switch-session`) nunca pasaba por
+   `PopulateSaludCriticaAsync` — `StoredSessionDto` no llevaba el campo. Corregido en BE
+   (`AuthFacadeService.SwitchSessionAsync`) y FE (`AuthService.switchSession()`), commits `15801a77`
+   (`Educa.API`) y `c9a94651` (`educa-web`).
+2. Confirmado (no un bug, documentado para quien retome F7/futuro): el switcher hace
+   `window.location.href = '/intranet'` (hard reload) tras el switch, lo que descarta cualquier toast
+   en vuelo antes de que se pinte — por eso la alerta no se veía usando el switcher aun con el gap #1
+   corregido. El login real usa `router.navigate` (SPA, sin reload) y sí muestra la alerta
+   correctamente — confirmado con el mismo pipeline que ya renderiza otros toasts (ej. "Ticket
+   creado"). No se tocó el hard-reload del switcher: es una herramienta de dev, no afecta producción.
+
 ## CRITERIOS DE CIERRE
-- [x] Validación final (lint/build/test) pasa.
-- [x] `../educa-coord/plans/xrepo-panel-ayuda-intranet.md` actualizado marcando F6 como shipped (o awaiting-prod si aplica, dado que la verificación en vivo se agrupa al final).
-- [x] Brief movido `running/` → `awaiting-prod/` (no `closed/` todavía — verificación en vivo conjunta con F4/F5 al final).
+- [x] Validación final (lint/build/test) pasa, incluida verificación en vivo (ver arriba).
+- [x] `../educa-coord/plans/xrepo-panel-ayuda-intranet.md` actualizado marcando F6 como shipped.
+- [x] Brief movido `awaiting-prod/` → `closed/`.
 - [x] Commit final único: código + move del brief + update del plan en coord (si el flujo del repo lo permite en un solo commit; si no, dos commits atados por referencia, uno por repo).
 
 ## COMMIT MESSAGE sugerido

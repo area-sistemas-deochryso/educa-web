@@ -64,10 +64,22 @@ Implementado en worktree `chat/480-fe-panel-ayuda-ticket`, commit `f6dec518`.
 - `npm run test` — tests mínimos de arriba pasando, sin romper la suite existente.
 - Verificación en vivo diferida: el usuario pidió agrupar la verificación de F4+F5+F6 al final, después de que las 3 fases FE estén implementadas — no hace falta levantar servidores en esta fase, dejar el brief listo para esa verificación conjunta.
 
+## VERIFICACIÓN EN VIVO (post `awaiting-prod`)
+Hecha con `Educa.API` + `educa-web` corriendo contra TEST DB (usuario `CODE CLAUDE`, Administrador).
+Creación de ticket, contador de caracteres, y aparición en "Mis tickets" con estado "Pendiente" — todo
+funcionó, pero solo tras un fix real de backend encontrado en esta pasada: `CrearTicketDto` usaba
+`[property: ...]` para las validaciones de `DataAnnotations`, lo cual rompe la validación automática
+de ASP.NET Core sobre records (necesita el atributo en el parámetro del constructor, no en la
+propiedad) — todo intento de crear un ticket tiraba 500. Corregido en
+`Educa.API/DTOs/Ayuda/CrearTicketDto.cs` y `ActualizarEstadoTicketDto.cs` (commit `15801a77` en
+`Educa.API`), con el test `TicketServiceTests.ValidateDto` reescrito para reflexionar sobre los
+parámetros del constructor en vez de `Validator.TryValidateObject` (que solo ve metadata de
+propiedades) — así el test ejercita el mismo camino que ASP.NET Core en runtime.
+
 ## CRITERIOS DE CIERRE
-- [x] Validación final (lint/build/test) pasa.
-- [x] `../educa-coord/plans/xrepo-panel-ayuda-intranet.md` actualizado marcando F5 como shipped (o awaiting-prod si aplica, dado que la verificación en vivo se agrupa al final con F6).
-- [x] Brief movido `running/` → `awaiting-prod/` (no `closed/` todavía — la verificación en vivo se hace junto con F6 al final, por pedido explícito del usuario).
+- [x] Validación final (lint/build/test) pasa, incluida verificación en vivo (ver arriba).
+- [x] `../educa-coord/plans/xrepo-panel-ayuda-intranet.md` actualizado marcando F5 como shipped.
+- [x] Brief movido `awaiting-prod/` → `closed/`.
 - [x] Commit final único: código + move del brief + update del plan en coord (si el flujo del repo lo permite en un solo commit; si no, dos commits atados por referencia, uno por repo).
 
 ## COMMIT MESSAGE sugerido
