@@ -69,6 +69,9 @@ export interface ModuloMenu {
 export const MENU_ITEMS: MenuItemDef[] = [
 	// --- Inicio ---
 	{ route: '/intranet', label: 'Inicio', icon: 'pi pi-home', capability: 'INTRANET', modulo: 'inicio', exact: true, preview: 'admin-table', description: 'Página principal de la intranet' },
+	// Ayuda (xrepo-panel-ayuda-intranet F4) — capability 'INTRANET' (misma que Inicio, sin soloParaRol):
+	// visible a todo usuario logueado, sin gate de capability propio para la página.
+	{ route: '/intranet/ayuda', label: 'Ayuda', icon: 'pi pi-question-circle', capability: 'INTRANET', modulo: 'inicio', preview: 'admin-table', description: 'Preguntas frecuentes, tickets y salud de tu sede' },
 
 	// --- Estudiante ---
 	{ route: '/intranet/estudiante/cursos', label: 'Mis Cursos', icon: 'pi pi-book', capability: 'ESTUDIANTE_CURSOS', modulo: 'estudiante', featureFlag: 'estudiante', group: { label: 'Mi Aula', icon: 'pi pi-graduation-cap' }, preview: 'course-cards', description: 'Contenido y materiales de tus cursos' },

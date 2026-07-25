@@ -276,6 +276,20 @@ export const INTRANET_ROUTES: Routes = [
 					),
 				title: 'Intranet - Asistencia',
 			},
+			{
+				// Panel de ayuda (xrepo-panel-ayuda-intranet F4) — visible a todo usuario
+				// logueado, sin gate de capability propio: el `permissionPath` apunta al
+				// mismo path que Home ('intranet'), que la capability genérica `INTRANET`
+				// ya concede a todos los roles. Ver brief 479 § DECISIONES YA TOMADAS.
+				path: 'ayuda',
+				loadComponent: () =>
+					import('./pages/cross-role/ayuda/ayuda-shell.component').then(
+						(m) => m.AyudaShellComponent,
+					),
+				loadChildren: () => import('./pages/cross-role/ayuda/ayuda.routes').then((m) => m.default),
+				data: { permissionPath: 'intranet' },
+				title: 'Intranet - Ayuda',
+			},
 			// #endregion
 
 			// #region Por rol (profesor / estudiante)
