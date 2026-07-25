@@ -7,6 +7,7 @@ import { SessionRefreshService } from './session-refresh.service';
 import { SessionCoordinatorService, type SessionMessage } from './session-coordinator.service';
 // eslint-disable-next-line layer-enforcement/imports-error -- DEBT: AuthApiService is internal to auth/
 import { AuthApiService } from '@core/services/auth/auth-api.service';
+import { AuthService } from '@core/services/auth';
 import { SwService } from '@core/services/sw';
 // #endregion
 
@@ -39,6 +40,12 @@ function createCoordinatorMock() {
 		broadcast: vi.fn(),
 	};
 }
+
+function createAuthServiceMock() {
+	return {
+		setDimensionesSaludCritica: vi.fn(),
+	};
+}
 // #endregion
 
 // #region Tests
@@ -47,6 +54,7 @@ describe('SessionRefreshService', () => {
 	let authApi: ReturnType<typeof createAuthApiMock>;
 	let sw: ReturnType<typeof createSwMock>;
 	let coordinator: ReturnType<typeof createCoordinatorMock>;
+	let authService: ReturnType<typeof createAuthServiceMock>;
 
 	const isActive = () => true;
 	const isVisible = () => true;
@@ -57,11 +65,13 @@ describe('SessionRefreshService', () => {
 		authApi = createAuthApiMock();
 		sw = createSwMock();
 		coordinator = createCoordinatorMock();
+		authService = createAuthServiceMock();
 
 		TestBed.configureTestingModule({
 			providers: [
 				SessionRefreshService,
 				{ provide: AuthApiService, useValue: authApi },
+				{ provide: AuthService, useValue: authService },
 				{ provide: SwService, useValue: sw },
 				{ provide: SessionCoordinatorService, useValue: coordinator },
 			],
@@ -115,6 +125,15 @@ describe('SessionRefreshService', () => {
 			expect(coordinator.broadcast).toHaveBeenCalledWith(
 				expect.objectContaining({ type: 'refresh-done' }),
 			);
+		});
+
+		it('propagates dimensionesSaludCritica from the refresh response to AuthService', () => {
+			authApi.refresh.mockReturnValue(of({ dimensionesSaludCritica: ['Infraestructura'] }));
+
+			service.start(isActive, isVisible);
+			vi.advanceTimersByTime(REFRESH_TIMER_MS);
+
+			expect(authService.setDimensionesSaludCritica).toHaveBeenCalledWith(['Infraestructura']);
 		});
 
 		it('emits sessionExpired$ when refresh fails and online', () => {

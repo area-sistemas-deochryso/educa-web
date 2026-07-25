@@ -2,8 +2,7 @@ import { Routes } from '@angular/router';
 
 /**
  * Rutas hijas del shell del panel de ayuda (`AyudaShellComponent`).
- * `salud-sede` carga un placeholder hasta que F6 lo reemplace por su
- * componente real — el shell y esta lista de rutas no cambian.
+ * Las 3 secciones (qa, ticket, salud-sede) cargan sus componentes reales.
  */
 export default [
 	{ path: '', redirectTo: 'qa', pathMatch: 'full' },
@@ -24,9 +23,9 @@ export default [
 	{
 		path: 'salud-sede',
 		loadComponent: () =>
-			import(
-				'./sections/ayuda-salud-sede-placeholder/ayuda-salud-sede-placeholder.component'
-			).then((m) => m.AyudaSaludSedePlaceholderComponent),
+			import('./sections/ayuda-salud-sede/ayuda-salud-sede.component').then(
+				(m) => m.AyudaSaludSedeComponent,
+			),
 		title: 'Intranet - Ayuda: Salud de sede',
 	},
 ] satisfies Routes;

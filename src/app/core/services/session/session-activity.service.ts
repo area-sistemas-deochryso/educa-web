@@ -11,6 +11,7 @@ import { SwService } from '@core/services/sw';
 import { StorageService } from '@core/services/storage';
 import { SignalRService } from '@core/services/signalr';
 import { NotificationsService } from '@core/services/notifications';
+import { SaludSedeAlertService } from '@core/services/salud-sede';
 import { SessionRefreshService } from './session-refresh.service';
 import { SessionCoordinatorService } from './session-coordinator.service';
 import { ForceLogoutSignal } from './force-logout.signal';
@@ -51,6 +52,10 @@ export class SessionActivityService {
 	private swService = inject(SwService);
 	private signalr = inject(SignalRService);
 	private notifications = inject(NotificationsService);
+	// Solo inyectado para forzar su instanciación temprana — su `effect()`
+	// interno reacciona a `AuthService.dimensionesSaludCritica` sin más
+	// interacción de este service (alerta de salud de sede, F6).
+	private saludSedeAlert = inject(SaludSedeAlertService);
 	private storage = inject(StorageService);
 	private router = inject(Router);
 	private platformId = inject(PLATFORM_ID);

@@ -37,13 +37,23 @@ export class AuthApiService {
 
 	/**
 	 * Refresh the access token using the HttpOnly refresh cookie.
-	 * Returns the new session context on success.
+	 * Returns the new session context on success, including the current
+	 * salud-de-sede critical alert (see `LoginResponse.dimensionesSaludCritica`).
 	 */
-	refresh(): Observable<{ rol: string; nombreCompleto: string; entityId: number; sedeId: number }> {
-		return this.http.post<{ rol: string; nombreCompleto: string; entityId: number; sedeId: number }>(
-			`${this.apiUrl}/refresh`,
-			{},
-		);
+	refresh(): Observable<{
+		rol: string;
+		nombreCompleto: string;
+		entityId: number;
+		sedeId: number;
+		dimensionesSaludCritica?: string[];
+	}> {
+		return this.http.post<{
+			rol: string;
+			nombreCompleto: string;
+			entityId: number;
+			sedeId: number;
+			dimensionesSaludCritica?: string[];
+		}>(`${this.apiUrl}/refresh`, {});
 	}
 
 	/**

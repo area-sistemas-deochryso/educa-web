@@ -35,6 +35,13 @@ export class AuthService {
 	private readonly _isAuthenticated = signal(this.storage.hasUserInfo());
 	private readonly _currentUser = signal<AuthUser | null>(this.storage.getUser());
 	private readonly _loginAttempts = signal(0);
+	/**
+	 * Dimensiones de salud de sede en estado Crítico para la sede del usuario
+	 * actual (solo poblado por el BE para roles del tier Administrativo — ver
+	 * `LoginResponse.dimensionesSaludCritica`). Se actualiza en cada
+	 * login/refresh; `SaludSedeAlertService` reacciona a sus cambios.
+	 */
+	private readonly _dimensionesSaludCritica = signal<string[]>([]);
 
 	// Signal reads (synchronous)
 	get isAuthenticated(): boolean { return this._isAuthenticated(); }
@@ -42,6 +49,8 @@ export class AuthService {
 	get loginAttempts(): number { return this._loginAttempts(); }
 	get remainingAttempts(): number { return this.MAX_LOGIN_ATTEMPTS - this._loginAttempts(); }
 	get isBlocked(): boolean { return this._loginAttempts() >= this.MAX_LOGIN_ATTEMPTS; }
+
+	readonly dimensionesSaludCritica = this._dimensionesSaludCritica.asReadonly();
 
 	// Observable bridges for consumers that use toSignal(authService.isAuthenticated$)
 	isAuthenticated$ = toObservable(this._isAuthenticated);
@@ -149,11 +158,22 @@ export class AuthService {
 
 		this._isAuthenticated.set(false);
 		this._currentUser.set(null);
+		this._dimensionesSaludCritica.set([]);
 		this.resetAttempts();
 	}
 
 	resetAttempts(): void {
 		this._loginAttempts.set(0);
+	}
+
+	/**
+	 * Actualiza la alerta de salud de sede crítica. Llamado tras login (con el
+	 * `LoginResponse`) y tras cada refresh exitoso de `SessionRefreshService`
+	 * (que llama a `AuthApiService.refresh()` directamente, sin pasar por
+	 * `AuthService.login()`).
+	 */
+	setDimensionesSaludCritica(dimensiones: string[] | undefined): void {
+		this._dimensionesSaludCritica.set(dimensiones ?? []);
 	}
 
 	/**
@@ -226,6 +246,7 @@ export class AuthService {
 
 		this._isAuthenticated.set(true);
 		this._currentUser.set(user);
+		this.setDimensionesSaludCritica(response.dimensionesSaludCritica);
 		this.resetAttempts();
 		this.activityTracker.track('STATE_CHANGE', `Login exitoso: ${user.rol}`);
 
