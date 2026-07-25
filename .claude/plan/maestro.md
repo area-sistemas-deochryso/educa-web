@@ -15,6 +15,7 @@
 | xP22 | → Endurecimiento correos (coord) | F3.FE ✅ awaiting-prod (284) | ver P22 |
 | xP43 | → Monitoreo Cowork (coord) | F5:5.2 FE ✅ awaiting-prod (285) · F6.1 FE ✅ awaiting-prod (296) · F6.2 FE ✅ awaiting-prod (297) · F6.3 FE ✅ awaiting-prod (303) · F6.3 follow-up ✅ awaiting-prod (304) | ver P43 |
 | xP53 | → Duplicate person validation (coord) | F3 FE ✅ awaiting-prod (281) | ver P53 |
+| xPanelAyuda | → Panel de ayuda intranet (coord) | F1-F3 BE ✅ · F4 FE ✅ awaiting-prod (479, `chat/479-fe-panel-ayuda-qa-shell`) | ver xrepo-panel-ayuda-intranet |
 <!-- INDEX:END -->
 
 ---
