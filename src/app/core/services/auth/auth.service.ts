@@ -210,6 +210,7 @@ export class AuthService {
 				this._currentUser.set(user);
 				this.storage.setUser(user);
 				this._isAuthenticated.set(true);
+				this.setDimensionesSaludCritica(session.dimensionesSaludCritica);
 				this.broadcastLoginEvent(user);
 			}),
 		);

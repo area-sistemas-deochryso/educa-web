@@ -102,6 +102,7 @@ export interface StoredSession {
 	rol: string;
 	entityId: number;
 	sedeId: number;
+	dimensionesSaludCritica?: string[];
 }
 
 /**
