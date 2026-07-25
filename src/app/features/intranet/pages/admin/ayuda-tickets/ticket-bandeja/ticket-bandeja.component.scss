@@ -1,0 +1,36 @@
+.filtro-bar {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	margin-bottom: 1.5rem;
+}
+
+.loading-state,
+.empty-state {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 3rem;
+	color: var(--text-color-secondary);
+	text-align: center;
+}
+
+.descripcion-cell {
+	max-width: 320px;
+	white-space: normal;
+	word-break: break-word;
+}
+
+:host ::ng-deep {
+	.filtro-dropdown,
+	.estado-dropdown {
+		min-width: 180px;
+	}
+
+	.p-inputtext,
+	.p-select {
+		background: transparent;
+		color: var(--text-color);
+		border-color: var(--surface-300);
+	}
+}

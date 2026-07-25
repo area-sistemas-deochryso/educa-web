@@ -381,6 +381,21 @@ export const INTRANET_ROUTES: Routes = [
 				redirectTo: 'admin/permisos/roles',
 				pathMatch: 'full' as const,
 			},
+			// xrepo-panel-ayuda-intranet F7b — bandeja de tickets + catálogo de tipos,
+			// contraparte admin de la sección Ticket pública (F5, `intranet/ayuda`).
+			// Ruta única (tabs por queryParam, mismo patrón que `admin/asistencias`):
+			// la capability `AYUDA_TICKET_MANAGE` tiene una sola `CAP_Ruta` seedeada
+			// (`intranet/admin/ayuda/tickets`) contra la que hace match exacto el
+			// `permissionsGuard` — 2 rutas hijas hubieran requerido 2 capabilities,
+			// fuera de alcance (F7a reusa la misma capability a propósito).
+			{
+				path: 'admin/ayuda/tickets',
+				loadComponent: () =>
+					import('./pages/admin/ayuda-tickets/ticket-admin/ticket-admin.component').then(
+						(m) => m.TicketAdminComponent,
+					),
+				title: 'Intranet - Administración de Tickets',
+			},
 			// Plan 35 — Submódulo "Monitoreo" reagrupado en hub + 3 dominios.
 			// Las 7 rutas viejas (email-outbox, trazabilidad-errores, reportes-usuario,
 			// rate-limit-events, auditoria-correos, dashboard-dia, diagnostico) viven ahora

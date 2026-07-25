@@ -1,0 +1,81 @@
+<app-page-header icon="pi pi-tags" title="Catálogo de tipos de ticket" />
+
+<div class="p-4 pt-0">
+	@if (!canAccess) {
+		<div class="empty-state">
+			<i class="pi pi-lock text-3xl mb-2"></i>
+			<p>No tenés permiso para acceder al catálogo de tipos.</p>
+		</div>
+	} @else {
+		<div class="toolbar">
+			<p-button label="Nuevo tipo" icon="pi pi-plus" (onClick)="openCreateDialog()" />
+		</div>
+
+		@if (loading()) {
+			<div class="loading-state">
+				<p-progressSpinner styleClass="w-3rem h-3rem" strokeWidth="4" />
+			</div>
+		} @else if (error()) {
+			<div class="empty-state">
+				<i class="pi pi-exclamation-triangle text-3xl mb-2"></i>
+				<p>No se pudo cargar el catálogo. Intentá de nuevo.</p>
+			</div>
+		} @else if (tipos().length === 0) {
+			<div class="empty-state">
+				<i class="pi pi-tags text-3xl mb-2"></i>
+				<p>Todavía no hay tipos de ticket. Creá el primero.</p>
+			</div>
+		} @else {
+			<p-table [value]="tipos()" dataKey="id" styleClass="p-datatable-sm">
+				<ng-template #header>
+					<tr>
+						<th>Nombre</th>
+						<th>Estado</th>
+						<th style="width: 140px">Activo</th>
+						<th style="width: 100px">Editar</th>
+					</tr>
+				</ng-template>
+				<ng-template #body let-tipo>
+					<tr [class.inactivo]="!tipo.estado">
+						<td>{{ tipo.nombre }}</td>
+						<td>
+							<p-tag [value]="tipo.estado ? 'Activo' : 'Inactivo'" [severity]="tipo.estado ? 'success' : 'secondary'" />
+						</td>
+						<td>
+							<p-toggleswitch [ngModel]="tipo.estado" (ngModelChange)="toggleEstado(tipo)" [disabled]="submitting()" />
+						</td>
+						<td>
+							<p-button icon="pi pi-pencil" [text]="true" (onClick)="openEditDialog(tipo)" />
+						</td>
+					</tr>
+				</ng-template>
+			</p-table>
+		}
+	}
+</div>
+
+<p-dialog
+	header="{{ editingTipo() ? 'Editar tipo' : 'Nuevo tipo' }}"
+	[visible]="dialogVisible()"
+	(visibleChange)="onDialogVisibleChange($event)"
+	[modal]="true"
+	[style]="{ width: '28rem' }"
+>
+	<div class="dialog-form">
+		<label for="nombre-tipo" class="font-semibold">Nombre</label>
+		<input
+			id="nombre-tipo"
+			pInputText
+			type="text"
+			[ngModel]="nombreForm()"
+			(ngModelChange)="onNombreChange($event)"
+			maxlength="150"
+			class="w-full"
+		/>
+	</div>
+
+	<ng-template #footer>
+		<p-button label="Cancelar" severity="secondary" [text]="true" (onClick)="closeDialog()" />
+		<p-button label="Guardar" (onClick)="guardar()" [disabled]="!nombreForm().trim() || submitting()" />
+	</ng-template>
+</p-dialog>

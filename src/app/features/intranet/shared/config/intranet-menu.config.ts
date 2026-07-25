@@ -54,7 +54,7 @@ export interface MenuItemDef {
 }
 
 /** Roles del cluster administrativo (comparten el módulo `administrador`). */
-const ADMIN_ROLES: UserRole[] = ['Director', 'Asistente Administrativo', 'Promotor', 'Coordinador Académico', 'Administrador'];
+export const ADMIN_ROLES: UserRole[] = ['Director', 'Asistente Administrativo', 'Promotor', 'Coordinador Académico', 'Administrador'];
 
 /** Módulo con sus items filtrados por permisos y feature flags. */
 export interface ModuloMenu {
@@ -136,6 +136,12 @@ export const MENU_ITEMS: MenuItemDef[] = [
 	{ route: '/intranet/admin/sistema/runtime-health', label: 'Salud del runtime', icon: 'pi pi-server', capability: 'ADMIN_SISTEMA_RUNTIME_HEALTH', modulo: 'administrador', soloParaRol: ADMIN_ROLES, featureFlag: 'runtimeHealth', group: { label: 'Diagnóstico', icon: 'pi pi-chart-bar' }, preview: 'admin-table', description: 'Snapshot del runtime ASP.NET (ThreadPool, Requests, BD, GC)' },
 	{ route: '/intranet/admin/sistema/db-diagnostics', label: 'Diagnóstico de BD', icon: 'pi pi-database', capability: 'ADMIN_SISTEMA_DB_DIAGNOSTICS', modulo: 'administrador', soloParaRol: ADMIN_ROLES, featureFlag: 'dbDiagnostics', group: { label: 'Diagnóstico', icon: 'pi pi-chart-bar' }, preview: 'admin-table', description: 'Uso de recursos, consultas costosas, bloqueos activos y almacenamiento del motor SQL' },
 	{ route: '/intranet/admin/campus', label: 'Campus', icon: 'pi pi-map', capability: 'ADMIN_CAMPUS', modulo: 'administrador', soloParaRol: ADMIN_ROLES, featureFlag: 'campusNavigation', group: { label: 'Herramientas', icon: 'pi pi-wrench' }, preview: 'admin-table', description: 'Navegar el campus virtual' },
+	// xrepo-panel-ayuda-intranet F7b — gate por AYUDA_TICKET_MANAGE (capability propia del
+	// dominio Ticket, distinta de INTRANET que gatea la sección pública `/intranet/ayuda`).
+	// Misma ruta con `tab` por queryParam (no 2 rutas hijas) — ver nota en
+	// `intranet.routes.ts`: la capability tiene una sola `CAP_Ruta` seedeada en BE.
+	{ route: '/intranet/admin/ayuda/tickets', label: 'Bandeja de Tickets', icon: 'pi pi-inbox', capability: 'AYUDA_TICKET_MANAGE', modulo: 'administrador', soloParaRol: ADMIN_ROLES, queryParams: { tab: 'bandeja' }, group: { label: 'Ayuda', icon: 'pi pi-question-circle' }, preview: 'admin-table', description: 'Gestionar tickets de soporte de los usuarios' },
+	{ route: '/intranet/admin/ayuda/tickets', label: 'Tipos de Ticket', icon: 'pi pi-tags', capability: 'AYUDA_TICKET_MANAGE', modulo: 'administrador', soloParaRol: ADMIN_ROLES, queryParams: { tab: 'tipos' }, group: { label: 'Ayuda', icon: 'pi pi-question-circle' }, preview: 'admin-table', description: 'Administrar el catálogo de tipos de problema' },
 	{ route: '/intranet/ctest-k6', label: 'Test k6', icon: 'pi pi-bolt', capability: 'CTEST_K6', modulo: 'administrador', soloParaRol: ADMIN_ROLES, featureFlag: 'ctestK6', group: { label: 'Herramientas', icon: 'pi pi-wrench' }, preview: 'admin-table', description: 'Herramienta de testing de carga' },
 	// Compartido (duplicado, ver §1 brief 444) — capability sin dueño de rol fijo
 	{ route: '/intranet/asistencia', label: 'Asistencia diaria', icon: 'pi pi-check-square', capability: 'ASISTENCIA', modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Asistencia', icon: 'pi pi-clock' }, preview: 'attendance', description: 'Control de asistencia diaria' },

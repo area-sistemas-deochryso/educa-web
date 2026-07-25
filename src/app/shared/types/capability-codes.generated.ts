@@ -32,11 +32,13 @@ export type CapabilityCode =
 	| 'ADMIN_USUARIOS'
 	| 'ASISTENCIA'
 	| 'ASISTENCIA_ADMIN'
-	// Manually appended (brief 483) — `AYUDA_MANAGE` seed lives in
-	// `Educa.API/Migrations/Manual/20260724_CreateFaqWizardTables.sql`, not yet
-	// run against any DB, so `npm run gen:caps` can't pick it up yet. Remove
-	// this comment once a regen naturally includes it.
+	// Manually appended (briefs 483/484) — both `AYUDA_MANAGE` and
+	// `AYUDA_TICKET_MANAGE` are seeded in `Educa.API` migrations but
+	// `npm run gen:caps` needs an authenticated session it can't send, so
+	// these were added by hand. Remove this comment once a regen naturally
+	// includes both.
 	| 'AYUDA_MANAGE'
+	| 'AYUDA_TICKET_MANAGE'
 	| 'CALENDARIO'
 	| 'CTEST_K6'
 	| 'ESTUDIANTE_ASISTENCIA'
