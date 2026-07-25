@@ -1,0 +1,25 @@
+.toolbar {
+	display: flex;
+	justify-content: flex-end;
+	margin-bottom: 1.5rem;
+}
+
+.loading-state,
+.empty-state {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 3rem;
+	color: var(--text-color-secondary);
+	text-align: center;
+}
+
+.dialog-form {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+:host ::ng-deep tr.inactivo {
+	opacity: 0.6;
+}

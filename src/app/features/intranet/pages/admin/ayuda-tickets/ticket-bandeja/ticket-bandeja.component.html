@@ -1,0 +1,80 @@
+<app-page-header icon="pi pi-inbox" title="Bandeja de tickets" />
+
+<div class="p-4 pt-0">
+	@if (!canAccess) {
+		<div class="empty-state">
+			<i class="pi pi-lock text-3xl mb-2"></i>
+			<p>No tenés permiso para acceder a la bandeja de tickets.</p>
+		</div>
+	} @else {
+		<!-- #region Filtro -->
+		<div class="filtro-bar">
+			<label for="filtro-estado" class="font-semibold">Estado</label>
+			<p-select
+				id="filtro-estado"
+				[options]="estadoFiltroOptions"
+				[ngModel]="filtroEstado()"
+				(ngModelChange)="onFiltroChange($event)"
+				optionLabel="label"
+				optionValue="value"
+				appendTo="body"
+				styleClass="filtro-dropdown"
+			/>
+		</div>
+		<!-- #endregion -->
+
+		@if (loading()) {
+			<div class="loading-state">
+				<p-progressSpinner styleClass="w-3rem h-3rem" strokeWidth="4" />
+			</div>
+		} @else if (error()) {
+			<div class="empty-state">
+				<i class="pi pi-exclamation-triangle text-3xl mb-2"></i>
+				<p>No se pudo cargar la bandeja. Intentá de nuevo.</p>
+			</div>
+		} @else if (tickets().length === 0) {
+			<div class="empty-state">
+				<i class="pi pi-inbox text-3xl mb-2"></i>
+				<p>No hay tickets{{ filtroEstado() ? ' con este estado' : '' }}.</p>
+			</div>
+		} @else {
+			<p-table [value]="tickets()" dataKey="id" [scrollable]="true" styleClass="p-datatable-sm">
+				<ng-template #header>
+					<tr>
+						<th>Tipo</th>
+						<th>Descripción</th>
+						<th>Propuesta</th>
+						<th>Usuario</th>
+						<th>Fecha</th>
+						<th>Estado</th>
+						<th>Cambiar estado</th>
+					</tr>
+				</ng-template>
+				<ng-template #body let-ticket>
+					<tr>
+						<td>{{ ticket.tipoNombre }}</td>
+						<td class="descripcion-cell">{{ ticket.descripcion }}</td>
+						<td class="descripcion-cell">{{ ticket.propuesta || '—' }}</td>
+						<td>{{ ticket.usuarioNombre }}</td>
+						<td>{{ ticket.fechaReg | date: 'dd/MM/yyyy HH:mm' }}</td>
+						<td>
+							<p-tag [value]="labelFor(ticket.estado)" [severity]="severityFor(ticket.estado)" />
+						</td>
+						<td>
+							<p-select
+								[options]="estadoCambioOptions"
+								[ngModel]="ticket.estado"
+								(ngModelChange)="onEstadoChange(ticket, $event)"
+								optionLabel="label"
+								optionValue="value"
+								appendTo="body"
+								[disabled]="updatingId() === ticket.id"
+								styleClass="estado-dropdown"
+							/>
+						</td>
+					</tr>
+				</ng-template>
+			</p-table>
+		}
+	}
+</div>
