@@ -2,8 +2,8 @@ import { Routes } from '@angular/router';
 
 /**
  * Rutas hijas del shell del panel de ayuda (`AyudaShellComponent`).
- * `ticket` y `salud-sede` cargan placeholders hasta que F5/F6 los reemplacen
- * por sus componentes reales — el shell y esta lista de rutas no cambian.
+ * `salud-sede` carga un placeholder hasta que F6 lo reemplace por su
+ * componente real — el shell y esta lista de rutas no cambian.
  */
 export default [
 	{ path: '', redirectTo: 'qa', pathMatch: 'full' },
@@ -16,8 +16,8 @@ export default [
 	{
 		path: 'ticket',
 		loadComponent: () =>
-			import('./sections/ayuda-ticket-placeholder/ayuda-ticket-placeholder.component').then(
-				(m) => m.AyudaTicketPlaceholderComponent,
+			import('./sections/ayuda-ticket/ayuda-ticket.component').then(
+				(m) => m.AyudaTicketComponent,
 			),
 		title: 'Intranet - Ayuda: Generar ticket',
 	},

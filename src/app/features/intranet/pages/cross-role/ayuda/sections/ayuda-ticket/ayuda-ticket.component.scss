@@ -1,0 +1,59 @@
+.ticket-form {
+	max-width: 40rem;
+	margin-bottom: 2rem;
+
+	h3 {
+		margin-top: 0;
+	}
+
+	&__field {
+		display: flex;
+		flex-direction: column;
+		gap: 0.35rem;
+		margin-bottom: 1rem;
+
+		label {
+			font-weight: 600;
+		}
+	}
+
+	&__textarea {
+		width: 100%;
+		resize: vertical;
+	}
+
+	&__counter {
+		align-self: flex-end;
+		font-size: 0.8rem;
+		color: var(--text-color-secondary);
+
+		&--invalid {
+			color: var(--red-500, #ef4444);
+		}
+	}
+}
+
+.ticket-history {
+	h3 {
+		margin-top: 0;
+	}
+
+	&__loading {
+		display: flex;
+		justify-content: center;
+		padding: 2rem 0;
+	}
+
+	&__error,
+	&__empty {
+		color: var(--text-color-secondary);
+		text-align: center;
+		padding: 2rem 0;
+	}
+
+	&__descripcion {
+		max-width: 24rem;
+		white-space: pre-wrap;
+		overflow-wrap: break-word;
+	}
+}
