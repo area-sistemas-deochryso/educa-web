@@ -1,0 +1,97 @@
+<p-toast />
+
+<!-- #region Formulario de creación -->
+<section class="ticket-form">
+	<h3>Generar ticket</h3>
+
+	<div class="ticket-form__field">
+		<label for="ticket-tipo">Tipo de problema</label>
+		<p-select
+			inputId="ticket-tipo"
+			[options]="tipoOptions()"
+			optionLabel="label"
+			optionValue="value"
+			[ngModel]="tipoId()"
+			(ngModelChange)="onTipoChange($event)"
+			placeholder="Selecciona un tipo de problema"
+			[showClear]="false"
+		/>
+	</div>
+
+	<div class="ticket-form__field">
+		<label for="ticket-descripcion">Descripción</label>
+		<textarea
+			id="ticket-descripcion"
+			pTextarea
+			rows="5"
+			class="ticket-form__textarea"
+			[ngModel]="descripcion()"
+			(ngModelChange)="onDescripcionChange($event)"
+			[maxlength]="descripcionMax"
+			placeholder="Describe el problema con el mayor detalle posible (mínimo 20 caracteres)"
+		></textarea>
+		<span class="ticket-form__counter" [class.ticket-form__counter--invalid]="!descripcionValid()">
+			{{ descripcionLength() }} / {{ descripcionMax }} (mínimo {{ descripcionMin }})
+		</span>
+	</div>
+
+	<div class="ticket-form__field">
+		<label for="ticket-propuesta">Propuesta de mejora (opcional)</label>
+		<textarea
+			id="ticket-propuesta"
+			pTextarea
+			rows="3"
+			class="ticket-form__textarea"
+			[ngModel]="propuesta()"
+			(ngModelChange)="onPropuestaChange($event)"
+			[maxlength]="propuestaMax"
+			placeholder="¿Cómo se podría mejorar esto? (opcional)"
+		></textarea>
+	</div>
+
+	<p-button
+		label="Enviar ticket"
+		icon="pi pi-send"
+		[disabled]="!canSubmit()"
+		[loading]="submitting()"
+		(onClick)="onSubmit()"
+	/>
+</section>
+<!-- #endregion -->
+
+<!-- #region Historial -->
+<section class="ticket-history">
+	<h3>Mis tickets</h3>
+
+	@if (loading()) {
+		<div class="ticket-history__loading">
+			<p-progressSpinner styleClass="w-3rem h-3rem" strokeWidth="4" />
+		</div>
+	} @else if (error()) {
+		<p class="ticket-history__error">No se pudo cargar tu historial de tickets. Intenta de nuevo más tarde.</p>
+	} @else if (tickets().length === 0) {
+		<p class="ticket-history__empty">Todavía no generaste ningún ticket.</p>
+	} @else {
+		<p-table [value]="tickets()" styleClass="ticket-history__table">
+			<ng-template pTemplate="header">
+				<tr>
+					<th>Tipo</th>
+					<th>Descripción</th>
+					<th>Estado</th>
+					<th>Fecha</th>
+				</tr>
+			</ng-template>
+			<ng-template pTemplate="body" let-ticket>
+				<tr>
+					<td>{{ ticket.tipoNombre }}</td>
+					<td class="ticket-history__descripcion">{{ ticket.descripcion }}</td>
+					<td>
+						<p-tag [value]="estadoLabel(ticket.estado)" [severity]="estadoTagSeverity(ticket.estado)" />
+					</td>
+					<td>{{ ticket.fechaReg | date: 'dd/MM/yyyy HH:mm' }}</td>
+				</tr>
+			</ng-template>
+		</p-table>
+	}
+</section>
+<!-- #endregion -->
