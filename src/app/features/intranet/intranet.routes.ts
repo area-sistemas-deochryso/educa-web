@@ -97,6 +97,12 @@ const ESTUDIANTE_ROUTES: Route[] = [
 		title: 'Intranet - Mis Calificaciones',
 	},
 	{
+		path: 'estudiante/rendimiento',
+		loadComponent: () =>
+			import('./pages/estudiante').then((m) => m.EstudianteRendimientoComponent),
+		title: 'Intranet - Mi Rendimiento',
+	},
+	{
 		path: 'estudiante/salones',
 		loadComponent: () =>
 			import('./pages/estudiante').then((m) => m.StudentClassroomsComponent),

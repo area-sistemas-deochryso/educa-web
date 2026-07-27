@@ -4,4 +4,5 @@ export { EstudianteForoComponent } from './foro/estudiante-foro.component';
 export { StudentSchedulesComponent } from './schedules/estudiante-horarios.component';
 export { EstudianteMensajeriaComponent } from './mensajeria/estudiante-mensajeria.component';
 export { EstudianteNotasComponent } from './notas/estudiante-notas.component';
+export { EstudianteRendimientoComponent } from './rendimiento/estudiante-rendimiento.component';
 export { StudentClassroomsComponent } from './classrooms/estudiante-salones.component';

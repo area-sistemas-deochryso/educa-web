@@ -1,0 +1,18 @@
+.rendimiento-cursos {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+	gap: 1rem;
+}
+
+.rendimiento-curso-header {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	padding: 1rem 1rem 0;
+
+	h3 {
+		margin: 0;
+		font-size: 1rem;
+		font-weight: 600;
+	}
+}

@@ -58,4 +58,10 @@ export type CapabilityCode =
 	| 'PROFESOR_HORARIOS'
 	| 'PROFESOR_MENSAJERIA'
 	| 'PROFESOR_SALONES'
+	// Manually appended (brief 489) — `REPORTES_RENDIMIENTO` fue seedeada en
+	// `Educa.API` (briefs 490/489) pero `npm run gen:caps` necesita una sesión
+	// autenticada que no puede enviar en este entorno. Mismo caso que
+	// `AYUDA_MANAGE`/`AYUDA_TICKET_MANAGE` arriba. Remover este comentario
+	// cuando un regen naturalmente la incluya.
+	| 'REPORTES_RENDIMIENTO'
 	| 'VIDEOCONFERENCIAS';
