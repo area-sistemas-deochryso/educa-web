@@ -1,0 +1,17 @@
+.admin-rendimiento-page {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.admin-rendimiento-page__kpis {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+	gap: 1rem;
+}
+
+.admin-rendimiento-page__cursos {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+	gap: 1rem;
+}

@@ -1,0 +1,50 @@
+<app-page-header icon="pi pi-chart-line" title="Rendimiento Institucional" />
+
+<div class="admin-rendimiento-page p-4 pt-0">
+	@if (vm().loading && vm().isEmpty) {
+		<app-stats-skeleton [count]="3" />
+	} @else {
+		@if (vm().error) {
+			<div class="flex flex-column align-items-center p-5 text-color-secondary">
+				<i class="pi pi-exclamation-triangle text-4xl mb-3 text-yellow-600"></i>
+				<p class="font-semibold">{{ vm().error }}</p>
+				<button pButton label="Reintentar" icon="pi pi-refresh" class="p-button-outlined mt-2" (click)="onRetry()"></button>
+			</div>
+		} @else if (vm().isEmpty) {
+			<div class="flex flex-column align-items-center p-5 text-color-secondary">
+				<i class="pi pi-chart-line text-4xl mb-3"></i>
+				<p class="font-semibold">Todavía no hay rendimiento registrado</p>
+				<span class="text-sm">El panel se completa cuando los profesores registren notas</span>
+			</div>
+		} @else {
+			<!-- #region KPI tiles -->
+			<section class="admin-rendimiento-page__kpis">
+				<app-admin-rendimiento-kpi-tile
+					label="Cursos evaluados"
+					[valor]="vm().kpis.totalCursos.toString()"
+					icono="pi pi-book"
+				/>
+				<app-admin-rendimiento-kpi-tile
+					label="Cursos con desvío"
+					[valor]="vm().kpis.cursosConOutlier.toString()"
+					icono="pi pi-exclamation-triangle"
+					[variante]="vm().kpis.cursosConOutlier > 0 ? 'alerta' : 'neutro'"
+				/>
+				<app-admin-rendimiento-kpi-tile
+					label="Promedio institucional"
+					[valor]="promedioInstitucionalLabel()"
+					icono="pi pi-chart-bar"
+				/>
+			</section>
+			<!-- #endregion -->
+
+			<!-- #region Cursos, ordenados por desvío -->
+			<section class="admin-rendimiento-page__cursos">
+				@for (curso of vm().cursos; track curso.cursoContenidoId) {
+					<app-admin-rendimiento-curso-card [curso]="curso" />
+				}
+			</section>
+			<!-- #endregion -->
+		}
+	}
+</div>

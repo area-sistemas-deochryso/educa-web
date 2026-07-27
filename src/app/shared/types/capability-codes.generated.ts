@@ -25,6 +25,12 @@ export type CapabilityCode =
 	| 'ADMIN_PERMISOS_USUARIOS'
 	| 'ADMIN_RATE_LIMIT_EVENTS'
 	| 'ADMIN_REGISTRO_VISTAS'
+	// Manually appended (brief 495) — `ADMIN_RENDIMIENTO` fue seedeada en `Educa.API`
+	// (migración manual `20260727_AddAdminRendimientoCapability.sql`, pendiente de correr
+	// en el entorno) pero `npm run gen:caps` necesita una sesión autenticada que no puede
+	// enviar en este entorno. Mismo caso que `AYUDA_MANAGE`/`REPORTES_RENDIMIENTO` arriba.
+	// Remover este comentario cuando un regen naturalmente la incluya.
+	| 'ADMIN_RENDIMIENTO'
 	| 'ADMIN_REPORTES_USUARIO'
 	| 'ADMIN_SALONES'
 	| 'ADMIN_SISTEMA_DB_DIAGNOSTICS'
