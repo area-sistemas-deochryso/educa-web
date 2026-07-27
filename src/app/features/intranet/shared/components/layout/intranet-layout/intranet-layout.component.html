@@ -17,6 +17,18 @@
 			</picture>
 		</a>
 
+		<!--
+			Brief 485 (punto 1): "Ayuda" vive en el módulo 'inicio' junto con "Inicio"
+			(intranet-menu.config.ts), pero ese módulo nunca aporta items a `.nav-links`
+			(ver `_allItems()`) -- por diseño, "Inicio" solo se alcanza con el logo. Sin un
+			link fijo acá, "Ayuda" quedaba sin ruta descubrible salvo Ctrl+K. Fijo junto al
+			logo (mismo nivel de "siempre visible", no depende del módulo activo).
+		-->
+		<a routerLink="/intranet/ayuda" routerLinkActive="active" class="ayuda-link">
+			<i class="pi pi-question-circle"></i>
+			<span>Ayuda</span>
+		</a>
+
 		<!-- * Module selector (search + dropdown, replaces pills). -->
 		<app-module-selector
 			[modulos]="modulos()"
@@ -112,6 +124,10 @@
 					fetchpriority="high"
 				/>
 			</picture>
+		</a>
+		<!-- Brief 485 (punto 1): mismo link fijo que en desktop-header, ver comentario ahí. -->
+		<a routerLink="/intranet/ayuda" routerLinkActive="active" class="ayuda-link ayuda-link--mobile" aria-label="Ayuda">
+			<i class="pi pi-question-circle"></i>
 		</a>
 		<app-mobile-menu
 			[modulos]="modulos()"

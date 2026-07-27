@@ -211,16 +211,42 @@ export class SessionRefreshService {
 		this.authApi.getProfile().subscribe({
 			next: (profile) => {
 				if (profile) {
-					// Token is valid — mark refresh time so the timer schedules correctly
-					this._lastRefreshTime.set(Date.now());
-					this.scheduleRefresh();
-					logger.log('[SessionRefresh] Session verified — refresh in', REFRESH_TIMER.minutes, 'min');
+					this.refreshAfterValidProfile();
 				} else {
 					this.attemptRefreshOrLogout();
 				}
 			},
 			error: () => {
 				this.attemptRefreshOrLogout();
+			},
+		});
+	}
+
+	/**
+	 * Brief 485 (punto 2, root cause): `/perfil` solo resuelve claims del JWT — nunca
+	 * incluye `dimensionesSaludCritica` (ver `contracts/auth.md`: ese campo solo viaja en
+	 * login/refresh/mobile-login, a propósito, no es un endpoint de "chequeo de sesión").
+	 * Antes de este fix, un perfil válido saltaba directo a `scheduleRefresh()` sin pasar
+	 * por `refresh()`, así que un simple F5 con sesión ya válida nunca hidrataba (ni
+	 * re-hidrataba) la alerta de salud crítica. Se llama a `refresh()` igual acá para
+	 * seguir leyendo el dato del payload de refresh, sin agregar un canal nuevo.
+	 */
+	private refreshAfterValidProfile(): void {
+		this.authApi.refresh().subscribe({
+			next: (response) => {
+				this._lastRefreshTime.set(Date.now());
+				this.authService.setDimensionesSaludCritica(response.dimensionesSaludCritica);
+				this.scheduleRefresh();
+				logger.log('[SessionRefresh] Session verified — refresh in', REFRESH_TIMER.minutes, 'min');
+			},
+			error: () => {
+				if (!this.swService.isOnline) {
+					logger.warn('[SessionRefresh] Refresh failed — offline, waiting for reconnection');
+					this.waitForReconnection();
+					return;
+				}
+				logger.warn('[SessionRefresh] Refresh failed after valid profile — session expired');
+				this._sessionExpired$.next();
 			},
 		});
 	}

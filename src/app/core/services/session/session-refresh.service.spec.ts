@@ -87,11 +87,15 @@ describe('SessionRefreshService', () => {
 
 	// #region start + verifySession
 	describe('start + verifySession', () => {
-		it('schedules refresh when online and profile is valid', () => {
+		it('calls refresh even when profile is valid, to hydrate dimensionesSaludCritica (brief 485 punto 2)', () => {
+			// getProfile() only resolves JWT claims -- dimensionesSaludCritica travels
+			// exclusively in the login/refresh payload (contracts/auth.md), so a valid
+			// profile alone must not skip refresh() or the health alert never re-hydrates
+			// on a plain page reload with an already-valid session.
 			service.start(isActive, isVisible);
 
 			expect(authApi.getProfile).toHaveBeenCalledOnce();
-			expect(authApi.refresh).not.toHaveBeenCalled();
+			expect(authApi.refresh).toHaveBeenCalledOnce();
 		});
 
 		it('attempts refresh when profile returns null', () => {
@@ -101,6 +105,16 @@ describe('SessionRefreshService', () => {
 
 			expect(authApi.getProfile).toHaveBeenCalledOnce();
 			expect(authApi.refresh).toHaveBeenCalledOnce();
+		});
+
+		it('emits sessionExpired$ when refresh fails right after a valid profile', () => {
+			authApi.refresh.mockReturnValue(throwError(() => new Error('401')));
+			let expired = false;
+			service.sessionExpired$.subscribe(() => { expired = true; });
+
+			service.start(isActive, isVisible);
+
+			expect(expired).toBe(true);
 		});
 
 		it('defers verification when offline at startup', () => {
@@ -118,6 +132,7 @@ describe('SessionRefreshService', () => {
 	describe('doRefresh (timer fires while active)', () => {
 		it('broadcasts refresh-done and reschedules on success', () => {
 			service.start(isActive, isVisible);
+			authApi.refresh.mockClear(); // start() already refreshed once (valid profile) — isolate the timer-triggered call
 
 			vi.advanceTimersByTime(REFRESH_TIMER_MS);
 
@@ -173,6 +188,7 @@ describe('SessionRefreshService', () => {
 		it('rechecks after 60s when tab is hidden', () => {
 			let hidden = false;
 			service.start(() => true, () => !hidden);
+			authApi.refresh.mockClear(); // isolate the timer-triggered call from start()'s own refresh
 
 			hidden = true;
 			vi.advanceTimersByTime(REFRESH_TIMER_MS);
@@ -191,6 +207,7 @@ describe('SessionRefreshService', () => {
 		it('rechecks after 60s when user is idle', () => {
 			let active = true;
 			service.start(() => active, isVisible);
+			authApi.refresh.mockClear(); // isolate the timer-triggered call from start()'s own refresh
 
 			active = false;
 			vi.advanceTimersByTime(REFRESH_TIMER_MS);
@@ -225,6 +242,7 @@ describe('SessionRefreshService', () => {
 
 		it('skips refresh when another tab refreshed recently', () => {
 			service.start(isActive, isVisible);
+			authApi.refresh.mockClear(); // isolate from start()'s own refresh (valid profile)
 
 			// Simulate another tab refreshing just before our timer fires
 			vi.advanceTimersByTime(REFRESH_TIMER_MS - 10_000);
@@ -233,7 +251,6 @@ describe('SessionRefreshService', () => {
 			// Our timer fires, but recent cross-tab refresh → skip
 			vi.advanceTimersByTime(10_000);
 
-			// Only the initial getProfile should have been called, no refresh
 			expect(authApi.refresh).not.toHaveBeenCalled();
 		});
 	});
@@ -243,6 +260,7 @@ describe('SessionRefreshService', () => {
 	describe('cross-tab coordination', () => {
 		it('reschedules on refresh-done message from another tab', () => {
 			service.start(isActive, isVisible);
+			authApi.refresh.mockClear(); // isolate from start()'s own refresh (valid profile)
 
 			coordinator.message$.next({ type: 'refresh-done', timestamp: Date.now() });
 
@@ -265,10 +283,11 @@ describe('SessionRefreshService', () => {
 		it('prevents timer from firing after stop', () => {
 			service.start(isActive, isVisible);
 			service.stop();
+			authApi.refresh.mockClear(); // isolate from start()'s own refresh (valid profile)
 
 			vi.advanceTimersByTime(REFRESH_TIMER_MS);
 
-			// Only the initial getProfile from start(), no refresh from timer
+			// No refresh from timer — stop() cleared it
 			expect(authApi.refresh).not.toHaveBeenCalled();
 		});
 	});

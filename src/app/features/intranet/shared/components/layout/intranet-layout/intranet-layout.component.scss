@@ -55,6 +55,45 @@ app-user-profile-menu {
 	height: 42.7px;
 	aspect-ratio: 2.81;
 }
+
+// Brief 485 (punto 1): link fijo a "Ayuda", siempre visible junto al logo (no depende
+// del módulo activo, a diferencia de `.nav-links`) -- mismo lenguaje visual que `.nav-item`.
+.ayuda-link {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+	margin-right: 1rem;
+	color: var(--intranet-default-text-color);
+	text-decoration: none;
+	font-size: 0.9rem;
+	font-weight: 500;
+	padding: 0.5rem 0.6rem;
+	border-radius: 6px;
+	white-space: nowrap;
+	flex-shrink: 0;
+	transition: color 0.2s ease;
+
+	i {
+		font-size: 1rem;
+	}
+
+	&:hover {
+		color: #7a9e3a;
+	}
+
+	&.active {
+		color: #5c7a28;
+	}
+
+	&--mobile {
+		margin-right: 0.5rem;
+		padding: 0.5rem;
+
+		i {
+			font-size: 1.15rem;
+		}
+	}
+}
 // #endregion
 
 // #region Nav links (overflow medido: los grupos que no entran caen al pill "Más")

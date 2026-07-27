@@ -35,6 +35,7 @@
 			[ngModel]="selectedDimension()"
 			(ngModelChange)="onDimensionChange($event)"
 			placeholder="Dimensión"
+			appendTo="body"
 		/>
 
 		<p-select
@@ -44,6 +45,7 @@
 			[ngModel]="selectedRating()"
 			(ngModelChange)="onRatingChange($event)"
 			placeholder="Severidad"
+			appendTo="body"
 		/>
 
 		<p-button label="Reportar" [disabled]="!canSubmit()" [loading]="submitting()" (onClick)="onSubmit()" />
