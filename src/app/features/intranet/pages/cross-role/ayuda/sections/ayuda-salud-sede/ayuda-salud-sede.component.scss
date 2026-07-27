@@ -1,5 +1,30 @@
+// Brief 485 (punto de mejora post-cierre): separación visual explícita entre
+// "presentación de lo ya creado" (estado vigente, acento neutro) y "crear"
+// (formulario de reporte, acento azul de acción) -- ver mismo patrón en ayuda-ticket.
+%ayuda-card {
+	padding: 1.25rem 1.5rem;
+	border: 1px solid var(--surface-300, var(--surface-border));
+	border-top: 3px solid var(--surface-300, var(--surface-border));
+	border-radius: 12px;
+	background: var(--surface-0, #fff);
+}
+
 .salud-sede-estado {
-	margin-bottom: 2rem;
+	@extend %ayuda-card;
+	margin-bottom: 1.5rem;
+
+	h4 {
+		margin-top: 0;
+	}
+
+	&__eyebrow {
+		margin: 0 0 0.25rem;
+		font-size: 0.75rem;
+		font-weight: 700;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		color: var(--text-color-secondary);
+	}
 
 	&__loading {
 		display: flex;
@@ -52,6 +77,22 @@
 }
 
 .salud-sede-form {
+	@extend %ayuda-card;
+	border-top-color: var(--blue-500, #3b82f6);
+
+	h4 {
+		margin-top: 0;
+	}
+
+	&__eyebrow {
+		margin: 0 0 0.25rem;
+		font-size: 0.75rem;
+		font-weight: 700;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		color: var(--blue-600, #2563eb);
+	}
+
 	&__fields {
 		display: flex;
 		flex-wrap: wrap;

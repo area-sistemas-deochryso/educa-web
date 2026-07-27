@@ -1,9 +1,32 @@
+// Brief 485 (punto de mejora post-cierre): separación visual explícita entre el
+// concepto "crear" (formulario, acento azul de acción) y "presentación de lo ya
+// creado" (historial, acento neutro) -- antes ambos eran secciones sin borde,
+// indistinguibles en el scroll salvo por el texto del h3.
+%ayuda-card {
+	padding: 1.25rem 1.5rem;
+	border: 1px solid var(--surface-300);
+	border-top: 3px solid var(--surface-300);
+	border-radius: 12px;
+	background: var(--surface-0, #fff);
+}
+
 .ticket-form {
+	@extend %ayuda-card;
 	max-width: 40rem;
-	margin-bottom: 2rem;
+	margin-bottom: 1.5rem;
+	border-top-color: var(--blue-500, #3b82f6);
 
 	h3 {
 		margin-top: 0;
+	}
+
+	&__eyebrow {
+		margin: 0 0 0.25rem;
+		font-size: 0.75rem;
+		font-weight: 700;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		color: var(--blue-600, #2563eb);
 	}
 
 	&__field {
@@ -34,8 +57,19 @@
 }
 
 .ticket-history {
+	@extend %ayuda-card;
+
 	h3 {
 		margin-top: 0;
+	}
+
+	&__eyebrow {
+		margin: 0 0 0.25rem;
+		font-size: 0.75rem;
+		font-weight: 700;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		color: var(--text-color-secondary);
 	}
 
 	&__loading {

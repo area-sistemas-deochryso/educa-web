@@ -281,6 +281,16 @@ export class StorageService {
 	}
 	// #endregion
 
+	// #region AYUDA FAB POSITION (Brief 485)
+	getAyudaFabPosition(): { x: number; y: number } | null {
+		return this.preferences.getAyudaFabPosition();
+	}
+
+	setAyudaFabPosition(position: { x: number; y: number }): void {
+		this.preferences.setAyudaFabPosition(position);
+	}
+	// #endregion
+
 	// #region THROTTLE STATUS WIDGET (Plan 22 Chat B)
 	getThrottleWidgetAutoRefresh(): boolean {
 		return this.preferences.getThrottleWidgetAutoRefresh();

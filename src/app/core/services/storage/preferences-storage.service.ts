@@ -54,6 +54,9 @@ const PREFERENCES_KEYS = {
 	// Brief 102 — runtime health widget
 	RUNTIME_HEALTH_WIDGET_AUTO_REFRESH: 'educa_pref_runtime_health_widget_auto_refresh',
 	RUNTIME_HEALTH_WIDGET_COLLAPSED: 'educa_pref_runtime_health_widget_collapsed',
+
+	// Brief 485 — draggable "Ayuda" FAB position
+	AYUDA_FAB_POSITION: 'educa_pref_ayuda_fab_position',
 } as const;
 
 export type ErrorGroupsViewMode = 'kanban' | 'table' | 'events' | 'heatmap' | 'pareto';
@@ -626,6 +629,18 @@ export class PreferencesStorageService {
 
 	setCorrelationAutoRefresh(enabled: boolean): void {
 		this.setItem(PREFERENCES_KEYS.CORRELATION_AUTO_REFRESH, enabled.toString());
+	}
+
+	// #endregion
+	// #region AYUDA FAB POSITION (Brief 485)
+
+	/** Offset (px) del FAB "Ayuda" respecto de su posición por defecto (bottom-left). `null` si nunca se arrastró. */
+	getAyudaFabPosition(): { x: number; y: number } | null {
+		return this.getJSON<{ x: number; y: number }>(PREFERENCES_KEYS.AYUDA_FAB_POSITION);
+	}
+
+	setAyudaFabPosition(position: { x: number; y: number }): void {
+		this.setJSON(PREFERENCES_KEYS.AYUDA_FAB_POSITION, position);
 	}
 
 	// #endregion

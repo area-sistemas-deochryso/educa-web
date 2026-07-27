@@ -9,6 +9,7 @@ import { SyncStatusComponent } from '@intranet-shared/components/sync-status';
 import { OfflineIndicatorComponent } from '@intranet-shared/components/offline-indicator/offline-indicator.component';
 import { FeedbackReportDialogComponent } from '@intranet-shared/components/feedback-report-dialog';
 import { FeedbackReportLauncherComponent } from '@intranet-shared/components/feedback-report-launcher';
+import { AyudaLauncherComponent } from '@intranet-shared/components/ayuda-launcher';
 import { UserPermissionsService, SessionActivityService, KeyboardShortcutsService, FeedbackReportFacade } from '@core/services';
 import { AuthService } from '@core/services/auth';
 import {
@@ -57,6 +58,7 @@ const NAV_GAP = 4;
 		OfflineIndicatorComponent,
 		FeedbackReportDialogComponent,
 		FeedbackReportLauncherComponent,
+		AyudaLauncherComponent,
 		NavItemComponent,
 		UserProfileMenuComponent,
 		MobileMenuComponent,

@@ -224,7 +224,7 @@ export function buildModuloMenus(userCapabilities: Set<string>, rol?: UserRole):
 			id: modulo.id,
 			label: modulo.label,
 			icon: modulo.icon,
-			items: groupItems(items),
+			items: groupItems(items, modulo.id),
 		});
 	}
 
@@ -333,8 +333,14 @@ function groupChildren(groupedItems: MenuItemDef[], depth = 0): NavMenuItem[] {
 	return children.sort((a, b) => a.label.localeCompare(b.label, 'es'));
 }
 
-/** Agrupa items por `group.label` en NavMenuItem con children. Items sin group quedan flat. */
-function groupItems(items: MenuItemDef[]): NavMenuItem[] {
+/**
+ * Agrupa items por `group.label` en NavMenuItem con children. Items sin group quedan flat.
+ * El orden final es alfabético, salvo para el módulo `'inicio'`: ahí se preserva el orden
+ * de declaración de `MENU_ITEMS` (Inicio, Ayuda) — brief 485, "Ayuda" debe salir justo
+ * después de "Inicio" en el module-selector (Ctrl+K) y el acordeón mobile, no antes por
+ * orden alfabético.
+ */
+function groupItems(items: MenuItemDef[], moduloId?: ModuloId): NavMenuItem[] {
 	const result: NavMenuItem[] = [];
 	const groups = new Map<string, { icon: string; items: MenuItemDef[] }>();
 
@@ -359,6 +365,7 @@ function groupItems(items: MenuItemDef[]): NavMenuItem[] {
 		});
 	}
 
+	if (moduloId === 'inicio') return result;
 	return result.sort((a, b) => a.label.localeCompare(b.label, 'es'));
 }
 // #endregion
