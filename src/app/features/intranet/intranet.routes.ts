@@ -359,6 +359,15 @@ export const INTRANET_ROUTES: Routes = [
 				title: 'Intranet - Gestión de Asistencias',
 			},
 			{
+				// P91 F2 (brief 495) — gateado por `ADMIN_RENDIMIENTO` (capability de página,
+				// separada de `REPORTES_RENDIMIENTO` que valida el endpoint). Ver
+				// `intranet-menu.config.ts` y migración manual `20260727_AddAdminRendimientoCapability.sql`.
+				path: 'admin/rendimiento',
+				loadComponent: () =>
+					import('./pages/admin/admin-rendimiento').then((m) => m.AdminRendimientoComponent),
+				title: 'Intranet - Rendimiento Institucional',
+			},
+			{
 				path: 'admin/permisos-salud',
 				loadComponent: () =>
 					import('./pages/admin/health-permissions/admin-health-permissions.component').then(
