@@ -1,0 +1,103 @@
+// #region Host
+:host {
+	display: block;
+}
+// #endregion
+
+// #region Filtro
+.filtro-row {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	margin-bottom: 1rem;
+}
+// #endregion
+
+// #region Sticky columns
+.sticky-col-header,
+.sticky-col {
+	position: sticky;
+	z-index: 1;
+	background: var(--surface-card) !important;
+}
+
+.col-riesgo {
+	width: 40px;
+	min-width: 40px;
+	text-align: center;
+}
+
+.col-nombre {
+	min-width: 180px;
+}
+// #endregion
+
+// #region Periodo headers
+.periodo-header {
+	min-width: 90px;
+	font-weight: 700;
+	font-size: 0.8rem;
+	background: rgba(16, 185, 129, 0.06) !important;
+}
+
+.sub-header {
+	min-width: 70px;
+	font-size: 0.7rem;
+	font-weight: 500;
+	color: var(--text-color-secondary);
+}
+// #endregion
+
+// #region Data cells
+.promedio-cell {
+	font-weight: 600;
+	font-size: 0.85rem;
+	font-variant-numeric: tabular-nums;
+}
+
+.delta-cell {
+	font-size: 0.8rem;
+	font-variant-numeric: tabular-nums;
+}
+
+.delta-mejora {
+	color: #16a34a;
+}
+
+.delta-caida {
+	color: var(--red-600);
+	font-weight: 600;
+}
+
+.delta-neutro {
+	color: var(--text-color-secondary);
+	opacity: 0.5;
+}
+// #endregion
+
+// #region Table overrides
+:host ::ng-deep .p-datatable {
+	--p-datatable-header-cell-background: transparent;
+	--p-datatable-row-background: transparent;
+}
+
+:host ::ng-deep .p-datatable-gridlines .p-datatable-thead > tr > th {
+	border-width: 0 0 1px 0;
+}
+
+:host ::ng-deep .p-datatable-gridlines .p-datatable-tbody > tr > td {
+	border-width: 0 0 1px 0;
+	border-color: var(--surface-border);
+}
+// #endregion
+
+// #region Empty state
+.empty-state {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 3rem 1rem;
+	text-align: center;
+}
+// #endregion

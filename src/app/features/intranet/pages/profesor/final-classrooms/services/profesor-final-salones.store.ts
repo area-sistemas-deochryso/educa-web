@@ -12,6 +12,7 @@ import {
 	ConfiguracionCalificacionListDto,
 	AprobacionEstudianteListDto,
 	SalonesAdminEstadisticas,
+	ReporteRendimientoEstudiantesDto,
 } from '../models';
 
 @Injectable({ providedIn: 'root' })
@@ -30,6 +31,9 @@ export class TeacherFinalClassroomsStore {
 	private readonly _horariosLoading = signal(false);
 	private readonly _asistenciaLoading = signal(false);
 	private readonly _notasLoading = signal(false);
+	private readonly _salonRendimiento = signal<ReporteRendimientoEstudiantesDto | null>(null);
+	private readonly _rendimientoLoading = signal(false);
+	private readonly _rendimientoError = signal<string | null>(null);
 	// #endregion
 
 	// #region Estado privado — UI
@@ -59,6 +63,9 @@ export class TeacherFinalClassroomsStore {
 	readonly horariosLoading = this._horariosLoading.asReadonly();
 	readonly asistenciaLoading = this._asistenciaLoading.asReadonly();
 	readonly notasLoading = this._notasLoading.asReadonly();
+	readonly salonRendimiento = this._salonRendimiento.asReadonly();
+	readonly rendimientoLoading = this._rendimientoLoading.asReadonly();
+	readonly rendimientoError = this._rendimientoError.asReadonly();
 
 	readonly loading = this._loading.asReadonly();
 	readonly tableReady = this._tableReady.asReadonly();
@@ -152,6 +159,9 @@ export class TeacherFinalClassroomsStore {
 		horariosLoading: this._horariosLoading(),
 		asistenciaLoading: this._asistenciaLoading(),
 		notasLoading: this._notasLoading(),
+		salonRendimiento: this._salonRendimiento(),
+		rendimientoLoading: this._rendimientoLoading(),
+		rendimientoError: this._rendimientoError(),
 
 		salonDialogVisible: this._salonDialogVisible(),
 		confirmDialogVisible: this._confirmDialogVisible(),
@@ -227,6 +237,18 @@ export class TeacherFinalClassroomsStore {
 	setNotasLoading(loading: boolean): void {
 		this._notasLoading.set(loading);
 	}
+
+	setSalonRendimiento(rendimiento: ReporteRendimientoEstudiantesDto | null): void {
+		this._salonRendimiento.set(rendimiento);
+	}
+
+	setRendimientoLoading(loading: boolean): void {
+		this._rendimientoLoading.set(loading);
+	}
+
+	setRendimientoError(error: string | null): void {
+		this._rendimientoError.set(error);
+	}
 	// #endregion
 
 	// #region Comandos de UI — Filtros
@@ -256,6 +278,8 @@ export class TeacherFinalClassroomsStore {
 		this._salonHorarios.set([]);
 		this._salonAsistencia.set([]);
 		this._salonNotas.set(null);
+		this._salonRendimiento.set(null);
+		this._rendimientoError.set(null);
 	}
 
 	openConfirmDialog(): void {

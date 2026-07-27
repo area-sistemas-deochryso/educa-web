@@ -107,5 +107,9 @@ export class TeacherFinalClassroomsComponent implements OnInit {
 	onLoadNotas(event: { salonId: number; cursoId: number }): void {
 		this.facade.loadNotasSalon(event.salonId, event.cursoId);
 	}
+
+	onLoadRendimiento(event: { salonId: number; cursoId: number }): void {
+		this.facade.loadRendimientoEstudiantes(event.cursoId);
+	}
 	// #endregion
 }

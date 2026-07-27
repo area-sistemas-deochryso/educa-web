@@ -28,6 +28,9 @@
 				<p-tab value="1"><i class="pi pi-calendar tab-icon"></i>Asistencias</p-tab>
 				<p-tab value="2"><i class="pi pi-chart-bar tab-icon"></i>Notas</p-tab>
 				<p-tab value="3"><i class="pi pi-users tab-icon"></i>Estudiantes</p-tab>
+				@if (showRendimiento()) {
+					<p-tab value="4"><i class="pi pi-chart-line tab-icon"></i>Rendimiento</p-tab>
+				}
 			</p-tablist>
 
 			<p-tabpanels>
@@ -73,6 +76,21 @@
 				<p-tabpanel value="3">
 					<app-classroom-students-tab [salonId]="s.id" [salonesDisponibles]="salonesDisponibles()" />
 				</p-tabpanel>
+				<!-- #endregion -->
+
+				<!-- #region Tab Rendimiento (brief 493, profesor-only) -->
+				@if (showRendimiento()) {
+					<p-tabpanel value="4">
+						<app-classroom-rendimiento-tab
+							[rendimiento]="rendimientoData()"
+							[loading]="rendimientoLoading()"
+							[error]="rendimientoError()"
+							[horarios]="horarios()"
+							[horariosLoading]="horariosLoading()"
+							(cursoChange)="onRendimientoCursoChange($event)"
+						/>
+					</p-tabpanel>
+				}
 				<!-- #endregion -->
 			</p-tabpanels>
 		</p-tabs>
