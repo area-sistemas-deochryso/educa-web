@@ -2,10 +2,17 @@
 
 > **Coord ref**: `educa-coord/chats/running/488-p91-f3-panel-rendimiento-profesor.md`
 > **Plan**: `educa-coord/plans/xrepo-91-dashboard-rendimiento-multirol.md`
-> **Creado**: 2026-07-27
+> **Creado**: 2026-07-27 · **Estado**: ⛔ bloqueado — 2 gaps de contrato encontrados al investigar, delegado a `Educa.API` brief 494.
 > **MODO SUGERIDO**: `/execute`
 > **exclusive**: false
 > **touches**: vista de rendimiento por estudiante para el profesor + extensión del diálogo de Cerrar Periodo
+
+## Bloqueo (investigación 2026-07-27, sin código escrito)
+
+1. **Punto de integración incorrecto**: `ClosePeriodDialogComponent` es admin-only (`admin/salones`, capability `ADMIN_SALONES`). El profesor no tiene esa capability. Corregido en el plan xrepo-91 — el punto real es `TeacherFinalClassroomsComponent` (`profesor/final-salones`, capability `PROFESOR_FINAL_SALONES`).
+2. **Contrato F1 insuficiente**: `ReporteRendimientoDto`/`RendimientoPeriodoDto` solo trae agregado a nivel de curso (`PromedioCurso`), sin desglose por estudiante — que F3 necesita. Delegado a `Educa.API` brief 494 (`.claude/chats/open/494-be-desglose-estudiante-rendimiento.md`).
+
+Retomar este brief cuando 494 cierre.
 
 ## Scope
 
