@@ -249,6 +249,27 @@ export class TeacherFinalClassroomsFacade {
 				},
 			});
 	}
+
+	/** Rendimiento por estudiante (brief 494/493, P91 F3) — cursoContenidoId sale del selector de curso del salón */
+	loadRendimientoEstudiantes(cursoContenidoId: number): void {
+		this.store.setRendimientoLoading(true);
+		this.store.setRendimientoError(null);
+
+		this.api
+			.getRendimientoEstudiantes(cursoContenidoId)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (rendimiento) => {
+					this.store.setSalonRendimiento(rendimiento);
+					this.store.setRendimientoLoading(false);
+				},
+				error: (err) => {
+					logger.error('Error al cargar rendimiento por estudiante:', err);
+					this.store.setRendimientoError('No se pudo cargar el rendimiento de los estudiantes');
+					this.store.setRendimientoLoading(false);
+				},
+			});
+	}
 	// #endregion
 
 	// #region Comandos de UI

@@ -118,11 +118,16 @@
 	[notasLoading]="vm().notasLoading"
 	[horarios]="vm().salonHorarios"
 	[horariosLoading]="vm().horariosLoading"
+	[showRendimiento]="true"
+	[rendimientoData]="vm().salonRendimiento"
+	[rendimientoLoading]="vm().rendimientoLoading"
+	[rendimientoError]="vm().rendimientoError"
 	(visibleChange)="onSalonDialogVisibleChange($event)"
 	(aprobar)="onAprobarEstudiante($event)"
 	(aprobarMasivo)="onAprobarMasivo($event)"
 	(loadAsistencia)="onLoadAsistencia($event)"
 	(loadNotas)="onLoadNotas($event)"
+	(loadRendimiento)="onLoadRendimiento($event)"
 />
 <!-- #endregion -->
 

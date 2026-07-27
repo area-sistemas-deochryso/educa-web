@@ -129,6 +129,47 @@ describe('TeacherFinalClassroomsStore', () => {
 	});
 	// #endregion
 
+	// #region Rendimiento por estudiante (brief 493)
+	describe('rendimiento', () => {
+		const mockRendimiento = {
+			cursoContenidoId: 10,
+			cursoNombre: 'Matemática',
+			salonDescripcion: '5to A',
+			estudiantes: [
+				{
+					estudianteId: 1,
+					estudianteNombre: 'Ana',
+					periodos: [
+						{ periodoId: 1, periodoNombre: 'P1', periodoOrden: 1, promedio: 15, outlierVsPeriodoAnterior: null, outlierVsAnioAnterior: -2 },
+					],
+				},
+			],
+		} as never;
+
+		it('should set rendimiento data and loading/error flags independently', () => {
+			store.setRendimientoLoading(true);
+			expect(store.vm().rendimientoLoading).toBe(true);
+
+			store.setSalonRendimiento(mockRendimiento);
+			expect(store.vm().salonRendimiento).toEqual(mockRendimiento);
+
+			store.setRendimientoError('boom');
+			expect(store.vm().rendimientoError).toBe('boom');
+		});
+
+		it('should reset rendimiento state on closeSalonDialog', () => {
+			store.openSalonDialog(1);
+			store.setSalonRendimiento(mockRendimiento);
+			store.setRendimientoError('boom');
+
+			store.closeSalonDialog();
+
+			expect(store.salonRendimiento()).toBeNull();
+			expect(store.rendimientoError()).toBeNull();
+		});
+	});
+	// #endregion
+
 	// #region Mutación quirúrgica
 	describe('updateAprobacion', () => {
 		it('should update specific student', () => {

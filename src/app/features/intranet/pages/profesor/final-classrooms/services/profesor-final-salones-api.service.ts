@@ -15,6 +15,7 @@ import {
 	BatchCommandResult,
 	PeriodoAcademicoListDto,
 	ConfiguracionCalificacionListDto,
+	ReporteRendimientoEstudiantesDto,
 } from '../models';
 
 @Injectable({ providedIn: 'root' })
@@ -104,6 +105,16 @@ export class TeacherFinalClassroomsApiService {
 		return this.http
 			.get<SalonNotasResumenDto>(
 				`${this.baseUrl}/api/calificacion/salon/${salonId}/curso/${cursoId}`,
+			)
+			.pipe(map((data) => (data && typeof data === 'object' && !('success' in data) ? data : null)));
+	}
+	// #endregion
+
+	// #region Rendimiento por estudiante (brief 494)
+	getRendimientoEstudiantes(cursoContenidoId: number): Observable<ReporteRendimientoEstudiantesDto | null> {
+		return this.http
+			.get<ReporteRendimientoEstudiantesDto>(
+				`${this.baseUrl}/api/reportesrendimiento/curso/${cursoContenidoId}/estudiantes`,
 			)
 			.pipe(map((data) => (data && typeof data === 'object' && !('success' in data) ? data : null)));
 	}

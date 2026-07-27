@@ -17,6 +17,13 @@ const mockSalones = [
 	{ id: 2, gradoOrden: 5, totalEstudiantes: 30, aprobados: 25, desaprobados: 3, pendientes: 2 },
 ] as never[];
 
+const mockRendimiento = {
+	cursoContenidoId: 10,
+	cursoNombre: 'Matemática',
+	salonDescripcion: '5to A',
+	estudiantes: [],
+} as never;
+
 function createMockApi() {
 	return {
 		getSalonesProfesor: vi.fn().mockReturnValue(of(mockSalones)),
@@ -25,6 +32,7 @@ function createMockApi() {
 		getEstudiantesPorSalon: vi.fn().mockReturnValue(of([])),
 		aprobarEstudiante: vi.fn().mockReturnValue(of(true)),
 		aprobacionMasiva: vi.fn().mockReturnValue(of({ aprobados: 5 })),
+		getRendimientoEstudiantes: vi.fn().mockReturnValue(of(mockRendimiento)),
 	};
 }
 // #endregion
@@ -60,6 +68,18 @@ describe('TeacherFinalClassroomsFacade', () => {
 			expect(store.loading()).toBe(false);
 			expect(store.tableReady()).toBe(true);
 			expect(store.statsReady()).toBe(true);
+		});
+	});
+	// #endregion
+
+	// #region loadRendimientoEstudiantes
+	describe('loadRendimientoEstudiantes', () => {
+		it('should load rendimiento by cursoContenidoId', () => {
+			facade.loadRendimientoEstudiantes(10);
+
+			expect(api.getRendimientoEstudiantes).toHaveBeenCalledWith(10);
+			expect(store.salonRendimiento()).toEqual(mockRendimiento);
+			expect(store.rendimientoLoading()).toBe(false);
 		});
 	});
 	// #endregion

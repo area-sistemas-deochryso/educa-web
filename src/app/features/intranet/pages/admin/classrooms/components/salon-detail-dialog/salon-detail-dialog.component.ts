@@ -6,7 +6,12 @@ import { TabsModule } from 'primeng/tabs';
 import { ButtonModule } from 'primeng/button';
 
 import { EstudianteAsistencia } from '@intranet-shared/services';
-import { HorarioResponseDto, SalonNotasResumenDto, resolveModoAsignacion } from '@data/models';
+import {
+	HorarioResponseDto,
+	SalonNotasResumenDto,
+	ReporteRendimientoEstudiantesDto,
+	resolveModoAsignacion,
+} from '@data/models';
 import { ModoAsignacionBadgeComponent } from '@shared/components';
 
 import {
@@ -19,6 +24,7 @@ import { ClassroomApprovalTabComponent } from '../salon-aprobacion-tab/salon-apr
 import { ClassroomAttendanceTabComponent } from '../salon-attendance-tab/salon-attendance-tab.component';
 import { ClassroomGradesTabComponent } from '../salon-notas-tab/salon-notas-tab.component';
 import { ClassroomStudentsTabComponent, SalonOption } from '../salon-estudiantes-tab/salon-estudiantes-tab.component';
+import { ClassroomRendimientoTabComponent } from '../salon-rendimiento-tab/salon-rendimiento-tab.component';
 
 @Component({
 	selector: 'app-classroom-detail-dialog',
@@ -33,6 +39,7 @@ import { ClassroomStudentsTabComponent, SalonOption } from '../salon-estudiantes
 		ClassroomAttendanceTabComponent,
 		ClassroomGradesTabComponent,
 		ClassroomStudentsTabComponent,
+		ClassroomRendimientoTabComponent,
 	],
 	templateUrl: './salon-detail-dialog.component.html',
 	styleUrl: './salon-detail-dialog.component.scss',
@@ -67,12 +74,20 @@ export class ClassroomDetailDialogComponent {
 	readonly salonesDisponibles = input<SalonOption[]>([]);
 	// #endregion
 
+	// #region Inputs — rendimiento por estudiante (brief 493, profesor-only por defecto)
+	readonly showRendimiento = input(false);
+	readonly rendimientoData = input<ReporteRendimientoEstudiantesDto | null>(null);
+	readonly rendimientoLoading = input(false);
+	readonly rendimientoError = input<string | null>(null);
+	// #endregion
+
 	// #region Outputs
 	readonly visibleChange = output<boolean>();
 	readonly aprobar = output<AprobarEstudianteDto>();
 	readonly aprobarMasivo = output<AprobacionMasivaDto>();
 	readonly loadAsistencia = output<{ grado: string; seccion: string; mes: number; anio: number }>();
 	readonly loadNotas = output<{ salonId: number; cursoId: number }>();
+	readonly loadRendimiento = output<{ salonId: number; cursoId: number }>();
 	// #endregion
 
 	// #region Estado local
@@ -157,6 +172,10 @@ export class ClassroomDetailDialogComponent {
 
 	onCursoChange(event: { salonId: number; cursoId: number }): void {
 		this.loadNotas.emit(event);
+	}
+
+	onRendimientoCursoChange(event: { salonId: number; cursoId: number }): void {
+		this.loadRendimiento.emit(event);
 	}
 	// #endregion
 }

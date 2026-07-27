@@ -1,0 +1,93 @@
+<!-- #region Selector de curso -->
+<div class="filtro-row">
+	<p-select
+		[options]="cursoOptions()"
+		[ngModel]="selectedCursoId()"
+		(ngModelChange)="onCursoChange($event)"
+		optionLabel="label"
+		optionValue="value"
+		appendTo="body"
+		placeholder="Seleccionar curso"
+		[loading]="horariosLoading()"
+		[style]="{ width: '250px' }"
+	/>
+
+	@if (rendimiento() && estudiantesEnRiesgo() > 0) {
+		<p-tag
+			[value]="estudiantesEnRiesgo() + ' en riesgo'"
+			severity="danger"
+			icon="pi pi-exclamation-triangle"
+			pTooltip="Estudiantes cuyo período más reciente cayó respecto a su propio período anterior o al año anterior"
+			tooltipPosition="top"
+		/>
+	}
+</div>
+<!-- #endregion -->
+
+<!-- #region Tabla de rendimiento -->
+@if (error(); as err) {
+	<div class="empty-state">
+		<i class="pi pi-exclamation-triangle" style="font-size: 2rem; opacity: 0.5"></i>
+		<p class="text-color-secondary mt-2">{{ err }}</p>
+	</div>
+} @else if (rendimiento(); as data) {
+	<p-table
+		[value]="data.estudiantes"
+		[dataKey]="'estudianteId'"
+		[loading]="loading()"
+		[scrollable]="true"
+		scrollHeight="400px"
+		styleClass="p-datatable-sm p-datatable-gridlines"
+	>
+		<ng-template #header>
+			<tr>
+				<th class="sticky-col-header col-riesgo" style="left: 0; z-index: 2"></th>
+				<th class="sticky-col-header col-nombre" style="left: 40px; z-index: 2">Estudiante</th>
+				@for (periodo of periodoColumns(); track periodo.periodoId) {
+					<th class="text-center periodo-header" [attr.colspan]="3">{{ periodo.periodoNombre }}</th>
+				}
+			</tr>
+			<tr>
+				<th class="sticky-col-header col-riesgo" style="left: 0; z-index: 2"></th>
+				<th class="sticky-col-header col-nombre" style="left: 40px; z-index: 2"></th>
+				@for (periodo of periodoColumns(); track periodo.periodoId) {
+					<th class="text-center sub-header">Promedio</th>
+					<th class="text-center sub-header" pTooltip="vs. propio período anterior" tooltipPosition="top">vs. período</th>
+					<th class="text-center sub-header" pTooltip="vs. baseline institucional del año anterior" tooltipPosition="top">vs. año</th>
+				}
+			</tr>
+		</ng-template>
+		<ng-template #body let-estudiante>
+			<tr>
+				<td class="sticky-col col-riesgo" style="left: 0">
+					@if (esEnRiesgo(estudiante)) {
+						<i class="pi pi-exclamation-triangle text-red-500" pTooltip="En riesgo: cayó respecto a su propia línea base" tooltipPosition="top"></i>
+					}
+				</td>
+				<td class="sticky-col col-nombre" style="left: 40px">{{ estudiante.estudianteNombre }}</td>
+				@for (periodo of periodoColumns(); track periodo.periodoId) {
+					<td class="text-center promedio-cell">{{ formatPromedio(getPeriodo(estudiante, periodo.periodoId)?.promedio ?? null) }}</td>
+					<td class="text-center delta-cell" [class]="deltaClass(getPeriodo(estudiante, periodo.periodoId)?.outlierVsPeriodoAnterior ?? null)">
+						{{ formatDelta(getPeriodo(estudiante, periodo.periodoId)?.outlierVsPeriodoAnterior ?? null) }}
+					</td>
+					<td class="text-center delta-cell" [class]="deltaClass(getPeriodo(estudiante, periodo.periodoId)?.outlierVsAnioAnterior ?? null)">
+						{{ formatDelta(getPeriodo(estudiante, periodo.periodoId)?.outlierVsAnioAnterior ?? null) }}
+					</td>
+				}
+			</tr>
+		</ng-template>
+		<ng-template #emptymessage>
+			<tr>
+				<td [attr.colspan]="periodoColumns().length * 3 + 2" class="text-center p-4">
+					No hay rendimiento registrado para este curso.
+				</td>
+			</tr>
+		</ng-template>
+	</p-table>
+} @else if (!loading()) {
+	<div class="empty-state">
+		<i class="pi pi-chart-line" style="font-size: 2rem; opacity: 0.3"></i>
+		<p class="text-color-secondary mt-2">Seleccione un curso para ver el rendimiento por estudiante.</p>
+	</div>
+}
+<!-- #endregion -->
