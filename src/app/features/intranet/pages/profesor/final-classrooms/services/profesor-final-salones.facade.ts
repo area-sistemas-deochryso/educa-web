@@ -1,11 +1,13 @@
 import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { forkJoin } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 import { logger, resolveErrorMessage, withRetry } from '@core/helpers';
 import { ErrorHandlerService, WalFacadeHelper, WalCrossTabRefetchService } from '@core/services';
 import { environment } from '@config';
 
+import { ProfesorCursosApiService } from '../../services/profesor-cursos-api.service';
 import { TeacherFinalClassroomsApiService } from './profesor-final-salones-api.service';
 import { TeacherFinalClassroomsStore } from './profesor-final-salones.store';
 import { NivelEducativo, AprobarEstudianteDto, AprobacionMasivaDto } from '../models';
@@ -14,6 +16,7 @@ import { NivelEducativo, AprobarEstudianteDto, AprobacionMasivaDto } from '../mo
 export class TeacherFinalClassroomsFacade {
 	// #region Dependencias
 	private api = inject(TeacherFinalClassroomsApiService);
+	private cursosApi = inject(ProfesorCursosApiService);
 	private store = inject(TeacherFinalClassroomsStore);
 	private errorHandler = inject(ErrorHandlerService);
 	private destroyRef = inject(DestroyRef);
@@ -250,17 +253,31 @@ export class TeacherFinalClassroomsFacade {
 			});
 	}
 
-	/** Rendimiento por estudiante (brief 494/493, P91 F3) — cursoContenidoId sale del selector de curso del salón */
-	loadRendimientoEstudiantes(cursoContenidoId: number): void {
+	/**
+	 * Rendimiento por estudiante (brief 494/493, P91 F3).
+	 * `HorarioResponseDto.cursoId` es el `CUR_CodID` (materia), NO el `cursoContenidoId`
+	 * que espera el endpoint (bug encontrado en verificación post-deploy, brief P91-F3-fix) —
+	 * se resuelve horarioId → contenido.id (mismo patrón que `GruposFacade.loadGruposForHorario`).
+	 */
+	loadRendimientoEstudiantes(horarioId: number): void {
 		this.store.setRendimientoLoading(true);
 		this.store.setRendimientoError(null);
 
-		this.api
-			.getRendimientoEstudiantes(cursoContenidoId)
-			.pipe(takeUntilDestroyed(this.destroyRef))
+		this.cursosApi
+			.getContenido(horarioId)
+			.pipe(
+				switchMap((contenido) => {
+					if (!contenido) return of(null);
+					return this.api.getRendimientoEstudiantes(contenido.id);
+				}),
+				takeUntilDestroyed(this.destroyRef),
+			)
 			.subscribe({
 				next: (rendimiento) => {
 					this.store.setSalonRendimiento(rendimiento);
+					if (!rendimiento) {
+						this.store.setRendimientoError('Este curso todavía no tiene contenido registrado');
+					}
 					this.store.setRendimientoLoading(false);
 				},
 				error: (err) => {

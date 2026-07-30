@@ -28,24 +28,22 @@ export class ClassroomRendimientoTabComponent {
 	readonly horarios = input<HorarioResponseDto[]>([]);
 	readonly horariosLoading = input(false);
 
-	readonly cursoChange = output<{ salonId: number; cursoId: number }>();
+	/**
+	 * `horarioId` (no `cursoId`/`CUR_CodID`) — el backend resuelve el `cursoContenidoId`
+	 * real a partir del horario (ver `TeacherFinalClassroomsFacade.loadRendimientoEstudiantes`).
+	 */
+	readonly cursoChange = output<{ salonId: number; horarioId: number }>();
 	// #endregion
 
 	// #region Estado local
-	readonly selectedCursoId = signal<number | null>(null);
+	readonly selectedHorarioId = signal<number | null>(null);
 	// #endregion
 
 	// #region Computed
+	/** Una opción por horario (no deduplicado por materia): cada horario resuelve a su propio `cursoContenidoId`. */
 	readonly cursoOptions = computed(() => {
 		const horarios = this.horarios();
-		const seen = new Set<number>();
-		return horarios
-			.filter((h) => {
-				if (seen.has(h.cursoId)) return false;
-				seen.add(h.cursoId);
-				return true;
-			})
-			.map((h) => ({ label: h.cursoNombre, value: h.cursoId, salonId: h.salonId }));
+		return horarios.map((h) => ({ label: h.cursoNombre, value: h.id, salonId: h.salonId }));
 	});
 
 	/** Columnas de período: se toman del primer estudiante — el mismo cursoContenido comparte períodos entre todos */
@@ -60,11 +58,11 @@ export class ClassroomRendimientoTabComponent {
 	// #endregion
 
 	// #region Event handlers
-	onCursoChange(cursoId: number): void {
-		this.selectedCursoId.set(cursoId);
-		const opt = this.cursoOptions().find((o) => o.value === cursoId);
+	onCursoChange(horarioId: number): void {
+		this.selectedHorarioId.set(horarioId);
+		const opt = this.cursoOptions().find((o) => o.value === horarioId);
 		if (opt) {
-			this.cursoChange.emit({ salonId: opt.salonId, cursoId });
+			this.cursoChange.emit({ salonId: opt.salonId, horarioId });
 		}
 	}
 	// #endregion

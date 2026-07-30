@@ -87,7 +87,7 @@ export class ClassroomDetailDialogComponent {
 	readonly aprobarMasivo = output<AprobacionMasivaDto>();
 	readonly loadAsistencia = output<{ grado: string; seccion: string; mes: number; anio: number }>();
 	readonly loadNotas = output<{ salonId: number; cursoId: number }>();
-	readonly loadRendimiento = output<{ salonId: number; cursoId: number }>();
+	readonly loadRendimiento = output<{ salonId: number; horarioId: number }>();
 	// #endregion
 
 	// #region Estado local
@@ -174,7 +174,7 @@ export class ClassroomDetailDialogComponent {
 		this.loadNotas.emit(event);
 	}
 
-	onRendimientoCursoChange(event: { salonId: number; cursoId: number }): void {
+	onRendimientoCursoChange(event: { salonId: number; horarioId: number }): void {
 		this.loadRendimiento.emit(event);
 	}
 	// #endregion
