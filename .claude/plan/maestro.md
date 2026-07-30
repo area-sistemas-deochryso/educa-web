@@ -16,6 +16,7 @@
 | xP43 | → Monitoreo Cowork (coord) | F5:5.2 FE ✅ awaiting-prod (285) · F6.1 FE ✅ awaiting-prod (296) · F6.2 FE ✅ awaiting-prod (297) · F6.3 FE ✅ awaiting-prod (303) · F6.3 follow-up ✅ awaiting-prod (304) | ver P43 |
 | xP53 | → Duplicate person validation (coord) | F3 FE ✅ awaiting-prod (281) | ver P53 |
 | xPanelAyuda | → Panel de ayuda intranet (coord) | F1-F3 BE ✅ · F4 FE ✅ awaiting-prod (479, `chat/479-fe-panel-ayuda-qa-shell`) · F5 FE ✅ awaiting-prod (480, `chat/480-fe-panel-ayuda-ticket`) · F6 FE ✅ awaiting-prod (481, `chat/481-fe-panel-ayuda-salud-sede`) | ver xrepo-panel-ayuda-intranet |
+| xP92 | → Admin "ver como" profesor/estudiante — gate + wrapper de módulo (coord P92 F2) | 🔒 bloqueado por F1 (`Educa.API` 498) — brief 499 sin arrancar | ver P92 |
 <!-- INDEX:END -->
 
 ---
