@@ -24,4 +24,5 @@ export * from './signalr';
 export * from './facades';
 export * from './excel';
 export * from './capacitor';
+export * from './view-as';
 // #endregion

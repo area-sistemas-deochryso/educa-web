@@ -1,0 +1,38 @@
+// #region View As Picker (P92 F2)
+.view-as-picker {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+
+	&__suggestion {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+
+		i {
+			color: var(--text-color-secondary);
+		}
+	}
+
+	&__suggestion-info {
+		display: flex;
+		flex-direction: column;
+	}
+
+	&__suggestion-name {
+		font-weight: 600;
+		color: var(--text-color);
+	}
+
+	&__suggestion-detail {
+		font-size: 0.8rem;
+		color: var(--text-color-secondary);
+	}
+
+	&__empty {
+		padding: 0.5rem 0.75rem;
+		color: var(--text-color-secondary);
+		font-size: 0.875rem;
+	}
+}
+// #endregion

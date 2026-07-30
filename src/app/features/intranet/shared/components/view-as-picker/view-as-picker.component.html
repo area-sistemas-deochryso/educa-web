@@ -1,0 +1,31 @@
+<!-- #region Template -->
+<div class="view-as-picker">
+	<p-autoComplete
+		[suggestions]="suggestions()"
+		[ngModel]="selectedUsuario()"
+		(completeMethod)="onSearch($event)"
+		(onSelect)="onSelect($event.value)"
+		optionLabel="nombreCompleto"
+		[placeholder]="placeholder()"
+		[attr.aria-label]="placeholder()"
+		[minLength]="2"
+		[style]="{ width: '100%' }"
+		[inputStyle]="{ width: '100%' }"
+	>
+		<ng-template let-usuario pTemplate="item">
+			<div class="view-as-picker__suggestion">
+				<i class="pi pi-user" aria-hidden="true"></i>
+				<div class="view-as-picker__suggestion-info">
+					<span class="view-as-picker__suggestion-name">{{ usuario.nombreCompleto }}</span>
+					<span class="view-as-picker__suggestion-detail">{{ usuario.rol }} &middot; {{ usuario.dni }}</span>
+				</div>
+			</div>
+		</ng-template>
+		<ng-template pTemplate="empty">
+			<div class="view-as-picker__empty">
+				{{ searching() ? 'Buscando...' : 'Sin resultados' }}
+			</div>
+		</ng-template>
+	</p-autoComplete>
+</div>
+<!-- #endregion -->

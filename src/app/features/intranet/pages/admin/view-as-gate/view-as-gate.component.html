@@ -1,0 +1,24 @@
+<!-- #region Template -->
+<div class="view-as-gate">
+	<app-page-header
+		icon="pi pi-eye"
+		[title]="'Ver como ' + (rol() ?? '')"
+		[subtitle]="'Elegí un ' + (rol() ?? 'usuario') + ' para ver cursos, salones y horarios exactamente como esa persona los vería.'"
+	>
+		<button
+			pButton
+			type="button"
+			label="Cancelar"
+			icon="pi pi-times"
+			class="p-button-outlined p-button-sm"
+			routerLink="/intranet"
+		></button>
+	</app-page-header>
+
+	@if (rol(); as currentRol) {
+		<section class="view-as-gate__picker-section">
+			<app-view-as-picker [rol]="currentRol" (userSelected)="onUserSelected($event)" />
+		</section>
+	}
+</div>
+<!-- #endregion -->

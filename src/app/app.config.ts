@@ -20,6 +20,7 @@ import {
 	schemaVersionInterceptor,
 	swCacheInvalidationInterceptor,
 	timeoutInterceptor,
+	viewAsInterceptor,
 } from '@core/interceptors';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { provideHttpClient, withFetch, withInterceptors, withXsrfConfiguration } from '@angular/common/http';
@@ -54,6 +55,7 @@ export const appConfig: ApplicationConfig = {
 				authInterceptor, // Will be simplified (no-op) after full migration
 				rateLimitInterceptor, // Throttle concurrent API requests + 429 backoff
 				clockSyncInterceptor, // Detect clock skew from server Date headers
+				viewAsInterceptor, // P92 F2: tag GET requests with the active "ver como" selection
 				requestTraceInterceptor,
 				schemaVersionInterceptor, // Plan WAL Resilience M4 — fingerprint en cache
 				swCacheInvalidationInterceptor, // Auto-invalidate SW cache after mutations

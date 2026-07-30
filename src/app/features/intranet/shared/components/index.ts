@@ -17,5 +17,7 @@ export * from './attendance-scope-student-notice';
 export * from './wal-migration-banner';
 export * from './correlation-id-pill';
 export * from './mini-sparkline';
+export * from './view-as-picker';
+export * from './view-as-banner';
 export * from './layout/intranet-layout';
 // #endregion

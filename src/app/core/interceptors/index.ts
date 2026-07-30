@@ -10,4 +10,5 @@ export * from './schema-version/schema-version.interceptor';
 export * from './sw-cache-invalidation/sw-cache-invalidation.interceptor';
 export * from './timeout/timeout.interceptor';
 export * from './trace/request-trace.interceptor';
+export * from './view-as/view-as.interceptor';
 // #endregion

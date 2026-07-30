@@ -28,6 +28,7 @@ import { AccessDeniedModalComponent } from '@intranet-shared/components/access-d
 import { WalMigrationBannerComponent } from '@intranet-shared/components/wal-migration-banner';
 import { WalDegradedBannerComponent } from '@intranet-shared/components/wal-degraded-banner';
 import { ConnectionStatusIndicatorComponent } from '@intranet-shared/components/connection-status-indicator/connection-status-indicator.component';
+import { ViewAsBannerComponent } from '@intranet-shared/components/view-as-banner';
 
 // #endregion
 
@@ -67,6 +68,7 @@ const NAV_GAP = 4;
 		WalMigrationBannerComponent,
 		WalDegradedBannerComponent,
 		ConnectionStatusIndicatorComponent,
+		ViewAsBannerComponent,
 	],
 	templateUrl: './intranet-layout.component.html',
 	styleUrl: './intranet-layout.component.scss',

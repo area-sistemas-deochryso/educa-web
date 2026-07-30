@@ -1,14 +1,31 @@
 /* eslint-disable max-lines -- Razón: archivo central de rutas de la intranet; crece linealmente con cada feature nuevo registrado y cada spread condicional por feature flag. Fraccionarlo (ej: `intranet-admin.routes.ts`) es un refactor transversal y se posterga como deuda técnica menor. */
 // #region Imports
 import { Route, Routes } from '@angular/router';
-import { authGuard, permissionsGuard } from '@core/guards';
+import { authGuard, permissionsGuard, viewAsGateGuard } from '@core/guards';
+import type { ViewAsRol } from '@core/services/view-as';
 
 import { IntranetLayoutComponent } from '@intranet-shared/components/layout/intranet-layout';
 import { environment } from '@config/environment';
 // #endregion
 
+// #region "Ver como" (P92 F2)
+/**
+ * Tags every route in `routesArr` with `canActivate: [viewAsGateGuard]` and
+ * `data.viewAsRol`, so an Administrador can't reach any page of the module
+ * without first choosing a user of the matching role (decision #3). No-op
+ * for real profesores/estudiantes — see `viewAsGateGuard`.
+ */
+function withViewAsGate(viewAsRol: ViewAsRol, routesArr: Route[]): Route[] {
+	return routesArr.map((r) => ({
+		...r,
+		canActivate: [viewAsGateGuard, ...(r.canActivate ?? [])],
+		data: { ...r.data, viewAsRol },
+	}));
+}
+// #endregion
+
 // #region Rutas por rol
-const PROFESOR_ROUTES: Route[] = [
+const PROFESOR_ROUTES_RAW: Route[] = [
 	{
 		path: 'profesor/asistencia',
 		loadComponent: () =>
@@ -58,8 +75,9 @@ const PROFESOR_ROUTES: Route[] = [
 		title: 'Intranet - Mis Salones',
 	},
 ];
+const PROFESOR_ROUTES: Route[] = withViewAsGate('Profesor', PROFESOR_ROUTES_RAW);
 
-const ESTUDIANTE_ROUTES: Route[] = [
+const ESTUDIANTE_ROUTES_RAW: Route[] = [
 	{
 		path: 'estudiante/asistencia',
 		loadComponent: () =>
@@ -109,6 +127,7 @@ const ESTUDIANTE_ROUTES: Route[] = [
 		title: 'Intranet - Mis Salones',
 	},
 ];
+const ESTUDIANTE_ROUTES: Route[] = withViewAsGate('Estudiante', ESTUDIANTE_ROUTES_RAW);
 // #endregion
 
 // #region Rutas con feature flags
@@ -304,6 +323,20 @@ export const INTRANET_ROUTES: Routes = [
 
 			// #region Admin
 			...experimentalRoutes,
+			{
+				// P92 F2 (brief 499) — gate de selección de usuario para "ver como".
+				// `permissionPath: 'intranet'` reusa la capability genérica ya
+				// concedida a todo rol logueado (mismo truco que la ruta 'ayuda',
+				// ver comentario más abajo) — el gate real de "quién puede ver como
+				// quién" vive en el backend (`ADMIN_VER_COMO`, F1 brief 498), esta
+				// ruta solo redirige a quien no sea Administrador (ver
+				// `ViewAsGateComponent.ngOnInit`).
+				path: 'ver-como/:rol',
+				loadComponent: () =>
+					import('./pages/admin/view-as-gate').then((m) => m.ViewAsGateComponent),
+				data: { permissionPath: 'intranet' },
+				title: 'Intranet - Ver como',
+			},
 			{
 				path: 'admin/permisos/roles',
 				loadComponent: () =>

@@ -1,0 +1,43 @@
+<!-- #region Template -->
+@if (isVisible()) {
+	<div class="view-as-banner" role="status">
+		<div class="view-as-banner__content">
+			<i class="pi pi-eye view-as-banner__icon" aria-hidden="true"></i>
+			<span>
+				Viendo como: <strong>{{ activeContext()?.nombreCompleto }}</strong>
+				({{ activeContext()?.rol }})
+			</span>
+		</div>
+		<div class="view-as-banner__actions">
+			<button
+				pButton
+				type="button"
+				label="Cambiar"
+				icon="pi pi-sync"
+				class="p-button-sm p-button-outlined"
+				(click)="openPicker()"
+			></button>
+			<button
+				pButton
+				type="button"
+				label="Salir"
+				icon="pi pi-sign-out"
+				class="p-button-sm p-button-text"
+				(click)="exit()"
+			></button>
+		</div>
+	</div>
+}
+
+<p-dialog
+	[visible]="pickerOpen()"
+	(visibleChange)="onDialogVisibleChange($event)"
+	[header]="'Cambiar ' + (activeContext()?.rol ?? '')"
+	[modal]="true"
+	[style]="{ width: '480px' }"
+>
+	@if (activeContext(); as context) {
+		<app-view-as-picker [rol]="context.rol" (userSelected)="onUserSelected($event)" />
+	}
+</p-dialog>
+<!-- #endregion -->
