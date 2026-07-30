@@ -2,7 +2,7 @@
 
 > **Coord ref**: `educa-coord/plans/xrepo-92-admin-ver-como-wrapper.md` § F2 (gap post-shipment)
 > **Plan**: `educa-coord/plans/xrepo-92-admin-ver-como-wrapper.md`
-> **Creado**: 2026-07-30 · **Estado**: ⏳ pendiente arrancar.
+> **Creado**: 2026-07-30 · **Estado**: ✅ cerrado -- fix aplicado, verificado en vivo.
 > **MODO SUGERIDO**: `/execute` directo — causa raíz ya identificada, no requiere diseño.
 > **exclusive**: false
 > **modules**: intranet-academico (profesor) — salones, horarios, cursos, calificaciones, asistencia, foro, mensajería
@@ -49,10 +49,51 @@ Antes de aplicar el fix, grepear el resto del código por el mismo patrón (`use
 
 ## Criterio de cierre
 
-- [ ] Grep confirmado: no queda ningún caller de `entityId()`/`AuthService.currentUser` en el módulo profesor (ni estudiante) que debería respetar "ver como" y no lo hace.
-- [ ] Fix aplicado, build + lint + tests OK.
-- [ ] Verificación en vivo: elegir Mendo Calderón, `/intranet/profesor/salones` y `/intranet/profesor/horarios` muestran datos reales de ella (confirmar con la request de red, no solo con que la pantalla no esté vacía).
-- [ ] `educa-coord/`: plan P92 actualizado con la nota del gap encontrado y su cierre.
+- [x] Grep confirmado: no queda ningún caller de `entityId()`/`AuthService.currentUser` en el módulo profesor (ni estudiante) que debería respetar "ver como" y no lo hace.
+- [x] Fix aplicado, build + lint + tests OK.
+- [x] Verificación en vivo: elegir Mendo Calderón, `/intranet/profesor/salones` y `/intranet/profesor/horarios` muestran datos reales de ella (confirmar con la request de red, no solo con que la pantalla no esté vacía).
+- [x] `educa-coord/`: plan P92 actualizado con la nota del gap encontrado y su cierre.
+
+## Cierre (2026-07-30)
+
+### Fix aplicado
+
+`ProfesorFacade.loadData()` (`src/app/features/intranet/pages/profesor/services/profesor.facade.ts`) ahora resuelve el id vía un nuevo helper privado `getEffectiveProfesorId()`:
+
+```ts
+private getEffectiveProfesorId(): number | null {
+	if (this.viewAsContext.hasContextForRol('Profesor')) {
+		return this.viewAsContext.activeContext()?.entityId ?? null;
+	}
+	return this.userProfile.entityId();
+}
+```
+
+Mismo criterio (`ViewAsContextService.hasContextForRol`) que ya usa `viewAsInterceptor` para decidir cuándo aplica "ver como" -- no se inventó un mecanismo nuevo.
+
+### Grep de otros callers (confirmado)
+
+Único otro caller de `.entityId()` en todo `src/`: `VideoconferenciasFacade.getHorariosByRole()` (`src/app/features/intranet/pages/cross-role/videoconferencias/services/videoconferencias.facade.ts:115`), mismo patrón (`GET /api/Horario/profesor/{entityId}`). **Fuera de alcance real, no fue tocado**: su ruta (`/intranet/videoconferencias`, definida en `experimentalRoutes` de `intranet.routes.ts`) no está bajo `withViewAsGate` ni bajo el prefijo `/intranet/profesor/*` -- `ViewAsContextService.clearIfOutsideModule` limpia el contexto activo apenas la navegación sale de `/intranet/{rol}`, así que un admin nunca puede llegar a esa página con un contexto "ver como" todavía activo. No hay ningún otro caller en `profesor/*` ni `estudiante/*`.
+
+### Build / lint / tests
+
+- `npm run lint`: OK, "All files pass linting."
+- `npm run build`: OK (SSR + prerender de 9 rutas estáticas, sin errores).
+- `npx vitest run`: **249 test files, 2469 tests, todos pasando** (incluye los 2 tests nuevos en `profesor.facade.spec.ts` cubriendo contexto activo para rol Profesor y contexto activo para otro rol -- Estudiante -- que debe ignorarse).
+
+### Verificación en vivo (sandbox `402-verify-pattern`, fast-forward merge de `chat/500-...`)
+
+Login ya activo como Administrador ("CODE CLAUDE"). Elegida "MARIELA MENDO CALDERON" (DNI 42724344) vía el picker "Ver como Profesor":
+
+- `/intranet/profesor/salones`: pantalla "Mis Salones" muestra 2 salones reales (1RO PRIMARIA A - 2026 / 20 estudiantes / QA E2E Curso Prueba; INICIAL 3 AÑOS B - 2026 / 2 estudiantes / Arte). Requests de red confirmadas: `GET /api/Horario/profesor/15` (200), `GET /api/ProfesorSalon/profesor/15` (200) -- **15 = id de Mendo Calderón, no 10 (admin)**.
+- `/intranet/profesor/horarios`: pantalla "Mi Horario" muestra el grid con los mismos 2 cursos (QA E2E Curso Prueba lunes 07:00-08:00, Arte miércoles 07:00-08:00). Requests confirmadas: `GET /api/Horario/profesor/15` (200), `GET /api/ProfesorSalon/profesor/15` (200) -- misma id 15.
+
+Nota metodológica: la navegación directa por URL (browser `navigate`) resetea el contexto "ver como" en memoria (comportamiento esperado, documentado en `ViewAsContextService`) -- la segunda verificación (`/horarios`) requirió re-elegir a Mendo Calderón desde el picker y navegar dentro de la app (no por URL bar) para mantener el contexto activo.
+
+### Commits
+
+- `educa-web` (branch `chat/500-fe-fix-viewas-profesor-facade-entityid`): `89e0e3ca` -- `fix(profesor): resolve profesorId from active view-as context when present`.
+- `educa-coord`: plan `xrepo-92-admin-ver-como-wrapper.md` actualizado con el cierre del gap.
 
 ## Tiempo estimado
 
