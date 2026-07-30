@@ -2,11 +2,19 @@
 
 > **Coord ref**: `educa-coord/plans/xrepo-92-admin-ver-como-wrapper.md` § F2
 > **Plan**: `educa-coord/plans/xrepo-92-admin-ver-como-wrapper.md`
-> **Creado**: 2026-07-30 · **Estado**: 🔒 bloqueado — depende de F1 (`Educa.API` brief 498, capability admin-only + resolución centralizada de identidad, sin arrancar todavía).
-> **MODO SUGERIDO**: no arrancar hasta que 498 cierre. Cuando cierre, `/execute` directo (diseño ya cerrado en coord).
+> **Creado**: 2026-07-30 · **Estado**: ✅ desbloqueado — F1 shipped en `Educa.API` (brief 498, `chat/498-be-admin-ver-como-capability`, commit `c06f73e7`).
+> **MODO SUGERIDO**: `/execute` directo (diseño ya cerrado en coord).
 > **exclusive**: false
 > **modules**: intranet-academico (cursos, salones, horarios) — estudiante y profesor
 > **touches**: nuevas rutas/gate de admin, wrapper a nivel de módulo sobre `estudiante/*` y `profesor/*`, interceptor HTTP nuevo
+
+## Contrato real que dejó F1 (no re-investigar, ya está shipped así)
+
+- **Capability**: `ADMIN_VER_COMO` (`AccessLevel.Read`), asignada solo al rol Administrador (rol 8) — ningún otro rol admin-like (Director, Coordinador, etc.) la tiene por ahora.
+- **Transporte**: headers HTTP, no query param — `X-View-As-Entity-Id` (id del usuario elegido) + `X-View-As-Rol` (rol elegido, se valida contra el rol que el endpoint espera). Hacen falta los dos.
+- **Gate duro de solo lectura en el backend**: cualquier request con esos headers que NO sea `GET` devuelve 403 `ADMIN_VER_COMO_SOLO_LECTURA` — no hace falta que el FE evite mandar los headers en mutaciones, el backend ya lo rechaza, pero el interceptor de este brief solo debería agregarlos a `GET` de todos modos (no generar 403 esperables a propósito).
+- **Otros 403 posibles**: `ADMIN_VER_COMO_NO_AUTORIZADO` (caller sin la capability) y `ADMIN_VER_COMO_ROL_NO_COINCIDE` (el rol del header no es el que el endpoint espera) — el interceptor/servicio de FE no debería poder disparar estos si el picker ya filtra correctamente por rol, pero conviene loguear si aparecen (bug de integración, no de uso normal).
+- Endpoints cubiertos: todos los que ya usaban `RequireProfesorId()`/`RequireEstudianteId()` en `Educa.API` (cursos, salones, horarios de profesor/estudiante, incluido `mi-horario-hoy`) — no hace falta pedir nada nuevo al backend para el scope de este brief.
 
 ## Contexto
 
@@ -52,9 +60,9 @@ Confirmado en vivo (sesión coord 2026-07-30) que un admin puede navegar a rutas
 
 ## Tiempo estimado
 
-Sin estimar — bloqueado por F1, no arranca todavía.
+Sin estimar — diseño cerrado, F1 shipped, implementación directa.
 
 ## Referencias
 
 - Plan: `educa-coord/plans/xrepo-92-admin-ver-como-wrapper.md`
-- F1 (backend, bloqueante): `Educa.API/.claude/chats/open/498-be-admin-ver-como-capability.md`
+- F1 (backend, shipped): `Educa.API/.claude/chats/closed/498-be-admin-ver-como-capability.md` (branch `chat/498-be-admin-ver-como-capability`, commit `c06f73e7`)
