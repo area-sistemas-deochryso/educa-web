@@ -9,6 +9,7 @@ import { ProfesorStore, ProfesorSalonConEstudiantes } from './profesor.store';
 import { ErrorHandlerService } from '@core/services';
 import { ProfesorApiService } from './profesor-api.service';
 import { UserProfileService } from '@core/services/user';
+import { ViewAsContextService } from '@core/services/view-as';
 import { SmartNotificationService } from '@core/services/notifications';
 
 // #endregion
@@ -37,6 +38,13 @@ function createMockUserProfile() {
 	return { entityId: vi.fn().mockReturnValue(1) };
 }
 
+function createMockViewAsContext(active: { entityId: number; rol: string } | null = null) {
+	return {
+		hasContextForRol: vi.fn().mockImplementation((rol: string) => active?.rol === rol),
+		activeContext: vi.fn().mockReturnValue(active),
+	};
+}
+
 function createMockSmartNotif() {
 	return { saveHorarioSnapshot: vi.fn(), saveCalificacionSnapshot: vi.fn(), saveActividadSnapshot: vi.fn() };
 }
@@ -59,6 +67,7 @@ describe('ProfesorFacade', () => {
 				ProfesorStore,
 				{ provide: ProfesorApiService, useValue: api },
 				{ provide: UserProfileService, useValue: createMockUserProfile() },
+				{ provide: ViewAsContextService, useValue: createMockViewAsContext() },
 				{ provide: ErrorHandlerService, useValue: errorHandler },
 				{ provide: SmartNotificationService, useValue: createMockSmartNotif() },
 			],
@@ -82,6 +91,60 @@ describe('ProfesorFacade', () => {
 			facade.loadData();
 			expect(api.getHorarios).toHaveBeenCalledWith(1);
 			expect(api.getSalonTutoria).toHaveBeenCalledWith(1);
+		});
+	});
+	// #endregion
+
+	// #region loadData -- "ver como" (P92 F2)
+	describe('loadData with active "ver como" context', () => {
+		it('should use the view-as entityId when a Profesor context is active', () => {
+			const viewAsApi = createMockApi();
+			TestBed.resetTestingModule();
+			TestBed.configureTestingModule({
+				providers: [
+					ProfesorFacade,
+					ProfesorStore,
+					{ provide: ProfesorApiService, useValue: viewAsApi },
+					{ provide: UserProfileService, useValue: createMockUserProfile() },
+					{
+						provide: ViewAsContextService,
+						useValue: createMockViewAsContext({ entityId: 99, rol: 'Profesor' }),
+					},
+					{ provide: ErrorHandlerService, useValue: errorHandler },
+					{ provide: SmartNotificationService, useValue: createMockSmartNotif() },
+				],
+			});
+
+			const viewAsFacade = TestBed.inject(ProfesorFacade);
+			viewAsFacade.loadData();
+
+			expect(viewAsApi.getHorarios).toHaveBeenCalledWith(99);
+			expect(viewAsApi.getSalonTutoria).toHaveBeenCalledWith(99);
+		});
+
+		it('should ignore an active context for a different rol (Estudiante)', () => {
+			const otherRolApi = createMockApi();
+			TestBed.resetTestingModule();
+			TestBed.configureTestingModule({
+				providers: [
+					ProfesorFacade,
+					ProfesorStore,
+					{ provide: ProfesorApiService, useValue: otherRolApi },
+					{ provide: UserProfileService, useValue: createMockUserProfile() },
+					{
+						provide: ViewAsContextService,
+						useValue: createMockViewAsContext({ entityId: 99, rol: 'Estudiante' }),
+					},
+					{ provide: ErrorHandlerService, useValue: errorHandler },
+					{ provide: SmartNotificationService, useValue: createMockSmartNotif() },
+				],
+			});
+
+			const otherRolFacade = TestBed.inject(ProfesorFacade);
+			otherRolFacade.loadData();
+
+			expect(otherRolApi.getHorarios).toHaveBeenCalledWith(1);
+			expect(otherRolApi.getSalonTutoria).toHaveBeenCalledWith(1);
 		});
 	});
 	// #endregion

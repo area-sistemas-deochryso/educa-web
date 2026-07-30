@@ -7,6 +7,7 @@ import { environment } from '@config';
 import { SmartNotificationService } from '@core/services/notifications';
 import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@app/shared/constants';
 import { UserProfileService } from '@core/services/user';
+import { ViewAsContextService } from '@core/services/view-as';
 import { CursoContenidoDetalleDto, VistaPromedio, ProfesorSalonConEstudiantes } from '../models';
 import { ProfesorApiService } from './profesor-api.service';
 import { ProfesorStore } from './profesor.store';
@@ -16,6 +17,7 @@ export class ProfesorFacade {
 	private readonly api = inject(ProfesorApiService);
 	private readonly store = inject(ProfesorStore);
 	private readonly userProfile = inject(UserProfileService);
+	private readonly viewAsContext = inject(ViewAsContextService);
 	private readonly errorHandler = inject(ErrorHandlerService);
 	private readonly smartNotif = inject(SmartNotificationService);
 	private readonly destroyRef = inject(DestroyRef);
@@ -41,7 +43,7 @@ export class ProfesorFacade {
 
 	// #region Comandos
 	loadData(): void {
-		const profesorId = this.userProfile.entityId();
+		const profesorId = this.getEffectiveProfesorId();
 		if (!profesorId) {
 			logger.warn('ProfesorFacade: No se encontró entityId del profesor');
 			return;
@@ -196,6 +198,22 @@ export class ProfesorFacade {
 
 	getServerTime(): Observable<string | null> {
 		return this.api.getServerTime();
+	}
+	// #endregion
+
+	// #region Helpers privados
+	/**
+	 * Id de profesor a usar en las llamadas que lo llevan en la URL
+	 * (`getHorarios`/`getSalonTutoria`). Si un Administrador tiene activo un
+	 * contexto "ver como" (P92 F2) para el rol Profesor, usa el `entityId`
+	 * del profesor elegido; si no, la identidad real logueada. Mismo
+	 * criterio que `viewAsInterceptor` para decidir cuándo aplica "ver como".
+	 */
+	private getEffectiveProfesorId(): number | null {
+		if (this.viewAsContext.hasContextForRol('Profesor')) {
+			return this.viewAsContext.activeContext()?.entityId ?? null;
+		}
+		return this.userProfile.entityId();
 	}
 	// #endregion
 
