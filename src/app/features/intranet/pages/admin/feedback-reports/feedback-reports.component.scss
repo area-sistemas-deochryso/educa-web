@@ -11,9 +11,12 @@
 // #endregion
 
 // #region Stats — patrón B3 (design-system §B3)
+// flex-wrap (no grid auto-fit): con un número de tarjetas que no es
+// múltiplo de columnas, grid deja la última tarjeta huérfana y angosta
+// con hueco vacío al lado; flex la estira para ocupar la fila completa.
 .stats-section {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+	display: flex;
+	flex-wrap: wrap;
 	gap: 1rem;
 
 	.stat-card {
@@ -23,6 +26,7 @@
 		padding: 1.25rem;
 		border: 1px solid var(--surface-300);
 		border-radius: 12px;
+		flex: 1 1 200px;
 
 		.stat-content {
 			display: flex;
@@ -83,10 +87,10 @@
 }
 
 @media (max-width: 768px) {
-	.stats-section { grid-template-columns: 1fr 1fr; }
+	.stats-section .stat-card { flex-basis: calc(50% - 0.5rem); }
 }
 @media (max-width: 480px) {
-	.stats-section { grid-template-columns: 1fr; }
+	.stats-section .stat-card { flex-basis: 100%; }
 }
 // #endregion
 
