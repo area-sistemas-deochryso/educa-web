@@ -57,9 +57,13 @@ export class ErrorHeatmapComponent {
 	/** Drill-down (brief 432, P68 F8.2) — solo celdas del calendario con count > 0. */
 	readonly cellClick = output<string>();
 
+	// 'Semanal' renderiza la grilla real de intensidad (heatmap); a 30 días se
+	// vuelve ilegible como grilla y se delega en un area chart por severidad
+	// (ver template, modo no-semanal) — el label refleja eso, no "Calendario",
+	// para no prometer una vista de heatmap que ese modo no muestra.
 	readonly periodOptions: HeatmapPeriodOption[] = [
 		{ label: 'Semanal', value: 7 },
-		{ label: 'Calendario', value: 30 },
+		{ label: 'Tendencia', value: 30 },
 	];
 
 	readonly today = new Date();
