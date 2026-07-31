@@ -15,6 +15,7 @@ import { AvatarModule } from 'primeng/avatar';
 import { BadgeModule } from 'primeng/badge';
 import { UserProfileService, NotificationsService } from '@core/services';
 import { FeatureFlagsFacade } from '@core/services/feature-flags';
+import { FabMenuVisibilityService } from '@intranet-shared/services';
 import { UserInfoDialogComponent } from '../user-info-dialog/user-info-dialog.component';
 
 // #endregion
@@ -32,6 +33,7 @@ export class UserProfileMenuComponent {
 	private userProfile = inject(UserProfileService);
 	private notificationsService = inject(NotificationsService);
 	private flags = inject(FeatureFlagsFacade);
+	private fabVisibility = inject(FabMenuVisibilityService);
 	// #endregion
 
 	// #region I/O
@@ -50,6 +52,7 @@ export class UserProfileMenuComponent {
 	readonly initials = this.userProfile.initials;
 
 	readonly showNotifications = computed(() => this.flags.isEnabled('notifications'));
+	readonly fabHidden = this.fabVisibility.hidden;
 	readonly unreadCount = this.notificationsService.unreadCount;
 	readonly unreadBadge = computed(() => {
 		const count = this.unreadCount();
@@ -81,6 +84,11 @@ export class UserProfileMenuComponent {
 		// * Cerrar popover antes de abrir el diálogo.
 		this.popover().hide();
 		this.infoDialogVisible.set(true);
+	}
+
+	onShowFabClick(): void {
+		this.popover().hide();
+		this.fabVisibility.show();
 	}
 
 	onInfoDialogVisibleChange(visible: boolean): void {

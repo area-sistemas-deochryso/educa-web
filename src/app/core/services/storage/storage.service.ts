@@ -291,6 +291,16 @@ export class StorageService {
 	}
 	// #endregion
 
+	// #region FAB MENU HIDDEN (fusión Ayuda+Reportar)
+	getFabMenuHidden(): boolean {
+		return this.preferences.getFabMenuHidden();
+	}
+
+	setFabMenuHidden(hidden: boolean): void {
+		this.preferences.setFabMenuHidden(hidden);
+	}
+	// #endregion
+
 	// #region THROTTLE STATUS WIDGET (Plan 22 Chat B)
 	getThrottleWidgetAutoRefresh(): boolean {
 		return this.preferences.getThrottleWidgetAutoRefresh();

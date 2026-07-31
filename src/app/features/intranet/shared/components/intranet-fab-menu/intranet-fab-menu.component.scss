@@ -100,17 +100,6 @@
 		outline: 3px solid #fbbf24;
 		outline-offset: 3px;
 	}
-
-	// Única acción disponible y es "Ayuda" (fuera de /intranet/ayuda): recupera su verde propio.
-	&--ayuda {
-		background: var(--green-700, #15803d);
-		box-shadow: 0 10px 24px rgba(21, 128, 61, 0.32);
-
-		&:hover {
-			background: var(--green-800, #166534);
-			box-shadow: 0 14px 28px rgba(21, 128, 61, 0.42);
-		}
-	}
 }
 
 // Respeta safe-area en iOS/Android (Capacitor)

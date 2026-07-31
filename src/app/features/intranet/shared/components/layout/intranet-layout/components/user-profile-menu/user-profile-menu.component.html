@@ -49,6 +49,13 @@
 			<i class="pi pi-user-edit"></i>
 			<span>Información</span>
 		</button>
+		@if (fabHidden()) {
+			<div class="popover-divider"></div>
+			<button class="menu-btn" (click)="onShowFabClick()" type="button">
+				<i class="pi pi-eye"></i>
+				<span>Mostrar accesos flotantes</span>
+			</button>
+		}
 		<div class="popover-divider"></div>
 		<button class="logout-btn" (click)="onLogout()" type="button">
 			<i class="pi pi-sign-out"></i>

@@ -57,6 +57,9 @@ const PREFERENCES_KEYS = {
 
 	// Brief 485 — draggable "Ayuda" FAB position
 	AYUDA_FAB_POSITION: 'educa_pref_ayuda_fab_position',
+
+	// Fusión FAB Ayuda+Reportar — ocultar/mostrar manual
+	FAB_MENU_HIDDEN: 'educa_pref_fab_menu_hidden',
 } as const;
 
 export type ErrorGroupsViewMode = 'kanban' | 'table' | 'events' | 'heatmap' | 'pareto';
@@ -641,6 +644,18 @@ export class PreferencesStorageService {
 
 	setAyudaFabPosition(position: { x: number; y: number }): void {
 		this.setJSON(PREFERENCES_KEYS.AYUDA_FAB_POSITION, position);
+	}
+
+	// #endregion
+	// #region FAB MENU HIDDEN (fusión Ayuda+Reportar)
+
+	/** Si el usuario ocultó manualmente el FAB de Ayuda/Reportar. Default false. */
+	getFabMenuHidden(): boolean {
+		return this.getItem(PREFERENCES_KEYS.FAB_MENU_HIDDEN) === 'true';
+	}
+
+	setFabMenuHidden(hidden: boolean): void {
+		this.setItem(PREFERENCES_KEYS.FAB_MENU_HIDDEN, hidden.toString());
 	}
 
 	// #endregion

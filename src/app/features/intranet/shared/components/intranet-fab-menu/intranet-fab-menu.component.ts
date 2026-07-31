@@ -9,10 +9,11 @@ import { filter, map } from 'rxjs';
 import { StorageService } from '@core/services';
 import { FeedbackReportFacade } from '@core/services/feedback';
 import { FeatureFlagsFacade } from '@core/services/feature-flags';
+import { FabMenuVisibilityService } from '@intranet-shared/services';
 // #endregion
 // #region Helpers
 interface FabAction {
-	key: 'ayuda' | 'reportar';
+	key: 'ayuda' | 'reportar' | 'ocultar';
 	label: string;
 	icon: string;
 	run: () => void;
@@ -22,10 +23,12 @@ interface FabAction {
 /**
  * FAB único (reemplaza brief 485 + su contraparte de Reportar): fusiona "Ayuda" y
  * "Reportar" en un solo control para que ninguno de los dos tape controles reales
- * cerca del borde inferior (hallazgo 01, auditoría /intranet/ayuda). Con una sola
- * acción disponible el botón la ejecuta directo; con dos, se comporta como
- * speed-dial. La acción "Ayuda" se excluye estando ya en /intranet/ayuda/* — ahí
- * ese acceso es redundante (hallazgo 02).
+ * cerca del borde inferior (hallazgo 01, auditoría /intranet/ayuda). Se comporta
+ * como speed-dial: colapsado muestra "Acciones", expandido lista las acciones
+ * disponibles más "Ocultar" (siempre al final). La acción "Ayuda" se excluye
+ * estando ya en /intranet/ayuda/* — ahí ese acceso es redundante (hallazgo 02).
+ * "Ocultar" persiste vía `FabMenuVisibilityService`; se recupera desde el menú
+ * de usuario ("Mostrar accesos flotantes").
  */
 @Component({
 	selector: 'app-intranet-fab-menu',
@@ -41,7 +44,7 @@ interface FabAction {
 				[cdkDragFreeDragPosition]="dragPosition()"
 				(cdkDragEnded)="onDragEnded($event)"
 			>
-				@if (actions().length > 1 && expanded()) {
+				@if (expanded()) {
 					<div class="fab-menu__actions">
 						@for (action of actions(); track action.key) {
 							<button type="button" class="fab-menu__chip" (click)="run(action)">
@@ -54,20 +57,14 @@ interface FabAction {
 				<button
 					type="button"
 					class="fab-menu__trigger"
-					[class.fab-menu__trigger--ayuda]="soloAyuda()"
 					[attr.aria-label]="triggerAriaLabel()"
-					[attr.aria-expanded]="actions().length > 1 ? expanded() : null"
+					[attr.aria-expanded]="expanded()"
 					[title]="triggerAriaLabel()"
 					cdkDragHandle
 					(click)="onTriggerClick()"
 				>
-					@if (actions().length === 1) {
-						<i [class]="actions()[0].icon"></i>
-						<span class="fab-label">{{ actions()[0].label }}</span>
-					} @else {
-						<i class="pi" [class.pi-plus]="!expanded()" [class.pi-times]="expanded()"></i>
-						<span class="fab-label">Acciones</span>
-					}
+					<i class="pi" [class.pi-plus]="!expanded()" [class.pi-times]="expanded()"></i>
+					<span class="fab-label">Acciones</span>
 				</button>
 			</div>
 		}
@@ -79,6 +76,7 @@ export class IntranetFabMenuComponent {
 	private readonly storage = inject(StorageService);
 	private readonly feedbackFacade = inject(FeedbackReportFacade);
 	private readonly flags = inject(FeatureFlagsFacade);
+	private readonly visibility = inject(FabMenuVisibilityService);
 
 	readonly suppressed = input<boolean>(false);
 
@@ -90,7 +88,7 @@ export class IntranetFabMenuComponent {
 		{ initialValue: this.router.url },
 	);
 
-	readonly actions = computed((): FabAction[] => {
+	private readonly primaryActions = computed((): FabAction[] => {
 		const list: FabAction[] = [];
 		if (!this.currentUrl().startsWith('/intranet/ayuda')) {
 			list.push({
@@ -111,18 +109,25 @@ export class IntranetFabMenuComponent {
 		return list;
 	});
 
-	readonly visible = computed(() => !this.suppressed() && this.actions().length > 0);
-	readonly soloAyuda = computed(() => this.actions().length === 1 && this.actions()[0].key === 'ayuda');
-
-	readonly triggerAriaLabel = computed(() => {
-		const list = this.actions();
-		if (list.length === 1) {
-			return list[0].key === 'ayuda'
-				? 'Ayuda: preguntas frecuentes, tickets y salud de tu sede'
-				: 'Reportar un problema (Ctrl+Alt+F)';
-		}
-		return this.expanded() ? 'Cerrar menú de acciones' : 'Abrir menú de acciones: Ayuda y Reportar';
+	readonly actions = computed((): FabAction[] => {
+		const primary = this.primaryActions();
+		if (primary.length === 0) return [];
+		return [
+			...primary,
+			{
+				key: 'ocultar',
+				label: 'Ocultar',
+				icon: 'pi pi-eye-slash',
+				run: () => this.visibility.hide(),
+			},
+		];
 	});
+
+	readonly visible = computed(() => !this.suppressed() && !this.visibility.hidden() && this.primaryActions().length > 0);
+
+	readonly triggerAriaLabel = computed(() =>
+		this.expanded() ? 'Cerrar menú de accesos rápidos' : 'Abrir menú de accesos rápidos: Ayuda, Reportar y Ocultar',
+	);
 
 	readonly expanded = signal(false);
 	readonly dragPosition = signal(this.storage.getAyudaFabPosition() ?? { x: 0, y: 0 });
@@ -153,11 +158,6 @@ export class IntranetFabMenuComponent {
 	onTriggerClick(): void {
 		if (this.wasDragged) {
 			this.wasDragged = false;
-			return;
-		}
-		const list = this.actions();
-		if (list.length === 1) {
-			list[0].run();
 			return;
 		}
 		this.expanded.update((v) => !v);
