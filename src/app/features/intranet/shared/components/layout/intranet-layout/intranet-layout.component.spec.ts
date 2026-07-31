@@ -9,7 +9,6 @@ import { QuickAccessFavoritesService } from '@intranet-shared/services';
 
 import { IntranetLayoutComponent } from './intranet-layout.component';
 import { FeedbackReportDialogComponent } from '@intranet-shared/components/feedback-report-dialog';
-import { FeedbackReportLauncherComponent } from '@intranet-shared/components/feedback-report-launcher';
 import { VoiceButtonComponent } from '@intranet-shared/components/voice-button';
 import { FloatingNotificationBellComponent } from '@intranet-shared/components/floating-notification-bell';
 import { SyncStatusComponent } from '@intranet-shared/components/sync-status';
@@ -17,13 +16,11 @@ import { OfflineIndicatorComponent } from '@intranet-shared/components/offline-i
 import { AccessDeniedModalComponent } from '@intranet-shared/components/access-denied-modal';
 import { WalMigrationBannerComponent } from '@intranet-shared/components/wal-migration-banner';
 import { WalDegradedBannerComponent } from '@intranet-shared/components/wal-degraded-banner';
+import { SaludSedeBannerComponent } from '@intranet-shared/components/salud-sede-banner';
 import { ConnectionStatusIndicatorComponent } from '@intranet-shared/components/connection-status-indicator/connection-status-indicator.component';
 
 @Component({ selector: 'app-feedback-report-dialog', standalone: true, template: '', changeDetection: ChangeDetectionStrategy.OnPush })
 class StubFeedbackReportDialogComponent {}
-
-@Component({ selector: 'app-feedback-report-launcher', standalone: true, template: '', changeDetection: ChangeDetectionStrategy.OnPush })
-class StubFeedbackReportLauncherComponent {}
 
 @Component({ selector: 'app-voice-button', standalone: true, template: '', changeDetection: ChangeDetectionStrategy.OnPush })
 class StubVoiceButtonComponent {}
@@ -45,6 +42,9 @@ class StubWalMigrationBannerComponent {}
 
 @Component({ selector: 'app-wal-degraded-banner', standalone: true, template: '', changeDetection: ChangeDetectionStrategy.OnPush })
 class StubWalDegradedBannerComponent {}
+
+@Component({ selector: 'app-salud-sede-banner', standalone: true, template: '', changeDetection: ChangeDetectionStrategy.OnPush })
+class StubSaludSedeBannerComponent {}
 
 @Component({ selector: 'app-connection-status-indicator', standalone: true, template: '', changeDetection: ChangeDetectionStrategy.OnPush })
 class StubConnectionStatusIndicatorComponent {}
@@ -98,18 +98,18 @@ describe('IntranetLayoutComponent', () => {
 		TestBed.overrideComponent(IntranetLayoutComponent, {
 			remove: {
 				imports: [
-					FeedbackReportDialogComponent, FeedbackReportLauncherComponent,
+					FeedbackReportDialogComponent,
 					VoiceButtonComponent, FloatingNotificationBellComponent,
 					SyncStatusComponent, OfflineIndicatorComponent,
-					AccessDeniedModalComponent, WalMigrationBannerComponent, WalDegradedBannerComponent, ConnectionStatusIndicatorComponent,
+					AccessDeniedModalComponent, WalMigrationBannerComponent, WalDegradedBannerComponent, SaludSedeBannerComponent, ConnectionStatusIndicatorComponent,
 				],
 			},
 			add: {
 				imports: [
-					StubFeedbackReportDialogComponent, StubFeedbackReportLauncherComponent,
+					StubFeedbackReportDialogComponent,
 					StubVoiceButtonComponent, StubFloatingNotificationBellComponent,
 					StubSyncStatusComponent, StubOfflineIndicatorComponent,
-					StubAccessDeniedModalComponent, StubWalMigrationBannerComponent, StubWalDegradedBannerComponent, StubConnectionStatusIndicatorComponent,
+					StubAccessDeniedModalComponent, StubWalMigrationBannerComponent, StubWalDegradedBannerComponent, StubSaludSedeBannerComponent, StubConnectionStatusIndicatorComponent,
 				],
 			},
 		});

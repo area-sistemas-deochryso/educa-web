@@ -1,0 +1,20 @@
+<!-- #region Template -->
+@if (visible()) {
+	<div class="salud-sede-banner" role="alert" aria-live="assertive">
+		<div class="salud-sede-banner__content">
+			<i class="pi pi-wave-pulse salud-sede-banner__icon" aria-hidden="true"></i>
+			<span>
+				<strong>Salud de sede crítica</strong> — {{ mensaje() }}
+			</span>
+		</div>
+		<button
+			type="button"
+			class="salud-sede-banner__dismiss"
+			aria-label="Cerrar aviso"
+			(click)="dismiss()"
+		>
+			<i class="pi pi-times"></i>
+		</button>
+	</div>
+}
+<!-- #endregion -->

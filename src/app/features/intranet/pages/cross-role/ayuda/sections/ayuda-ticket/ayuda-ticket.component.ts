@@ -99,6 +99,16 @@ export class AyudaTicketComponent implements OnInit {
 	readonly propuestaMax = TICKET_PROPUESTA_MAX;
 	// #endregion
 
+	// #region Vista previa (auditoría /intranet/ayuda, hallazgo 06 — antes el
+	// formulario dejaba vacía la mitad del viewport en desktop; ahora esa
+	// columna muestra cómo queda el ticket antes de enviarlo)
+	readonly tipoLabel = computed(() => {
+		const id = this.tipoId();
+		if (id === null) return 'Sin especificar';
+		return this.tipoOptions().find((t) => t.value === id)?.label ?? 'Sin especificar';
+	});
+	// #endregion
+
 	ngOnInit(): void {
 		this.facade.init();
 	}

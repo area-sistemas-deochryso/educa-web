@@ -1,8 +1,7 @@
 // #region Imports
-import { Injectable, effect, inject } from '@angular/core';
+import { Injectable, computed, effect, inject, signal } from '@angular/core';
 
 import { AuthService } from '@core/services/auth';
-import { ErrorHandlerService } from '@core/services/error';
 import { NotificationsSoundService } from '@core/services/notifications';
 // #endregion
 
@@ -27,6 +26,11 @@ const DIMENSION_LABELS: Record<string, string> = {
  * login/refresh. El BE ya filtra por rol (tier no-Administrativo siempre
  * recibe lista vacía) — este service no repite ese gate.
  *
+ * Expone `mensaje`/`visible` a `SaludSedeBannerComponent` (banner de ancho
+ * completo bajo el header) en vez de pasar por el toast genérico de errores:
+ * el toast comparte estilo con notificaciones de error reales y esta alerta
+ * no lo es (auditoría /intranet/ayuda, hallazgo 05).
+ *
  * Instanciado desde `SessionActivityService` para que el `effect()` arranque
  * junto con el resto del ciclo de vida de sesión y capture el valor ya
  * seteado por el login que precede a la entrada a la intranet.
@@ -35,29 +39,31 @@ const DIMENSION_LABELS: Record<string, string> = {
 export class SaludSedeAlertService {
 	// #region Dependencies
 	private readonly authService = inject(AuthService);
-	private readonly errorHandler = inject(ErrorHandlerService);
 	private readonly notificationsSound = inject(NotificationsSoundService);
 	// #endregion
+
+	private readonly _dismissed = signal(false);
+
+	readonly mensaje = computed(() => {
+		const dimensiones = this.authService.dimensionesSaludCritica();
+		if (dimensiones.length === 0) return null;
+		const etiquetas = dimensiones.map((d) => DIMENSION_LABELS[d] ?? d).join(', ');
+		return `Dimensión en estado Crítico: ${etiquetas}. Revisa la sección Salud de sede del panel de ayuda.`;
+	});
+
+	readonly visible = computed(() => this.mensaje() !== null && !this._dismissed());
 
 	constructor() {
 		effect(() => {
 			const dimensiones = this.authService.dimensionesSaludCritica();
 			if (dimensiones.length === 0) return;
 
-			this.showAlert(dimensiones);
+			this._dismissed.set(false);
+			this.notificationsSound.playSound();
 		});
 	}
 
-	// #region Private helpers
-	private showAlert(dimensiones: string[]): void {
-		const etiquetas = dimensiones.map((d) => DIMENSION_LABELS[d] ?? d).join(', ');
-
-		this.errorHandler.showWarning(
-			'Salud de sede crítica',
-			`Dimensión en estado Crítico: ${etiquetas}. Revisa la sección Salud de sede del panel de ayuda.`,
-			8000,
-		);
-		this.notificationsSound.playSound();
+	dismiss(): void {
+		this._dismissed.set(true);
 	}
-	// #endregion
 }

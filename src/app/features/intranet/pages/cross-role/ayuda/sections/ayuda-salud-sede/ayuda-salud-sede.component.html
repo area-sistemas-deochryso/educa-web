@@ -14,9 +14,9 @@
 	} @else {
 		<ul class="salud-sede-estado__list">
 			@for (item of estadoPorDimension(); track item.dimension) {
-				<li class="salud-sede-estado__item" [class]="'salud-sede-estado__item--' + item.rating.toLowerCase()">
+				<li class="salud-sede-estado__item">
 					<span class="salud-sede-estado__dimension">{{ dimensionLabels[item.dimension] }}</span>
-					<span class="salud-sede-estado__rating">{{ ratingLabels[item.rating] }}</span>
+					<p-tag [value]="ratingLabels[item.rating]" [severity]="ratingSeverity(item.rating)" />
 				</li>
 			}
 		</ul>

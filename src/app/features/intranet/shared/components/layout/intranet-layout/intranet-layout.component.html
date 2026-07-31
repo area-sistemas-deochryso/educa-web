@@ -167,6 +167,7 @@
 <app-connection-status-indicator />
 <app-wal-degraded-banner />
 <app-wal-migration-banner />
+<app-salud-sede-banner />
 <app-view-as-banner />
 
 <main class="intranet-content">
@@ -180,14 +181,12 @@
 	<app-voice-button />
 }
 
-<!-- Brief 485 (punto 1): FAB arrastrable a "Ayuda" -- reemplaza el link fijo que quedaba
-     mal ubicado en el header desktop y apretado entre logo/hamburger en mobile. -->
-<app-ayuda-launcher [suppressed]="mobileMenuOpen()" />
+<!-- FAB único: fusiona "Ayuda" (brief 485) y "Reportar" en un solo control para no
+     tapar controles reales cerca del borde inferior (auditoría /intranet/ayuda,
+     hallazgo 01). Con una sola acción disponible actúa directo; con dos, speed-dial. -->
+<app-intranet-fab-menu [suppressed]="mobileMenuOpen()" />
 
-<!-- Reporte de usuario: dialog SIEMPRE en el DOM (regla dialogs-sync.md) + launcher flotante -->
-@if (showFeedbackReport()) {
-	<app-feedback-report-launcher [suppressed]="mobileMenuOpen()" />
-}
+<!-- Reporte de usuario: dialog SIEMPRE en el DOM (regla dialogs-sync.md) -->
 <app-feedback-report-dialog />
 
 <app-sync-status />

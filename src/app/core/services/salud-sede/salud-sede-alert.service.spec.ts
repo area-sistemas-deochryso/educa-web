@@ -4,26 +4,22 @@ import { signal } from '@angular/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { AuthService } from '@core/services/auth';
-import { ErrorHandlerService } from '@core/services/error';
 import { NotificationsSoundService } from '@core/services/notifications';
 import { SaludSedeAlertService } from './salud-sede-alert.service';
 // #endregion
 
 describe('SaludSedeAlertService', () => {
 	let dimensionesSaludCritica: ReturnType<typeof signal<string[]>>;
-	let errorHandler: { showWarning: ReturnType<typeof vi.fn> };
 	let notificationsSound: { playSound: ReturnType<typeof vi.fn> };
 
 	function setup(initial: string[] = []): void {
 		dimensionesSaludCritica = signal(initial);
-		errorHandler = { showWarning: vi.fn() };
 		notificationsSound = { playSound: vi.fn() };
 
 		TestBed.configureTestingModule({
 			providers: [
 				SaludSedeAlertService,
 				{ provide: AuthService, useValue: { dimensionesSaludCritica } },
-				{ provide: ErrorHandlerService, useValue: errorHandler },
 				{ provide: NotificationsSoundService, useValue: notificationsSound },
 			],
 		});
@@ -34,36 +30,49 @@ describe('SaludSedeAlertService', () => {
 		TestBed.resetTestingModule();
 	});
 
-	it('no dispara alerta cuando no hay dimensiones críticas (rol no-Administrativo o sede sana)', () => {
+	it('no muestra el banner cuando no hay dimensiones críticas (rol no-Administrativo o sede sana)', () => {
 		setup([]);
-		TestBed.inject(SaludSedeAlertService);
+		const service = TestBed.inject(SaludSedeAlertService);
 		TestBed.tick();
 
-		expect(errorHandler.showWarning).not.toHaveBeenCalled();
+		expect(service.visible()).toBe(false);
 		expect(notificationsSound.playSound).not.toHaveBeenCalled();
 	});
 
-	it('dispara alerta visual + sonora cuando el login/refresh trae dimensiones en Crítico', () => {
+	it('muestra el banner + sonido cuando el login/refresh trae dimensiones en Crítico', () => {
 		setup(['Infraestructura']);
-		TestBed.inject(SaludSedeAlertService);
+		const service = TestBed.inject(SaludSedeAlertService);
 		TestBed.tick();
 
-		expect(errorHandler.showWarning).toHaveBeenCalledOnce();
-		expect(errorHandler.showWarning.mock.calls[0][1]).toContain('Infraestructura');
+		expect(service.visible()).toBe(true);
+		expect(service.mensaje()).toContain('Infraestructura');
 		expect(notificationsSound.playSound).toHaveBeenCalledOnce();
 	});
 
-	it('vuelve a disparar en cada cambio del signal (nuevo login/refresh) mientras siga crítico', () => {
+	it('vuelve a sonar en cada cambio del signal (nuevo login/refresh) mientras siga crítico', () => {
 		setup(['Profesorado']);
 		TestBed.inject(SaludSedeAlertService);
 		TestBed.tick();
-		expect(errorHandler.showWarning).toHaveBeenCalledOnce();
+		expect(notificationsSound.playSound).toHaveBeenCalledOnce();
 
 		// Simula un refresh posterior que vuelve a traer la misma dimensión crítica.
 		dimensionesSaludCritica.set(['Profesorado']);
 		TestBed.tick();
 
-		expect(errorHandler.showWarning).toHaveBeenCalledTimes(2);
 		expect(notificationsSound.playSound).toHaveBeenCalledTimes(2);
+	});
+
+	it('dismiss() oculta el banner hasta el próximo cambio a crítico', () => {
+		setup(['Profesorado']);
+		const service = TestBed.inject(SaludSedeAlertService);
+		TestBed.tick();
+		expect(service.visible()).toBe(true);
+
+		service.dismiss();
+		expect(service.visible()).toBe(false);
+
+		dimensionesSaludCritica.set(['Infraestructura']);
+		TestBed.tick();
+		expect(service.visible()).toBe(true);
 	});
 });

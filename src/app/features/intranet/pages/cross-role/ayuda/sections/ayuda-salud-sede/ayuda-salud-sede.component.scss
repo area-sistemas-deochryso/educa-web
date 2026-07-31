@@ -57,22 +57,6 @@
 		padding: 0.5rem 0.75rem;
 		border-radius: 6px;
 		border: 1px solid var(--surface-border);
-
-		&--bien {
-			border-left: 4px solid var(--green-500);
-		}
-
-		&--advertencia {
-			border-left: 4px solid var(--yellow-500);
-		}
-
-		&--critico {
-			border-left: 4px solid var(--red-500);
-		}
-	}
-
-	&__rating {
-		font-weight: 600;
 	}
 }
 

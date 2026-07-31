@@ -8,8 +8,7 @@ import { FloatingNotificationBellComponent } from '@intranet-shared/components/f
 import { SyncStatusComponent } from '@intranet-shared/components/sync-status';
 import { OfflineIndicatorComponent } from '@intranet-shared/components/offline-indicator/offline-indicator.component';
 import { FeedbackReportDialogComponent } from '@intranet-shared/components/feedback-report-dialog';
-import { FeedbackReportLauncherComponent } from '@intranet-shared/components/feedback-report-launcher';
-import { AyudaLauncherComponent } from '@intranet-shared/components/ayuda-launcher';
+import { IntranetFabMenuComponent } from '@intranet-shared/components/intranet-fab-menu';
 import { UserPermissionsService, SessionActivityService, KeyboardShortcutsService, FeedbackReportFacade } from '@core/services';
 import { AuthService } from '@core/services/auth';
 import {
@@ -27,6 +26,7 @@ import { QuickAccessFavoritesService } from '@intranet-shared/services';
 import { AccessDeniedModalComponent } from '@intranet-shared/components/access-denied-modal';
 import { WalMigrationBannerComponent } from '@intranet-shared/components/wal-migration-banner';
 import { WalDegradedBannerComponent } from '@intranet-shared/components/wal-degraded-banner';
+import { SaludSedeBannerComponent } from '@intranet-shared/components/salud-sede-banner';
 import { ConnectionStatusIndicatorComponent } from '@intranet-shared/components/connection-status-indicator/connection-status-indicator.component';
 import { ViewAsBannerComponent } from '@intranet-shared/components/view-as-banner';
 
@@ -58,8 +58,7 @@ const NAV_GAP = 4;
 		SyncStatusComponent,
 		OfflineIndicatorComponent,
 		FeedbackReportDialogComponent,
-		FeedbackReportLauncherComponent,
-		AyudaLauncherComponent,
+		IntranetFabMenuComponent,
 		NavItemComponent,
 		UserProfileMenuComponent,
 		MobileMenuComponent,
@@ -67,6 +66,7 @@ const NAV_GAP = 4;
 		AccessDeniedModalComponent,
 		WalMigrationBannerComponent,
 		WalDegradedBannerComponent,
+		SaludSedeBannerComponent,
 		ConnectionStatusIndicatorComponent,
 		ViewAsBannerComponent,
 	],

@@ -17,7 +17,7 @@ interface ShellTab {
 const AYUDA_TABS: ShellTab[] = [
 	{ value: 'qa', label: 'Preguntas frecuentes', icon: 'pi pi-question-circle' },
 	{ value: 'ticket', label: 'Generar ticket', icon: 'pi pi-ticket' },
-	{ value: 'salud-sede', label: 'Salud de sede', icon: 'pi pi-heart' },
+	{ value: 'salud-sede', label: 'Salud de sede', icon: 'pi pi-wave-pulse' },
 ];
 // #endregion
 

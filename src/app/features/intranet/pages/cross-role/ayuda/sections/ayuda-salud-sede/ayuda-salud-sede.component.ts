@@ -6,6 +6,7 @@ import { ButtonModule } from 'primeng/button';
 import { MessageModule } from 'primeng/message';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { SelectModule } from 'primeng/select';
+import { TagModule } from 'primeng/tag';
 
 import {
 	SALUD_SEDE_DIMENSIONES,
@@ -31,6 +32,13 @@ const RATING_OPTIONS: SelectOption<SaludSedeRating>[] = (
 	['Bien', 'Advertencia', 'Critico'] as SaludSedeRating[]
 ).map((r) => ({ label: SALUD_SEDE_RATING_LABELS[r], value: r }));
 
+/** Mapea al `severity` de `p-tag` (design-system.md §6 — estado operativo, sin `tag-neutral`). */
+const RATING_SEVERITY: Record<SaludSedeRating, 'success' | 'warn' | 'danger'> = {
+	Bien: 'success',
+	Advertencia: 'warn',
+	Critico: 'danger',
+};
+
 /**
  * Sección Salud de sede: formulario de reporte por dimensión (abierto a
  * cualquier rol, sin gate de capability) + vista del estado vigente por
@@ -40,7 +48,7 @@ const RATING_OPTIONS: SelectOption<SaludSedeRating>[] = (
 @Component({
 	selector: 'app-ayuda-salud-sede',
 	standalone: true,
-	imports: [FormsModule, SelectModule, ButtonModule, ProgressSpinnerModule, MessageModule],
+	imports: [FormsModule, SelectModule, ButtonModule, ProgressSpinnerModule, MessageModule, TagModule],
 	providers: [AyudaSaludSedeFacade],
 	templateUrl: './ayuda-salud-sede.component.html',
 	styleUrl: './ayuda-salud-sede.component.scss',
@@ -88,6 +96,10 @@ export class AyudaSaludSedeComponent implements OnInit {
 
 	/** Sin ninguna dimensión en Advertencia/Crítico → colapsar al mensaje genérico. */
 	readonly todoBien = computed(() => this.estadoPorDimension().every((e) => e.rating === 'Bien'));
+
+	ratingSeverity(rating: SaludSedeRating): 'success' | 'warn' | 'danger' {
+		return RATING_SEVERITY[rating];
+	}
 
 	ngOnInit(): void {
 		this.facade.init();

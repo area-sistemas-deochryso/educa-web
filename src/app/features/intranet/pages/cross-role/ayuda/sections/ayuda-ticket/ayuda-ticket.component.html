@@ -1,65 +1,93 @@
 <p-toast />
 
-<!-- #region Formulario de creación -->
-<section class="ticket-form">
-	<p class="ticket-form__eyebrow">Crear</p>
-	<h3>Generar ticket</h3>
+<div class="ticket-layout">
+	<!-- #region Formulario de creación -->
+	<section class="ticket-form">
+		<p class="ticket-form__eyebrow">Crear</p>
+		<h3>Generar ticket</h3>
 
-	<div class="ticket-form__field">
-		<label for="ticket-tipo">Tipo de problema</label>
-		<p-select
-			inputId="ticket-tipo"
-			[options]="tipoOptions()"
-			optionLabel="label"
-			optionValue="value"
-			[ngModel]="tipoId()"
-			(ngModelChange)="onTipoChange($event)"
-			placeholder="Selecciona un tipo de problema"
-			[showClear]="false"
-			appendTo="body"
+		<div class="ticket-form__field">
+			<label for="ticket-tipo">Tipo de problema</label>
+			<p-select
+				inputId="ticket-tipo"
+				[options]="tipoOptions()"
+				optionLabel="label"
+				optionValue="value"
+				[ngModel]="tipoId()"
+				(ngModelChange)="onTipoChange($event)"
+				placeholder="Selecciona un tipo de problema"
+				[showClear]="false"
+				appendTo="body"
+			/>
+		</div>
+
+		<div class="ticket-form__field">
+			<label for="ticket-descripcion">Descripción</label>
+			<textarea
+				id="ticket-descripcion"
+				pTextarea
+				rows="5"
+				class="ticket-form__textarea"
+				[ngModel]="descripcion()"
+				(ngModelChange)="onDescripcionChange($event)"
+				[maxlength]="descripcionMax"
+				placeholder="Describe el problema con el mayor detalle posible (mínimo 20 caracteres)"
+			></textarea>
+			<span class="ticket-form__counter" [class.ticket-form__counter--invalid]="!descripcionValid()">
+				{{ descripcionLength() }} / {{ descripcionMax }} (mínimo {{ descripcionMin }})
+			</span>
+		</div>
+
+		<div class="ticket-form__field">
+			<label for="ticket-propuesta">Propuesta de mejora (opcional)</label>
+			<textarea
+				id="ticket-propuesta"
+				pTextarea
+				rows="3"
+				class="ticket-form__textarea"
+				[ngModel]="propuesta()"
+				(ngModelChange)="onPropuestaChange($event)"
+				[maxlength]="propuestaMax"
+				placeholder="¿Cómo se podría mejorar esto? (opcional)"
+			></textarea>
+		</div>
+
+		<p-button
+			label="Enviar ticket"
+			icon="pi pi-send"
+			[disabled]="!canSubmit()"
+			[loading]="submitting()"
+			(onClick)="onSubmit()"
 		/>
-	</div>
+	</section>
+	<!-- #endregion -->
 
-	<div class="ticket-form__field">
-		<label for="ticket-descripcion">Descripción</label>
-		<textarea
-			id="ticket-descripcion"
-			pTextarea
-			rows="5"
-			class="ticket-form__textarea"
-			[ngModel]="descripcion()"
-			(ngModelChange)="onDescripcionChange($event)"
-			[maxlength]="descripcionMax"
-			placeholder="Describe el problema con el mayor detalle posible (mínimo 20 caracteres)"
-		></textarea>
-		<span class="ticket-form__counter" [class.ticket-form__counter--invalid]="!descripcionValid()">
-			{{ descripcionLength() }} / {{ descripcionMax }} (mínimo {{ descripcionMin }})
-		</span>
-	</div>
+	<!-- #region Vista previa en vivo -->
+	<aside class="ticket-preview">
+		<p class="ticket-preview__eyebrow">Vista previa</p>
+		<h3>Así lo verá soporte</h3>
 
-	<div class="ticket-form__field">
-		<label for="ticket-propuesta">Propuesta de mejora (opcional)</label>
-		<textarea
-			id="ticket-propuesta"
-			pTextarea
-			rows="3"
-			class="ticket-form__textarea"
-			[ngModel]="propuesta()"
-			(ngModelChange)="onPropuestaChange($event)"
-			[maxlength]="propuestaMax"
-			placeholder="¿Cómo se podría mejorar esto? (opcional)"
-		></textarea>
-	</div>
-
-	<p-button
-		label="Enviar ticket"
-		icon="pi pi-send"
-		[disabled]="!canSubmit()"
-		[loading]="submitting()"
-		(onClick)="onSubmit()"
-	/>
-</section>
-<!-- #endregion -->
+		<dl class="ticket-preview__body">
+			<div class="ticket-preview__row">
+				<dt>Tipo</dt>
+				<dd>{{ tipoLabel() }}</dd>
+			</div>
+			<div class="ticket-preview__row">
+				<dt>Descripción</dt>
+				<dd [class.ticket-preview__placeholder]="!descripcion()">
+					{{ descripcion() || 'Aún no escribiste una descripción.' }}
+				</dd>
+			</div>
+			@if (propuesta()) {
+				<div class="ticket-preview__row">
+					<dt>Propuesta de mejora</dt>
+					<dd>{{ propuesta() }}</dd>
+				</div>
+			}
+		</dl>
+	</aside>
+	<!-- #endregion -->
+</div>
 
 <!-- #region Historial -->
 <section class="ticket-history">

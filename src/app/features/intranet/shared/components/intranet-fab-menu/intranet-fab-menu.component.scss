@@ -1,0 +1,151 @@
+// #region FAB — Botón único (Ayuda + Reportar fusionados), arrastrable
+:host {
+	display: contents;
+}
+
+.fab-menu {
+	position: fixed;
+	right: 1.5rem;
+	bottom: 1.5rem;
+	z-index: 997; // Debajo de overlays (1000+) pero sobre contenido normal
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: 0.625rem;
+}
+
+.fab-menu__actions {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: 0.5rem;
+	animation: fab-menu-in 0.16s ease-out;
+}
+
+@keyframes fab-menu-in {
+	from {
+		opacity: 0;
+		transform: translateY(6px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.fab-menu__chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.6rem 1rem;
+	border: none;
+	border-radius: 999px;
+	background: #ffffff;
+	color: #1f2937;
+	font-weight: 600;
+	font-size: 0.8125rem;
+	cursor: pointer;
+	box-shadow: 0 8px 20px rgba(15, 23, 42, 0.18);
+	transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+	i {
+		font-size: 0.9375rem;
+		color: var(--blue-800);
+	}
+
+	&:hover {
+		transform: translateY(-1px);
+		box-shadow: 0 10px 24px rgba(15, 23, 42, 0.24);
+	}
+
+	&:focus-visible {
+		outline: 3px solid #fbbf24;
+		outline-offset: 2px;
+	}
+}
+
+.fab-menu__trigger {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.75rem 1.125rem;
+	border: none;
+	border-radius: 999px;
+	background: var(--blue-800); // token canónico (design-system.md §8)
+	color: #ffffff;
+	font-weight: 600;
+	font-size: 0.875rem;
+	cursor: grab;
+	box-shadow: 0 10px 24px rgba(30, 64, 175, 0.32);
+	transition: box-shadow 0.18s ease, background 0.18s ease;
+	touch-action: none; // requerido por CDK drag para gestos táctiles
+
+	i {
+		font-size: 1rem;
+	}
+
+	&:hover {
+		background: var(--blue-900, #1e3a8a);
+		box-shadow: 0 14px 28px rgba(30, 64, 175, 0.42);
+	}
+
+	&:focus-visible {
+		outline: 3px solid #fbbf24;
+		outline-offset: 3px;
+	}
+
+	&.cdk-drag-dragging {
+		cursor: grabbing;
+		transition: none;
+	}
+
+	// Única acción disponible y es "Ayuda" (fuera de /intranet/ayuda): recupera su verde propio.
+	&--ayuda {
+		background: var(--green-700, #15803d);
+		box-shadow: 0 10px 24px rgba(21, 128, 61, 0.32);
+
+		&:hover {
+			background: var(--green-800, #166534);
+			box-shadow: 0 14px 28px rgba(21, 128, 61, 0.42);
+		}
+	}
+}
+
+// Respeta safe-area en iOS/Android (Capacitor)
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+	.fab-menu {
+		bottom: calc(1.5rem + env(safe-area-inset-bottom, 0));
+		right: calc(1.5rem + env(safe-area-inset-right, 0));
+	}
+}
+
+// En móvil: sin label para ocupar menos
+@media screen and (max-width: 640px) {
+	.fab-menu__trigger,
+	.fab-menu__chip {
+		padding: 0.875rem;
+	}
+
+	.fab-label,
+	.fab-menu__chip-label {
+		display: none;
+	}
+
+	.fab-menu__trigger i {
+		font-size: 1.25rem;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.fab-menu__actions {
+		animation: none;
+	}
+}
+
+// Ocultar en impresión
+@media print {
+	.fab-menu {
+		display: none;
+	}
+}
+// #endregion
