@@ -9,7 +9,7 @@ import {
 	output,
 	viewChild,
 } from '@angular/core';
-import { Chart, registerables } from 'chart.js';
+import { Chart, LegendItem, registerables } from 'chart.js';
 
 import { ErrorGroupPareto, ErrorSeveridad } from '../../models';
 
@@ -22,6 +22,12 @@ const SEVERIDAD_COLOR_MAP: Record<ErrorSeveridad, string> = {
 };
 
 const CUMULATIVE_COLOR = '#22c55e';
+
+const SEVERIDAD_LABEL: Record<ErrorSeveridad, string> = {
+	CRITICAL: 'Critical',
+	ERROR: 'Error',
+	WARNING: 'Warning',
+};
 
 /** Barras visibles en el chart — el % acumulado se calcula sobre el 100% de `items()`, no solo estas. */
 const MAX_BARS = 20;
@@ -141,7 +147,45 @@ export class ErrorParetoChartComponent implements AfterViewInit {
 					if (target) target.style.cursor = elements.length > 0 ? 'pointer' : 'default';
 				},
 				plugins: {
-					legend: { labels: { color: textColor, boxWidth: 12, padding: 12 } },
+					legend: {
+						// El dataset "Score" pinta cada barra según severidad (ver
+						// SEVERIDAD_COLOR_MAP) — la leyenda default de Chart.js solo
+						// muestra una entrada por dataset, así que se reemplaza acá
+						// por una entrada informativa por severidad + la línea acumulada.
+						labels: {
+							color: textColor,
+							boxWidth: 12,
+							padding: 12,
+							generateLabels: (): LegendItem[] => [
+								...(Object.keys(SEVERIDAD_COLOR_MAP) as ErrorSeveridad[]).map((severidad, i) => ({
+									text: SEVERIDAD_LABEL[severidad],
+									fillStyle: SEVERIDAD_COLOR_MAP[severidad],
+									strokeStyle: SEVERIDAD_COLOR_MAP[severidad],
+									lineWidth: 0,
+									datasetIndex: 0,
+									index: i,
+								})),
+								{
+									text: '% acumulado',
+									fillStyle: CUMULATIVE_COLOR,
+									strokeStyle: CUMULATIVE_COLOR,
+									lineWidth: 2,
+									datasetIndex: 1,
+									index: 3,
+								},
+							],
+						},
+						onClick: (_event, legendItem, legend) => {
+							// Solo la línea de % acumulado (datasetIndex 1) es togglable —
+							// las 3 entradas de severidad son swatches informativos sobre
+							// un único dataset de barras, no representan datasets propios.
+							if (legendItem.datasetIndex !== 1) return;
+							const chart = legend.chart;
+							const meta = chart.getDatasetMeta(1);
+							meta.hidden = meta.hidden === null ? !chart.data.datasets[1].hidden : !meta.hidden;
+							chart.update();
+						},
+					},
 					tooltip: {
 						callbacks: {
 							title: (items) => visible[items[0]?.dataIndex ?? 0]?.mensajeRepresentativo ?? '',
