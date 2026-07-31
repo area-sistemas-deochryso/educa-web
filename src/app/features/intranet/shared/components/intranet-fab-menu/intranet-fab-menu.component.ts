@@ -34,7 +34,13 @@ interface FabAction {
 	imports: [CommonModule, DragDropModule],
 	template: `
 		@if (visible()) {
-			<div class="fab-menu">
+			<div
+				class="fab-menu"
+				cdkDrag
+				cdkDragBoundary="body"
+				[cdkDragFreeDragPosition]="dragPosition()"
+				(cdkDragEnded)="onDragEnded($event)"
+			>
 				@if (actions().length > 1 && expanded()) {
 					<div class="fab-menu__actions">
 						@for (action of actions(); track action.key) {
@@ -52,10 +58,7 @@ interface FabAction {
 					[attr.aria-label]="triggerAriaLabel()"
 					[attr.aria-expanded]="actions().length > 1 ? expanded() : null"
 					[title]="triggerAriaLabel()"
-					cdkDrag
-					cdkDragBoundary="body"
-					[cdkDragFreeDragPosition]="dragPosition()"
-					(cdkDragEnded)="onDragEnded($event)"
+					cdkDragHandle
 					(click)="onTriggerClick()"
 				>
 					@if (actions().length === 1) {
