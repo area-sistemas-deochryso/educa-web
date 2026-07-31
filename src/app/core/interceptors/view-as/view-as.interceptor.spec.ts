@@ -1,5 +1,6 @@
-// * Tests for viewAsInterceptor (P92 F2) — headers only travel with an
-// * active context, and only on GET, matching the backend's read-only gate.
+// * Tests for viewAsInterceptor (P92 F2 + extensión brief 501) — headers
+// * travel with an active context on any HTTP method; the backend decides
+// * per-endpoint whether a mutation is actually honored.
 // #region Imports
 import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
@@ -56,14 +57,14 @@ describe('viewAsInterceptor', () => {
 		req.flush({});
 	});
 
-	it('does NOT add headers to a POST request even with an active context', () => {
+	it('adds both headers to a POST request when a context is active', () => {
 		viewAsContext.setContext({ entityId: 42, rol: 'Estudiante', nombreCompleto: 'Ana López' });
 
 		http.post('/api/test', {}).subscribe();
 
 		const req = httpMock.expectOne('/api/test');
-		expect(req.request.headers.has('X-View-As-Entity-Id')).toBe(false);
-		expect(req.request.headers.has('X-View-As-Rol')).toBe(false);
+		expect(req.request.headers.get('X-View-As-Entity-Id')).toBe('42');
+		expect(req.request.headers.get('X-View-As-Rol')).toBe('Estudiante');
 		req.flush({});
 	});
 });

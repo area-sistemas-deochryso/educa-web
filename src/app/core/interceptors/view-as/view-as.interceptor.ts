@@ -12,10 +12,13 @@ import { ViewAsContextService } from '@core/services/view-as';
  * service (`EstudianteApiService`, `ProfesorCursosApiService`, etc.), per
  * decision #5 of `educa-coord/plans/xrepo-92-admin-ver-como-wrapper.md`.
  *
- * Only tags GET requests — the backend gate (`Educa.API` F1,
- * `BaseApiController.ResolveViewAsIdentity`) already 403s any non-GET
- * carrying these headers (`ADMIN_VER_COMO_SOLO_LECTURA`), but there is no
- * reason to provoke that 403 on purpose from the FE.
+ * Tags every HTTP method, not just GET (P92 extensión — brief 501). The
+ * backend remains the real authority: by default `ResolveViewAsIdentity`
+ * still 403s any non-GET carrying these headers (`ADMIN_VER_COMO_SOLO_LECTURA`)
+ * — only call sites that explicitly opt in via `allowMutation: true` (today:
+ * `CalificacionController`'s mutating actions) actually honor a mutation.
+ * Sending the headers on every method here is harmless for the other ~9
+ * wrapped controllers that haven't opted in — they keep 403ing as before.
  *
  * No URL/route matching here on purpose: only the ~9 controllers wrapped by
  * `RequireProfesorId()`/`RequireEstudianteId()`/`GetMiHorarioHoy` ever read
@@ -28,7 +31,7 @@ export const viewAsInterceptor: HttpInterceptorFn = (req, next) => {
 	const viewAsContext = inject(ViewAsContextService);
 	const context = viewAsContext.activeContext();
 
-	if (!context || req.method !== 'GET') {
+	if (!context) {
 		return next(req);
 	}
 
