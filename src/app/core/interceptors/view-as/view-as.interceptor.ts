@@ -12,13 +12,15 @@ import { ViewAsContextService } from '@core/services/view-as';
  * service (`EstudianteApiService`, `ProfesorCursosApiService`, etc.), per
  * decision #5 of `educa-coord/plans/xrepo-92-admin-ver-como-wrapper.md`.
  *
- * Tags every HTTP method, not just GET (P92 extensión — brief 501). The
+ * Tags every HTTP method, not just GET (P92 extensión — briefs 501/502). The
  * backend remains the real authority: by default `ResolveViewAsIdentity`
  * still 403s any non-GET carrying these headers (`ADMIN_VER_COMO_SOLO_LECTURA`)
  * — only call sites that explicitly opt in via `allowMutation: true` (today:
- * `CalificacionController`'s mutating actions) actually honor a mutation.
- * Sending the headers on every method here is harmless for the other ~9
- * wrapped controllers that haven't opted in — they keep 403ing as before.
+ * every mutating action of `CalificacionController`, `CursoContenidoController`,
+ * `GrupoContenidoController`, `ProfesorController`, `AsistenciaCursoController`
+ * and `EstudianteCursoController`) actually honor a mutation. Sending the
+ * headers on every method here is harmless for `HorarioController`'s
+ * `GetMiHorarioHoy` (the remaining wrapped endpoint, GET-only).
  *
  * No URL/route matching here on purpose: only the ~9 controllers wrapped by
  * `RequireProfesorId()`/`RequireEstudianteId()`/`GetMiHorarioHoy` ever read
