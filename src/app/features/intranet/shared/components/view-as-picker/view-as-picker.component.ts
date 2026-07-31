@@ -1,12 +1,23 @@
 // #region Imports
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, output, signal, computed } from '@angular/core';
+import {
+	ChangeDetectionStrategy,
+	Component,
+	DestroyRef,
+	OnInit,
+	inject,
+	input,
+	output,
+	signal,
+	computed,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 
 import { AutoCompleteModule, AutoCompleteCompleteEvent } from 'primeng/autocomplete';
+import { SelectModule } from 'primeng/select';
 
 import { PermissionsService, UsuarioBusqueda } from '@core/services/permissions';
-import { ViewAsContext, ViewAsRol } from '@core/services/view-as';
+import { ViewAsContext, ViewAsFiltroOption, ViewAsFiltrosService, ViewAsRol } from '@core/services/view-as';
 // #endregion
 
 // #region Implementation
@@ -26,13 +37,14 @@ import { ViewAsContext, ViewAsRol } from '@core/services/view-as';
 @Component({
 	selector: 'app-view-as-picker',
 	standalone: true,
-	imports: [FormsModule, AutoCompleteModule],
+	imports: [FormsModule, AutoCompleteModule, SelectModule],
 	templateUrl: './view-as-picker.component.html',
 	styleUrl: './view-as-picker.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ViewAsPickerComponent {
+export class ViewAsPickerComponent implements OnInit {
 	private readonly api = inject(PermissionsService);
+	private readonly filtrosApi = inject(ViewAsFiltrosService);
 	private readonly destroyRef = inject(DestroyRef);
 
 	readonly rol = input.required<ViewAsRol>();
@@ -43,14 +55,47 @@ export class ViewAsPickerComponent {
 	/** Local-only — reflects the current selection back into the input; never read by a parent. */
 	readonly selectedUsuario = signal<UsuarioBusqueda | null>(null);
 
+	/** Filtros complementarios — ninguno es obligatorio para elegir un usuario. */
+	readonly salonOptions = signal<ViewAsFiltroOption[]>([]);
+	readonly cursoOptions = signal<ViewAsFiltroOption[]>([]);
+	readonly selectedSalonId = signal<number | null>(null);
+	readonly selectedCursoId = signal<number | null>(null);
+
+	/** Recordado para reaplicar el mismo texto libre cuando cambia un filtro. */
+	private lastTermino: string | undefined;
+
 	readonly placeholder = computed(() =>
 		this.rol() === 'Profesor' ? 'Buscar profesor por nombre o DNI...' : 'Buscar estudiante por nombre o DNI...',
 	);
 
+	ngOnInit(): void {
+		this.filtrosApi
+			.listarSalones()
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe((salones) => this.salonOptions.set(salones));
+
+		this.filtrosApi
+			.listarCursos()
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe((cursos) => this.cursoOptions.set(cursos));
+
+		// Precarga: sin texto ni filtros, mostrar algunos resultados en vez de arrancar vacío.
+		this.runSearch();
+	}
+
 	onSearch(event: AutoCompleteCompleteEvent): void {
+		this.runSearch(event.query || undefined);
+	}
+
+	onFiltroChange(): void {
+		this.runSearch(this.lastTermino);
+	}
+
+	private runSearch(termino?: string): void {
+		this.lastTermino = termino;
 		this.searching.set(true);
 		this.api
-			.searchUsers(event.query || undefined, this.rol())
+			.searchUsers(termino, this.rol(), this.selectedSalonId() ?? undefined, this.selectedCursoId() ?? undefined)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: (result) => {

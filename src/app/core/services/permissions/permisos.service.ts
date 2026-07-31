@@ -295,10 +295,17 @@ export class PermissionsService {
 		return this.http.get<string[]>(`${this.capAdminUrl}/users/${entityId}/rol/${rolId}/effective`);
 	}
 
-	searchUsers(termino?: string, rol?: string): Observable<UsuarioBusquedaResultado> {
+	searchUsers(
+		termino?: string,
+		rol?: string,
+		salonId?: number,
+		cursoId?: number,
+	): Observable<UsuarioBusquedaResultado> {
 		const params: Record<string, string> = {};
 		if (termino) params['termino'] = termino;
 		if (rol) params['rol'] = rol;
+		if (salonId) params['salonId'] = String(salonId);
+		if (cursoId) params['cursoId'] = String(cursoId);
 
 		return this.http.get<UsuarioBusquedaResultado>(`${this.capAdminUrl}/users/search`, { params });
 	}

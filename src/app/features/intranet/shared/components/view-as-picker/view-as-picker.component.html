@@ -1,5 +1,33 @@
 <!-- #region Template -->
 <div class="view-as-picker">
+	<div class="view-as-picker__filters">
+		<p-select
+			[options]="salonOptions()"
+			[ngModel]="selectedSalonId()"
+			(ngModelChange)="selectedSalonId.set($event); onFiltroChange()"
+			placeholder="Todos los salones"
+			optionLabel="label"
+			optionValue="value"
+			appendTo="body"
+			[filter]="true"
+			filterPlaceholder="Buscar salón..."
+			[showClear]="true"
+			aria-label="Filtrar por salón y año"
+		/>
+		<p-select
+			[options]="cursoOptions()"
+			[ngModel]="selectedCursoId()"
+			(ngModelChange)="selectedCursoId.set($event); onFiltroChange()"
+			placeholder="Todos los cursos"
+			optionLabel="label"
+			optionValue="value"
+			appendTo="body"
+			[filter]="true"
+			filterPlaceholder="Buscar curso..."
+			[showClear]="true"
+			aria-label="Filtrar por curso"
+		/>
+	</div>
 	<p-autoComplete
 		[suggestions]="suggestions()"
 		[ngModel]="selectedUsuario()"
@@ -9,6 +37,7 @@
 		[placeholder]="placeholder()"
 		[attr.aria-label]="placeholder()"
 		[minLength]="2"
+		[dropdown]="true"
 		[style]="{ width: '100%' }"
 		[inputStyle]="{ width: '100%' }"
 	>

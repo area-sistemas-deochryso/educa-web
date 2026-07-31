@@ -4,6 +4,16 @@
 	flex-direction: column;
 	gap: 0.5rem;
 
+	&__filters {
+		display: flex;
+		gap: 0.5rem;
+		flex-wrap: wrap;
+
+		p-select {
+			flex: 1 1 12rem;
+		}
+	}
+
 	&__suggestion {
 		display: flex;
 		align-items: center;
