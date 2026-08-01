@@ -166,7 +166,7 @@
 										aria-label="Ir a calificaciones"
 									>
 										<i class="pi pi-chart-bar"></i>
-										<div class="stat-number">{{ calVm().totalEvaluaciones }}</div>
+										<div class="stat-number">{{ calVm().loading ? '—' : calVm().totalEvaluaciones }}</div>
 										<div class="stat-label">Calificaciones</div>
 									</button>
 								</div>
