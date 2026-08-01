@@ -33,6 +33,12 @@ import { ViewAsContext, ViewAsFiltroOption, ViewAsFiltrosService, ViewAsRol } fr
  * admin capabilities page; routing this picker through it would mutate
  * `usuariosSugeridos` state that page also reads, which is an unrelated
  * side effect this component has no business causing.
+ *
+ * `p-autoComplete` uses `appendTo="body"` (brief 505) — inside the
+ * "Cambiar" dialog, the overlay used to nest under the dialog's scrollable
+ * content, so scrolling the dialog to reveal cut-off results auto-closed
+ * the overlay before a result could be clicked. Anchoring to `body` matches
+ * the two `p-select` filters above, which already did this.
  */
 @Component({
 	selector: 'app-view-as-picker',
