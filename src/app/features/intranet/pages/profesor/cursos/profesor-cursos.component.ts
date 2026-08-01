@@ -51,6 +51,23 @@ import { HorarioProfesorDto, CrearCursoContenidoRequest } from '../models';
 			border-color: var(--p-surface-300);
 			border-left-color: var(--card-accent, var(--p-primary-color));
 		}
+		.course-card-affordance {
+			display: flex;
+			align-items: center;
+			justify-content: flex-end;
+			gap: 0.35rem;
+			margin-top: 0.75rem;
+			font-size: 0.75rem;
+			font-weight: 600;
+			color: var(--p-primary-color);
+		}
+		.course-card-affordance i {
+			font-size: 0.7rem;
+			transition: transform 0.15s;
+		}
+		.course-card:hover .course-card-affordance i {
+			transform: translateX(3px);
+		}
 	`,
 	template: `
 		@if (vm().loading) {
@@ -94,6 +111,10 @@ import { HorarioProfesorDto, CrearCursoContenidoRequest } from '../models';
 									<i class="pi pi-users text-xs"></i>
 									<span>{{ horario.cantidadEstudiantes | pluralize: 'estudiante' }}</span>
 								</div>
+							</div>
+							<div class="course-card-affordance">
+								<span>Ver curso</span>
+								<i class="pi pi-arrow-right"></i>
 							</div>
 						</div>
 					}

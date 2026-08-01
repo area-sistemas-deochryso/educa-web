@@ -47,6 +47,23 @@ const DAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Vierne
 			border-color: var(--p-surface-300);
 			border-left-color: var(--card-accent, var(--p-primary-color));
 		}
+		.course-card-affordance {
+			display: flex;
+			align-items: center;
+			justify-content: flex-end;
+			gap: 0.35rem;
+			margin-top: 0.75rem;
+			font-size: 0.75rem;
+			font-weight: 600;
+			color: var(--p-primary-color);
+		}
+		.course-card-affordance i {
+			font-size: 0.7rem;
+			transition: transform 0.15s;
+		}
+		.course-card:hover .course-card-affordance i {
+			transform: translateX(3px);
+		}
 		.hoy-strip {
 			background: var(--p-surface-50);
 			border-radius: 8px;
@@ -109,6 +126,10 @@ const DAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Vierne
 										<span>{{ horario.profesorNombreCompleto }}</span>
 									</div>
 								}
+							</div>
+							<div class="course-card-affordance">
+								<span>Ver curso</span>
+								<i class="pi pi-arrow-right"></i>
 							</div>
 						</div>
 					}
