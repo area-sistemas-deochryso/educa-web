@@ -12,8 +12,12 @@
 	gap: 0.75rem;
 	padding: 1rem 1rem 0;
 
+	// Explícito: sin esto hereda el tamaño por defecto de p-card (~2rem), que
+	// compite con el H1 de página (1.5rem, design-system.md B2/B12).
 	h3 {
 		margin: 0;
+		font-size: 1.05rem;
+		font-weight: 600;
 	}
 }
 

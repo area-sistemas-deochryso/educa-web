@@ -14,6 +14,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Select } from 'primeng/select';
 import { TabsModule } from 'primeng/tabs';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { PageHeaderComponent } from '@intranet-shared/components';
 import { ProfesorFacade } from '../services/profesor.facade';
 import { AttendanceCourseFacade } from '../cursos/services/attendance-course.facade';
 import { AttendanceRegistrationPanelComponent } from '../cursos/components/attendance-registration-panel/attendance-registration-panel.component';
@@ -31,6 +32,7 @@ import { EstadoAsistenciaCurso } from '../models';
 		ProgressSpinnerModule,
 		AttendanceRegistrationPanelComponent,
 		AttendanceSummaryPanelComponent,
+		PageHeaderComponent,
 	],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	styles: `
@@ -41,20 +43,6 @@ import { EstadoAsistenciaCurso } from '../models';
 			padding: 1.5rem;
 			max-width: 1200px;
 			margin: 0 auto;
-		}
-		.page-header {
-			display: flex;
-			align-items: center;
-			gap: 0.75rem;
-			margin-bottom: 1.25rem;
-		}
-		.page-header i {
-			font-size: 1.5rem;
-			color: var(--primary-color);
-		}
-		.page-header h2 {
-			margin: 0;
-			font-size: 1.35rem;
 		}
 		.filters-row {
 			display: flex;
@@ -109,10 +97,11 @@ import { EstadoAsistenciaCurso } from '../models';
 	`,
 	template: `
 		<div class="asistencia-container">
-			<div class="page-header">
-				<i class="pi pi-check-square"></i>
-				<h2>Asistencia</h2>
-			</div>
+			<app-page-header
+				icon="pi pi-check-square"
+				title="Asistencia"
+				subtitle="Registra la asistencia diaria de tus cursos y revisa el resumen histórico"
+			/>
 
 			@if (pageLoading()) {
 				<div class="flex justify-content-center p-5">
