@@ -23,3 +23,11 @@
 :host ::ng-deep tr.inactivo {
 	opacity: 0.6;
 }
+
+// design-system.md B4/B7 — encabezados UPPERCASE + flechas donde haya orden.
+:host ::ng-deep .p-datatable-thead > tr > th {
+	font-weight: 600;
+	font-size: 0.8rem;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}

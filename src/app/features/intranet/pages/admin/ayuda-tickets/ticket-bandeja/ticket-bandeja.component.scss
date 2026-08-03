@@ -33,4 +33,12 @@
 		color: var(--text-color);
 		border-color: var(--surface-300);
 	}
+
+	// design-system.md B4/B7 — encabezados UPPERCASE + flechas donde haya orden.
+	.p-datatable-thead > tr > th {
+		font-weight: 600;
+		font-size: 0.8rem;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+	}
 }

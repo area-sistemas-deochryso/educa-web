@@ -1,6 +1,4 @@
-<app-page-header icon="pi pi-inbox" title="Bandeja de tickets" />
-
-<div class="p-4 pt-0">
+<div class="p-4">
 	@if (!canAccess) {
 		<div class="empty-state">
 			<i class="pi pi-lock text-3xl mb-2"></i>
@@ -41,13 +39,13 @@
 			<p-table [value]="tickets()" dataKey="id" [scrollable]="true" styleClass="p-datatable-sm">
 				<ng-template #header>
 					<tr>
-						<th>Tipo</th>
-						<th>Descripción</th>
-						<th>Propuesta</th>
-						<th>Usuario</th>
-						<th>Fecha</th>
-						<th>Estado</th>
-						<th>Cambiar estado</th>
+						<th pSortableColumn="tipoNombre">TIPO <p-sortIcon field="tipoNombre" /></th>
+						<th>DESCRIPCIÓN</th>
+						<th>PROPUESTA</th>
+						<th pSortableColumn="usuarioNombre">USUARIO <p-sortIcon field="usuarioNombre" /></th>
+						<th pSortableColumn="fechaReg">FECHA <p-sortIcon field="fechaReg" /></th>
+						<th pSortableColumn="estado">ESTADO <p-sortIcon field="estado" /></th>
+						<th>CAMBIAR ESTADO</th>
 					</tr>
 				</ng-template>
 				<ng-template #body let-ticket>

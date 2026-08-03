@@ -16,18 +16,24 @@
 		<tr>
 			<th style="width: 50px">#</th>
 			<th pSortableColumn="grado" style="min-width: 120px">
-				Grado <p-sortIcon field="grado" />
+				GRADO <p-sortIcon field="grado" />
 			</th>
-			<th style="width: 80px">Sección</th>
-			<th style="width: 110px" class="text-center">Modo</th>
-			<th style="min-width: 100px">Sede</th>
-			<th style="min-width: 180px">Tutor</th>
-			<th style="width: 80px" class="text-center">Estudiantes</th>
-			<th style="width: 100px" class="text-center">Aprobados</th>
-			<th style="width: 110px" class="text-center">Desaprobados</th>
-			<th style="width: 100px" class="text-center">Pendientes</th>
-			<th style="width: 100px" class="text-center">Periodo</th>
-			<th style="width: 80px" class="text-center">Acciones</th>
+			<th pSortableColumn="seccion" style="width: 80px">
+				SECCIÓN <p-sortIcon field="seccion" />
+			</th>
+			<th style="width: 110px" class="text-center">MODO</th>
+			<th pSortableColumn="sede" style="min-width: 100px">
+				SEDE <p-sortIcon field="sede" />
+			</th>
+			<th style="min-width: 180px">TUTOR</th>
+			<th pSortableColumn="totalEstudiantes" style="width: 80px" class="text-center">
+				ESTUDIANTES <p-sortIcon field="totalEstudiantes" />
+			</th>
+			<th style="width: 100px" class="text-center">APROBADOS</th>
+			<th style="width: 110px" class="text-center">DESAPROBADOS</th>
+			<th style="width: 100px" class="text-center">PENDIENTES</th>
+			<th style="width: 100px" class="text-center">PERIODO</th>
+			<th style="width: 80px" class="text-center">ACCIONES</th>
 		</tr>
 	</ng-template>
 	<ng-template #body let-salon let-rowIndex="rowIndex">

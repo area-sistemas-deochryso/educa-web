@@ -1,6 +1,4 @@
-<app-page-header icon="pi pi-tags" title="Catálogo de tipos de ticket" />
-
-<div class="p-4 pt-0">
+<div class="p-4">
 	@if (!canAccess) {
 		<div class="empty-state">
 			<i class="pi pi-lock text-3xl mb-2"></i>
@@ -29,10 +27,10 @@
 			<p-table [value]="tipos()" dataKey="id" styleClass="p-datatable-sm">
 				<ng-template #header>
 					<tr>
-						<th>Nombre</th>
-						<th>Estado</th>
-						<th style="width: 140px">Activo</th>
-						<th style="width: 100px">Editar</th>
+						<th pSortableColumn="nombre">NOMBRE <p-sortIcon field="nombre" /></th>
+						<th pSortableColumn="estado">ESTADO <p-sortIcon field="estado" /></th>
+						<th style="width: 140px">ACTIVO</th>
+						<th style="width: 100px">EDITAR</th>
 					</tr>
 				</ng-template>
 				<ng-template #body let-tipo>
