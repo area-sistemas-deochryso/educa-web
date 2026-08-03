@@ -65,6 +65,8 @@ export class SalonMensajeriaTabComponent {
 	readonly nuevoContenido = signal('');
 	readonly selectedHorarioId = signal<number | null>(null);
 	readonly initialized = signal(false);
+	/** Horario para el que ya se auto-abrió la conversación más reciente (evita reabrirla tras "Volver"). */
+	private readonly autoOpenedHorarioId = signal<number | null>(null);
 	// #endregion
 
 	// #region Computed
@@ -104,6 +106,28 @@ export class SalonMensajeriaTabComponent {
 			if (options.length === 1 && !this.initialized()) {
 				this.onCursoChange(options[0].value);
 			}
+		});
+
+		// Caso 8 de la auditoría de diseño (2026-08-03): en vez de un estado
+		// vacío ("Selecciona una conversación"), abrir directamente la más
+		// reciente cuando existe. Guardado por horarioId para no reabrirla
+		// después de que el usuario use "Volver" a propósito.
+		effect(() => {
+			const horarioId = this.selectedHorarioId();
+			const vm = this.vm();
+			if (
+				horarioId === null ||
+				vm.loading ||
+				vm.vistaDetalle ||
+				vm.detalle ||
+				vm.conversaciones.length === 0 ||
+				this.autoOpenedHorarioId() === horarioId
+			) {
+				return;
+			}
+
+			this.autoOpenedHorarioId.set(horarioId);
+			this.onSelectConversacion(vm.conversaciones[0].id);
 		});
 	}
 	// #endregion
