@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -15,7 +15,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 
 import { UiMappingService } from '@intranet-shared/services';
-import { PageHeaderComponent } from '@intranet-shared/components';
+import { PageHeaderComponent, KpiStatsComponent, type KpiStatItem } from '@intranet-shared/components';
 import { EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleIconPipe, EstadoToggleLabelPipe } from '@intranet-shared/pipes';
 import { buildDeleteCursoMessage } from '@app/shared/constants';
 
@@ -38,6 +38,7 @@ import type { Curso } from './models';
 		ToggleSwitch,
 		ConfirmDialogModule,
 		PageHeaderComponent,
+		KpiStatsComponent,
 		EstadoLabelPipe,
 		EstadoSeverityPipe,
 		EstadoToggleIconPipe,
@@ -61,6 +62,29 @@ export class CursosComponent implements OnInit {
 
 	// #region Estado local
 	showValidation = signal(false);
+	// #endregion
+
+	// #region Stats KPI
+	readonly statsItems = computed<KpiStatItem[]>(() => [
+		{
+			icon: 'pi pi-book',
+			label: 'Total Cursos',
+			value: this.vm().estadisticas.totalCursos,
+			sublabel: 'registrados',
+		},
+		{
+			icon: 'pi pi-check-circle',
+			label: 'Cursos Activos',
+			value: this.vm().estadisticas.cursosActivos,
+			sublabel: 'disponibles',
+		},
+		{
+			icon: 'pi pi-ban',
+			label: 'Cursos Inactivos',
+			value: this.vm().estadisticas.cursosInactivos,
+			sublabel: 'deshabilitados',
+		},
+	]);
 	// #endregion
 
 	// #region Opciones estáticas

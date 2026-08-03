@@ -38,40 +38,7 @@
 
 		<p-tabpanel value="roles">
 			<!-- #region Stats cards -->
-			<section class="stats-section">
-				<div class="stat-card">
-					<div class="stat-content">
-						<span class="stat-label">Roles</span>
-						<span class="stat-value">{{ vm().estadisticas.totalRoles }}</span>
-						<span class="stat-sublabel">en el sistema</span>
-					</div>
-					<div class="stat-icon roles">
-						<i class="pi pi-id-card"></i>
-					</div>
-				</div>
-
-				<div class="stat-card">
-					<div class="stat-content">
-						<span class="stat-label">Módulos</span>
-						<span class="stat-value">{{ vm().estadisticas.totalModulos }}</span>
-						<span class="stat-sublabel">categorías</span>
-					</div>
-					<div class="stat-icon modules">
-						<i class="pi pi-th-large"></i>
-					</div>
-				</div>
-
-				<div class="stat-card">
-					<div class="stat-content">
-						<span class="stat-label">Capabilities</span>
-						<span class="stat-value">{{ vm().estadisticas.totalCapabilities }}</span>
-						<span class="stat-sublabel">disponibles</span>
-					</div>
-					<div class="stat-icon views">
-						<i class="pi pi-shield"></i>
-					</div>
-				</div>
-			</section>
+			<app-kpi-stats [items]="statsItems()" />
 			<!-- #endregion -->
 
 			<!-- #region Table -->

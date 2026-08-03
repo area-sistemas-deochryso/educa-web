@@ -18,24 +18,7 @@
 			</div>
 		} @else {
 			<!-- #region KPI tiles -->
-			<section class="admin-rendimiento-page__kpis">
-				<app-admin-rendimiento-kpi-tile
-					label="Cursos evaluados"
-					[valor]="vm().kpis.totalCursos.toString()"
-					icono="pi pi-book"
-				/>
-				<app-admin-rendimiento-kpi-tile
-					label="Cursos con desvío"
-					[valor]="vm().kpis.cursosConOutlier.toString()"
-					icono="pi pi-exclamation-triangle"
-					[variante]="vm().kpis.cursosConOutlier > 0 ? 'alerta' : 'neutro'"
-				/>
-				<app-admin-rendimiento-kpi-tile
-					label="Promedio institucional"
-					[valor]="promedioInstitucionalLabel()"
-					icono="pi pi-chart-bar"
-				/>
-			</section>
+			<app-kpi-stats [items]="statsItems()" />
 			<!-- #endregion -->
 
 			<!-- #region Cursos, ordenados por desvío -->

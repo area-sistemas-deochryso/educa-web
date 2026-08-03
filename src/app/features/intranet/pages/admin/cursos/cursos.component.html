@@ -24,40 +24,7 @@
 	}
 
 	<!-- * Stats cards -->
-	<section class="stats-section">
-		<div class="stat-card">
-			<div class="stat-content">
-				<span class="stat-label">Total Cursos</span>
-				<span class="stat-value">{{ vm().estadisticas.totalCursos }}</span>
-				<span class="stat-sublabel">registrados</span>
-			</div>
-			<div class="stat-icon">
-				<i class="pi pi-book"></i>
-			</div>
-		</div>
-
-		<div class="stat-card">
-			<div class="stat-content">
-				<span class="stat-label">Cursos Activos</span>
-				<span class="stat-value">{{ vm().estadisticas.cursosActivos }}</span>
-				<span class="stat-sublabel">disponibles</span>
-			</div>
-			<div class="stat-icon">
-				<i class="pi pi-check-circle"></i>
-			</div>
-		</div>
-
-		<div class="stat-card">
-			<div class="stat-content">
-				<span class="stat-label">Cursos Inactivos</span>
-				<span class="stat-value">{{ vm().estadisticas.cursosInactivos }}</span>
-				<span class="stat-sublabel">deshabilitados</span>
-			</div>
-			<div class="stat-icon">
-				<i class="pi pi-ban"></i>
-			</div>
-		</div>
-	</section>
+	<app-kpi-stats [items]="statsItems()" />
 
 	<!-- * Filters -->
 	<section class="filters-section">

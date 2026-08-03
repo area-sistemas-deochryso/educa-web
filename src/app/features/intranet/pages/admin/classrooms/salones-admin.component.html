@@ -27,6 +27,7 @@
 		pButton
 		label="Nuevo Salón"
 		icon="pi pi-plus"
+		class="p-button-success"
 		(click)="onOpenNuevoSalonDialog()"
 	></button>
 </app-page-header>
@@ -41,33 +42,7 @@
 
 <!-- #region Stats -->
 @if (vm().statsReady) {
-	<div class="stats-row">
-		<div class="stat-card">
-			<i class="pi pi-building stat-icon"></i>
-			<div class="stat-value">{{ vm().estadisticas.totalSalones }}</div>
-			<div class="stat-label">Salones</div>
-		</div>
-		<div class="stat-card">
-			<i class="pi pi-users stat-icon"></i>
-			<div class="stat-value">{{ vm().estadisticas.totalEstudiantes }}</div>
-			<div class="stat-label">Estudiantes</div>
-		</div>
-		<div class="stat-card">
-			<i class="pi pi-check-circle stat-icon text-green-500"></i>
-			<div class="stat-value text-green-500">{{ vm().estadisticas.totalAprobados }}</div>
-			<div class="stat-label">Aprobados</div>
-		</div>
-		<div class="stat-card">
-			<i class="pi pi-times-circle stat-icon text-red-500"></i>
-			<div class="stat-value text-red-500">{{ vm().estadisticas.totalDesaprobados }}</div>
-			<div class="stat-label">Desaprobados</div>
-		</div>
-		<div class="stat-card">
-			<i class="pi pi-clock stat-icon text-orange-500"></i>
-			<div class="stat-value text-orange-500">{{ vm().estadisticas.totalPendientes }}</div>
-			<div class="stat-label">Pendientes</div>
-		</div>
-	</div>
+	<app-kpi-stats [items]="statsItems()" />
 }
 <!-- #endregion -->
 

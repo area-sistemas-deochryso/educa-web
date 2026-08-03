@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -12,7 +12,7 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { DrawerModule } from 'primeng/drawer';
 import { Tab, TabList, TabPanel, Tabs } from 'primeng/tabs';
 
-import { PageHeaderComponent } from '@intranet-shared/components';
+import { PageHeaderComponent, KpiStatsComponent, type KpiStatItem } from '@intranet-shared/components';
 
 import { PermissionsRolesFacade } from './services';
 import type { RolCapabilityMatrixRow } from '@core/services';
@@ -34,6 +34,7 @@ import { VistasComponent } from '../vistas';
 		DrawerModule,
 		Tabs, TabList, Tab, TabPanel,
 		PageHeaderComponent,
+		KpiStatsComponent,
 		VistasComponent,
 	],
 	templateUrl: './permisos-roles.component.html',
@@ -44,6 +45,15 @@ export class PermissionsRolesComponent implements OnInit {
 	private facade = inject(PermissionsRolesFacade);
 	readonly vm = this.facade.vm;
 	readonly saving = signal(false);
+
+	readonly statsItems = computed<KpiStatItem[]>(() => {
+		const stats = this.vm().estadisticas;
+		return [
+			{ icon: 'pi pi-id-card', label: 'Roles', value: stats.totalRoles, sublabel: 'en el sistema' },
+			{ icon: 'pi pi-th-large', label: 'Módulos', value: stats.totalModulos, sublabel: 'categorías' },
+			{ icon: 'pi pi-shield', label: 'Capabilities', value: stats.totalCapabilities, sublabel: 'disponibles' },
+		];
+	});
 
 	ngOnInit(): void {
 		this.facade.loadAll();

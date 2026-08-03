@@ -23,7 +23,7 @@ import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { ErrorGroupsViewMode, StorageService } from '@core/services/storage';
-import { PageHeaderComponent } from '@intranet-shared/components';
+import { PageHeaderComponent, KpiStatsComponent, type KpiStatItem } from '@intranet-shared/components';
 import { TableSkeletonComponent } from '@intranet-shared/components/table-skeleton';
 
 import { HubContextBannerComponent, readHubContext } from '../monitoreo/shared';
@@ -95,6 +95,7 @@ const VIEW_MODE_VOLUME_THRESHOLD = 40;
 		TooltipModule,
 		ErrorOccurrenceTimelineComponent,
 		PageHeaderComponent,
+		KpiStatsComponent,
 		TableSkeletonComponent,
 		ErrorGroupDetailDrawerComponent,
 		ErrorOccurrenceDrawerComponent,
@@ -123,6 +124,15 @@ export class ErrorGroupsComponent implements OnInit {
 
 	readonly items = this.store.visibleItems;
 	readonly stats = this.store.stats;
+	readonly statsItems = computed<KpiStatItem[]>(() => {
+		const s = this.stats();
+		return [
+			{ icon: 'pi pi-list', label: 'Total grupos (página)', value: s.total, sublabel: 'grupos visibles' },
+			{ icon: 'pi pi-times-circle', label: 'Critical', value: s.critical, sublabel: 'bugs urgentes', variant: 'critical' },
+			{ icon: 'pi pi-exclamation-triangle', label: 'Error', value: s.error, sublabel: 'errores estándar', variant: 'error' },
+			{ icon: 'pi pi-info-circle', label: 'Warning', value: s.warning, sublabel: 'avisos', variant: 'warning' },
+		];
+	});
 	readonly loading = this.store.loading;
 	readonly error = this.store.error;
 	readonly tableReady = this.store.tableReady;

@@ -10,7 +10,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 
-import { PageHeaderComponent, PeriodToggleComponent } from '@intranet-shared/components';
+import { PageHeaderComponent, PeriodToggleComponent, KpiStatsComponent, type KpiStatItem } from '@intranet-shared/components';
 import { ClassroomsAdminFacade } from './services';
 import { ClassroomsAdminTableComponent } from './components/salones-admin-table/salones-admin-table.component';
 import { ConfigGradeDialogComponent } from './components/config-calificacion-dialog/config-calificacion-dialog.component';
@@ -40,6 +40,7 @@ import { NuevoSalonDialogComponent } from './components/nuevo-salon-dialog/nuevo
 		ToastModule,
 		PageHeaderComponent,
 		PeriodToggleComponent,
+		KpiStatsComponent,
 		ClassroomsAdminTableComponent,
 		ConfigGradeDialogComponent,
 		ClosePeriodDialogComponent,
@@ -68,6 +69,19 @@ export class ClassroomsAdminComponent implements OnInit {
 		return this.vm()
 			.salones.filter((s) => s.id !== actualId)
 			.map((s) => ({ id: s.id, label: `${s.grado} ${s.seccion} — ${s.sede}` }));
+	});
+	// #endregion
+
+	// #region Stats KPI
+	readonly statsItems = computed<KpiStatItem[]>(() => {
+		const stats = this.vm().estadisticas;
+		return [
+			{ icon: 'pi pi-building', label: 'Salones', value: stats.totalSalones },
+			{ icon: 'pi pi-users', label: 'Estudiantes', value: stats.totalEstudiantes },
+			{ icon: 'pi pi-check-circle', label: 'Aprobados', value: stats.totalAprobados, variant: 'success' },
+			{ icon: 'pi pi-times-circle', label: 'Desaprobados', value: stats.totalDesaprobados, variant: 'critical' },
+			{ icon: 'pi pi-clock', label: 'Pendientes', value: stats.totalPendientes, variant: 'warning' },
+		];
 	});
 	// #endregion
 

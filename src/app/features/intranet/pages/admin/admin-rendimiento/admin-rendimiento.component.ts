@@ -2,10 +2,10 @@ import { Component, ChangeDetectionStrategy, computed, inject, OnInit } from '@a
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 
-import { PageHeaderComponent, StatsSkeletonComponent } from '@intranet-shared/components';
+import { PageHeaderComponent, StatsSkeletonComponent, KpiStatsComponent, type KpiStatItem } from '@intranet-shared/components';
 
 import { AdminRendimientoFacade } from './services';
-import { AdminRendimientoKpiTileComponent, AdminRendimientoCursoCardComponent } from './components';
+import { AdminRendimientoCursoCardComponent } from './components';
 
 @Component({
 	selector: 'app-admin-rendimiento',
@@ -15,7 +15,7 @@ import { AdminRendimientoKpiTileComponent, AdminRendimientoCursoCardComponent } 
 		ButtonModule,
 		PageHeaderComponent,
 		StatsSkeletonComponent,
-		AdminRendimientoKpiTileComponent,
+		KpiStatsComponent,
 		AdminRendimientoCursoCardComponent,
 	],
 	templateUrl: './admin-rendimiento.component.html',
@@ -29,6 +29,24 @@ export class AdminRendimientoComponent implements OnInit {
 	readonly promedioInstitucionalLabel = computed(() => {
 		const promedio = this.vm().kpis.promedioInstitucional;
 		return promedio === null ? '—' : promedio.toFixed(1);
+	});
+
+	readonly statsItems = computed<KpiStatItem[]>(() => {
+		const kpis = this.vm().kpis;
+		return [
+			{ icon: 'pi pi-book', label: 'Cursos evaluados', value: kpis.totalCursos },
+			{
+				icon: 'pi pi-exclamation-triangle',
+				label: 'Cursos con desvío',
+				value: kpis.cursosConOutlier,
+				variant: kpis.cursosConOutlier > 0 ? 'warning' : undefined,
+			},
+			{
+				icon: 'pi pi-chart-bar',
+				label: 'Promedio institucional',
+				value: this.promedioInstitucionalLabel(),
+			},
+		];
 	});
 
 	ngOnInit(): void {

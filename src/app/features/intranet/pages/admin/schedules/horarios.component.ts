@@ -13,7 +13,7 @@ import { ScheduleDetailDrawerComponent } from './components/horario-detail-drawe
 import { SchedulesCoursePickerComponent } from './components/horarios-curso-picker/horarios-curso-picker.component';
 import { SchedulesFormDialogComponent } from './components/horarios-form-dialog/horarios-form-dialog.component';
 import { SchedulesImportDialogComponent } from './components/horarios-import-dialog/horarios-import-dialog.component';
-import { PageHeaderComponent, PeriodToggleComponent } from '@intranet-shared/components';
+import { PageHeaderComponent, PeriodToggleComponent, KpiStatsComponent, type KpiStatItem } from '@intranet-shared/components';
 import { type ImportarHorarioItem } from './helpers/horario-import.config';
 import {
 	type EmptySlotClickEvent,
@@ -56,6 +56,7 @@ import {
 		ScheduleGlobalViewComponent,
 		PageHeaderComponent,
 		PeriodToggleComponent,
+		KpiStatsComponent,
 		DependencyGuidanceComponent,
 	],
 	templateUrl: './horarios.component.html',
@@ -115,6 +116,33 @@ export class SchedulesComponent implements OnInit {
 			targetLabel: 'Ir a Usuarios',
 		},
 	]);
+
+	readonly statsItems = computed<KpiStatItem[]>(() => {
+		const stats = this.vm().estadisticas;
+		if (!stats) return [];
+
+		return [
+			{ icon: 'pi pi-calendar', label: 'Total Horarios', value: stats.totalHorarios },
+			{ icon: 'pi pi-check-circle', label: 'Activos', value: stats.horariosActivos },
+			{
+				icon: 'pi pi-user-minus',
+				label: 'Sin profesor',
+				value: stats.horariosSinProfesor,
+				variant: stats.horariosSinProfesor > 0 ? 'warning' : undefined,
+			},
+			{
+				icon: 'pi pi-users',
+				label: 'Sin estudiantes',
+				value: stats.horariosSinEstudiantes,
+				variant: stats.horariosSinEstudiantes > 0 ? 'warning' : undefined,
+			},
+			{
+				icon: 'pi pi-exclamation-circle',
+				label: 'Conflictos',
+				value: 0,
+			},
+		];
+	});
 
 	readonly estadoOptions = [
 		{ label: 'Activos', value: true },

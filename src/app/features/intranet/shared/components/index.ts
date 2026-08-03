@@ -11,6 +11,7 @@ export * from './page-header';
 export * from './period-toggle';
 export * from './responsive-table';
 export * from './stats-skeleton';
+export * from './kpi-stats';
 export * from './table-skeleton';
 export * from './attendance-scope-banner';
 export * from './attendance-scope-student-notice';

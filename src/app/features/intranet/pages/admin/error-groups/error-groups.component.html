@@ -51,48 +51,7 @@
 }
 
 <!-- #region Stats -->
-<section class="stats-section">
-	<div class="stat-card">
-		<div class="stat-content">
-			<span class="stat-label">Total grupos (página)</span>
-			<span class="stat-value">{{ stats().total }}</span>
-			<span class="stat-sublabel">grupos visibles</span>
-		</div>
-		<div class="stat-icon">
-			<i class="pi pi-list"></i>
-		</div>
-	</div>
-	<div class="stat-card stat-card--critical">
-		<div class="stat-content">
-			<span class="stat-label">Critical</span>
-			<span class="stat-value">{{ stats().critical }}</span>
-			<span class="stat-sublabel">bugs urgentes</span>
-		</div>
-		<div class="stat-icon">
-			<i class="pi pi-times-circle"></i>
-		</div>
-	</div>
-	<div class="stat-card stat-card--error">
-		<div class="stat-content">
-			<span class="stat-label">Error</span>
-			<span class="stat-value">{{ stats().error }}</span>
-			<span class="stat-sublabel">errores estándar</span>
-		</div>
-		<div class="stat-icon">
-			<i class="pi pi-exclamation-triangle"></i>
-		</div>
-	</div>
-	<div class="stat-card stat-card--warning">
-		<div class="stat-content">
-			<span class="stat-label">Warning</span>
-			<span class="stat-value">{{ stats().warning }}</span>
-			<span class="stat-sublabel">avisos</span>
-		</div>
-		<div class="stat-icon">
-			<i class="pi pi-info-circle"></i>
-		</div>
-	</div>
-</section>
+<app-kpi-stats [items]="statsItems()" />
 <!-- #endregion -->
 
 <!-- #region Filtros -->

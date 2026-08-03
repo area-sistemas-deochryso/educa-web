@@ -1,31 +1,5 @@
 <section class="stats-section">
-	<div class="stats-grid">
-		<!-- Total -->
-		<div class="stat-card">
-			<i class="pi pi-chart-line stat-icon"></i>
-			<div class="stat-content">
-				<span class="stat-value">{{ stats()?.total ?? 0 }}</span>
-				<span class="stat-label">Total eventos</span>
-				<span class="stat-sublabel">últimas {{ stats()?.horas ?? 24 }}h</span>
-			</div>
-		</div>
-
-		<!-- Rechazados -->
-		<div
-			class="stat-card"
-			[class.stat-card--critical]="(stats()?.totalRechazados ?? 0) > 50"
-		>
-			<i class="pi pi-ban stat-icon"></i>
-			<div class="stat-content">
-				<span class="stat-value">{{ stats()?.totalRechazados ?? 0 }}</span>
-				<span class="stat-label">Rechazados</span>
-				<span class="stat-sublabel">
-					{{ (stats()?.totalRechazados ?? 0) > 50 ? 'alto volumen' : 'últimas ' + (stats()?.horas ?? 24) + 'h' }}
-				</span>
-			</div>
-		</div>
-
-	</div>
+	<app-kpi-stats [items]="statsItems()" />
 
 	<!-- #region Breakdown — Top roles / Top endpoints -->
 	<div class="breakdown-grid">

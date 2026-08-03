@@ -25,7 +25,7 @@ import { ToastModule } from 'primeng/toast';
 
 import { logger } from '@core/helpers';
 import { ErrorStateComponent } from '@shared/components';
-import { SkeletonColumnDef, TableSkeletonComponent, StatsSkeletonComponent, PageHeaderComponent } from '@intranet-shared/components';
+import { SkeletonColumnDef, TableSkeletonComponent, StatsSkeletonComponent, PageHeaderComponent, KpiStatsComponent, type KpiStatItem } from '@intranet-shared/components';
 import { AttendanceScopeBannerComponent } from '@intranet-shared/components/attendance-scope-banner';
 import { AttendanceReportsComponent } from '../../cross-role/attendance-reports';
 import { AttendancePanelComponent } from '../attendance-panel';
@@ -78,6 +78,7 @@ import {
 		CheckboxModule,
 		TableSkeletonComponent,
 		StatsSkeletonComponent,
+		KpiStatsComponent,
 		Tabs,
 		TabList,
 		Tab,
@@ -116,6 +117,31 @@ export class AttendancesComponent implements OnInit {
 
 	/** `true` mientras hay un job de sync activo (QUEUED o RUNNING). */
 	readonly syncActive = this.syncService.isActive;
+	// #endregion
+
+	// #region Stats KPI
+	readonly statsItems = computed<KpiStatItem[]>(() => {
+		const stats = this.vm().estadisticas;
+		if (!stats) return [];
+
+		const mostrarSublabel =
+			this.vm().tipoPersonaFilter === 'todos' &&
+			(stats.totalProfesores > 0 || stats.totalAsistentesAdmin > 0);
+
+		return [
+			{
+				icon: 'pi pi-users',
+				label: 'Total registros',
+				value: stats.totalRegistros,
+				sublabel: mostrarSublabel
+					? `${stats.totalProfesores} profesores · ${stats.totalAsistentesAdmin} asistentes admin.`
+					: undefined,
+			},
+			{ icon: 'pi pi-check-circle', label: 'Completas', value: stats.completas },
+			{ icon: 'pi pi-exclamation-circle', label: 'Incompletas', value: stats.incompletas },
+			{ icon: 'pi pi-pencil', label: 'Manuales', value: stats.registrosManuales },
+		];
+	});
 	// #endregion
 
 	// #region Estado local

@@ -1,0 +1,26 @@
+<!-- #region Template -->
+<section class="stats-section" [style.--kpi-min-width]="minColumnWidth()">
+	@for (item of items(); track item.label) {
+		<div
+			class="stat-card"
+			[class.stat-card--icon-right]="iconPosition() === 'right'"
+			[class.stat-card--critical]="item.variant === 'critical'"
+			[class.stat-card--error]="item.variant === 'error'"
+			[class.stat-card--warning]="item.variant === 'warning'"
+			[class.stat-card--success]="item.variant === 'success'"
+			[class.stat-card--info]="item.variant === 'info'"
+		>
+			<div class="stat-content">
+				<span class="stat-label">{{ item.label }}</span>
+				<span class="stat-value">{{ item.value }}</span>
+				@if (item.sublabel) {
+					<span class="stat-sublabel">{{ item.sublabel }}</span>
+				}
+			</div>
+			<div class="stat-icon">
+				<i [class]="item.icon" aria-hidden="true"></i>
+			</div>
+		</div>
+	}
+</section>
+<!-- #endregion -->
