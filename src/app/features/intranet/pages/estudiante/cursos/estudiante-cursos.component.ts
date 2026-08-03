@@ -6,7 +6,7 @@ import { filter, take } from 'rxjs';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { PageHeaderComponent } from '@intranet-shared/components';
+import { PageHeaderComponent, EmptyStateComponent } from '@intranet-shared/components';
 import { buildCursoColorMap } from '@intranet-shared/config/curso-colors';
 import { EstudianteCursosFacade } from '../services/estudiante-cursos.facade';
 import { CursoContentReadonlyDialogComponent } from './components/curso-content-readonly-dialog/curso-content-readonly-dialog.component';
@@ -24,16 +24,23 @@ const DAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Vierne
 		ProgressSpinnerModule,
 		RouterLink,
 		PageHeaderComponent,
+		EmptyStateComponent,
 		CursoContentReadonlyDialogComponent,
 	],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	styles: `
 		.course-grid {
-			display: grid;
-			grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+			// Flexbox, no CSS Grid: con pocos cursos, un grid (auto-fill o
+			// auto-fit) deja las columnas sobrantes en blanco en vez de
+			// estirar las tarjetas existentes (mismo hallazgo que app-kpi-stats,
+			// Caso 1 — verificado en navegador, no solo en teoría de spec).
+			display: flex;
+			flex-wrap: wrap;
 			gap: 1rem;
 		}
 		.course-card {
+			flex: 1 1 320px;
+			min-width: 320px;
 			border-radius: 8px;
 			border: 1px solid var(--p-surface-200);
 			border-left: 4px solid var(--card-accent, var(--p-primary-color));
@@ -77,10 +84,7 @@ const DAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Vierne
 				<p-progressSpinner strokeWidth="4" />
 			</div>
 		} @else if (vm().horarios.length === 0) {
-			<div class="flex flex-column align-items-center p-5 text-color-secondary">
-				<i class="pi pi-book text-4xl mb-3"></i>
-				<p>No tienes cursos asignados</p>
-			</div>
+			<app-empty-state icon="pi pi-book" title="Mis Cursos" message="No tienes cursos asignados" />
 		} @else {
 			<app-page-header icon="pi pi-book" title="Mis Cursos">
 				<a routerLink="/intranet/estudiante/horarios" class="text-sm no-underline text-primary flex align-items-center gap-1">

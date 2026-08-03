@@ -8,6 +8,7 @@ export * from './offline-indicator';
 export * from './sync-status';
 export * from './voice-button';
 export * from './page-header';
+export * from './empty-state';
 export * from './period-toggle';
 export * from './responsive-table';
 export * from './stats-skeleton';

@@ -6,7 +6,7 @@ import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { filter, take } from 'rxjs';
-import { PageHeaderComponent } from '@intranet-shared/components';
+import { PageHeaderComponent, EmptyStateComponent } from '@intranet-shared/components';
 import { PluralizePipe } from '@intranet-shared/pipes';
 import { buildCursoColorMap } from '@intranet-shared/config/curso-colors';
 import { ProfesorFacade } from '../services/profesor.facade';
@@ -26,6 +26,7 @@ import { HorarioProfesorDto, CrearCursoContenidoRequest } from '../models';
 		ProgressSpinnerModule,
 		RouterLink,
 		PageHeaderComponent,
+		EmptyStateComponent,
 		PluralizePipe,
 		CursoContentDialogComponent,
 		CursoBuilderDialogComponent,
@@ -75,10 +76,7 @@ import { HorarioProfesorDto, CrearCursoContenidoRequest } from '../models';
 				<p-progressSpinner strokeWidth="4" />
 			</div>
 		} @else if (vm().horarios.length === 0) {
-			<div class="flex flex-column align-items-center p-5 text-color-secondary">
-				<i class="pi pi-book text-4xl mb-3"></i>
-				<p>No tienes cursos asignados</p>
-			</div>
+			<app-empty-state icon="pi pi-book" title="Mis Cursos" message="No tienes cursos asignados" />
 		} @else {
 			<app-page-header icon="pi pi-book" title="Mis Cursos">
 				<a routerLink="/intranet/profesor/horarios" class="text-sm no-underline text-primary flex align-items-center gap-1">

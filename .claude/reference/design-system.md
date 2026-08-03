@@ -4,12 +4,12 @@
 >
 > **Regla de oro**: todas las overrides y utilidades globales del design system viven en `src/styles.scss`. **NO** duplicar per-component salvo excepciones justificadas.
 
-Este archivo es la fuente de verdad para overrides de PrimeNG y utilidades de CSS que aplican a toda la intranet, y para las pautas estructurales recomendadas por componente (B1-B12). Está organizado en dos capas:
+Este archivo es la fuente de verdad para overrides de PrimeNG y utilidades de CSS que aplican a toda la intranet, y para las pautas estructurales recomendadas por componente (B1-B13). Está organizado en dos capas:
 
 | Capa | Cubre | Secciones |
 |---|---|---|
 | **Globales (A)** — overrides y utilidades en `src/styles.scss` | Qué pinta PrimeNG "solo" sin escribir SCSS en el componente | 1-5 |
-| **Pautas recomendadas (B)** — estructura, clases y ejemplos canónicos | Cómo armar un componente nuevo para que encaje con el estándar | 6 (B1-B12) |
+| **Pautas recomendadas (B)** — estructura, clases y ejemplos canónicos | Cómo armar un componente nuevo para que encaje con el estándar | 6 (B1-B13) |
 | **Tokens de color (D)** — variables CSS del tema PrimeNG Aura usadas como fuente de verdad | Qué variable usar en lugar de hex literal | 7 |
 
 Cuando aparezca un patrón nuevo que se repite en 3+ páginas, decidir en qué capa vive: si es visualmente invariable (background, color, border-color de PrimeNG) → A en `styles.scss`. Si es estructural o requiere clases semánticas (layout de filtros, anatomía de stat card, acciones de fila) → B como pauta.
@@ -234,7 +234,7 @@ Preguntarse antes de decidir:
 
 ---
 
-## 7. Pautas recomendadas por componente (B1-B12)
+## 7. Pautas recomendadas por componente (B1-B13)
 
 > **Estándar extraído literalmente de `/intranet/admin/usuarios`.** Los ejemplos de esta sección son copy-paste-ables — si tu página nueva tiene el mismo componente, copia la estructura y adáptala.
 >
@@ -980,6 +980,27 @@ La intranet usa **dos idiomas de navegación por secciones**, cada uno reservado
 
 ---
 
+### B13 · Estado vacío — nunca sin encabezado (`app-empty-state`)
+
+Case 10 de la auditoría de diseño (2026-08-03) encontró que varias pantallas (`ProfesorCursosComponent`, `EstudianteCursosComponent`) tenían una rama `@else if (lista vacía)` que reemplazaba TODO el contenido, incluido `<app-page-header>` — al quedarse sin datos, la pantalla perdía ícono + H1 + subtítulo por completo.
+
+**Regla**: cualquier pantalla con un estado "sin datos" usa `<app-empty-state icon="..." title="..." [subtitle]="...opcional" message="...">` en lugar de armar el bloque a mano. El componente (`shared/components/empty-state`) renderiza siempre el `<app-page-header>` internamente — es estructuralmente imposible perder el encabezado al usarlo, porque no es una opción del componente, es su implementación.
+
+```html
+@if (vm().loading) {
+	<p-progressSpinner />
+} @else if (vm().items.length === 0) {
+	<app-empty-state icon="pi pi-book" title="Mis Cursos" message="No tienes cursos asignados" />
+} @else {
+	<app-page-header icon="pi pi-book" title="Mis Cursos">...</app-page-header>
+	...
+}
+```
+
+No usar para estados vacíos DENTRO de una pantalla que ya tiene su propio `<app-page-header>` fijo (p. ej. una tabla vacía bajo un header que no depende de los datos) — ahí el `#emptymessage` de `p-table` o un div simple siguen siendo correctos. `app-empty-state` es específicamente para cuando la ausencia de datos reemplazaba la pantalla completa, header incluido.
+
+---
+
 ## 8. Tokens de color — Convención (D)
 
 > **"Ningún color hex literal sobre fondo plano de la intranet. Siempre token."**
@@ -1151,6 +1172,8 @@ No abrir excepciones nuevas para "componentes con animación" o "páginas comple
 - **Fase 4 (2026-08-03, Design System F4)** — B3 (stat card) migrado de "copiá este HTML" a componente compartido `<app-kpi-stats>`. Auditoría de consistencia visual detectó 8 implementaciones divergentes del mismo patrón (Usuarios, Cursos, Horarios, Rendimiento, Salones, Asistencias, Permisos/Roles, Errores, Rate Limit); todas migradas salvo Usuarios (excepción documentada — es un filtro clickeable, no una tarjeta de solo lectura).
 - **Fase 4 (2026-04-17, Design System F4)** — Agregada sección 5 (A5: `p-button-success` con texto blanco global) + sección 8 (D: Tokens de color con mapa canónico). Migrados ~30 archivos de admin/shared/cross-role/profesor/estudiante: `#e24c4c → var(--red-500)`, `#dc2626 → var(--red-600)`, `#1e40af → var(--blue-800)`. Eliminado `style="color: white"` inline en `usuarios-header`. Excepciones justificadas documentadas (Sass color functions, Canvas API, avatar palettes). Deuda C1/C4 resuelta, C3 resuelta con token; C2 resuelta en todas las rutas migrables.
 - **Fase 5 (2026-08-03, Design System F5, Case 5 de la auditoría)** — Agregado B12 (tabs vs. segmented control): documenta como regla intencional los dos idiomas de navegación (tabs = filtrar la misma vista, segmented control = visualización alternativa — reservado a Monitoreo > Incidencias > Errores) y fija el orden `<app-page-header>` antes de `p-tabs`, a nivel del shell. Corregido el orden invertido (header duplicado dentro de cada tab-panel) en `TicketAdminComponent` (Bandeja/Tipos) y `PermissionsRolesComponent` (Por Rol/Catálogo — `VistasComponent` perdió su `<app-page-header>` propio, el botón "Refrescar" se movió al toolbar de filtros).
+- **Fase 5 (2026-08-03, Design System F5, Case 10 de la auditoría)** — Agregado B13 (estado vacío nunca sin encabezado) y creado el componente compartido `<app-empty-state>` (`shared/components/empty-state`), que envuelve `<app-page-header>` internamente. Migrados `ProfesorCursosComponent` y `EstudianteCursosComponent` (ambos perdían el header completo en la rama de "sin cursos asignados").
+
 Overrides existentes son redundantes con los globales pero no rompen nada — se pueden limpiar incrementalmente al tocar cada archivo.
 
 ---
