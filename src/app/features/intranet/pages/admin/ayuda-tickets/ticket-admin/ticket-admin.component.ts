@@ -5,6 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 import { Tab, TabList, Tabs } from 'primeng/tabs';
 
+import { PageHeaderComponent } from '@intranet-shared/components';
 import { UserPermissionsService } from '@core/services';
 
 import { TicketBandejaComponent } from '../ticket-bandeja/ticket-bandeja.component';
@@ -30,7 +31,7 @@ type TicketAdminTab = 'bandeja' | 'tipos';
 @Component({
 	selector: 'app-ticket-admin',
 	standalone: true,
-	imports: [Tabs, TabList, Tab, TicketBandejaComponent, TicketTiposComponent],
+	imports: [Tabs, TabList, Tab, PageHeaderComponent, TicketBandejaComponent, TicketTiposComponent],
 	templateUrl: './ticket-admin.component.html',
 	styleUrl: './ticket-admin.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

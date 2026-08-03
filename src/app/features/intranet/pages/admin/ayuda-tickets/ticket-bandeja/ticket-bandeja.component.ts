@@ -9,7 +9,6 @@ import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 
-import { PageHeaderComponent } from '@intranet-shared/components';
 import { UserPermissionsService } from '@core/services';
 
 import { TicketAdminDto, TicketEstado } from '../models/ticket-admin.models';
@@ -64,7 +63,6 @@ const ESTADO_LABEL: Record<TicketEstado, string> = {
 		SelectModule,
 		TableModule,
 		TagModule,
-		PageHeaderComponent,
 	],
 	providers: [TicketBandejaFacade],
 	templateUrl: './ticket-bandeja.component.html',

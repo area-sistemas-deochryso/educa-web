@@ -1,17 +1,5 @@
 <!-- #region Template -->
 <div class="vistas-container">
-	<!-- #region Header -->
-	<app-page-header icon="pi pi-shield" title="Catálogo de Capabilities" subtitle="Gestiona las capabilities del sistema de permisos">
-		<button
-			pButton
-			label="Refrescar"
-			icon="pi pi-refresh"
-			class="p-button-outlined"
-			(click)="refresh()"
-		></button>
-	</app-page-header>
-	<!-- #endregion -->
-
 	@if (vm().error) {
 		<div class="error-banner">
 			<i class="pi pi-exclamation-triangle"></i>
@@ -84,6 +72,14 @@
 		></button>
 
 		<div class="filter-spacer"></div>
+
+		<button
+			pButton
+			label="Refrescar"
+			icon="pi pi-refresh"
+			class="p-button-outlined"
+			(click)="refresh()"
+		></button>
 
 		<button
 			pButton

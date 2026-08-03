@@ -12,7 +12,6 @@ import { TagModule } from 'primeng/tag';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 
-import { PageHeaderComponent } from '@intranet-shared/components';
 import type { CapabilityCatalogItem } from '@core/services';
 
 import { VistasFacade } from './services';
@@ -31,7 +30,6 @@ import { VistasFacade } from './services';
 		SelectModule,
 		TagModule,
 		ConfirmDialogModule,
-		PageHeaderComponent,
 	],
 	providers: [ConfirmationService],
 	templateUrl: './vistas.component.html',

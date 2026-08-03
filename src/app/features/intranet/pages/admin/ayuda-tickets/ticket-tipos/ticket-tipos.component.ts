@@ -11,7 +11,6 @@ import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 
-import { PageHeaderComponent } from '@intranet-shared/components';
 import { UserPermissionsService } from '@core/services';
 
 import { TicketTipoAdminDto } from '../models/ticket-admin.models';
@@ -38,7 +37,6 @@ const AYUDA_TICKET_MANAGE = 'AYUDA_TICKET_MANAGE';
 		TableModule,
 		TagModule,
 		ToggleSwitchModule,
-		PageHeaderComponent,
 	],
 	providers: [TicketTipoCatalogoFacade],
 	templateUrl: './ticket-tipos.component.html',

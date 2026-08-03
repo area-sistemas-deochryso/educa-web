@@ -4,6 +4,12 @@
 		<p>No tenés permiso para acceder a la administración de tickets.</p>
 	</div>
 } @else {
+	<app-page-header
+		icon="pi pi-inbox"
+		title="Tickets de soporte"
+		subtitle="Bandeja de tickets recibidos y catálogo de tipos de problema"
+	/>
+
 	<p-tabs [value]="activeTab()" (valueChange)="onTabChange($event)">
 		<p-tablist>
 			<p-tab value="bandeja">

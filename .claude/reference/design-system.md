@@ -4,12 +4,12 @@
 >
 > **Regla de oro**: todas las overrides y utilidades globales del design system viven en `src/styles.scss`. **NO** duplicar per-component salvo excepciones justificadas.
 
-Este archivo es la fuente de verdad para overrides de PrimeNG y utilidades de CSS que aplican a toda la intranet, y para las pautas estructurales recomendadas por componente (B1-B11). Está organizado en dos capas:
+Este archivo es la fuente de verdad para overrides de PrimeNG y utilidades de CSS que aplican a toda la intranet, y para las pautas estructurales recomendadas por componente (B1-B12). Está organizado en dos capas:
 
 | Capa | Cubre | Secciones |
 |---|---|---|
 | **Globales (A)** — overrides y utilidades en `src/styles.scss` | Qué pinta PrimeNG "solo" sin escribir SCSS en el componente | 1-5 |
-| **Pautas recomendadas (B)** — estructura, clases y ejemplos canónicos | Cómo armar un componente nuevo para que encaje con el estándar | 6 (B1-B11) |
+| **Pautas recomendadas (B)** — estructura, clases y ejemplos canónicos | Cómo armar un componente nuevo para que encaje con el estándar | 6 (B1-B12) |
 | **Tokens de color (D)** — variables CSS del tema PrimeNG Aura usadas como fuente de verdad | Qué variable usar en lugar de hex literal | 7 |
 
 Cuando aparezca un patrón nuevo que se repite en 3+ páginas, decidir en qué capa vive: si es visualmente invariable (background, color, border-color de PrimeNG) → A en `styles.scss`. Si es estructural o requiere clases semánticas (layout de filtros, anatomía de stat card, acciones de fila) → B como pauta.
@@ -234,7 +234,7 @@ Preguntarse antes de decidir:
 
 ---
 
-## 7. Pautas recomendadas por componente (B1-B11)
+## 7. Pautas recomendadas por componente (B1-B12)
 
 > **Estándar extraído literalmente de `/intranet/admin/usuarios`.** Los ejemplos de esta sección son copy-paste-ables — si tu página nueva tiene el mismo componente, copia la estructura y adáptala.
 >
@@ -321,72 +321,24 @@ Usar el componente shared `<app-page-header>`. Layout canónico: **icono a la iz
 
 ### B3 · Stat card
 
+> **F4 (2026-08-03)** — Migrado a componente compartido `<app-kpi-stats>` (`@intranet-shared/components`, carpeta `shared/components/kpi-stats`). **Ya no se copia el HTML/SCSS por página** — este componente reemplazó 8 implementaciones divergentes (Usuarios, Cursos, Horarios, Rendimiento, Salones, Asistencias, Permisos/Roles, Errores, Rate Limit). El HTML/SCSS de abajo documenta qué renderiza el componente por dentro, no algo para copy-pastear.
+
 Anatomía: **content-left (label + valor + sublabel) + icon-right (48×48, border-radius 12px, fondo `--surface-200`)**. El valor grande (1.75rem / 700) es el número; el label (0.85rem) dice qué mide; el sublabel (0.75rem) da contexto.
 
 ```html
-<section class="stats-section">
-	<div class="stat-card">
-		<div class="stat-content">
-			<span class="stat-label">Total Usuarios</span>
-			<span class="stat-value">{{ estadisticas().totalUsuarios }}</span>
-			<span class="stat-sublabel">usuarios registrados</span>
-		</div>
-		<div class="stat-icon">
-			<i class="pi pi-users"></i>
-		</div>
-	</div>
-	<!-- ... más stat-cards -->
-</section>
+<app-kpi-stats
+	[items]="[
+		{ icon: 'pi pi-users', label: 'Total Usuarios', value: estadisticas().totalUsuarios, sublabel: 'usuarios registrados' },
+		<!-- ... más KpiStatItem -->
+	]"
+/>
 ```
 
-```scss
-.stats-section {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-	gap: 1rem;
-	margin-bottom: 1.5rem;
+`KpiStatItem = { icon: string; label: string; value: string | number; sublabel?: string; variant?: 'critical' | 'error' | 'warning' | 'success' | 'info' }`. El grid interno usa `repeat(auto-fit, minmax(200px, 1fr))` — se adapta solo a la cantidad de items sin dejar filas huérfanas (era el bug de Horarios con 5 stats).
 
-	.stat-card {
-		// background: transparent ya lo aplica el global (sección 1)
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: 1.25rem;
-		border-radius: 12px;
+**Variantes semánticas**: pasar `variant` en el item — modifica `border-left` + `color`, nunca `background`. Ver bloque "✅ SÍ hacer" más abajo.
 
-		.stat-content {
-			display: flex;
-			flex-direction: column;
-			gap: 0.25rem;
-
-			.stat-label { font-size: 0.85rem; color: var(--text-color-secondary); font-weight: 500; }
-			.stat-value { font-size: 1.75rem; font-weight: 700; color: var(--text-color); }
-			.stat-sublabel { font-size: 0.75rem; color: var(--text-color-secondary); }
-		}
-
-		.stat-icon {
-			width: 48px;
-			height: 48px;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			border-radius: 12px;
-			background: var(--surface-200);
-
-			i { font-size: 1.25rem; color: var(--text-color); }
-		}
-	}
-}
-
-@media (max-width: 768px) {
-	.stats-section { grid-template-columns: 1fr 1fr; }
-}
-@media (max-width: 480px) {
-	.stats-section { grid-template-columns: 1fr; }
-}
-```
-
-**Variantes semánticas** (críticos, highlights): modificar `border-left` o `color`, NO `background`. Ver bloque "✅ SÍ hacer" más abajo.
+**Excepción documentada — Usuarios**: la barra de conteos de `/intranet/admin/usuarios` (`usuarios-stats.component`) NO usa `<app-kpi-stats>` a propósito — es un filtro clickeable (cada pill cambia la tabla), no una tarjeta de solo lectura. Es un componente distinto resolviendo un problema distinto; no migrar sin antes decidir si el filtro por click se banca en `app-kpi-stats` o se mantiene separado.
 
 ---
 
@@ -1016,6 +968,18 @@ readonly isDev = !environment.production;
 
 ---
 
+### B12 · Tabs vs. segmented control (navegación por secciones)
+
+La intranet usa **dos idiomas de navegación por secciones**, cada uno reservado para un propósito distinto. No son intercambiables — mezclarlos o usarlos sin criterio es lo que Case 5 de la auditoría de diseño (2026-08-03) marcó como inconsistencia.
+
+**Tabs con subrayado verde (`p-tabs`/`p-tablist`/`p-tab`)** — usar cuando las secciones son **la misma vista, filtrada distinto** (mismo dataset, mismo layout, cambia el subconjunto o el modo). Ejemplos: Tickets (Bandeja / Tipos), Permisos (Por Rol / Catálogo), Asistencias (Gestión / Reportes / Panel).
+
+**Segmented control de fondo sólido** — reservado para cuando las secciones son **visualizaciones de naturaleza distinta de los mismos datos** (no un filtro, una representación distinta: tabla vs. kanban vs. heatmap). Única instancia hoy: Monitoreo > Incidencias > Errores (Kanban / Tabla / Eventos / Heatmap / Priorización). Forzar esas 5 vistas a tabs les quitaría expresividad — la excepción es intencional, no accidental.
+
+**Orden obligatorio: `<app-page-header>` va ANTES de `p-tabs`, siempre, a nivel del componente shell — nunca dentro de cada tab-panel.** Si cada pestaña necesita acciones propias (un date-picker, un buscador), esas acciones van en un toolbar propio dentro del tab-panel, o se proyectan condicionalmente en el `header-actions` del shell — pero el `<app-page-header>` (ícono + H1 + subtítulo) no se duplica por pestaña. Ver `TicketAdminComponent`/`PermissionsRolesComponent` como referencia tras el fix de Case 5.
+
+---
+
 ## 8. Tokens de color — Convención (D)
 
 > **"Ningún color hex literal sobre fondo plano de la intranet. Siempre token."**
@@ -1184,8 +1148,9 @@ No abrir excepciones nuevas para "componentes con animación" o "páginas comple
 - **Fase 1 (2026-04-17)** — Migrado a global: tablas, paginador, stat-cards. Regla original `table-transparency.md` creada.
 - **Fase 2 (2026-04-17, Design System F1)** — Renombrado a `design-system.md`. Agregados A2 (inputs/selects reset), A3 (buttons text/outlined), A4 (utility `.label-uppercase`).
 - **Fase 3 (2026-04-17, Design System F3)** — Agregada sección 7 (antes 6) con pautas recomendadas B1-B11 (container con border, page header, stat card, tabla, row actions triplet, filter bar, botones canónicos, dialogs, alert banners con `color-mix()`, drawer detalle, dev banners). Extraídas literalmente de `/intranet/admin/usuarios`.
+- **Fase 4 (2026-08-03, Design System F4)** — B3 (stat card) migrado de "copiá este HTML" a componente compartido `<app-kpi-stats>`. Auditoría de consistencia visual detectó 8 implementaciones divergentes del mismo patrón (Usuarios, Cursos, Horarios, Rendimiento, Salones, Asistencias, Permisos/Roles, Errores, Rate Limit); todas migradas salvo Usuarios (excepción documentada — es un filtro clickeable, no una tarjeta de solo lectura).
 - **Fase 4 (2026-04-17, Design System F4)** — Agregada sección 5 (A5: `p-button-success` con texto blanco global) + sección 8 (D: Tokens de color con mapa canónico). Migrados ~30 archivos de admin/shared/cross-role/profesor/estudiante: `#e24c4c → var(--red-500)`, `#dc2626 → var(--red-600)`, `#1e40af → var(--blue-800)`. Eliminado `style="color: white"` inline en `usuarios-header`. Excepciones justificadas documentadas (Sass color functions, Canvas API, avatar palettes). Deuda C1/C4 resuelta, C3 resuelta con token; C2 resuelta en todas las rutas migrables.
-
+- **Fase 5 (2026-08-03, Design System F5, Case 5 de la auditoría)** — Agregado B12 (tabs vs. segmented control): documenta como regla intencional los dos idiomas de navegación (tabs = filtrar la misma vista, segmented control = visualización alternativa — reservado a Monitoreo > Incidencias > Errores) y fija el orden `<app-page-header>` antes de `p-tabs`, a nivel del shell. Corregido el orden invertido (header duplicado dentro de cada tab-panel) en `TicketAdminComponent` (Bandeja/Tipos) y `PermissionsRolesComponent` (Por Rol/Catálogo — `VistasComponent` perdió su `<app-page-header>` propio, el botón "Refrescar" se movió al toolbar de filtros).
 Overrides existentes son redundantes con los globales pero no rompen nada — se pueden limpiar incrementalmente al tocar cada archivo.
 
 ---
