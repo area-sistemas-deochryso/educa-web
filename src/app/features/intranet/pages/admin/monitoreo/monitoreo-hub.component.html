@@ -203,7 +203,12 @@
 										<span class="tile-hint">{{ tile.badge.label }}</span>
 									}
 
-									<p class="tile-description">{{ tile.description }}</p>
+									<p
+										class="tile-description"
+										[pTooltip]="tile.description"
+										[title]="tile.description"
+										tooltipPosition="top"
+									>{{ tile.description }}</p>
 								</div>
 
 								<i class="pi pi-arrow-right tile-arrow"></i>
