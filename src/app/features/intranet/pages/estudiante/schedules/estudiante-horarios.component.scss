@@ -299,7 +299,7 @@
 		&.active {
 			background: var(--primary-color);
 			color: var(--white-color);
-			border-color: var(--primary-color);
+			border-color: var(--accent-interactive);
 			box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
 		}
 	}
@@ -437,22 +437,4 @@
 
 // #endregion
 // #region Dark mode
-:host-context(.dark-mode) {
-	.horario-block {
-		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-
-		&:hover {
-			box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
-		}
-	}
-
-	.mobile-card {
-		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-	}
-
-	.day-selector .day-btn.active {
-		box-shadow: 0 2px 8px rgba(79, 70, 229, 0.4);
-	}
-}
-
 // #endregion

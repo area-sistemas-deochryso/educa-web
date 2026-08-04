@@ -632,7 +632,7 @@
 
 			&.p-highlight {
 				background: var(--primary-color);
-				border-color: var(--primary-color);
+				border-color: var(--accent-interactive);
 			}
 		}
 
@@ -643,7 +643,7 @@
 		&.p-checkbox-checked {
 			.p-checkbox-box {
 				background: var(--primary-color);
-				border-color: var(--primary-color);
+				border-color: var(--accent-interactive);
 			}
 		}
 	}

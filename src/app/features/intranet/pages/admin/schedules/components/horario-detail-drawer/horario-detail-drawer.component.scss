@@ -390,32 +390,4 @@
 
 // #endregion
 // #region Dark Mode
-:host-context(.dark-mode) {
-  .status-section {
-    background: var(--surface-100);
-  }
-
-  .info-section,
-  .assignment-section {
-    border-color: var(--surface-border);
-  }
-
-  .assigned-professor {
-    .professor-info {
-      background: var(--surface-100);
-    }
-  }
-
-  .no-assignment {
-    background: var(--surface-100);
-    border-color: var(--surface-border);
-  }
-
-  .students-list {
-    .student-item {
-      background: var(--surface-100);
-      border-color: var(--surface-border);
-    }
-  }
-}
 // #endregion

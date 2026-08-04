@@ -1,0 +1,54 @@
+// #region Tokens semánticos de theming (brief 521)
+// Capa central de tokens, separada de styles.scss (paleta legacy + shim PrimeNG).
+// Consume los tokens --red-500/--green-500/etc. del shim PrimeNG definido en
+// styles.scss (bloque "PRIMENG TOKEN COMPATIBILITY SHIM") — este archivo no
+// redefine paleta, solo compone tokens semánticos sobre ella.
+
+:root {
+	/* --- Acento interactivo ---
+	   Reemplaza el uso indebido de --primary-color (celeste de landing pública,
+	   #86d7f5, sin contraste para texto/borde) como acento interactivo en la
+	   intranet (~40 archivos), además de unificar los 2 casos que ya
+	   hardcodeaban #4338ca por separado (login-intranet, user-profile-menu) y
+	   el --green-500 que videoconferencias usaba para el mismo propósito con
+	   una familia de color distinta. Valor canonizado desde el #4338ca ya
+	   usado en producción. */
+	--accent-interactive: #4338ca;
+	--accent-interactive-hover: #3730a3;
+	/* indigo-600 — extremo claro del gradiente de avatar reusado en
+	   user-profile-menu y usuarios-table (mismo par de hex duplicado). */
+	--accent-interactive-light: #4f46e5;
+
+	/* --- Escala de sombra/elevación ---
+	   No existía definición real: --shadow-2/--shadow-3 se referenciaban en
+	   videoconferencias sin estar nunca definidos en ningún lado (var()
+	   resolviendo vacío, mismo patrón del bug histórico de --blue-500 antes
+	   del shim de brief 467, hallazgo 0). Valores elegidos por clustering de
+	   los rgba(0,0,0,x) más repetidos entre los 6+ componentes que
+	   reinventaban sombra suelta. */
+	--shadow-1: 0 1px 4px rgba(0, 0, 0, 0.06);
+	--shadow-2: 0 4px 12px rgba(0, 0, 0, 0.1);
+	--shadow-3: 0 4px 20px rgba(0, 0, 0, 0.15);
+
+	/* --- Paleta de tinte por tipo de contenido ---
+	   Mismo patrón color-mix() que B9 ya resolvió para alert banners
+	   (src/scss/utilities/_misc.scss), centralizado acá para eliminar la
+	   copia-pega de la paleta fondo+borde+ícono en 4+ archivos —
+	   voice-button incluido, que la resolvía con valores propios (drift). */
+	--tint-danger-bg: color-mix(in srgb, var(--red-500) 8%, transparent);
+	--tint-danger-border: color-mix(in srgb, var(--red-500) 30%, transparent);
+	--tint-danger-icon: var(--red-600);
+
+	--tint-warning-bg: color-mix(in srgb, var(--yellow-500) 12%, transparent);
+	--tint-warning-border: color-mix(in srgb, var(--yellow-500) 35%, transparent);
+	--tint-warning-icon: var(--yellow-700);
+
+	--tint-success-bg: color-mix(in srgb, var(--green-500) 10%, transparent);
+	--tint-success-border: color-mix(in srgb, var(--green-500) 30%, transparent);
+	--tint-success-icon: var(--green-600);
+
+	--tint-info-bg: color-mix(in srgb, var(--blue-500) 8%, transparent);
+	--tint-info-border: color-mix(in srgb, var(--blue-500) 30%, transparent);
+	--tint-info-icon: var(--blue-600);
+}
+// #endregion

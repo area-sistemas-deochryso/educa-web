@@ -74,14 +74,6 @@
 // #endregion
 
 // #region Dark mode
-:host-context(.dark-mode) {
-	.stat-card {
-		&.stat-success { color: var(--green-400); }
-		&.stat-warn { color: var(--yellow-400); }
-		&.stat-danger { color: var(--red-400); }
-		&.stat-info { color: var(--blue-400); }
-	}
-}
 // #endregion
 
 // #region Tabla

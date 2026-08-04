@@ -18,7 +18,7 @@
 
 	i {
 		font-size: 1rem;
-		color: var(--primary-color);
+		color: var(--accent-interactive);
 	}
 
 	&.editing {
@@ -110,7 +110,7 @@
 
 	i {
 		font-size: 0.875rem;
-		color: var(--primary-color);
+		color: var(--accent-interactive);
 	}
 }
 
@@ -137,7 +137,7 @@
 		}
 
 		&:enabled:focus {
-			border-color: var(--primary-color);
+			border-color: var(--accent-interactive);
 			box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary-color) 30%, transparent);
 		}
 	}

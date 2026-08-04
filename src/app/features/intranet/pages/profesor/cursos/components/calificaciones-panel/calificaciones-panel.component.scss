@@ -87,7 +87,7 @@
 	transition: border-color 0.2s;
 
 	&:hover {
-		border-color: var(--primary-color);
+		border-color: var(--accent-interactive);
 	}
 }
 
@@ -108,7 +108,7 @@
 		.eval-peso {
 			font-size: 0.75rem;
 			font-weight: 600;
-			color: var(--primary-color);
+			color: var(--accent-interactive);
 			background: var(--primary-50);
 			padding: 0.125rem 0.5rem;
 			border-radius: 1rem;

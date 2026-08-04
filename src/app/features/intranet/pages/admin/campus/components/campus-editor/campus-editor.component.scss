@@ -70,12 +70,12 @@
 	transition: stroke 0.15s;
 
 	&:hover {
-		stroke: var(--primary-color);
+		stroke: var(--accent-interactive);
 		stroke-width: 2.5;
 	}
 
 	&.selected {
-		stroke: var(--primary-color);
+		stroke: var(--accent-interactive);
 		stroke-width: 2.5;
 	}
 }
@@ -85,7 +85,7 @@
 	transition: fill 0.15s;
 
 	&.selected {
-		fill: var(--primary-color);
+		fill: var(--accent-interactive);
 	}
 }
 // #endregion
@@ -210,7 +210,7 @@
 
 	i {
 		font-size: 1.5rem;
-		color: var(--primary-color);
+		color: var(--accent-interactive);
 	}
 
 	span {

@@ -180,13 +180,4 @@
 // #endregion
 
 // #region Dark mode
-:host-context(.dark-mode) {
-	.profile-header {
-		background: linear-gradient(135deg, var(--surface-100) 0%, var(--surface-200) 100%);
-	}
-
-	.info-value {
-		background: var(--surface-100);
-	}
-}
 // #endregion

@@ -7,6 +7,9 @@
 /* Sistema de utilidades SCSS custom (reemplaza Bootstrap) */
 @use 'scss';
 
+/* Capa de tokens semánticos de theming (brief 521) */
+@use 'tokens';
+
 /* PWA safe areas - removido de body, aplicado en intranet-layout.component.scss */
 
 /* PrimeIcons */

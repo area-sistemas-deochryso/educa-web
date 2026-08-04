@@ -41,7 +41,7 @@
 	width: 60px;
 	text-align: center;
 	font-weight: 600;
-	border: 1.5px dashed var(--primary-color);
+	border: 1.5px dashed var(--accent-interactive);
 	border-radius: var(--border-radius);
 	background: var(--primary-50, rgba(79, 70, 229, 0.04));
 	transition: border-color 0.2s, background 0.2s;
@@ -89,7 +89,7 @@
 	width: 60px;
 	text-align: center;
 	font-weight: 600;
-	border: 1.5px solid var(--primary-color);
+	border: 1.5px solid var(--accent-interactive);
 	border-radius: var(--border-radius);
 
 	// Hide spinner arrows
@@ -170,7 +170,7 @@
 	transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
 
 	&.promedio-simulated {
-		border: 1.5px dashed var(--primary-color);
+		border: 1.5px dashed var(--accent-interactive);
 		background: var(--primary-50, rgba(79, 70, 229, 0.05));
 		box-shadow: 0 0 0 1px rgba(79, 70, 229, 0.08);
 	}
@@ -187,7 +187,7 @@
 
 	.sim-icon {
 		font-size: 0.55rem;
-		color: var(--primary-color);
+		color: var(--accent-interactive);
 	}
 }
 

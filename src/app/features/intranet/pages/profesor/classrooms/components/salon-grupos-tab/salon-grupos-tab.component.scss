@@ -73,7 +73,7 @@
 	gap: 0.5rem;
 
 	.grupo-icon {
-		color: var(--primary-color);
+		color: var(--accent-interactive);
 		font-size: 0.9rem;
 	}
 
@@ -152,7 +152,7 @@
 	transition: border-color 0.2s;
 
 	&:focus-within {
-		border-color: var(--primary-color);
+		border-color: var(--accent-interactive);
 	}
 }
 // #endregion
@@ -193,7 +193,7 @@
 	align-items: center;
 	gap: 0.5rem;
 	background: var(--surface-card);
-	border: 2px solid var(--primary-color);
+	border: 2px solid var(--accent-interactive);
 	border-radius: var(--border-radius);
 	padding: 0.4rem 0.85rem;
 	box-shadow:
@@ -206,13 +206,13 @@
 
 	.drag-handle {
 		opacity: 1;
-		color: var(--primary-color);
+		color: var(--accent-interactive);
 	}
 }
 
 .cdk-drag-placeholder {
 	background: rgba(79, 70, 229, 0.06);
-	border: 2px dashed var(--primary-color);
+	border: 2px dashed var(--accent-interactive);
 	border-radius: var(--border-radius);
 	min-height: 2rem;
 	opacity: 0.6;

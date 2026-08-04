@@ -26,7 +26,7 @@
 
 	i {
 		font-size: 1rem;
-		color: var(--primary-color);
+		color: var(--accent-interactive);
 	}
 
 	h3 {
@@ -83,12 +83,12 @@
 		box-shadow: inset 3px 0 0 var(--primary-color);
 
 		.piso-icon {
-			color: var(--primary-color);
+			color: var(--accent-interactive);
 			background: color-mix(in srgb, var(--primary-color) 18%, transparent);
 		}
 
 		.piso-name {
-			color: var(--primary-color);
+			color: var(--accent-interactive);
 			font-weight: 600;
 		}
 	}

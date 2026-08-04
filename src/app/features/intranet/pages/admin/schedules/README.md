@@ -70,7 +70,6 @@ Componente presentacional con grid interactivo:
 ### 7. **Estilos Completos**
 - ✅ `horarios.component.scss`: Layout principal, header, stats, filtros, tabs
 - ✅ `horarios-weekly-view.component.scss`: Grid de 60px por hora, bloques flotantes
-- ✅ Dark mode support con `host-context(.dark-mode)`
 - ✅ Responsive breakpoints: 1024px, 768px
 - ✅ Variables CSS de PrimeNG (--surface-*, --primary-color, etc.)
 

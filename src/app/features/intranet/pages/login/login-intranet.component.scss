@@ -76,11 +76,8 @@
 	transition: border-color 0.2s, box-shadow 0.2s;
 
 	&:hover {
-		/* var(--primary-color) (#86d7f5, celeste de marca) sin contraste
-		   suficiente como acento de hover — mismo indigo que el resto de
-		   la intranet (ver user-profile-menu.component.scss). */
-		border-color: #4338ca;
-		box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+		border-color: var(--accent-interactive);
+		box-shadow: var(--shadow-1);
 	}
 }
 

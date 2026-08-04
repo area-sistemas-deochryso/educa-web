@@ -72,9 +72,6 @@ export const appConfig: ApplicationConfig = {
 		providePrimeNG({
 			theme: {
 				preset: Aura,
-				options: {
-					darkModeSelector: '.dark-mode',
-				},
 			},
 		}),
 		{ provide: ErrorHandler, useClass: GlobalErrorHandler },

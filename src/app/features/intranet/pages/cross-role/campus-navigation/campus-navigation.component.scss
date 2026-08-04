@@ -80,13 +80,13 @@
 	white-space: nowrap;
 
 	&:hover {
-		border-color: var(--primary-color);
+		border-color: var(--accent-interactive);
 		background: var(--primary-50, #eef2ff);
 		color: #4338ca;
 	}
 
 	&--active {
-		border-color: var(--primary-color);
+		border-color: var(--accent-interactive);
 		background: var(--primary-color);
 		color: #fff;
 

@@ -36,10 +36,7 @@
 			display: flex;
 			align-items: center;
 			justify-content: center;
-			/* Mismo indigo con contraste WCAG AA que .profile-avatar del header
-			   (ver user-profile-menu.component.scss) — var(--primary-color)
-			   (#86d7f5, celeste claro) con texto blanco no cumple 4.5:1. */
-			background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+			background: linear-gradient(135deg, var(--accent-interactive-light) 0%, var(--accent-interactive) 100%);
 			color: #ffffff;
 			border-radius: 50%;
 			font-weight: 700;

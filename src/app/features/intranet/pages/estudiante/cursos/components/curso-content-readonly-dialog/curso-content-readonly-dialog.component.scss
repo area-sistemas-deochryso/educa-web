@@ -170,7 +170,7 @@
 	transition: border-color 0.2s, box-shadow 0.2s;
 
 	&:focus-within {
-		border-color: var(--primary-color);
+		border-color: var(--accent-interactive);
 		box-shadow: 0 0 0 2px var(--primary-100, rgba(79, 70, 229, 0.08));
 	}
 

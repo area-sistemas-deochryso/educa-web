@@ -55,16 +55,16 @@
 		background 0.15s;
 
 	&:hover {
-		border-color: var(--primary-color);
+		border-color: var(--accent-interactive);
 	}
 
 	&:focus-visible {
-		outline: 2px solid var(--primary-color);
+		outline: 2px solid var(--accent-interactive);
 		outline-offset: 2px;
 	}
 
 	&--selected {
-		border-color: var(--primary-color);
+		border-color: var(--accent-interactive);
 		background: color-mix(in srgb, var(--primary-color) 8%, transparent);
 	}
 
