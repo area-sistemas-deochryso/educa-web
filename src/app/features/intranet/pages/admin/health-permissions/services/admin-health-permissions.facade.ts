@@ -85,12 +85,14 @@ export class AdminHealthPermissionsFacade {
 	onSalonChange(salonId: number): void {
 		this.store.setSelectedSalonId(salonId);
 		this.store.clearSalonData();
+		this.store.setLoadError(false);
 		this.loadResumen(salonId);
 	}
 
 	loadResumen(salonId: number): void {
 		if (this.store.loading()) return;
 		this.store.setLoading(true);
+		this.store.setLoadError(false);
 
 		const requests$ = this.store.sintomas().length > 0
 			? forkJoin({
@@ -114,6 +116,7 @@ export class AdminHealthPermissionsFacade {
 			error: (err) => {
 				logger.error('Error cargando resumen', err);
 				this.store.setLoading(false);
+				this.store.setLoadError(true);
 			},
 		});
 	}

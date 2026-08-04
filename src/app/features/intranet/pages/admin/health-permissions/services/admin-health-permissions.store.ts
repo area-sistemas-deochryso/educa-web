@@ -23,6 +23,7 @@ export class AdminHealthPermissionsStore {
 	private readonly _fechasValidacion = signal<DateValidationResult[]>([]);
 	private readonly _salonesLoading = signal(false);
 	private readonly _loading = signal(false);
+	private readonly _loadError = signal(false);
 	private readonly _saving = signal(false);
 	private readonly _exitDialogVisible = signal(false);
 	private readonly _justificationDialogVisible = signal(false);
@@ -38,6 +39,7 @@ export class AdminHealthPermissionsStore {
 	readonly fechasValidacion = this._fechasValidacion.asReadonly();
 	readonly salonesLoading = this._salonesLoading.asReadonly();
 	readonly loading = this._loading.asReadonly();
+	readonly loadError = this._loadError.asReadonly();
 	readonly saving = this._saving.asReadonly();
 	readonly exitDialogVisible = this._exitDialogVisible.asReadonly();
 	readonly justificationDialogVisible = this._justificationDialogVisible.asReadonly();
@@ -49,7 +51,11 @@ export class AdminHealthPermissionsStore {
 	);
 
 	readonly salonOptions = computed(() =>
-		this._salones().map((s) => ({ label: `${s.descripcion} (${s.cantidadEstudiantes} est.)`, value: s.id })),
+		this._salones().map((s) => ({
+			label: s.descripcion,
+			value: s.id,
+			sublabel: `${s.cantidadEstudiantes} est.`,
+		})),
 	);
 
 	readonly vm = computed(() => ({
@@ -64,6 +70,7 @@ export class AdminHealthPermissionsStore {
 		fechasValidacion: this._fechasValidacion(),
 		salonesLoading: this._salonesLoading(),
 		loading: this._loading(),
+		loadError: this._loadError(),
 		saving: this._saving(),
 		exitDialogVisible: this._exitDialogVisible(),
 		justificationDialogVisible: this._justificationDialogVisible(),
@@ -110,6 +117,9 @@ export class AdminHealthPermissionsStore {
 	}
 	setLoading(v: boolean): void {
 		this._loading.set(v);
+	}
+	setLoadError(v: boolean): void {
+		this._loadError.set(v);
 	}
 	setSaving(v: boolean): void {
 		this._saving.set(v);

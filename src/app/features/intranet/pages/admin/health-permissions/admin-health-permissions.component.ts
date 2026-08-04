@@ -1,9 +1,9 @@
 import { Component, ChangeDetectionStrategy, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { SelectModule } from 'primeng/select';
+import { ButtonModule } from 'primeng/button';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { PageHeaderComponent } from '@intranet-shared/components';
+import { PageHeaderComponent, PickerGridComponent } from '@intranet-shared/components';
 
 import { AdminHealthPermissionsFacade } from './services/admin-health-permissions.facade';
 // eslint-disable-next-line layer-enforcement/imports-error -- Razón: health-permissions es concepto cross-role (admin supervisa lo que profesor gestiona). Ubicación física bajo profesor/ es histórica; migración a @intranet-shared diferida (ver maestro F3.5.C notas de seguimiento).
@@ -17,9 +17,10 @@ import { SalonHealthPermissionsTabComponent } from '@features/intranet/pages/pro
 	imports: [
 		CommonModule,
 		FormsModule,
-		SelectModule,
+		ButtonModule,
 		ProgressSpinnerModule,
 		PageHeaderComponent,
+		PickerGridComponent,
 		SalonHealthPermissionsTabComponent,
 	],
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -29,20 +30,15 @@ import { SalonHealthPermissionsTabComponent } from '@features/intranet/pages/pro
 		<div class="p-4 pt-0">
 			<!-- #region Selector de salon -->
 			<div class="salon-selector">
-				<label for="salon-select" class="font-semibold">Salón</label>
-				<p-select
-					id="salon-select"
+				<label class="font-semibold">Salón</label>
+				<app-picker-grid
 					[options]="vm().salonOptions"
-					[ngModel]="vm().selectedSalonId"
-					(ngModelChange)="onSalonChange($event)"
-					optionLabel="label"
-					optionValue="value"
-					placeholder="Seleccionar salón..."
-					[filter]="true"
-					filterPlaceholder="Buscar salón..."
-					appendTo="body"
+					[selected]="vm().selectedSalonId"
 					[loading]="vm().salonesLoading"
-					styleClass="salon-dropdown"
+					searchPlaceholder="Buscar salón..."
+					emptyMessage="Sin salones"
+					ariaLabel="Seleccionar salón"
+					(selectionChange)="onSalonChange($event)"
 				/>
 			</div>
 			<!-- #endregion -->
@@ -52,6 +48,18 @@ import { SalonHealthPermissionsTabComponent } from '@features/intranet/pages/pro
 				<div class="empty-state">
 					<i class="pi pi-info-circle text-3xl mb-2"></i>
 					<p>Seleccione un salón para gestionar permisos de salud</p>
+				</div>
+			} @else if (vm().loadError) {
+				<div class="empty-state empty-state--error">
+					<i class="pi pi-exclamation-triangle text-3xl mb-2"></i>
+					<p>No se pudo cargar la información de este salón</p>
+					<button
+						pButton
+						label="Reintentar"
+						icon="pi pi-refresh"
+						class="p-button-outlined p-button-sm mt-2"
+						(click)="facade.loadResumen(vm().selectedSalonId!)"
+					></button>
 				</div>
 			} @else {
 				<app-salon-health-permissions-tab
@@ -85,13 +93,10 @@ import { SalonHealthPermissionsTabComponent } from '@features/intranet/pages/pro
 		`
 			.salon-selector {
 				display: flex;
-				align-items: center;
-				gap: 1rem;
+				flex-direction: column;
+				align-items: stretch;
+				gap: 0.5rem;
 				margin-bottom: 1.5rem;
-			}
-
-			:host ::ng-deep .salon-dropdown {
-				min-width: 320px;
 			}
 
 			.empty-state {
@@ -103,9 +108,12 @@ import { SalonHealthPermissionsTabComponent } from '@features/intranet/pages/pro
 				text-align: center;
 			}
 
+			.empty-state--error i {
+				color: var(--yellow-600);
+			}
+
 			:host ::ng-deep {
-				.p-inputtext,
-				.p-select {
+				.p-inputtext {
 					background: transparent;
 					color: var(--text-color);
 					border-color: var(--surface-300);
@@ -119,14 +127,6 @@ import { SalonHealthPermissionsTabComponent } from '@features/intranet/pages/pro
 						box-shadow: 0 0 0 1px var(--text-color);
 					}
 				}
-
-				.p-select-label {
-					color: var(--text-color);
-				}
-
-				.p-select-dropdown {
-					color: var(--text-color);
-				}
 			}
 		`,
 	],
@@ -139,7 +139,8 @@ export class AdminHealthPermissionsComponent implements OnInit {
 		this.facade.loadSalones();
 	}
 
-	onSalonChange(salonId: number): void {
+	onSalonChange(salonId: number | null): void {
+		if (salonId === null) return;
 		this.facade.onSalonChange(salonId);
 	}
 

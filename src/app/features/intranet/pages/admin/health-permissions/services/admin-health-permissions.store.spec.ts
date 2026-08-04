@@ -177,9 +177,9 @@ describe('AdminHealthPermissionsStore', () => {
 		expect(store.fechasValidacion()).toEqual([]);
 	});
 
-	it('salonOptions computed genera labels con cantidad', () => {
+	it('salonOptions computed genera label + sublabel con cantidad', () => {
 		store.setSalones([makeSalon({ id: 1, descripcion: '1ro A', cantidadEstudiantes: 30 })]);
-		expect(store.salonOptions()).toEqual([{ label: '1ro A (30 est.)', value: 1 }]);
+		expect(store.salonOptions()).toEqual([{ label: '1ro A', value: 1, sublabel: '30 est.' }]);
 	});
 
 	it('vm contiene todo el estado consolidado', () => {
