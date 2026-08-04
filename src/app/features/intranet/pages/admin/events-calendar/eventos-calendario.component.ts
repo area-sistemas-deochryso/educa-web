@@ -1,5 +1,5 @@
 // #region Imports
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ConfirmationService } from 'primeng/api';
@@ -18,7 +18,7 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 
-import { PageHeaderComponent } from '@intranet-shared/components';
+import { PageHeaderComponent, KpiStatsComponent, type KpiStatItem } from '@intranet-shared/components';
 import { EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleLabelPipe } from '@intranet-shared/pipes';
 import { UiMappingService } from '@intranet-shared/services';
 import { EventsCalendarFacade, EventsCalendarStore } from './services';
@@ -48,6 +48,7 @@ import { EventoCalendarioLista } from '@data/models';
 		IconFieldModule,
 		InputIconModule,
 		PageHeaderComponent,
+		KpiStatsComponent,
 		EstadoLabelPipe,
 		EstadoSeverityPipe,
 		EstadoToggleLabelPipe,
@@ -67,6 +68,31 @@ export class EventsCalendarComponent implements OnInit {
 	// #region Estado del facade
 	readonly vm = this.facade.vm;
 	showValidation = signal(false);
+	// #endregion
+
+	// #region Stats KPI
+	readonly statsItems = computed<KpiStatItem[]>(() => [
+		{
+			icon: 'pi pi-list',
+			label: 'Total',
+			value: this.vm().estadisticas.total,
+		},
+		{
+			icon: 'pi pi-check-circle',
+			label: 'Activos',
+			value: this.vm().estadisticas.activos,
+		},
+		{
+			icon: 'pi pi-times-circle',
+			label: 'Inactivos',
+			value: this.vm().estadisticas.inactivos,
+		},
+		{
+			icon: 'pi pi-clock',
+			label: 'Próximos 30 días',
+			value: this.vm().estadisticas.proximosMes,
+		},
+	]);
 	// #endregion
 
 	// #region Opciones de filtros

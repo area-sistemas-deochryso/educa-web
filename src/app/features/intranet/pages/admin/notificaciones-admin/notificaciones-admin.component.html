@@ -24,36 +24,7 @@
 }
 
 <!-- #region Stats -->
-<div class="stats-grid">
-	<div class="stat-card">
-		<div class="stat-icon"><i class="pi pi-list"></i></div>
-		<div class="stat-info">
-			<span class="stat-value">{{ vm().estadisticas.total }}</span>
-			<span class="stat-label">Total</span>
-		</div>
-	</div>
-	<div class="stat-card">
-		<div class="stat-icon active"><i class="pi pi-check-circle"></i></div>
-		<div class="stat-info">
-			<span class="stat-value">{{ vm().estadisticas.activas }}</span>
-			<span class="stat-label">Activas</span>
-		</div>
-	</div>
-	<div class="stat-card">
-		<div class="stat-icon inactive"><i class="pi pi-times-circle"></i></div>
-		<div class="stat-info">
-			<span class="stat-value">{{ vm().estadisticas.inactivas }}</span>
-			<span class="stat-label">Inactivas</span>
-		</div>
-	</div>
-	<div class="stat-card">
-		<div class="stat-icon today"><i class="pi pi-calendar-clock"></i></div>
-		<div class="stat-info">
-			<span class="stat-value">{{ vm().estadisticas.vigentesHoy }}</span>
-			<span class="stat-label">Vigentes hoy</span>
-		</div>
-	</div>
-</div>
+<app-kpi-stats [items]="statsItems()" />
 <!-- #endregion -->
 
 <!-- #region Filtros -->

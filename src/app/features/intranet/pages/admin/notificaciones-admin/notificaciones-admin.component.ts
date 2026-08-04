@@ -1,5 +1,5 @@
 // #region Imports
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ConfirmationService } from 'primeng/api';
@@ -18,7 +18,7 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 
-import { PageHeaderComponent } from '@intranet-shared/components';
+import { PageHeaderComponent, KpiStatsComponent, type KpiStatItem } from '@intranet-shared/components';
 import { EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleLabelPipe } from '@intranet-shared/pipes';
 import { UiMappingService } from '@intranet-shared/services';
 import { NotificacionesAdminFacade, NotificacionesAdminStore } from './services';
@@ -48,6 +48,7 @@ import { NotificacionLista } from '@data/models';
 		IconFieldModule,
 		InputIconModule,
 		PageHeaderComponent,
+		KpiStatsComponent,
 		EstadoLabelPipe,
 		EstadoSeverityPipe,
 		EstadoToggleLabelPipe,
@@ -67,6 +68,31 @@ export class NotificacionesAdminComponent implements OnInit {
 	// #region Estado del facade
 	readonly vm = this.facade.vm;
 	showValidation = signal(false);
+	// #endregion
+
+	// #region Stats KPI
+	readonly statsItems = computed<KpiStatItem[]>(() => [
+		{
+			icon: 'pi pi-list',
+			label: 'Total',
+			value: this.vm().estadisticas.total,
+		},
+		{
+			icon: 'pi pi-check-circle',
+			label: 'Activas',
+			value: this.vm().estadisticas.activas,
+		},
+		{
+			icon: 'pi pi-times-circle',
+			label: 'Inactivas',
+			value: this.vm().estadisticas.inactivas,
+		},
+		{
+			icon: 'pi pi-calendar-clock',
+			label: 'Vigentes hoy',
+			value: this.vm().estadisticas.vigentesHoy,
+		},
+	]);
 	// #endregion
 
 	// #region Opciones de filtros
