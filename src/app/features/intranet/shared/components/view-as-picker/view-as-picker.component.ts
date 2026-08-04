@@ -14,10 +14,10 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 
 import { AutoCompleteModule, AutoCompleteCompleteEvent } from 'primeng/autocomplete';
-import { SelectModule } from 'primeng/select';
 
 import { PermissionsService, UsuarioBusqueda } from '@core/services/permissions';
 import { ViewAsContext, ViewAsFiltroOption, ViewAsFiltrosService, ViewAsRol } from '@core/services/view-as';
+import { PickerGridComponent } from '../picker-grid';
 // #endregion
 
 // #region Implementation
@@ -43,7 +43,7 @@ import { ViewAsContext, ViewAsFiltroOption, ViewAsFiltrosService, ViewAsRol } fr
 @Component({
 	selector: 'app-view-as-picker',
 	standalone: true,
-	imports: [FormsModule, AutoCompleteModule, SelectModule],
+	imports: [FormsModule, AutoCompleteModule, PickerGridComponent],
 	templateUrl: './view-as-picker.component.html',
 	styleUrl: './view-as-picker.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

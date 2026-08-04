@@ -1,0 +1,46 @@
+<!-- #region Template -->
+<div class="picker-grid">
+	<div class="picker-grid__search">
+		<i class="pi pi-search" aria-hidden="true"></i>
+		<input
+			type="text"
+			pInputText
+			[ngModel]="term()"
+			(ngModelChange)="term.set($event)"
+			[placeholder]="searchPlaceholder()"
+			[attr.aria-label]="searchPlaceholder()"
+			[disabled]="loading()"
+		/>
+	</div>
+
+	@if (loading()) {
+		<div class="picker-grid__empty">{{ loadingMessage() }}</div>
+	} @else if (filtered().length > 0) {
+		<div
+			class="picker-grid__cards"
+			role="listbox"
+			[attr.aria-label]="ariaLabel() || null"
+			[style.max-height]="maxHeight()"
+			[style.overflow-y]="maxHeight() ? 'auto' : null"
+		>
+			@for (option of filtered(); track option.value) {
+				<button
+					type="button"
+					class="picker-card"
+					[class.picker-card--selected]="isSelected(option)"
+					role="option"
+					[attr.aria-selected]="isSelected(option)"
+					(click)="select(option)"
+				>
+					<span class="picker-card__label">{{ option.label }}</span>
+					@if (option.sublabel) {
+						<span class="picker-card__sublabel">{{ option.sublabel }}</span>
+					}
+				</button>
+			}
+		</div>
+	} @else {
+		<div class="picker-grid__empty">{{ emptyMessage() }}</div>
+	}
+</div>
+<!-- #endregion -->

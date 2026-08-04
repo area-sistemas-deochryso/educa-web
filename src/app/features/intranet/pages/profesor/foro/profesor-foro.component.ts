@@ -9,9 +9,8 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Select } from 'primeng/select';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { PageHeaderComponent } from '@intranet-shared/components';
+import { PageHeaderComponent, PickerGridComponent } from '@intranet-shared/components';
 import { ProfesorFacade } from '../services/profesor.facade';
 import { SalonMensajeriaFacade } from '@features/intranet/pages/cross-role/mensajeria/services/mensajeria.facade';
 import { SalonForoTabComponent } from '@features/intranet/pages/cross-role/mensajeria/components/foro-tab/foro-tab.component';
@@ -22,7 +21,14 @@ import { toSelectOptionsFrom } from '@shared/models';
 @Component({
 	selector: 'app-profesor-foro',
 	standalone: true,
-	imports: [CommonModule, FormsModule, Select, ProgressSpinnerModule, PageHeaderComponent, SalonForoTabComponent],
+	imports: [
+		CommonModule,
+		FormsModule,
+		ProgressSpinnerModule,
+		PageHeaderComponent,
+		PickerGridComponent,
+		SalonForoTabComponent,
+	],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	styles: `
 		:host {
@@ -54,12 +60,13 @@ import { toSelectOptionsFrom } from '@shared/models';
 				</div>
 			} @else {
 				<div class="filters-row mb-3">
-					<p-select
+					<app-picker-grid
 						[options]="salonOptions()"
-						[(ngModel)]="selectedSalonId"
-						placeholder="Seleccionar salón"
-						appendTo="body"
-						(ngModelChange)="onSalonChange($event)"
+						[selected]="selectedSalonId()"
+						searchPlaceholder="Buscar salón..."
+						emptyMessage="Sin salones"
+						ariaLabel="Seleccionar salón"
+						(selectionChange)="onSalonChange($event)"
 					/>
 				</div>
 
@@ -135,7 +142,8 @@ export class ProfesorForoComponent implements OnInit, OnDestroy {
 	// #endregion
 
 	// #region Handlers
-	onSalonChange(salonId: number): void {
+	onSalonChange(salonId: number | null): void {
+		if (salonId === null) return;
 		this.selectedSalonId.set(salonId);
 
 		const salon = this.facade.vm().salonesConEstudiantes.find((s) => s.salonId === salonId);

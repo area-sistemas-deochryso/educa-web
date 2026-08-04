@@ -1,0 +1,90 @@
+// Anatomía: design-system.md §B6 (search-box) + §B3 (card) adaptada a card
+// clickeable — es un componente distinto al read-only <app-kpi-stats>, mismo
+// espíritu que la excepción documentada de usuarios-stats (§B3).
+:host {
+	display: block;
+	width: 100%;
+}
+
+.picker-grid {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+
+.picker-grid__search {
+	position: relative;
+
+	i {
+		position: absolute;
+		left: 0.75rem;
+		top: 50%;
+		transform: translateY(-50%);
+		color: var(--text-color-secondary);
+		font-size: 0.85rem;
+	}
+
+	input {
+		width: 100%;
+		padding-left: 2.25rem;
+		font-size: 0.875rem;
+	}
+}
+
+.picker-grid__cards {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+	gap: 0.75rem;
+}
+
+.picker-card {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 0.2rem;
+	padding: 0.85rem 1rem;
+	border: 1px solid var(--surface-300);
+	border-radius: 12px;
+	background: transparent;
+	color: inherit;
+	font: inherit;
+	text-align: left;
+	cursor: pointer;
+	transition:
+		border-color 0.15s,
+		background 0.15s;
+
+	&:hover {
+		border-color: var(--primary-color);
+	}
+
+	&:focus-visible {
+		outline: 2px solid var(--primary-color);
+		outline-offset: 2px;
+	}
+
+	&--selected {
+		border-color: var(--primary-color);
+		background: color-mix(in srgb, var(--primary-color) 8%, transparent);
+	}
+
+	&__label {
+		font-size: 0.95rem;
+		font-weight: 600;
+		color: var(--text-color);
+	}
+
+	&__sublabel {
+		font-size: 0.78rem;
+		color: var(--text-color-secondary);
+	}
+}
+
+.picker-grid__empty {
+	padding: 1.5rem;
+	text-align: center;
+	color: var(--text-color-secondary);
+	font-size: 0.875rem;
+	border: 1px dashed var(--surface-300);
+	border-radius: 12px;
+}

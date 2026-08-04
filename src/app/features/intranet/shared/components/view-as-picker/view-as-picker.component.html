@@ -1,31 +1,25 @@
 <!-- #region Template -->
 <div class="view-as-picker">
 	<div class="view-as-picker__filters">
-		<p-select
+		<app-picker-grid
 			[options]="salonOptions()"
-			[ngModel]="selectedSalonId()"
-			(ngModelChange)="selectedSalonId.set($event); onFiltroChange()"
-			placeholder="Todos los salones"
-			optionLabel="label"
-			optionValue="value"
-			appendTo="body"
-			[filter]="true"
-			filterPlaceholder="Buscar salón..."
-			[showClear]="true"
-			aria-label="Filtrar por salón y año"
+			[selected]="selectedSalonId()"
+			[clearable]="true"
+			[maxHeight]="'12rem'"
+			searchPlaceholder="Buscar salón..."
+			emptyMessage="Sin salones"
+			ariaLabel="Filtrar por salón y año"
+			(selectionChange)="selectedSalonId.set($event); onFiltroChange()"
 		/>
-		<p-select
+		<app-picker-grid
 			[options]="cursoOptions()"
-			[ngModel]="selectedCursoId()"
-			(ngModelChange)="selectedCursoId.set($event); onFiltroChange()"
-			placeholder="Todos los cursos"
-			optionLabel="label"
-			optionValue="value"
-			appendTo="body"
-			[filter]="true"
-			filterPlaceholder="Buscar curso..."
-			[showClear]="true"
-			aria-label="Filtrar por curso"
+			[selected]="selectedCursoId()"
+			[clearable]="true"
+			[maxHeight]="'12rem'"
+			searchPlaceholder="Buscar curso..."
+			emptyMessage="Sin cursos"
+			ariaLabel="Filtrar por curso"
+			(selectionChange)="selectedCursoId.set($event); onFiltroChange()"
 		/>
 	</div>
 	<p-autoComplete

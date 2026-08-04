@@ -18,12 +18,13 @@
 	} @else {
 		<!-- #region Selector de curso -->
 		<div class="filters-row mb-3">
-			<p-select
+			<app-picker-grid
 				[options]="cursoOptions()"
-				[(ngModel)]="selectedHorarioId"
-				placeholder="Seleccionar curso"
-				appendTo="body"
-				(ngModelChange)="onCursoChange($event)"
+				[selected]="selectedHorarioId()"
+				searchPlaceholder="Buscar curso..."
+				emptyMessage="Sin cursos"
+				ariaLabel="Seleccionar curso"
+				(selectionChange)="onCursoChange($event)"
 			/>
 		</div>
 		<!-- #endregion -->

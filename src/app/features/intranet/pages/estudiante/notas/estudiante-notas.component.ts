@@ -1,12 +1,11 @@
 import { Component, ChangeDetectionStrategy, inject, input, computed, effect, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Select } from 'primeng/select';
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { CardModule } from 'primeng/card';
 import { TooltipModule } from 'primeng/tooltip';
-import { PageHeaderComponent } from '@intranet-shared/components';
+import { PageHeaderComponent, PickerGridComponent } from '@intranet-shared/components';
 import { SkeletonLoaderComponent } from '@shared/components';
 import { EstudianteNotasFacade } from './services/estudiante-notas.facade';
 import { NotasCursoCardComponent } from './components/notas-curso-card/notas-curso-card.component';
@@ -18,12 +17,12 @@ import { SimuladorNotasComponent } from './components/simulador-notas/simulador-
 	imports: [
 		CommonModule,
 		FormsModule,
-		Select,
 		ButtonModule,
 		TagModule,
 		CardModule,
 		TooltipModule,
 		PageHeaderComponent,
+		PickerGridComponent,
 		SkeletonLoaderComponent,
 		NotasCursoCardComponent,
 		SimuladorNotasComponent,
@@ -77,7 +76,8 @@ export class EstudianteNotasComponent implements OnInit {
 		this.facade.loadNotas();
 	}
 
-	onCursoChange(index: number): void {
+	onCursoChange(index: number | null): void {
+		if (index === null) return;
 		this.facade.selectCurso(index);
 	}
 

@@ -11,10 +11,9 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { Select } from 'primeng/select';
 import { TabsModule } from 'primeng/tabs';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { PageHeaderComponent } from '@intranet-shared/components';
+import { PageHeaderComponent, PickerGridComponent } from '@intranet-shared/components';
 import { ProfesorFacade } from '../services/profesor.facade';
 import { AttendanceCourseFacade } from '../cursos/services/attendance-course.facade';
 import { AttendanceRegistrationPanelComponent } from '../cursos/components/attendance-registration-panel/attendance-registration-panel.component';
@@ -27,12 +26,12 @@ import { EstadoAsistenciaCurso } from '../models';
 	imports: [
 		CommonModule,
 		FormsModule,
-		Select,
 		TabsModule,
 		ProgressSpinnerModule,
 		AttendanceRegistrationPanelComponent,
 		AttendanceSummaryPanelComponent,
 		PageHeaderComponent,
+		PickerGridComponent,
 	],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	styles: `
@@ -115,12 +114,13 @@ import { EstadoAsistenciaCurso } from '../models';
 			} @else {
 				<div class="filters-row">
 					<label>Curso</label>
-					<p-select
+					<app-picker-grid
 						[options]="cursoOptions()"
-						[(ngModel)]="selectedHorarioId"
-						placeholder="Seleccionar curso"
-						appendTo="body"
-						(ngModelChange)="onCursoChange($event)"
+						[selected]="selectedHorarioId()"
+						searchPlaceholder="Buscar curso..."
+						emptyMessage="Sin cursos"
+						ariaLabel="Seleccionar curso"
+						(selectionChange)="onCursoChange($event)"
 					/>
 				</div>
 
@@ -255,7 +255,8 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
 	// #endregion
 
 	// #region Handlers
-	onCursoChange(horarioId: number): void {
+	onCursoChange(horarioId: number | null): void {
+		if (horarioId === null) return;
 		this.selectedHorarioId.set(horarioId);
 		this.asistenciaFacade.resetAsistencia();
 	}

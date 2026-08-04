@@ -10,12 +10,11 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Select } from 'primeng/select';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { logger, withRetry } from '@core/helpers';
-import { PageHeaderComponent } from '@intranet-shared/components';
+import { PageHeaderComponent, PickerGridComponent } from '@intranet-shared/components';
 import { SkeletonLoaderComponent } from '@shared/components';
 import { ProfesorFacade } from '../services/profesor.facade';
 import { CalificacionesFacade } from '../cursos/services/calificaciones.facade';
@@ -38,9 +37,9 @@ import {
 	imports: [
 		CommonModule,
 		FormsModule,
-		Select,
 		ConfirmDialogModule,
 		PageHeaderComponent,
+		PickerGridComponent,
 		SkeletonLoaderComponent,
 		CalificacionesPanelComponent,
 		CalificarDialogComponent,
@@ -116,7 +115,8 @@ export class TeacherGradesComponent implements OnInit, OnDestroy {
 	// #endregion
 
 	// #region Handlers
-	onCursoChange(horarioId: number): void {
+	onCursoChange(horarioId: number | null): void {
+		if (horarioId === null) return;
 		this.selectedHorarioId.set(horarioId);
 		this.calFacade.resetCalificaciones();
 		this._contenido.set(null);

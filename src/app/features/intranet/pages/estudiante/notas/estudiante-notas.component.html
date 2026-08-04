@@ -48,14 +48,13 @@
 		<!-- #region Filters -->
 		<div class="notas-filters">
 			@if (vm().cursoOptions.length > 1) {
-				<p-select
+				<app-picker-grid
 					[options]="vm().cursoOptions"
-					[ngModel]="vm().selectedCursoIndex"
-					(ngModelChange)="onCursoChange($event)"
-					optionLabel="label"
-					optionValue="value"
-					placeholder="Seleccionar curso"
-					appendTo="body"
+					[selected]="vm().selectedCursoIndex"
+					(selectionChange)="onCursoChange($event)"
+					searchPlaceholder="Buscar curso..."
+					emptyMessage="Sin cursos"
+					ariaLabel="Seleccionar curso"
 					class="curso-select"
 				/>
 			}
