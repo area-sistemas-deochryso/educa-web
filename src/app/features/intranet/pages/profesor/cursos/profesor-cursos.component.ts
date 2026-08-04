@@ -1,4 +1,14 @@
-import { Component, ChangeDetectionStrategy, inject, OnInit, DestroyRef, computed } from '@angular/core';
+import {
+	Component,
+	ChangeDetectionStrategy,
+	inject,
+	OnInit,
+	OnDestroy,
+	DestroyRef,
+	computed,
+	effect,
+	signal,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -93,6 +103,7 @@ import { HorarioProfesorDto, CrearCursoContenidoRequest } from '../models';
 							(click)="onVerContenido(horario)"
 							pTooltip="Ver contenido"
 							tooltipPosition="top"
+							[tooltipDisabled]="!tooltipsReady()"
 						>
 							<div class="flex align-items-start justify-content-between mb-2">
 								<span class="font-bold text-lg line-height-3">{{ horario.cursoNombre }}</span>
@@ -130,7 +141,7 @@ import { HorarioProfesorDto, CrearCursoContenidoRequest } from '../models';
 		/>
 	`,
 })
-export class ProfesorCursosComponent implements OnInit {
+export class ProfesorCursosComponent implements OnInit, OnDestroy {
 	private readonly facade = inject(ProfesorFacade);
 	private readonly contenidoDataFacade = inject(CursoContenidoDataFacade);
 	private readonly contenidoUiFacade = inject(CursoContenidoUiFacade);
@@ -142,6 +153,47 @@ export class ProfesorCursosComponent implements OnInit {
 	readonly contenidoVm = this.contenidoDataFacade.vm;
 
 	readonly colorMap = computed(() => buildCursoColorMap(this.vm().horarios));
+
+	// #region Tooltip anti-glitch al entrar por navegación programática
+	// Cuando se llega a esta pantalla vía "Ver como" (redirect sin acción real
+	// del mouse), el cursor físico ya está posicionado sobre donde termina
+	// apareciendo la primera course-card -- pero esa card recién se crea acá
+	// una vez que `vm().horarios` llega (async, después del loading), no al
+	// montar el shell del componente. pTooltip liga su listener nativo de
+	// "mouseenter" apenas la card entra al DOM; el navegador dispara ese
+	// mouseenter igual bajo un cursor quieto (no hace falta que el usuario
+	// mueva el mouse), así que el tooltip se activa sin hover real y nunca
+	// recibe el "mouseleave" que lo cerraría -- queda flotando huérfano.
+	// Por eso el gate reacciona a la transición de loading (no a AfterViewInit,
+	// que dispara demasiado temprano, antes de que existan las cards): los
+	// tooltips arrancan deshabilitados y se habilitan recién un margen corto
+	// después de que los datos llegan y las cards se montan, para que ese
+	// mouseenter fantasma no dispare nada; un hover real del usuario, que
+	// siempre llega bastante después, sigue funcionando normal.
+	readonly tooltipsReady = signal(false);
+	private tooltipsReadyTimeout?: ReturnType<typeof setTimeout>;
+
+	constructor() {
+		effect(() => {
+			if (this.vm().loading) {
+				this.tooltipsReady.set(false);
+				clearTimeout(this.tooltipsReadyTimeout);
+				this.tooltipsReadyTimeout = undefined;
+				return;
+			}
+			if (!this.tooltipsReady() && !this.tooltipsReadyTimeout) {
+				this.tooltipsReadyTimeout = setTimeout(() => {
+					this.tooltipsReadyTimeout = undefined;
+					this.tooltipsReady.set(true);
+				}, 50);
+			}
+		});
+	}
+
+	ngOnDestroy(): void {
+		clearTimeout(this.tooltipsReadyTimeout);
+	}
+	// #endregion
 
 	ngOnInit(): void {
 		this.facade.loadData();
