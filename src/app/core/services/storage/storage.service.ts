@@ -331,6 +331,18 @@ export class StorageService {
 	}
 	// #endregion
 
+	// #region VIEW AS CONTEXT — P92 F2 / brief 511
+	/** Lee el contexto de "ver como" persistido. Se usa para rehidratarlo tras F5. */
+	getViewAsContext<T>(): T | null {
+		return this.session.getViewAsContext<T>();
+	}
+
+	/** Persiste el contexto activo o lo borra (pasando `null`). */
+	setViewAsContext<T>(context: T | null): void {
+		this.session.setViewAsContext(context);
+	}
+	// #endregion
+
 	// #region DEFER/FAIL STATUS WIDGET (Plan 22 Chat B / Plan 29 Chat 2.6)
 	getDeferFailWidgetAutoRefresh(): boolean {
 		return this.preferences.getDeferFailWidgetAutoRefresh();

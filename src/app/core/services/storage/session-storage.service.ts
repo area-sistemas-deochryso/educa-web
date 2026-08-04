@@ -443,4 +443,28 @@ export class SessionStorageService {
 	}
 
 	// #endregion
+	// #region VIEW AS CONTEXT — P92 F2 / brief 511
+
+	/**
+	 * Lee el contexto de "ver como" (P92 F2) persistido en la sesión actual.
+	 * Permite rehidratarlo tras un F5 sin perder el profesor/estudiante ya
+	 * elegido. Igual que `getCrossChexJobId`, no depende de la session key de
+	 * auth — vive y expira con el tab.
+	 */
+	getViewAsContext<T>(): T | null {
+		return this.getJSON<T>('educa_view_as_context');
+	}
+
+	/**
+	 * Persiste (o borra, pasando `null`) el contexto de "ver como" activo.
+	 */
+	setViewAsContext<T>(context: T | null): void {
+		if (context === null) {
+			this.removeItem('educa_view_as_context');
+		} else {
+			this.setJSON('educa_view_as_context', context);
+		}
+	}
+
+	// #endregion
 }
