@@ -17,6 +17,7 @@ import { TableModule } from 'primeng/table';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { logger, withRetry } from '@core/helpers';
+import { PageHeaderComponent } from '@intranet-shared/components';
 import { EstudianteFacade } from '../services/estudiante.facade';
 import {
 	HorarioProfesorDto,
@@ -28,13 +29,21 @@ import {
 @Component({
 	selector: 'app-student-attendance',
 	standalone: true,
-	imports: [CommonModule, FormsModule, Select, TagModule, TableModule, ProgressSpinnerModule],
+	imports: [
+		CommonModule,
+		FormsModule,
+		Select,
+		TagModule,
+		TableModule,
+		ProgressSpinnerModule,
+		PageHeaderComponent,
+	],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	styleUrl: './student-attendance.component.scss',
 	template: `
-		<div class="p-4">
-			<h2 class="mt-0 mb-3">Mi Asistencia</h2>
+		<app-page-header icon="pi pi-check-square" title="Mi Asistencia" />
 
+		<div class="p-4 pt-0">
 			@if (pageLoading()) {
 				<div class="flex justify-content-center p-5">
 					<p-progressSpinner strokeWidth="4" />
