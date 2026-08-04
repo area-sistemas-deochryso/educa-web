@@ -112,23 +112,25 @@
 	}
 
 	&.pdf {
-		background: #fef2f2;
-		border-color: #fecaca;
-		i { color: #ef4444; }
+		background: var(--red-50);
+		border-color: var(--red-200);
+		i { color: var(--red-500); }
 	}
 
 	&.word {
-		background: #eff6ff;
+		background: var(--blue-50);
+		// TODO(521): hex sin token equivalente (#bfdbfe, blue-200 no existe en el shim)
 		border-color: #bfdbfe;
-		i { color: #3b82f6; }
+		i { color: var(--blue-500); }
 	}
 
 	&.excel {
-		background: #f0fdf4;
-		border-color: #bbf7d0;
-		i { color: #22c55e; }
+		background: var(--green-50);
+		border-color: var(--green-200);
+		i { color: var(--green-500); }
 	}
 
+	// TODO(521): hex sin token equivalente (#f5f3ff/#ddd6fe/#8b5cf6, violeta sin token en la paleta)
 	&.image {
 		background: #f5f3ff;
 		border-color: #ddd6fe;
@@ -136,9 +138,9 @@
 	}
 
 	&.video {
-		background: #fff7ed;
-		border-color: #fed7aa;
-		i { color: #f97316; }
+		background: var(--orange-50);
+		border-color: var(--orange-200);
+		i { color: var(--orange-500); }
 	}
 }
 

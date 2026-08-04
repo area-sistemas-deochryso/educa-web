@@ -397,20 +397,20 @@
 
 	// Tag Info (Inicial)
 	&.tag-info {
-		background: #3b82f6;
-		color: #ffffff;
+		background: var(--blue-500);
+		color: var(--white-color);
 	}
 
 	// Tag Success (Primaria)
 	&.tag-success {
-		background: #22c55e;
-		color: #ffffff;
+		background: var(--green-500);
+		color: var(--white-color);
 	}
 
 	// Tag Warn (Secundaria)
 	&.tag-warn {
-		background: #f97316;
-		color: #ffffff;
+		background: var(--orange-500);
+		color: var(--white-color);
 	}
 }
 
@@ -467,9 +467,11 @@
 			padding: 1rem;
 			background: transparent;
 			border-top: 1px solid var(--surface-300);
+			// TODO(521): hex sin token equivalente
 			color: #000000 !important;
 
 			.p-paginator-current {
+				// TODO(521): hex sin token equivalente
 				color: #000000 !important;
 				font-weight: 500;
 			}
@@ -479,6 +481,7 @@
 			.p-paginator-prev,
 			.p-paginator-next,
 			.p-paginator-last {
+				// TODO(521): hex sin token equivalente
 				color: #000000 !important;
 				border-color: var(--surface-300);
 				transition: all 0.2s ease;
@@ -495,6 +498,7 @@
 				&.p-highlight,
 				&.p-paginator-page-selected {
 					background: rgba(0, 0, 0, 0.08) !important;
+					// TODO(521): hex sin token equivalente
 					color: #000000 !important;
 					border-color: transparent !important;
 					font-weight: 600;
@@ -503,6 +507,7 @@
 			}
 
 			.p-select-label {
+				// TODO(521): hex sin token equivalente
 				color: #000000 !important;
 			}
 		}
@@ -566,10 +571,12 @@
 	// Botón de grados - transparente con borde
 	.grados-button {
 		background: transparent !important;
+		// TODO(521): hex sin token equivalente
 		color: #000000 !important;
 		border: 1px solid rgba(0, 0, 0, 0.2) !important;
 
 		.pi {
+			// TODO(521): hex sin token equivalente
 			color: #000000 !important;
 		}
 

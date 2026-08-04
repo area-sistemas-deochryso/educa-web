@@ -33,12 +33,12 @@
 	}
 
 	&.active {
-		color: #1e40af;
-		border-bottom-color: #1e40af;
+		color: var(--blue-800);
+		border-bottom-color: var(--blue-800);
 		font-weight: 600;
 
 		i {
-			color: #1e40af;
+			color: var(--blue-800);
 		}
 	}
 }

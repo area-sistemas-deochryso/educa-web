@@ -100,14 +100,14 @@
   padding: 0.5rem;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-2);
   overflow: hidden;
-  color: #ffffff;
+  color: var(--white-color);
   font-size: 0.8rem;
 
   &:hover {
     transform: translateX(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    box-shadow: var(--shadow-3);
     z-index: 10;
 
     .block-actions {
@@ -126,7 +126,7 @@
       top: 4px;
       right: 4px;
       background: rgba(0, 0, 0, 0.4);
-      color: #fff;
+      color: var(--white-color);
       padding: 2px 6px;
       border-radius: 3px;
       font-size: 0.65rem;
@@ -193,7 +193,7 @@
       backdrop-filter: blur(4px);
 
       &:hover {
-        background: #ffffff;
+        background: var(--white-color);
         transform: scale(1.1);
       }
     }

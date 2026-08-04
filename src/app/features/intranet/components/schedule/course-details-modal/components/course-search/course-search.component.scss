@@ -15,7 +15,7 @@
 	input {
 		width: 100%;
 		padding: 0.4rem 0.6rem;
-		border: 1px solid #ddd;
+		border: 1px solid var(--intranet-border-color);
 		border-radius: 4px;
 		font-size: 0.75rem;
 		color: var(--intranet-default-text-color);
@@ -37,8 +37,8 @@
 	top: 100%;
 	left: 0;
 	right: 0;
-	background: #ffffff;
-	border: 1px solid #ddd;
+	background: var(--intranet-white-color);
+	border: 1px solid var(--intranet-border-color);
 	border-top: none;
 	border-radius: 0 0 4px 4px;
 	z-index: 10;

@@ -3,7 +3,7 @@
 	.summary-modal.p-dialog {
 		border-radius: 10px;
 		overflow: hidden;
-		background-color: #ffffff;
+		background-color: var(--intranet-white-color);
 		max-width: 90vw;
 
 		.p-dialog-content {
@@ -15,7 +15,7 @@
 
 .modal-content {
 	padding: 2rem;
-	background-color: #ffffff;
+	background-color: var(--intranet-white-color);
 	min-width: 400px;
 
 	h2 {
@@ -28,7 +28,7 @@
 }
 
 .summary-table {
-	border: 1px solid #ddd;
+	border: 1px solid var(--surface-border);
 	border-radius: 8px;
 	overflow: hidden;
 }
@@ -44,11 +44,11 @@
 	background-color: rgba(0, 0, 0, 0.03);
 	font-weight: 600;
 	color: var(--intranet-default-text-color);
-	border-bottom: 1px solid #ddd;
+	border-bottom: 1px solid var(--surface-border);
 }
 
 .summary-row {
-	border-bottom: 1px solid #ddd;
+	border-bottom: 1px solid var(--surface-border);
 
 	&:last-child {
 		border-bottom: none;
@@ -101,12 +101,12 @@
 
 .grade-red,
 .attendance-red {
-	color: #f44336;
+	color: var(--red-500);
 }
 
 .grade-green,
 .attendance-green {
-	color: #77a02d;
+	color: var(--intranet-accent-color-green);
 }
 
 @media screen and (max-width: 768px) {

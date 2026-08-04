@@ -169,7 +169,7 @@
 	color: var(--text-color);
 
 	i {
-		color: #1e40af;
+		color: var(--blue-800);
 	}
 }
 
@@ -203,7 +203,7 @@
 		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: 0.5px;
-		color: #1e40af;
+		color: var(--blue-800);
 	}
 }
 

@@ -1,8 +1,8 @@
-$color-asistio: #77a02d;
-$color-tardanza: #ffcc0c;
-$color-falta: #f44336;
-$color-justificado: #9c27b0;
-$color-pendiente: #9e9e9e;
+$color-asistio: var(--attendance-presente);
+$color-tardanza: var(--yellow-400);
+$color-falta: var(--red-500);
+$color-justificado: var(--attendance-justificado);
+$color-pendiente: var(--attendance-pendiente);
 
 .legend-stats {
 	display: flex;
@@ -72,7 +72,6 @@ $color-pendiente: #9e9e9e;
 // Active state per status color
 .legend-stats-item {
 	&.active .color-indicator.status-asistio ~ .item-code { color: $color-asistio; }
-	&.active .color-indicator.status-tardanza ~ .item-code { color: #cc9f00; }
 	&.active .color-indicator.status-falta ~ .item-code { color: $color-falta; }
 	&.active .color-indicator.status-justificado ~ .item-code { color: $color-justificado; }
 	&.active .color-indicator.status-pendiente ~ .item-code { color: $color-pendiente; }

@@ -31,7 +31,7 @@
 
 // #region Path: glow + huellas
 .path-glow {
-	stroke: #22c55e;
+	stroke: var(--green-500);
 	stroke-width: 20;
 	stroke-linecap: round;
 	stroke-opacity: 0.1;
@@ -48,12 +48,12 @@
 }
 
 .foot-sole {
-	fill: #6b7280;
+	fill: var(--surface-500);
 	opacity: 0.6;
 }
 
 .foot-toe {
-	fill: #6b7280;
+	fill: var(--surface-500);
 	opacity: 0.6;
 }
 
@@ -73,22 +73,26 @@
 		}
 	}
 	&.start-node .node-rect {
-		stroke: #22c55e;
+		stroke: var(--green-500);
 		stroke-width: 3;
 	}
 	&.dest-node .node-rect {
-		stroke: #ef4444;
+		stroke: var(--red-500);
 		stroke-width: 3;
 	}
 }
 
 .node-rect { stroke-width: 1.5; transition: all 0.15s; }
-.node-classroom { fill: #dbeafe; stroke: #3b82f6; }
-.node-stairs    { fill: #fef3c7; stroke: #f59e0b; }
+.node-classroom { fill: var(--blue-100); stroke: var(--blue-500); }
+// TODO(521): hex sin token equivalente (paleta amber, no existe en el shim)
+.node-stairs    { fill: #fef3c7; stroke: var(--accent-amber); }
+// TODO(521): hex sin token equivalente (paleta emerald, no existe en el shim)
 .node-entrance  { fill: #d1fae5; stroke: #10b981; }
+// TODO(521): hex sin token equivalente (paleta emerald, no existe en el shim)
 .node-patio     { fill: #ecfdf5; stroke: #6ee7b7; }
+// TODO(521): hex sin token equivalente (paleta sky, no existe en el shim)
 .node-bathroom  { fill: #e0f2fe; stroke: #0ea5e9; }
-.node-office    { fill: #f3f4f6; stroke: #6b7280; }
+.node-office    { fill: var(--surface-100); stroke: var(--surface-500); }
 
 .node-label {
 	font-size: 11px;
@@ -101,13 +105,13 @@
 
 // #region Marcadores
 .marker-start {
-	fill: #22c55e;
-	stroke: #ffffff;
+	fill: var(--green-500);
+	stroke: var(--white-color);
 	stroke-width: 2;
 }
 .marker-dest {
-	fill: #ef4444;
-	stroke: #ffffff;
+	fill: var(--red-500);
+	stroke: var(--white-color);
 	stroke-width: 2;
 	animation: destPulse 1s ease-in-out infinite;
 }

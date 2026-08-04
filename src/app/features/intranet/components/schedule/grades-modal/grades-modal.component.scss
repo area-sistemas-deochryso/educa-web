@@ -3,7 +3,7 @@
 	.grades-modal.p-dialog {
 		border-radius: 10px;
 		overflow: hidden;
-		background-color: #ffffff;
+		background-color: var(--intranet-white-color);
 		max-width: 500px;
 
 		.p-dialog-content {
@@ -15,7 +15,7 @@
 
 .modal-content {
 	padding: 2rem;
-	background-color: #ffffff;
+	background-color: var(--intranet-white-color);
 
 	h2 {
 		font-size: 1.25rem;
@@ -31,7 +31,7 @@
 }
 
 .grades-table {
-	border: 1px solid #ddd;
+	border: 1px solid var(--intranet-border-color);
 	border-radius: 8px;
 	overflow: hidden;
 }
@@ -42,14 +42,14 @@
 	background-color: rgba(0, 0, 0, 0.03);
 	font-weight: 600;
 	color: var(--intranet-default-text-color);
-	border-bottom: 1px solid #ddd;
+	border-bottom: 1px solid var(--intranet-border-color);
 }
 
 .grades-row {
 	display: flex;
 	padding: 0.75rem 1rem;
 	align-items: center;
-	border-bottom: 1px solid #ddd;
+	border-bottom: 1px solid var(--intranet-border-color);
 
 	&:last-child {
 		border-bottom: none;
@@ -86,11 +86,11 @@
 }
 
 .grade-red {
-	color: #f44336;
+	color: var(--red-500);
 }
 
 .grade-green {
-	color: #77a02d;
+	color: var(--intranet-accent-color-green);
 }
 
 .simulate-btn {
@@ -105,17 +105,17 @@
 
 	&:hover {
 		background-color: var(--intranet-default-text-color);
-		color: #ffffff;
+		color: var(--intranet-white-color);
 	}
 
 	&.active {
-		background-color: #f44336;
-		border-color: #f44336;
-		color: #ffffff;
+		background-color: var(--red-500);
+		border-color: var(--red-500);
+		color: var(--intranet-white-color);
 
 		&:hover {
-			background-color: #d32f2f;
-			border-color: #d32f2f;
+			background-color: var(--red-600);
+			border-color: var(--red-600);
 		}
 	}
 }

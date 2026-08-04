@@ -82,17 +82,17 @@
 	&:hover {
 		border-color: var(--accent-interactive);
 		background: var(--primary-50, #eef2ff);
-		color: #4338ca;
+		color: var(--accent-interactive);
 	}
 
 	&--active {
 		border-color: var(--accent-interactive);
 		background: var(--primary-color);
-		color: #fff;
+		color: var(--white-color);
 
 		&:hover {
 			background: var(--primary-700, #4338ca);
-			color: #fff;
+			color: var(--white-color);
 		}
 	}
 

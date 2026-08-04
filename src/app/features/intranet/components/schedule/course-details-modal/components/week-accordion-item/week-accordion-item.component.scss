@@ -1,6 +1,6 @@
 // #region Styles
 .week-item {
-	border-bottom: 1px solid #ddd;
+	border-bottom: 1px solid var(--intranet-border-color);
 
 	&:last-child {
 		border-bottom: none;
@@ -33,7 +33,7 @@
 .week-content {
 	padding: 1rem;
 	background-color: rgba(0, 0, 0, 0.01);
-	border-top: 1px solid #eee;
+	border-top: 1px solid var(--intranet-border-color);
 
 	.teacher-message {
 		font-size: 0.75rem;

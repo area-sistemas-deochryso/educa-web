@@ -22,10 +22,10 @@
 	}
 
 	&.editing {
-		background: color-mix(in srgb, #f59e0b 12%, transparent);
+		background: color-mix(in srgb, var(--accent-amber) 12%, transparent);
 
 		i {
-			color: #f59e0b;
+			color: var(--accent-amber);
 		}
 	}
 }

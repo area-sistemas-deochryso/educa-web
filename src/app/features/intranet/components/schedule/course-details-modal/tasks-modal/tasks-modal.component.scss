@@ -3,7 +3,7 @@
 	.tasks-modal.p-dialog {
 		border-radius: 10px;
 		overflow: hidden;
-		background-color: #ffffff;
+		background-color: var(--intranet-white-color);
 		max-width: 520px;
 		width: 90vw;
 
@@ -16,7 +16,7 @@
 
 .modal-content {
 	padding: 1.5rem;
-	background-color: #ffffff;
+	background-color: var(--intranet-white-color);
 
 	h2 {
 		font-size: 1.1rem;
@@ -35,7 +35,7 @@
 }
 
 .tasks-list {
-	border: 1px solid #ddd;
+	border: 1px solid var(--intranet-border-color);
 	border-radius: 8px;
 	overflow: hidden;
 }
@@ -45,7 +45,7 @@
 	align-items: flex-start;
 	gap: 0.75rem;
 	padding: 1rem;
-	border-bottom: 1px solid #eee;
+	border-bottom: 1px solid var(--intranet-border-color);
 	cursor: pointer;
 	transition: background-color 0.2s;
 
@@ -65,7 +65,7 @@
 .task-icon {
 	width: 40px;
 	height: 40px;
-	border: 1px solid #ddd;
+	border: 1px solid var(--intranet-border-color);
 	border-radius: 4px;
 	display: flex;
 	align-items: center;
@@ -75,7 +75,6 @@
 
 	i {
 		font-size: 1.1rem;
-		color: #f9a825;
 	}
 }
 
@@ -101,8 +100,7 @@
 
 .unread-badge {
 	font-size: 0.6rem;
-	background-color: #f9a825;
-	color: #ffffff;
+	color: var(--white-color);
 	padding: 0.1rem 0.35rem;
 	border-radius: 3px;
 	font-weight: 500;
@@ -139,7 +137,7 @@
 	font-weight: 500;
 
 	&.urgent {
-		color: #f44336;
+		color: var(--red-500);
 	}
 }
 
@@ -155,17 +153,15 @@
 
 	&.status-pending {
 		background-color: rgba(255, 193, 7, 0.15);
-		color: #f9a825;
 	}
 
 	&.status-late {
 		background-color: rgba(244, 67, 54, 0.15);
-		color: #f44336;
+		color: var(--red-500);
 	}
 
 	&.status-submitted {
 		background-color: rgba(119, 160, 45, 0.15);
-		color: #77a02d;
 	}
 }
 
@@ -176,7 +172,6 @@
 
 	i {
 		font-size: 2.5rem;
-		color: #77a02d;
 		margin-bottom: 0.5rem;
 	}
 

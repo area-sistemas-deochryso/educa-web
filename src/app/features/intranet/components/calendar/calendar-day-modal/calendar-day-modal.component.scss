@@ -29,15 +29,15 @@
 	max-height: 90vh;
 	overflow-y: auto;
 	position: relative;
-	box-shadow: 0 24px 48px rgba(0, 0, 0, 0.2);
+	box-shadow: var(--shadow-3);
 	animation: slideUp 0.3s ease;
 
 	&.holiday-modal {
-		border-top: 4px solid #dc3545;
+		border-top: 4px solid var(--red-600);
 	}
 
 	&.event-modal {
-		border-top: 4px solid #28a745;
+		border-top: 4px solid var(--green-600);
 	}
 }
 
@@ -60,7 +60,7 @@
 	height: 36px;
 	border-radius: 50%;
 	border: none;
-	background: #f5f5f5;
+	background: var(--surface-50);
 	cursor: pointer;
 	display: flex;
 	align-items: center;
@@ -70,14 +70,14 @@
 
 	i {
 		font-size: 1rem;
-		color: #666;
+		color: var(--intranet-soft-text-color);
 	}
 
 	&:hover {
-		background: #e0e0e0;
+		background: var(--surface-100);
 
 		i {
-			color: #333;
+			color: var(--intranet-alternative-text-color);
 		}
 	}
 }
@@ -104,11 +104,13 @@
 	}
 
 	&.holiday-icon {
-		background: linear-gradient(135deg, #dc3545, #c82333);
+		// TODO(521): #c82333 sin token equivalente
+		background: linear-gradient(135deg, var(--red-600), #c82333);
 	}
 
 	&.event-icon {
-		background: linear-gradient(135deg, #28a745, #1e7e34);
+		// TODO(521): #1e7e34 sin token equivalente
+		background: linear-gradient(135deg, var(--green-600), #1e7e34);
 	}
 }
 
@@ -129,12 +131,12 @@
 
 	&.holiday-badge {
 		background: rgba(220, 53, 69, 0.1);
-		color: #dc3545;
+		color: var(--red-600);
 	}
 
 	&.event-badge {
 		background: rgba(40, 167, 69, 0.1);
-		color: #28a745;
+		color: var(--green-600);
 	}
 }
 
@@ -156,7 +158,7 @@
 	align-items: center;
 	gap: 0.75rem;
 	padding: 0.75rem 1rem;
-	background: #f8f9fa;
+	background: var(--surface-50);
 	border-radius: 12px;
 	margin-bottom: 0.75rem;
 

@@ -99,6 +99,7 @@ $priority-urgent: var(--red-600);
 	width: 60px;
 	height: 60px;
 	border-radius: 50%;
+	// TODO(521): hex sin token equivalente (stop de gradiente decorativo)
 	background: linear-gradient(135deg, var(--intranet-accent-color-yellow, #ffcc0c), #e6b800);
 	border: none;
 	cursor: pointer;
@@ -111,7 +112,7 @@ $priority-urgent: var(--red-600);
 	transition: all 0.3s ease;
 
 	&.badge-urgent {
-		background: linear-gradient(135deg, $priority-urgent, #b91c1c);
+		background: linear-gradient(135deg, $priority-urgent, var(--red-700));
 		box-shadow:
 			0 6px 20px rgba(220, 38, 38, 0.4),
 			0 2px 8px rgba(0, 0, 0, 0.1);
@@ -120,6 +121,7 @@ $priority-urgent: var(--red-600);
 	&.badge-high,
 	&.badge-medium,
 	&.badge-low {
+		// TODO(521): hex sin token equivalente (stop de gradiente decorativo)
 		background: linear-gradient(135deg, var(--intranet-accent-color-yellow, #ffcc0c), #e6b800);
 	}
 
@@ -155,12 +157,12 @@ $priority-urgent: var(--red-600);
 	&:not(.ringing) {
 		filter: grayscale(70%);
 		opacity: 0.7;
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+		box-shadow: var(--shadow-2);
 
 		&:hover {
 			filter: grayscale(30%);
 			opacity: 0.9;
-			box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+			box-shadow: var(--shadow-3);
 		}
 	}
 }
@@ -182,22 +184,25 @@ $priority-urgent: var(--red-600);
 	border: 2px solid white;
 
 	&.badge-urgent {
-		background: linear-gradient(135deg, $priority-urgent, #b91c1c);
+		background: linear-gradient(135deg, $priority-urgent, var(--red-700));
 		box-shadow: 0 2px 8px rgba(220, 38, 38, 0.5);
 	}
 
 	&.badge-high {
-		background: linear-gradient(135deg, #ffcc0c, #d4a700);
+		// TODO(521): hex sin token equivalente (stop de gradiente decorativo, #d4a700)
+		background: linear-gradient(135deg, var(--intranet-accent-color-yellow), #d4a700);
 		color: var(--intranet-default-text-color, #171717);
 		box-shadow: 0 2px 8px rgba(255, 204, 12, 0.5);
 	}
 
 	&.badge-medium {
+		// TODO(521): hex sin token equivalente (stop de gradiente decorativo, #1a2550)
 		background: linear-gradient(135deg, var(--intranet-accent-color-blue, #253470), #1a2550);
 		box-shadow: 0 2px 8px rgba(37, 52, 112, 0.5);
 	}
 
 	&.badge-low {
+		// TODO(521): hex sin token equivalente (stop de gradiente decorativo, #5c7d22)
 		background: linear-gradient(135deg, var(--intranet-accent-color-green, #77a02d), #5c7d22);
 		box-shadow: 0 2px 8px rgba(119, 160, 45, 0.5);
 	}

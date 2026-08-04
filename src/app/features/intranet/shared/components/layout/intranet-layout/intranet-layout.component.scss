@@ -11,6 +11,7 @@
 .intranet-header {
 	background-color: var(--intranet-background-color);
 	padding: env(safe-area-inset-top, 0) 3rem 0 !important;
+	// TODO(521): hex sin token equivalente
 	border-bottom: 1px solid #c0c0c0;
 	overflow: visible;
 	position: sticky;
@@ -119,7 +120,7 @@ app-user-profile-menu {
 	}
 
 	&:hover {
-		color: #7a9e3a;
+		color: var(--intranet-accent-color-green);
 
 		&::after {
 			transform: translateX(-50%) scaleX(1);
@@ -127,7 +128,7 @@ app-user-profile-menu {
 	}
 
 	&.active {
-		color: #5c7a28;
+		color: var(--nav-active);
 
 		&::after {
 			transform: translateX(-50%) scaleX(1);
@@ -160,12 +161,12 @@ app-user-profile-menu {
 	margin-left: -0.25rem;
 
 	&:hover:not(:disabled) {
-		color: #d97706;
+		color: var(--accent-amber-dark);
 		background-color: rgba(217, 119, 6, 0.1);
 	}
 
 	&.starred {
-		color: #d97706;
+		color: var(--accent-amber-dark);
 	}
 
 	&:disabled {
@@ -182,7 +183,7 @@ app-user-profile-menu {
 .active-section-breadcrumb {
 	height: auto;
 	padding: 0.5rem 1.75rem;
-	border-top: 1px solid #e5e5e5;
+	border-top: 1px solid var(--intranet-border-color);
 
 	nav {
 		display: flex;
@@ -208,7 +209,7 @@ app-user-profile-menu {
 			cursor: pointer;
 
 			&:hover {
-				color: #5c7a28;
+		color: var(--nav-active);
 				text-decoration: underline;
 			}
 		}
@@ -230,9 +231,10 @@ app-user-profile-menu {
 			left: 0;
 			min-width: 180px;
 			background: var(--intranet-background-color);
+			// TODO(521): hex sin token equivalente
 			border: 1px solid #c0c0c0;
 			border-radius: 8px;
-			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+			box-shadow: var(--shadow-3);
 			padding: 0.5rem;
 			z-index: 1000;
 			margin-top: 0.35rem;
@@ -260,7 +262,7 @@ app-user-profile-menu {
 
 			&:hover {
 				background-color: rgba(92, 122, 40, 0.1);
-				color: #5c7a28;
+		color: var(--nav-active);
 			}
 		}
 	}

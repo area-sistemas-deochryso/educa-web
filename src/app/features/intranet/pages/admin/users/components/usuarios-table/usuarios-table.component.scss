@@ -37,7 +37,7 @@
 			align-items: center;
 			justify-content: center;
 			background: linear-gradient(135deg, var(--accent-interactive-light) 0%, var(--accent-interactive) 100%);
-			color: #ffffff;
+			color: var(--white-color);
 			border-radius: 50%;
 			font-weight: 700;
 			font-size: 0.75rem;
@@ -69,7 +69,7 @@
 		transition: color 0.15s ease;
 
 		&:hover {
-			color: #1e40af;
+			color: var(--blue-800);
 		}
 	}
 
@@ -81,7 +81,7 @@
 	}
 
 	.user-name--clickable:hover .salon-hint {
-		color: #1e40af;
+		color: var(--blue-800);
 	}
 
 	.actions-cell {
@@ -256,7 +256,7 @@
 		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: 0.5px;
-		color: #1e40af;
+		color: var(--blue-800);
 	}
 
 	&__list {

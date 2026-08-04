@@ -57,7 +57,7 @@
 	top: 100%;
 	left: 0;
 	min-width: 280px;
-	background: #ffffff !important;
+	background: var(--intranet-white-color) !important;
 	border: 1px solid var(--surface-border);
 	border-top: none;
 	border-radius: 0 0 8px 8px;
@@ -67,7 +67,7 @@
 	list-style: none;
 	padding: 0;
 	margin: 0;
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+	box-shadow: var(--shadow-2);
 
 	li {
 		display: flex;

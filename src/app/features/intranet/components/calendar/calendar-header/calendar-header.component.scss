@@ -18,6 +18,7 @@
 		width: 56px;
 		height: 56px;
 		border-radius: 16px;
+		// TODO(521): #1a2550 sin token equivalente
 		background: linear-gradient(135deg, var(--intranet-accent-color-blue, #253470), #1a2550);
 		display: flex;
 		align-items: center;
@@ -108,7 +109,7 @@
 	}
 
 	&:hover {
-		background: #1e7e34;
+		background: var(--green-700);
 	}
 }
 

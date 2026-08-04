@@ -21,8 +21,8 @@
 }
 
 :host ::ng-deep .dialog-avatar {
-	background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
-	color: #ffffff;
+	background: linear-gradient(135deg, var(--accent-interactive-light) 0%, var(--accent-interactive) 100%);
+	color: var(--intranet-white-color);
 	font-weight: 700;
 	font-size: 1.25rem;
 	box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
@@ -165,7 +165,7 @@
 	transition: color 0.2s ease;
 
 	&:hover {
-		color: #4338ca;
+		color: var(--accent-interactive);
 	}
 
 	i {

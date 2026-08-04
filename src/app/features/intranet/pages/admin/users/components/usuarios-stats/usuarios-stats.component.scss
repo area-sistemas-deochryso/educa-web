@@ -34,9 +34,9 @@
 	}
 
 	&.active {
-		background: #1e40af;
-		border-color: #1e40af;
-		color: #fff;
+		background: var(--blue-800);
+		border-color: var(--blue-800);
+		color: var(--white-color);
 
 		.stat-badge__value,
 		.stat-badge__label {

@@ -272,7 +272,7 @@
 	position: relative;
 	font-size: 0.6rem;
 	font-weight: 600;
-	color: #fff;
+	color: var(--white-color);
 	text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 	white-space: nowrap;
 }
@@ -395,26 +395,27 @@
 	animation-delay: calc(var(--step-index, 0) * 0.4s);
 
 	&.dot-get {
-		border-color: #22c55e;
-		background: #22c55e;
+		border-color: var(--green-500);
+		background: var(--green-500);
 	}
 
 	&.dot-post {
-		border-color: #3b82f6;
-		background: #3b82f6;
+		border-color: var(--blue-500);
+		background: var(--blue-500);
 	}
 
 	&.dot-put {
-		border-color: #f59e0b;
-		background: #f59e0b;
+		border-color: var(--accent-amber);
+		background: var(--accent-amber);
 	}
 
 	&.dot-delete {
-		border-color: #ef4444;
-		background: #ef4444;
+		border-color: var(--red-500);
+		background: var(--red-500);
 	}
 
 	&.dot-auth {
+		// TODO(521): hex sin token equivalente (violeta, distinto de --purple-500)
 		border-color: #8b5cf6;
 		background: #8b5cf6;
 	}
@@ -489,17 +490,17 @@
 
 	&.method-get {
 		background: rgba(34, 197, 94, 0.15);
-		color: #16a34a;
+		color: var(--green-600);
 	}
 
 	&.method-post {
 		background: rgba(59, 130, 246, 0.15);
-		color: #2563eb;
+		color: var(--blue-600);
 	}
 
 	&.method-put {
 		background: rgba(245, 158, 11, 0.15);
-		color: #d97706;
+		color: var(--accent-amber-dark);
 	}
 
 	&.method-delete {
@@ -509,6 +510,7 @@
 
 	&.badge-auth {
 		background: rgba(139, 92, 246, 0.15);
+		// TODO(521): hex sin token equivalente (violeta, distinto de --purple-700)
 		color: #7c3aed;
 	}
 
@@ -566,7 +568,7 @@
 
 	i {
 		font-size: 0.6rem;
-		color: #22c55e;
+		color: var(--green-500);
 	}
 }
 

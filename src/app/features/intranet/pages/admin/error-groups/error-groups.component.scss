@@ -81,9 +81,9 @@
 	}
 
 	&--error {
-		border-color: #f59e0b;
-		.stat-icon i { color: #f59e0b; }
-		.stat-value { color: #f59e0b; }
+		border-color: var(--accent-amber);
+		.stat-icon i { color: var(--accent-amber); }
+		.stat-value { color: var(--accent-amber); }
 	}
 
 	&--warning {
@@ -176,7 +176,7 @@
 
 		&--active {
 			opacity: 1;
-			color: #4338ca;
+			color: var(--accent-interactive);
 		}
 	}
 

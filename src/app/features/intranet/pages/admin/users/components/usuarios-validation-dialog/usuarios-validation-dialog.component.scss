@@ -95,7 +95,7 @@
 	&.active {
 		background: var(--red-500);
 		border-color: var(--red-500);
-		color: #fff;
+		color: var(--white-color);
 
 		.error-chip__count {
 			color: inherit;

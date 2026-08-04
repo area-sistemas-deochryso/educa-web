@@ -9,9 +9,9 @@
 .control-btn {
 	width: 32px;
 	height: 32px;
-	border: 1px solid #ddd;
+	border: 1px solid var(--intranet-border-color);
 	border-radius: 4px;
-	background: #fff;
+	background: var(--intranet-white-color);
 	cursor: pointer;
 	display: flex;
 	align-items: center;
@@ -33,11 +33,11 @@
 	}
 
 	&.close-btn:hover {
-		background-color: #fee2e2;
-		border-color: #ef4444;
+		background-color: var(--red-100);
+		border-color: var(--red-500);
 
 		i {
-			color: #ef4444;
+			color: var(--red-500);
 		}
 	}
 }

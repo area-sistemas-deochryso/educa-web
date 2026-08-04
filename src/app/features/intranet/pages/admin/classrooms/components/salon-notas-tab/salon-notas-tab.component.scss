@@ -24,7 +24,7 @@
 
 .group-eval {
 	color: var(--text-color-secondary);
-	background: rgba(59, 130, 246, 0.06) !important;
+	background: color-mix(in srgb, var(--blue-500) 6%, transparent) !important;
 }
 
 .group-periodo {
@@ -114,7 +114,7 @@
 
 // #region Grade colors
 .nota-alta {
-	color: #16a34a;
+	color: var(--green-600);
 }
 
 .nota-baja {

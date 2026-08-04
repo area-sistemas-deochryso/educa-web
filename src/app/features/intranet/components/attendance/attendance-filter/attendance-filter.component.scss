@@ -6,7 +6,7 @@
 	padding: 1rem 1.25rem;
 	background: var(--intranet-background-color, white);
 	border-radius: 12px;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+	box-shadow: var(--shadow-1);
 	flex-wrap: wrap;
 }
 
@@ -27,7 +27,7 @@
 
 :host ::ng-deep .filter-select {
 	&.p-select {
-		background: #f5f7fa;
+		background: var(--surface-50);
 		border: 1px solid transparent;
 		border-radius: 8px;
 		min-width: 150px;

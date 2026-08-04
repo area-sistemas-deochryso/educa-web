@@ -3,13 +3,13 @@
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;
-	background-color: rgba(220, 53, 69, 0.1);
-	border: 1px solid rgba(220, 53, 69, 0.3);
+	background-color: var(--tint-danger-bg);
+	border: 1px solid var(--tint-danger-border);
 	border-radius: 4px;
 	padding: 0.75rem 1rem;
 	margin: 0 auto 1rem auto;
 	width: calc(100% - 5rem);
-	color: #dc3545;
+	color: var(--tint-danger-icon);
 	font-size: 0.9rem;
 
 	i {

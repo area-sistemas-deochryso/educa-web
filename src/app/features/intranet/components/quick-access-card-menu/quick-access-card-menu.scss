@@ -21,7 +21,7 @@
 	text-decoration: none;
 	color: var(--intranet-default-text-color, #171717);
 	transition: all 0.3s ease;
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+	box-shadow: var(--shadow-1);
 	border: 2px solid var(--intranet-accent-color-green, #77a02d);
 	cursor: pointer;
 	font-family: inherit;
@@ -86,7 +86,7 @@
 	min-width: 220px;
 	border-radius: 12px;
 	border: 2px solid var(--intranet-accent-color-green, #77a02d);
-	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+	box-shadow: var(--shadow-3);
 	overflow: hidden;
 
 	.p-menu-list {

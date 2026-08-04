@@ -1,9 +1,9 @@
 // Colores de estado (mismos que attendance-table)
-$color-asistio: #77a02d;
-$color-tardanza: #ffcc0c;
-$color-falta: #f44336;
-$color-justificado: #9c27b0;
-$color-pendiente: #9e9e9e;
+$color-asistio: var(--attendance-presente);
+$color-tardanza: var(--attendance-tardanza);
+$color-falta: var(--red-500);
+$color-justificado: var(--attendance-justificado);
+$color-pendiente: var(--attendance-pendiente);
 
 // #region Filters bar
 .filters-bar {
@@ -166,6 +166,7 @@ $color-pendiente: #9e9e9e;
 	border-radius: 4px;
 	font-weight: 600;
 	font-size: 1.25rem;
+	// TODO(521): hex sin token equivalente
 	color: #333;
 }
 
@@ -176,6 +177,7 @@ $color-pendiente: #9e9e9e;
 .status-pendiente { background-color: $color-pendiente; }
 .status-sin-registro {
 	background-color: transparent;
+	// TODO(521): hex sin token equivalente
 	border: 1px dashed #ccc;
 	color: var(--intranet-soft-text-color);
 }
@@ -340,16 +342,17 @@ $color-pendiente: #9e9e9e;
 	gap: 0.5rem;
 	padding: 0.625rem 1rem;
 	margin-bottom: 0.5rem;
-	background: #fff3cd;
-	border: 1px solid #ffc107;
+	background: var(--tint-warning-bg);
+	border: 1px solid var(--tint-warning-border);
 	border-radius: 6px;
+	// TODO(521): hex sin token equivalente
 	color: #664d03;
 	font-size: 0.85rem;
 	font-weight: 500;
 
 	i {
 		font-size: 1rem;
-		color: #cc9a06;
+		color: var(--tint-warning-icon);
 	}
 }
 // #endregion
@@ -409,7 +412,7 @@ $color-pendiente: #9e9e9e;
 			height: 48px;
 			border-radius: 50%;
 			background: $color-justificado;
-			color: #fff;
+			color: var(--white-color);
 			display: flex;
 			align-items: center;
 			justify-content: center;
@@ -470,8 +473,8 @@ $color-pendiente: #9e9e9e;
 // #region PDF menu
 :host ::ng-deep .p-menu {
 	background: var(--intranet-background-color) !important;
-	border: 1px solid #ddd !important;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+	border: 1px solid var(--intranet-border-color) !important;
+	box-shadow: var(--shadow-2) !important;
 
 	a:hover {
 		color: initial !important;

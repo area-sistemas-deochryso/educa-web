@@ -5,7 +5,7 @@
 	padding: 1.5rem;
 	width: 100%;
 	max-width: 450px;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+	box-shadow: var(--shadow-1);
 }
 
 .calendar-header {
@@ -115,6 +115,7 @@
 	}
 
 	&.other-month {
+		// TODO(521): hex sin token equivalente (gris tenue sin match confirmado)
 		color: #bbb;
 	}
 

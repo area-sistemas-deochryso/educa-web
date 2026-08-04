@@ -79,7 +79,7 @@ app-mobile-menu .mobile-nav {
 	height: 100dvh;
 	height: 100vh;
 	background-color: var(--intranet-background-color);
-	box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+	box-shadow: var(--shadow-3);
 	z-index: 201;
 	display: flex;
 	flex-direction: column;
@@ -201,21 +201,21 @@ app-mobile-menu .nav-result-item {
 
 	// Current route — la página en que está el usuario. Pintada en verde, no azul.
 	&.is-current {
-		background: color-mix(in srgb, #5c7a28 14%, transparent);
-		box-shadow: inset 4px 0 0 0 #5c7a28;
+		background: color-mix(in srgb, var(--nav-active) 14%, transparent);
+		box-shadow: inset 4px 0 0 0 var(--nav-active);
 
 		.result-label {
 			font-weight: 600;
-			color: #5c7a28;
+			color: var(--nav-active);
 		}
 
 		.result-icon {
-			color: #5c7a28;
+			color: var(--nav-active);
 		}
 
 		.result-badge {
-			background: color-mix(in srgb, #5c7a28 22%, transparent);
-			color: #5c7a28;
+			background: color-mix(in srgb, var(--nav-active) 22%, transparent);
+			color: var(--nav-active);
 		}
 	}
 }
@@ -322,7 +322,7 @@ app-mobile-menu .section-count {
 }
 
 app-mobile-menu .section-star {
-	color: #d97706;
+	color: var(--yellow-600);
 }
 
 app-mobile-menu .nav-module {
@@ -338,7 +338,7 @@ app-mobile-menu .nav-module {
 		> .section-header,
 		> .section-header .section-caret,
 		> .section-header .section-count {
-			color: #5c7a28;
+			color: var(--nav-active);
 		}
 
 		> .section-header--button:active {
@@ -349,10 +349,10 @@ app-mobile-menu .nav-module {
 
 // Cascadeo desde el item activo hacia afuera: el grupo que lo contiene se pinta verde.
 app-mobile-menu .nav-group:has(.nav-result-item.is-current) {
-	border-color: #5c7a28;
+	border-color: var(--nav-active);
 
 	> .nav-group-legend {
-		color: #5c7a28;
+		color: var(--nav-active);
 	}
 }
 
@@ -414,12 +414,12 @@ app-mobile-menu .star-btn {
 	}
 
 	&:active:not(:disabled) {
-		color: #d97706;
+		color: var(--yellow-600);
 		background: rgba(217, 119, 6, 0.08);
 	}
 
 	&.starred {
-		color: #d97706;
+		color: var(--yellow-600);
 	}
 
 	&:disabled:not(.starred) {

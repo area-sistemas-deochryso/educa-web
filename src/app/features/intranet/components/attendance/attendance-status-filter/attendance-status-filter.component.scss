@@ -1,8 +1,8 @@
-$color-asistio: #77a02d;
-$color-tardanza: #ffcc0c;
-$color-falta: #f44336;
-$color-justificado: #9c27b0;
-$color-pendiente: #9e9e9e;
+$color-asistio: var(--attendance-presente);
+$color-tardanza: var(--attendance-tardanza);
+$color-falta: var(--attendance-falta);
+$color-justificado: var(--attendance-justificado);
+$color-pendiente: var(--attendance-pendiente);
 
 .status-filter {
 	display: flex;
@@ -94,7 +94,7 @@ $color-pendiente: #9e9e9e;
 	}
 
 	&.status-tardanza {
-		.chip-code { color: #cc9f00; }
+		.chip-code { color: var(--yellow-600); }
 		&.active { background: rgba($color-tardanza, 0.15); border-color: $color-tardanza; }
 	}
 

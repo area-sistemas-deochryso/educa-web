@@ -65,7 +65,7 @@ $priority-urgent: var(--red-600);
 	background: white;
 	border-radius: 18px;
 	border-left: 5px solid var(--intranet-accent-color-blue, #253470);
-	box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+	box-shadow: var(--shadow-2);
 	position: relative;
 	cursor: pointer;
 	animation: slideInRight 0.4s ease-out backwards;
@@ -73,7 +73,7 @@ $priority-urgent: var(--red-600);
 
 	&:hover {
 		transform: translateX(8px);
-		box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+		box-shadow: var(--shadow-3);
 	}
 
 	&.is-read {
@@ -87,7 +87,7 @@ $priority-urgent: var(--red-600);
 
 	&.is-unread {
 		background: white;
-		box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+		box-shadow: var(--shadow-2);
 
 		.notification-title {
 			font-weight: 700;
@@ -106,18 +106,19 @@ $priority-urgent: var(--red-600);
 		}
 
 		.notification-icon {
-			background: linear-gradient(135deg, $priority-urgent, #b91c1c);
+			background: linear-gradient(135deg, $priority-urgent, var(--red-700));
 			color: white;
 			box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);
 		}
 	}
 
 	&.notification-high {
-		border-left-color: #ffcc0c;
+		border-left-color: var(--intranet-accent-color-yellow, #ffcc0c);
 		background: linear-gradient(to right, rgba(255, 204, 12, 0.08), white);
 
 		.notification-icon {
-			background: linear-gradient(135deg, #ffcc0c, #d4a700);
+			// TODO(521): hex sin token equivalente
+			background: linear-gradient(135deg, var(--intranet-accent-color-yellow, #ffcc0c), #d4a700);
 			color: var(--intranet-default-text-color, #171717);
 			box-shadow: 0 4px 15px rgba(255, 204, 12, 0.4);
 		}
@@ -127,6 +128,7 @@ $priority-urgent: var(--red-600);
 		border-left-color: var(--intranet-accent-color-blue, #253470);
 
 		.notification-icon {
+			// TODO(521): hex sin token equivalente
 			background: linear-gradient(
 				135deg,
 				var(--intranet-accent-color-blue, #253470),
@@ -141,6 +143,7 @@ $priority-urgent: var(--red-600);
 		border-left-color: var(--intranet-accent-color-green, #77a02d);
 
 		.notification-icon {
+			// TODO(521): hex sin token equivalente
 			background: linear-gradient(
 				135deg,
 				var(--intranet-accent-color-green, #77a02d),
@@ -168,7 +171,7 @@ $priority-urgent: var(--red-600);
 	}
 
 	&.notification-high {
-		background: #ffcc0c;
+		background: var(--intranet-accent-color-yellow, #ffcc0c);
 		box-shadow: 0 0 8px rgba(255, 204, 12, 0.6);
 	}
 
@@ -206,6 +209,7 @@ $priority-urgent: var(--red-600);
 	}
 
 	&.icon-matricula {
+		// TODO(521): hex sin token equivalente
 		background: linear-gradient(
 			135deg,
 			var(--intranet-accent-color-blue, #253470),
@@ -215,6 +219,7 @@ $priority-urgent: var(--red-600);
 	}
 
 	&.icon-pago {
+		// TODO(521): hex sin token equivalente
 		background: linear-gradient(
 			135deg,
 			var(--intranet-accent-color-green, #77a02d),
@@ -224,11 +229,13 @@ $priority-urgent: var(--red-600);
 	}
 
 	&.icon-academico {
-		background: linear-gradient(135deg, #a855f7, #9333ea) !important;
+		// TODO(521): #9333ea sin token equivalente
+		background: linear-gradient(135deg, var(--purple-500), #9333ea) !important;
 		color: white !important;
 	}
 
 	&.icon-festividad {
+		// TODO(521): hex sin token equivalente
 		background: linear-gradient(
 			135deg,
 			var(--intranet-accent-color-yellow, #ffcc0c),
@@ -238,11 +245,12 @@ $priority-urgent: var(--red-600);
 	}
 
 	&.icon-evento {
-		background: linear-gradient(135deg, #f97316, #ea580c) !important;
+		background: linear-gradient(135deg, var(--orange-500), var(--orange-600)) !important;
 		color: white !important;
 	}
 
 	&.icon-smart {
+		// TODO(521): hex sin token equivalente (rosa, sin familia en la paleta)
 		background: linear-gradient(135deg, #ec4899, #db2777) !important;
 		color: white !important;
 		box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4) !important;
@@ -283,21 +291,23 @@ $priority-urgent: var(--red-600);
 
 	&[data-type='academico'] {
 		background: rgba(168, 85, 247, 0.15);
-		color: #a855f7;
+		color: var(--purple-500);
 	}
 
 	&[data-type='festividad'] {
 		background: rgba(255, 204, 12, 0.2);
+		// TODO(521): hex sin token equivalente
 		color: #b8960a;
 	}
 
 	&[data-type='evento'] {
 		background: rgba(249, 115, 22, 0.15);
-		color: #f97316;
+		color: var(--orange-500);
 	}
 
 	&[data-type='smart'] {
 		background: rgba(236, 72, 153, 0.15);
+		// TODO(521): hex sin token equivalente (rosa, sin familia en la paleta)
 		color: #db2777;
 	}
 }
@@ -318,6 +328,7 @@ $priority-urgent: var(--red-600);
 
 	&[data-priority='high'] {
 		background: rgba(255, 204, 12, 0.2);
+		// TODO(521): hex sin token equivalente
 		color: #b8960a;
 	}
 

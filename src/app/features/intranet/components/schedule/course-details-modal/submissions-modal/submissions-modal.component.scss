@@ -3,7 +3,7 @@
 	.submissions-modal.p-dialog {
 		border-radius: 10px;
 		overflow: hidden;
-		background-color: #ffffff;
+		background-color: var(--intranet-white-color);
 		max-width: 520px;
 		width: 90vw;
 
@@ -16,7 +16,7 @@
 
 .modal-content {
 	padding: 1.5rem;
-	background-color: #ffffff;
+	background-color: var(--intranet-white-color);
 
 	h2 {
 		font-size: 1.1rem;
@@ -35,7 +35,7 @@
 }
 
 .submissions-list {
-	border: 1px solid #ddd;
+	border: 1px solid var(--intranet-border-color);
 	border-radius: 8px;
 	overflow: hidden;
 }
@@ -45,7 +45,7 @@
 	align-items: flex-start;
 	gap: 0.75rem;
 	padding: 1rem;
-	border-bottom: 1px solid #eee;
+	border-bottom: 1px solid var(--intranet-border-color);
 	cursor: pointer;
 	transition: background-color 0.2s;
 
@@ -65,7 +65,7 @@
 .submission-icon {
 	width: 40px;
 	height: 40px;
-	border: 1px solid #ddd;
+	border: 1px solid var(--intranet-border-color);
 	border-radius: 4px;
 	display: flex;
 	align-items: center;
@@ -79,21 +79,18 @@
 	&.status-pending-review {
 		background-color: rgba(33, 150, 243, 0.1);
 		i {
-			color: #2196f3;
 		}
 	}
 
 	&.status-reviewed {
 		background-color: rgba(119, 160, 45, 0.1);
 		i {
-			color: #77a02d;
 		}
 	}
 
 	&.status-returned {
 		background-color: rgba(255, 152, 0, 0.1);
 		i {
-			color: #ff9800;
 		}
 	}
 }
@@ -120,8 +117,7 @@
 
 .unread-badge {
 	font-size: 0.6rem;
-	background-color: #77a02d;
-	color: #ffffff;
+	color: var(--white-color);
 	padding: 0.1rem 0.35rem;
 	border-radius: 3px;
 	font-weight: 500;
@@ -184,17 +180,14 @@
 
 	&.status-pending-review {
 		background-color: rgba(33, 150, 243, 0.15);
-		color: #2196f3;
 	}
 
 	&.status-reviewed {
 		background-color: rgba(119, 160, 45, 0.15);
-		color: #77a02d;
 	}
 
 	&.status-returned {
 		background-color: rgba(255, 152, 0, 0.15);
-		color: #ff9800;
 	}
 }
 
@@ -203,11 +196,10 @@
 	font-weight: 600;
 
 	&.grade-red {
-		color: #f44336;
+		color: var(--red-500);
 	}
 
 	&.grade-green {
-		color: #77a02d;
 	}
 }
 

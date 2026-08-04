@@ -22,10 +22,10 @@
 	}
 
 	&.editing {
-		background: color-mix(in srgb, #f59e0b 12%, transparent);
+		background: var(--tint-warning-bg);
 
 		i {
-			color: #f59e0b;
+			color: var(--yellow-500);
 		}
 	}
 }

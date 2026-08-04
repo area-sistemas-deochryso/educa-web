@@ -50,5 +50,32 @@
 	--tint-info-bg: color-mix(in srgb, var(--blue-500) 8%, transparent);
 	--tint-info-border: color-mix(in srgb, var(--blue-500) 30%, transparent);
 	--tint-info-icon: var(--blue-600);
+
+	/* --- Estado de asistencia ---
+	   Paleta idéntica copy-pasteada en 7 archivos de src/app/features/intranet/
+	   components/attendance/* (mismo bloque $color-asistio/tardanza/falta/
+	   justificado/pendiente repetido literal). asistio/tardanza reusan el
+	   acento de marca ya existente; falta/justificado/pendiente no tenían
+	   token — colores Material ya establecidos en el código, no inventados. */
+	--attendance-presente: var(--intranet-accent-color-green);
+	--attendance-tardanza: var(--intranet-accent-color-yellow);
+	--attendance-falta: #f44336;
+	--attendance-justificado: #9c27b0;
+	--attendance-pendiente: #9e9e9e;
+
+	/* --- Indicador de navegación activa ---
+	   Oliva distinto del verde de marca (--intranet-accent-color-green),
+	   duplicado en module-selector, mobile-menu, intranet-layout y
+	   user-profile-menu para marcar la ruta/ítem de nav activo. */
+	--nav-active: #5c7a28;
+	--nav-active-hover: #7a9e3a;
+
+	/* --- Ámbar (advertencia fuerte / pendiente) ---
+	   #f59e0b es el hex más repetido sin token en todo el codebase (14
+	   ocurrencias en 2026-08-04) — familia distinta de --yellow-500
+	   (#eab308, más dorado/mostaza) y de --intranet-accent-color-yellow
+	   (#ffcc0c, marca). Reusado para badges "pendiente"/warning fuerte. */
+	--accent-amber: #f59e0b;
+	--accent-amber-dark: #d97706;
 }
 // #endregion

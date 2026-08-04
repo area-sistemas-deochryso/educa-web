@@ -121,9 +121,9 @@
 
 .action-login {
 	&:hover:not(:disabled) {
-		background: #16a34a;
-		border-color: #16a34a;
-		color: #ffffff;
+		background: var(--green-600);
+		border-color: var(--green-600);
+		color: var(--white-color);
 	}
 }
 
@@ -131,7 +131,7 @@
 	&:hover:not(:disabled) {
 		background: var(--red-600);
 		border-color: var(--red-600);
-		color: #ffffff;
+		color: var(--white-color);
 	}
 }
 // #endregion
@@ -142,8 +142,8 @@
 	width: 42px;
 	height: 42px;
 	border-radius: 50%;
-	background: #4f46e5;
-	color: #ffffff;
+	background: var(--accent-interactive-light);
+	color: var(--white-color);
 	display: flex;
 	align-items: center;
 	justify-content: center;

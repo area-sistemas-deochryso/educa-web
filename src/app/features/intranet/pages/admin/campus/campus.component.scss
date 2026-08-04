@@ -47,7 +47,7 @@
 .toolbar-btn {
 	&.active {
 		background: color-mix(in srgb, var(--primary-color) 15%, transparent) !important;
-		color: #4338ca !important;
+		color: var(--accent-interactive) !important;
 	}
 }
 
@@ -82,7 +82,7 @@
 	color: var(--text-color-secondary);
 
 	i {
-		color: #f59e0b;
+		color: var(--accent-amber);
 		font-size: 0.75rem;
 	}
 }

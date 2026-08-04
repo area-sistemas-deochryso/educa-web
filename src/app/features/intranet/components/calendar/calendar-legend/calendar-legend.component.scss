@@ -7,7 +7,7 @@
 	padding: 0.75rem 1rem;
 	background: var(--intranet-background-color, white);
 	border-radius: 12px;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+	box-shadow: var(--shadow-1);
 	flex-wrap: wrap;
 }
 
@@ -25,16 +25,17 @@
 	border-radius: 50%;
 
 	&.today-dot {
+		// TODO(521): hex sin token equivalente
 		border: 3px solid #f5a623;
 		background: transparent;
 	}
 
 	&.holiday-dot {
-		background: #dc3545;
+		background: var(--red-600);
 	}
 
 	&.event-dot {
-		background: #28a745;
+		background: var(--green-600);
 	}
 }
 
@@ -42,7 +43,7 @@
 	width: 16px;
 	height: 16px;
 	position: relative;
-	background: #f0f0f0;
+	background: var(--surface-card);
 	border-radius: 3px;
 }
 
@@ -56,14 +57,14 @@
 		top: 0;
 		left: 0;
 		border-width: 10px 10px 0 0;
-		border-color: #28a745 transparent transparent transparent;
+		border-color: var(--green-600) transparent transparent transparent;
 	}
 
 	&.end {
 		top: 0;
 		right: 0;
 		border-width: 0 10px 10px 0;
-		border-color: transparent #28a745 transparent transparent;
+		border-color: transparent var(--green-600) transparent transparent;
 	}
 }
 

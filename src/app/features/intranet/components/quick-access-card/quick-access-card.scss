@@ -1,5 +1,6 @@
 // #region Variables
 $accent: var(--intranet-accent-color-green, #77a02d);
+// TODO(521): hex sin token equivalente
 $accent-dark: #5c7d22;
 $wf-bar: rgba(150, 150, 150, 0.3);
 $wf-bar-dark: rgba(150, 150, 150, 0.45);
@@ -33,7 +34,7 @@ $wf-yellow: rgba(234, 179, 8, 0.45);
 	text-decoration: none;
 	color: var(--intranet-default-text-color, #171717);
 	transition: all 0.3s ease;
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+	box-shadow: var(--shadow-2);
 	border: 2px solid $accent;
 	cursor: pointer;
 	width: 100%;
@@ -94,7 +95,7 @@ $wf-yellow: rgba(234, 179, 8, 0.45);
 	width: 280px;
 	background: var(--surface-card, #fff);
 	border-radius: 12px;
-	box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18), 0 2px 8px rgba(0, 0, 0, 0.08);
+	box-shadow: var(--shadow-3);
 	overflow: hidden;
 	opacity: 0;
 	pointer-events: none;
@@ -112,7 +113,7 @@ $wf-yellow: rgba(234, 179, 8, 0.45);
 		width: 12px;
 		height: 12px;
 		background: var(--surface-50, #fafafa);
-		box-shadow: 3px 3px 4px rgba(0, 0, 0, 0.06);
+		box-shadow: var(--shadow-1);
 	}
 }
 // #endregion
@@ -135,6 +136,7 @@ $wf-yellow: rgba(234, 179, 8, 0.45);
 			height: 6px;
 			border-radius: 50%;
 
+			// TODO(521): hex sin token equivalente (colores fijos de convención macOS, no semánticos)
 			&:nth-child(1) { background: #ff5f57; }
 			&:nth-child(2) { background: #febc2e; }
 			&:nth-child(3) { background: #28c840; }

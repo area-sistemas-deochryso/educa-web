@@ -182,7 +182,7 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 	height: 60px;
 	border-radius: 50%;
 	// Campana siempre amarilla por defecto
-	background: linear-gradient(135deg, var(--intranet-accent-color-yellow, #ffcc0c), #e6b800);
+	background: linear-gradient(135deg, var(--intranet-accent-color-yellow, #ffcc0c), var(--yellow-500));
 	border: none;
 	cursor: pointer;
 	display: flex;
@@ -195,7 +195,7 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 
 	// Solo cambia a rojo si es urgente
 	&.badge-urgent {
-		background: linear-gradient(135deg, $priority-urgent, #b91c1c);
+		background: linear-gradient(135deg, $priority-urgent, var(--red-700));
 		box-shadow:
 			0 6px 20px rgba(220, 38, 38, 0.4),
 			0 2px 8px rgba(0, 0, 0, 0.1);
@@ -205,7 +205,7 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 	&.badge-high,
 	&.badge-medium,
 	&.badge-low {
-		background: linear-gradient(135deg, var(--intranet-accent-color-yellow, #ffcc0c), #e6b800);
+		background: linear-gradient(135deg, var(--intranet-accent-color-yellow, #ffcc0c), var(--yellow-500));
 	}
 
 	i {
@@ -241,12 +241,12 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 	&:not(.ringing) {
 		filter: grayscale(70%);
 		opacity: 0.7;
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+		box-shadow: var(--shadow-2);
 
 		&:hover {
 			filter: grayscale(30%);
 			opacity: 0.9;
-			box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+			box-shadow: var(--shadow-3);
 		}
 	}
 }
@@ -269,22 +269,25 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 
 	// Colores por prioridad
 	&.badge-urgent {
-		background: linear-gradient(135deg, $priority-urgent, #b91c1c);
+		background: linear-gradient(135deg, $priority-urgent, var(--red-700));
 		box-shadow: 0 2px 8px rgba(220, 38, 38, 0.5);
 	}
 
 	&.badge-high {
-		background: linear-gradient(135deg, #ffcc0c, #d4a700);
+		// TODO(521): hex sin token equivalente
+		background: linear-gradient(135deg, var(--intranet-accent-color-yellow, #ffcc0c), #d4a700);
 		color: var(--intranet-default-text-color, #171717);
 		box-shadow: 0 2px 8px rgba(255, 204, 12, 0.5);
 	}
 
 	&.badge-medium {
+		// TODO(521): hex sin token equivalente
 		background: linear-gradient(135deg, var(--intranet-accent-color-blue, #253470), #1a2550);
 		box-shadow: 0 2px 8px rgba(37, 52, 112, 0.5);
 	}
 
 	&.badge-low {
+		// TODO(521): hex sin token equivalente
 		background: linear-gradient(135deg, var(--intranet-accent-color-green, #77a02d), #5c7d22);
 		box-shadow: 0 2px 8px rgba(119, 160, 45, 0.5);
 	}
@@ -311,7 +314,7 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 	border-radius: 24px;
 	padding: 1.75rem;
 	border: 2px solid var(--intranet-accent-color-yellow, #ffcc0c);
-	box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+	box-shadow: var(--shadow-3);
 	z-index: 997; // Debajo del mobile-nav (z-index 1000)
 	backdrop-filter: blur(12px);
 }
@@ -352,6 +355,7 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 		}
 
 		&.badge-high {
+			// TODO(521): hex sin token equivalente
 			color: #d4a700;
 		}
 
@@ -395,6 +399,7 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 
 	&.priority-high {
 		background: rgba(255, 204, 12, 0.2);
+		// TODO(521): hex sin token equivalente
 		color: #b8960a;
 	}
 
@@ -414,7 +419,7 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 	height: 54px;
 	border-radius: 16px;
 	// Siempre amarillo por defecto
-	background: linear-gradient(135deg, var(--intranet-accent-color-yellow, #ffcc0c), #e6b800);
+	background: linear-gradient(135deg, var(--intranet-accent-color-yellow, #ffcc0c), var(--yellow-500));
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -422,7 +427,7 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 
 	// Solo rojo si es urgente
 	&.badge-urgent {
-		background: linear-gradient(135deg, $priority-urgent, #b91c1c);
+		background: linear-gradient(135deg, $priority-urgent, var(--red-700));
 		box-shadow: 0 6px 16px rgba(220, 38, 38, 0.4);
 
 		i {
@@ -434,7 +439,7 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 	&.badge-high,
 	&.badge-medium,
 	&.badge-low {
-		background: linear-gradient(135deg, var(--intranet-accent-color-yellow, #ffcc0c), #e6b800);
+		background: linear-gradient(135deg, var(--intranet-accent-color-yellow, #ffcc0c), var(--yellow-500));
 		box-shadow: 0 6px 16px rgba(255, 204, 12, 0.4);
 	}
 
@@ -514,7 +519,7 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 	background: white;
 	border-radius: 18px;
 	border-left: 5px solid var(--intranet-accent-color-blue, #253470);
-	box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+	box-shadow: var(--shadow-1);
 	position: relative;
 	cursor: pointer;
 	animation: slideInRight 0.4s ease-out backwards;
@@ -522,7 +527,7 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 
 	&:hover {
 		transform: translateX(8px);
-		box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+		box-shadow: var(--shadow-2);
 	}
 
 	// Estado leído
@@ -538,7 +543,7 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 	// Estado no leído
 	&.is-unread {
 		background: white;
-		box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+		box-shadow: var(--shadow-2);
 
 		.notification-title {
 			font-weight: 700;
@@ -558,18 +563,19 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 		}
 
 		.notification-icon {
-			background: linear-gradient(135deg, $priority-urgent, #b91c1c);
+			background: linear-gradient(135deg, $priority-urgent, var(--red-700));
 			color: white;
 			box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);
 		}
 	}
 
 	&.notification-high {
-		border-left-color: #ffcc0c;
+		border-left-color: var(--intranet-accent-color-yellow, #ffcc0c);
 		background: linear-gradient(to right, rgba(255, 204, 12, 0.08), white);
 
 		.notification-icon {
-			background: linear-gradient(135deg, #ffcc0c, #d4a700);
+			// TODO(521): hex sin token equivalente
+			background: linear-gradient(135deg, var(--intranet-accent-color-yellow, #ffcc0c), #d4a700);
 			color: var(--intranet-default-text-color, #171717);
 			box-shadow: 0 4px 15px rgba(255, 204, 12, 0.4);
 		}
@@ -579,6 +585,7 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 		border-left-color: var(--intranet-accent-color-blue, #253470);
 
 		.notification-icon {
+			// TODO(521): hex sin token equivalente
 			background: linear-gradient(
 				135deg,
 				var(--intranet-accent-color-blue, #253470),
@@ -593,6 +600,7 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 		border-left-color: var(--intranet-accent-color-green, #77a02d);
 
 		.notification-icon {
+			// TODO(521): hex sin token equivalente
 			background: linear-gradient(
 				135deg,
 				var(--intranet-accent-color-green, #77a02d),
@@ -621,7 +629,7 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 	}
 
 	&.notification-high {
-		background: #ffcc0c;
+		background: var(--intranet-accent-color-yellow, #ffcc0c);
 		box-shadow: 0 0 8px rgba(255, 204, 12, 0.6);
 	}
 
@@ -660,6 +668,7 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 
 	// Colores por tipo
 	&.icon-matricula {
+		// TODO(521): hex sin token equivalente
 		background: linear-gradient(
 			135deg,
 			var(--intranet-accent-color-blue, #253470),
@@ -669,6 +678,7 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 	}
 
 	&.icon-pago {
+		// TODO(521): hex sin token equivalente
 		background: linear-gradient(
 			135deg,
 			var(--intranet-accent-color-green, #77a02d),
@@ -678,11 +688,13 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 	}
 
 	&.icon-academico {
-		background: linear-gradient(135deg, #a855f7, #9333ea) !important;
+		// TODO(521): hex sin token equivalente (segundo stop del gradiente)
+		background: linear-gradient(135deg, var(--purple-500), #9333ea) !important;
 		color: white !important;
 	}
 
 	&.icon-festividad {
+		// TODO(521): hex sin token equivalente
 		background: linear-gradient(
 			135deg,
 			var(--intranet-accent-color-yellow, #ffcc0c),
@@ -692,7 +704,7 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 	}
 
 	&.icon-evento {
-		background: linear-gradient(135deg, #f97316, #ea580c) !important;
+		background: linear-gradient(135deg, var(--orange-500), var(--orange-600)) !important;
 		color: white !important;
 	}
 }
@@ -731,17 +743,18 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 
 	&[data-type='academico'] {
 		background: rgba(168, 85, 247, 0.15);
-		color: #a855f7;
+		color: var(--purple-500);
 	}
 
 	&[data-type='festividad'] {
 		background: rgba(255, 204, 12, 0.2);
+		// TODO(521): hex sin token equivalente
 		color: #b8960a;
 	}
 
 	&[data-type='evento'] {
 		background: rgba(249, 115, 22, 0.15);
-		color: #f97316;
+		color: var(--orange-500);
 	}
 }
 
@@ -761,6 +774,7 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 
 	&[data-priority='high'] {
 		background: rgba(255, 204, 12, 0.2);
+		// TODO(521): hex sin token equivalente
 		color: #b8960a;
 	}
 
@@ -944,7 +958,7 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 	}
 
 	&.notification-high {
-		border-left-color: #ffcc0c;
+		border-left-color: var(--intranet-accent-color-yellow, #ffcc0c);
 	}
 
 	&.notification-medium {
@@ -1087,7 +1101,7 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 	position: fixed;
 	background: var(--intranet-white-color, #ffffff);
 	border-radius: 12px;
-	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+	box-shadow: var(--shadow-3);
 	border: 1px solid var(--intranet-soft-text-color, #e0e0e0);
 	min-width: 280px;
 	max-width: 320px;
@@ -1123,7 +1137,7 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 	align-items: center;
 	gap: 8px;
 	padding: 12px 14px;
-	background: linear-gradient(135deg, var(--intranet-accent-color-yellow, #ffcc0c), #e6b800);
+	background: linear-gradient(135deg, var(--intranet-accent-color-yellow, #ffcc0c), var(--yellow-500));
 	color: var(--intranet-default-text-color, #171717);
 	font-weight: 600;
 	font-size: 0.9rem;
@@ -1185,7 +1199,7 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 	height: 20px;
 	border-radius: 6px;
 	flex-shrink: 0;
-	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+	box-shadow: var(--shadow-3);
 }
 
 .priority-info {

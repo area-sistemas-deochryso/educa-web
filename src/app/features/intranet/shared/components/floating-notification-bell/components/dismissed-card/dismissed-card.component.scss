@@ -21,7 +21,7 @@
 	}
 
 	&.notification-high {
-		border-left-color: #ffcc0c;
+		border-left-color: var(--intranet-accent-color-yellow);
 	}
 
 	&.notification-medium {

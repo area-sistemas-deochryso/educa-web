@@ -3,7 +3,7 @@
 	.details-modal.p-dialog {
 		border-radius: 10px;
 		overflow: hidden;
-		background-color: #ffffff;
+		background-color: var(--white-color);
 		max-width: 800px;
 		width: 90vw;
 		transition: all 0.3s ease;
@@ -35,7 +35,7 @@
 
 .modal-content {
 	padding: 2rem;
-	background-color: #ffffff;
+	background-color: var(--white-color);
 
 	h2 {
 		font-size: 1.25rem;
@@ -61,7 +61,7 @@
 
 		.details-right {
 			border-left: none;
-			border-right: 1px solid #ddd;
+			border-right: 1px solid var(--intranet-border-color);
 			padding-left: 0;
 			padding-right: 1.5rem;
 
@@ -80,7 +80,7 @@
 
 .details-right {
 	width: 200px;
-	border-left: 1px solid #ddd;
+	border-left: 1px solid var(--intranet-border-color);
 	padding-left: 1.5rem;
 	position: relative;
 
@@ -90,9 +90,9 @@
 		left: -12px;
 		width: 24px;
 		height: 24px;
-		border: 1px solid #ddd;
+		border: 1px solid var(--intranet-border-color);
 		border-radius: 50%;
-		background: #fff;
+		background: var(--white-color);
 		cursor: pointer;
 		display: flex;
 		align-items: center;
@@ -117,7 +117,7 @@
 }
 
 .weeks-accordion {
-	border: 1px solid #ddd;
+	border: 1px solid var(--intranet-border-color);
 	border-radius: 4px;
 	margin-bottom: 1rem;
 }
@@ -134,7 +134,7 @@
 	.details-right {
 		width: 100%;
 		border-left: none;
-		border-top: 1px solid #ddd;
+		border-top: 1px solid var(--intranet-border-color);
 		padding-left: 0;
 		padding-top: 1.5rem;
 

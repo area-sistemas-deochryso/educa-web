@@ -31,7 +31,7 @@
 	}
 
 	&.open {
-		border-color: #5c7a28;
+		border-color: var(--nav-active);
 		background: rgba(92, 122, 40, 0.06);
 	}
 
@@ -44,7 +44,7 @@
 
 .trigger-icon {
 	font-size: 1rem;
-	color: #5c7a28;
+	color: var(--nav-active);
 }
 
 .trigger-label {
@@ -200,7 +200,7 @@
 }
 
 .panel-section-star {
-	color: #d97706;
+	color: var(--yellow-600);
 }
 
 // Acordeón: bloque del módulo. Borde-bottom separa módulos.
@@ -217,7 +217,7 @@
 		> .panel-section-header,
 		> .panel-section-header .panel-section-caret,
 		> .panel-section-header .panel-section-count {
-			color: #5c7a28;
+			color: var(--nav-active);
 		}
 
 		> .panel-section-header:hover {
@@ -228,19 +228,19 @@
 
 // Cascadeo desde el item activo hacia afuera: el grupo que lo contiene se pinta verde.
 .panel-group:has(.panel-item.is-current) {
-	border-color: #5c7a28;
+	border-color: var(--nav-active);
 
 	> .panel-group-legend {
-		color: #5c7a28;
+		color: var(--nav-active);
 	}
 }
 
 .panel-subgroup:has(.panel-item.is-current) {
-	border-color: #5c7a28;
+	border-color: var(--nav-active);
 
 	> .panel-subgroup-toggle,
 	> .panel-subgroup-toggle .panel-subgroup-caret {
-		color: #5c7a28;
+		color: var(--nav-active);
 	}
 }
 
@@ -363,20 +363,20 @@
 
 	// Current route — la página en que está el usuario. Pintada en verde, no azul.
 	&.is-current {
-		background: color-mix(in srgb, #5c7a28 14%, transparent);
-		box-shadow: inset 3px 0 0 0 #5c7a28;
+		background: color-mix(in srgb, var(--nav-active) 14%, transparent);
+		box-shadow: inset 3px 0 0 0 var(--nav-active);
 
 		.panel-item-label {
 			font-weight: 600;
-			color: #5c7a28;
+			color: var(--nav-active);
 		}
 
 		.panel-item-icon {
-			color: #5c7a28;
+			color: var(--nav-active);
 		}
 
 		&.active {
-			background: color-mix(in srgb, #5c7a28 22%, transparent);
+			background: color-mix(in srgb, var(--nav-active) 22%, transparent);
 		}
 	}
 }
@@ -431,12 +431,12 @@
 	}
 
 	&:hover:not(:disabled) {
-		color: #d97706;
+		color: var(--yellow-600);
 		background: rgba(217, 119, 6, 0.08);
 	}
 
 	&.starred {
-		color: #d97706;
+		color: var(--yellow-600);
 		opacity: 1;
 	}
 
