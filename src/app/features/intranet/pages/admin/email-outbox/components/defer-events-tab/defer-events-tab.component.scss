@@ -40,6 +40,10 @@
 	align-items: center;
 	gap: 0.5rem;
 	min-width: 120px;
+	// Separación visual del stat-pill con el total histórico — evita que la
+	// tendencia de 7d/30d se lea pegada a ese número.
+	padding-left: 0.75rem;
+	border-left: 1px solid var(--surface-300);
 }
 
 .stat-trend-summary {

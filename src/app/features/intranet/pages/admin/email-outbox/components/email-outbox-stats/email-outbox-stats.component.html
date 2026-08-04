@@ -36,9 +36,11 @@
 					color="var(--green-500)"
 					[ariaLabel]="'Tendencia últimos 30 días: enviados'"
 				/>
-				<span class="stat-trend-summary">
-					promedio 7d: {{ sentSummary().avg7d | number }} · máx 30d: {{ sentSummary().max30d | number }}
-				</span>
+				@if (sentSummary().avg7d > 0 || sentSummary().max30d > 0) {
+					<span class="stat-trend-summary">
+						promedio 7d: {{ sentSummary().avg7d | number }} · máx 30d: {{ sentSummary().max30d | number }}
+					</span>
+				}
 			</div>
 		}
 	</div>
@@ -58,9 +60,11 @@
 					color="var(--red-500)"
 					[ariaLabel]="'Tendencia últimos 30 días: fallidos'"
 				/>
-				<span class="stat-trend-summary">
-					promedio 7d: {{ failedSummary().avg7d | number }} · máx 30d: {{ failedSummary().max30d | number }}
-				</span>
+				@if (failedSummary().avg7d > 0 || failedSummary().max30d > 0) {
+					<span class="stat-trend-summary">
+						promedio 7d: {{ failedSummary().avg7d | number }} · máx 30d: {{ failedSummary().max30d | number }}
+					</span>
+				}
 			</div>
 		}
 	</div>
