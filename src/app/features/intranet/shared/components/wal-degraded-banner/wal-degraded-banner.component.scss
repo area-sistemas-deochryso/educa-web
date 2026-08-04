@@ -4,7 +4,9 @@
 	align-items: center;
 	justify-content: space-between;
 	gap: 1rem;
-	padding: 0.6rem 1rem;
+	// Mismo padding horizontal que .intranet-content (banner es full-bleed) —
+	// evita el desfase de alineación con el título/breadcrumb de cada pantalla.
+	padding: 0.6rem 2rem;
 	background: color-mix(in srgb, var(--yellow-500) 15%, transparent);
 	border-bottom: 1px solid var(--yellow-500);
 	color: var(--text-color);
@@ -37,6 +39,12 @@
 		align-items: center;
 		gap: 0.5rem;
 		flex-shrink: 0;
+	}
+}
+
+@media screen and (max-width: 840px) {
+	.wal-degraded-banner {
+		padding: 0.6rem 1rem;
 	}
 }
 // #endregion

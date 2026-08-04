@@ -6,7 +6,10 @@
 	align-items: center;
 	justify-content: space-between;
 	gap: 1rem;
-	padding: 0.6rem 1rem;
+	// Mismo padding horizontal que .intranet-content (banner es full-bleed, el
+	// resto de la página vive dentro de ese padding) — evita el desfase de
+	// alineación con el título/breadcrumb de cada pantalla.
+	padding: 0.6rem 2rem;
 	background: color-mix(in srgb, var(--yellow-500) 15%, transparent);
 	border-bottom: 1px solid var(--yellow-500);
 	color: var(--text-color);
@@ -46,6 +49,12 @@
 			outline: 2px solid var(--yellow-700);
 			outline-offset: 1px;
 		}
+	}
+}
+
+@media screen and (max-width: 840px) {
+	.salud-sede-banner {
+		padding: 0.6rem 1rem;
 	}
 }
 // #endregion
