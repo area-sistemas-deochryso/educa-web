@@ -247,6 +247,19 @@ export class AttendancesComponent implements OnInit {
 			});
 	}
 
+	/**
+	 * Brief 512 — `<p-tabs [value]="activeTab()">` era un binding de solo lectura: PrimeNG
+	 * maneja el cambio de tab internamente (el panel se actualiza visualmente) pero sin
+	 * `(valueChange)` nunca se notificaba al componente, así que la URL (`?tab=...`) y el
+	 * signal `activeTab` quedaban stale — sin bookmark posible y F5 siempre volvía a "gestion".
+	 * Mismo patrón que `TicketAdminComponent.onTabChange`: navega con el nuevo `tab` en
+	 * queryParams; `subscribeToQueryParams` recibe el cambio y sincroniza `activeTab`.
+	 */
+	onTabChange(value: string | number | undefined): void {
+		if (value === undefined) return;
+		void this.router.navigate([], { relativeTo: this.route, queryParams: { tab: String(value) } });
+	}
+
 	// Cross-link desde `AttendanceDirectorComponent` tab profesores (Plan 23 Chat 5).
 	// Query params soportados: `tab`, `tipoPersona`, `dni`, `fecha` (YYYY-MM-DD).
 	//

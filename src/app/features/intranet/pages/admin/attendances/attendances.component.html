@@ -8,7 +8,7 @@
 <app-attendance-scope-banner />
 
 <!-- #region Tabs -->
-<p-tabs [value]="activeTab()">
+<p-tabs [value]="activeTab()" (valueChange)="onTabChange($event)">
 	<p-tablist>
 		<p-tab value="gestion">
 			<i class="pi pi-cog mr-2"></i>
