@@ -583,22 +583,6 @@
 		}
 	}
 
-	// Botón success - verde con texto blanco
-	.p-button-success {
-		background: #22c55e !important;
-		color: #ffffff !important;
-		border-color: #22c55e !important;
-
-		&:hover {
-			background: #16a34a !important;
-			border-color: #16a34a !important;
-		}
-
-		&:focus {
-			box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #22c55e !important;
-		}
-	}
-
 	.p-button-text {
 		color: var(--text-color);
 
