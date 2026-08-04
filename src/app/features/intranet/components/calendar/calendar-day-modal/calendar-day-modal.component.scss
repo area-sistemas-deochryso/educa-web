@@ -104,13 +104,19 @@
 	}
 
 	&.holiday-icon {
-		// TODO(521): #c82333 sin token equivalente
-		background: linear-gradient(135deg, var(--red-600), #c82333);
+		background: linear-gradient(
+			135deg,
+			var(--red-600),
+			color-mix(in srgb, var(--red-600) 80%, black)
+		);
 	}
 
 	&.event-icon {
-		// TODO(521): #1e7e34 sin token equivalente
-		background: linear-gradient(135deg, var(--green-600), #1e7e34);
+		background: linear-gradient(
+			135deg,
+			var(--green-600),
+			color-mix(in srgb, var(--green-600) 80%, black)
+		);
 	}
 }
 

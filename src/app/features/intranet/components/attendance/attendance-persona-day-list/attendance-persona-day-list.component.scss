@@ -148,8 +148,7 @@ $color-pendiente: var(--attendance-pendiente);
 	border-radius: 4px;
 	font-weight: 600;
 	font-size: 1.25rem;
-	// TODO(521): hex sin token equivalente (texto fijo oscuro sobre badge de color saturado)
-	color: #333;
+	color: var(--gray-700);
 }
 
 .status-asistio { background-color: $color-asistio; }

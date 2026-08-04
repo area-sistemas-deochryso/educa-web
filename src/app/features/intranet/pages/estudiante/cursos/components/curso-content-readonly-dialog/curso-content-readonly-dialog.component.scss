@@ -477,8 +477,7 @@
 
 	&.word {
 		background: var(--blue-50);
-		// TODO(521): hex sin token equivalente (no existe --blue-200 en el shim)
-		border-color: #bfdbfe;
+		border-color: var(--blue-200);
 		i { color: var(--blue-500); }
 	}
 
@@ -489,9 +488,9 @@
 	}
 
 	&.image {
-		background: #f5f3ff;
-		border-color: #ddd6fe;
-		i { color: #8b5cf6; }
+		background: var(--violet-50);
+		border-color: var(--violet-200);
+		i { color: var(--violet-500); }
 	}
 
 	&.video {
@@ -501,8 +500,8 @@
 	}
 
 	&.tarea {
-		background: #fffbeb;
-		border-color: #fde68a;
+		background: var(--yellow-50);
+		border-color: var(--yellow-200);
 		i { color: var(--accent-amber); }
 	}
 }

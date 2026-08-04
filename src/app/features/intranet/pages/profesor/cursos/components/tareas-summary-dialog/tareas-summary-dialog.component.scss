@@ -100,8 +100,7 @@
 	justify-content: center;
 	flex-shrink: 0;
 	background: var(--yellow-50);
-	// TODO(521): hex sin token equivalente (no existe --yellow-200)
-	border: 1px solid #fde68a;
+	border: 1px solid var(--yellow-200);
 
 	i {
 		font-size: 0.85rem;

@@ -21,10 +21,9 @@ $priority-urgent: var(--red-600);
 		color: $priority-urgent;
 	}
 
-	// TODO(521): hex sin token equivalente (#b8960a, dorado sin token en la paleta)
 	&.priority-high {
 		background: rgba(255, 204, 12, 0.2);
-		color: #b8960a;
+		color: var(--gold-800);
 	}
 
 	&.priority-medium {

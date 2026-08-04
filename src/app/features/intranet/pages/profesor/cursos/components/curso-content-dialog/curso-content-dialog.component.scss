@@ -267,8 +267,7 @@
 		background: rgba(168, 85, 247, 0.04);
 		border-color: rgba(168, 85, 247, 0.15);
 
-		// TODO(521): hex sin token equivalente (morado #9333ea entre --purple-500/700, sin match cercano)
-		> i { color: #9333ea; }
+		> i { color: var(--violet-600); }
 
 		&.clickable:hover {
 			border-color: rgba(168, 85, 247, 0.35);

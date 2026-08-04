@@ -416,8 +416,7 @@ $color-justificado: var(--attendance-justificado);
 }
 
 .status-pendiente {
-	// TODO(521): hex sin token equivalente
-	background-color: #9e9e9e;
+	background-color: var(--attendance-pendiente);
 }
 
 // Responsive

@@ -39,8 +39,7 @@
 	align-items: center;
 	gap: 8px;
 	padding: 12px 14px;
-	// TODO(521): hex sin token equivalente
-	background: linear-gradient(135deg, var(--intranet-accent-color-yellow, #ffcc0c), #e6b800);
+	background: linear-gradient(135deg, var(--intranet-accent-color-yellow, #ffcc0c), var(--gold-600));
 	color: var(--intranet-default-text-color, #171717);
 	font-weight: 600;
 	font-size: 0.9rem;

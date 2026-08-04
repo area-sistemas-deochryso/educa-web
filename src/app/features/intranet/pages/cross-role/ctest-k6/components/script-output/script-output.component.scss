@@ -29,9 +29,9 @@
 }
 
 .code-block {
-	// TODO(521): hex sin token equivalente (paleta fija tipo terminal/IDE oscuro, intencional)
+	// Excepción (brief 521): paleta fija tipo terminal/IDE oscuro (Catppuccin), intencional y no semántica.
 	background: #1e1e2e;
-	// TODO(521): hex sin token equivalente (paleta fija tipo terminal/IDE oscuro, intencional)
+	// Excepción (brief 521): paleta fija tipo terminal/IDE oscuro (Catppuccin), intencional y no semántica.
 	color: #cdd6f4;
 	padding: 1.25rem;
 	margin: 0;
@@ -91,7 +91,7 @@
 }
 
 .command-block {
-	// TODO(521): hex sin token equivalente (paleta fija tipo terminal/IDE oscuro, intencional)
+	// Excepción (brief 521): paleta fija tipo terminal/IDE oscuro (Catppuccin), intencional y no semántica.
 	background: #1e1e2e;
 	padding: 0.5rem 0.75rem;
 	border-radius: 6px;
@@ -99,7 +99,7 @@
 	code {
 		font-family: 'Cascadia Code', 'Consolas', monospace;
 		font-size: 0.85rem;
-		// TODO(521): hex sin token equivalente (verde terminal fijo, intencional)
+		// Excepción (brief 521): verde terminal fijo (Catppuccin), intencional y no semántico.
 		color: #a6e3a1;
 	}
 }

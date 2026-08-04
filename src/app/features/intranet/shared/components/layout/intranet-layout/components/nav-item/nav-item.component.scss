@@ -92,8 +92,7 @@
 	min-width: 200px;
 	min-height: 50px;
 	background: var(--intranet-background-color);
-	// TODO(521): hex sin token equivalente
-	border: 1px solid #c0c0c0;
+	border: 1px solid var(--gray-300);
 	border-radius: 8px;
 	box-shadow: var(--shadow-2);
 	padding: 0.5rem;

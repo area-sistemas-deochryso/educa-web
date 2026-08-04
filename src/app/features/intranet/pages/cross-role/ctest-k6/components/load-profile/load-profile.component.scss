@@ -415,9 +415,8 @@
 	}
 
 	&.dot-auth {
-		// TODO(521): hex sin token equivalente (violeta, distinto de --purple-500)
-		border-color: #8b5cf6;
-		background: #8b5cf6;
+		border-color: var(--violet-500);
+		background: var(--violet-500);
 	}
 
 	&.dot-sleep {
@@ -510,8 +509,7 @@
 
 	&.badge-auth {
 		background: rgba(139, 92, 246, 0.15);
-		// TODO(521): hex sin token equivalente (violeta, distinto de --purple-700)
-		color: #7c3aed;
+		color: var(--violet-600);
 	}
 
 	&.badge-sleep {

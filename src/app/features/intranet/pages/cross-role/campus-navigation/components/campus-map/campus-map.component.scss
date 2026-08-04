@@ -84,14 +84,10 @@
 
 .node-rect { stroke-width: 1.5; transition: all 0.15s; }
 .node-classroom { fill: var(--blue-100); stroke: var(--blue-500); }
-// TODO(521): hex sin token equivalente (paleta amber, no existe en el shim)
-.node-stairs    { fill: #fef3c7; stroke: var(--accent-amber); }
-// TODO(521): hex sin token equivalente (paleta emerald, no existe en el shim)
-.node-entrance  { fill: #d1fae5; stroke: #10b981; }
-// TODO(521): hex sin token equivalente (paleta emerald, no existe en el shim)
-.node-patio     { fill: #ecfdf5; stroke: #6ee7b7; }
-// TODO(521): hex sin token equivalente (paleta sky, no existe en el shim)
-.node-bathroom  { fill: #e0f2fe; stroke: #0ea5e9; }
+.node-stairs    { fill: var(--amber-100); stroke: var(--accent-amber); }
+.node-entrance  { fill: var(--emerald-200); stroke: var(--emerald-500); }
+.node-patio     { fill: var(--emerald-50); stroke: var(--emerald-300); }
+.node-bathroom  { fill: var(--sky-bg); stroke: var(--sky-500); }
 .node-office    { fill: var(--surface-100); stroke: var(--surface-500); }
 
 .node-label {

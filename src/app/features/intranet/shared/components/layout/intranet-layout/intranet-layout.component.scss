@@ -11,8 +11,7 @@
 .intranet-header {
 	background-color: var(--intranet-background-color);
 	padding: env(safe-area-inset-top, 0) 3rem 0 !important;
-	// TODO(521): hex sin token equivalente
-	border-bottom: 1px solid #c0c0c0;
+	border-bottom: 1px solid var(--gray-300);
 	overflow: visible;
 	position: sticky;
 	top: 0;
@@ -217,7 +216,7 @@ app-user-profile-menu {
 
 	.breadcrumb-sep {
 		font-size: 0.65rem;
-		color: var(--text-color-secondary, #9ca3af);
+		color: var(--text-color-secondary, var(--surface-400));
 	}
 
 	.breadcrumb-group-wrapper {
@@ -231,8 +230,7 @@ app-user-profile-menu {
 			left: 0;
 			min-width: 180px;
 			background: var(--intranet-background-color);
-			// TODO(521): hex sin token equivalente
-			border: 1px solid #c0c0c0;
+			border: 1px solid var(--gray-300);
 			border-radius: 8px;
 			box-shadow: var(--shadow-3);
 			padding: 0.5rem;

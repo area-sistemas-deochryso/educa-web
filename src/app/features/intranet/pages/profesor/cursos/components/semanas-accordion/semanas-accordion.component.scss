@@ -377,8 +377,7 @@
 
 	&.word {
 		background: var(--blue-50);
-		// TODO(521): hex sin token equivalente (no existe --blue-200)
-		border-color: #bfdbfe;
+		border-color: var(--blue-200);
 		i { color: var(--blue-500); }
 	}
 
@@ -389,12 +388,9 @@
 	}
 
 	&.image {
-		// TODO(521): hex sin token equivalente (no existe --purple-50)
-		background: #f5f3ff;
-		// TODO(521): hex sin token equivalente (no existe --purple-200)
-		border-color: #ddd6fe;
-		// TODO(521): hex sin token equivalente (violeta, sin match cercano en --purple-500/700)
-		i { color: #8b5cf6; }
+		background: var(--violet-50);
+		border-color: var(--violet-200);
+		i { color: var(--violet-500); }
 	}
 
 	&.video {
@@ -405,8 +401,7 @@
 
 	&.tarea {
 		background: var(--yellow-50);
-		// TODO(521): hex sin token equivalente (no existe --yellow-200)
-		border-color: #fde68a;
+		border-color: var(--yellow-200);
 		i { color: var(--yellow-500); }
 	}
 }

@@ -1,7 +1,6 @@
 // #region Variables
 $accent: var(--intranet-accent-color-green, #77a02d);
-// TODO(521): hex sin token equivalente
-$accent-dark: #5c7d22;
+$accent-dark: var(--nav-active);
 $wf-bar: rgba(150, 150, 150, 0.3);
 $wf-bar-dark: rgba(150, 150, 150, 0.45);
 $wf-accent: rgba(119, 160, 45, 0.4);
@@ -136,7 +135,7 @@ $wf-yellow: rgba(234, 179, 8, 0.45);
 			height: 6px;
 			border-radius: 50%;
 
-			// TODO(521): hex sin token equivalente (colores fijos de convención macOS, no semánticos)
+			// Excepción (brief 521): colores fijos de la convención macOS (semáforo de ventana), decorativos y no semánticos.
 			&:nth-child(1) { background: #ff5f57; }
 			&:nth-child(2) { background: #febc2e; }
 			&:nth-child(3) { background: #28c840; }

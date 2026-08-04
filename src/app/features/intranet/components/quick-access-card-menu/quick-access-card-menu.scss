@@ -33,7 +33,7 @@
 		width: 65px;
 		height: 65px;
 		border-radius: 18px;
-		background: linear-gradient(135deg, var(--intranet-accent-color-green, #77a02d), #5c7d22);
+		background: linear-gradient(135deg, var(--intranet-accent-color-green, #77a02d), var(--nav-active));
 		display: flex;
 		align-items: center;
 		justify-content: center;

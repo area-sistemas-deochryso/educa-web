@@ -154,9 +154,8 @@
 		border: 1px solid var(--surface-300);
 	}
 
-	// TODO(521): hex sin token equivalente (#1e3a5f, navy oscuro sin token en la paleta)
 	thead th {
-		background: #1e3a5f;
+		background: var(--navy-800);
 		color: var(--white-color);
 		font-weight: 700;
 		font-size: 0.8rem;
@@ -231,15 +230,13 @@ thead .holiday-col {
 	}
 }
 
-// TODO(521): hex sin token equivalente (#9ca3af, gray-400 sin token en la paleta slate)
 .matrix-cell-pending .matrix-badge,
 .matrix-cell-pending {
-	color: #9ca3af;
+	color: var(--surface-400);
 }
 
-// TODO(521): hex sin token equivalente (#1e3a5f, navy oscuro sin token en la paleta)
 .matrix-total-header {
-	background: #1e3a5f !important;
+	background: var(--navy-800) !important;
 	font-size: 0.75rem;
 	letter-spacing: 0.03em;
 }
@@ -258,19 +255,16 @@ thead .holiday-col {
 	font-weight: 700;
 }
 
-// TODO(521): hex sin token equivalente (#166534, green-800 sin token en la paleta)
 .total-A {
-	background: #166534 !important;
+	background: var(--emerald-800) !important;
 }
 
-// TODO(521): hex sin token equivalente (#991b1b, red-800 sin token en la paleta)
 .total-F {
-	background: #991b1b !important;
+	background: var(--red-800) !important;
 }
 
-// TODO(521): hex sin token equivalente (#92400e, amber-800 sin token en la paleta)
 .total-T {
-	background: #92400e !important;
+	background: var(--amber-800) !important;
 }
 
 .total-J {

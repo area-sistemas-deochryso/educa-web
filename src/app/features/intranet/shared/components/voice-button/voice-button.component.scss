@@ -213,10 +213,9 @@
 	color: var(--intranet-soft-text-color, #5e5e5e);
 	transition: all 0.2s ease;
 
-	// TODO(521): hex sin token equivalente
 	&:hover {
-		background: #f5d5d5;
-		color: #c53030;
+		background: var(--red-100);
+		color: var(--red-700);
 	}
 }
 
@@ -342,21 +341,19 @@
 		margin-top: 2px;
 	}
 
-	// TODO(521): hex sin token equivalente
 	span {
 		flex: 1;
 		font-size: 0.8rem;
-		color: #991b1b;
+		color: var(--red-800);
 		line-height: 1.4;
 	}
 
-	// TODO(521): hex sin token equivalente
 	.dismiss-btn {
 		width: 24px;
 		height: 24px;
 		border: none;
 		background: transparent;
-		color: #991b1b;
+		color: var(--red-800);
 		cursor: pointer;
 		display: flex;
 		align-items: center;

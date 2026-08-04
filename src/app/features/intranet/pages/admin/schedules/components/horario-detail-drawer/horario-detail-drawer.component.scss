@@ -289,8 +289,7 @@
       .student-avatar {
         width: 36px;
         height: 36px;
-        // TODO(521): hex sin token equivalente (verde esmeralda, distinto de --green-500/600)
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        background: linear-gradient(135deg, var(--emerald-500) 0%, var(--emerald-600) 100%);
         border-radius: 50%;
         display: flex;
         align-items: center;

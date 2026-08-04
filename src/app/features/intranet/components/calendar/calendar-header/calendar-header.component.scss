@@ -18,8 +18,7 @@
 		width: 56px;
 		height: 56px;
 		border-radius: 16px;
-		// TODO(521): #1a2550 sin token equivalente
-		background: linear-gradient(135deg, var(--intranet-accent-color-blue, #253470), #1a2550);
+		background: linear-gradient(135deg, var(--intranet-accent-color-blue, #253470), var(--intranet-accent-color-blue-dark));
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -121,7 +120,7 @@
 	padding: 0 1.5rem;
 	border-radius: 12px;
 	border: none;
-	// Token canónico (design-system.md §8) — antes hex literal (#f5a623/#e09000).
+	// Token canónico (design-system.md §8) — antes hex literal (var(--orange-500)/#e09000).
 	background: linear-gradient(135deg, var(--orange-500), var(--orange-600));
 	color: white;
 	font-weight: 600;

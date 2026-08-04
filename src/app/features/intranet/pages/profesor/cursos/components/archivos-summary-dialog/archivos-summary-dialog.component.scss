@@ -119,8 +119,7 @@
 
 	&.word {
 		background: var(--blue-50);
-		// TODO(521): hex sin token equivalente (#bfdbfe, blue-200 no existe en el shim)
-		border-color: #bfdbfe;
+		border-color: var(--blue-200);
 		i { color: var(--blue-500); }
 	}
 
@@ -130,11 +129,10 @@
 		i { color: var(--green-500); }
 	}
 
-	// TODO(521): hex sin token equivalente (#f5f3ff/#ddd6fe/#8b5cf6, violeta sin token en la paleta)
 	&.image {
-		background: #f5f3ff;
-		border-color: #ddd6fe;
-		i { color: #8b5cf6; }
+		background: var(--violet-50);
+		border-color: var(--violet-200);
+		i { color: var(--violet-500); }
 	}
 
 	&.video {

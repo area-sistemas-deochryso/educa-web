@@ -274,21 +274,18 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 	}
 
 	&.badge-high {
-		// TODO(521): hex sin token equivalente
-		background: linear-gradient(135deg, var(--intranet-accent-color-yellow, #ffcc0c), #d4a700);
+		background: linear-gradient(135deg, var(--intranet-accent-color-yellow, #ffcc0c), var(--gold-700));
 		color: var(--intranet-default-text-color, #171717);
 		box-shadow: 0 2px 8px rgba(255, 204, 12, 0.5);
 	}
 
 	&.badge-medium {
-		// TODO(521): hex sin token equivalente
-		background: linear-gradient(135deg, var(--intranet-accent-color-blue, #253470), #1a2550);
+		background: linear-gradient(135deg, var(--intranet-accent-color-blue, #253470), var(--intranet-accent-color-blue-dark));
 		box-shadow: 0 2px 8px rgba(37, 52, 112, 0.5);
 	}
 
 	&.badge-low {
-		// TODO(521): hex sin token equivalente
-		background: linear-gradient(135deg, var(--intranet-accent-color-green, #77a02d), #5c7d22);
+		background: linear-gradient(135deg, var(--intranet-accent-color-green, #77a02d), var(--nav-active));
 		box-shadow: 0 2px 8px rgba(119, 160, 45, 0.5);
 	}
 
@@ -355,8 +352,7 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 		}
 
 		&.badge-high {
-			// TODO(521): hex sin token equivalente
-			color: #d4a700;
+			color: var(--gold-700);
 		}
 
 		&.badge-medium {
@@ -399,8 +395,7 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 
 	&.priority-high {
 		background: rgba(255, 204, 12, 0.2);
-		// TODO(521): hex sin token equivalente
-		color: #b8960a;
+		color: var(--gold-800);
 	}
 
 	&.priority-medium {
@@ -574,8 +569,7 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 		background: linear-gradient(to right, rgba(255, 204, 12, 0.08), white);
 
 		.notification-icon {
-			// TODO(521): hex sin token equivalente
-			background: linear-gradient(135deg, var(--intranet-accent-color-yellow, #ffcc0c), #d4a700);
+			background: linear-gradient(135deg, var(--intranet-accent-color-yellow, #ffcc0c), var(--gold-700));
 			color: var(--intranet-default-text-color, #171717);
 			box-shadow: 0 4px 15px rgba(255, 204, 12, 0.4);
 		}
@@ -585,11 +579,10 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 		border-left-color: var(--intranet-accent-color-blue, #253470);
 
 		.notification-icon {
-			// TODO(521): hex sin token equivalente
 			background: linear-gradient(
 				135deg,
 				var(--intranet-accent-color-blue, #253470),
-				#1a2550
+				var(--intranet-accent-color-blue-dark)
 			);
 			color: white;
 			box-shadow: 0 4px 15px rgba(37, 52, 112, 0.3);
@@ -600,11 +593,10 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 		border-left-color: var(--intranet-accent-color-green, #77a02d);
 
 		.notification-icon {
-			// TODO(521): hex sin token equivalente
 			background: linear-gradient(
 				135deg,
 				var(--intranet-accent-color-green, #77a02d),
-				#5c7d22
+				var(--nav-active)
 			);
 			color: white;
 			box-shadow: 0 4px 15px rgba(119, 160, 45, 0.3);
@@ -668,37 +660,33 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 
 	// Colores por tipo
 	&.icon-matricula {
-		// TODO(521): hex sin token equivalente
 		background: linear-gradient(
 			135deg,
 			var(--intranet-accent-color-blue, #253470),
-			#1a2550
+			var(--intranet-accent-color-blue-dark)
 		) !important;
 		color: white !important;
 	}
 
 	&.icon-pago {
-		// TODO(521): hex sin token equivalente
 		background: linear-gradient(
 			135deg,
 			var(--intranet-accent-color-green, #77a02d),
-			#5c7d22
+			var(--nav-active)
 		) !important;
 		color: white !important;
 	}
 
 	&.icon-academico {
-		// TODO(521): hex sin token equivalente (segundo stop del gradiente)
-		background: linear-gradient(135deg, var(--purple-500), #9333ea) !important;
+		background: linear-gradient(135deg, var(--purple-500), var(--violet-600)) !important;
 		color: white !important;
 	}
 
 	&.icon-festividad {
-		// TODO(521): hex sin token equivalente
 		background: linear-gradient(
 			135deg,
 			var(--intranet-accent-color-yellow, #ffcc0c),
-			#d4a700
+			var(--gold-700)
 		) !important;
 		color: var(--intranet-default-text-color, #171717) !important;
 	}
@@ -748,8 +736,7 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 
 	&[data-type='festividad'] {
 		background: rgba(255, 204, 12, 0.2);
-		// TODO(521): hex sin token equivalente
-		color: #b8960a;
+		color: var(--gold-800);
 	}
 
 	&[data-type='evento'] {
@@ -774,8 +761,7 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 
 	&[data-priority='high'] {
 		background: rgba(255, 204, 12, 0.2);
-		// TODO(521): hex sin token equivalente
-		color: #b8960a;
+		color: var(--gold-800);
 	}
 
 	&[data-priority='medium'] {

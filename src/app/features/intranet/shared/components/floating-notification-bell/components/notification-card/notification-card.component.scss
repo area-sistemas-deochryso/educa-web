@@ -117,8 +117,7 @@ $priority-urgent: var(--red-600);
 		background: linear-gradient(to right, rgba(255, 204, 12, 0.08), white);
 
 		.notification-icon {
-			// TODO(521): hex sin token equivalente
-			background: linear-gradient(135deg, var(--intranet-accent-color-yellow, #ffcc0c), #d4a700);
+			background: linear-gradient(135deg, var(--intranet-accent-color-yellow, #ffcc0c), var(--gold-700));
 			color: var(--intranet-default-text-color, #171717);
 			box-shadow: 0 4px 15px rgba(255, 204, 12, 0.4);
 		}
@@ -128,11 +127,10 @@ $priority-urgent: var(--red-600);
 		border-left-color: var(--intranet-accent-color-blue, #253470);
 
 		.notification-icon {
-			// TODO(521): hex sin token equivalente
 			background: linear-gradient(
 				135deg,
 				var(--intranet-accent-color-blue, #253470),
-				#1a2550
+				var(--intranet-accent-color-blue-dark)
 			);
 			color: white;
 			box-shadow: 0 4px 15px rgba(37, 52, 112, 0.3);
@@ -143,11 +141,10 @@ $priority-urgent: var(--red-600);
 		border-left-color: var(--intranet-accent-color-green, #77a02d);
 
 		.notification-icon {
-			// TODO(521): hex sin token equivalente
 			background: linear-gradient(
 				135deg,
 				var(--intranet-accent-color-green, #77a02d),
-				#5c7d22
+				var(--nav-active)
 			);
 			color: white;
 			box-shadow: 0 4px 15px rgba(119, 160, 45, 0.3);
@@ -209,37 +206,33 @@ $priority-urgent: var(--red-600);
 	}
 
 	&.icon-matricula {
-		// TODO(521): hex sin token equivalente
 		background: linear-gradient(
 			135deg,
 			var(--intranet-accent-color-blue, #253470),
-			#1a2550
+			var(--intranet-accent-color-blue-dark)
 		) !important;
 		color: white !important;
 	}
 
 	&.icon-pago {
-		// TODO(521): hex sin token equivalente
 		background: linear-gradient(
 			135deg,
 			var(--intranet-accent-color-green, #77a02d),
-			#5c7d22
+			var(--nav-active)
 		) !important;
 		color: white !important;
 	}
 
 	&.icon-academico {
-		// TODO(521): #9333ea sin token equivalente
-		background: linear-gradient(135deg, var(--purple-500), #9333ea) !important;
+		background: linear-gradient(135deg, var(--purple-500), var(--violet-600)) !important;
 		color: white !important;
 	}
 
 	&.icon-festividad {
-		// TODO(521): hex sin token equivalente
 		background: linear-gradient(
 			135deg,
 			var(--intranet-accent-color-yellow, #ffcc0c),
-			#d4a700
+			var(--gold-700)
 		) !important;
 		color: var(--intranet-default-text-color, #171717) !important;
 	}
@@ -250,8 +243,7 @@ $priority-urgent: var(--red-600);
 	}
 
 	&.icon-smart {
-		// TODO(521): hex sin token equivalente (rosa, sin familia en la paleta)
-		background: linear-gradient(135deg, #ec4899, #db2777) !important;
+		background: linear-gradient(135deg, var(--pink-500), var(--pink-600)) !important;
 		color: white !important;
 		box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4) !important;
 	}
@@ -296,8 +288,7 @@ $priority-urgent: var(--red-600);
 
 	&[data-type='festividad'] {
 		background: rgba(255, 204, 12, 0.2);
-		// TODO(521): hex sin token equivalente
-		color: #b8960a;
+		color: var(--gold-800);
 	}
 
 	&[data-type='evento'] {
@@ -307,8 +298,7 @@ $priority-urgent: var(--red-600);
 
 	&[data-type='smart'] {
 		background: rgba(236, 72, 153, 0.15);
-		// TODO(521): hex sin token equivalente (rosa, sin familia en la paleta)
-		color: #db2777;
+		color: var(--pink-600);
 	}
 }
 
@@ -328,8 +318,7 @@ $priority-urgent: var(--red-600);
 
 	&[data-priority='high'] {
 		background: rgba(255, 204, 12, 0.2);
-		// TODO(521): hex sin token equivalente
-		color: #b8960a;
+		color: var(--gold-800);
 	}
 
 	&[data-priority='medium'] {

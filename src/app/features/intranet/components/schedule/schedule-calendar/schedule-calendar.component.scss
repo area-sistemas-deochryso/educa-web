@@ -115,8 +115,7 @@
 	}
 
 	&.other-month {
-		// TODO(521): hex sin token equivalente (gris tenue sin match confirmado)
-		color: #bbb;
+		color: var(--gray-300);
 	}
 
 	&.today {

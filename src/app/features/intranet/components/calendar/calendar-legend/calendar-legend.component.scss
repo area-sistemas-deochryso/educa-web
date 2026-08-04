@@ -25,8 +25,7 @@
 	border-radius: 50%;
 
 	&.today-dot {
-		// TODO(521): hex sin token equivalente
-		border: 3px solid #f5a623;
+		border: 3px solid var(--orange-500);
 		background: transparent;
 	}
 

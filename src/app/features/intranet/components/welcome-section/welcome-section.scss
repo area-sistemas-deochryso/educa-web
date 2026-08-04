@@ -16,7 +16,7 @@
 		width: 56px;
 		height: 56px;
 		border-radius: 16px;
-		background: linear-gradient(135deg, var(--intranet-accent-color-blue, #253470), #1a2550);
+		background: linear-gradient(135deg, var(--intranet-accent-color-blue, #253470), var(--intranet-accent-color-blue-dark));
 		display: flex;
 		align-items: center;
 		justify-content: center;

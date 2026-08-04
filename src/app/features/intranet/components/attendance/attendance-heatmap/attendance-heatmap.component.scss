@@ -174,8 +174,7 @@ $color-justificado: var(--attendance-justificado);
 
 .status-tardanza {
 	background-color: $color-tardanza;
-	// TODO(521): hex sin token equivalente (texto fijo oscuro sobre badge de color saturado)
-	color: #333;
+	color: var(--gray-700);
 
 	.cell-day-number { color: rgba(0, 0, 0, 0.5); }
 }
@@ -195,19 +194,15 @@ $color-justificado: var(--attendance-justificado);
 }
 
 .status-pendiente {
-	// TODO(521): hex sin token equivalente (gris sin match confirmado en --surface-*)
-	background-color: #e8e8e8;
-	// TODO(521): hex sin token equivalente (gris sin match confirmado en --surface-*)
-	color: #888;
+	background-color: var(--gray-200);
+	color: var(--gray-500);
 
-	// TODO(521): hex sin token equivalente (gris sin match confirmado en --surface-*)
-	.cell-day-number { color: #999; }
+	.cell-day-number { color: var(--gray-500); }
 }
 
 .status-sin-registro {
 	background-color: transparent;
-	// TODO(521): hex sin token equivalente (gris sin match confirmado en --surface-*)
-	color: #aaa;
+	color: var(--gray-500);
 }
 // #endregion
 

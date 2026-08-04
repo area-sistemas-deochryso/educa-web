@@ -1,9 +1,18 @@
+// Paleta autocontenida del popup 3D de navegacion (overlay + HUD + arrival card)
+// -- sky/slate, sin reuso en otros archivos; variables locales en vez de tokens globales.
+$view3d-sky: #87ceeb;
+$view3d-text: #1e293b;
+$view3d-text-muted: #64748b;
+$view3d-border: #334155;
+$view3d-surface: #e2e8f0;
+$view3d-surface-border: #cbd5e1;
+$view3d-amber-text: #fbbf24;
+
 		:host { display: contents; }
 
 		.overlay3d {
 			position: fixed; inset: 0; z-index: 1100;
-			// TODO(521): hex sin token equivalente
-			background: #87ceeb; display: flex; flex-direction: column;
+			background: $view3d-sky; display: flex; flex-direction: column;
 			user-select: none;
 		}
 		.scene-canvas {
@@ -30,8 +39,7 @@
 			display: flex; align-items: center; gap: 8px;
 			background: rgba(255,255,255,0.82); border: 1px solid rgba(0,0,0,0.15);
 			border-radius: 20px; padding: 6px 14px; backdrop-filter: blur(6px);
-			// TODO(521): hex sin token equivalente
-			color: #1e293b; font-size: 14px; font-weight: 600;
+			color: $view3d-text; font-size: 14px; font-weight: 600;
 
 			@media (max-width: 767px) {
 				padding: 4px 10px; font-size: 12px; gap: 5px;
@@ -49,8 +57,7 @@
 		.fullscreen-btn, .exit-btn {
 			background: rgba(255,255,255,0.85); border: 1px solid rgba(0,0,0,0.15);
 			border-radius: 10px; padding: 6px 14px; cursor: pointer;
-			// TODO(521): hex sin token equivalente
-			font-size: 13px; font-weight: 600; color: #1e293b;
+			font-size: 13px; font-weight: 600; color: $view3d-text;
 			backdrop-filter: blur(6px); transition: background 0.15s;
 
 			@media (max-width: 767px) {
@@ -75,16 +82,14 @@
 			position: absolute; bottom: 16px; left: 16px;
 			background: rgba(255,255,255,0.88); backdrop-filter: blur(8px);
 			border-radius: 12px; padding: 10px 14px; font-size: 12px;
-			// TODO(521): hex sin token equivalente
-			border: 1px solid rgba(0,0,0,0.1); color: #334155;
+			border: 1px solid rgba(0,0,0,0.1); color: $view3d-border;
 			box-shadow: var(--shadow-2);
 		}
 		.cp-title { font-weight: 700; margin-bottom: 6px; font-size: 13px; }
 		.cp-row { display: flex; align-items: center; gap: 5px; margin-bottom: 3px; }
-		// TODO(521): hex sin token equivalente
 		.cp-row kbd {
-			background: #e2e8f0; border-radius: 4px; padding: 1px 6px;
-			font-family: monospace; font-size: 11px; border: 1px solid #cbd5e1;
+			background: $view3d-surface; border-radius: 4px; padding: 1px 6px;
+			font-family: monospace; font-size: 11px; border: 1px solid $view3d-surface-border;
 		}
 		.cp-mouse { font-style: italic; }
 		// #endregion
@@ -93,8 +98,7 @@
 		.stair-msg {
 			position: absolute; bottom: 50%; left: 50%; transform: translateX(-50%);
 			background: rgba(146,64,14,0.88);
-			// TODO(521): hex sin token equivalente
-			color: #fbbf24;
+			color: $view3d-amber-text;
 			border-radius: 16px; padding: 8px 20px; font-size: 14px; font-weight: 600;
 			pointer-events: none; white-space: nowrap;
 		}
@@ -115,10 +119,8 @@
 			}
 		}
 		.arrival-icon { font-size: 48px; margin-bottom: 8px; }
-		// TODO(521): hex sin token equivalente
-		.arrival-title { font-size: 28px; font-weight: 800; color: #1e293b; }
-		// TODO(521): hex sin token equivalente
-		.arrival-dest { font-size: 16px; color: #64748b; margin: 4px 0 12px; }
+		.arrival-title { font-size: 28px; font-weight: 800; color: $view3d-text; }
+		.arrival-dest { font-size: 16px; color: $view3d-text-muted; margin: 4px 0 12px; }
 		.arrival-time { font-size: 20px; font-weight: 600; color: var(--accent-interactive-light); margin-bottom: 20px; }
 		.arrival-actions { display: flex; gap: 12px; justify-content: center; }
 		.arrival-retry, .arrival-exit {
@@ -127,8 +129,7 @@
 		}
 		.arrival-retry:hover, .arrival-exit:hover { transform: scale(1.03); }
 		.arrival-retry { background: var(--accent-interactive-light); color: white; }
-		// TODO(521): hex sin token equivalente
-		.arrival-exit { background: #e2e8f0; color: #334155; }
+		.arrival-exit { background: $view3d-surface; color: $view3d-border; }
 		// #endregion
 
 		// #region Joystick (mobile)

@@ -90,9 +90,8 @@ $priority-urgent: var(--red-600);
 			color: $priority-urgent;
 		}
 
-		// TODO(521): hex sin token equivalente
 		&.badge-high {
-			color: #d4a700;
+			color: var(--gold-700);
 		}
 
 		&.badge-medium {

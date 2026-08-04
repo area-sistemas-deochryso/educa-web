@@ -166,8 +166,7 @@ $color-pendiente: var(--attendance-pendiente);
 	border-radius: 4px;
 	font-weight: 600;
 	font-size: 1.25rem;
-	// TODO(521): hex sin token equivalente
-	color: #333;
+	color: var(--gray-700);
 }
 
 .status-asistio { background-color: $color-asistio; }
@@ -177,8 +176,7 @@ $color-pendiente: var(--attendance-pendiente);
 .status-pendiente { background-color: $color-pendiente; }
 .status-sin-registro {
 	background-color: transparent;
-	// TODO(521): hex sin token equivalente
-	border: 1px dashed #ccc;
+	border: 1px dashed var(--gray-300);
 	color: var(--intranet-soft-text-color);
 }
 
@@ -345,8 +343,7 @@ $color-pendiente: var(--attendance-pendiente);
 	background: var(--tint-warning-bg);
 	border: 1px solid var(--tint-warning-border);
 	border-radius: 6px;
-	// TODO(521): hex sin token equivalente
-	color: #664d03;
+	color: var(--amber-900);
 	font-size: 0.85rem;
 	font-weight: 500;
 

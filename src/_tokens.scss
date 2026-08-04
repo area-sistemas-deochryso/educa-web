@@ -77,5 +77,71 @@
 	   (#ffcc0c, marca). Reusado para badges "pendiente"/warning fuerte. */
 	--accent-amber: #f59e0b;
 	--accent-amber-dark: #d97706;
+	--amber-100: #fef3c7;
+	--amber-800: #92400e;
+	--amber-900: #664d03;
+	--yellow-200: #fde68a;
+
+	/* --- Extremo oscuro del acento azul de marca ---
+	   Stop oscuro de gradiente decorativo, duplicado idéntico en 5+ archivos
+	   (calendar-header, welcome-section, floating-notification-bell y
+	   derivados) siempre emparejado con --intranet-accent-color-blue. */
+	--intranet-accent-color-blue-dark: #1a2550;
+	--blue-200: #bfdbfe;
+
+	/* --- Oro (badge de prioridad alta, floating-notification-bell) ---
+	   Rampa oscurecida de --intranet-accent-color-yellow (#ffcc0c), duplicada
+	   literal en 6 archivos de components/floating-notification-bell/*. */
+	--gold-600: #e6b800;
+	--gold-700: #d4a700;
+	--gold-800: #b8960a;
+
+	/* --- Esmeralda (Tailwind emerald, distinta de --green-500/600) ---
+	   Recurrente en error-occurrence-drawer (ícono state_change),
+	   horario-detail-drawer (gradiente) y campus-map (leyenda de ambientes). */
+	--emerald-50: #ecfdf5;
+	--emerald-200: #d1fae5;
+	--emerald-300: #6ee7b7;
+	--emerald-500: #10b981;
+	--emerald-600: #059669;
+	--emerald-800: #166534;
+
+	/* --- Violeta (Tailwind violet, distinta de --purple-500/700 de PrimeNG) ---
+	   Recurrente como indicador de "tipo imagen"/"académico" en 6+ archivos
+	   (error-occurrence-drawer, load-profile, curso-content-readonly-dialog,
+	   archivos-summary-dialog, curso-content-dialog, semanas-accordion,
+	   floating-notification-bell). */
+	--violet-50: #f5f3ff;
+	--violet-200: #ddd6fe;
+	--violet-500: #8b5cf6;
+	--violet-600: #9333ea;
+
+	/* --- Rosa (categoría de prioridad, floating-notification-bell) --- */
+	--pink-500: #ec4899;
+	--pink-600: #db2777;
+
+	/* --- Rojo/cielo puntuales, ya recurrentes en 2+ archivos --- */
+	--red-800: #991b1b;
+	--sky-bg: #e0f2fe;
+	--sky-500: #0ea5e9;
+
+	/* --- Navy oscuro (tiles/paneles de video, distinto del acento azul) ---
+	   #1e3a5f recurrente en reports-result (headers de tabla) y en toda la
+	   familia videoconferencias/videoconferencia-sala (tiles de ícono);
+	   #1a1a2e es el fondo oscuro del panel de video en videoconferencia-sala. */
+	--navy-800: #1e3a5f;
+	--navy-900: #1a1a2e;
+
+	/* --- Grises neutros puros (sin tinte azulado de --surface-*) ---
+	   input de login, bordes de nav, scrollbar y texto fijo sobre badges de
+	   color saturado — recurrentes en 8+ archivos, sin equivalente limpio en
+	   la escala --surface-* (que tiene tinte azulado deliberado). */
+	--gray-200: #e8e8e8;
+	--gray-300: #c0c0c0;
+	--gray-400: #a0a0a0;
+	--gray-500: #999999;
+	--gray-600: #707070;
+	--gray-700: #333333;
+	--black-color: #000000;
 }
 // #endregion
