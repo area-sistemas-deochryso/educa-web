@@ -1019,6 +1019,17 @@ No usar para estados vacíos DENTRO de una pantalla que ya tiene su propio `<app
 | Advertencia | `var(--yellow-500)`, `var(--yellow-700)` | `#eab308`, `#a16207` | Tag warn, borde de alerta de cuidado |
 | Texto blanco sobre fondo primario | `var(--white-color)` | `#ffffff` | Texto en botones `p-button-success` (ver A5) |
 
+**Tokens nuevos (brief 521, `src/_tokens.scss`)** — capa de tokens semánticos, separada del `styles.scss` monolítico:
+
+| Intención | Token | Valor aproximado | Usos |
+|---|---|---|---|
+| Acento interactivo (foco/hover/selección) | `var(--accent-interactive)`, `-hover`, `-light` | `#4338ca`, `#3730a3`, `#4f46e5` | Bordes/texto de foco, hover de nav, gradiente de avatar. Reemplaza el uso indebido de `--primary-color` (celeste de landing) como acento en la intranet |
+| Elevación (`box-shadow` sin escala) | `var(--shadow-1)`, `-2`, `-3` | sutil → fuerte | Sustituye `rgba(0,0,0,x)` sueltos reinventados por componente |
+| Tinte de estado (badge/banner fondo+borde+ícono) | `var(--tint-danger/warning/success/info-bg/border/icon)` | `color-mix()` sobre `--red/yellow/green/blue-500` | Mismo patrón que B9 (alert banners), centralizado |
+| Estado de asistencia | `var(--attendance-presente/tardanza/falta/justificado/pendiente)` | verde/amarillo marca, `#f44336`, `#9c27b0`, `#9e9e9e` | Antes duplicado literal en 7 componentes de `components/attendance/*` |
+| Indicador de navegación activa | `var(--nav-active)`, `-hover` | `#5c7a28`, `#7a9e3a` | Ítem/ruta activa en el menú lateral, distinto del verde de marca |
+| Ámbar (advertencia fuerte / pendiente) | `var(--accent-amber)`, `-dark` | `#f59e0b`, `#d97706` | Hex más repetido sin token detectado por el brief 521 (14 ocurrencias) |
+
 ### Reglas
 
 1. **No usar hex literal** (`#dc2626`, `#1e40af`, `#e24c4c`) en SCSS de componentes. Usar siempre el token equivalente.
@@ -1030,12 +1041,15 @@ No usar para estados vacíos DENTRO de una pantalla que ya tiene su propio `<app
    - **Paletas de avatares / decorativas** (chat, foro): los colores son slots rotativos, no semánticos; no aplica esta convención.
 5. **Fallback defensivo aceptable**: `var(--red-600, #dc2626)` es válido si el archivo se carga antes del tema o para resiliencia. Preferir sin fallback; con fallback si ya existe y funciona.
 
-### Estado de migración (Plan 20 F4, 2026-04-17)
+### Estado de migración (Plan 20 F4, 2026-04-17 — actualizado brief 521, 2026-08-04)
 
+> ⚠️ **Corrección (brief 521, 2026-08-04)**: esta sección decía "3 excepciones activas" desde abril, pero el audit `xrepo-95` (segunda pasada) encontró 636 líneas de hex hardcodeado vigentes en 143 archivos el mismo día que se escribe esta nota — la migración de Plan 20 F4 nunca cubrió toda la intranet, o hubo regresión sostenida desde entonces. No se investigó la causa (no es el objetivo del brief 521); esta sección ahora refleja el estado real verificado, no el historial de abril.
+
+- **Brief 521 (2026-08-04)**: migración de ~117 archivos / ~650 hex bare hacia el vocabulario de esta tabla + tokens nuevos en `src/_tokens.scss` (`--accent-interactive`, `--shadow-1/2/3`, `--tint-danger/warning/success/info-bg/border/icon`, `--attendance-presente/tardanza/falta/justificado/pendiente`, `--nav-active`/`--nav-active-hover`, `--accent-amber`/`--accent-amber-dark`). Quedan **112 archivos con hex documentado como `// TODO(521): hex sin token equivalente`** — colores decorativos/específicos sin token limpio (navy de tiles de ícono, violeta Material, paletas de terminal/debug) tratados como deuda explícita, no migrados a la fuerza.
 - **Admin pages**: migradas (usuarios, error-logs, feedback-reports, classrooms, schedules, campus, ctest-k6).
 - **Shared**: migrado (form-field-error, feedback-report-dialog, voice-button, user-profile-menu, floating-notification-bell, feedback-report-launcher — brief 463).
 - **Cross-role + profesor + estudiante**: migrados (reports, attendance widgets, home widgets, student tabs, health-justification-list).
-- **Excepciones activas**: 3 archivos con hex literal justificado (notification-quick-access Sass, campus-minimap Canvas, mensajería/foro avatar palettes).
+- **Excepciones activas**: 3 archivos con hex literal justificado (notification-quick-access Sass, campus-minimap Canvas, mensajería/foro avatar palettes) — confirmadas vigentes por el brief 521.
 
 ### Shim de compatibilidad de tokens (brief 467, 2026-07-18)
 
