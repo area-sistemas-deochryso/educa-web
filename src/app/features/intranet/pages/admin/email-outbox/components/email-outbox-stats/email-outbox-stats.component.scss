@@ -65,6 +65,10 @@
 	align-items: flex-end;
 	gap: 0.25rem;
 	min-width: 80px;
+	// Separación visual del total histórico (izquierda) — evita que la
+	// tendencia de 7d/30d se lea pegada al número grande de la card.
+	padding-left: 0.75rem;
+	border-left: 1px solid var(--surface-300);
 }
 
 .stat-trend-summary {

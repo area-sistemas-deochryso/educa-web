@@ -54,6 +54,10 @@
 	gap: 0.5rem;
 	margin-left: auto;
 	min-width: 120px;
+	// Separación visual de los stat-pill con totales históricos — evita que
+	// la tendencia de 7d/30d se lea pegada a esos números.
+	padding-left: 0.75rem;
+	border-left: 1px solid var(--surface-300);
 }
 
 .stat-trend-summary {

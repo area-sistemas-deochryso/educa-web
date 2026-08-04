@@ -24,30 +24,32 @@
 				<p>Todavía no hay tipos de ticket. Creá el primero.</p>
 			</div>
 		} @else {
-			<p-table [value]="tipos()" dataKey="id" styleClass="p-datatable-sm">
-				<ng-template #header>
-					<tr>
-						<th pSortableColumn="nombre">NOMBRE <p-sortIcon field="nombre" /></th>
-						<th pSortableColumn="estado">ESTADO <p-sortIcon field="estado" /></th>
-						<th style="width: 140px">ACTIVO</th>
-						<th style="width: 100px">EDITAR</th>
-					</tr>
-				</ng-template>
-				<ng-template #body let-tipo>
-					<tr [class.inactivo]="!tipo.estado">
-						<td>{{ tipo.nombre }}</td>
-						<td>
-							<p-tag [value]="tipo.estado ? 'Activo' : 'Inactivo'" [severity]="tipo.estado ? 'success' : 'secondary'" />
-						</td>
-						<td>
-							<p-toggleswitch [ngModel]="tipo.estado" (ngModelChange)="toggleEstado(tipo)" [disabled]="submitting()" />
-						</td>
-						<td>
-							<p-button icon="pi pi-pencil" [text]="true" (onClick)="openEditDialog(tipo)" />
-						</td>
-					</tr>
-				</ng-template>
-			</p-table>
+			<section class="table-section">
+				<p-table [value]="tipos()" dataKey="id" styleClass="p-datatable-sm">
+					<ng-template #header>
+						<tr>
+							<th pSortableColumn="nombre">NOMBRE <p-sortIcon field="nombre" /></th>
+							<th pSortableColumn="estado">ESTADO <p-sortIcon field="estado" /></th>
+							<th style="width: 140px">ACTIVO</th>
+							<th style="width: 100px">EDITAR</th>
+						</tr>
+					</ng-template>
+					<ng-template #body let-tipo>
+						<tr [class.inactivo]="!tipo.estado">
+							<td>{{ tipo.nombre }}</td>
+							<td>
+								<p-tag [value]="tipo.estado ? 'Activo' : 'Inactivo'" [severity]="tipo.estado ? 'success' : 'secondary'" />
+							</td>
+							<td>
+								<p-toggleswitch [ngModel]="tipo.estado" (ngModelChange)="toggleEstado(tipo)" [disabled]="submitting()" />
+							</td>
+							<td>
+								<p-button icon="pi pi-pencil" [text]="true" (onClick)="openEditDialog(tipo)" />
+							</td>
+						</tr>
+					</ng-template>
+				</p-table>
+			</section>
 		}
 	}
 </div>

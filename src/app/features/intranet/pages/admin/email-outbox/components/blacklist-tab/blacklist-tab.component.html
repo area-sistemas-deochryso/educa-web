@@ -35,9 +35,11 @@
 					color="var(--red-400)"
 					ariaLabel="Tendencia últimos 30 días: blacklist"
 				/>
-				<span class="stat-trend-summary">
-					promedio 7d: {{ trendSummaryValue().avg7d | number }} · máx 30d: {{ trendSummaryValue().max30d | number }}
-				</span>
+				@if (trendSummaryValue().avg7d > 0 || trendSummaryValue().max30d > 0) {
+					<span class="stat-trend-summary">
+						promedio 7d: {{ trendSummaryValue().avg7d | number }} · máx 30d: {{ trendSummaryValue().max30d | number }}
+					</span>
+				}
 			</div>
 		}
 	</section>
