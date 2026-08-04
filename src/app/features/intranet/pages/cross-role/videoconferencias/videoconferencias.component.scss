@@ -19,13 +19,19 @@
 // #endregion
 
 // #region Curso Cards Grid
+// Flexbox, no CSS grid: con grid auto-fill/auto-fit la última fila incompleta
+// deja las cards huérfanas con espacio vacío al lado — mismo bug documentado
+// en kpi-stats (design-system.md §B3). flex-wrap + flex-grow hace que la(s)
+// card(s) de la última fila se estiren para ocupar el ancho disponible.
 .cursos-grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+	display: flex;
+	flex-wrap: wrap;
 	gap: 1.25rem;
 }
 
 .curso-card {
+	flex: 1 1 320px;
+	min-width: 320px;
 	display: flex;
 	flex-direction: column;
 	border: 1px solid var(--surface-border);

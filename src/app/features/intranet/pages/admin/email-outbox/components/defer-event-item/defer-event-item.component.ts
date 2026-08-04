@@ -30,6 +30,9 @@ export class DeferEventItemComponent {
 
 	truncate(value: string | null, max = 100): string {
 		if (!value) return '';
-		return value.length > max ? value.substring(0, max) + '…' : value;
+		if (value.length <= max) return value;
+		const cut = value.substring(0, max);
+		const lastSpace = cut.lastIndexOf(' ');
+		return (lastSpace > 0 ? cut.substring(0, lastSpace) : cut) + '…';
 	}
 }

@@ -106,10 +106,10 @@ function formatCountdown(remainingMs: number): string {
 	const m = Math.floor((totalSecs % 3600) / 60);
 	const s = totalSecs % 60;
 
-	if (d > 0) return `${d}d ${h}h`;
-	if (h > 0) return `${h}h ${m}m`;
-	if (m > 0) return `${m}m ${s}s`;
-	return `${s}s`;
+	if (d > 0) return `en ${d}d ${h}h`;
+	if (h > 0) return `en ${h}h ${m}m`;
+	if (m > 0) return `en ${m}m ${s}s`;
+	return `en ${s}s`;
 }
 
 /** Calculate the next occurrence date for a block's day+time relative to now */
