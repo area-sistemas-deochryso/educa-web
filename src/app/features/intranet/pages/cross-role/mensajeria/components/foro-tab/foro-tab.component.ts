@@ -52,7 +52,23 @@ export class SalonForoTabComponent {
 	constructor() {
 		effect(() => {
 			const options = this.cursoOptions();
-			if (options.length === 1 && !this.initialized()) {
+			const currentId = this.selectedHorarioId();
+			const isCurrentStillValid = currentId !== null && options.some((o) => o.value === currentId);
+
+			// El curso ya cargado sigue siendo válido para el set de opciones
+			// actual (ej: sin cambios, o recomputo que no afecta la selección) —
+			// no reiniciar el foro ya cargado.
+			if (isCurrentStillValid) return;
+
+			// `cursoOptions` cambió a un set que no incluye la selección previa
+			// (ej: profesor/foro cambia de salón, reusando la MISMA instancia de
+			// este componente vía @if). Sin este reset, `initialized` queda en
+			// `true` para siempre y el foro del salón nuevo nunca se carga —
+			// cero requests, spinner/estado viejo indefinido (brief 513).
+			this.initialized.set(false);
+			this.selectedHorarioId.set(null);
+
+			if (options.length === 1) {
 				this.onCursoChange(options[0].value);
 			}
 		});
