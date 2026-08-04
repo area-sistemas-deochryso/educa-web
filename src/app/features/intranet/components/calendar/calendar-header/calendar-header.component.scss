@@ -68,7 +68,9 @@
 }
 
 .year-input {
-	width: 110px;
+	// ch en vez de px fijo: el placeholder "Buscar año" (10 caracteres) se
+	// cortaba porque el ancho fijo no dejaba espacio para el texto completo.
+	width: 12ch;
 	height: 44px;
 	padding: 0 1rem;
 	border: none;
@@ -167,7 +169,7 @@
 	}
 
 	.year-input {
-		width: 90px;
+		width: 10ch;
 		height: 40px;
 		padding: 0 0.75rem;
 		font-size: 0.875rem;
