@@ -15,11 +15,20 @@
 		<button pButton label="Reintentar" icon="pi pi-refresh" class="p-button-outlined mt-2" (click)="onRetry()"></button>
 	</div>
 } @else if (vm().isEmpty) {
-	<div class="flex flex-column align-items-center p-5 text-color-secondary">
-		<i class="pi pi-book text-4xl mb-3"></i>
-		<p class="font-semibold">No tienes notas registradas</p>
-		<span class="text-sm">Las notas aparecerán aquí cuando tus profesores las registren</span>
-	</div>
+	@if (embedded()) {
+		<div class="flex flex-column align-items-center p-5 text-color-secondary">
+			<i class="pi pi-book text-4xl mb-3"></i>
+			<p class="font-semibold">No tienes notas registradas</p>
+			<span class="text-sm">Las notas aparecerán aquí cuando tus profesores las registren</span>
+		</div>
+	} @else {
+		<app-empty-state
+			icon="pi pi-chart-bar"
+			title="Mis Calificaciones"
+			subtitle="Las notas aparecerán aquí cuando tus profesores las registren"
+			message="No tienes notas registradas"
+		/>
+	}
 } @else {
 	<!-- #endregion -->
 

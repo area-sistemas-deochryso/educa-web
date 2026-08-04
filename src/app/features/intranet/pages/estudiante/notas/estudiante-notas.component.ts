@@ -5,7 +5,7 @@ import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { CardModule } from 'primeng/card';
 import { TooltipModule } from 'primeng/tooltip';
-import { PageHeaderComponent, PickerGridComponent } from '@intranet-shared/components';
+import { PageHeaderComponent, PickerGridComponent, EmptyStateComponent } from '@intranet-shared/components';
 import { SkeletonLoaderComponent } from '@shared/components';
 import { EstudianteNotasFacade } from './services/estudiante-notas.facade';
 import { NotasCursoCardComponent } from './components/notas-curso-card/notas-curso-card.component';
@@ -23,6 +23,7 @@ import { SimuladorNotasComponent } from './components/simulador-notas/simulador-
 		TooltipModule,
 		PageHeaderComponent,
 		PickerGridComponent,
+		EmptyStateComponent,
 		SkeletonLoaderComponent,
 		NotasCursoCardComponent,
 		SimuladorNotasComponent,

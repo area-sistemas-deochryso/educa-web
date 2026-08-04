@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { PageHeaderComponent, PeriodToggleComponent } from '@intranet-shared/components';
+import { PageHeaderComponent, PeriodToggleComponent, EmptyStateComponent } from '@intranet-shared/components';
 import { StudentClassroomsFacade } from './services/estudiante-salones.facade';
 import { EstudianteSalon, EstudianteSalonCurso } from '../models';
 import { EstudianteSalonDialogComponent } from './components/estudiante-salon-dialog/estudiante-salon-dialog.component';
@@ -19,6 +19,7 @@ import { EstudianteSalonDialogComponent } from './components/estudiante-salon-di
 		ProgressSpinnerModule,
 		PageHeaderComponent,
 		PeriodToggleComponent,
+		EmptyStateComponent,
 		EstudianteSalonDialogComponent,
 	],
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -49,10 +50,7 @@ import { EstudianteSalonDialogComponent } from './components/estudiante-salon-di
 				<p-progressSpinner strokeWidth="4" />
 			</div>
 		} @else if (vm().isEmpty) {
-			<div class="flex flex-column align-items-center p-5 text-color-secondary">
-				<i class="pi pi-building text-4xl mb-3"></i>
-				<p>No tienes salones asignados</p>
-			</div>
+			<app-empty-state icon="pi pi-building" title="Mis Salones" message="No tienes salones asignados" />
 		} @else {
 			<app-page-header icon="pi pi-building" title="Mis Salones">
 				<app-period-toggle
