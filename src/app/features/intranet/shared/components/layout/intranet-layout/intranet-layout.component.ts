@@ -41,6 +41,26 @@ export interface BreadcrumbPart {
 	groupIndex?: number;
 }
 
+function normalizeBreadcrumbLabel(label: string): string {
+	return label
+		.toLowerCase()
+		.normalize('NFD')
+		.replace(/[̀-ͯ]/g, '')
+		.replace(/s$/, '');
+}
+
+/**
+ * Un tramo del breadcrumb es redundante si es una abreviatura o el singular/plural de un tramo
+ * ya presente (ej. "Admin" ⊂ "Administrador", "Asistencias" ⊂ "Asistencia") — típico de un nivel
+ * de `subgroup` que existe solo para anidar el árbol del sidebar, sin aportar contexto nuevo.
+ */
+function isRedundantBreadcrumbLabel(label: string, existing: string): boolean {
+	const a = normalizeBreadcrumbLabel(label);
+	const b = normalizeBreadcrumbLabel(existing);
+	if (a === b) return true;
+	return a.length >= 4 && b.length >= 4 && (a.startsWith(b) || b.startsWith(a));
+}
+
 /** Ancho aproximado (px) del pill "Más" reservado durante el cálculo de overflow. */
 const MORE_PILL_RESERVE = 90;
 const NAV_GAP = 4;
@@ -127,7 +147,14 @@ export class IntranetLayoutComponent implements OnInit, AfterViewInit, OnDestroy
 		const modulo = MODULOS[this._selectedModuloId()];
 		const item = findMenuItemDefByUrl(this._currentUrl(), this._selectedModuloId());
 		const parts: BreadcrumbPart[] = [{ label: modulo.label, kind: 'modulo' }];
-		this._groupNodeChain().forEach((node, groupIndex) => parts.push({ label: node.label, kind: 'grupo', groupIndex }));
+		// Un nivel de subgroup puede ser un wrapper puramente estructural del árbol del sidebar
+		// (ej. "Admin" agrupa Asistencias + Permisos Salud bajo "Asistencia") sin aportar nada
+		// nuevo al breadcrumb si ya es prefijo/abreviatura de un tramo anterior (Admin ⊂ Administrador,
+		// Asistencias ⊂ Asistencia). Se omite del breadcrumb sin tocar la estructura del menú.
+		this._groupNodeChain().forEach((node, groupIndex) => {
+			if (parts.some((p) => isRedundantBreadcrumbLabel(node.label, p.label))) return;
+			parts.push({ label: node.label, kind: 'grupo', groupIndex });
+		});
 		// Sin grupo, "página" puede repetir el label del módulo (ej. Inicio > Inicio) — no aporta información.
 		if (item && !(!item.group && item.label === modulo.label)) {
 			parts.push({ label: resolveMenuItemLabel(item, this.authService.currentUser?.rol), kind: 'pagina' });
