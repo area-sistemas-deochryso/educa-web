@@ -1,3 +1,9 @@
 <div class="chart-canvas-wrap">
-	<canvas #rendimientoChart></canvas>
+	<canvas #rendimientoChart [class.chart-canvas--hidden]="periodos().length === 0"></canvas>
+	@if (periodos().length === 0) {
+		<div class="chart-empty">
+			<i class="pi pi-chart-line" aria-hidden="true"></i>
+			<span>Sin datos para este período</span>
+		</div>
+	}
 </div>
