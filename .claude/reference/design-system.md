@@ -1028,7 +1028,16 @@ No usar para estados vacíos DENTRO de una pantalla que ya tiene su propio `<app
 | Tinte de estado (badge/banner fondo+borde+ícono) | `var(--tint-danger/warning/success/info-bg/border/icon)` | `color-mix()` sobre `--red/yellow/green/blue-500` | Mismo patrón que B9 (alert banners), centralizado |
 | Estado de asistencia | `var(--attendance-presente/tardanza/falta/justificado/pendiente)` | verde/amarillo marca, `#f44336`, `#9c27b0`, `#9e9e9e` | Antes duplicado literal en 7 componentes de `components/attendance/*` |
 | Indicador de navegación activa | `var(--nav-active)`, `-hover` | `#5c7a28`, `#7a9e3a` | Ítem/ruta activa en el menú lateral, distinto del verde de marca |
-| Ámbar (advertencia fuerte / pendiente) | `var(--accent-amber)`, `-dark` | `#f59e0b`, `#d97706` | Hex más repetido sin token detectado por el brief 521 (14 ocurrencias) |
+| Ámbar (advertencia fuerte / pendiente) | `var(--accent-amber)`, `-dark`, `--amber-100/800/900` | `#f59e0b`, `#d97706`, `#fef3c7`, `#92400e`, `#664d03` | Hex más repetido sin token detectado por el brief 521 (14 ocurrencias) |
+| Esmeralda (distinto de `--green-500/600`) | `var(--emerald-50/200/300/500/600/800)` | familia Tailwind emerald | Íconos de estado "resuelto", leyenda de ambientes (campus-map) |
+| Violeta (distinto de `--purple-500/700` de PrimeNG) | `var(--violet-50/200/500/600)` | familia Tailwind violet | Indicador "tipo imagen"/"académico", 6+ archivos |
+| Oro (badge de prioridad alta) | `var(--gold-600/700/800)` | `#e6b800`, `#d4a700`, `#b8960a` | Rampa oscurecida de `--intranet-accent-color-yellow`, floating-notification-bell |
+| Extremo oscuro del azul de marca | `var(--intranet-accent-color-blue-dark)` | `#1a2550` | Stop oscuro de gradientes con `--intranet-accent-color-blue` |
+| Navy de tile/panel oscuro | `var(--navy-800/900)` | `#1e3a5f`, `#1a1a2e` | Headers de tabla (reports-result), tiles/fondo de video (videoconferencias) |
+| Rosa | `var(--pink-500/600)` | `#ec4899`, `#db2777` | Categoría de prioridad, floating-notification-bell |
+| Grises neutros puros (sin tinte azulado) | `var(--gray-200/300/400/500/600/700)`, `var(--black-color)` | `#e8e8e8`…`#333333`, `#000000` | Bordes de nav/scrollbar, texto fijo sobre badge saturado — distintos de `--surface-*` (tinte azulado deliberado) |
+| Azul claro / cielo puntuales | `var(--blue-200)`, `var(--sky-bg)`, `var(--sky-500)` | `#bfdbfe`, `#e0f2fe`, `#0ea5e9` | Rungs faltantes en el shim, usos puntuales ya recurrentes |
+| Rojo oscuro / amarillo claro puntuales | `var(--red-800)`, `var(--yellow-200)` | `#991b1b`, `#fde68a` | Badges "F"/crítico en reports, borde de folder tarea |
 
 ### Reglas
 
@@ -1045,7 +1054,7 @@ No usar para estados vacíos DENTRO de una pantalla que ya tiene su propio `<app
 
 > ⚠️ **Corrección (brief 521, 2026-08-04)**: esta sección decía "3 excepciones activas" desde abril, pero el audit `xrepo-95` (segunda pasada) encontró 636 líneas de hex hardcodeado vigentes en 143 archivos el mismo día que se escribe esta nota — la migración de Plan 20 F4 nunca cubrió toda la intranet, o hubo regresión sostenida desde entonces. No se investigó la causa (no es el objetivo del brief 521); esta sección ahora refleja el estado real verificado, no el historial de abril.
 
-- **Brief 521 (2026-08-04)**: migración de ~117 archivos / ~650 hex bare hacia el vocabulario de esta tabla + tokens nuevos en `src/_tokens.scss` (`--accent-interactive`, `--shadow-1/2/3`, `--tint-danger/warning/success/info-bg/border/icon`, `--attendance-presente/tardanza/falta/justificado/pendiente`, `--nav-active`/`--nav-active-hover`, `--accent-amber`/`--accent-amber-dark`). Quedan **112 archivos con hex documentado como `// TODO(521): hex sin token equivalente`** — colores decorativos/específicos sin token limpio (navy de tiles de ícono, violeta Material, paletas de terminal/debug) tratados como deuda explícita, no migrados a la fuerza.
+- **Brief 521 (2026-08-04)**: migración completa de ~130 archivos / ~660 hex bare hacia el vocabulario de esta tabla + la capa de tokens nuevos en `src/_tokens.scss` (ver bloque debajo). **0 hex bare sin resolver** en `features/intranet` al cierre — el único hex restante son las 3 excepciones documentadas (Sass compile-time, avatar/decorativas) más una paleta autocontenida de un solo archivo resuelta con variables Sass locales (`campus-3d-view.component.scss`, sin equivalente global porque no se reusa en ningún otro lado).
 - **Admin pages**: migradas (usuarios, error-logs, feedback-reports, classrooms, schedules, campus, ctest-k6).
 - **Shared**: migrado (form-field-error, feedback-report-dialog, voice-button, user-profile-menu, floating-notification-bell, feedback-report-launcher — brief 463).
 - **Cross-role + profesor + estudiante**: migrados (reports, attendance widgets, home widgets, student tabs, health-justification-list).
