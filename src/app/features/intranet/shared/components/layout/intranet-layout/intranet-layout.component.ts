@@ -11,6 +11,7 @@ import { FeedbackReportDialogComponent } from '@intranet-shared/components/feedb
 import { IntranetFabMenuComponent } from '@intranet-shared/components/intranet-fab-menu';
 import { UserPermissionsService, SessionActivityService, KeyboardShortcutsService, FeedbackReportFacade } from '@core/services';
 import { AuthService } from '@core/services/auth';
+import { ViewAsContextService } from '@core/services/view-as';
 import {
 	NavItemComponent,
 	UserProfileMenuComponent,
@@ -96,6 +97,7 @@ const NAV_GAP = 4;
 export class IntranetLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
 	private userPermissionsService = inject(UserPermissionsService);
 	private authService = inject(AuthService);
+	private viewAsContext = inject(ViewAsContextService);
 	private destroyRef = inject(DestroyRef);
 	private flags = inject(FeatureFlagsFacade);
 	private sessionActivity = inject(SessionActivityService);
@@ -236,12 +238,20 @@ export class IntranetLayoutComponent implements OnInit, AfterViewInit, OnDestroy
 	readonly showFeedbackReport = computed(() => this.flags.isEnabled('feedbackReport'));
 	// #endregion
 
+	/**
+	 * Rol que gobierna el nav (brief 510): mientras un Admin usa "Ver como", el menú debe
+	 * filtrar `soloParaRol` por el rol impersonado, no por el rol real del Admin — de lo
+	 * contrario ítems como Calendario/Videoconferencias/Historial de Asistencia (soloParaRol:
+	 * ['Estudiante'|'Profesor']) quedan invisibles porque el Admin real nunca matchea esos roles.
+	 */
+	private readonly effectiveRol = computed(() => this.viewAsContext.activeContext()?.rol ?? this.authService.currentUser?.rol);
+
 	constructor() {
 		effect(() => {
 			const loaded = this.userPermissionsService.loaded();
 			const caps = this.userPermissionsService.userCapabilities();
 			if (loaded) {
-				const modulos = buildModuloMenus(caps, this.authService.currentUser?.rol);
+				const modulos = buildModuloMenus(caps, this.effectiveRol());
 				this._modulos.set(modulos);
 				const id = detectModuloFromUrl(this.router.url, modulos);
 				this.applySelection(id, modulos, this.router.url);
@@ -293,7 +303,7 @@ export class IntranetLayoutComponent implements OnInit, AfterViewInit, OnDestroy
 		} else {
 			const modulos = buildModuloMenus(
 				this.userPermissionsService.userCapabilities(),
-				this.authService.currentUser?.rol,
+				this.effectiveRol(),
 			);
 			this._modulos.set(modulos);
 			const id = detectModuloFromUrl(this.router.url, modulos);
