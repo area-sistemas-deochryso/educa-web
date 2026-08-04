@@ -83,6 +83,15 @@
 				<td class="text-center actions-cell">
 					<button
 						pButton
+						icon="pi pi-eye"
+						class="p-button-sm p-button-text action-icon"
+						pTooltip="Ver detalles"
+						tooltipPosition="top"
+						(click)="onView(usuario)"
+						[pt]="{ root: { 'aria-label': 'Ver detalles del usuario' } }"
+					></button>
+					<button
+						pButton
 						icon="pi pi-pencil"
 						class="p-button-sm p-button-text action-icon action-edit"
 						pTooltip="Editar"

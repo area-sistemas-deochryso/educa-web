@@ -31,6 +31,7 @@ export class UsersTableComponent {
 	readonly sortField = input<string | null>(null);
 	readonly sortOrder = input<'asc' | 'desc' | null>(null);
 
+	readonly view = output<UsuarioLista>();
 	readonly edit = output<UsuarioLista>();
 	readonly toggleEstado = output<UsuarioLista>();
 	readonly lazyLoad = output<{
@@ -86,6 +87,10 @@ export class UsersTableComponent {
 	onShowSalones(usuario: UsuarioLista): void {
 		this.salonDialogUser.set(usuario);
 		this.salonDialogVisible.set(true);
+	}
+
+	onView(usuario: UsuarioLista): void {
+		this.view.emit(usuario);
 	}
 
 	onEdit(usuario: UsuarioLista): void {

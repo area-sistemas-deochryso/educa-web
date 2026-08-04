@@ -31,6 +31,7 @@ import {
 	UserFormDialogComponent,
 } from './components/usuario-form-dialog/usuario-form-dialog.component';
 import { UsersImportDialogComponent } from './components/usuarios-import-dialog/usuarios-import-dialog.component';
+import { UserDetailDrawerComponent } from './components/usuario-detail-drawer/usuario-detail-drawer.component';
 import {
 	UsuarioValidacionItem,
 	UsersValidationDialogComponent,
@@ -71,6 +72,7 @@ import {
 		UserFormDialogComponent,
 		UsersImportDialogComponent,
 		UsersValidationDialogComponent,
+		UserDetailDrawerComponent,
 		ErrorStateComponent,
 	],
 	providers: [ConfirmationService],
@@ -197,6 +199,18 @@ export class UsersComponent implements AfterViewInit {
 		} else if (tab === 'profesores') {
 			this.uiFacade.updateFormField('rol', 'Profesor');
 		}
+	}
+
+	onViewUsuario(usuario: UsuarioLista): void {
+		this.uiFacade.openDetail(usuario);
+	}
+
+	onCloseDetailDrawer(): void {
+		this.uiFacade.closeDetail();
+	}
+
+	onEditFromDetailDrawer(): void {
+		this.uiFacade.editFromDetail();
 	}
 
 	onEditUsuario(usuario: UsuarioLista): void {

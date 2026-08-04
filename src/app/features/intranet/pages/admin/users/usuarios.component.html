@@ -73,6 +73,7 @@
 			[activeTab]="vm().activeTab"
 			[sortField]="vm().sortField"
 			[sortOrder]="vm().sortOrder"
+			(view)="onViewUsuario($event)"
 			(edit)="onEditUsuario($event)"
 			(toggleEstado)="onToggleEstado($event)"
 			(lazyLoad)="onLazyLoad($event)"
@@ -80,6 +81,15 @@
 		/>
 	}
 </div>
+
+<!-- * Read-only detail drawer (B5 "ver" action) -->
+<app-user-detail-drawer
+	[visible]="vm().detailDrawerVisible"
+	[usuario]="vm().selectedUsuario"
+	(visibleChange)="onCloseDetailDrawer()"
+	(closeDrawer)="onCloseDetailDrawer()"
+	(edit)="onEditFromDetailDrawer()"
+/>
 
 <!-- * Create/Edit form dialog -->
 <app-user-form-dialog
