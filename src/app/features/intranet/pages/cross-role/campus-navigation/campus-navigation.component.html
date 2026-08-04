@@ -21,6 +21,11 @@
 			</div>
 		} @else if (vm().error) {
 			<app-error-state [message]="vm().error!" (retry)="facade.loadData()" />
+		} @else if (!vm().hasCampusData) {
+			<div class="map-empty">
+				<i class="pi pi-map" aria-hidden="true"></i>
+				<span>Sin datos de ubicación configurados</span>
+			</div>
 		} @else {
 		<!-- Controles superiores -->
 		<div class="controls-row">
