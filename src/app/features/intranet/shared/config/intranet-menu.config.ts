@@ -239,6 +239,16 @@ export function buildModuloMenus(userCapabilities: Set<string>, rol?: UserRole):
 }
 
 /**
+ * `true` si los `queryParams` declarados en `item` (ej. `{ tab: 'reportes' }`) matchean los
+ * de la URL activa. Un item sin `queryParams` no discrimina por query string — matchea
+ * cualquier query (comportamiento previo, preservado para items sin tabs).
+ */
+function queryParamsMatchUrl(item: MenuItemDef, searchParams: URLSearchParams): boolean {
+	if (!item.queryParams) return true;
+	return Object.entries(item.queryParams).every(([key, value]) => searchParams.get(key) === value);
+}
+
+/**
  * Dado un URL, encuentra el `MenuItemDef` cuyo `route` matchea (el más específico/largo).
  * Fuente única para el breadcrumb de "sección activa" (brief 428, P84 F6) — evita que cada
  * pantalla arme su propio indicador de ubicación.
@@ -247,17 +257,33 @@ export function buildModuloMenus(userCapabilities: Set<string>, rol?: UserRole):
  * compartidos como Calendario/Asistencia diaria tienen un `MenuItemDef` por módulo con el
  * mismo `route` — sin esto, siempre se resolvería el primero declarado en `MENU_ITEMS`,
  * independientemente del módulo activo del usuario).
+ *
+ * Brief 512 — páginas con tabs por queryParam (ej. `admin/asistencias`, `admin/ayuda/tickets`)
+ * declaran VARIOS `MenuItemDef` con el MISMO `route` y distinto `queryParams.tab`. Matchear
+ * solo por `route` (longitud) deja el desempate en "el primero declarado" sin importar el
+ * `?tab=` real de la URL — el breadcrumb quedaba pegado al primer tab siempre. Ahora, ante un
+ * empate de longitud de `route`, se prioriza el item cuyo `queryParams` matchea la query string
+ * de la URL activa.
  */
 export function findMenuItemDefByUrl(url: string, moduloId?: ModuloId): MenuItemDef | undefined {
+	const [path, queryString] = url.split('?');
+	const searchParams = new URLSearchParams(queryString ?? '');
+
+	/** `true` si `candidate` debe reemplazar a `current` como mejor match. */
+	const isBetterMatch = (candidate: MenuItemDef, current?: MenuItemDef): boolean => {
+		if (!current) return true;
+		if (candidate.route.length !== current.route.length) return candidate.route.length > current.route.length;
+		const candidateMatchesQuery = queryParamsMatchUrl(candidate, searchParams);
+		const currentMatchesQuery = queryParamsMatchUrl(current, searchParams);
+		return candidateMatchesQuery && !currentMatchesQuery;
+	};
+
 	let best: MenuItemDef | undefined;
 	let bestSameModulo: MenuItemDef | undefined;
 	for (const item of MENU_ITEMS) {
-		if (item.route && url.startsWith(item.route)) {
-			if (!best || item.route.length > best.route.length) best = item;
-			if (moduloId && item.modulo === moduloId && (!bestSameModulo || item.route.length > bestSameModulo.route.length)) {
-				bestSameModulo = item;
-			}
-		}
+		if (!item.route || !path.startsWith(item.route)) continue;
+		if (isBetterMatch(item, best)) best = item;
+		if (moduloId && item.modulo === moduloId && isBetterMatch(item, bestSameModulo)) bestSameModulo = item;
 	}
 	return bestSameModulo ?? best;
 }
