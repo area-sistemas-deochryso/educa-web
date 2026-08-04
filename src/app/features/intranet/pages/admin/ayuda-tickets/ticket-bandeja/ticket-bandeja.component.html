@@ -36,43 +36,45 @@
 				<p>No hay tickets{{ filtroEstado() ? ' con este estado' : '' }}.</p>
 			</div>
 		} @else {
-			<p-table [value]="tickets()" dataKey="id" [scrollable]="true" styleClass="p-datatable-sm">
-				<ng-template #header>
-					<tr>
-						<th pSortableColumn="tipoNombre">TIPO <p-sortIcon field="tipoNombre" /></th>
-						<th>DESCRIPCIÓN</th>
-						<th>PROPUESTA</th>
-						<th pSortableColumn="usuarioNombre">USUARIO <p-sortIcon field="usuarioNombre" /></th>
-						<th pSortableColumn="fechaReg">FECHA <p-sortIcon field="fechaReg" /></th>
-						<th pSortableColumn="estado">ESTADO <p-sortIcon field="estado" /></th>
-						<th>CAMBIAR ESTADO</th>
-					</tr>
-				</ng-template>
-				<ng-template #body let-ticket>
-					<tr>
-						<td>{{ ticket.tipoNombre }}</td>
-						<td class="descripcion-cell">{{ ticket.descripcion }}</td>
-						<td class="descripcion-cell">{{ ticket.propuesta || '—' }}</td>
-						<td>{{ ticket.usuarioNombre }}</td>
-						<td>{{ ticket.fechaReg | date: 'dd/MM/yyyy HH:mm' }}</td>
-						<td>
-							<p-tag [value]="labelFor(ticket.estado)" [severity]="severityFor(ticket.estado)" />
-						</td>
-						<td>
-							<p-select
-								[options]="estadoCambioOptions"
-								[ngModel]="ticket.estado"
-								(ngModelChange)="onEstadoChange(ticket, $event)"
-								optionLabel="label"
-								optionValue="value"
-								appendTo="body"
-								[disabled]="updatingId() === ticket.id"
-								styleClass="estado-dropdown"
-							/>
-						</td>
-					</tr>
-				</ng-template>
-			</p-table>
+			<section class="table-section">
+				<p-table [value]="tickets()" dataKey="id" [scrollable]="true" styleClass="p-datatable-sm">
+					<ng-template #header>
+						<tr>
+							<th pSortableColumn="tipoNombre">TIPO <p-sortIcon field="tipoNombre" /></th>
+							<th>DESCRIPCIÓN</th>
+							<th>PROPUESTA</th>
+							<th pSortableColumn="usuarioNombre">USUARIO <p-sortIcon field="usuarioNombre" /></th>
+							<th pSortableColumn="fechaReg">FECHA <p-sortIcon field="fechaReg" /></th>
+							<th pSortableColumn="estado">ESTADO <p-sortIcon field="estado" /></th>
+							<th>CAMBIAR ESTADO</th>
+						</tr>
+					</ng-template>
+					<ng-template #body let-ticket>
+						<tr>
+							<td>{{ ticket.tipoNombre }}</td>
+							<td class="descripcion-cell">{{ ticket.descripcion }}</td>
+							<td class="descripcion-cell">{{ ticket.propuesta || '—' }}</td>
+							<td>{{ ticket.usuarioNombre }}</td>
+							<td>{{ ticket.fechaReg | date: 'dd/MM/yyyy HH:mm' }}</td>
+							<td>
+								<p-tag [value]="labelFor(ticket.estado)" [severity]="severityFor(ticket.estado)" />
+							</td>
+							<td>
+								<p-select
+									[options]="estadoCambioOptions"
+									[ngModel]="ticket.estado"
+									(ngModelChange)="onEstadoChange(ticket, $event)"
+									optionLabel="label"
+									optionValue="value"
+									appendTo="body"
+									[disabled]="updatingId() === ticket.id"
+									styleClass="estado-dropdown"
+								/>
+							</td>
+						</tr>
+					</ng-template>
+				</p-table>
+			</section>
 		}
 	}
 </div>

@@ -5,6 +5,14 @@
 	margin-bottom: 1.5rem;
 }
 
+// design-system.md B1/B4 — container con border, sin background propio.
+.table-section {
+	background: transparent;
+	border: 1px solid var(--surface-300);
+	border-radius: 12px;
+	overflow: hidden;
+}
+
 .loading-state,
 .empty-state {
 	display: flex;
