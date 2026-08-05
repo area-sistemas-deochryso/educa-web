@@ -186,6 +186,10 @@
      hallazgo 01). Con una sola acción disponible actúa directo; con dos, speed-dial. -->
 <app-intranet-fab-menu [suppressed]="mobileMenuOpen()" />
 
+<!-- Modo informativo (brief 524, plan xrepo-96 F1+F2): SIEMPRE en el DOM, solo se
+     renderiza cuando hay un callout activo (mismo patrón que app-feedback-report-dialog). -->
+<app-informative-mode-callout />
+
 <!-- Reporte de usuario: dialog SIEMPRE en el DOM (regla dialogs-sync.md) -->
 <app-feedback-report-dialog />
 

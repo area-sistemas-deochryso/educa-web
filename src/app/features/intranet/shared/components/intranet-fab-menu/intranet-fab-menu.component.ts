@@ -9,11 +9,11 @@ import { filter, map } from 'rxjs';
 import { StorageService } from '@core/services';
 import { FeedbackReportFacade } from '@core/services/feedback';
 import { FeatureFlagsFacade } from '@core/services/feature-flags';
-import { FabMenuVisibilityService } from '@intranet-shared/services';
+import { FabMenuVisibilityService, InformativeModeService } from '@intranet-shared/services';
 // #endregion
 // #region Helpers
 interface FabAction {
-	key: 'ayuda' | 'reportar' | 'ocultar';
+	key: 'ayuda' | 'reportar' | 'modoInformativo' | 'ocultar';
 	label: string;
 	icon: string;
 	run: () => void;
@@ -64,7 +64,7 @@ interface FabAction {
 					(click)="onTriggerClick()"
 				>
 					<i class="pi" [class.pi-plus]="!expanded()" [class.pi-times]="expanded()"></i>
-					<span class="fab-label">Acciones</span>
+					<span class="fab-label">{{ triggerLabel() }}</span>
 				</button>
 			</div>
 		}
@@ -77,6 +77,7 @@ export class IntranetFabMenuComponent {
 	private readonly feedbackFacade = inject(FeedbackReportFacade);
 	private readonly flags = inject(FeatureFlagsFacade);
 	private readonly visibility = inject(FabMenuVisibilityService);
+	private readonly informativeMode = inject(InformativeModeService);
 
 	readonly suppressed = input<boolean>(false);
 
@@ -106,6 +107,12 @@ export class IntranetFabMenuComponent {
 				run: () => this.feedbackFacade.open(),
 			});
 		}
+		list.push({
+			key: 'modoInformativo',
+			label: this.informativeMode.active() ? 'Salir de modo informativo' : 'Modo informativo',
+			icon: 'pi pi-info-circle',
+			run: () => this.informativeMode.toggle(),
+		});
 		return list;
 	});
 
@@ -125,9 +132,15 @@ export class IntranetFabMenuComponent {
 
 	readonly visible = computed(() => !this.suppressed() && !this.visibility.hidden() && this.primaryActions().length > 0);
 
-	readonly triggerAriaLabel = computed(() =>
-		this.expanded() ? 'Cerrar menú de accesos rápidos' : 'Abrir menú de accesos rápidos: Ayuda, Reportar y Ocultar',
-	);
+	readonly triggerLabel = computed(() => (this.informativeMode.active() ? 'Modo informativo' : 'Acciones'));
+
+	readonly triggerAriaLabel = computed(() => {
+		if (this.expanded()) return 'Cerrar menú de accesos rápidos';
+		const actionLabels = this.actions()
+			.map((a) => a.label)
+			.join(', ');
+		return `Abrir menú de accesos rápidos: ${actionLabels}`;
+	});
 
 	readonly expanded = signal(false);
 	readonly dragPosition = signal(this.storage.getAyudaFabPosition() ?? { x: 0, y: 0 });
