@@ -17,7 +17,7 @@
 | xP53 | → Duplicate person validation (coord) | F3 FE ✅ awaiting-prod (281) | ver P53 |
 | xPanelAyuda | → Panel de ayuda intranet (coord) | F1-F3 BE ✅ · F4 FE ✅ awaiting-prod (479, `chat/479-fe-panel-ayuda-qa-shell`) · F5 FE ✅ awaiting-prod (480, `chat/480-fe-panel-ayuda-ticket`) · F6 FE ✅ awaiting-prod (481, `chat/481-fe-panel-ayuda-salud-sede`) | ver xrepo-panel-ayuda-intranet |
 | xP92 | → Admin "ver como" profesor/estudiante — gate + wrapper de módulo (coord P92 F2) | 🔒 bloqueado por F1 (`Educa.API` 498) — brief 499 sin arrancar | ver P92 |
-| xModoInformativo | → Modo informativo interactivo (coord xrepo-96) | F1-F4 ✅ y F7 1/5 (527, shell común + Inicio) ✅ — mergeados a `main` local, sin push. F7 2/5 (Estudiante) es el próximo brief · F5-F6 pendientes | ver xrepo-96 |
+| xModoInformativo | → Modo informativo interactivo (coord xrepo-96) | F1-F4 ✅ y F7 shell+Inicio (527) ✅ — mergeados a `main` local, sin push. F7 acotado a 3 módulos (Apoderado descartado, backlog tibio); Estudiante es el próximo brief · F5-F6 pendientes | ver xrepo-96 |
 <!-- INDEX:END -->
 
 ---
