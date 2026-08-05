@@ -1,0 +1,12 @@
+<!-- #region Template -->
+@if (callout(); as c) {
+	<div class="info-callout__backdrop" (click)="close()"></div>
+	<div class="info-callout__highlight" [ngStyle]="highlightStyle(c.rect)"></div>
+	<div class="info-callout__box" [ngStyle]="calloutStyle(c.rect)" role="dialog" aria-label="Explicación del modo informativo">
+		<p class="info-callout__text">{{ c.text }}</p>
+		<button type="button" class="info-callout__close" aria-label="Cerrar explicación" (click)="close()">
+			<i class="pi pi-times"></i>
+		</button>
+	</div>
+}
+<!-- #endregion -->
