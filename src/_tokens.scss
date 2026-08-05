@@ -56,6 +56,7 @@
 	--tint-info-bg: color-mix(in srgb, var(--blue-500) 8%, transparent);
 	--tint-info-border: color-mix(in srgb, var(--blue-500) 30%, transparent);
 	--tint-info-icon: var(--blue-600);
+	--tint-info-text: var(--blue-700);
 
 	/* --- Tinte de acento primario (brief 523) ---
 	   Mismo patrón color-mix() que los 4 de arriba, pero con un -text además
@@ -307,6 +308,8 @@
 	--tint-success-text: var(--p-green-300, #86efac);
 	--tint-info-bg: color-mix(in srgb, var(--blue-500) 20%, transparent);
 	--tint-info-border: color-mix(in srgb, var(--blue-500) 40%, transparent);
+	/* blue-300 tampoco está en el shim -- mismo caso que yellow-300/green-300. */
+	--tint-info-text: var(--p-blue-300, #93c5fd);
 
 	/* --tint-primary-bg/-border ya heredan el % subido de arriba (son la
 	   misma variable, color-mix recalcula solo). --tint-primary-text SÍ

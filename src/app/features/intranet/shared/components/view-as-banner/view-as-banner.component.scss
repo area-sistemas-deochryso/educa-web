@@ -3,17 +3,31 @@
 // (Design system §B9), but blue (informational) instead of yellow (warning) —
 // this isn't an error state, it's the admin intentionally in "ver como" mode.
 .view-as-banner {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 1rem;
-	// Mismo padding horizontal que .intranet-content (banner es full-bleed) —
-	// evita el desfase de alineación con el título/breadcrumb de cada pantalla.
-	padding: 0.6rem 2rem;
-	background: color-mix(in srgb, var(--blue-500) 15%, transparent);
+	// Fondo/borde full-bleed, contenido centrado en &__inner — mismo criterio
+	// que .header-container (max-width: 1400px + margin: 0 auto), para que
+	// quede alineado con el logo/nav de arriba en pantallas anchas en vez de
+	// pegado a 2rem del borde real de la ventana.
+	//
+	// --tint-info-bg/-border en vez del color-mix() ad-hoc que tenía antes —
+	// mismos tokens que ya usa el resto de banners de severidad, se adaptan
+	// solos entre claro/oscuro.
+	background: var(--tint-info-bg);
 	border-bottom: 1px solid var(--blue-500);
-	color: var(--text-color);
+	/* Brief 523: era --text-color genérico -- ilegible en dark mode sobre
+	   este tinte (mismo bug que salud-sede-banner). --tint-info-text sigue
+	   al tinte compuesto en vez de al fondo de página. */
+	color: var(--tint-info-text);
 	font-size: 0.875rem;
+
+	&__inner {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		max-width: 1400px;
+		margin: 0 auto;
+		padding: 0.6rem 2rem;
+	}
 
 	&__content {
 		display: flex;
@@ -24,7 +38,10 @@
 
 	&__icon {
 		font-size: 1.1rem;
-		color: var(--blue-700);
+		// Era --blue-700 fijo (pensado para el tinte claro de siempre) -- con
+		// --tint-info-bg ahora oscuro en dark mode, un azul oscuro fijo se
+		// perdía contra ese fondo. --tint-info-text ya resuelve esto por modo.
+		color: var(--tint-info-text);
 		flex-shrink: 0;
 	}
 
@@ -37,7 +54,7 @@
 }
 
 @media screen and (max-width: 840px) {
-	.view-as-banner {
+	.view-as-banner__inner {
 		padding: 0.6rem 1rem;
 	}
 }

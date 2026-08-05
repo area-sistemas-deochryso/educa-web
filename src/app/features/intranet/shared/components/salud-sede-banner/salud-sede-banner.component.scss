@@ -2,14 +2,11 @@
 // Misma forma "banner strip" que wal-degraded-banner (yellow = advertencia,
 // no error) — evita que esta alerta se confunda con el toast rojo de errores.
 .salud-sede-banner {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 1rem;
-	// Mismo padding horizontal que .intranet-content (banner es full-bleed, el
-	// resto de la página vive dentro de ese padding) — evita el desfase de
-	// alineación con el título/breadcrumb de cada pantalla.
-	padding: 0.6rem 2rem;
+	// Fondo/borde siguen full-bleed (la franja de color cruza todo el ancho);
+	// lo que se centra es el CONTENIDO, en &__inner — mismo criterio que
+	// .header-container (max-width: 1400px + margin: 0 auto) para que el
+	// texto quede alineado con el logo/nav de arriba en pantallas anchas,
+	// en vez de pegado a 2rem del borde real de la ventana.
 	background: color-mix(in srgb, var(--yellow-500) 15%, transparent);
 	border-bottom: 1px solid var(--yellow-500);
 	/* Brief 523: NO usar --text-color acá -- es el color de texto genérico de
@@ -20,6 +17,19 @@
 	   un tono fijo de la familia amarillo, no el genérico de la página). */
 	color: var(--yellow-700);
 	font-size: 0.875rem;
+
+	&__inner {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		max-width: 1400px;
+		margin: 0 auto;
+		// Mismo padding horizontal que .intranet-content/.desktop-header —
+		// evita el desfase de alineación con el título/breadcrumb de cada
+		// pantalla en viewports por debajo de los 1400px del max-width.
+		padding: 0.6rem 2rem;
+	}
 
 	&__content {
 		display: flex;
@@ -59,7 +69,7 @@
 }
 
 @media screen and (max-width: 840px) {
-	.salud-sede-banner {
+	.salud-sede-banner__inner {
 		padding: 0.6rem 1rem;
 	}
 }
