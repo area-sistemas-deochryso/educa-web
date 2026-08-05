@@ -25,10 +25,12 @@
 		gap: 1rem;
 		max-width: 1400px;
 		margin: 0 auto;
-		// Mismo padding horizontal que .intranet-content/.desktop-header —
-		// evita el desfase de alineación con el título/breadcrumb de cada
-		// pantalla en viewports por debajo de los 1400px del max-width.
-		padding: 0.6rem 2rem;
+		// 4rem, NO 2rem: medido en vivo contra el logo real (.logo-link
+		// queda a 64px del borde, no a 32px) -- el header combina su propio
+		// padding (3rem) con el de .desktop-header (1.75rem) y el resultado
+		// visible no es un múltiplo redondo de ninguno de los dos por
+		// separado. 4rem (64px) es el valor que coincide en la práctica.
+		padding: 0.6rem 4rem;
 	}
 
 	&__content {
