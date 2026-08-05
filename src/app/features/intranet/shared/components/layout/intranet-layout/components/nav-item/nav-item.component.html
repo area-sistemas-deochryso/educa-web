@@ -2,7 +2,7 @@
 @if (hasChildren()) {
 	<!-- * Parent item with dropdown. -->
 	<div class="nav-dropdown" [class.open]="isOpen()" [class.active]="isActive()">
-		<button class="nav-item parent" (click)="toggle()">
+		<button class="nav-item parent" data-info-anchor="header-nav-item" (click)="toggle()">
 			<i [class]="icon"></i>
 			<span>{{ label }}</span>
 			<i class="pi pi-chevron-down chevron"></i>
@@ -45,6 +45,7 @@
 		routerLinkActive="active"
 		[routerLinkActiveOptions]="{ exact: exact }"
 		class="nav-item"
+		data-info-anchor="header-nav-item"
 	>
 		<i [class]="icon"></i>
 		<span>{{ label }}</span>
