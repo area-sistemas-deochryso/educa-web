@@ -14,6 +14,13 @@ const EXEMPT_SELECTOR = 'app-intranet-fab-menu, app-informative-mode-callout';
 const GENERIC_MESSAGE = 'Todavía no hay una explicación cargada para este elemento.';
 
 /**
+ * Umbral (ms) de mantener presionado para que el click bypasee la intercepción y ejecute la
+ * acción original — sin esto, un elemento que despliega/oculta un sub-elemento al click (ej.
+ * un dropdown) queda imposible de operar mientras el modo está activo (hallazgo post-524).
+ */
+const HOLD_BYPASS_MS = 500;
+
+/**
  * Contenido de prueba en memoria (brief 524, F1+F2) — F3/F4 lo reemplazan por contenido real
  * por ancla. Ningún elemento del codebase declara `data-info-anchor` todavía (eso lo fuerza la
  * regla de mantenimiento de F5); hasta entonces, cualquier click real resuelve al callout
@@ -26,7 +33,9 @@ const TEST_CONTENT = new Map<string, string>([['sample-anchor', 'Explicación de
 /**
  * Modo global de sesión (brief 524, plan xrepo-96 F1+F2): mientras está activo, un listener
  * en fase de captura sobre `document` bloquea el click/tap por defecto de cualquier elemento
- * (salvo el FAB y el propio callout) y muestra una explicación en su lugar.
+ * (salvo el FAB y el propio callout) y muestra una explicación en su lugar. Mantener presionado
+ * ≥{@link HOLD_BYPASS_MS} bypasea la intercepción y ejecuta la acción original (hallazgo
+ * post-524: sin esto, un dropdown que abre/cierra al click queda imposible de operar).
  *
  * Persistencia deliberadamente **solo en memoria** (a diferencia de `ThemeService`): el plan
  * lo define como estado de sesión, no como preferencia de dispositivo — un F5 lo apaga.
@@ -41,10 +50,25 @@ export class InformativeModeService {
 	readonly currentCallout = this._currentCallout.asReadonly();
 	// #endregion
 
+	// `null` = sin pointerdown previo registrado para este click (ej. activación por teclado,
+	// Enter/Space sobre un botón enfocado) — debe tratarse como click corto, nunca como hold.
+	private pointerDownAt: number | null = null;
+
+	private readonly onDocumentPointerDown = (): void => {
+		this.pointerDownAt = Date.now();
+	};
+
 	private readonly onDocumentClick = (event: MouseEvent): void => {
 		const target = event.target as HTMLElement | null;
 		if (!target) return;
 		if (target.closest(EXEMPT_SELECTOR)) return;
+
+		// Hold-to-bypass: mantener presionado ≥HOLD_BYPASS_MS antes de soltar deja pasar el
+		// click normal, sin salir del modo — necesario para operar elementos cuyo estado
+		// (dropdown abierto/cerrado) el modo informativo no debe pisar.
+		const held = this.pointerDownAt !== null && Date.now() - this.pointerDownAt >= HOLD_BYPASS_MS;
+		this.pointerDownAt = null;
+		if (held) return;
 
 		event.preventDefault();
 		event.stopPropagation();
@@ -58,11 +82,14 @@ export class InformativeModeService {
 	constructor() {
 		effect(() => {
 			if (this.active()) {
+				document.addEventListener('pointerdown', this.onDocumentPointerDown, true);
 				document.addEventListener('click', this.onDocumentClick, true);
 				this.closeOpenOverlays();
 			} else {
+				document.removeEventListener('pointerdown', this.onDocumentPointerDown, true);
 				document.removeEventListener('click', this.onDocumentClick, true);
 				this._currentCallout.set(null);
+				this.pointerDownAt = null;
 			}
 		});
 	}

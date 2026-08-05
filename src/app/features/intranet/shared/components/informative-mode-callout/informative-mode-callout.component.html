@@ -3,7 +3,10 @@
 	<div class="info-callout__backdrop" (click)="close()"></div>
 	<div class="info-callout__highlight" [ngStyle]="highlightStyle(c.rect)"></div>
 	<div class="info-callout__box" [ngStyle]="calloutStyle(c.rect)" role="dialog" aria-label="Explicación del modo informativo">
-		<p class="info-callout__text">{{ c.text }}</p>
+		<div class="info-callout__body">
+			<p class="info-callout__text">{{ c.text }}</p>
+			<p class="info-callout__hint">Mantené presionado el elemento para hacer la acción normal.</p>
+		</div>
 		<button type="button" class="info-callout__close" aria-label="Cerrar explicación" (click)="close()">
 			<i class="pi pi-times"></i>
 		</button>

@@ -1,7 +1,7 @@
 // * Tests for InformativeModeService — validates toggle, interception y resolución de ancla.
 // #region Imports
 import { TestBed } from '@angular/core/testing';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { InformativeModeService } from './informative-mode.service';
 
@@ -30,6 +30,11 @@ describe('InformativeModeService', () => {
 
 	function click(el: HTMLElement): void {
 		el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+	}
+
+	// jsdom no implementa PointerEvent — un MouseEvent con ese `type` alcanza para el listener.
+	function pointerDown(el: HTMLElement): void {
+		el.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, cancelable: true }));
 	}
 
 	it('starts inactive with no callout', () => {
@@ -121,6 +126,74 @@ describe('InformativeModeService', () => {
 		service.dismissCallout();
 		expect(service.currentCallout()).toBeNull();
 		expect(service.active()).toBe(true);
+	});
+
+	describe('hold-to-bypass', () => {
+		beforeEach(() => {
+			vi.useFakeTimers();
+		});
+
+		afterEach(() => {
+			vi.useRealTimers();
+		});
+
+		it('lets a held click (≥500ms between pointerdown and click) run the original action', () => {
+			const button = document.createElement('button');
+			let ran = false;
+			button.addEventListener('click', () => (ran = true));
+			document.body.appendChild(button);
+
+			toggle();
+			pointerDown(button);
+			vi.advanceTimersByTime(600);
+			click(button);
+
+			expect(ran).toBe(true);
+			expect(service.currentCallout()).toBeNull();
+		});
+
+		it('still intercepts a quick click (<500ms between pointerdown and click)', () => {
+			const button = document.createElement('button');
+			let ran = false;
+			button.addEventListener('click', () => (ran = true));
+			document.body.appendChild(button);
+
+			toggle();
+			pointerDown(button);
+			vi.advanceTimersByTime(100);
+			click(button);
+
+			expect(ran).toBe(false);
+			expect(service.currentCallout()).not.toBeNull();
+		});
+
+		it('intercepts a click with no preceding pointerdown (ej. activación por teclado)', () => {
+			const button = document.createElement('button');
+			let ran = false;
+			button.addEventListener('click', () => (ran = true));
+			document.body.appendChild(button);
+
+			toggle();
+			vi.advanceTimersByTime(600);
+			click(button);
+
+			expect(ran).toBe(false);
+			expect(service.currentCallout()).not.toBeNull();
+		});
+
+		it('resets the hold state after each click, so a second quick click after a hold is intercepted again', () => {
+			const button = document.createElement('button');
+			document.body.appendChild(button);
+
+			toggle();
+			pointerDown(button);
+			vi.advanceTimersByTime(600);
+			click(button);
+			expect(service.currentCallout()).toBeNull();
+
+			click(button);
+			expect(service.currentCallout()).not.toBeNull();
+		});
 	});
 });
 // #endregion
