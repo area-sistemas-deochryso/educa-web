@@ -874,7 +874,13 @@ app-intranet-layout {
   para el usuario.
 -----------------------------------------*/
 .p-tag.tag-neutral {
-	background: var(--surface-200);
+	/* Brief 523: era --surface-200 (primitivo de Aura, gris claro FIJO en
+	   los dos colorScheme -- no es "más claro que el fondo de ESE modo").
+	   Con --text-color (que sí varía) terminaban casi idénticos en dark
+	   (#e4e4e7 los dos, coincidencia que lo hizo evidente). --surface-100
+	   es nuestro, con variante dark real (#e3e3e3 claro / #37373c oscuro)
+	   -- se ve gris neutro en los dos modos, no una isla clara en dark. */
+	background: var(--surface-100);
 	color: var(--text-color);
 	font-weight: 600;
 }
@@ -1011,7 +1017,14 @@ app-intranet-layout {
 
 	// Blanco puro (--p-popover-background) contrasta demasiado fuerte contra
 	// el header (--intranet-background-color, #eeeeee); usar surface-50 en vez.
-	--p-popover-background: var(--p-surface-50);
+	// * Brief 523: NO usar --p-surface-50 directo -- en la escala Aura la
+	//   familia --p-surface-* es una rampa de luminosidad literal en ambos
+	//   colorScheme (surface-50 = casi blanco tanto en claro COMO en oscuro),
+	//   no "más clara que el fondo de ESE modo". Quedaba un popover blanco
+	//   flotando sobre toda la intranet en dark mode. --surface-card sí es
+	//   nuestro, y ya representa "superficie elevada, más clara que el fondo,
+	//   coherente con el modo activo" en los dos esquemas.
+	--p-popover-background: var(--surface-card);
 
 	// Mover la flecha al lado derecho (cerca del chevron)
 	&::before,

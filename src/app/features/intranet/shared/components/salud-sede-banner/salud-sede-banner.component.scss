@@ -12,7 +12,13 @@
 	padding: 0.6rem 2rem;
 	background: color-mix(in srgb, var(--yellow-500) 15%, transparent);
 	border-bottom: 1px solid var(--yellow-500);
-	color: var(--text-color);
+	/* Brief 523: NO usar --text-color acá -- es el color de texto genérico de
+	   la página, pensado para el fondo de la página, no para el tinte
+	   amarillo semi-transparente de este banner. En dark mode --text-color
+	   pasa a ser claro, e ilegible sobre este fondo que sigue siendo claro
+	   a propósito (mismo criterio que ya usaba &__icon un poco más abajo:
+	   un tono fijo de la familia amarillo, no el genérico de la página). */
+	color: var(--yellow-700);
 	font-size: 0.875rem;
 
 	&__content {
@@ -38,7 +44,7 @@
 		border: none;
 		border-radius: 6px;
 		background: transparent;
-		color: var(--text-color);
+		color: var(--yellow-700); // mismo criterio que el color del banner arriba
 		cursor: pointer;
 
 		&:hover {
