@@ -17,6 +17,7 @@ export * from './blob/blob-storage.service';
 export * from './trace';
 export * from './feature-flags';
 export * from './feedback';
+export * from './informative-mode';
 export * from './wal';
 export * from './rate-limit-countdown';
 export * from './session';
