@@ -2,7 +2,7 @@
 <header class="intranet-header">
 	<!-- #region Desktop header -->
 	<div class="header-container desktop-header">
-		<a routerLink="/intranet" class="logo-link">
+		<a routerLink="/intranet" class="logo-link" data-info-anchor="header-logo-home">
 			<picture>
 				<source srcset="images/logo.avif" type="image/avif" />
 				<source srcset="images/logo.webp" type="image/webp" />
@@ -66,6 +66,7 @@
 							<button
 								type="button"
 								class="breadcrumb-part breadcrumb-part--clickable"
+								data-info-anchor="header-breadcrumb-group"
 								[attr.aria-haspopup]="part.kind === 'grupo' ? 'true' : null"
 								[attr.aria-expanded]="part.kind === 'grupo' ? groupDropdownOpenIndex() === part.groupIndex : null"
 								(click)="onBreadcrumbClick($event, part)"
@@ -99,7 +100,7 @@
 
 	<!-- #region Mobile header -->
 	<div class="header-container mobile-header">
-		<a routerLink="/intranet" class="logo-link">
+		<a routerLink="/intranet" class="logo-link" data-info-anchor="header-logo-home">
 			<picture>
 				<source srcset="images/logo.avif" type="image/avif" />
 				<source srcset="images/logo.webp" type="image/webp" />
@@ -130,6 +131,7 @@
 							<button
 								type="button"
 								class="breadcrumb-part breadcrumb-part--clickable"
+								data-info-anchor="header-breadcrumb-group"
 								[attr.aria-haspopup]="part.kind === 'grupo' ? 'true' : null"
 								[attr.aria-expanded]="part.kind === 'grupo' ? groupDropdownOpenIndex() === part.groupIndex : null"
 								(click)="onBreadcrumbClick($event, part)"

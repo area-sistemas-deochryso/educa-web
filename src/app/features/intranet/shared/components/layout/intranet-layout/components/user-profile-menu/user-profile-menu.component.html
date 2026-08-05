@@ -2,6 +2,7 @@
 <!-- * User avatar trigger + popover menu. -->
 <button
 	class="profile-trigger"
+	data-info-anchor="header-user-menu-toggle"
 	[class.open]="isOpen()"
 	(click)="toggleMenu($event)"
 	type="button"
@@ -43,11 +44,12 @@
 				(ngModelChange)="onThemeToggle()"
 				inputId="theme-toggle"
 				class="theme-toggle-switch"
+				data-info-anchor="header-user-menu-theme-toggle"
 			/>
 		</div>
 		@if (showNotifications()) {
 			<div class="popover-divider"></div>
-			<button class="menu-btn" (click)="onNotificationsClick()" type="button">
+			<button class="menu-btn" data-info-anchor="header-user-menu-notifications" (click)="onNotificationsClick()" type="button">
 				<i class="pi pi-bell" [class.bell-shake]="unreadBadge()"></i>
 				<span>Notificaciones</span>
 				@if (unreadBadge()) {
@@ -56,19 +58,19 @@
 			</button>
 		}
 		<div class="popover-divider"></div>
-		<button class="menu-btn" (click)="onInfoClick()" type="button">
+		<button class="menu-btn" data-info-anchor="header-user-menu-info" (click)="onInfoClick()" type="button">
 			<i class="pi pi-user-edit"></i>
 			<span>Información</span>
 		</button>
 		@if (fabHidden()) {
 			<div class="popover-divider"></div>
-			<button class="menu-btn" (click)="onShowFabClick()" type="button">
+			<button class="menu-btn" data-info-anchor="header-user-menu-show-fab" (click)="onShowFabClick()" type="button">
 				<i class="pi pi-eye"></i>
 				<span>Mostrar accesos flotantes</span>
 			</button>
 		}
 		<div class="popover-divider"></div>
-		<button class="logout-btn" (click)="onLogout()" type="button">
+		<button class="logout-btn" data-info-anchor="header-user-menu-logout" (click)="onLogout()" type="button">
 			<i class="pi pi-sign-out"></i>
 			<span>Cerrar sesión</span>
 		</button>

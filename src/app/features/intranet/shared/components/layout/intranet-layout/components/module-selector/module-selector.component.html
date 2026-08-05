@@ -2,6 +2,7 @@
 <button
 	type="button"
 	class="selector-trigger"
+	data-info-anchor="header-module-selector-toggle"
 	[class.open]="isOpen()"
 	[class.selector-trigger--hidden]="isOpen()"
 	(click)="toggle()"
@@ -32,6 +33,7 @@
 				#searchInput
 				type="text"
 				class="panel-search-input"
+				data-info-anchor="header-module-selector-search"
 				placeholder="Buscar página..."
 				[ngModel]="searchTerm()"
 				(ngModelChange)="onSearchChange($event)"
@@ -138,6 +140,7 @@
 													<button
 														type="button"
 														class="star-btn"
+														data-info-anchor="header-module-selector-favorite-toggle"
 														[class.starred]="favorites.isFavorite(item.route)"
 														[disabled]="!favorites.isFavorite(item.route) && !favorites.canAddMore()"
 														(click)="onStarClick($event, item.route)"
@@ -179,6 +182,7 @@
 																<button
 																	type="button"
 																	class="star-btn"
+																	data-info-anchor="header-module-selector-favorite-toggle"
 																	[class.starred]="favorites.isFavorite(item.route)"
 																	[disabled]="!favorites.isFavorite(item.route) && !favorites.canAddMore()"
 																	(click)="onStarClick($event, item.route)"
@@ -213,6 +217,7 @@
 													<button
 														type="button"
 														class="star-btn"
+														data-info-anchor="header-module-selector-favorite-toggle"
 														[class.starred]="favorites.isFavorite(item.route)"
 														[disabled]="!favorites.isFavorite(item.route) && !favorites.canAddMore()"
 														(click)="onStarClick($event, item.route)"

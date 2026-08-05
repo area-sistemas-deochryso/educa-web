@@ -1,5 +1,5 @@
 <!-- #region Template -->
-<button class="hamburger-btn" (click)="toggle()" [class.open]="isOpen()" aria-label="Menú">
+<button class="hamburger-btn" data-info-anchor="header-mobile-menu-toggle" (click)="toggle()" [class.open]="isOpen()" aria-label="Menú">
 	<span class="hamburger-line"></span>
 	<span class="hamburger-line"></span>
 	<span class="hamburger-line"></span>
@@ -27,6 +27,7 @@
 				#mobileSearchInput
 				type="text"
 				class="search-input"
+				data-info-anchor="header-module-selector-search"
 				placeholder="Buscar página..."
 				[ngModel]="searchTerm()"
 				(ngModelChange)="onSearchChange($event)"
@@ -121,6 +122,7 @@
 													<button
 														type="button"
 														class="star-btn"
+														data-info-anchor="header-module-selector-favorite-toggle"
 														[class.starred]="favorites.isFavorite(item.route)"
 														[disabled]="!favorites.isFavorite(item.route) && !favorites.canAddMore()"
 														(click)="onStarClick($event, item.route)"
@@ -148,6 +150,7 @@
 													<button
 														type="button"
 														class="star-btn"
+														data-info-anchor="header-module-selector-favorite-toggle"
 														[class.starred]="favorites.isFavorite(item.route)"
 														[disabled]="!favorites.isFavorite(item.route) && !favorites.canAddMore()"
 														(click)="onStarClick($event, item.route)"

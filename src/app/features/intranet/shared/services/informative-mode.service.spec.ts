@@ -306,5 +306,55 @@ describe('InformativeModeService', () => {
 			expect(service.currentCallout()?.text).toContain('Todavía no hay una explicación cargada');
 		});
 	});
+
+	describe('F7 — re-escaneo ante overlays que montan tarde (brief 527)', () => {
+		it('vuelve a pedir contenido cuando aparece una ancla nueva en el DOM sin navegar', async () => {
+			toggle();
+			await flushAsync();
+			expect(resolverMock).not.toHaveBeenCalled(); // sin anclas en la vista todavía
+
+			resolverMock.mockReturnValue(of({ 'late-anchor': 'Explicación de un overlay que abrió después.' }));
+			const late = document.createElement('div');
+			late.dataset['infoAnchor'] = 'late-anchor';
+			document.body.appendChild(late);
+
+			await new Promise((resolve) => setTimeout(resolve, 200));
+			await flushAsync();
+
+			expect(resolverMock).toHaveBeenCalledTimes(1);
+			click(late);
+			expect(service.currentCallout()?.text).toBe('Explicación de un overlay que abrió después.');
+		});
+
+		it('no vuelve a pedir contenido si la mutación del DOM no trae anclas nuevas', async () => {
+			const el = document.createElement('div');
+			el.dataset['infoAnchor'] = 'anchor-a';
+			document.body.appendChild(el);
+			resolverMock.mockReturnValue(of({ 'anchor-a': 'Explicación existente.' }));
+
+			toggle();
+			await flushAsync();
+			expect(resolverMock).toHaveBeenCalledTimes(1);
+
+			const unrelated = document.createElement('span');
+			document.body.appendChild(unrelated);
+			await new Promise((resolve) => setTimeout(resolve, 200));
+
+			expect(resolverMock).toHaveBeenCalledTimes(1);
+		});
+
+		it('deja de observar el DOM al desactivar el modo (sin re-escaneo tras el toggle off)', async () => {
+			toggle();
+			await flushAsync();
+			toggle(); // desactiva
+
+			const late = document.createElement('div');
+			late.dataset['infoAnchor'] = 'late-anchor';
+			document.body.appendChild(late);
+			await new Promise((resolve) => setTimeout(resolve, 200));
+
+			expect(resolverMock).not.toHaveBeenCalled();
+		});
+	});
 });
 // #endregion

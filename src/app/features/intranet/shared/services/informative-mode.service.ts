@@ -36,10 +36,11 @@ const HOLD_BYPASS_MS = 500;
  * presionado ≥{@link HOLD_BYPASS_MS} bypasea la intercepción y ejecuta la acción original
  * (hallazgo post-524: sin esto, un dropdown que abre/cierra al click queda imposible de operar).
  *
- * El contenido explicativo (F4) se resuelve contra el backend por ancla: al activar el modo y
- * en cada navegación mientras sigue activo, se escanea el DOM renderizado por
- * `[data-info-anchor]` y se piden en un solo batch las claves únicas presentes en la vista
- * actual. El resultado se cachea en memoria hasta la próxima activación/navegación — no hace
+ * El contenido explicativo (F4) se resuelve contra el backend por ancla: al activar el modo, en
+ * cada navegación mientras sigue activo, y cuando aparecen anclas nuevas en el DOM (overlays que
+ * montan tarde — popovers, paneles de búsqueda; hallazgo brief 527, ver su Cierre), se escanea el
+ * DOM renderizado por `[data-info-anchor]` y se piden en un solo batch las claves únicas presentes
+ * en la vista actual. El resultado se cachea en memoria hasta el próximo re-escaneo — no hace
  * falta invalidación más sofisticada para esta fase (ver Cierre del brief 526).
  *
  * Persistencia deliberadamente **solo en memoria** (a diferencia de `ThemeService`): el plan
@@ -68,6 +69,24 @@ export class InformativeModeService {
 	// `null` = sin pointerdown previo registrado para este click (ej. activación por teclado,
 	// Enter/Space sobre un botón enfocado) — debe tratarse como click corto, nunca como hold.
 	private pointerDownAt: number | null = null;
+
+	private domObserver: MutationObserver | null = null;
+	private rescanTimer: ReturnType<typeof setTimeout> | null = null;
+
+	/**
+	 * Overlays con `appendTo="body"` (popovers, paneles de búsqueda) no existen en el DOM hasta
+	 * que el usuario los abre, así que el escaneo de activación/navegación nunca los ve. Debounced
+	 * porque un solo overlay suele insertar varios nodos en la misma tanda de mutaciones.
+	 */
+	private readonly onDomMutated = (): void => {
+		if (this.rescanTimer !== null) clearTimeout(this.rescanTimer);
+		this.rescanTimer = setTimeout(() => {
+			this.rescanTimer = null;
+			const known = this._content();
+			const hasUnresolved = this.scanAnchors().some((key) => !known.has(key));
+			if (hasUnresolved) void this.refreshContent();
+		}, 150);
+	};
 
 	private readonly onDocumentPointerDown = (): void => {
 		this.pointerDownAt = Date.now();
@@ -100,12 +119,20 @@ export class InformativeModeService {
 				document.addEventListener('pointerdown', this.onDocumentPointerDown, true);
 				document.addEventListener('click', this.onDocumentClick, true);
 				this.closeOpenOverlays();
+				this.domObserver = new MutationObserver(this.onDomMutated);
+				this.domObserver.observe(document.body, { childList: true, subtree: true });
 			} else {
 				document.removeEventListener('pointerdown', this.onDocumentPointerDown, true);
 				document.removeEventListener('click', this.onDocumentClick, true);
 				this._currentCallout.set(null);
 				this.pointerDownAt = null;
 				this._content.set(new Map());
+				this.domObserver?.disconnect();
+				this.domObserver = null;
+				if (this.rescanTimer !== null) {
+					clearTimeout(this.rescanTimer);
+					this.rescanTimer = null;
+				}
 			}
 		});
 
