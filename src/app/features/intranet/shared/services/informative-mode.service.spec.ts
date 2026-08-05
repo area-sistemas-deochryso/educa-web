@@ -1,7 +1,12 @@
-// * Tests for InformativeModeService — validates toggle, interception y resolución de ancla.
+// * Tests for InformativeModeService — validates toggle, interception, hold-to-bypass y
+// * resolución de anclas contra el backend (F4).
 // #region Imports
 import { TestBed } from '@angular/core/testing';
+import { NavigationEnd, Router } from '@angular/router';
+import { Subject, of, throwError } from 'rxjs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { InformativeContentService } from '@core/services/informative-mode';
 
 import { InformativeModeService } from './informative-mode.service';
 
@@ -10,9 +15,20 @@ import { InformativeModeService } from './informative-mode.service';
 // #region Tests
 describe('InformativeModeService', () => {
 	let service: InformativeModeService;
+	let resolverMock: ReturnType<typeof vi.fn>;
+	let routerEvents$: Subject<NavigationEnd>;
 
 	beforeEach(() => {
-		TestBed.configureTestingModule({ providers: [InformativeModeService] });
+		resolverMock = vi.fn().mockReturnValue(of({}));
+		routerEvents$ = new Subject<NavigationEnd>();
+
+		TestBed.configureTestingModule({
+			providers: [
+				InformativeModeService,
+				{ provide: Router, useValue: { events: routerEvents$.asObservable() } },
+				{ provide: InformativeContentService, useValue: { resolver: resolverMock } },
+			],
+		});
 		service = TestBed.inject(InformativeModeService);
 	});
 
@@ -21,11 +37,18 @@ describe('InformativeModeService', () => {
 		document.body.innerHTML = '';
 	});
 
-	// El listener se instala/desinstala dentro de un effect() — hay que flushearlo
+	// El listener (y el fetch de contenido) se instalan dentro de effect() — hay que flushearlo
 	// (TestBed.tick()) antes de disparar el click de prueba, o el listener aún no está.
 	function toggle(): void {
 		service.toggle();
 		TestBed.tick();
+	}
+
+	/** Deja asentar los microtasks encolados por `firstValueFrom` dentro del effect de fetch. */
+	async function flushAsync(): Promise<void> {
+		for (let i = 0; i < 5; i++) {
+			await Promise.resolve();
+		}
 	}
 
 	function click(el: HTMLElement): void {
@@ -35,6 +58,11 @@ describe('InformativeModeService', () => {
 	// jsdom no implementa PointerEvent — un MouseEvent con ese `type` alcanza para el listener.
 	function pointerDown(el: HTMLElement): void {
 		el.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, cancelable: true }));
+	}
+
+	function navigate(url = '/intranet/otra-pagina'): void {
+		routerEvents$.next(new NavigationEnd(1, url, url));
+		TestBed.tick();
 	}
 
 	it('starts inactive with no callout', () => {
@@ -59,18 +87,21 @@ describe('InformativeModeService', () => {
 		expect(service.currentCallout()?.text).toContain('Todavía no hay una explicación cargada');
 	});
 
-	it('resolves the test map content for an element with a declared anchor', () => {
+	it('resolves fetched content for an element with a declared anchor', async () => {
+		resolverMock.mockReturnValue(of({ 'sample-anchor': 'Explicación real desde el backend.' }));
 		const button = document.createElement('button');
 		button.dataset['infoAnchor'] = 'sample-anchor';
 		document.body.appendChild(button);
 
 		toggle();
+		await flushAsync();
 		click(button);
 
-		expect(service.currentCallout()?.text).toContain('Explicación de prueba');
+		expect(service.currentCallout()?.text).toBe('Explicación real desde el backend.');
 	});
 
-	it('resolves the anchor from the closest ancestor, not just the exact target', () => {
+	it('resolves the anchor from the closest ancestor, not just the exact target', async () => {
+		resolverMock.mockReturnValue(of({ 'sample-anchor': 'Explicación real desde el backend.' }));
 		const wrapper = document.createElement('div');
 		wrapper.dataset['infoAnchor'] = 'sample-anchor';
 		const icon = document.createElement('i');
@@ -78,9 +109,10 @@ describe('InformativeModeService', () => {
 		document.body.appendChild(wrapper);
 
 		toggle();
+		await flushAsync();
 		click(icon);
 
-		expect(service.currentCallout()?.text).toContain('Explicación de prueba');
+		expect(service.currentCallout()?.text).toBe('Explicación real desde el backend.');
 	});
 
 	it('exempts clicks inside app-intranet-fab-menu from interception', () => {
@@ -193,6 +225,85 @@ describe('InformativeModeService', () => {
 
 			click(button);
 			expect(service.currentCallout()).not.toBeNull();
+		});
+	});
+
+	describe('F4 — conexión con contenido real por ancla', () => {
+		it('escanea el DOM y pide un batch con las claves únicas presentes al activar el modo', async () => {
+			const a = document.createElement('div');
+			a.dataset['infoAnchor'] = 'anchor-a';
+			const b = document.createElement('div');
+			b.dataset['infoAnchor'] = 'anchor-b';
+			const bDup = document.createElement('div');
+			bDup.dataset['infoAnchor'] = 'anchor-b';
+			document.body.append(a, b, bDup);
+
+			toggle();
+			await flushAsync();
+
+			expect(resolverMock).toHaveBeenCalledTimes(1);
+			const anclas = resolverMock.mock.calls[0][0] as string[];
+			expect([...anclas].sort()).toEqual(['anchor-a', 'anchor-b']);
+		});
+
+		it('no pide nada al backend si no hay anclas en la vista', async () => {
+			toggle();
+			await flushAsync();
+
+			expect(resolverMock).not.toHaveBeenCalled();
+		});
+
+		it('re-pide el contenido en cada navegación mientras el modo sigue activo', async () => {
+			const el = document.createElement('div');
+			el.dataset['infoAnchor'] = 'anchor-a';
+			document.body.appendChild(el);
+
+			toggle();
+			await flushAsync();
+			expect(resolverMock).toHaveBeenCalledTimes(1);
+
+			navigate();
+			await flushAsync();
+			expect(resolverMock).toHaveBeenCalledTimes(2);
+		});
+
+		it('no re-pide contenido en una navegación mientras el modo está inactivo', async () => {
+			navigate();
+			await flushAsync();
+
+			expect(resolverMock).not.toHaveBeenCalled();
+		});
+
+		it('cae al mensaje genérico si el fetch del batch falla', async () => {
+			resolverMock.mockReturnValue(throwError(() => new Error('network down')));
+			const button = document.createElement('button');
+			button.dataset['infoAnchor'] = 'anchor-a';
+			document.body.appendChild(button);
+
+			toggle();
+			await flushAsync();
+			click(button);
+
+			expect(service.currentCallout()?.text).toContain('Todavía no hay una explicación cargada');
+		});
+
+		it('descarta el contenido cacheado al desactivar el modo', async () => {
+			resolverMock.mockReturnValue(of({ 'anchor-a': 'Explicación real.' }));
+			const button = document.createElement('button');
+			button.dataset['infoAnchor'] = 'anchor-a';
+			document.body.appendChild(button);
+
+			toggle();
+			await flushAsync();
+			click(button);
+			expect(service.currentCallout()?.text).toBe('Explicación real.');
+
+			toggle(); // desactiva
+			resolverMock.mockReturnValue(of({}));
+			toggle(); // reactiva sin contenido nuevo todavía resuelto
+			click(button);
+
+			expect(service.currentCallout()?.text).toContain('Todavía no hay una explicación cargada');
 		});
 	});
 });
