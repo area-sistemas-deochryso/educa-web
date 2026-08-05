@@ -1,0 +1,90 @@
+<p-dialog
+	[header]="headerLabel()"
+	[visible]="visible()"
+	(visibleChange)="onHide()"
+	[modal]="true"
+	[style]="{ width: '40rem' }"
+	[draggable]="false"
+	appendTo="body"
+>
+	<div class="explicacion-form">
+		<div class="field">
+			<label for="explicacion-ancla">Ancla *</label>
+			<input
+				id="explicacion-ancla"
+				type="text"
+				pInputText
+				class="w-full"
+				[ngModel]="ancla()"
+				(ngModelChange)="ancla.set($event)"
+				maxlength="150"
+				placeholder="Clave data-info-anchor del elemento"
+			/>
+		</div>
+
+		<div class="field">
+			<label for="explicacion-texto">Texto *</label>
+			<textarea
+				id="explicacion-texto"
+				pTextarea
+				class="w-full"
+				[rows]="4"
+				[ngModel]="texto()"
+				(ngModelChange)="texto.set($event)"
+			></textarea>
+		</div>
+
+		<div class="field-row">
+			<div class="field">
+				<label for="explicacion-rol">Rol</label>
+				<p-select
+					id="explicacion-rol"
+					[options]="rolOptions()"
+					optionLabel="label"
+					optionValue="value"
+					[ngModel]="rolId()"
+					(ngModelChange)="rolId.set($event)"
+					placeholder="Default (todos los roles)"
+					appendTo="body"
+					class="w-full"
+				/>
+			</div>
+
+			<div class="field">
+				<label for="explicacion-capability">Visible para</label>
+				<p-select
+					id="explicacion-capability"
+					[options]="capabilityOptions()"
+					optionLabel="label"
+					optionValue="value"
+					[ngModel]="capabilityId()"
+					(ngModelChange)="capabilityId.set($event)"
+					placeholder="Sin gating (todos)"
+					appendTo="body"
+					class="w-full"
+				/>
+			</div>
+		</div>
+	</div>
+
+	<ng-template pTemplate="footer">
+		<button
+			pButton
+			type="button"
+			label="Cancelar"
+			class="p-button-text"
+			(click)="onCancel()"
+			[pt]="{ root: { 'aria-label': 'Cancelar' } }"
+		></button>
+		<button
+			pButton
+			type="button"
+			label="Guardar"
+			icon="pi pi-check"
+			[disabled]="!isValid() || saving()"
+			[loading]="saving()"
+			(click)="onSave()"
+			[pt]="{ root: { 'aria-label': 'Guardar explicación' } }"
+		></button>
+	</ng-template>
+</p-dialog>

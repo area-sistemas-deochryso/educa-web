@@ -1,0 +1,39 @@
+.explicaciones-admin-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 1rem;
+	margin-bottom: 1rem;
+
+	h2 {
+		margin: 0;
+	}
+}
+
+.explicaciones-admin-toolbar {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.search-box {
+	position: relative;
+	display: flex;
+	align-items: center;
+
+	i {
+		position: absolute;
+		left: 0.75rem;
+		color: var(--text-color-secondary);
+	}
+
+	input {
+		padding-left: 2.25rem;
+	}
+}
+
+.explicaciones-admin-error {
+	color: var(--red-500);
+	margin-bottom: 1rem;
+}

@@ -368,6 +368,17 @@ export const INTRANET_ROUTES: Routes = [
 				title: 'Intranet - Ayuda: Gestión de FAQ',
 			},
 			{
+				// Panel del modo informativo — administración del contenido explicativo
+				// (plan xrepo-96 F3, brief 525). Ruta debe coincidir con la capability
+				// `EXPLICACIONES_MANAGE` seed en
+				// `Educa.API/Migrations/Manual/20260805_CreateExplicacionesTable.sql`
+				// ('intranet/admin/explicaciones'). Panel propio, separado del de FAQ.
+				path: 'admin/explicaciones',
+				loadComponent: () =>
+					import('./pages/admin/explicaciones').then((m) => m.ExplicacionesAdminComponent),
+				title: 'Intranet - Admin: Modo informativo',
+			},
+			{
 				path: 'admin/cursos',
 				loadComponent: () =>
 					import('./pages/admin/cursos').then((m) => m.CursosComponent),

@@ -54,6 +54,12 @@ export type CapabilityCode =
 	| 'ESTUDIANTE_MENSAJERIA'
 	| 'ESTUDIANTE_NOTAS'
 	| 'ESTUDIANTE_SALONES'
+	// Manually appended (brief 525) — `EXPLICACIONES_MANAGE` fue seedeada en
+	// `Educa.API` (migración manual `20260805_CreateExplicacionesTable.sql`, pendiente
+	// de correr en el entorno) pero `npm run gen:caps` necesita una sesión autenticada
+	// que no puede enviar en este entorno. Mismo caso que `AYUDA_MANAGE` arriba.
+	// Remover este comentario cuando un regen naturalmente la incluya.
+	| 'EXPLICACIONES_MANAGE'
 	| 'INTRANET'
 	| 'MENSAJERIA'
 	| 'PROFESOR_ASISTENCIA'
