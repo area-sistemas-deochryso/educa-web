@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- Razón: facade thin (passthrough directo a session/preferences/notification storage) consumido como single entry-point por ~30 servicios; cada preferencia nueva agrega 2-3 líneas de passthrough sobre 300. Ya excedía el límite antes de brief 523 (THEME PREFERENCE la empujó de 307 a 317) — partir el facade fragmentaría ese contrato sin ganancia real (mismo criterio documentado en el chat cerrado 195). */
 import { Injectable, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { logger } from '@app/core/helpers';
@@ -13,10 +14,11 @@ import {
 	CorrelationViewMode,
 	ErrorGroupsViewMode,
 	PreferencesStorageService,
+	ThemePreference,
 } from './preferences-storage.service';
 import { NotificationStorageService } from './notification-storage.service';
 
-export type { CorrelationViewMode, ErrorGroupsViewMode } from './preferences-storage.service';
+export type { CorrelationViewMode, ErrorGroupsViewMode, ThemePreference } from './preferences-storage.service';
 
 /**
  * Storage facade for auth, permissions, notifications, and preferences.
@@ -400,6 +402,20 @@ export class StorageService {
 
 	hasErrorGroupsViewModePreference(): boolean {
 		return this.preferences.hasErrorGroupsViewModePreference();
+	}
+	// #endregion
+
+	// #region THEME PREFERENCE (brief 523)
+	getThemePreference(): ThemePreference | null {
+		return this.preferences.getThemePreference();
+	}
+
+	setThemePreference(theme: ThemePreference): void {
+		this.preferences.setThemePreference(theme);
+	}
+
+	hasThemePreference(): boolean {
+		return this.preferences.hasThemePreference();
 	}
 	// #endregion
 

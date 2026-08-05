@@ -11,7 +11,7 @@ import { SessionStorageService } from './session-storage.service';
  * and should be shared across tabs and browser restarts.
  *
  * @example
- * prefs.setTheme('system');
+ * prefs.setThemePreference('dark');
  */
 const PREFERENCES_KEYS = {
 	// Attendance preferences
@@ -24,7 +24,10 @@ const PREFERENCES_KEYS = {
 	SELECTED_ESTUDIANTE_DIRECTOR: 'educa_pref_selected_estudiante_director',
 
 	// UI preferences
-	THEME: 'educa_pref_theme',
+	// * Brief 523: key kept as `intranet-theme-mode` (not the `educa_pref_*`
+	//   convention used elsewhere) per product decision — matches what a
+	//   dev inspecting localStorage would expect to find.
+	THEME: 'intranet-theme-mode',
 	SIDEBAR_COLLAPSED: 'educa_pref_sidebar_collapsed',
 	NOTIFICATIONS_SOUND: 'educa_pref_notif_sound',
 
@@ -69,9 +72,14 @@ const ERROR_GROUPS_VIEW_MODES: readonly ErrorGroupsViewMode[] = ['kanban', 'tabl
 export type CorrelationViewMode = 'timeline' | 'section';
 
 /**
- * Theme preference for the UI.
+ * Explicit theme preference for the UI.
+ *
+ * There is no `'system'` value on purpose (brief 523): the absence of a
+ * stored value already means "follow `prefers-color-scheme` live" — see
+ * {@link PreferencesStorageService.getThemePreference}. Once the user
+ * toggles manually, the choice freezes as one of these two.
  */
-export type ThemePreference = 'light' | 'dark' | 'system';
+export type ThemePreference = 'light' | 'dark';
 
 /**
  * Grade and section preference.
@@ -403,25 +411,40 @@ export class PreferencesStorageService {
 	// #region UI PREFERENCES
 
 	/**
-	 * Get current theme preference.
+	 * Get the user's explicit theme preference, if any was ever set.
 	 *
-	 * @returns Theme preference.
+	 * `null` means the user never toggled manually — callers should follow
+	 * `prefers-color-scheme` live instead of assuming a default.
+	 *
+	 * @returns 'light', 'dark', or null when no manual preference is stored.
 	 * @example
-	 * const theme = prefs.getTheme();
+	 * const pref = prefs.getThemePreference();
 	 */
-	getTheme(): ThemePreference {
-		return (this.getItem(PREFERENCES_KEYS.THEME) as ThemePreference) || 'system';
+	getThemePreference(): ThemePreference | null {
+		const stored = this.getItem(PREFERENCES_KEYS.THEME);
+		return stored === 'light' || stored === 'dark' ? stored : null;
 	}
 
 	/**
-	 * Set theme preference.
+	 * Store the user's explicit theme preference (set on manual toggle).
 	 *
 	 * @param theme Theme preference.
 	 * @example
-	 * prefs.setTheme('dark');
+	 * prefs.setThemePreference('dark');
 	 */
-	setTheme(theme: ThemePreference): void {
+	setThemePreference(theme: ThemePreference): void {
 		this.setItem(PREFERENCES_KEYS.THEME, theme);
+	}
+
+	/**
+	 * Whether the user has an explicit theme preference stored, as opposed
+	 * to following `prefers-color-scheme` live.
+	 *
+	 * @example
+	 * if (!prefs.hasThemePreference()) { ... }
+	 */
+	hasThemePreference(): boolean {
+		return this.getThemePreference() !== null;
 	}
 
 	/**

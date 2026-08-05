@@ -23,16 +23,18 @@ describe('PreferencesStorageService', () => {
 
 	// #region Theme
 	describe('theme', () => {
-		it('should default to system', () => {
-			expect(service.getTheme()).toBe('system');
+		it('should default to null (no manual preference)', () => {
+			expect(service.getThemePreference()).toBeNull();
+			expect(service.hasThemePreference()).toBe(false);
 		});
 
 		it('should set and get theme', () => {
-			service.setTheme('dark');
-			expect(service.getTheme()).toBe('dark');
+			service.setThemePreference('dark');
+			expect(service.getThemePreference()).toBe('dark');
+			expect(service.hasThemePreference()).toBe(true);
 
-			service.setTheme('light');
-			expect(service.getTheme()).toBe('light');
+			service.setThemePreference('light');
+			expect(service.getThemePreference()).toBe('light');
 		});
 	});
 	// #endregion
@@ -195,14 +197,14 @@ describe('PreferencesStorageService', () => {
 	// #region clearAll
 	describe('clearAll', () => {
 		it('should clear everything', () => {
-			service.setTheme('dark');
+			service.setThemePreference('dark');
 			service.setSidebarCollapsed(true);
 			service.setNotificationsSoundEnabled(false);
 			service.setAttendanceMonth({ month: 1, year: 2026 });
 
 			service.clearAll();
 
-			expect(service.getTheme()).toBe('system');
+			expect(service.getThemePreference()).toBeNull();
 			expect(service.getSidebarCollapsed()).toBe(false);
 			expect(service.getNotificationsSoundEnabled()).toBe(true);
 			expect(service.getAttendanceMonth()).toBeNull();

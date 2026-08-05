@@ -5,7 +5,7 @@
 // * SmartDataStorageService is exposed because notifications smart-prefetch needs its keyed
 //   cache (out of scope for the generic StorageService facade).
 export { StorageService } from './storage.service';
-export type { CorrelationViewMode, ErrorGroupsViewMode } from './storage.service';
+export type { CorrelationViewMode, ErrorGroupsViewMode, ThemePreference } from './storage.service';
 export { SmartDataStorageService } from './smart-data-storage.service';
 export * from './storage.models';
 // #endregion

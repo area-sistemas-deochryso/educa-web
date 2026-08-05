@@ -73,7 +73,11 @@ export const appConfig: ApplicationConfig = {
 			theme: {
 				preset: Aura,
 				options: {
-					darkModeSelector: false,
+					// Brief 523: real dark mode toggle. ThemeService (core/services/theme)
+					// applies/removes `.dark-mode` on `document.documentElement` — do NOT
+					// revert to `false`/default `'system'` without also removing the
+					// service and toggle UI (see brief 522 for what happens otherwise).
+					darkModeSelector: '.dark-mode',
 				},
 			},
 		}),

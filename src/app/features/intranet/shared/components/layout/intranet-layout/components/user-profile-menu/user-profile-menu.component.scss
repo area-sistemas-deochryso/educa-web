@@ -277,6 +277,28 @@
 	margin-left: auto;
 }
 
+// Brief 523 — dark mode toggle row. Not a `.menu-btn`: only the switch is
+// interactive, not the whole row, so it skips the button hover/click affordance.
+.theme-toggle-row {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	width: 100%;
+	padding: 0.875rem 1.25rem;
+	color: var(--text-color);
+	font-size: 0.875rem;
+	font-weight: 500;
+
+	i {
+		font-size: 1.125rem;
+		color: var(--text-color-secondary);
+	}
+
+	.theme-toggle-switch {
+		margin-left: auto;
+	}
+}
+
 .bell-shake {
 	display: inline-block;
 	transform-origin: top center;

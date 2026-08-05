@@ -25,4 +25,5 @@ export * from './facades';
 export * from './excel';
 export * from './capacitor';
 export * from './view-as';
+export * from './theme';
 // #endregion

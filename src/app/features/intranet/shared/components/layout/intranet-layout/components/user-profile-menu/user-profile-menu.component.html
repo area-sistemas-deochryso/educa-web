@@ -34,6 +34,17 @@
 				<span class="popover-role">{{ userRole() }}</span>
 			</div>
 		</div>
+		<div class="popover-divider"></div>
+		<div class="theme-toggle-row">
+			<i class="pi" [class.pi-moon]="isDarkMode()" [class.pi-sun]="!isDarkMode()"></i>
+			<span>Modo oscuro</span>
+			<p-toggleswitch
+				[ngModel]="isDarkMode()"
+				(ngModelChange)="onThemeToggle()"
+				inputId="theme-toggle"
+				class="theme-toggle-switch"
+			/>
+		</div>
 		@if (showNotifications()) {
 			<div class="popover-divider"></div>
 			<button class="menu-btn" (click)="onNotificationsClick()" type="button">
