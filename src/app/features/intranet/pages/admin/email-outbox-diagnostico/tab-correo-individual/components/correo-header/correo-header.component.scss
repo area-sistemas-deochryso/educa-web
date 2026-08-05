@@ -32,7 +32,7 @@
 		align-items: center;
 		justify-content: center;
 		border-radius: 10px;
-		background: var(--surface-200);
+		background: var(--surface-100);
 		color: var(--text-color);
 
 		i { font-size: 1.05rem; }
@@ -77,7 +77,7 @@
 		letter-spacing: 0.5px;
 		padding: 2px 7px;
 		border-radius: 4px;
-		background: var(--surface-200);
+		background: var(--surface-100);
 		color: var(--text-color-secondary);
 
 		// * Mismo color-coding que el avatar — coherencia de tipo persona.

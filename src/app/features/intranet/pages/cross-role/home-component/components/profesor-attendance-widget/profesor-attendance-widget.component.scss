@@ -146,7 +146,8 @@
 		color: var(--blue-800);
 	}
 	&.estado-pendiente {
-		background: var(--surface-200, #e5e7eb);
+		// Brief 523: --surface-200 (fijo) -> --surface-100 (con variante dark).
+		background: var(--surface-100, #f0f0f0);
 		color: var(--text-color-secondary);
 	}
 }

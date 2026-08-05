@@ -171,7 +171,7 @@ type SelectionMode = 'start' | 'destination';
 			height: 18px;
 			border-radius: 50%;
 			border: none;
-			background: var(--surface-300);
+			background: var(--surface-100);
 			color: var(--text-color);
 			font-size: 10px;
 			cursor: pointer;

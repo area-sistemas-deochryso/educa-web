@@ -42,7 +42,8 @@
 			align-items: center;
 			justify-content: center;
 			border-radius: 12px;
-			background: var(--surface-200);
+			// Brief 523: --surface-200 (fijo) -> --surface-100 (con variante dark).
+			background: var(--surface-100);
 
 			i {
 				font-size: 1.25rem;

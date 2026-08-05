@@ -23,7 +23,8 @@
 	height: 48px;
 	border-radius: 12px;
 	font-size: 1.25rem;
-	background: var(--surface-200);
+	// Brief 523: --surface-200 (fijo) -> --surface-100 (con variante dark).
+	background: var(--surface-100);
 
 	&.total i {
 		color: var(--blue-800);

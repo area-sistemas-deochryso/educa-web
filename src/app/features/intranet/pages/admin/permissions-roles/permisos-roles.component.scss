@@ -48,7 +48,10 @@
 			align-items: center;
 			justify-content: center;
 			border-radius: 12px;
-			background: var(--surface-200);
+			// Brief 523: era --surface-200 (primitivo fijo, sin variante dark) --
+			// el ícono usa --text-color, que sí varía, y en dark quedaban casi
+			// idénticos. --surface-100 sí tiene variante dark real (_tokens.scss).
+			background: var(--surface-100);
 
 			i {
 				font-size: 1.25rem;
@@ -88,14 +91,15 @@
 		min-width: 28px;
 		height: 28px;
 		padding: 0 0.5rem;
-		background: var(--surface-200);
+		// Brief 523: --surface-200 -> --surface-100 (mismo motivo que .stat-icon arriba).
+		background: var(--surface-100);
 		color: var(--text-color);
 		border-radius: 6px;
 		font-weight: 600;
 		font-size: 0.85rem;
 
 		&.secondary {
-			background: var(--surface-200);
+			background: var(--surface-100);
 			color: var(--text-color);
 		}
 	}
@@ -105,7 +109,7 @@
 		align-items: center;
 		gap: 0.35rem;
 		padding: 0.35rem 0.75rem;
-		background: var(--surface-200);
+		background: var(--surface-100);
 		color: var(--text-color);
 		border-radius: 20px;
 		font-size: 0.8rem;
@@ -366,14 +370,16 @@
 					min-width: 20px;
 					height: 20px;
 					padding: 0 0.35rem;
-					background: var(--surface-200);
+					// Brief 523: --surface-200/-400 (primitivos fijos) -> --surface-100.
+					background: var(--surface-100);
 					border-radius: 10px;
 					font-size: 0.75rem;
 					color: var(--text-color);
 
 					&.has-selection {
-						background: var(--surface-400);
+						background: var(--surface-100);
 						color: var(--text-color);
+						font-weight: 700;
 					}
 				}
 
@@ -579,8 +585,8 @@
 				transition: all 0.2s ease;
 
 				&:hover:not(.p-disabled) {
-					background: var(--surface-200) !important;
-					border-color: var(--surface-400) !important;
+					background: var(--surface-100) !important;
+					border-color: var(--surface-300) !important;
 				}
 
 				&.p-disabled {
@@ -684,7 +690,7 @@
 	// Tags con colores neutrales
 	.p-tag {
 		font-weight: 600;
-		background: var(--surface-200) !important;
+		background: var(--surface-100) !important;
 		color: var(--text-color) !important;
 	}
 

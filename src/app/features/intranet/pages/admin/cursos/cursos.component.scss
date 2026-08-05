@@ -50,7 +50,8 @@
 			align-items: center;
 			justify-content: center;
 			border-radius: 12px;
-			background: var(--surface-200);
+			// Brief 523: --surface-200 (fijo) -> --surface-100 (con variante dark).
+			background: var(--surface-100);
 
 			i {
 				font-size: 1.25rem;
@@ -126,7 +127,7 @@
 	.id-badge {
 		display: inline-block;
 		padding: 0.25rem 0.5rem;
-		background: var(--surface-200);
+		background: var(--surface-100);
 		border-radius: 6px;
 		font-size: 0.85rem;
 		font-weight: 600;
@@ -458,7 +459,7 @@
 
 				&:hover > td {
 					opacity: 1;
-					background: var(--surface-200);
+					background: var(--surface-100);
 				}
 			}
 		}
@@ -484,8 +485,13 @@
 				transition: all 0.2s ease;
 
 				&:hover:not(.p-disabled) {
-					background: var(--surface-200) !important;
-					border-color: var(--surface-400) !important;
+					// Brief 523: --surface-200 fijo -- aunque el texto acá usa
+					// --black-color (no --text-color), --black-color SÍ tiene
+					// variante dark real (invierte a casi blanco), así que
+					// combinado con un fondo fijo claro queda el mismo bug:
+					// texto claro sobre fondo claro en dark mode.
+					background: var(--surface-100) !important;
+					border-color: var(--surface-300) !important;
 				}
 
 				&.p-disabled {

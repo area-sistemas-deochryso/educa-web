@@ -162,8 +162,9 @@ app-mobile-menu .search-clear {
 	transition: all 0.15s ease;
 
 	&:active {
+		// Brief 523: --surface-200 (fijo) -> --surface-100 (con variante dark).
 		color: var(--text-color);
-		background: var(--surface-200, #e5e7eb);
+		background: var(--surface-100, #f0f0f0);
 	}
 }
 // #endregion

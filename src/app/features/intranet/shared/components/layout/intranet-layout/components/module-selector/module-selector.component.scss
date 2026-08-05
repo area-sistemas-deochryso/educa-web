@@ -26,8 +26,10 @@
 	transition: all 0.2s ease;
 
 	&:hover {
+		// Brief 523: --surface-200 (fijo) -> --surface-100 (con variante dark)
+		// -- el trigger usa --text-color genérico, que se vuelve claro en dark.
 		border-color: var(--surface-400, #9ca3af);
-		background: var(--surface-200, #e5e7eb);
+		background: var(--surface-100, #f0f0f0);
 	}
 
 	&.open {

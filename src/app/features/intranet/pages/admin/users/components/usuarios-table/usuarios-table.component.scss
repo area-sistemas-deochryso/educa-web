@@ -96,7 +96,7 @@
 
 		&:hover {
 			color: var(--text-color) !important;
-			background: var(--surface-200) !important;
+			background: var(--surface-100) !important;
 		}
 	}
 
@@ -185,7 +185,7 @@
 
 				&:hover > td {
 					opacity: 1;
-					background: var(--surface-200);
+					background: var(--surface-100);
 				}
 			}
 		}
@@ -206,8 +206,8 @@
 				transition: all 0.2s ease;
 
 				&:hover:not(.p-disabled) {
-					background: var(--surface-200) !important;
-					border-color: var(--surface-400) !important;
+					background: var(--surface-100) !important;
+					border-color: var(--surface-300) !important;
 				}
 
 				&.p-disabled {
