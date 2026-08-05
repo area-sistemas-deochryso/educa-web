@@ -1,0 +1,12 @@
+.explicacion-admin-table {
+	:host {
+		display: block;
+	}
+}
+
+.texto-cell {
+	max-width: 28rem;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}

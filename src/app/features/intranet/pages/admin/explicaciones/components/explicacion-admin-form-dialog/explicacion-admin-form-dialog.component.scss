@@ -1,0 +1,25 @@
+.explicacion-form {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.field {
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
+
+	label {
+		font-weight: 600;
+		font-size: 0.875rem;
+	}
+}
+
+.field-row {
+	display: flex;
+	gap: 1rem;
+
+	.field {
+		flex: 1;
+	}
+}
