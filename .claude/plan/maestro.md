@@ -17,6 +17,7 @@
 | xP53 | → Duplicate person validation (coord) | F3 FE ✅ awaiting-prod (281) | ver P53 |
 | xPanelAyuda | → Panel de ayuda intranet (coord) | F1-F3 BE ✅ · F4 FE ✅ awaiting-prod (479, `chat/479-fe-panel-ayuda-qa-shell`) · F5 FE ✅ awaiting-prod (480, `chat/480-fe-panel-ayuda-ticket`) · F6 FE ✅ awaiting-prod (481, `chat/481-fe-panel-ayuda-salud-sede`) | ver xrepo-panel-ayuda-intranet |
 | xP92 | → Admin "ver como" profesor/estudiante — gate + wrapper de módulo (coord P92 F2) | 🔒 bloqueado por F1 (`Educa.API` 498) — brief 499 sin arrancar | ver P92 |
+| xModoInformativo | → Modo informativo interactivo (coord xrepo-96) | F1+F2 FE ✅ shipped, sin cerrar chat (524, `chat/524-fe-modo-informativo-fab-interceptor`, incluye fix hold-to-bypass) · F3 brief 525 en `educa-coord/chats/open/` (BE+admin) · F4 brief 526 (`open/`, 🔒 bloqueado hasta 525) · F5-F6 pendientes | ver xrepo-96 |
 <!-- INDEX:END -->
 
 ---
@@ -90,7 +91,7 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub F3-F6), *
 
 ### Notas operativas
 
-- **`running/`**: vacío en main · **`open/`**: 5 briefs (332, 390, 391, 458, 462) · **`awaiting-prod/`**: 4 briefs (464, 465, 480, 481) · **`waiting/`**: vacío · **`troubles/`**: vacío
+- **`running/`**: 1 brief (524, worktree `chat/524-fe-modo-informativo-fab-interceptor`) · **`open/`**: 5 briefs (332, 390, 391, 458, 462) · **`awaiting-prod/`**: 4 briefs (464, 465, 480, 481) · **`waiting/`**: vacío · **`troubles/`**: vacío
 - **Último cierre**: 467 (audit Administrador — shim global de tokens PrimeNG sin prefijo `--p-` en 229 archivos, fix puerto k6, fix "Rol del sistema") → `closed/`, 2026-07-18.
 - **Último saneamiento**: 2026-07-11 — sync-maestro: vaciado `awaiting-prod/` completo (estables, verificados con usuarios reales).
 
