@@ -222,14 +222,28 @@
 	border-radius: 6px;
 	margin-top: 0.5rem;
 
+	// Brief 523: --green-50/--red-50 (primitivos fijos) -> tints que sí
+	// adaptan por modo. .smtp-code y .retry-duration viven directo sobre el
+	// tinte (no sobre el fondo de página), así que necesitan el -text del
+	// tinte en vez del --text-color/-secondary genérico.
 	&.success {
-		background: var(--green-50);
-		border: 1px solid var(--green-200);
+		background: var(--tint-success-bg);
+		border: 1px solid var(--tint-success-border);
+
+		.smtp-code,
+		.retry-duration {
+			color: var(--tint-success-text);
+		}
 	}
 
 	&.failed {
-		background: var(--red-50);
-		border: 1px solid var(--red-200);
+		background: var(--tint-danger-bg);
+		border: 1px solid var(--tint-danger-border);
+
+		.smtp-code,
+		.retry-duration {
+			color: var(--tint-danger-text);
+		}
 	}
 
 	.retry-duration {

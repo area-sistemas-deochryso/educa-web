@@ -38,18 +38,37 @@
 	--tint-danger-bg: color-mix(in srgb, var(--red-500) 8%, transparent);
 	--tint-danger-border: color-mix(in srgb, var(--red-500) 30%, transparent);
 	--tint-danger-icon: var(--red-600);
+	/* -text agregado en brief 523 para casos donde el texto de cuerpo (no
+	   solo un ícono) vive directamente sobre el tinte -- mismo criterio que
+	   --tint-primary-text (ver más abajo). */
+	--tint-danger-text: var(--red-700);
 
 	--tint-warning-bg: color-mix(in srgb, var(--yellow-500) 12%, transparent);
 	--tint-warning-border: color-mix(in srgb, var(--yellow-500) 35%, transparent);
 	--tint-warning-icon: var(--yellow-700);
+	--tint-warning-text: var(--yellow-700);
 
 	--tint-success-bg: color-mix(in srgb, var(--green-500) 10%, transparent);
 	--tint-success-border: color-mix(in srgb, var(--green-500) 30%, transparent);
 	--tint-success-icon: var(--green-600);
+	--tint-success-text: var(--green-700);
 
 	--tint-info-bg: color-mix(in srgb, var(--blue-500) 8%, transparent);
 	--tint-info-border: color-mix(in srgb, var(--blue-500) 30%, transparent);
 	--tint-info-icon: var(--blue-600);
+
+	/* --- Tinte de acento primario (brief 523) ---
+	   Mismo patrón color-mix() que los 4 de arriba, pero con un -text además
+	   de -icon: a diferencia de un banner de alerta (ícono + label corto),
+	   acá el tinte envuelve texto de cuerpo real (burbuja de mensaje propio,
+	   ítem de conversación activa) que necesita leerse cómodo, no solo tener
+	   un ícono de color reconocible. -text SÍ cambia entre claro/oscuro
+	   (ver bloque .dark-mode) porque, a diferencia de --tint-*-icon, va
+	   sobre el propio tinte compuesto (que cambia de tono según lo que haya
+	   detrás), no sobre el fondo de página. */
+	--tint-primary-bg: color-mix(in srgb, var(--primary-500) 10%, transparent);
+	--tint-primary-border: color-mix(in srgb, var(--primary-500) 25%, transparent);
+	--tint-primary-text: var(--primary-700);
 
 	/* --- Estado de asistencia ---
 	   Paleta idéntica copy-pasteada en 7 archivos de src/app/features/intranet/
@@ -143,5 +162,179 @@
 	--gray-600: #707070;
 	--gray-700: #333333;
 	--black-color: #000000;
+}
+// #endregion
+
+// #region Variantes dark (brief 523 — modo oscuro real)
+// Bloque centralizado: todo lo que necesita un valor distinto bajo `.dark-mode`
+// vive acá, no disperso por componente (ese fue el error del código muerto
+// original que brief 521 limpió). Selector activado por ThemeService
+// (core/services/theme) sobre `document.documentElement` — ver
+// `darkModeSelector: '.dark-mode'` en app.config.ts.
+//
+// Contraste verificado por CÁLCULO (fórmula WCAG de luminancia relativa),
+// NO por inspección visual en navegador — ver reporte del brief 523 para el
+// detalle de qué sí se pudo verificar en vivo. Fondo de referencia usado en
+// los cálculos: #18181b (el mismo --surface-ground definido abajo).
+//
+// Lo que NO está en este bloque a propósito:
+// - --text-color, --text-color-secondary, --surface-hover, --surface-border,
+//   --surface-0/200/300/400/500/900: alias reales de tokens --p-* que Aura
+//   recalcula solo bajo el selector activo (confirmado leyendo
+//   node_modules/@primeuix/themes/dist/aura/base — colorScheme.dark usa la
+//   escala `zinc` en vez de `slate` para toda la familia surface).
+// - Primitivos de color del shim de styles.scss (--red-500, --blue-600,
+//   etc.): paleta fija, no varía entre esquemas (confirmado en el mismo
+//   archivo — viven fuera de `colorScheme`, es una paleta plana).
+// - --emerald-500, --violet-500, --intranet-accent-color-green/-yellow/-red,
+//   --tint-*-icon, --intranet-primary-color: contraste calculado ≥3:1 (uso
+//   ícono/borde) o ≥4.5:1 (texto) contra el fondo oscuro elegido — ya
+//   suficiente, sin cambios.
+// - --violet-50/200, --emerald-50/200/300, --navy-800/900, --gold-600,
+//   --pink-*, --sky-*, --accent-amber*, --intranet-accent-color-blue-hover/
+//   -blue-dark: uso decorativo de fondo con texto/ícono fijo encima, o ya
+//   oscuros por diseño (paneles de video) — impacto visual bajo, revisado y
+//   descartado.
+:root.dark-mode {
+	/* --- Fix crítico no listado en el brief original: --surface-card/
+	   -ground/-100 y --surface-dialog son hex FIJOS en el shim de
+	   styles.scss (NO alias de --p-surface-*, a pesar de la sección
+	   "PRIMENG TOKEN COMPATIBILITY SHIM" sugerir lo contrario a simple
+	   vista). Sin este override, cards/popovers/diálogos/tablas (113
+	   archivos) se quedarían con fondo claro mientras --text-color pasa a
+	   claro-sobre-oscuro vía Aura — mismo patrón de bug que brief 522,
+	   esta vez dentro de cada card en vez de en toda la página. Valores
+	   alineados a la escala `zinc` que usa Aura internamente en dark
+	   (zinc-900/800/700), para que combinen con lo que PrimeNG sí ajusta
+	   solo (surface-hover, surface-border, --text-color). */
+	/* Ramp más suave que el zinc "de catálogo" (#18181b/#27272a/#3f3f46) —
+	   feedback del usuario: el fondo se sentía demasiado negro/duro. Pasos
+	   más parejos entre sí (~9-10 puntos de luminancia c/u) en vez del salto
+	   grande final. */
+	--surface-ground: #232326;
+	--surface-card: #2c2c30;
+	--surface-100: #37373c;
+	--surface-dialog: #37373c;
+
+	/* --- Paleta de marca legacy (styles.scss :root, ~13 tokens de color) --- */
+	--intranet-background-color: var(--surface-ground);
+	--intranet-white-color: var(--surface-card);
+	--intranet-soft-text-color: #b5b5b5; /* era #4a4a4a, texto medio sobre fondo claro */
+	--intranet-alternative-text-color: #d0d0d0; /* era #242424, texto/borde fuerte */
+	--intranet-default-text-color: #ededed; /* era #141414, texto más fuerte */
+	--intranet-border-color: #3f3f46; /* era #e5e5e5 — borde sutil equivalente en dark */
+	/* era #253470 (~1.5:1, ilegible). Primer intento usó --blue-400 crudo
+	   (#60a5fa) para pasar contraste, pero quedó demasiado brillante/saturado
+	   contra el fondo oscuro (feedback del usuario) — azul acero apagado,
+	   ~5.7:1 calculado contra texto blanco, más cerca del tono navy original. */
+	--intranet-accent-color-blue: #3f6a8f;
+	/* El amarillo de marca (#ffcc0c, mismo del logo) se mantenía sin variante
+	   dark — sobre fondo casi negro se percibe "neón". Dorado más apagado,
+	   ~3:1 calculado contra el ícono del botón de login (que usa el azul de
+	   arriba como color), suficiente para el umbral de ícono/UI. */
+	--intranet-accent-color-yellow: #e3c02e;
+	/* --primer-text-color (#0c7da0, teal saturado) es el color GLOBAL de
+	   `<a>` (styles.scss línea ~363) — sin variante dark se percibía como el
+	   mismo problema del azul/amarillo: no ilegible (~3.3:1), pero sí
+	   "brillante"/desentonado contra el fondo neutro oscuro. Mismo tono que
+	   --intranet-accent-color-blue pero aclarado lo justo para servir como
+	   texto de link (~5.4:1) en vez de fondo de botón — una sola familia de
+	   azul en dark, no tres distintas (uniformidad pedida por el usuario). */
+	--primary-text-color: #6f9dc2;
+
+	/* --- Texto base de PrimeNG (Aura) — el preset usa blanco puro (#ffffff)
+	   para --p-text-color en dark, que técnicamente contrasta de sobra pero
+	   cansa la vista en sesiones largas (pedido explícito del usuario: "ni
+	   tan brillante que canse"). Off-white, ~14.8:1 contra el fondo — sigue
+	   sobrando contraste para AA, pero sin el brillo de blanco puro. Se
+	   pisa --p-text-color (no --text-color, que es solo un alias) para que
+	   el ajuste alcance también a los componentes nativos de PrimeNG que
+	   leen --p-text-color directo, no solo los que pasan por nuestro shim. */
+	--p-text-color: #e4e4e7;
+
+	/* --- Acento interactivo (indigo) — #4338ca da ~2.25:1 calculado contra
+	   el fondo oscuro, muy por debajo de AA (se usa como color/border-color
+	   de texto e íconos en 30+ archivos). indigo-400/300 dan ~5.9-8.5:1. */
+	--accent-interactive: #818cf8;
+	--accent-interactive-hover: #a5b4fc;
+	--accent-interactive-light: #a5b4fc;
+
+	/* --- Nav activo (oliva) — #5c7a28 da ~3.6:1 calculado (pasa umbral de
+	   ícono/UI 3:1, no pasa el de texto 4.5:1) y se usa como texto de item
+	   de nav activo. Variante más clara de la misma familia, ~8.8:1. */
+	--nav-active: #9bc44f;
+	--nav-active-hover: #b3d873;
+
+	/* --- Oro (badge prioridad alta, floating-notification-bell) — gold-700/
+	   800 se usan como `color` de texto sobre un tinte propio semi-
+	   transparente (rgba(255,204,12,0.2)); compuesto contra fondo oscuro
+	   ese tinte da ~3.9:1 calculado, límite. gold-600 es solo parada de
+	   gradiente decorativo sin texto encima — no necesita variante. */
+	--gold-700: #f5c518;
+	--gold-800: #ffdb66;
+
+	/* --- Grises puros (sin tinte, distintos de --surface-*) — usados como
+	   texto/borde en login, attendance, layout (15+ archivos). Rampa
+	   invertida: lo que era "casi negro" (700, black) pasa a "casi blanco"
+	   y viceversa, preservando el orden relativo de énfasis. */
+	--gray-200: #2e2e2e;
+	--gray-300: #454545;
+	--gray-400: #5c5c5c;
+	--gray-500: #8a8a8a;
+	--gray-600: #b0b0b0;
+	--gray-700: #e0e0e0;
+	--black-color: #f5f5f5;
+
+	/* --- Tints de severidad — color-mix con "transparent" diluye mucho más
+	   sobre un fondo casi negro que sobre uno casi blanco (mismo % de
+	   mezcla, resultado visualmente casi idéntico al fondo). Se sube el
+	   porcentaje para mantener el tinte perceptible; los íconos (primitivos
+	   fijos, --tint-*-icon) ya dan contraste suficiente sin cambios. */
+	--tint-danger-bg: color-mix(in srgb, var(--red-500) 20%, transparent);
+	--tint-danger-border: color-mix(in srgb, var(--red-500) 40%, transparent);
+	/* red-300 sí existe en el shim (styles.scss) -- variante clara para leer
+	   sobre el tinte ahora oscuro, mismo criterio que --tint-primary-text. */
+	--tint-danger-text: var(--red-300);
+	--tint-warning-bg: color-mix(in srgb, var(--yellow-500) 24%, transparent);
+	--tint-warning-border: color-mix(in srgb, var(--yellow-500) 45%, transparent);
+	/* yellow-300 NO está en el shim (solo hasta yellow-50/400+) -- primitivo
+	   --p-yellow-300 directo con fallback hex (ver comentario del brief 523
+	   en el fix template). */
+	--tint-warning-text: var(--p-yellow-300, #fde047);
+	--tint-success-bg: color-mix(in srgb, var(--green-500) 22%, transparent);
+	--tint-success-border: color-mix(in srgb, var(--green-500) 40%, transparent);
+	/* green-300 tampoco está en el shim -- mismo caso que yellow-300 arriba. */
+	--tint-success-text: var(--p-green-300, #86efac);
+	--tint-info-bg: color-mix(in srgb, var(--blue-500) 20%, transparent);
+	--tint-info-border: color-mix(in srgb, var(--blue-500) 40%, transparent);
+
+	/* --tint-primary-bg/-border ya heredan el % subido de arriba (son la
+	   misma variable, color-mix recalcula solo). --tint-primary-text SÍ
+	   necesita valor propio acá -- primary-700 (verde oscuro) se volvería
+	   ilegible sobre el tinte ahora oscuro; primary-300 (verde claro) es
+	   la variante correcta para leer sobre ESE fondo compuesto. */
+	--tint-primary-text: var(--primary-300);
+
+	/* --- Estado de asistencia — presente/tardanza (alias de tokens ya
+	   corregidos arriba) y pendiente (#9e9e9e, ~6.6:1 calculado) están bien.
+	   falta (#f44336, ~4.8:1 calculado) también. justificado (#9c27b0) da
+	   solo ~2.8:1 calculado — bajo el umbral de ícono (3:1) — variante más
+	   clara de la misma familia (purple-400). */
+	--attendance-justificado: #c084fc;
+}
+
+/* `body { background-color: var(--white-color) }` (styles.scss) es blanco
+   FIJO a propósito -- --white-color se usa como texto sobre badges de color
+   saturado en decenas de archivos y no puede variar por modo. El problema:
+   varios elementos entre `body` y el contenido real de página son
+   transparentes (app-root, intranet-layout, el wrapper del banner de salud
+   de sede), así que cualquier fondo translúcido (color-mix con "transparent"
+   -- salud-sede-banner y los --tint-*-bg de arriba usan ese patrón) termina
+   mezclándose contra el blanco de `body`, no contra el fondo oscuro real de
+   la página. Encontrado en vivo: la franja de "Salud de sede crítica" se
+   veía crema clara con texto claro encima -- ilegible -- pese a que el resto
+   de la página ya estaba oscura. */
+.dark-mode body {
+	background-color: var(--surface-ground);
 }
 // #endregion

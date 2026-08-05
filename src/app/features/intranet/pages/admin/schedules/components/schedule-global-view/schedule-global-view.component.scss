@@ -59,24 +59,36 @@
   border: 1px solid var(--surface-border);
   overflow: hidden;
 
+  // Brief 523: --orange-50/--red-50 (primitivos fijos) -> tints que sí
+  // adaptan por modo. Naranja se mapea a --tint-warning-* (mismo
+  // significado semántico "advertencia") en vez de crear una familia
+  // --tint-orange-* nueva solo para este caso.
   &.severity-warning {
     .group-header {
-      background: var(--orange-50);
-      border-bottom-color: var(--orange-200);
+      background: var(--tint-warning-bg);
+      border-bottom-color: var(--tint-warning-border);
 
       i {
         color: var(--orange-500);
+      }
+
+      .group-label {
+        color: var(--tint-warning-text);
       }
     }
   }
 
   &.severity-error {
     .group-header {
-      background: var(--red-50);
-      border-bottom-color: var(--red-200);
+      background: var(--tint-danger-bg);
+      border-bottom-color: var(--tint-danger-border);
 
       i {
         color: var(--red-500);
+      }
+
+      .group-label {
+        color: var(--tint-danger-text);
       }
     }
   }
@@ -101,7 +113,7 @@
   }
 
   .group-count {
-    background: var(--surface-200);
+    background: var(--surface-100);
     color: var(--text-color-secondary);
     padding: 0.125rem 0.5rem;
     border-radius: 10px;

@@ -105,11 +105,14 @@
 			font-weight: 500;
 		}
 
+		// Brief 523: era --primary-50 fijo + --accent-interactive (familias
+		// mezcladas) -> --tint-primary-bg/-text, unificado con el resto de la
+		// paleta de tinte (mensajeria-tab, salud-sede-banner).
 		.eval-peso {
 			font-size: 0.75rem;
 			font-weight: 600;
-			color: var(--accent-interactive);
-			background: var(--primary-50);
+			color: var(--tint-primary-text);
+			background: var(--tint-primary-bg);
 			padding: 0.125rem 0.5rem;
 			border-radius: 1rem;
 		}
