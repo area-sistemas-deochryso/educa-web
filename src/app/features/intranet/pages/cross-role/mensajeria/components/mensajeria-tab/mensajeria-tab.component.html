@@ -3,6 +3,7 @@
 	<div class="mensajeria-curso-selector">
 		<label class="mensajeria-curso-label">Curso:</label>
 		<p-select
+			data-info-anchor="curso-selector"
 			[options]="cursoOptions()"
 			[ngModel]="selectedHorarioId()"
 			(ngModelChange)="onCursoChange($event)"
@@ -36,6 +37,7 @@
 					pButton
 					icon="pi pi-refresh"
 					class="p-button-rounded p-button-text p-button-sm"
+					data-info-anchor="mensajeria-refresh-lista"
 					(click)="onRefreshLista()"
 					[disabled]="vm().loading"
 					[pt]="{ root: { 'aria-label': 'Refrescar' } }"
@@ -44,6 +46,7 @@
 					pButton
 					icon="pi pi-plus"
 					class="p-button-rounded p-button-sm"
+					data-info-anchor="mensajeria-nuevo"
 					(click)="onNuevoMensaje()"
 					[pt]="{ root: { 'aria-label': 'Nuevo mensaje' } }"
 				></button>
@@ -68,6 +71,7 @@
 						class="conversacion-item"
 						[class.conversacion-item--active]="vm().detalle?.id === conv.id"
 						[class.conversacion-item--unread]="conv.mensajesNoLeidos > 0"
+						data-info-anchor="mensajeria-conversacion-item"
 						(click)="onSelectConversacion(conv.id)"
 					>
 						<div class="conversacion-avatar" [style.background]="conv.avatarColor">
@@ -119,6 +123,7 @@
 					pButton
 					icon="pi pi-arrow-left"
 					class="p-button-rounded p-button-text p-button-sm back-btn"
+					data-info-anchor="mensajeria-volver"
 					(click)="onBack()"
 					[pt]="{ root: { 'aria-label': 'Volver a lista' } }"
 				></button>
@@ -134,6 +139,7 @@
 					pButton
 					icon="pi pi-refresh"
 					class="p-button-rounded p-button-text p-button-sm"
+					data-info-anchor="mensajeria-refresh-detalle"
 					(click)="onRefreshDetalle()"
 					[disabled]="vm().detalleLoading"
 					[pt]="{ root: { 'aria-label': 'Refrescar' } }"
@@ -177,6 +183,7 @@
 						pButton
 						icon="pi pi-send"
 						class="p-button-rounded"
+						data-info-anchor="mensajeria-enviar"
 						(click)="onEnviar()"
 						[disabled]="!nuevoMensaje().trim() || vm().sending"
 						[loading]="vm().sending"
@@ -202,6 +209,7 @@
 		<div class="nuevo-field">
 			<label class="nuevo-label" for="dest-select">Destinatario</label>
 			<p-select
+				data-info-anchor="mensajeria-dialog-destinatario"
 				id="dest-select"
 				[options]="resolvedEstudiantes()"
 				[ngModel]="selectedEstudianteDni()"
@@ -239,11 +247,12 @@
 	</div>
 
 	<ng-template #footer>
-		<button pButton label="Cancelar" class="p-button-text" (click)="onCancelarNuevo()"></button>
+		<button pButton label="Cancelar" class="p-button-text" data-info-anchor="mensajeria-dialog-cancelar" (click)="onCancelarNuevo()"></button>
 		<button
 			pButton
 			label="Enviar"
 			icon="pi pi-send"
+			data-info-anchor="mensajeria-dialog-enviar"
 			(click)="onCrearConversacion()"
 			[disabled]="!canCreate() || vm().sending"
 			[loading]="vm().sending"

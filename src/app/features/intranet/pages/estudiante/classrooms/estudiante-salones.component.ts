@@ -62,7 +62,7 @@ import { EstudianteSalonDialogComponent } from './components/estudiante-salon-di
 			<div class="p-4 pt-0">
 				<div class="salon-grid">
 					@for (salon of vm().salones; track salon.salonId) {
-						<div class="salon-card" (click)="onVerSalon(salon)">
+						<div class="salon-card" data-info-anchor="estudiante-salones-card" (click)="onVerSalon(salon)">
 							<div class="flex align-items-center justify-content-between mb-2">
 								<span class="font-bold text-lg">{{ salon.salonDescripcion }}</span>
 								<p-tag
@@ -76,6 +76,7 @@ import { EstudianteSalonDialogComponent } from './components/estudiante-salon-di
 									<p-tag
 										[value]="curso.cursoNombre"
 										styleClass="tag-neutral cursor-pointer"
+										data-info-anchor="estudiante-salones-card-curso-tag"
 										(click)="onVerCurso(curso, $event)"
 										pTooltip="Ver contenido del curso"
 										tooltipPosition="top"

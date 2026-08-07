@@ -12,7 +12,7 @@
 	<div class="flex flex-column align-items-center p-5 text-color-secondary">
 		<i class="pi pi-exclamation-triangle text-4xl mb-3 text-yellow-600"></i>
 		<p class="font-semibold">{{ vm().error }}</p>
-		<button pButton label="Reintentar" icon="pi pi-refresh" class="p-button-outlined mt-2" (click)="onRetry()"></button>
+		<button pButton label="Reintentar" icon="pi pi-refresh" class="p-button-outlined mt-2" data-info-anchor="reintentar" (click)="onRetry()"></button>
 	</div>
 } @else if (vm().isEmpty) {
 	@if (embedded()) {
@@ -40,6 +40,7 @@
 				label="Simular"
 				icon="pi pi-calculator"
 				class="p-button-outlined p-button-help"
+				data-info-anchor="estudiante-notas-simular"
 				(click)="onOpenSimulador()"
 				[disabled]="!vm().selectedCurso"
 				pTooltip="Simular qué nota necesitás para aprobar"
@@ -58,6 +59,7 @@
 		<div class="notas-filters">
 			@if (vm().cursoOptions.length > 1) {
 				<app-picker-grid
+					data-info-anchor="curso-picker-grid"
 					[options]="vm().cursoOptions"
 					[selected]="vm().selectedCursoIndex"
 					(selectionChange)="onCursoChange($event)"
@@ -73,6 +75,7 @@
 					label="Simular"
 					icon="pi pi-calculator"
 					class="p-button-outlined p-button-help p-button-sm"
+					data-info-anchor="estudiante-notas-simular"
 					(click)="onOpenSimulador()"
 					[disabled]="!vm().selectedCurso"
 				></button>

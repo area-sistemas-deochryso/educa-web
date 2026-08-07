@@ -1,6 +1,7 @@
 <!-- #region Curso selector -->
 <div class="tab-header">
 	<p-select
+		data-info-anchor="curso-selector"
 		[options]="cursoOptions()"
 		[(ngModel)]="selectedCursoLocal"
 		(ngModelChange)="onCursoChange($event)"
@@ -59,7 +60,7 @@
 	>
 		<ng-template #header>
 			<tr>
-				<th pSortableColumn="fecha">Fecha <p-sortIcon field="fecha" /></th>
+				<th pSortableColumn="fecha" data-info-anchor="tabla-orden-columna">Fecha <p-sortIcon field="fecha" /></th>
 				<th style="width: 120px; text-align: center">Estado</th>
 				<th>Justificacion</th>
 			</tr>

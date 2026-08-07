@@ -24,6 +24,7 @@
 						@for (archivo of semana.archivos; track archivo.id) {
 							<div
 								class="file-row clickable"
+								data-info-anchor="cursos-archivos-resumen-fila"
 								(click)="openArchivo(archivo.urlArchivo)"
 							>
 								<div [class]="'file-icon ' + getFileIconClass(archivo.tipoArchivo)">

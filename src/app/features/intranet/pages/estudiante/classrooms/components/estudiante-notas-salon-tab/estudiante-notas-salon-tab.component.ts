@@ -15,6 +15,7 @@ import { NotasCursoCardComponent } from '@features/intranet/pages/estudiante/not
 		@if (cursoOptions().length > 1) {
 			<div class="tab-header">
 				<p-select
+					data-info-anchor="curso-selector"
 					[options]="cursoOptions()"
 					[ngModel]="selectedCurso()"
 				(ngModelChange)="selectedCurso.set($event)"

@@ -3,6 +3,7 @@
 	<div class="foro-curso-selector">
 		<label class="foro-curso-label">Curso:</label>
 		<p-select
+			data-info-anchor="curso-selector"
 			[options]="cursoOptions()"
 			[ngModel]="selectedHorarioId()"
 			(ngModelChange)="onCursoChange($event)"
@@ -35,6 +36,7 @@
 			pButton
 			icon="pi pi-refresh"
 			class="p-button-rounded p-button-text p-button-sm"
+			data-info-anchor="foro-refresh"
 			(click)="onRefresh()"
 			[disabled]="vm().loading"
 			[pt]="{ root: { 'aria-label': 'Refrescar mensajes' } }"
@@ -83,6 +85,7 @@
 			@if (destinatarioOptions().length > 0) {
 				<div class="foro-destinatarios">
 					<p-multiselect
+						data-info-anchor="foro-destinatarios"
 						[options]="destinatarioOptions()"
 						[ngModel]="selectedDestinatarios()"
 						(ngModelChange)="selectedDestinatarios.set($event)"
@@ -118,6 +121,7 @@
 					pButton
 					[icon]="isDirectedMessage() ? 'pi pi-envelope' : 'pi pi-send'"
 					class="p-button-rounded"
+					data-info-anchor="foro-enviar"
 					(click)="onEnviar()"
 					[disabled]="!nuevoMensaje().trim() || vm().sending"
 					[loading]="vm().sending"

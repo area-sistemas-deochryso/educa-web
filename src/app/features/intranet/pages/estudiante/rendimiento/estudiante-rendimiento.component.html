@@ -9,7 +9,7 @@
 		<div class="flex flex-column align-items-center p-5 text-color-secondary">
 			<i class="pi pi-exclamation-triangle text-4xl mb-3 text-yellow-600"></i>
 			<p class="font-semibold">{{ vm().error }}</p>
-			<button pButton label="Reintentar" icon="pi pi-refresh" class="p-button-outlined mt-2" (click)="onRetry()"></button>
+			<button pButton label="Reintentar" icon="pi pi-refresh" class="p-button-outlined mt-2" data-info-anchor="reintentar" (click)="onRetry()"></button>
 		</div>
 	} @else if (vm().isEmpty) {
 		<div class="flex flex-column align-items-center p-5 text-color-secondary">

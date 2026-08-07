@@ -32,6 +32,7 @@
 					<button
 						type="button"
 						class="day-btn"
+						data-info-anchor="estudiante-horarios-day-selector"
 						[class.active]="selectedDay() === dia.value"
 						[attr.aria-label]="'Ver horario del ' + dia.label"
 						(click)="selectDay(dia.value)"
@@ -51,6 +52,7 @@
 					@for (block of selectedDayBlocks(); track block.id) {
 						<div
 							class="mobile-card"
+							data-info-anchor="estudiante-horarios-block"
 							[style.border-left-color]="block.color"
 							(click)="verCursoContenido(block)"
 						>
@@ -112,6 +114,7 @@
 								@for (block of dayBlocks; track block.id) {
 									<div
 										class="horario-block"
+										data-info-anchor="estudiante-horarios-block"
 										[ngStyle]="block.style"
 										[pTooltip]="block.tooltip"
 										tooltipPosition="top"

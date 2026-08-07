@@ -57,6 +57,7 @@ import {
 				@if (cursoOptions().length > 1) {
 					<div class="filters-row mb-3">
 						<p-select
+							data-info-anchor="curso-selector"
 							[options]="cursoOptions()"
 							[(ngModel)]="selectedHorarioId"
 							placeholder="Seleccionar curso"

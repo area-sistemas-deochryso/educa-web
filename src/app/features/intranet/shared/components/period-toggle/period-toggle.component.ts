@@ -11,6 +11,7 @@ import { esVerano, periodoActual } from '@shared/models';
 	imports: [FormsModule, SelectButtonModule],
 	template: `
 		<p-selectButton
+			data-info-anchor="period-toggle"
 			[options]="options"
 			[ngModel]="value()"
 			(ngModelChange)="value.set($event)"

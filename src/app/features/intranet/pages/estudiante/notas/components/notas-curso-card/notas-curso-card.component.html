@@ -45,7 +45,7 @@
 	<p-accordion [multiple]="true" [value]="openPanels()" (valueChange)="openPanels.set($any($event))">
 		@for (g of periodoGroups(); track g.periodo.id) {
 			<p-accordionpanel [value]="g.periodo.id">
-				<p-accordionheader>
+				<p-accordionheader data-info-anchor="estudiante-notas-periodo-accordion">
 					<div class="accordion-header-content">
 						<span class="accordion-periodo-name">{{ g.periodo.nombre }}</span>
 						<span class="accordion-eval-count">{{ g.evaluaciones.length }} evaluación{{ g.evaluaciones.length !== 1 ? 'es' : '' }}</span>

@@ -24,6 +24,7 @@
 				label="Restaurar"
 				icon="pi pi-undo"
 				class="p-button-outlined p-button-sm"
+				data-info-anchor="estudiante-notas-simulador-restaurar"
 				(click)="resetSimulacion.emit()"
 			></button>
 		</div>
@@ -46,6 +47,7 @@
 						Original: {{ formatNota(sim.notaOriginal) }}
 					</span>
 					<p-inputNumber
+						data-info-anchor="estudiante-notas-simulador-input"
 						[ngModel]="sim.notaSimulada"
 						(ngModelChange)="notaChange.emit({ calificacionId: sim.calificacionId, nota: $event })"
 						[min]="notaMin"

@@ -87,7 +87,7 @@ const DAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Vierne
 			<app-empty-state icon="pi pi-book" title="Mis Cursos" message="No tienes cursos asignados" />
 		} @else {
 			<app-page-header icon="pi pi-book" title="Mis Cursos">
-				<a routerLink="/intranet/estudiante/horarios" class="text-sm no-underline text-primary flex align-items-center gap-1">
+				<a routerLink="/intranet/estudiante/horarios" data-info-anchor="estudiante-cursos-ver-horario" class="text-sm no-underline text-primary flex align-items-center gap-1">
 					<i class="pi pi-calendar"></i> Ver horario
 				</a>
 			</app-page-header>
@@ -108,6 +108,7 @@ const DAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Vierne
 					@for (horario of vm().horarios; track horario.id) {
 						<div
 							class="course-card"
+							data-info-anchor="estudiante-cursos-card"
 							[style.--card-accent]="colorMap().get(horario.cursoId)"
 							(click)="onVerContenido(horario)"
 							pTooltip="Ver contenido"
@@ -115,7 +116,7 @@ const DAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Vierne
 						>
 							<div class="flex align-items-start justify-content-between mb-2">
 								<span class="font-bold text-lg line-height-3">{{ horario.cursoNombre }}</span>
-								<a routerLink="/intranet/estudiante/salones" class="no-underline" (click)="$event.stopPropagation()">
+								<a routerLink="/intranet/estudiante/salones" data-info-anchor="estudiante-cursos-card-salon-tag" class="no-underline" (click)="$event.stopPropagation()">
 									<p-tag [value]="horario.salonDescripcion" severity="info" />
 								</a>
 							</div>

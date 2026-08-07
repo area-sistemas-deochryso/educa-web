@@ -97,6 +97,7 @@ import { MiAsistenciaCursoResumenDto } from '@features/intranet/pages/estudiante
 					<span class="p-dialog-title">{{ salon()?.salonDescripcion ?? 'Salón' }}</span>
 					<button
 						class="fullscreen-toggle-btn"
+						data-info-anchor="estudiante-salon-dialog-fullscreen-toggle"
 						type="button"
 						(click)="toggleFullscreen()"
 						[attr.aria-label]="isFullscreen() ? 'Salir de pantalla completa' : 'Expandir a pantalla completa'"
@@ -108,17 +109,17 @@ import { MiAsistenciaCursoResumenDto } from '@features/intranet/pages/estudiante
 			@if (salon(); as s) {
 				<p-tabs value="0" (valueChange)="onTabChange($any($event))">
 					<p-tablist>
-						<p-tab value="0">
+						<p-tab value="0" data-info-anchor="estudiante-salon-dialog-tab">
 							<i class="pi pi-users tab-icon"></i>Grupos
 						</p-tab>
-						<p-tab value="1">
+						<p-tab value="1" data-info-anchor="estudiante-salon-dialog-tab">
 							<i class="pi pi-chart-bar tab-icon"></i>Notas
 						</p-tab>
-						<p-tab value="2">
+						<p-tab value="2" data-info-anchor="estudiante-salon-dialog-tab">
 							<i class="pi pi-calendar-times tab-icon"></i>Asistencia
 						</p-tab>
 						@if (showCampusNav) {
-							<p-tab value="3">
+							<p-tab value="3" data-info-anchor="estudiante-salon-dialog-tab">
 								<i class="pi pi-map tab-icon"></i>Ubicación
 							</p-tab>
 						}
@@ -132,6 +133,7 @@ import { MiAsistenciaCursoResumenDto } from '@features/intranet/pages/estudiante
 									pButton
 									icon="pi pi-refresh"
 									class="p-button-rounded p-button-text p-button-sm"
+									data-info-anchor="estudiante-salon-dialog-refresh-grupos"
 									(click)="onRefreshGrupos()"
 									[disabled]="gruposLoading()"
 									pTooltip="Refrescar"

@@ -13,6 +13,7 @@
 			<span class="p-dialog-title">{{ vm().contenido ? vm().contenido!.cursoNombre : 'Contenido del Curso' }}</span>
 			<button
 				class="fullscreen-toggle-btn"
+				data-info-anchor="estudiante-curso-dialog-fullscreen-toggle"
 				type="button"
 				(click)="toggleFullscreen()"
 				[attr.aria-label]="isFullscreen() ? 'Salir de pantalla completa' : 'Expandir a pantalla completa'"
@@ -26,26 +27,26 @@
 			<p-tabs [value]="activeTab()" (valueChange)="onTabChange($any($event))">
 				<div class="tabs-header-row">
 					<p-tablist>
-						<p-tab value="0">
+						<p-tab value="0" data-info-anchor="estudiante-curso-dialog-tab">
 							<i class="pi pi-book tab-icon"></i>
 							Contenido
 						</p-tab>
-						<p-tab value="1">
+						<p-tab value="1" data-info-anchor="estudiante-curso-dialog-tab">
 							<i class="pi pi-chart-bar tab-icon"></i>
 							Mis Calificaciones
 						</p-tab>
-						<p-tab value="2">
+						<p-tab value="2" data-info-anchor="estudiante-curso-dialog-tab">
 							<i class="pi pi-info-circle tab-icon"></i>
 							Información
 						</p-tab>
 					</p-tablist>
 					<div class="tabs-header-links">
-						<button type="button" class="ver-asistencia-link" (click)="onVerSalon()">
+						<button type="button" class="ver-asistencia-link" data-info-anchor="estudiante-curso-dialog-ver-salon" (click)="onVerSalon()">
 							<i class="pi pi-building"></i>
 							Ver salón
 							<i class="pi pi-arrow-right"></i>
 						</button>
-						<button type="button" class="ver-asistencia-link" (click)="onVerAsistencia()">
+						<button type="button" class="ver-asistencia-link" data-info-anchor="estudiante-curso-dialog-ver-asistencia" (click)="onVerAsistencia()">
 							<i class="pi pi-check-square"></i>
 							Ver asistencia
 							<i class="pi pi-arrow-right"></i>
@@ -62,6 +63,7 @@
 									pButton
 									icon="pi pi-refresh"
 									class="p-button-rounded p-button-text p-button-sm"
+									data-info-anchor="estudiante-curso-dialog-refresh-contenido"
 									(click)="onRefreshContenido()"
 									[disabled]="vm().contentLoading"
 									pTooltip="Refrescar"
@@ -81,6 +83,7 @@
 								@if (searchQuery()) {
 									<button
 										class="search-clear"
+										data-info-anchor="estudiante-curso-dialog-search-clear"
 										(click)="searchQuery.set('')"
 										type="button"
 										aria-label="Limpiar búsqueda"
@@ -101,7 +104,7 @@
 									<p-accordion [multiple]="true" [value]="openPanels()" (valueChange)="onAccordionChange($any($event))">
 										@for (semana of filteredSemanas(); track semana.id) {
 											<p-accordionpanel [value]="semana.id">
-												<p-accordionheader>
+												<p-accordionheader data-info-anchor="estudiante-curso-dialog-week-accordion">
 													<div class="week-header">
 														<span class="week-number">{{ semana.numeroSemana }}</span>
 														<div class="week-title-group">
@@ -165,6 +168,7 @@
 																			</div>
 																			<div
 																				class="row-info clickable"
+																				data-info-anchor="estudiante-curso-dialog-archivo-profesor"
 																				(click)="openArchivo(archivo.urlArchivo)"
 																			>
 																				<strong>{{ archivo.nombreArchivo }}</strong>
@@ -186,6 +190,7 @@
 															<div class="section-header">
 																<button
 																	class="section-label section-action"
+																	data-info-anchor="estudiante-curso-dialog-mis-archivos-upload"
 																	type="button"
 																	(click)="studentFileInput.click()"
 																	aria-label="Subir mi archivo"
@@ -215,6 +220,7 @@
 																			</div>
 																			<div
 																				class="row-info clickable"
+																				data-info-anchor="estudiante-curso-dialog-mi-archivo"
 																				(click)="openArchivo(archivo.urlArchivo)"
 																			>
 																				<strong>{{ archivo.nombreArchivo }}</strong>
@@ -231,6 +237,7 @@
 																					class="p-button-text p-button-danger p-button-sm p-button-rounded"
 																					pTooltip="Eliminar"
 																					tooltipPosition="top"
+																					data-info-anchor="estudiante-curso-dialog-mi-archivo-eliminar"
 																					(click)="onDeleteMiArchivo(semana.id, archivo)"
 																					[pt]="{
 																						root: {
@@ -298,6 +305,7 @@
 																							</div>
 																							<div
 																								class="row-info clickable"
+																								data-info-anchor="estudiante-curso-dialog-archivo-profesor"
 																								(click)="openArchivo(archivo.urlArchivo)"
 																							>
 																								<strong>{{ archivo.nombreArchivo }}</strong>
@@ -317,6 +325,7 @@
 																				<button
 																					class="tarea-attach-link"
 																					type="button"
+																					data-info-anchor="estudiante-curso-dialog-mi-entrega-upload"
 																					(click)="tareaFileInput.click()"
 																					aria-label="Subir mi archivo de tarea"
 																				>
@@ -344,6 +353,7 @@
 																							</div>
 																							<div
 																								class="row-info clickable"
+																								data-info-anchor="estudiante-curso-dialog-mi-entrega"
 																								(click)="openArchivo(archivo.urlArchivo)"
 																							>
 																								<strong>{{ archivo.nombreArchivo }}</strong>
@@ -358,6 +368,7 @@
 																									class="p-button-text p-button-danger p-button-sm p-button-rounded"
 																									pTooltip="Eliminar"
 																									tooltipPosition="top"
+																									data-info-anchor="estudiante-curso-dialog-mi-entrega-eliminar"
 																									(click)="onDeleteMiTareaArchivo(tarea.id, archivo)"
 																									[pt]="{
 																										root: {
@@ -395,6 +406,7 @@
 									pButton
 									icon="pi pi-refresh"
 									class="p-button-rounded p-button-text p-button-sm"
+									data-info-anchor="estudiante-curso-dialog-refresh-notas"
 									(click)="onRefreshNotas()"
 									[disabled]="vm().misNotasLoading"
 									pTooltip="Refrescar"
@@ -455,6 +467,7 @@
 									<button
 										class="stat-box files clickable"
 										type="button"
+										data-info-anchor="estudiante-curso-dialog-ver-archivos-resumen"
 										(click)="onOpenArchivosSummary()"
 										aria-label="Ver todos los archivos"
 									>
@@ -465,6 +478,7 @@
 									<button
 										class="stat-box tasks clickable"
 										type="button"
+										data-info-anchor="estudiante-curso-dialog-ver-tareas-resumen"
 										(click)="onOpenTareasSummary()"
 										aria-label="Ver todas las tareas"
 									>
