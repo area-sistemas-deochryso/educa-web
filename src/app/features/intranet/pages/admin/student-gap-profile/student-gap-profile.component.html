@@ -5,6 +5,7 @@
 			label="Volver al dashboard"
 			[text]="true"
 			(onClick)="goBack()"
+			data-info-anchor="admin-gap-profile-back-btn"
 			[pt]="{ root: { 'aria-label': 'Volver al dashboard de correos' } }"
 		/>
 
@@ -24,6 +25,7 @@
 					<a
 						[routerLink]="['/intranet/admin/monitoreo/correos/persona', student.correo]"
 						[attr.aria-label]="'Ver historial de ' + student.correo"
+						data-info-anchor="admin-gap-profile-history-link"
 					>
 						<i class="pi pi-history"></i> Ver historial de correos
 					</a>

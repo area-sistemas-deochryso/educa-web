@@ -26,16 +26,16 @@
 		<ng-template #header>
 			<tr>
 				<th style="width: 100px">DNI</th>
-				<th pSortableColumn="nombreCompleto">
+				<th pSortableColumn="nombreCompleto" data-info-anchor="tabla-orden-columna">
 					NOMBRE <p-sortIcon field="nombreCompleto" />
 				</th>
 				@if (activeTab() === null) {
-					<th style="width: 120px" pSortableColumn="rol">ROL <p-sortIcon field="rol" /></th>
+					<th style="width: 120px" pSortableColumn="rol" data-info-anchor="tabla-orden-columna">ROL <p-sortIcon field="rol" /></th>
 				}
 				@if (activeTab() === 'estudiantes') {
 					<th style="width: 180px">SALÓN</th>
 				}
-				<th style="width: 120px" pSortableColumn="fechaRegistro">
+				<th style="width: 120px" pSortableColumn="fechaRegistro" data-info-anchor="tabla-orden-columna">
 					FECHA <p-sortIcon field="fechaRegistro" />
 				</th>
 				<th style="width: 110px" class="text-center">ACCIONES</th>
@@ -55,6 +55,7 @@
 								class="user-name"
 								[class.user-name--clickable]="hasMultipleSalones(usuario)"
 								(click)="hasMultipleSalones(usuario) && onShowSalones(usuario)"
+								data-info-anchor="admin-users-multi-salon-link"
 							>
 								{{ usuario.apellidos | fullName: usuario.nombres }}
 								@if (hasMultipleSalones(usuario)) {
@@ -88,6 +89,7 @@
 						pTooltip="Ver detalles"
 						tooltipPosition="top"
 						(click)="onView(usuario)"
+						data-info-anchor="admin-users-ver-detalle-btn"
 						[pt]="{ root: { 'aria-label': 'Ver detalles del usuario' } }"
 					></button>
 					<button
@@ -97,6 +99,7 @@
 						pTooltip="Editar"
 						tooltipPosition="top"
 						(click)="onEdit(usuario)"
+						data-info-anchor="admin-users-edit-btn"
 						[pt]="{ root: { 'aria-label': 'Editar usuario' } }"
 					></button>
 					<button
@@ -108,6 +111,7 @@
 						[pTooltip]="usuario.estado ? 'Desactivar' : 'Activar'"
 						tooltipPosition="top"
 						(click)="onToggleEstado(usuario)"
+						data-info-anchor="admin-users-toggle-estado-btn"
 						[pt]="{ root: { 'aria-label': usuario.estado ? 'Desactivar usuario' : 'Activar usuario' } }"
 					></button>
 					<button
@@ -117,6 +121,7 @@
 						pTooltip="Copiar DNI"
 						tooltipPosition="top"
 						(click)="onCopyDni(usuario.dni)"
+						data-info-anchor="copiar-btn"
 						[pt]="{ root: { 'aria-label': 'Copiar DNI al portapapeles' } }"
 					></button>
 				</td>

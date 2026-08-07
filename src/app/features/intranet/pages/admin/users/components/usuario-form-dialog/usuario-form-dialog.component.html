@@ -11,16 +11,16 @@
 >
 	<p-tabs [value]="activeFormTab()" (valueChange)="onTabChange($event)">
 		<p-tablist>
-			<p-tab value="datos">
+			<p-tab value="datos" data-info-anchor="tab-switch">
 				<i class="pi pi-user"></i>
 				Datos
 			</p-tab>
-			<p-tab value="contacto">
+			<p-tab value="contacto" data-info-anchor="tab-switch">
 				<i class="pi pi-envelope"></i>
 				Contacto
 			</p-tab>
 			@if (showAsignacionesTab()) {
-				<p-tab value="asignaciones">
+				<p-tab value="asignaciones" data-info-anchor="tab-switch">
 					<i class="pi pi-building-columns"></i>
 					Asignaciones
 				</p-tab>
@@ -41,6 +41,7 @@
 							(ngModelChange)="onFieldChange('rol', $event)"
 							placeholder="Seleccione el rol"
 							[style]="{ width: '100%' }"
+							data-info-anchor="admin-users-form-rol-select"
 						/>
 					</div>
 				}
@@ -54,6 +55,7 @@
 						(ngModelChange)="onFieldChange('sedeId', $event)"
 						placeholder="Seleccione la sede"
 						[style]="{ width: '100%' }"
+						data-info-anchor="admin-users-form-sede-select"
 					/>
 				</div>
 				<div class="field">
@@ -66,6 +68,7 @@
 						[ngModel]="formData().nombres"
 						(ngModelChange)="onFieldChange('nombres', $event)"
 						placeholder="Nombres del usuario"
+						data-info-anchor="admin-users-form-nombres-input"
 					/>
 				</div>
 				<div class="field">
@@ -78,6 +81,7 @@
 						[ngModel]="formData().apellidos"
 						(ngModelChange)="onFieldChange('apellidos', $event)"
 						placeholder="Apellidos del usuario"
+						data-info-anchor="admin-users-form-apellidos-input"
 					/>
 				</div>
 				<div class="field">
@@ -92,6 +96,7 @@
 						maxlength="8"
 						[class.ng-invalid]="errors().dniError"
 						[class.ng-dirty]="formData().dni"
+						data-info-anchor="admin-users-form-dni-input"
 					/>
 					<app-form-field-error [error]="errors().dniError" />
 				</div>
@@ -118,6 +123,7 @@
 						[style]="{ width: '100%' }"
 						[inputStyle]="{ width: '100%' }"
 						placeholder="Se generará automáticamente"
+						data-info-anchor="admin-users-form-contrasena-input"
 					></p-password>
 					@if (!isEditing() || !canEditPassword()) {
 						<small class="text-muted">
@@ -140,6 +146,7 @@
 								id="estado"
 								[ngModel]="formData().estado"
 								(ngModelChange)="onFieldChange('estado', $event)"
+								data-info-anchor="admin-users-form-estado-toggle"
 							/>
 							<span>{{ formData().estado | estadoLabel }}</span>
 						</div>
@@ -163,6 +170,7 @@
 							[ngModel]="formData().nombreApoderado"
 							(ngModelChange)="onFieldChange('nombreApoderado', $event)"
 							placeholder="Nombre completo del apoderado"
+							data-info-anchor="admin-users-form-nombre-apoderado-input"
 						/>
 					</div>
 					<div class="field">
@@ -174,6 +182,7 @@
 							[ngModel]="formData().telefonoApoderado"
 							(ngModelChange)="onFieldChange('telefonoApoderado', $event)"
 							placeholder="999999999"
+							data-info-anchor="admin-users-form-telefono-apoderado-input"
 						/>
 					</div>
 					<div class="field">
@@ -187,6 +196,7 @@
 							placeholder="correo@ejemplo.com"
 							[class.ng-invalid]="errors().correoApoderadoError"
 							[class.ng-dirty]="formData().correoApoderado"
+							data-info-anchor="admin-users-form-correo-apoderado-input"
 						/>
 						<app-form-field-error [error]="errors().correoApoderadoError" />
 					</div>
@@ -200,6 +210,7 @@
 							[ngModel]="formData().telefono"
 							(ngModelChange)="onFieldChange('telefono', $event)"
 							placeholder="999999999"
+							data-info-anchor="admin-users-form-telefono-input"
 						/>
 					</div>
 					<div class="field">
@@ -213,6 +224,7 @@
 							placeholder="correo@ejemplo.com"
 							[class.ng-invalid]="errors().correoError"
 							[class.ng-dirty]="formData().correo"
+							data-info-anchor="admin-users-form-correo-input"
 						/>
 						<app-form-field-error [error]="errors().correoError" />
 					</div>
@@ -237,6 +249,7 @@
 								[style]="{ width: '100%' }"
 								[showClear]="true"
 								appendTo="body"
+								data-info-anchor="admin-users-form-grado-select"
 							/>
 						</div>
 						@if (_gradoSeleccionado()) {
@@ -251,6 +264,7 @@
 									[style]="{ width: '100%' }"
 									[showClear]="true"
 									appendTo="body"
+									data-info-anchor="admin-users-form-seccion-select"
 								/>
 								<small class="text-muted">
 									<i class="pi pi-info-circle" style="margin-right: 0.25rem"></i>
@@ -278,6 +292,7 @@
 														[pTooltip]="salon.modo === 'TutorPleno' ? modoTooltipFor(salon.modo) : ''"
 														tooltipPosition="top"
 														(ngModelChange)="onToggleTutor(salon.salonId, $event)"
+														data-info-anchor="admin-users-form-tutor-checkbox"
 													/>
 													<label [for]="'tutor-' + salon.salonId" class="tutor-label">Tutor</label>
 												}
@@ -286,6 +301,7 @@
 													icon="pi pi-times"
 													class="p-button-rounded p-button-text p-button-danger p-button-sm"
 													(click)="onRemoverSalon(salon.salonId)"
+													data-info-anchor="admin-users-form-quitar-salon-btn"
 													[pt]="{ root: { 'aria-label': 'Quitar salón ' + salon.salonNombre } }"
 												></button>
 											</div>
@@ -302,6 +318,7 @@
 									[style]="{ width: '100%' }"
 									[showClear]="true"
 									appendTo="body"
+									data-info-anchor="admin-users-form-grado-select"
 								/>
 								@if (_gradoSeleccionado()) {
 									<p-select
@@ -312,6 +329,7 @@
 										[style]="{ width: '100%' }"
 										[showClear]="true"
 										appendTo="body"
+										data-info-anchor="admin-users-form-seccion-select"
 									/>
 								}
 								<button
@@ -321,6 +339,7 @@
 									label="Agregar"
 									(click)="onAgregarSalon()"
 									[disabled]="!salonSeleccionado() || salonYaAsignado()"
+									data-info-anchor="admin-users-form-agregar-salon-btn"
 									[pt]="{ root: { 'aria-label': 'Agregar salón' } }"
 								></button>
 							</div>
@@ -356,6 +375,7 @@
 													icon="pi pi-times"
 													class="p-button-rounded p-button-text p-button-danger p-button-sm"
 													(click)="onDesasignarCurso(curso.id)"
+												data-info-anchor="admin-users-form-quitar-curso-btn"
 													[pt]="{ root: { 'aria-label': 'Quitar curso ' + curso.cursoNombre } }"
 												></button>
 											</div>
@@ -379,6 +399,7 @@
 											[showClear]="true"
 											[filter]="true"
 											filterPlaceholder="Buscar curso..."
+											data-info-anchor="admin-users-form-cursos-multiselect"
 										/>
 										<button
 											pButton
@@ -387,6 +408,7 @@
 											label="Asignar"
 											(click)="onAgregarCursos()"
 											[disabled]="_cursosSeleccionados().length === 0"
+											data-info-anchor="admin-users-form-asignar-cursos-btn"
 											[pt]="{ root: { 'aria-label': 'Asignar cursos seleccionados' } }"
 										></button>
 									</div>
@@ -413,6 +435,7 @@
 				icon="pi pi-times"
 				class="p-button-text"
 				(click)="onCancel()"
+				data-info-anchor="admin-users-form-cancelar-btn"
 				[pt]="{ root: { 'aria-label': 'Cancelar' } }"
 			></button>
 			<button
@@ -422,6 +445,7 @@
 				class="p-button-success"
 				(click)="onSave()"
 				[disabled]="!isFormValid() || loading()"
+				data-info-anchor="admin-users-form-guardar-btn"
 				[pt]="{ root: { 'aria-label': 'Guardar' } }"
 			></button>
 		</div>

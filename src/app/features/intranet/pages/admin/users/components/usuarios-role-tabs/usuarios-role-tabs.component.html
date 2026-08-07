@@ -7,6 +7,7 @@
 			[attr.aria-current]="activeTab() === tab.key ? 'page' : null"
 			[attr.aria-label]="'Filtrar por ' + tab.label"
 			(click)="onTabClick(tab.key)"
+			data-info-anchor="tab-switch"
 		>
 			<i [class]="tab.icon"></i>
 			<span>{{ tab.label }}</span>

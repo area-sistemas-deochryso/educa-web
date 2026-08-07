@@ -8,6 +8,7 @@
 			placeholder="Buscar por nombre, DNI o correo..."
 			[ngModel]="searchTerm()"
 			(ngModelChange)="onSearchChange($event)"
+			data-info-anchor="admin-users-search-input"
 		/>
 	</div>
 
@@ -18,6 +19,7 @@
 			(ngModelChange)="onFilterEstadoChange($event)"
 			placeholder="Estado"
 			appendTo="body"
+			data-info-anchor="admin-users-estado-filter"
 		/>
 
 		@if (showSalonFilter()) {
@@ -27,6 +29,7 @@
 				(ngModelChange)="onFilterSalonIdChange($event)"
 				placeholder="Salón"
 				appendTo="body"
+				data-info-anchor="admin-users-salon-filter"
 			/>
 		}
 	</div>
@@ -39,6 +42,7 @@
 			pTooltip="Limpiar filtros"
 			tooltipPosition="top"
 			(click)="onClearFilters()"
+			data-info-anchor="admin-users-clear-filters-btn"
 			[pt]="{ root: { 'aria-label': 'Limpiar filtros' } }"
 		></button>
 	}

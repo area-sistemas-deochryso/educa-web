@@ -32,6 +32,7 @@
 					optionValue="value"
 					appendTo="body"
 					[style]="{ width: '260px' }"
+					data-info-anchor="admin-users-import-seccion-select"
 				/>
 			</div>
 
@@ -50,6 +51,7 @@
 					label="Seleccionar archivo .xlsx"
 					class="p-button-outlined"
 					(click)="fileInput.click()"
+					data-info-anchor="admin-users-import-select-file-btn"
 				></button>
 				@if (fileName()) {
 					<span class="file-name">
@@ -94,6 +96,7 @@
 					label="Cambiar archivo"
 					class="p-button-text p-button-sm"
 					(click)="onNuevoArchivo()"
+					data-info-anchor="admin-users-import-change-file-btn"
 					[pt]="{ root: { 'aria-label': 'Cambiar archivo' } }"
 				></button>
 			</div>
@@ -101,7 +104,7 @@
 			<p-accordion [multiple]="true">
 				@for (group of gradoGroups(); track group.grado) {
 					<p-accordionpanel [value]="group.grado">
-						<p-accordionheader>
+						<p-accordionheader data-info-anchor="admin-users-import-grado-accordion-header">
 							{{ group.grado }}
 							<p-tag [value]="group.filas.length + ' estudiantes'" severity="secondary" styleClass="ml-2 tag-neutral" />
 						</p-accordionheader>
@@ -224,6 +227,7 @@
 				label="Cancelar"
 				class="p-button-text"
 				(click)="onClose()"
+				data-info-anchor="admin-users-import-cancelar-btn"
 			></button>
 		}
 		@if (step() === 'preview') {
@@ -233,6 +237,7 @@
 				label="Cancelar"
 				class="p-button-text"
 				(click)="onClose()"
+				data-info-anchor="admin-users-import-cancelar-btn"
 			></button>
 			<button
 				pButton
@@ -241,6 +246,7 @@
 				[label]="'Importar ' + totalFilas() + ' estudiantes'"
 				[disabled]="!canImport()"
 				(click)="onImportar()"
+				data-info-anchor="admin-users-import-confirm-btn"
 			></button>
 		}
 		@if (step() === 'result') {
@@ -252,12 +258,14 @@
 					label="Importar otro archivo"
 					class="p-button-outlined"
 					(click)="onNuevoArchivo()"
+					data-info-anchor="admin-users-import-change-file-btn"
 				></button>
 				<button
 					pButton
 					type="button"
 					label="Cerrar"
 					(click)="onClose()"
+					data-info-anchor="admin-users-import-cerrar-btn"
 				></button>
 			}
 		}

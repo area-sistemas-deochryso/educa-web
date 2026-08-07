@@ -17,7 +17,7 @@
 	<!-- * One-time migration (dev only) -->
 	@if (isDev && migrationPhase() !== 'hidden' && !migracionCompletada()) {
 		@if (migrationPhase() === 'toast') {
-			<div class="migration-overlay" (click)="dismissMigration()"></div>
+			<div class="migration-overlay" (click)="dismissMigration()" data-info-anchor="admin-users-migration-dismiss-overlay"></div>
 			<div class="migration-toast">
 				<i class="pi pi-info-circle"></i>
 				<span>Hay contraseñas en texto plano que pueden migrarse al campo encriptado.</span>

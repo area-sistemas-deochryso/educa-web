@@ -28,6 +28,7 @@
 					placeholder="Buscar por nombre, DNI, correo, rol..."
 					[ngModel]="searchTerm()"
 					(ngModelChange)="searchTerm.set($event)"
+					data-info-anchor="admin-users-validation-search-input"
 				/>
 			</span>
 			<p-select
@@ -39,6 +40,7 @@
 				placeholder="Tipo de error"
 				appendTo="body"
 				styleClass="error-filter"
+				data-info-anchor="admin-users-validation-error-filter"
 			/>
 		</div>
 		<!-- #endregion -->
@@ -50,6 +52,7 @@
 					class="error-chip"
 					[class.active]="filterError() === ec.label"
 					(click)="toggleErrorFilter(ec.label)"
+					data-info-anchor="admin-users-validation-error-chip"
 				>
 					{{ ec.label }} <span class="error-chip__count">{{ ec.count }}</span>
 				</button>
@@ -100,6 +103,7 @@
 							pTooltip="Editar"
 							tooltipPosition="top"
 							(click)="editUsuario.emit(item)"
+							data-info-anchor="admin-users-validation-edit-btn"
 							[pt]="{ root: { 'aria-label': 'Editar' } }"
 						></button>
 					</td>

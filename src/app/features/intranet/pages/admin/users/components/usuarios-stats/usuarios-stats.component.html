@@ -4,6 +4,7 @@
 		class="stat-badge stat-badge--total"
 		[class.active]="activeTab() === null"
 		(click)="onBadgeClick(null)"
+		data-info-anchor="tab-switch"
 		[attr.aria-label]="'Total: ' + estadisticas().totalUsuarios + ' usuarios'"
 	>
 		<span class="stat-badge__value">{{ estadisticas().totalUsuarios }}</span>
@@ -16,6 +17,7 @@
 		class="stat-badge"
 		[class.active]="activeTab() === 'estudiantes'"
 		(click)="onBadgeClick('estudiantes')"
+		data-info-anchor="tab-switch"
 		[attr.aria-label]="estadisticas().totalEstudiantes + ' estudiantes'"
 	>
 		<span class="stat-badge__value">{{ estadisticas().totalEstudiantes }}</span>
@@ -28,6 +30,7 @@
 		class="stat-badge"
 		[class.active]="activeTab() === 'profesores'"
 		(click)="onBadgeClick('profesores')"
+		data-info-anchor="tab-switch"
 		[attr.aria-label]="estadisticas().totalProfesores + ' profesores'"
 	>
 		<span class="stat-badge__value">{{ estadisticas().totalProfesores }}</span>
@@ -40,6 +43,7 @@
 		class="stat-badge"
 		[class.active]="activeTab() === 'admin'"
 		(click)="onBadgeClick('admin')"
+		data-info-anchor="tab-switch"
 		[attr.aria-label]="adminTotal() + ' personal admin'"
 	>
 		<span class="stat-badge__value">{{ adminTotal() }}</span>
