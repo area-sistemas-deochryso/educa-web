@@ -12,6 +12,7 @@
 				optionLabel="label"
 				optionValue="value"
 				[pt]="{ root: { 'aria-label': 'Periodo del heatmap' } }"
+				data-info-anchor="period-toggle"
 			/>
 			<div class="heatmap-nav">
 				<button
@@ -22,6 +23,7 @@
 					[pTooltip]="isWeekMode() ? 'Semana anterior' : 'Mes anterior'"
 					tooltipPosition="top"
 					[pt]="{ root: { 'aria-label': isWeekMode() ? 'Semana anterior' : 'Mes anterior' } }"
+					data-info-anchor="admin-error-groups-heatmap-prev-btn"
 				></button>
 				<span class="heatmap-range-label">
 					{{ rangeLabel().start | date: 'dd MMM' }} – {{ rangeLabel().end | date: 'dd MMM' }}
@@ -35,6 +37,7 @@
 					[pTooltip]="isWeekMode() ? 'Semana siguiente' : 'Mes siguiente'"
 					tooltipPosition="top"
 					[pt]="{ root: { 'aria-label': isWeekMode() ? 'Semana siguiente' : 'Mes siguiente' } }"
+					data-info-anchor="admin-error-groups-heatmap-next-btn"
 				></button>
 			</div>
 			<span [pTooltip]="calendarTooltip()" tooltipPosition="top">
@@ -48,6 +51,7 @@
 					placeholder="Hasta hoy"
 					appendTo="body"
 					[pt]="{ root: { 'aria-label': 'Fecha final del rango del heatmap' } }"
+					data-info-anchor="admin-error-groups-heatmap-fecha-picker"
 				/>
 			</span>
 		</div>

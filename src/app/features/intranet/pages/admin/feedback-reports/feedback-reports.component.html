@@ -22,6 +22,7 @@
 			class="p-button-outlined p-button-sm"
 			(click)="onExportCsv()"
 			[pt]="{ root: { 'aria-label': 'Exportar reportes a CSV' } }"
+			data-info-anchor="admin-feedback-reports-export-btn"
 		></button>
 		<button
 			pButton
@@ -31,6 +32,7 @@
 			class="p-button-outlined p-button-sm"
 			(click)="onRefresh()"
 			[pt]="{ root: { 'aria-label': 'Refrescar listado' } }"
+			data-info-anchor="admin-feedback-reports-refresh-btn"
 		></button>
 	</app-page-header>
 	<!-- #endregion -->
@@ -111,6 +113,7 @@
 					[ngModel]="vm().searchQuery"
 					(ngModelChange)="onSearchChange($event)"
 					[attr.aria-label]="'Buscar reportes'"
+					data-info-anchor="admin-feedback-reports-buscar-input"
 				/>
 			</span>
 			<p-select
@@ -122,6 +125,7 @@
 				appendTo="body"
 				[ngModel]="vm().filterTipo"
 				(ngModelChange)="onFilterTipoChange($event)"
+				data-info-anchor="admin-feedback-reports-tipo-select"
 			></p-select>
 			<p-select
 				[options]="estadoOptions"
@@ -132,6 +136,7 @@
 				appendTo="body"
 				[ngModel]="vm().filterEstado"
 				(ngModelChange)="onFilterEstadoChange($event)"
+				data-info-anchor="admin-feedback-reports-estado-select"
 			></p-select>
 			<p-datepicker
 				[ngModel]="vm().filterDesde"
@@ -140,6 +145,7 @@
 				appendTo="body"
 				[showIcon]="true"
 				dateFormat="dd/mm/yy"
+				data-info-anchor="admin-feedback-reports-desde-picker"
 			></p-datepicker>
 			<p-datepicker
 				[ngModel]="vm().filterHasta"
@@ -148,6 +154,7 @@
 				appendTo="body"
 				[showIcon]="true"
 				dateFormat="dd/mm/yy"
+				data-info-anchor="admin-feedback-reports-hasta-picker"
 			></p-datepicker>
 		</div>
 		<button
@@ -158,6 +165,7 @@
 			pTooltip="Limpiar filtros"
 			(click)="onClearFilters()"
 			[pt]="{ root: { 'aria-label': 'Limpiar filtros' } }"
+			data-info-anchor="admin-feedback-reports-limpiar-filtros-btn"
 		></button>
 	</div>
 	<!-- #endregion -->
@@ -188,7 +196,7 @@
 				</tr>
 			</ng-template>
 			<ng-template pTemplate="body" let-item>
-				<tr class="data-row" (click)="onRowClick(item)">
+				<tr class="data-row" (click)="onRowClick(item)" data-info-anchor="admin-feedback-reports-ver-detalle-btn">
 					<td>{{ item.fechaReg | date: 'dd/MM/yyyy HH:mm' }}</td>
 					<td>{{ tipoLabel(item.tipo) }}</td>
 					<td class="desc-cell">
@@ -222,6 +230,7 @@
 							class="p-button-rounded p-button-text"
 							(click)="onRowClick(item); $event.stopPropagation()"
 							[pt]="{ root: { 'aria-label': 'Ver detalle del reporte' } }"
+							data-info-anchor="admin-feedback-reports-ver-detalle-btn"
 						></button>
 					</td>
 				</tr>
@@ -321,6 +330,7 @@
 						appendTo="body"
 						[ngModel]="nuevoEstado()"
 						(ngModelChange)="nuevoEstado.set($event)"
+						data-info-anchor="admin-feedback-reports-nuevo-estado-select"
 					></p-select>
 				</div>
 				<div class="estado-field">
@@ -332,6 +342,7 @@
 						(ngModelChange)="observacionCambio.set($event)"
 						placeholder="Contexto del cambio, plan de acción, etc."
 						maxlength="1000"
+						data-info-anchor="admin-feedback-reports-observacion-textarea"
 					></textarea>
 				</div>
 				<button
@@ -342,6 +353,7 @@
 					(click)="onGuardarCambioEstado()"
 					[loading]="vm().estadoUpdating"
 					[disabled]="!nuevoEstado() || nuevoEstado() === d.estado"
+					data-info-anchor="admin-feedback-reports-guardar-cambio-btn"
 				></button>
 			</section>
 
@@ -365,6 +377,7 @@
 					label="Eliminar reporte #{{ d.id }}"
 					class="p-button-danger p-button-outlined"
 					(click)="onDeleteReport()"
+					data-info-anchor="admin-feedback-reports-eliminar-btn"
 				></button>
 			</section>
 			<!-- #endregion -->

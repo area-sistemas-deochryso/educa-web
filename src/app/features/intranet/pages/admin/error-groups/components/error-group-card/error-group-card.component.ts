@@ -37,6 +37,7 @@ import { ErrorOccurrenceTimelineComponent } from '../error-occurrence-timeline';
 		role: 'button',
 		'[attr.tabindex]': '0',
 		'[attr.aria-label]': 'ariaLabel()',
+		'data-info-anchor': 'admin-error-groups-card',
 	},
 })
 export class ErrorGroupCardComponent {

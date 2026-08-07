@@ -66,30 +66,30 @@
 			<!-- Tabs -->
 			<p-tabs value="general" class="occurrence-tabs">
 				<p-tablist>
-					<p-tab value="general">
+					<p-tab value="general" data-info-anchor="tab-switch">
 						<i class="pi pi-info-circle"></i>
 						<span>General</span>
 					</p-tab>
-					<p-tab value="trace">
+					<p-tab value="trace" data-info-anchor="tab-switch">
 						<i class="pi pi-code"></i>
 						<span>Trace</span>
 					</p-tab>
-					<p-tab value="breadcrumbs">
+					<p-tab value="breadcrumbs" data-info-anchor="tab-switch">
 						<i class="pi pi-history"></i>
 						<span>Breadcrumbs</span>
 						@if (err.breadcrumbs.length > 0) {
 							<span class="tab-count">{{ err.breadcrumbs.length }}</span>
 						}
 					</p-tab>
-					<p-tab value="group">
+					<p-tab value="group" data-info-anchor="tab-switch">
 						<i class="pi pi-sitemap"></i>
 						<span>Group</span>
 					</p-tab>
-					<p-tab value="reqres">
+					<p-tab value="reqres" data-info-anchor="tab-switch">
 						<i class="pi pi-replay"></i>
 						<span>Req/Res</span>
 					</p-tab>
-					<p-tab value="environment">
+					<p-tab value="environment" data-info-anchor="tab-switch">
 						<i class="pi pi-desktop"></i>
 						<span>Entorno</span>
 					</p-tab>
@@ -253,6 +253,7 @@
 									label="Ver ocurrencia contraparte"
 									icon="pi pi-external-link"
 									class="p-button-text p-button-sm counterpart-link"
+									data-info-anchor="admin-error-groups-ver-contraparte-link"
 								></a>
 							</div>
 						}
@@ -422,6 +423,7 @@
 									label="Ver eventos correlacionados"
 									icon="pi pi-share-alt"
 									class="p-button-text p-button-sm correlation-link"
+									data-info-anchor="admin-error-groups-ver-correlacionados-link"
 								></a>
 							</div>
 						}
@@ -440,6 +442,7 @@
 										aria-label="Copiar para reproducir"
 										pTooltip="Copiar para Postman/curl"
 										tooltipPosition="left"
+										data-info-anchor="copiar-btn"
 									>
 										<i class="pi pi-copy"></i>
 									</button>

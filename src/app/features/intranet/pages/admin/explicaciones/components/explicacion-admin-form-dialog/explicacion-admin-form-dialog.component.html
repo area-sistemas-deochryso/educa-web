@@ -19,6 +19,7 @@
 				(ngModelChange)="ancla.set($event)"
 				maxlength="150"
 				placeholder="Clave data-info-anchor del elemento"
+				data-info-anchor="admin-explicaciones-form-ancla-input"
 			/>
 		</div>
 
@@ -31,6 +32,7 @@
 				[rows]="4"
 				[ngModel]="texto()"
 				(ngModelChange)="texto.set($event)"
+				data-info-anchor="admin-explicaciones-form-texto-textarea"
 			></textarea>
 		</div>
 
@@ -47,6 +49,7 @@
 					placeholder="Default (todos los roles)"
 					appendTo="body"
 					class="w-full"
+					data-info-anchor="admin-explicaciones-form-rol-select"
 				/>
 			</div>
 
@@ -62,6 +65,7 @@
 					placeholder="Sin gating (todos)"
 					appendTo="body"
 					class="w-full"
+					data-info-anchor="admin-explicaciones-form-capability-select"
 				/>
 			</div>
 		</div>
@@ -75,6 +79,7 @@
 			class="p-button-text"
 			(click)="onCancel()"
 			[pt]="{ root: { 'aria-label': 'Cancelar' } }"
+			data-info-anchor="admin-explicaciones-form-cancelar-btn"
 		></button>
 		<button
 			pButton
@@ -85,6 +90,7 @@
 			[loading]="saving()"
 			(click)="onSave()"
 			[pt]="{ root: { 'aria-label': 'Guardar explicación' } }"
+			data-info-anchor="admin-explicaciones-form-guardar-btn"
 		></button>
 	</ng-template>
 </p-dialog>

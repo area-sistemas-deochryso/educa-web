@@ -33,6 +33,7 @@
 					tooltipPosition="top"
 					(click)="edit.emit(explicacion)"
 					[pt]="{ root: { 'aria-label': 'Editar ' + explicacion.ancla } }"
+					data-info-anchor="admin-explicaciones-fila-editar-btn"
 				></button>
 				<button
 					pButton
@@ -42,6 +43,7 @@
 					tooltipPosition="top"
 					(click)="remove.emit(explicacion)"
 					[pt]="{ root: { 'aria-label': 'Eliminar ' + explicacion.ancla } }"
+					data-info-anchor="admin-explicaciones-fila-eliminar-btn"
 				></button>
 			</td>
 		</tr>

@@ -12,6 +12,7 @@
 			[disabled]="badgesLoading()"
 			[attr.aria-label]="'Refrescar métricas'"
 			title="Refrescar métricas"
+			data-info-anchor="admin-monitoreo-refresh-btn"
 		>
 			<i class="pi" [class.pi-refresh]="!badgesLoading()" [class.pi-spinner]="badgesLoading()" [class.pi-spin]="badgesLoading()"></i>
 		</button>
@@ -37,6 +38,7 @@
 					(click)="refreshBadges()"
 					[disabled]="badgesLoading()"
 					aria-label="Refrescar métricas"
+					data-info-anchor="admin-monitoreo-refresh-btn"
 				>
 					<i class="pi" [class.pi-refresh]="!badgesLoading()" [class.pi-spinner]="badgesLoading()" [class.pi-spin]="badgesLoading()"></i>
 				</button>
@@ -56,6 +58,7 @@
 					(click)="refreshBadges()"
 					[disabled]="badgesLoading()"
 					aria-label="Refrescar métricas"
+					data-info-anchor="admin-monitoreo-refresh-btn"
 				>
 					<i class="pi" [class.pi-refresh]="!badgesLoading()" [class.pi-spinner]="badgesLoading()" [class.pi-spin]="badgesLoading()"></i>
 				</button>
@@ -68,6 +71,7 @@
 					[attr.data-level]="item.badge.level"
 					[routerLink]="item.route"
 					[queryParams]="item.hubParams"
+					data-info-anchor="admin-monitoreo-triage-card"
 				>
 					<span class="triage-card-level">
 						@if (item.badge.level === 'critical') {
@@ -104,7 +108,7 @@
 	<p-tabs [value]="activeDomain()" (valueChange)="setActiveDomain($event)">
 		<p-tablist>
 			@for (domain of domains(); track domain.id) {
-				<p-tab [value]="domain.id">
+				<p-tab [value]="domain.id" data-info-anchor="tab-switch">
 					<span class="tab-trigger" [attr.data-tone]="domain.tone">
 						<i [class]="domain.icon"></i>
 						<span class="tab-label">{{ domain.label }}</span>
@@ -159,6 +163,7 @@
 								[attr.data-level]="tile.badge?.level ?? 'unknown'"
 								[attr.data-tone]="domain.tone"
 								[attr.aria-label]="tile.label + (tile.badge?.label ? ' — ' + tile.badge!.label : '')"
+								data-info-anchor="admin-monitoreo-tile"
 							>
 								@if (tile.badge?.level === 'critical' || tile.badge?.level === 'warn') {
 									<span

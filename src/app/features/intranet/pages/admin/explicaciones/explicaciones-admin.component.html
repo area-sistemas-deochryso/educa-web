@@ -11,6 +11,7 @@
 				placeholder="Buscar por ancla..."
 				[ngModel]="facade.searchTerm()"
 				(ngModelChange)="onSearchChange($event)"
+				data-info-anchor="admin-explicaciones-buscar-input"
 			/>
 		</div>
 
@@ -21,6 +22,7 @@
 			pTooltip="Refrescar"
 			(click)="facade.load()"
 			[pt]="{ root: { 'aria-label': 'Refrescar listado' } }"
+			data-info-anchor="admin-explicaciones-refresh-btn"
 		></button>
 
 		<button
@@ -30,6 +32,7 @@
 			class="p-button-success p-button-sm"
 			(click)="onOpenCreate()"
 			[pt]="{ root: { 'aria-label': 'Crear nueva explicación' } }"
+			data-info-anchor="admin-explicaciones-nueva-btn"
 		></button>
 	</div>
 </div>

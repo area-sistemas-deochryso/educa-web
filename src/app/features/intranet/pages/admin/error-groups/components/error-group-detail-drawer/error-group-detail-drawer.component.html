@@ -59,11 +59,11 @@
 		<!-- #region Tabs -->
 		<p-tabs value="resumen" class="group-tabs">
 			<p-tablist>
-				<p-tab value="resumen">
+				<p-tab value="resumen" data-info-anchor="tab-switch">
 					<i class="pi pi-info-circle"></i>
 					Resumen
 				</p-tab>
-				<p-tab value="ocurrencias">
+				<p-tab value="ocurrencias" data-info-anchor="tab-switch">
 					<i class="pi pi-list"></i>
 					Ocurrencias ({{ vm().ocurrenciasTotal }})
 				</p-tab>
@@ -158,6 +158,7 @@
 								class="p-button-outlined p-button-sm"
 								(click)="onExportOcurrenciasClick()"
 								[pt]="{ root: { 'aria-label': 'Exportar ocurrencias a CSV' } }"
+								data-info-anchor="admin-error-groups-export-ocurrencias-btn"
 							></button>
 						</div>
 						<p-table
@@ -176,7 +177,7 @@
 								</tr>
 							</ng-template>
 							<ng-template #body let-item>
-								<tr class="ocurrencia-row" (click)="onOccurrenceClick(item)">
+								<tr class="ocurrencia-row" (click)="onOccurrenceClick(item)" data-info-anchor="admin-error-groups-ver-detalle-btn">
 									<td class="col-fecha">{{ item.fecha | date: 'dd/MM HH:mm:ss' }}</td>
 									<td>
 										@if (item.httpStatus) {
@@ -207,6 +208,7 @@
 											tooltipPosition="left"
 											(click)="$event.stopPropagation(); onOccurrenceClick(item)"
 											[pt]="{ root: { 'aria-label': 'Ver detalle de la ocurrencia' } }"
+											data-info-anchor="admin-error-groups-ver-detalle-btn"
 										></button>
 									</td>
 								</tr>
@@ -220,6 +222,7 @@
 							[showCurrentPageReport]="true"
 							currentPageReportTemplate="Página {currentPage}"
 							(onPageChange)="onOcurrenciasPageChange($event)"
+							data-info-anchor="paginador"
 						/>
 					}
 				</p-tabpanel>
@@ -239,6 +242,7 @@
 				[disabled]="transitionButtons().length === 0"
 				(click)="onStatusChangeClick()"
 				[pt]="{ root: { 'aria-label': 'Cambiar estado del grupo' } }"
+				data-info-anchor="admin-error-groups-cambiar-estado-btn"
 			></button>
 		</div>
 		<!-- #endregion -->

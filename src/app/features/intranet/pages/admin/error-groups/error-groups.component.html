@@ -28,6 +28,7 @@
 			label="Exportar CSV"
 			class="p-button-outlined p-button-sm"
 			(click)="onExportGrupos()"
+			data-info-anchor="admin-error-groups-export-btn"
 		></button>
 		<button
 			pButton
@@ -36,6 +37,7 @@
 			class="p-button-outlined p-button-sm"
 			(click)="onRefresh()"
 			[loading]="loading()"
+			data-info-anchor="admin-error-groups-refresh-btn"
 		></button>
 	</div>
 </app-page-header>
@@ -65,6 +67,7 @@
 			[ngModel]="searchTerm()"
 			(ngModelChange)="onSearchChange($event)"
 			[maxlength]="searchMax"
+			data-info-anchor="admin-error-groups-buscar-input"
 		/>
 	</p-iconfield>
 
@@ -76,6 +79,7 @@
 				(ngModelChange)="onFilterEstadoChange($event)"
 				placeholder="Estado"
 				appendTo="body"
+				data-info-anchor="admin-error-groups-estado-select"
 			/>
 		}
 		<p-select
@@ -84,6 +88,7 @@
 			(ngModelChange)="onFilterSeveridadChange($event)"
 			placeholder="Severidad"
 			appendTo="body"
+			data-info-anchor="admin-error-groups-severidad-select"
 		/>
 		<p-select
 			[options]="origenOptions"
@@ -91,6 +96,7 @@
 			(ngModelChange)="onFilterOrigenChange($event)"
 			placeholder="Origen"
 			appendTo="body"
+			data-info-anchor="admin-error-groups-origen-select"
 		/>
 		<p-inputNumber
 			[ngModel]="filterOcurrenciasMin()"
@@ -100,6 +106,7 @@
 			[min]="0"
 			[showButtons]="false"
 			styleClass="ocurrencias-min-input"
+			data-info-anchor="admin-error-groups-ocurrencias-min-input"
 		/>
 	</div>
 
@@ -109,6 +116,7 @@
 			[ngModel]="hideResolvedIgnored()"
 			(ngModelChange)="onHideResolvedIgnoredChange($event)"
 			[binary]="true"
+			data-info-anchor="admin-error-groups-ocultar-resueltos-toggle"
 		/>
 		<label for="hideResolvedIgnored" class="toggle-label">
 			Ocultar resueltos / ignorados
@@ -121,6 +129,7 @@
 			[ngModel]="excluirRuido()"
 			(ngModelChange)="onExcluirRuidoChange($event)"
 			[binary]="true"
+			data-info-anchor="admin-error-groups-ocultar-ruido-toggle"
 		/>
 		<label for="excluirRuido" class="toggle-label">
 			Ocultar ruido de infra
@@ -133,6 +142,7 @@
 			[ngModel]="excluirNegocio()"
 			(ngModelChange)="onExcluirNegocioChange($event)"
 			[binary]="true"
+			data-info-anchor="admin-error-groups-ocultar-negocio-toggle"
 		/>
 		<label for="excluirNegocio" class="toggle-label">
 			Ocultar errores de negocio
@@ -146,6 +156,7 @@
 		pTooltip="Limpiar filtros"
 		(click)="onClearFilters()"
 		[pt]="{ root: { 'aria-label': 'Limpiar filtros' } }"
+		data-info-anchor="admin-error-groups-limpiar-filtros-btn"
 	></button>
 </div>
 <!-- #endregion -->
@@ -188,7 +199,7 @@
 					</tr>
 				</ng-template>
 				<ng-template #body let-item>
-					<tr (click)="onEventRowClick(item)" class="group-row">
+					<tr (click)="onEventRowClick(item)" class="group-row" data-info-anchor="admin-error-groups-evento-fila">
 						<td>
 							<p-tag
 								[value]="item.severidad"
@@ -246,6 +257,7 @@
 				[showCurrentPageReport]="true"
 				currentPageReportTemplate="Página {currentPage}"
 				(onPageChange)="onEventPageChange($event)"
+				data-info-anchor="paginador"
 			/>
 		</section>
 	}
@@ -275,6 +287,7 @@
 					label="Eliminar seleccionados"
 					class="p-button-danger p-button-sm"
 					(click)="onDeleteSelectedRequested()"
+					data-info-anchor="admin-error-groups-eliminar-seleccionados-btn"
 				></button>
 			</div>
 		}
@@ -291,9 +304,10 @@
 							[binary]="true"
 							[ngModel]="allSelected()"
 							(onChange)="toggleSelectAll()"
+							data-info-anchor="admin-error-groups-seleccionar-todos-checkbox"
 						/>
 					</th>
-					<th class="sortable-header" (click)="onSortChange('severidad')">
+					<th class="sortable-header" (click)="onSortChange('severidad')" data-info-anchor="tabla-orden-columna">
 						Severidad
 						<i class="pi sort-icon"
 							[class.pi-sort-amount-up-alt]="sortField() === 'severidad' && sortDireccion() === 'asc'"
@@ -304,7 +318,7 @@
 					</th>
 					<th>Estado</th>
 					<th>Mensaje</th>
-					<th class="sortable-header" (click)="onSortChange('contadorTotal')">
+					<th class="sortable-header" (click)="onSortChange('contadorTotal')" data-info-anchor="tabla-orden-columna">
 						Ocurrencias
 						<i class="pi sort-icon"
 							[class.pi-sort-amount-up-alt]="sortField() === 'contadorTotal' && sortDireccion() === 'asc'"
@@ -316,7 +330,7 @@
 					<th>Ocurrencias 30d</th>
 					<th pTooltip="Usuarios distintos afectados" tooltipPosition="top">Usuarios únicos</th>
 					<th>Origen</th>
-					<th class="sortable-header" (click)="onSortChange('ultimaFecha')">
+					<th class="sortable-header" (click)="onSortChange('ultimaFecha')" data-info-anchor="tabla-orden-columna">
 						Última fecha
 						<i class="pi sort-icon"
 							[class.pi-sort-amount-up-alt]="sortField() === 'ultimaFecha' && sortDireccion() === 'asc'"
@@ -329,12 +343,13 @@
 				</tr>
 			</ng-template>
 			<ng-template #body let-item>
-				<tr (click)="onRowClick(item)" class="group-row">
+				<tr (click)="onRowClick(item)" class="group-row" data-info-anchor="admin-error-groups-ver-detalle-btn">
 					<td (click)="$event.stopPropagation()">
 						<p-checkbox
 							[binary]="true"
 							[ngModel]="selectedIds().has(item.id)"
 							(onChange)="store.toggleSelected(item.id)"
+							data-info-anchor="admin-error-groups-fila-checkbox"
 						/>
 					</td>
 					<td>
@@ -378,6 +393,7 @@
 							pTooltip="Ver ocurrencias 30 días ampliado"
 							tooltipPosition="top"
 							[attr.aria-label]="'Ver ocurrencias 30 días ampliado de ' + item.mensajeRepresentativo"
+							data-info-anchor="admin-error-groups-sparkline-btn"
 						>
 							<app-error-occurrence-timeline
 								[data]="trendCache().get(item.id)?.data ?? []"
@@ -403,6 +419,7 @@
 							tooltipPosition="left"
 							(click)="onRowClick(item)"
 							[pt]="{ root: { 'aria-label': 'Ver detalle del grupo' } }"
+							data-info-anchor="admin-error-groups-ver-detalle-btn"
 						></button>
 						<button
 							pButton
@@ -412,6 +429,7 @@
 							tooltipPosition="left"
 							(click)="onStatusChangeRequested(item)"
 							[pt]="{ root: { 'aria-label': 'Cambiar estado del grupo' } }"
+							data-info-anchor="admin-error-groups-cambiar-estado-btn"
 						></button>
 						<button
 							pButton
@@ -421,6 +439,7 @@
 							tooltipPosition="left"
 							(click)="onDeleteRequested(item)"
 							[pt]="{ root: { 'aria-label': 'Eliminar grupo' } }"
+							data-info-anchor="admin-error-groups-eliminar-btn"
 						></button>
 					</td>
 				</tr>
@@ -442,6 +461,7 @@
 			[showCurrentPageReport]="true"
 			currentPageReportTemplate="Página {currentPage}"
 			(onPageChange)="onPageChange($event)"
+			data-info-anchor="paginador"
 		/>
 	</section>
 }

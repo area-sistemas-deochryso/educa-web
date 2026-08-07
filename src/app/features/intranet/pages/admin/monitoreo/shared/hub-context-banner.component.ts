@@ -12,7 +12,7 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
 				<i class="pi" [class.pi-exclamation-circle]="level() === 'critical'" [class.pi-exclamation-triangle]="level() === 'warn'" [class.pi-info-circle]="!level()"></i>
 				<span>{{ message() }}</span>
 			</div>
-			<button type="button" class="hub-banner-action" (click)="clearFilter.emit()">
+			<button type="button" class="hub-banner-action" (click)="clearFilter.emit()" data-info-anchor="hub-context-banner-clear-btn">
 				<i class="pi pi-filter-slash"></i>
 				Ver todo
 			</button>

@@ -6,12 +6,14 @@
 		(ngModelChange)="onChangeAnio($event)"
 		appendTo="body"
 		placeholder="Año"
+		data-info-anchor="admin-notificaciones-anio-select"
 	/>
 	<button
 		pButton
 		label="Nueva Notificación"
 		icon="pi pi-plus"
 		(click)="onNew()"
+		data-info-anchor="admin-notificaciones-nueva-btn"
 	></button>
 </app-page-header>
 <!-- #endregion -->
@@ -37,6 +39,7 @@
 			placeholder="Buscar por título o mensaje..."
 			[ngModel]="vm().searchTerm"
 			(ngModelChange)="onSearch($event)"
+			data-info-anchor="admin-notificaciones-buscar-input"
 		/>
 	</p-iconfield>
 	<p-select
@@ -45,6 +48,7 @@
 		(ngModelChange)="onFilterTipo($event)"
 		appendTo="body"
 		placeholder="Tipo"
+		data-info-anchor="admin-notificaciones-tipo-select"
 	/>
 	<p-select
 		[options]="estadoOptions"
@@ -52,6 +56,7 @@
 		(ngModelChange)="onFilterEstado($event)"
 		appendTo="body"
 		placeholder="Estado"
+		data-info-anchor="admin-notificaciones-estado-select"
 	/>
 	<button
 		pButton
@@ -61,6 +66,7 @@
 		pTooltip="Limpiar filtros"
 		tooltipPosition="top"
 		[pt]="{ root: { 'aria-label': 'Limpiar filtros' } }"
+		data-info-anchor="admin-notificaciones-limpiar-filtros-btn"
 	></button>
 </div>
 <!-- #endregion -->
@@ -81,13 +87,13 @@
 >
 	<ng-template #header>
 		<tr>
-			<th pSortableColumn="titulo">Título <p-sortIcon field="titulo" /></th>
-			<th pSortableColumn="tipo" style="width: 110px">Tipo <p-sortIcon field="tipo" /></th>
-			<th pSortableColumn="prioridad" style="width: 100px">Prioridad <p-sortIcon field="prioridad" /></th>
+			<th pSortableColumn="titulo" data-info-anchor="tabla-orden-columna">Título <p-sortIcon field="titulo" /></th>
+			<th pSortableColumn="tipo" style="width: 110px" data-info-anchor="tabla-orden-columna">Tipo <p-sortIcon field="tipo" /></th>
+			<th pSortableColumn="prioridad" style="width: 100px" data-info-anchor="tabla-orden-columna">Prioridad <p-sortIcon field="prioridad" /></th>
 			<th style="width: 110px">Fecha Inicio</th>
 			<th style="width: 110px">Fecha Fin</th>
 			<th style="width: 130px">Destinatario</th>
-			<th pSortableColumn="estado" style="width: 90px">Estado <p-sortIcon field="estado" /></th>
+			<th pSortableColumn="estado" style="width: 90px" data-info-anchor="tabla-orden-columna">Estado <p-sortIcon field="estado" /></th>
 			<th style="width: 140px">Acciones</th>
 		</tr>
 	</ng-template>
@@ -127,6 +133,7 @@
 						pTooltip="Editar"
 						tooltipPosition="top"
 						[pt]="{ root: { 'aria-label': 'Editar' } }"
+						data-info-anchor="admin-notificaciones-editar-btn"
 					></button>
 					<button
 						pButton
@@ -138,6 +145,7 @@
 						[pTooltip]="item.estado | estadoToggleLabel"
 						tooltipPosition="top"
 						[pt]="{ root: { 'aria-label': item.estado | estadoToggleLabel } }"
+						data-info-anchor="admin-notificaciones-toggle-estado-btn"
 					></button>
 					<button
 						pButton
@@ -147,6 +155,7 @@
 						pTooltip="Eliminar"
 						tooltipPosition="top"
 						[pt]="{ root: { 'aria-label': 'Eliminar' } }"
+						data-info-anchor="admin-notificaciones-eliminar-btn"
 					></button>
 				</div>
 			</td>
@@ -182,6 +191,7 @@
 				[ngModel]="vm().formData.titulo"
 				(ngModelChange)="updateField('titulo', $event)"
 				placeholder="Título de la notificación"
+				data-info-anchor="admin-notificaciones-form-titulo-input"
 			/>
 			@if (showValidation() && !vm().formData.titulo.trim()) {
 				<small class="error-msg">El título es obligatorio</small>
@@ -198,6 +208,7 @@
 				placeholder="Mensaje de la notificación"
 				[rows]="3"
 				[autoResize]="true"
+				data-info-anchor="admin-notificaciones-form-mensaje-textarea"
 			></textarea>
 			@if (showValidation() && !vm().formData.mensaje.trim()) {
 				<small class="error-msg">El mensaje es obligatorio</small>
@@ -212,6 +223,7 @@
 				[ngModel]="vm().formData.tipo"
 				(ngModelChange)="updateField('tipo', $event)"
 				appendTo="body"
+				data-info-anchor="admin-notificaciones-form-tipo-select"
 			/>
 		</div>
 
@@ -223,6 +235,7 @@
 				[ngModel]="vm().formData.prioridad"
 				(ngModelChange)="updateField('prioridad', $event)"
 				appendTo="body"
+				data-info-anchor="admin-notificaciones-form-prioridad-select"
 			/>
 		</div>
 
@@ -235,6 +248,7 @@
 				(ngModelChange)="updateField('destinatarioRol', $event)"
 				appendTo="body"
 				placeholder="Todos los roles"
+				data-info-anchor="admin-notificaciones-form-destinatario-rol-select"
 			/>
 		</div>
 
@@ -247,6 +261,7 @@
 				(ngModelChange)="updateField('destinatarioGrado', $event)"
 				appendTo="body"
 				placeholder="Todos los grados"
+				data-info-anchor="admin-notificaciones-form-destinatario-grado-select"
 			/>
 		</div>
 
@@ -259,6 +274,7 @@
 				(ngModelChange)="updateField('destinatarioSeccion', $event)"
 				appendTo="body"
 				placeholder="Todas las secciones"
+				data-info-anchor="admin-notificaciones-form-destinatario-seccion-select"
 			/>
 		</div>
 
@@ -270,6 +286,7 @@
 				[ngModel]="vm().formData.icono"
 				(ngModelChange)="updateField('icono', $event)"
 				appendTo="body"
+				data-info-anchor="admin-notificaciones-form-icono-select"
 			>
 				<ng-template let-item #selectedItem>
 					<div class="icon-option">
@@ -301,6 +318,7 @@
 				(ngModelChange)="updateField('fechaInicio', $event)"
 				dateFormat="yy-mm-dd"
 				appendTo="body"
+				data-info-anchor="admin-notificaciones-form-fecha-inicio-picker"
 			/>
 			@if (showValidation() && !vm().formData.fechaInicio) {
 				<small class="error-msg">La fecha de inicio es obligatoria</small>
@@ -315,6 +333,7 @@
 				(ngModelChange)="updateField('fechaFin', $event)"
 				dateFormat="yy-mm-dd"
 				appendTo="body"
+				data-info-anchor="admin-notificaciones-form-fecha-fin-picker"
 			/>
 			@if (showValidation() && !vm().formData.fechaFin) {
 				<small class="error-msg">La fecha de fin es obligatoria</small>
@@ -329,6 +348,7 @@
 				[ngModel]="vm().formData.actionUrl"
 				(ngModelChange)="updateField('actionUrl', $event)"
 				placeholder="/intranet/..."
+				data-info-anchor="admin-notificaciones-form-action-url-input"
 			/>
 		</div>
 
@@ -340,6 +360,7 @@
 				[ngModel]="vm().formData.actionText"
 				(ngModelChange)="updateField('actionText', $event)"
 				placeholder="Ver detalles"
+				data-info-anchor="admin-notificaciones-form-action-text-input"
 			/>
 		</div>
 
@@ -349,6 +370,7 @@
 				<p-toggleswitch
 					[ngModel]="vm().formData.dismissible"
 					(ngModelChange)="updateField('dismissible', $event)"
+					data-info-anchor="admin-notificaciones-form-descartable-toggle"
 				/>
 			</div>
 			<div class="toggle-item">
@@ -356,13 +378,14 @@
 				<p-toggleswitch
 					[ngModel]="vm().formData.estado"
 					(ngModelChange)="updateField('estado', $event)"
+					data-info-anchor="admin-notificaciones-form-activa-toggle"
 				/>
 			</div>
 		</div>
 	</div>
 
 	<ng-template #footer>
-		<button pButton label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="onDialogVisibleChange(false)"></button>
+		<button pButton label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="onDialogVisibleChange(false)" data-info-anchor="admin-notificaciones-form-cancelar-btn"></button>
 		<button
 			pButton
 			[label]="vm().isEditing ? 'Actualizar' : 'Crear'"
@@ -370,6 +393,7 @@
 			(click)="onSave()"
 			[disabled]="!vm().isFormValid || vm().saving"
 			[loading]="vm().saving"
+			data-info-anchor="admin-notificaciones-form-guardar-btn"
 		></button>
 	</ng-template>
 </p-dialog>
