@@ -3,17 +3,23 @@
 	display: contents;
 }
 
+// z-index por encima de los tiers por defecto de PrimeNG (overlay: 1000, modal: 1100 — ver
+// node_modules/primeng/.../primeng-config.mjs) — el modo informativo intercepta y explica
+// elementos dentro de popovers/paneles reales (p-popover, brief 527), así que el callout
+// necesita quedar arriba de esos overlays o la explicación queda tapada (hallazgo brief 528,
+// reportado con captura real). Por debajo de esto queda el FAB (997) — al mostrar un callout
+// puede taparlo brevemente, aceptable: cerrar el callout (click en el fondo o la X) lo libera.
 .info-callout__backdrop {
 	position: fixed;
 	inset: 0;
-	z-index: 990; // Debajo del FAB (997, ver intranet-fab-menu.component.scss) — nunca lo tapa
+	z-index: 1150;
 	background: rgba(0, 0, 0, 0.6);
 	cursor: pointer;
 }
 
 .info-callout__highlight {
 	position: fixed;
-	z-index: 991;
+	z-index: 1151;
 	border-radius: 8px;
 	outline: 3px solid var(--yellow-400);
 	outline-offset: 2px;
@@ -23,7 +29,7 @@
 
 .info-callout__box {
 	position: fixed;
-	z-index: 992;
+	z-index: 1152;
 	display: flex;
 	align-items: flex-start;
 	gap: 0.75rem;
