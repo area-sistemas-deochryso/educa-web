@@ -5,6 +5,7 @@
 		<button
 			type="button"
 			class="throttle-widget__toggle"
+			data-info-anchor="email-outbox-widget-collapse-toggle"
 			(click)="onCollapseToggle()"
 			[attr.aria-expanded]="!collapsed()"
 			[attr.aria-label]="
@@ -23,6 +24,7 @@
 			<label class="throttle-widget__autorefresh">
 				<span>Auto-refresh 30s</span>
 				<p-toggleswitch
+					data-info-anchor="email-outbox-autorefresh-toggle"
 					[ngModel]="autoRefresh()"
 					(ngModelChange)="onAutoRefreshToggle($event)"
 					inputId="throttle-autorefresh"
@@ -32,6 +34,7 @@
 				pButton
 				icon="pi pi-refresh"
 				class="p-button-outlined p-button-sm"
+				data-info-anchor="email-outbox-refresh-btn"
 				(click)="onRefreshClick()"
 				pTooltip="Refrescar ahora"
 				tooltipPosition="top"

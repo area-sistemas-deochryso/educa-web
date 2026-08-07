@@ -59,6 +59,7 @@
 										class="p-button-text p-button-sm"
 										[disabled]="!canGoToGroup(event.payload)"
 										(click)="onGoToGroup(event.payload)"
+										data-info-anchor="admin-correlation-row-action"
 										[pt]="{ root: { 'aria-label': 'Ver grupo de errores' } }"
 									></button>
 								</div>
@@ -106,6 +107,7 @@
 										icon="pi pi-external-link"
 										class="p-button-text p-button-sm"
 										(click)="onGoToReport(event.payload)"
+										data-info-anchor="admin-correlation-row-action"
 										[pt]="{ root: { 'aria-label': 'Ver detalle del reporte' } }"
 									></button>
 								</div>
@@ -134,6 +136,7 @@
 										icon="pi pi-envelope"
 										class="p-button-text p-button-sm"
 										(click)="onGoToOutbox(event.payload)"
+										data-info-anchor="admin-correlation-row-action"
 										[pt]="{ root: { 'aria-label': 'Ver correos del destinatario en bandeja' } }"
 									></button>
 								</div>

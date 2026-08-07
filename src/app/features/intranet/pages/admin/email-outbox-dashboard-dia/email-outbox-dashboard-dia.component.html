@@ -18,18 +18,18 @@
 <!-- #region Tabs -->
 <p-tabs value="resumen" class="dashboard-tabs">
 	<p-tablist>
-		<p-tab value="resumen">
+		<p-tab value="resumen" data-info-anchor="admin-email-outbox-dashboard-tab">
 			<i class="pi pi-th-large"></i>
 			<span>Resumen</span>
 		</p-tab>
-		<p-tab value="detalle">
+		<p-tab value="detalle" data-info-anchor="admin-email-outbox-dashboard-tab">
 			<i class="pi pi-list"></i>
 			<span>Detalle de fallos</span>
 			@if (totalFallos() + totalBounces() > 0) {
 				<span class="tab-badge">{{ totalFallos() + totalBounces() }}</span>
 			}
 		</p-tab>
-		<p-tab value="mapa">
+		<p-tab value="mapa" data-info-anchor="admin-email-outbox-dashboard-tab">
 			<i class="pi pi-compass"></i>
 			<span>Mapa de envío</span>
 		</p-tab>

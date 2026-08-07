@@ -68,12 +68,14 @@
 							class="p-button-rounded p-button-text p-button-secondary"
 							pTooltip="Ver detalles"
 							tooltipPosition="top"
+							data-info-anchor="email-outbox-view-detail-btn"
 							(click)="onViewDetail(item)"
 							[pt]="{ root: { 'aria-label': 'Ver detalles' } }"
 						></button>
 						<a
 							[routerLink]="['/intranet/admin/monitoreo/correos/persona', item.correo]"
 							class="p-button p-button-rounded p-button-text p-button-info"
+							data-info-anchor="email-outbox-view-history-link"
 							pTooltip="Ver historial"
 							tooltipPosition="top"
 							[attr.aria-label]="'Ver historial de ' + item.correo"
@@ -87,6 +89,7 @@
 								class="p-button-rounded p-button-text p-button-warning"
 								pTooltip="Desbloquear"
 								tooltipPosition="top"
+								data-info-anchor="admin-email-outbox-blacklist-desbloquear-btn"
 								(click)="onUnblock(item)"
 								[pt]="{ root: { 'aria-label': 'Desbloquear correo' } }"
 							></button>

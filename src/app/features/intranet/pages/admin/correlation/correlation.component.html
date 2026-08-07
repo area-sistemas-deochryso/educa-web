@@ -10,6 +10,7 @@
 			label="Volver"
 			class="p-button-text p-button-sm"
 			(click)="onBack()"
+			data-info-anchor="admin-correlation-back"
 			[pt]="{ root: { 'aria-label': 'Volver' } }"
 		></button>
 
@@ -24,6 +25,7 @@
 				[class.p-button-outlined]="viewMode() === 'timeline'"
 				(click)="onToggleView('timeline')"
 				[attr.aria-pressed]="viewMode() === 'timeline'"
+				data-info-anchor="admin-correlation-view-toggle"
 				[pt]="{ root: { 'aria-label': 'Vista timeline cronológica' } }"
 			></button>
 			<button
@@ -36,6 +38,7 @@
 				[class.p-button-outlined]="viewMode() === 'section'"
 				(click)="onToggleView('section')"
 				[attr.aria-pressed]="viewMode() === 'section'"
+				data-info-anchor="admin-correlation-view-toggle"
 				[pt]="{ root: { 'aria-label': 'Vista por sección' } }"
 			></button>
 		</div>
@@ -47,6 +50,7 @@
 			class="p-button-outlined p-button-sm"
 			[disabled]="vm().loading || isSnapshotEmpty()"
 			(click)="onExport()"
+			data-info-anchor="admin-correlation-export"
 			pTooltip="Descargar snapshot como JSON"
 			[pt]="{ root: { 'aria-label': 'Exportar snapshot como JSON' } }"
 		></button>
@@ -61,6 +65,7 @@
 			[class.p-button-outlined]="autoRefresh()"
 			(click)="onToggleAutoRefresh()"
 			[attr.aria-pressed]="autoRefresh()"
+			data-info-anchor="admin-correlation-autorefresh-toggle"
 			[pTooltip]="
 				autoRefresh()
 					? 'Auto-refresh activo: recarga cada 30s (pausa al cambiar de pestaña)'
@@ -81,6 +86,7 @@
 			class="p-button-text p-button-sm btn-icon"
 			[disabled]="vm().loading || !vm().correlationId"
 			(click)="onRetry()"
+			data-info-anchor="admin-correlation-refresh"
 			pTooltip="Recargar snapshot"
 			[pt]="{ root: { 'aria-label': 'Recargar snapshot' } }"
 		></button>
@@ -105,6 +111,7 @@
 				label="Copiar id"
 				class="p-button-text p-button-sm"
 				(click)="onCopyId(vm().correlationId)"
+				data-info-anchor="admin-correlation-copy-id"
 				[pt]="{ root: { 'aria-label': 'Copiar correlation id al portapapeles' } }"
 			></button>
 		</div>
@@ -127,6 +134,7 @@
 			icon="pi pi-refresh"
 			class="p-button-outlined p-button-sm"
 			(click)="onRetry()"
+			data-info-anchor="reintentar"
 		></button>
 	</div>
 } @else {

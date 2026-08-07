@@ -53,6 +53,7 @@
 		<input
 			type="text"
 			pInputText
+			data-info-anchor="email-outbox-search-input"
 			placeholder="Buscar por correo..."
 			[ngModel]="vm().searchTerm"
 			(ngModelChange)="onSearchChange($event)"
@@ -61,6 +62,7 @@
 
 	<div class="filter-dropdowns">
 		<p-select
+			data-info-anchor="email-outbox-status-filter-select"
 			[options]="estadoOptions"
 			optionLabel="label"
 			optionValue="value"
@@ -71,6 +73,7 @@
 			appendTo="body"
 		/>
 		<p-select
+			data-info-anchor="email-outbox-motivo-filter-select"
 			[options]="motivoOptions"
 			optionLabel="label"
 			optionValue="value"
@@ -88,6 +91,7 @@
 		class="p-button-text p-button-sm btn-clear"
 		pTooltip="Limpiar filtros"
 		tooltipPosition="top"
+		data-info-anchor="email-outbox-clear-filters-btn"
 		(click)="onClearFiltros()"
 		[pt]="{ root: { 'aria-label': 'Limpiar filtros' } }"
 	></button>
@@ -98,6 +102,7 @@
 		class="p-button-text p-button-sm"
 		pTooltip="Refrescar"
 		tooltipPosition="top"
+		data-info-anchor="email-outbox-refresh-btn"
 		(click)="onRefresh()"
 		[pt]="{ root: { 'aria-label': 'Refrescar' } }"
 	></button>
@@ -108,6 +113,7 @@
 		class="p-button-text p-button-sm"
 		pTooltip="Exportar CSV (página actual)"
 		tooltipPosition="top"
+		data-info-anchor="email-outbox-export-csv-btn"
 		[disabled]="vm().items.length === 0"
 		(click)="onExportCsv()"
 		[pt]="{ root: { 'aria-label': 'Exportar blacklist a CSV' } }"
@@ -118,6 +124,7 @@
 		label="Agregar"
 		icon="pi pi-plus"
 		class="p-button-success p-button-sm"
+		data-info-anchor="admin-email-outbox-blacklist-agregar-btn"
 		(click)="onOpenAddDialog()"
 		[pt]="{ root: { 'aria-label': 'Agregar correo a blacklist' } }"
 	></button>
@@ -182,6 +189,7 @@
 		</p>
 		<textarea
 			pTextarea
+			data-info-anchor="admin-email-outbox-blacklist-unblock-textarea"
 			[ngModel]="unblockMotivo()"
 			(ngModelChange)="onUnblockMotivoChange($event)"
 			[rows]="3"
@@ -198,6 +206,7 @@
 			pButton
 			label="Cancelar"
 			class="p-button-text"
+			data-info-anchor="email-outbox-dialog-cancel-btn"
 			(click)="onUnblockCancel()"
 			[pt]="{ root: { 'aria-label': 'Cancelar desbloqueo' } }"
 		></button>
@@ -206,6 +215,7 @@
 			label="Desbloquear"
 			icon="pi pi-lock-open"
 			class="p-button-warning"
+			data-info-anchor="admin-email-outbox-blacklist-desbloquear-btn"
 			[disabled]="unblockMotivo().length < MIN_MOTIVO_LENGTH"
 			(click)="onUnblockConfirm()"
 			[pt]="{ root: { 'aria-label': 'Confirmar desbloqueo' } }"

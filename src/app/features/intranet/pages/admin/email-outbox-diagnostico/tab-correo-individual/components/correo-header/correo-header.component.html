@@ -83,6 +83,7 @@
 			class="p-button-success p-button-sm"
 			[disabled]="loading() || !correoInput().trim()"
 			[pt]="{ root: { 'aria-label': 'Buscar diagnóstico' } }"
+			data-info-anchor="admin-email-outbox-diagnostico-buscar-btn"
 		></button>
 
 		@if (correoConsultado()) {
@@ -94,6 +95,7 @@
 				pTooltip="Limpiar"
 				(click)="onLimpiar()"
 				[pt]="{ root: { 'aria-label': 'Limpiar' } }"
+				data-info-anchor="admin-email-outbox-diagnostico-limpiar-btn"
 			></button>
 		}
 	</form>
@@ -112,6 +114,7 @@
 			pTooltip="Copiar correo"
 			(click)="onCopyConsultado()"
 			[pt]="{ root: { 'aria-label': 'Copiar correo consultado' } }"
+			data-info-anchor="copiar-btn"
 		></button>
 		@if (mostrarEcoNormalizado()) {
 			<span class="correo-echo__hint">

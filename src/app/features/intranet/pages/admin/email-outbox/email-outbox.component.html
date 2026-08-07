@@ -26,6 +26,7 @@
 	<button
 		type="button"
 		class="overview-toggle"
+		data-info-anchor="email-outbox-widget-collapse-toggle"
 		(click)="onOverviewCollapsedChange(!vm().overviewCollapsed)"
 		[attr.aria-expanded]="!vm().overviewCollapsed"
 		[attr.aria-label]="vm().overviewCollapsed ? 'Expandir resumen y tendencia' : 'Contraer resumen y tendencia'"
@@ -244,6 +245,7 @@
 						icon="pi pi-replay"
 						severity="warn"
 						[outlined]="true"
+						data-info-anchor="reintentar"
 						(click)="onOpenManualRetry()"
 					></button>
 				</div>
@@ -341,6 +343,7 @@
 				<label class="detail-label" for="senderSelect">Remitente</label>
 				<p-select
 					id="senderSelect"
+					data-info-anchor="admin-email-outbox-retry-sender-select"
 					[options]="senderOptions"
 					[(ngModel)]="selectedSender"
 					optionLabel="label"
@@ -366,18 +369,19 @@
 		</div>
 	}
 	<ng-template #footer>
-		<button pButton label="Cancelar" severity="secondary" [text]="true" (click)="onCloseManualRetryDialog()"></button>
+		<button pButton label="Cancelar" severity="secondary" [text]="true" data-info-anchor="email-outbox-dialog-cancel-btn" (click)="onCloseManualRetryDialog()"></button>
 		@if (!vm().manualRetryResult) {
 			<button
 				pButton
 				label="Reintentar"
 				icon="pi pi-replay"
 				severity="warn"
+				data-info-anchor="reintentar"
 				[loading]="vm().manualRetryLoading"
 				(click)="onConfirmManualRetry()"
 			></button>
 		} @else {
-			<button pButton label="Cerrar" (click)="onCloseManualRetryDialog()"></button>
+			<button pButton label="Cerrar" data-info-anchor="email-outbox-dialog-close-btn" (click)="onCloseManualRetryDialog()"></button>
 		}
 	</ng-template>
 </p-dialog>

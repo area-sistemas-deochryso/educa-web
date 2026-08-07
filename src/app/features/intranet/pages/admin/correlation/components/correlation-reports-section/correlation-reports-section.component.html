@@ -13,6 +13,7 @@
 			label="Abrir en reportes"
 			icon="pi pi-external-link"
 			class="p-button-text p-button-sm"
+			data-info-anchor="admin-correlation-open-external"
 		></a>
 	</header>
 
@@ -83,6 +84,7 @@
 							icon="pi pi-external-link"
 							class="p-button-text p-button-sm"
 							(click)="onGoToReport(row)"
+							data-info-anchor="admin-correlation-row-action"
 							[pt]="{ root: { 'aria-label': 'Ver reporte' } }"
 						></button>
 					</td>

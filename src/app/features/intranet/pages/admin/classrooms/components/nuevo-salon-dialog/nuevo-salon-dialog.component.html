@@ -17,6 +17,7 @@
 			placeholder="Seleccionar grado"
 			appendTo="body"
 			[style]="{ width: '100%' }"
+			data-info-anchor="admin-salon-nuevo-grado-select"
 		/>
 	</div>
 
@@ -32,6 +33,7 @@
 			placeholder="Seleccionar sección"
 			appendTo="body"
 			[style]="{ width: '100%' }"
+			data-info-anchor="admin-salon-nuevo-seccion-select"
 		/>
 	</div>
 
@@ -47,6 +49,7 @@
 			placeholder="Seleccionar sede"
 			appendTo="body"
 			[style]="{ width: '100%' }"
+			data-info-anchor="admin-salon-nuevo-sede-select"
 		/>
 	</div>
 
@@ -60,17 +63,25 @@
 			[min]="2020"
 			[max]="2030"
 			[style]="{ width: '100%' }"
+			data-info-anchor="admin-salon-nuevo-anio-input"
 		/>
 	</div>
 
 	<ng-template #footer>
-		<button pButton label="Cancelar" class="p-button-text" (click)="onVisibleChange(false)"></button>
+		<button
+			pButton
+			label="Cancelar"
+			class="p-button-text"
+			(click)="onVisibleChange(false)"
+			data-info-anchor="admin-salon-nuevo-cancel-btn"
+		></button>
 		<button
 			pButton
 			label="Crear"
 			[loading]="loading()"
 			[disabled]="!isFormValid()"
 			(click)="onSave()"
+			data-info-anchor="admin-salon-nuevo-crear-btn"
 		></button>
 	</ng-template>
 </p-dialog>

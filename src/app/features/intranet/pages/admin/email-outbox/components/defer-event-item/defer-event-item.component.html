@@ -15,6 +15,7 @@
 				<a
 					[routerLink]="['/intranet/admin/monitoreo/correos/persona', event().destinatario]"
 					class="history-link"
+					data-info-anchor="email-outbox-view-history-link"
 					[attr.aria-label]="'Ver historial de ' + event().destinatario"
 				>
 					<i class="pi pi-history"></i> Ver historial
@@ -45,7 +46,8 @@
 			<div class="event-item__row">
 				<span class="event-item__label">EmailOutbox</span>
 				<a [routerLink]="['/intranet/admin/monitoreo/correos/diagnostico']"
-					[queryParams]="{ id: event().emailOutboxId }">
+					[queryParams]="{ id: event().emailOutboxId }"
+					data-info-anchor="admin-email-outbox-defer-ver-outbox-link">
 					#{{ event().emailOutboxId }}
 				</a>
 			</div>

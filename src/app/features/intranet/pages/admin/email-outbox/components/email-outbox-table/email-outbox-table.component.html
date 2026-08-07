@@ -74,6 +74,7 @@
 						class="p-button-rounded p-button-text p-button-sm"
 						pTooltip="Ver detalle"
 						tooltipPosition="top"
+						data-info-anchor="email-outbox-view-detail-btn"
 						(click)="viewDetail.emit(item)"
 						[pt]="{
 							root: {
@@ -84,6 +85,7 @@
 					<a
 						[routerLink]="['/intranet/admin/monitoreo/correos/persona', item.destinatario]"
 						class="p-button p-button-rounded p-button-text p-button-sm p-button-info"
+						data-info-anchor="email-outbox-view-history-link"
 						pTooltip="Ver historial"
 						tooltipPosition="top"
 						[attr.aria-label]="'Ver historial de ' + item.destinatario"
@@ -101,6 +103,7 @@
 									: 'Reintentar'
 							"
 							tooltipPosition="top"
+							data-info-anchor="reintentar"
 							[disabled]="esPermanente(item.tipoFallo)"
 							(click)="retry.emit(item)"
 							[pt]="{
@@ -118,6 +121,7 @@
 						class="p-button-rounded p-button-text p-button-sm p-button-secondary"
 						pTooltip="Exportar caso"
 						tooltipPosition="top"
+						data-info-anchor="admin-email-outbox-exportar-caso-btn"
 						(click)="exportCaso.emit(item)"
 						[pt]="{ root: { 'aria-label': 'Exportar caso completo' } }"
 					></button>

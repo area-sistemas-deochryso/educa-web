@@ -9,6 +9,7 @@
 			@if (!isEmpty()) {
 				<p-button
 					label="Exportar Excel"
+					data-info-anchor="exportar-excel-btn"
 					icon="pi pi-file-excel"
 					[text]="true"
 					size="small"
@@ -33,6 +34,7 @@
 					appendTo="body"
 					styleClass="salon-multiselect"
 					[pt]="{ root: { 'aria-label': 'Filtrar por salón' } }"
+					data-info-anchor="admin-email-outbox-diagnostico-salon-filtro"
 				/>
 				@if (selectedSalonIds().length > 0) {
 					<span class="filter-count">
@@ -79,6 +81,7 @@
 					(click)="onRowClick(row)"
 					pTooltip="Ver en bandeja de correos"
 					tooltipPosition="left"
+					data-info-anchor="admin-email-outbox-diagnostico-asistencia-fila"
 				>
 					<td>{{ row.alumno }}</td>
 					<td>{{ row.grado }}</td>
@@ -105,6 +108,7 @@
 									size="small"
 									(onClick)="onStudentClick($event, row)"
 									[pt]="{ root: { 'aria-label': 'Ver perfil de ' + row.alumno } }"
+									data-info-anchor="admin-email-outbox-diagnostico-ver-perfil-btn"
 								/>
 							}
 						</td>

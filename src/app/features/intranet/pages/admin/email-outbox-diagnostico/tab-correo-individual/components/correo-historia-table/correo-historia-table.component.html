@@ -40,6 +40,7 @@
 							[pTooltip]="isExpanded(row.id) ? 'Ocultar detalles' : 'Ver detalles'"
 							(click)="toggleExpand(row.id)"
 							[pt]="{ root: { 'aria-label': 'Expandir detalles' } }"
+							data-info-anchor="admin-email-outbox-diagnostico-historia-expandir-btn"
 						></button>
 					}
 				</td>
@@ -71,6 +72,7 @@
 						tooltipPosition="top"
 						(click)="onViewDetail(row)"
 						[pt]="{ root: { 'aria-label': 'Ver detalle completo' } }"
+						data-info-anchor="email-row-ver-detalle-btn"
 					></button>
 				</td>
 			</tr>

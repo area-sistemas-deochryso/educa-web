@@ -13,6 +13,7 @@
 			label="Abrir en bandeja"
 			icon="pi pi-external-link"
 			class="p-button-text p-button-sm"
+			data-info-anchor="admin-correlation-open-external"
 		></a>
 	</header>
 
@@ -70,6 +71,7 @@
 							icon="pi pi-inbox"
 							class="p-button-text p-button-sm"
 							(click)="onGoToOutbox(row)"
+							data-info-anchor="admin-correlation-row-action"
 							[pt]="{ root: { 'aria-label': 'Ver bandeja del destinatario' } }"
 						></button>
 					</td>

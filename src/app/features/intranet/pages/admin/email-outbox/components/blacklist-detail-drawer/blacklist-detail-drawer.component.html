@@ -106,6 +106,7 @@
 				label="Cerrar"
 				icon="pi pi-times"
 				class="p-button-text"
+				data-info-anchor="email-outbox-dialog-close-btn"
 				(click)="onClose()"
 				[pt]="{ root: { 'aria-label': 'Cerrar' } }"
 			></button>
@@ -115,6 +116,7 @@
 					label="Desbloquear"
 					icon="pi pi-lock-open"
 					class="p-button-warning"
+					data-info-anchor="admin-email-outbox-blacklist-desbloquear-btn"
 					(click)="onUnblock()"
 					[pt]="{ root: { 'aria-label': 'Desbloquear correo' } }"
 				></button>

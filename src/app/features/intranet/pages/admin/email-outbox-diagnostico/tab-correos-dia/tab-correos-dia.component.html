@@ -19,7 +19,7 @@
 <!-- #region Detail tabs (flat — formerly 3rd-level sub-sub-tabs) -->
 <p-tabs value="entradas" class="detalle-tabs">
 	<p-tablist>
-		<p-tab value="entradas">
+		<p-tab value="entradas" data-info-anchor="tab-switch">
 			<i class="pi pi-sign-in"></i>
 			<span>Entradas sin correo</span>
 			@if (hasData() && vm().entradasSinCorreoEnviado.length > 0) {
@@ -28,7 +28,7 @@
 				</span>
 			}
 		</p-tab>
-		<p-tab value="estudiantes">
+		<p-tab value="estudiantes" data-info-anchor="tab-switch">
 			<i class="pi pi-user-minus"></i>
 			<span>Sin correo apoderado</span>
 			@if (hasData() && vm().estudiantesSinCorreo.length > 0) {
@@ -37,7 +37,7 @@
 				</span>
 			}
 		</p-tab>
-		<p-tab value="apoderados">
+		<p-tab value="apoderados" data-info-anchor="tab-switch">
 			<i class="pi pi-ban"></i>
 			<span>Apoderados blacklisteados</span>
 			@if (hasData() && vm().apoderadosBlacklisteados.length > 0) {
@@ -46,7 +46,7 @@
 				</span>
 			}
 		</p-tab>
-		<p-tab value="enviados">
+		<p-tab value="enviados" data-info-anchor="tab-switch">
 			<i class="pi pi-check-circle"></i>
 			<span>Entradas con correo</span>
 			@if (hasData() && vm().entradasConCorreoEnviado.length > 0) {
@@ -55,7 +55,7 @@
 				</span>
 			}
 		</p-tab>
-		<p-tab value="asistencias">
+		<p-tab value="asistencias" data-info-anchor="tab-switch">
 			<i class="pi pi-calendar-times"></i>
 			<span>Asistencia sin correo confirmado</span>
 			@if (hasData() && vm().attendanceGaps.length > 0) {

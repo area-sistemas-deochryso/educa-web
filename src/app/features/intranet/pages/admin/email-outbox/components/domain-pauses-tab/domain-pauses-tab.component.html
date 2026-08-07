@@ -41,6 +41,7 @@
 		<input
 			type="text"
 			pInputText
+			data-info-anchor="email-outbox-search-input"
 			placeholder="Buscar por dominio..."
 			[ngModel]="vm().searchTerm"
 			(ngModelChange)="onSearchChange($event)"
@@ -49,6 +50,7 @@
 
 	<div class="filter-dropdowns">
 		<p-select
+			data-info-anchor="email-outbox-status-filter-select"
 			[options]="estadoOptions"
 			optionLabel="label"
 			optionValue="value"
@@ -59,6 +61,7 @@
 			appendTo="body"
 		/>
 		<p-select
+			data-info-anchor="email-outbox-motivo-filter-select"
 			[options]="motivoOptions"
 			optionLabel="label"
 			optionValue="value"
@@ -76,6 +79,7 @@
 		class="p-button-text p-button-sm btn-clear"
 		pTooltip="Limpiar filtros"
 		tooltipPosition="top"
+		data-info-anchor="email-outbox-clear-filters-btn"
 		(click)="onClearFiltros()"
 		[pt]="{ root: { 'aria-label': 'Limpiar filtros' } }"
 	></button>
@@ -86,6 +90,7 @@
 		class="p-button-text p-button-sm"
 		pTooltip="Refrescar"
 		tooltipPosition="top"
+		data-info-anchor="email-outbox-refresh-btn"
 		(click)="onRefresh()"
 		[pt]="{ root: { 'aria-label': 'Refrescar' } }"
 	></button>
@@ -96,6 +101,7 @@
 		class="p-button-text p-button-sm"
 		pTooltip="Exportar CSV (página actual)"
 		tooltipPosition="top"
+		data-info-anchor="email-outbox-export-csv-btn"
 		(click)="onExportCsv()"
 		[disabled]="vm().items.length === 0"
 		[pt]="{ root: { 'aria-label': 'Exportar CSV' } }"
@@ -106,6 +112,7 @@
 		label="Pausar"
 		icon="pi pi-pause"
 		class="p-button-success p-button-sm"
+		data-info-anchor="admin-email-outbox-domain-pausar-btn"
 		(click)="onOpenAddDialog()"
 		[pt]="{ root: { 'aria-label': 'Pausar dominio manualmente' } }"
 	></button>

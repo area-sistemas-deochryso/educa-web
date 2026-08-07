@@ -18,6 +18,7 @@ import { PageHeaderComponent } from '@intranet-shared/components/page-header/pag
 				icon="pi pi-refresh"
 				label="Refrescar"
 				class="p-button-outlined p-button-sm"
+				data-info-anchor="email-outbox-refresh-btn"
 				(click)="refresh.emit()"
 			></button>
 			<button
@@ -25,6 +26,7 @@ import { PageHeaderComponent } from '@intranet-shared/components/page-header/pag
 				icon="pi pi-file-excel"
 				label="Exportar"
 				class="p-button-success p-button-sm"
+				data-info-anchor="admin-email-outbox-exportar-excel-btn"
 				(click)="exportExcel.emit()"
 			></button>
 		</app-page-header>

@@ -15,6 +15,7 @@
 				<input
 					id="qt-destinatario"
 					pInputText
+					data-info-anchor="admin-email-outbox-quarantine-destinatario-input"
 					type="email"
 					autocomplete="off"
 					[ngModel]="formData().destinatario"
@@ -31,6 +32,7 @@
 				<label for="qt-duration">Duración *</label>
 				<p-select
 					inputId="qt-duration"
+					data-info-anchor="admin-email-outbox-quarantine-duration-select"
 					[options]="durationOptions"
 					optionLabel="label"
 					optionValue="value"
@@ -46,6 +48,7 @@
 				<textarea
 					id="qt-observacion"
 					pTextarea
+					data-info-anchor="admin-email-outbox-quarantine-observacion-textarea"
 					rows="3"
 					maxlength="500"
 					autocomplete="off"
@@ -70,6 +73,7 @@
 				label="Cancelar"
 				icon="pi pi-times"
 				class="p-button-text"
+				data-info-anchor="email-outbox-dialog-cancel-btn"
 				(click)="onCancel()"
 				[disabled]="submitting()"
 				[pt]="{ root: { 'aria-label': 'Cancelar' } }"
@@ -79,6 +83,7 @@
 				label="Cuarentena"
 				icon="pi pi-shield"
 				class="p-button-success"
+				data-info-anchor="admin-email-outbox-quarantine-crear-btn"
 				(click)="onConfirm()"
 				[disabled]="!canSubmit()"
 				[pt]="{ root: { 'aria-label': 'Crear cuarentena manual' } }"

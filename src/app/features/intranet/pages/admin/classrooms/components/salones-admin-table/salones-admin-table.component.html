@@ -15,18 +15,18 @@
 	<ng-template #header>
 		<tr>
 			<th style="width: 50px">#</th>
-			<th pSortableColumn="grado" style="min-width: 120px">
+			<th pSortableColumn="grado" style="min-width: 120px" data-info-anchor="tabla-orden-columna">
 				GRADO <p-sortIcon field="grado" />
 			</th>
-			<th pSortableColumn="seccion" style="width: 80px">
+			<th pSortableColumn="seccion" style="width: 80px" data-info-anchor="tabla-orden-columna">
 				SECCIÓN <p-sortIcon field="seccion" />
 			</th>
 			<th style="width: 110px" class="text-center">MODO</th>
-			<th pSortableColumn="sede" style="min-width: 100px">
+			<th pSortableColumn="sede" style="min-width: 100px" data-info-anchor="tabla-orden-columna">
 				SEDE <p-sortIcon field="sede" />
 			</th>
 			<th style="min-width: 180px">TUTOR</th>
-			<th pSortableColumn="totalEstudiantes" style="width: 80px" class="text-center">
+			<th pSortableColumn="totalEstudiantes" style="width: 80px" class="text-center" data-info-anchor="tabla-orden-columna">
 				ESTUDIANTES <p-sortIcon field="totalEstudiantes" />
 			</th>
 			<th style="width: 100px" class="text-center">APROBADOS</th>
@@ -89,6 +89,7 @@
 							'aria-label': 'Ver salón',
 						},
 					}"
+					data-info-anchor="admin-salones-table-ver-btn"
 				></button>
 				<button
 					pButton
@@ -102,6 +103,7 @@
 							'aria-label': 'Ver horarios de este salón',
 						},
 					}"
+					data-info-anchor="admin-salones-table-horarios-btn"
 				></button>
 				<button
 					pButton
@@ -115,6 +117,7 @@
 							'aria-label': 'Ver usuarios de este salón',
 						},
 					}"
+					data-info-anchor="admin-salones-table-usuarios-btn"
 				></button>
 			</td>
 		</tr>

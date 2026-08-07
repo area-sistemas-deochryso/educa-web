@@ -38,6 +38,7 @@ import { SalonHealthPermissionsTabComponent } from '@features/intranet/pages/pro
 					searchPlaceholder="Buscar salón..."
 					emptyMessage="Sin salones"
 					ariaLabel="Seleccionar salón"
+					data-info-anchor="salon-picker-grid"
 					(selectionChange)="onSalonChange($event)"
 				/>
 			</div>
@@ -58,6 +59,7 @@ import { SalonHealthPermissionsTabComponent } from '@features/intranet/pages/pro
 						label="Reintentar"
 						icon="pi pi-refresh"
 						class="p-button-outlined p-button-sm mt-2"
+						data-info-anchor="reintentar"
 						(click)="facade.loadResumen(vm().selectedSalonId!)"
 					></button>
 				</div>

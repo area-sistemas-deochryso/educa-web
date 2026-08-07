@@ -45,6 +45,7 @@
 					class="p-button-sm p-button-success"
 					[loading]="loading()"
 					(click)="onAprobarSeleccionados('APROBADO')"
+					data-info-anchor="admin-salon-aprobacion-bulk-aprobar-btn"
 				></button>
 				<button
 					pButton
@@ -53,6 +54,7 @@
 					class="p-button-sm p-button-danger"
 					[loading]="loading()"
 					(click)="onAprobarSeleccionados('DESAPROBADO')"
+					data-info-anchor="admin-salon-aprobacion-bulk-desaprobar-btn"
 				></button>
 			}
 		</div>
@@ -77,6 +79,7 @@
 						[ngModel]="allSelected()"
 						(ngModelChange)="toggleSelectAll()"
 						[binary]="true"
+						data-info-anchor="admin-salon-aprobacion-select-all-checkbox"
 					/>
 				</th>
 			}
@@ -97,6 +100,7 @@
 						[ngModel]="isSelected(aprobacion.estudianteId)"
 						(ngModelChange)="toggleStudent(aprobacion.estudianteId)"
 						[binary]="true"
+						data-info-anchor="admin-salon-aprobacion-row-checkbox"
 					/>
 				</td>
 			}
@@ -123,6 +127,7 @@
 							[disabled]="aprobacion.estado === 'APROBADO' || loading()"
 							(click)="onAprobarIndividual(aprobacion, 'APROBADO')"
 							[pt]="{ root: { 'aria-label': 'Aprobar estudiante' } }"
+							data-info-anchor="admin-salon-aprobacion-row-aprobar-btn"
 						></button>
 						<button
 							pButton
@@ -133,6 +138,7 @@
 							[disabled]="aprobacion.estado === 'DESAPROBADO' || loading()"
 							(click)="onAprobarIndividual(aprobacion, 'DESAPROBADO')"
 							[pt]="{ root: { 'aria-label': 'Desaprobar estudiante' } }"
+							data-info-anchor="admin-salon-aprobacion-row-desaprobar-btn"
 						></button>
 					</div>
 				</td>

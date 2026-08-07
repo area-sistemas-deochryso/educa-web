@@ -7,6 +7,7 @@
 			label="Refrescar"
 			icon="pi pi-refresh"
 			class="p-button-outlined"
+			data-info-anchor="admin-cursos-refresh-btn"
 			(click)="refresh()"
 			[pt]="{
 				root: {
@@ -34,6 +35,7 @@
 				type="text"
 				pInputText
 				placeholder="Buscar por nombre..."
+				data-info-anchor="admin-cursos-search-input"
 				[ngModel]="vm().searchTerm"
 				(ngModelChange)="onSearchTermChange($event)"
 			/>
@@ -46,6 +48,7 @@
 			placeholder="Estado"
 			[style]="{ minWidth: '140px' }"
 			appendTo="body"
+			data-info-anchor="admin-cursos-estado-select"
 		/>
 
 		<p-select
@@ -55,6 +58,7 @@
 			placeholder="Nivel educativo"
 			[style]="{ minWidth: '180px' }"
 			appendTo="body"
+			data-info-anchor="admin-cursos-nivel-select"
 		/>
 
 		<button
@@ -62,6 +66,7 @@
 			label="Limpiar"
 			icon="pi pi-filter-slash"
 			class="p-button-text"
+			data-info-anchor="admin-cursos-limpiar-filtros-btn"
 			(click)="clearFilters()"
 			[pt]="{
 				root: {
@@ -77,6 +82,7 @@
 			label="Nuevo Curso"
 			icon="pi pi-plus"
 			class="p-button-success"
+			data-info-anchor="admin-cursos-nuevo-btn"
 			(click)="openNew()"
 		></button>
 	</section>
@@ -96,10 +102,10 @@
 		>
 			<ng-template #header>
 				<tr>
-					<th style="width: 70px" pSortableColumn="id">ID <p-sortIcon field="id" /></th>
-					<th pSortableColumn="nombre">NOMBRE <p-sortIcon field="nombre" /></th>
+					<th style="width: 70px" pSortableColumn="id" data-info-anchor="tabla-orden-columna">ID <p-sortIcon field="id" /></th>
+					<th pSortableColumn="nombre" data-info-anchor="tabla-orden-columna">NOMBRE <p-sortIcon field="nombre" /></th>
 					<th style="width: 250px">GRADOS</th>
-					<th style="width: 100px" pSortableColumn="estado">
+					<th style="width: 100px" pSortableColumn="estado" data-info-anchor="tabla-orden-columna">
 						ESTADO <p-sortIcon field="estado" />
 					</th>
 					<th style="width: 220px">COMPLETITUD</th>
@@ -126,6 +132,7 @@
 								"
 								icon="pi pi-eye"
 								class="p-button-sm grados-button"
+								data-info-anchor="admin-cursos-ver-grados-btn"
 								(click)="showGrados(curso)"
 								pTooltip="Ver grados asignados"
 								[pt]="{
@@ -193,6 +200,7 @@
 								icon="pi pi-pencil"
 								class="p-button-rounded p-button-text p-button-success"
 								pTooltip="Editar"
+								data-info-anchor="admin-cursos-editar-btn"
 								(click)="editCurso(curso)"
 								[pt]="{
 									root: {
@@ -209,6 +217,7 @@
 								[class.p-button-warning]="curso.estado"
 								[class.p-button-info]="!curso.estado"
 								[pTooltip]="curso.estado | estadoToggleLabel"
+								data-info-anchor="admin-cursos-toggle-estado-btn"
 								(click)="toggleEstado(curso)"
 								[pt]="{
 									root: {
@@ -223,6 +232,7 @@
 								icon="pi pi-trash"
 								class="p-button-rounded p-button-text p-button-danger"
 								pTooltip="Eliminar"
+								data-info-anchor="admin-cursos-eliminar-btn"
 								(click)="deleteCurso(curso)"
 								[pt]="{
 									root: {
@@ -273,6 +283,7 @@
 					[ngModel]="vm().formData.nombre"
 					(ngModelChange)="updateFormField('nombre', $event)"
 					placeholder="Ejemplo: Matemática, Comunicación, etc."
+					data-info-anchor="admin-cursos-nombre-input"
 				/>
 				@if (showValidation() && !vm().formData.nombre.trim()) {
 					<small class="error-msg">El nombre es obligatorio</small>
@@ -297,6 +308,7 @@
 												<button
 													type="button"
 													class="tag-remove"
+													data-info-anchor="admin-cursos-grado-remove-btn"
 													(click)="removeGrado(grado.id)"
 													[attr.aria-label]="'Remover ' + grado.nombre"
 												>
@@ -330,6 +342,7 @@
 										@for (grado of nivel.availableGrados; track grado.id) {
 											<button
 												class="available-item"
+												data-info-anchor="admin-cursos-grado-add-btn"
 												(click)="addGrado(grado.id)"
 												[attr.aria-label]="'Agregar ' + grado.nombre"
 											>
@@ -357,6 +370,7 @@
 					<div class="estado-switch">
 						<p-toggleswitch
 							id="estado"
+							data-info-anchor="admin-cursos-estado-switch"
 							[ngModel]="vm().formData.estado"
 							(ngModelChange)="updateFormField('estado', $event)"
 						/>
@@ -374,6 +388,7 @@
 				label="Cancelar"
 				icon="pi pi-times"
 				class="p-button-text"
+				data-info-anchor="admin-cursos-dialog-cerrar-btn"
 				(click)="onDialogVisibleChange(false)"
 				[disabled]="vm().saving"
 			></button>
@@ -382,6 +397,7 @@
 				label="Guardar"
 				icon="pi pi-check"
 				class="p-button-success"
+				data-info-anchor="admin-cursos-dialog-guardar-btn"
 				(click)="saveCurso()"
 				[disabled]="!vm().isFormValid || vm().saving"
 				[loading]="vm().saving"
@@ -431,6 +447,7 @@
 				label="Cerrar"
 				icon="pi pi-times"
 				class="p-button-text"
+				data-info-anchor="admin-cursos-dialog-cerrar-btn"
 				(click)="onGradosDialogVisibleChange(false)"
 			></button>
 		</div>

@@ -10,6 +10,7 @@
 		[minLength]="2"
 		[style]="{ width: '100%' }"
 		[inputStyle]="{ width: '100%' }"
+		data-info-anchor="admin-salon-estudiantes-buscar-autocomplete"
 	>
 		<ng-template let-estudiante pTemplate="item">
 			<div class="estudiante-suggestion">
@@ -51,6 +52,7 @@
 						class="p-button-rounded p-button-text p-button-sm"
 						pTooltip="Transferir a otro salón"
 						(click)="openTransferir(estudiante.estudianteId)"
+						data-info-anchor="admin-salon-estudiantes-transferir-btn"
 					></button>
 					<button
 						pButton
@@ -58,6 +60,7 @@
 						class="p-button-rounded p-button-text p-button-sm p-button-danger"
 						pTooltip="Retirar del salón"
 						(click)="openRetirar(estudiante.estudianteId)"
+						data-info-anchor="admin-salon-estudiantes-retirar-btn"
 					></button>
 				}
 			</td>
@@ -75,8 +78,8 @@
 									}
 								</div>
 								<div class="advertencias-actions">
-									<button pButton label="Confirmar de todos modos" class="p-button-sm p-button-warning" (click)="confirmarPendienteConAdvertencia()"></button>
-									<button pButton label="Cancelar" class="p-button-sm p-button-text" (click)="cancelarPendiente()"></button>
+									<button pButton label="Confirmar de todos modos" class="p-button-sm p-button-warning" (click)="confirmarPendienteConAdvertencia()" data-info-anchor="admin-salon-estudiantes-confirmar-advertencia-btn"></button>
+									<button pButton label="Cancelar" class="p-button-sm p-button-text" (click)="cancelarPendiente()" data-info-anchor="admin-salon-estudiantes-cancelar-pendiente-btn"></button>
 								</div>
 							</p-message>
 						} @else if (accion.tipo === 'transferir') {
@@ -90,6 +93,7 @@
 									appendTo="body"
 									placeholder="Salón destino"
 									[style]="{ minWidth: '220px' }"
+									data-info-anchor="admin-salon-estudiantes-transferir-select"
 								/>
 								<button
 									pButton
@@ -97,8 +101,9 @@
 									class="p-button-sm"
 									[disabled]="!selectedSalonDestino() || vm().actionLoading"
 									(click)="confirmarTransferir(estudiante.estudianteId)"
+									data-info-anchor="admin-salon-estudiantes-transferir-confirm-btn"
 								></button>
-								<button pButton label="Cancelar" class="p-button-sm p-button-text" (click)="cancelarAccion()"></button>
+								<button pButton label="Cancelar" class="p-button-sm p-button-text" (click)="cancelarAccion()" data-info-anchor="admin-salon-estudiantes-cancelar-accion-btn"></button>
 							</div>
 						} @else {
 							<div class="accion-form">
@@ -111,6 +116,7 @@
 									appendTo="body"
 									placeholder="Motivo de retiro"
 									[style]="{ minWidth: '220px' }"
+									data-info-anchor="admin-salon-estudiantes-retirar-motivo-select"
 								/>
 								<button
 									pButton
@@ -118,8 +124,9 @@
 									class="p-button-sm p-button-danger"
 									[disabled]="!selectedMotivo() || vm().actionLoading"
 									(click)="confirmarRetirar(estudiante.estudianteId)"
+									data-info-anchor="admin-salon-estudiantes-retirar-confirm-btn"
 								></button>
-								<button pButton label="Cancelar" class="p-button-sm p-button-text" (click)="cancelarAccion()"></button>
+								<button pButton label="Cancelar" class="p-button-sm p-button-text" (click)="cancelarAccion()" data-info-anchor="admin-salon-estudiantes-cancelar-accion-btn"></button>
 							</div>
 						}
 					</td>

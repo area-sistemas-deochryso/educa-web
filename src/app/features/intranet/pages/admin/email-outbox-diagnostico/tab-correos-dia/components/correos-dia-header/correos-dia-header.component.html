@@ -14,6 +14,7 @@
 			appendTo="body"
 			(ngModelChange)="onDateChange($event)"
 			class="fecha-picker"
+			data-info-anchor="email-fecha-picker"
 		/>
 
 		@if (fechaConsulta()) {
@@ -24,6 +25,7 @@
 				pTooltip="Volver a hoy"
 				(click)="onClearDate()"
 				[pt]="{ root: { 'aria-label': 'Volver a hoy' } }"
+				data-info-anchor="admin-email-outbox-diagnostico-volver-hoy-btn"
 			></button>
 		}
 
@@ -37,6 +39,7 @@
 			[disabled]="loading()"
 			(click)="onRefresh()"
 			[pt]="{ root: { 'aria-label': 'Refrescar' } }"
+			data-info-anchor="refrescar-btn"
 		></button>
 	</div>
 </app-page-header>

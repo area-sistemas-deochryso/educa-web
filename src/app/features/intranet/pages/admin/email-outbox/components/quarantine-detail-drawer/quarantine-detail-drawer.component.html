@@ -134,6 +134,7 @@
 				label="Cerrar"
 				icon="pi pi-times"
 				class="p-button-text"
+				data-info-anchor="email-outbox-dialog-close-btn"
 				(click)="onClose()"
 				[pt]="{ root: { 'aria-label': 'Cerrar' } }"
 			></button>
@@ -143,6 +144,7 @@
 					label="Liberar"
 					icon="pi pi-unlock"
 					class="p-button-warning"
+					data-info-anchor="admin-email-outbox-quarantine-liberar-btn"
 					(click)="onRelease()"
 					[pt]="{ root: { 'aria-label': 'Liberar cuarentena' } }"
 				></button>

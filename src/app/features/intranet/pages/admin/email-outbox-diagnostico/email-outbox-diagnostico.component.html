@@ -3,11 +3,11 @@
 
 <p-tabs [value]="activeTab()" (valueChange)="onTabChange($event)" class="diagnostico-tabs">
 	<p-tablist>
-		<p-tab value="gap">
+		<p-tab value="gap" data-info-anchor="tab-switch">
 			<i class="pi pi-search"></i>
 			<span>Gap del día</span>
 		</p-tab>
-		<p-tab value="correo">
+		<p-tab value="correo" data-info-anchor="tab-switch">
 			<i class="pi pi-envelope"></i>
 			<span>Diagnóstico por correo</span>
 		</p-tab>
