@@ -17,6 +17,7 @@
 				optionValue="value"
 				appendTo="body"
 				styleClass="filtro-dropdown"
+				data-info-anchor="admin-tickets-filtro-estado-select"
 			/>
 		</div>
 		<!-- #endregion -->
@@ -40,12 +41,12 @@
 				<p-table [value]="tickets()" dataKey="id" [scrollable]="true" styleClass="p-datatable-sm">
 					<ng-template #header>
 						<tr>
-							<th pSortableColumn="tipoNombre">TIPO <p-sortIcon field="tipoNombre" /></th>
+							<th pSortableColumn="tipoNombre" data-info-anchor="tabla-orden-columna">TIPO <p-sortIcon field="tipoNombre" /></th>
 							<th>DESCRIPCIÓN</th>
 							<th>PROPUESTA</th>
-							<th pSortableColumn="usuarioNombre">USUARIO <p-sortIcon field="usuarioNombre" /></th>
-							<th pSortableColumn="fechaReg">FECHA <p-sortIcon field="fechaReg" /></th>
-							<th pSortableColumn="estado">ESTADO <p-sortIcon field="estado" /></th>
+							<th pSortableColumn="usuarioNombre" data-info-anchor="tabla-orden-columna">USUARIO <p-sortIcon field="usuarioNombre" /></th>
+							<th pSortableColumn="fechaReg" data-info-anchor="tabla-orden-columna">FECHA <p-sortIcon field="fechaReg" /></th>
+							<th pSortableColumn="estado" data-info-anchor="tabla-orden-columna">ESTADO <p-sortIcon field="estado" /></th>
 							<th>CAMBIAR ESTADO</th>
 						</tr>
 					</ng-template>
@@ -69,6 +70,7 @@
 									appendTo="body"
 									[disabled]="updatingId() === ticket.id"
 									styleClass="estado-dropdown"
+									data-info-anchor="admin-tickets-fila-cambiar-estado-select"
 								/>
 							</td>
 						</tr>

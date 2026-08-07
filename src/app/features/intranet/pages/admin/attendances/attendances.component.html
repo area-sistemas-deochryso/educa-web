@@ -8,7 +8,7 @@
 <app-attendance-scope-banner />
 
 <!-- #region Tabs -->
-<p-tabs [value]="activeTab()" (valueChange)="onTabChange($event)">
+<p-tabs [value]="activeTab()" (valueChange)="onTabChange($event)" data-info-anchor="admin-asistencia-tabs">
 	<p-tablist>
 		<p-tab value="gestion">
 			<i class="pi pi-cog mr-2"></i>
@@ -45,6 +45,7 @@
 					'aria-label': 'Ver resumen en el tab Panel',
 				},
 			}"
+			data-info-anchor="admin-asistencia-ver-panel-btn"
 		></button>
 		@if (vm().selectedCount > 0) {
 			<button
@@ -61,6 +62,7 @@
 				}"
 				pTooltip="Envía el correo de asistencia al apoderado de cada estudiante seleccionado"
 				tooltipPosition="bottom"
+				data-info-anchor="admin-asistencia-enviar-correos-btn"
 			></button>
 		}
 		<button
@@ -82,6 +84,7 @@
 					: 'Sincroniza ambos tipos (estudiantes y profesores). El filtro de tipo solo afecta la visualización.'
 			"
 			tooltipPosition="bottom"
+			data-info-anchor="admin-asistencia-sincronizar-btn"
 		></button>
 		<button
 			pButton
@@ -97,6 +100,7 @@
 			}"
 			pTooltip="Sincronizar un rango de fechas con filtro opcional de personas"
 			tooltipPosition="bottom"
+			data-info-anchor="admin-asistencia-sincronizar-rango-btn"
 		></button>
 		<button
 			pButton
@@ -106,6 +110,7 @@
 			(click)="onDebugPagination()"
 			pTooltip="DEBUG: llama páginas 1-3 de CrossChex y guarda raw JSON en SQL"
 			tooltipPosition="bottom"
+			data-info-anchor="admin-asistencia-debug-paginacion-btn"
 		></button>
 		<button
 			pButton
@@ -113,6 +118,7 @@
 			label="Cerrar mes"
 			class="p-button-outlined p-button-warning"
 			(click)="onAbrirCierre()"
+			data-info-anchor="admin-asistencia-cerrar-mes-btn"
 		></button>
 		<button
 			pButton
@@ -120,6 +126,7 @@
 			label="Nueva asistencia"
 			class="p-button-success"
 			(click)="onNuevo('entrada')"
+			data-info-anchor="admin-asistencia-nueva-btn"
 		></button>
 	</div>
 </div>
@@ -142,6 +149,7 @@
 				'aria-label': 'Filtro por tipo de persona',
 			},
 		}"
+		data-info-anchor="admin-asistencia-tipo-persona-toggle"
 	/>
 	@if (!isFilterDefault()) {
 		<span class="filter-active-badge">
@@ -156,6 +164,7 @@
 						'aria-label': 'Restablecer filtro a Estudiantes',
 					},
 				}"
+				data-info-anchor="admin-asistencia-reset-filtro-btn"
 			></button>
 		</span>
 	}
@@ -179,6 +188,7 @@
 		[showIcon]="true"
 		appendTo="body"
 		placeholder="Fecha"
+		data-info-anchor="admin-asistencia-fecha-picker"
 	/>
 	<p-iconfield>
 		<p-inputicon styleClass="pi pi-search" />
@@ -190,6 +200,7 @@
 			tooltipPosition="bottom"
 			[value]="vm().searchTerm"
 			(input)="onSearch($event)"
+			data-info-anchor="admin-asistencia-buscar-input"
 		/>
 	</p-iconfield>
 </div>
@@ -218,6 +229,7 @@
 						[binary]="true"
 						[ngModel]="vm().allSelected"
 						(ngModelChange)="store.toggleSelectAll()"
+						data-info-anchor="admin-asistencia-seleccionar-todos-checkbox"
 					/>
 				</th>
 				<th style="width: 50px">#</th>
@@ -237,6 +249,7 @@
 						[binary]="true"
 						[ngModel]="vm().selectedIds.has(item.asistenciaId)"
 						(ngModelChange)="store.toggleSelection(item.asistenciaId)"
+						data-info-anchor="admin-asistencia-fila-checkbox"
 					/>
 				</td>
 				<td>{{ i + 1 }}</td>
@@ -279,6 +292,7 @@
 										'aria-label': 'Agregar salida',
 									},
 								}"
+								data-info-anchor="admin-asistencia-fila-agregar-salida-btn"
 							></button>
 						}
 						<button
@@ -293,6 +307,7 @@
 									'aria-label': 'Editar horas',
 								},
 							}"
+							data-info-anchor="admin-asistencia-fila-editar-btn"
 						></button>
 						<button
 							pButton
@@ -306,6 +321,7 @@
 									'aria-label': 'Eliminar registro',
 								},
 							}"
+							data-info-anchor="admin-asistencia-fila-eliminar-btn"
 						></button>
 					</div>
 				</td>
@@ -347,6 +363,7 @@
 							'aria-label': 'Tipo de persona para el registro',
 						},
 					}"
+					data-info-anchor="admin-asistencia-form-tipo-persona-toggle"
 				/>
 			</div>
 
@@ -358,6 +375,7 @@
 					[ngModel]="vm().formData.tipoOperacion"
 					(ngModelChange)="store.updateFormData({ tipoOperacion: $event })"
 					appendTo="body"
+					data-info-anchor="admin-asistencia-form-tipo-operacion-select"
 				/>
 			</div>
 
@@ -377,6 +395,7 @@
 						(onFilter)="onPersonaFilter($event)"
 						[placeholder]="'Seleccionar ' + getTipoPersonaLabel(vm().formData.tipoPersona).toLowerCase() + '...'"
 						appendTo="body"
+						data-info-anchor="admin-asistencia-form-persona-select"
 					/>
 				</div>
 			}
@@ -398,6 +417,7 @@
 								[showSeconds]="false"
 								[hourFormat]="'24'"
 								placeholder="HH:mm"
+								data-info-anchor="admin-asistencia-form-hora-entrada-picker"
 							/>
 							<button
 								pButton
@@ -407,6 +427,7 @@
 								[pt]="{ root: { 'aria-label': 'Quitar hora de entrada' } }"
 								pTooltip="Quitar entrada"
 								tooltipPosition="top"
+								data-info-anchor="admin-asistencia-form-quitar-entrada-btn"
 							></button>
 						} @else {
 							<button
@@ -415,6 +436,7 @@
 								label="Agregar hora de entrada"
 								class="p-button-outlined p-button-sm"
 								(click)="setHoraEntradaNow()"
+								data-info-anchor="admin-asistencia-form-agregar-entrada-btn"
 							></button>
 						}
 					</div>
@@ -428,6 +450,7 @@
 						dateFormat="yy-mm-dd"
 						placeholder="Seleccionar fecha y hora..."
 						appendTo="body"
+						data-info-anchor="admin-asistencia-form-hora-entrada-picker"
 					/>
 				}
 			</div>
@@ -449,6 +472,7 @@
 								[showSeconds]="false"
 								[hourFormat]="'24'"
 								placeholder="HH:mm"
+								data-info-anchor="admin-asistencia-form-hora-salida-picker"
 							/>
 							<button
 								pButton
@@ -458,6 +482,7 @@
 								[pt]="{ root: { 'aria-label': 'Quitar hora de salida' } }"
 								pTooltip="Quitar salida"
 								tooltipPosition="top"
+								data-info-anchor="admin-asistencia-form-quitar-salida-btn"
 							></button>
 						} @else {
 							<button
@@ -466,6 +491,7 @@
 								label="Agregar hora de salida"
 								class="p-button-outlined p-button-sm"
 								(click)="setHoraSalidaNow()"
+								data-info-anchor="admin-asistencia-form-agregar-salida-btn"
 							></button>
 						}
 					} @else {
@@ -478,6 +504,7 @@
 							dateFormat="yy-mm-dd"
 							placeholder="Seleccionar fecha y hora..."
 							appendTo="body"
+							data-info-anchor="admin-asistencia-form-hora-salida-picker"
 						/>
 					}
 				</div>
@@ -493,6 +520,7 @@
 				[ngModel]="vm().formData.observacion"
 				(ngModelChange)="store.updateFormData({ observacion: $event })"
 				placeholder="Motivo de la corrección..."
+				data-info-anchor="admin-asistencia-form-observacion-input"
 			/>
 		</div>
 	</div>
@@ -503,6 +531,7 @@
 			label="Cancelar"
 			class="p-button-text"
 			(click)="uiFacade.closeDialog()"
+			data-info-anchor="admin-asistencia-form-cancelar-btn"
 		></button>
 		<button
 			pButton
@@ -510,6 +539,7 @@
 			icon="pi pi-check"
 			[disabled]="!vm().isFormValid"
 			(click)="onSave()"
+			data-info-anchor="admin-asistencia-form-guardar-btn"
 		></button>
 	</ng-template>
 </p-dialog>
@@ -532,18 +562,21 @@
 				[(ngModel)]="cierreMes"
 				placeholder="Mes"
 				appendTo="body"
+				data-info-anchor="admin-asistencia-cierre-mes-select"
 			/>
 			<input
 				type="number"
 				pInputText
 				[(ngModel)]="cierreAnio"
 				style="width: 100px"
+				data-info-anchor="admin-asistencia-cierre-anio-input"
 			/>
 			<input
 				type="text"
 				pInputText
 				[(ngModel)]="cierreObservacion"
 				placeholder="Observación (opcional)"
+				data-info-anchor="admin-asistencia-cierre-observacion-input"
 			/>
 			<button
 				pButton
@@ -553,6 +586,7 @@
 				[loading]="cierreSaving()"
 				[disabled]="cierreSaving()"
 				(click)="onCrearCierre()"
+				data-info-anchor="admin-asistencia-cierre-confirmar-btn"
 			></button>
 		</div>
 	</div>
@@ -575,6 +609,7 @@
 							[(ngModel)]="revertirObservacion"
 							placeholder="Motivo (mín 10 chars)..."
 							style="width: 200px"
+							data-info-anchor="admin-asistencia-cierre-revertir-motivo-input"
 						/>
 						<button
 							pButton
@@ -584,6 +619,7 @@
 							[loading]="revertSaving()"
 							[disabled]="revertirObservacion().length < 10 || revertSaving()"
 							(click)="onRevertirCierre(cierre.cierreId, cierre.rowVersion)"
+							data-info-anchor="admin-asistencia-cierre-revertir-btn"
 						></button>
 					</div>
 				</div>

@@ -12,6 +12,7 @@
 		pTooltip="Nuevo piso"
 		tooltipPosition="right"
 		[pt]="{ root: { 'aria-label': 'Crear piso' } }"
+		data-info-anchor="admin-campus-nuevo-piso-btn"
 	></button>
 </div>
 <!-- #endregion -->
@@ -36,6 +37,7 @@
 			icon="pi pi-plus"
 			class="p-button-sm p-button-outlined"
 			(click)="createPiso.emit()"
+			data-info-anchor="admin-campus-nuevo-piso-btn"
 		></button>
 	</div>
 } @else {
@@ -46,6 +48,7 @@
 				[class.selected]="piso.id === selectedPisoId()"
 				[class.disabled]="!piso.estado"
 				(click)="selectPiso.emit(piso.id)"
+				data-info-anchor="admin-campus-piso-item"
 			>
 				<div class="piso-icon">
 					<i class="pi pi-th-large"></i>
@@ -67,6 +70,7 @@
 						class="p-button-sm p-button-text p-button-rounded"
 						(click)="editPiso.emit(piso)"
 						[pt]="{ root: { 'aria-label': 'Editar piso' } }"
+						data-info-anchor="admin-campus-piso-editar-btn"
 					></button>
 					<button
 						pButton
@@ -76,6 +80,7 @@
 						pTooltip="{{ piso.estado ? 'Desactivar' : 'Activar' }}"
 						tooltipPosition="top"
 						[pt]="{ root: { 'aria-label': piso.estado ? 'Desactivar piso' : 'Activar piso' } }"
+						data-info-anchor="admin-campus-piso-toggle-estado-btn"
 					></button>
 				</div>
 			</div>

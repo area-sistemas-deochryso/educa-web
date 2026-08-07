@@ -31,6 +31,7 @@
 				[ngModel]="formData().nombre"
 				(ngModelChange)="onNombreChange($event)"
 				placeholder="Ej: Primer Piso"
+				data-info-anchor="admin-campus-piso-form-nombre-input"
 			/>
 		</div>
 		<div class="form-row">
@@ -46,6 +47,7 @@
 					[showButtons]="true"
 					[min]="0"
 					[max]="99"
+					data-info-anchor="admin-campus-piso-form-orden-input"
 				/>
 			</div>
 			<div class="form-field">
@@ -61,6 +63,7 @@
 					[maxFractionDigits]="1"
 					[min]="0.1"
 					[max]="100"
+					data-info-anchor="admin-campus-piso-form-altura-input"
 				/>
 			</div>
 		</div>
@@ -74,6 +77,7 @@
 			label="Cancelar"
 			class="p-button-text p-button-secondary"
 			(click)="onCancel()"
+			data-info-anchor="admin-campus-piso-form-cancelar-btn"
 		></button>
 		<button
 			pButton
@@ -82,6 +86,7 @@
 			(click)="onSave()"
 			[loading]="saving()"
 			[disabled]="!formData().nombre.trim()"
+			data-info-anchor="admin-campus-piso-form-guardar-btn"
 		></button>
 	</div>
 	<!-- #endregion -->

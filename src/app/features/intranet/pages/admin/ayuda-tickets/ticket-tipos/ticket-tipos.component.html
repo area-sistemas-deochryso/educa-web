@@ -6,7 +6,7 @@
 		</div>
 	} @else {
 		<div class="toolbar">
-			<p-button label="Nuevo tipo" icon="pi pi-plus" (onClick)="openCreateDialog()" />
+			<p-button label="Nuevo tipo" icon="pi pi-plus" (onClick)="openCreateDialog()" data-info-anchor="admin-tickets-tipos-nuevo-btn" />
 		</div>
 
 		@if (loading()) {
@@ -28,8 +28,8 @@
 				<p-table [value]="tipos()" dataKey="id" styleClass="p-datatable-sm">
 					<ng-template #header>
 						<tr>
-							<th pSortableColumn="nombre">NOMBRE <p-sortIcon field="nombre" /></th>
-							<th pSortableColumn="estado">ESTADO <p-sortIcon field="estado" /></th>
+							<th pSortableColumn="nombre" data-info-anchor="tabla-orden-columna">NOMBRE <p-sortIcon field="nombre" /></th>
+							<th pSortableColumn="estado" data-info-anchor="tabla-orden-columna">ESTADO <p-sortIcon field="estado" /></th>
 							<th style="width: 140px">ACTIVO</th>
 							<th style="width: 100px">EDITAR</th>
 						</tr>
@@ -41,10 +41,10 @@
 								<p-tag [value]="tipo.estado ? 'Activo' : 'Inactivo'" [severity]="tipo.estado ? 'success' : 'secondary'" />
 							</td>
 							<td>
-								<p-toggleswitch [ngModel]="tipo.estado" (ngModelChange)="toggleEstado(tipo)" [disabled]="submitting()" />
+								<p-toggleswitch [ngModel]="tipo.estado" (ngModelChange)="toggleEstado(tipo)" [disabled]="submitting()" data-info-anchor="admin-tickets-tipos-fila-activo-toggle" />
 							</td>
 							<td>
-								<p-button icon="pi pi-pencil" [text]="true" (onClick)="openEditDialog(tipo)" />
+								<p-button icon="pi pi-pencil" [text]="true" (onClick)="openEditDialog(tipo)" data-info-anchor="admin-tickets-tipos-fila-editar-btn" />
 							</td>
 						</tr>
 					</ng-template>
@@ -71,11 +71,12 @@
 			(ngModelChange)="onNombreChange($event)"
 			maxlength="150"
 			class="w-full"
+			data-info-anchor="admin-tickets-tipos-form-nombre-input"
 		/>
 	</div>
 
 	<ng-template #footer>
-		<p-button label="Cancelar" severity="secondary" [text]="true" (onClick)="closeDialog()" />
-		<p-button label="Guardar" (onClick)="guardar()" [disabled]="!nombreForm().trim() || submitting()" />
+		<p-button label="Cancelar" severity="secondary" [text]="true" (onClick)="closeDialog()" data-info-anchor="admin-tickets-tipos-form-cancelar-btn" />
+		<p-button label="Guardar" (onClick)="guardar()" [disabled]="!nombreForm().trim() || submitting()" data-info-anchor="admin-tickets-tipos-form-guardar-btn" />
 	</ng-template>
 </p-dialog>

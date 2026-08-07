@@ -22,6 +22,7 @@
 	(mousemove)="onMouseMove($event)"
 	(mouseup)="onMouseUp()"
 	(mouseleave)="onMouseUp()"
+	data-info-anchor="admin-campus-canvas"
 >
 	<!-- #region Grid background -->
 	<defs>
@@ -62,6 +63,7 @@
 			(mousedown)="onBloqueoMouseDown($event, bloqueo.id)"
 			(mouseenter)="onBloqueoMouseEnter(bloqueo.id)"
 			(mouseleave)="onElementMouseLeave()"
+			data-info-anchor="admin-campus-canvas-bloqueo"
 		/>
 	}
 	<!-- #endregion -->
@@ -83,6 +85,7 @@
 				(click)="onAristaClick($event, arista.id)"
 				(mouseenter)="onAristaMouseEnter(arista.id)"
 				(mouseleave)="onElementMouseLeave()"
+				data-info-anchor="admin-campus-canvas-arista"
 			/>
 			<!-- Visible edge -->
 			<line
@@ -93,6 +96,7 @@
 				[attr.x2]="dp?.x ?? destino.x"
 				[attr.y2]="dp?.y ?? destino.y"
 				(click)="onAristaClick($event, arista.id)"
+				data-info-anchor="admin-campus-canvas-arista"
 			/>
 			@if (arista.bidireccional) {
 				<circle
@@ -141,6 +145,7 @@
 			(mousedown)="onNodeMouseDown($event, nodo.id)"
 			(mouseenter)="onNodeMouseEnter(nodo.id)"
 			(mouseleave)="onElementMouseLeave()"
+			data-info-anchor="admin-campus-canvas-nodo"
 		>
 			@if (nodo.width > 0 && nodo.height > 0) {
 				<!-- Rectangular node -->

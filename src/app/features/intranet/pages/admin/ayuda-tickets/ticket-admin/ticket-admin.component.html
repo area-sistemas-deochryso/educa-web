@@ -10,7 +10,7 @@
 		subtitle="Bandeja de tickets recibidos y catálogo de tipos de problema"
 	/>
 
-	<p-tabs [value]="activeTab()" (valueChange)="onTabChange($event)">
+	<p-tabs [value]="activeTab()" (valueChange)="onTabChange($event)" data-info-anchor="admin-tickets-tabs">
 		<p-tablist>
 			<p-tab value="bandeja">
 				<i class="pi pi-inbox mr-2"></i>

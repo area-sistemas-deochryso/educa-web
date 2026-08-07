@@ -33,6 +33,7 @@
 					tooltipPosition="top"
 					(click)="edit.emit(faq)"
 					[pt]="{ root: { 'aria-label': 'Editar ' + faq.pregunta } }"
+					data-info-anchor="admin-faq-fila-editar-btn"
 				></button>
 				<button
 					pButton
@@ -42,6 +43,7 @@
 					tooltipPosition="top"
 					(click)="remove.emit(faq)"
 					[pt]="{ root: { 'aria-label': 'Eliminar ' + faq.pregunta } }"
+					data-info-anchor="admin-faq-fila-eliminar-btn"
 				></button>
 			</td>
 		</tr>

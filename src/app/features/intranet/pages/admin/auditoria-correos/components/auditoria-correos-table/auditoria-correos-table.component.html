@@ -53,6 +53,7 @@
 							tooltipPosition="top"
 							(click)="onNavegar(item)"
 							[pt]="{ root: { 'aria-label': 'Ir al registro en Usuarios' } }"
+							data-info-anchor="admin-auditoria-correos-ir-usuario-btn"
 						></button>
 						@if (item.correoActual) {
 							<a
@@ -61,6 +62,7 @@
 								pTooltip="Ver historial de correo"
 								tooltipPosition="top"
 								[attr.aria-label]="'Ver historial de ' + item.correoActual"
+								data-info-anchor="admin-auditoria-correos-ver-historial-link"
 							>
 								<i class="pi pi-history"></i>
 							</a>

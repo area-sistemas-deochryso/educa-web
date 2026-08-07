@@ -18,6 +18,7 @@
 					dateFormat="dd/mm/yy"
 					[showIcon]="true"
 					appendTo="body"
+					data-info-anchor="admin-asistencia-sync-range-fecha-inicio-picker"
 				/>
 			</div>
 			<div class="sync-range-form__field">
@@ -29,6 +30,7 @@
 					dateFormat="dd/mm/yy"
 					[showIcon]="true"
 					appendTo="body"
+					data-info-anchor="admin-asistencia-sync-range-fecha-fin-picker"
 				/>
 			</div>
 		</div>
@@ -44,6 +46,7 @@
 				[ngModel]="todosUsuarios()"
 				(ngModelChange)="todosUsuarios.set($event)"
 				inputId="syncTodos"
+				data-info-anchor="admin-asistencia-sync-range-todos-toggle"
 			/>
 			<label for="syncTodos">Todos los usuarios</label>
 		</div>
@@ -64,6 +67,7 @@
 					[display]="'chip'"
 					appendTo="body"
 					[pt]="{ root: { 'aria-label': 'Seleccionar personas para sincronizar' } }"
+					data-info-anchor="admin-asistencia-sync-range-personas-multiselect"
 				/>
 			</div>
 		}
@@ -77,6 +81,7 @@
 				label="Cancelar"
 				class="p-button-text"
 				(click)="onHide()"
+				data-info-anchor="admin-asistencia-sync-range-cancelar-btn"
 			></button>
 			<button
 				pButton
@@ -87,6 +92,7 @@
 				[loading]="saving()"
 				(click)="onConfirm()"
 				[pt]="{ root: { 'aria-label': 'Iniciar sincronización del rango seleccionado' } }"
+				data-info-anchor="admin-asistencia-sync-range-confirmar-btn"
 			></button>
 		</div>
 	</ng-template>

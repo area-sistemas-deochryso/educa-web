@@ -34,6 +34,7 @@
 							pTooltip="{{ t.label }}"
 							tooltipPosition="bottom"
 							[pt]="{ root: { 'aria-label': t.label } }"
+							data-info-anchor="admin-campus-toolbar-tool-btn"
 						></button>
 					}
 				</div>
@@ -65,6 +66,7 @@
 						appendTo="body"
 						placeholder="Tipo de nodo"
 						class="node-type-select"
+						data-info-anchor="admin-campus-toolbar-node-type-select"
 					/>
 				}
 
@@ -145,6 +147,7 @@
 							class="p-button-sm p-button-text p-button-rounded p-button-danger tooltip-action"
 							(click)="facade.eliminarConexionVertical(conexion.id)"
 							[pt]="{ root: { 'aria-label': 'Eliminar conexión vertical' } }"
+							data-info-anchor="admin-campus-eliminar-conexion-vertical-btn"
 						></button>
 					</div>
 					<div class="tooltip-meta">

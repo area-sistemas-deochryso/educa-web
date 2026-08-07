@@ -7,6 +7,7 @@
 			placeholder="Buscar por nombre, DNI o correo..."
 			[ngModel]="searchTerm()"
 			(ngModelChange)="onSearchChange($event)"
+			data-info-anchor="admin-auditoria-correos-buscar-input"
 		/>
 	</div>
 
@@ -17,6 +18,7 @@
 			(ngModelChange)="onTipoChange($event)"
 			placeholder="Tipo"
 			appendTo="body"
+			data-info-anchor="admin-auditoria-correos-tipo-select"
 		/>
 	</div>
 
@@ -29,5 +31,6 @@
 		[disabled]="!hasActiveFilters()"
 		(click)="onClear()"
 		[pt]="{ root: { 'aria-label': 'Limpiar filtros' } }"
+		data-info-anchor="admin-auditoria-correos-limpiar-filtros-btn"
 	></button>
 </div>

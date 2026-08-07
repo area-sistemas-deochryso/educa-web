@@ -13,6 +13,7 @@
 				optionValue="value"
 				placeholder="Seleccionar sede"
 				[style]="{ minWidth: '14rem' }"
+				data-info-anchor="admin-attendance-panel-sede-select"
 			/>
 			@if (sedeSelectorDisabled()) {
 				<span class="filter-hint">Requiere permiso de administración para ver otra sede.</span>
@@ -28,6 +29,7 @@
 				(ngModelChange)="onRangoChange($event)"
 				optionLabel="label"
 				optionValue="value"
+				data-info-anchor="admin-attendance-panel-rango-toggle"
 			/>
 		</div>
 
@@ -39,6 +41,7 @@
 				(ngModelChange)="onFechaChange($event)"
 				dateFormat="dd/mm/yy"
 				[showIcon]="true"
+				data-info-anchor="admin-attendance-panel-fecha-picker"
 			/>
 		</div>
 	</section>

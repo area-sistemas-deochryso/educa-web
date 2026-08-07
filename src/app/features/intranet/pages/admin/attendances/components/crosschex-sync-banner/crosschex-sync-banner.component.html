@@ -53,6 +53,7 @@
 					class="p-button-outlined p-button-danger p-button-sm"
 					(click)="onRetry()"
 					[pt]="{ root: { 'aria-label': 'Reintentar sincronización' } }"
+					data-info-anchor="reintentar"
 				></button>
 				<button
 					pButton
@@ -61,6 +62,7 @@
 					class="p-button-text p-button-sm"
 					(click)="onDismiss()"
 					[pt]="{ root: { 'aria-label': 'Cerrar banner' } }"
+					data-info-anchor="admin-asistencia-sync-banner-dismiss-btn"
 				></button>
 			</div>
 		}

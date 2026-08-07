@@ -33,6 +33,7 @@
 				optionLabel="label"
 				optionValue="value"
 				appendTo="body"
+				data-info-anchor="admin-campus-vertical-form-tipo-select"
 			/>
 		</div>
 
@@ -50,6 +51,7 @@
 				optionValue="id"
 				appendTo="body"
 				placeholder="Selecciona un piso"
+				data-info-anchor="admin-campus-vertical-form-dest-piso-select"
 			/>
 		</div>
 
@@ -74,6 +76,7 @@
 						optionValue="id"
 						appendTo="body"
 						placeholder="Selecciona un nodo"
+						data-info-anchor="admin-campus-vertical-form-dest-nodo-select"
 					>
 						<ng-template let-node pTemplate="item">
 							<span>{{ node.etiqueta || node.tipo }} ({{ node.x | number: '1.0-0' }}, {{ node.y | number: '1.0-0' }})</span>
@@ -100,6 +103,7 @@
 					[maxFractionDigits]="1"
 					[min]="0.1"
 					[max]="100"
+					data-info-anchor="admin-campus-vertical-form-peso-subida-input"
 				/>
 			</div>
 			<div class="form-field">
@@ -115,6 +119,7 @@
 					[maxFractionDigits]="1"
 					[min]="0.1"
 					[max]="100"
+					data-info-anchor="admin-campus-vertical-form-peso-bajada-input"
 				/>
 			</div>
 		</div>
@@ -128,6 +133,7 @@
 				id="verticalBidireccional"
 				[ngModel]="formData().bidireccional"
 				(ngModelChange)="onBidireccionalChange($event)"
+				data-info-anchor="admin-campus-vertical-form-bidireccional-toggle"
 			/>
 		</div>
 	</div>
@@ -140,6 +146,7 @@
 			label="Cancelar"
 			class="p-button-text p-button-secondary"
 			(click)="onCancel()"
+			data-info-anchor="admin-campus-vertical-form-cancelar-btn"
 		></button>
 		<button
 			pButton
@@ -148,6 +155,7 @@
 			(click)="onSave()"
 			[loading]="saving()"
 			[disabled]="!formData().destNodoId"
+			data-info-anchor="admin-campus-vertical-form-guardar-btn"
 		></button>
 	</div>
 	<!-- #endregion -->

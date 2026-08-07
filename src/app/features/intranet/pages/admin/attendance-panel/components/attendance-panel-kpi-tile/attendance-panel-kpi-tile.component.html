@@ -3,6 +3,7 @@
 	class="kpi-tile"
 	(click)="onClick()"
 	[attr.aria-label]="disponible() ? label() + ': ' + valor() + sufijo() : label() + ': no disponible en este rango'"
+	data-info-anchor="admin-attendance-panel-kpi-tile"
 >
 	<i [class]="icono()" aria-hidden="true"></i>
 	<div class="kpi-tile__body">

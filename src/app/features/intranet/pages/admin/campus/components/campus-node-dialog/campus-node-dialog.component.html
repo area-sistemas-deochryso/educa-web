@@ -31,6 +31,7 @@
 				[ngModel]="formData().etiqueta"
 				(ngModelChange)="onEtiquetaChange($event)"
 				placeholder="Ej: Aula 101, Baño Varones..."
+				data-info-anchor="admin-campus-nodo-form-etiqueta-input"
 			/>
 		</div>
 		<div class="form-field">
@@ -46,6 +47,7 @@
 				optionLabel="label"
 				optionValue="value"
 				appendTo="body"
+				data-info-anchor="admin-campus-nodo-form-tipo-select"
 			/>
 		</div>
 		<div class="form-row">
@@ -62,6 +64,7 @@
 					[max]="500"
 					[showButtons]="true"
 					[step]="10"
+					data-info-anchor="admin-campus-nodo-form-width-input"
 				/>
 			</div>
 			<div class="form-field">
@@ -77,6 +80,7 @@
 					[max]="500"
 					[showButtons]="true"
 					[step]="10"
+					data-info-anchor="admin-campus-nodo-form-height-input"
 				/>
 			</div>
 		</div>
@@ -90,6 +94,7 @@
 			label="Cancelar"
 			class="p-button-text p-button-secondary"
 			(click)="onCancel()"
+			data-info-anchor="admin-campus-nodo-form-cancelar-btn"
 		></button>
 		<button
 			pButton
@@ -97,6 +102,7 @@
 			icon="pi pi-check"
 			(click)="onSave()"
 			[loading]="saving()"
+			data-info-anchor="admin-campus-nodo-form-guardar-btn"
 		></button>
 	</div>
 	<!-- #endregion -->
