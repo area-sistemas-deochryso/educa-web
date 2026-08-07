@@ -3,6 +3,7 @@
 	<div class="flex align-items-center gap-2 mb-3">
 		<label class="font-semibold text-sm">Curso:</label>
 		<p-select
+			data-info-anchor="curso-selector"
 			[options]="cursoOptions()"
 			[ngModel]="selectedCurso()"
 			(ngModelChange)="onCursoChange($event)"
@@ -80,6 +81,7 @@
 					pButton
 					icon="pi pi-check"
 					class="p-button-sm p-button-success p-button-rounded"
+					data-info-anchor="profesor-grupos-guardar-max"
 					(click)="onSaveMax()"
 					[disabled]="saving()"
 					pTooltip="Guardar límite"
@@ -123,6 +125,7 @@
 									pButton
 									icon="pi pi-check"
 									class="p-button-rounded p-button-text p-button-success p-button-sm"
+									data-info-anchor="profesor-grupos-guardar-nombre"
 									(click)="onSaveEditing(grupo.id)"
 									[disabled]="saving()"
 									[pt]="{ root: { 'aria-label': 'Guardar nombre' } }"
@@ -131,6 +134,7 @@
 									pButton
 									icon="pi pi-times"
 									class="p-button-rounded p-button-text p-button-secondary p-button-sm"
+									data-info-anchor="profesor-grupos-cancelar-nombre"
 									(click)="onCancelEditing()"
 									[pt]="{ root: { 'aria-label': 'Cancelar edición' } }"
 								></button>
@@ -150,6 +154,7 @@
 									pButton
 									icon="pi pi-user-plus"
 									class="p-button-rounded p-button-text p-button-sm"
+									data-info-anchor="profesor-grupos-asignar-estudiantes"
 									(click)="onOpenAsignar(grupo.id)"
 									[disabled]="saving() || estudiantesSinGrupo().length === 0"
 									pTooltip="Asignar estudiantes"
@@ -160,6 +165,7 @@
 									pButton
 									icon="pi pi-pencil"
 									class="p-button-rounded p-button-text p-button-sm"
+									data-info-anchor="profesor-grupos-editar-nombre"
 									(click)="onStartEditing(grupo)"
 									[disabled]="saving()"
 									pTooltip="Renombrar"
@@ -170,6 +176,7 @@
 									pButton
 									icon="pi pi-trash"
 									class="p-button-rounded p-button-text p-button-danger p-button-sm"
+									data-info-anchor="profesor-grupos-eliminar-grupo"
 									(click)="onEliminarGrupo(grupo)"
 									[disabled]="saving()"
 									pTooltip="Eliminar grupo"
@@ -212,6 +219,7 @@
 										pButton
 										icon="pi pi-times"
 										class="p-button-rounded p-button-text p-button-danger p-button-sm"
+										data-info-anchor="profesor-grupos-remover-estudiante"
 										(click)="onRemoverEstudiante(grupo.id, est)"
 										[disabled]="saving()"
 										[pt]="{ root: { 'aria-label': 'Remover ' + est.estudianteNombre } }"
@@ -242,6 +250,7 @@
 			label="Crear"
 			icon="pi pi-plus"
 			class="p-button-sm"
+			data-info-anchor="profesor-grupos-crear-grupo"
 			(click)="onCrearGrupo()"
 			[disabled]="saving() || !nuevoGrupoNombre.trim()"
 		></button>
@@ -312,6 +321,7 @@
 				@for (est of estudiantesSinGrupo(); track est.estudianteId) {
 					<div
 						class="flex align-items-center gap-2 p-2 border-round cursor-pointer hover:surface-hover"
+						data-info-anchor="profesor-grupos-asignar-dialog-row"
 						(click)="toggleEstudiante(est.estudianteId)"
 					>
 						<p-checkbox
@@ -332,12 +342,14 @@
 					pButton
 					label="Cancelar"
 					class="p-button-text p-button-sm"
+					data-info-anchor="profesor-grupos-asignar-dialog-cancelar"
 					(click)="onCloseAsignar()"
 				></button>
 				<button
 					pButton
 					[label]="'Asignar (' + selectedEstudianteIds().length + ')'"
 					icon="pi pi-check"
+					data-info-anchor="profesor-grupos-asignar-dialog-confirmar"
 					class="p-button-sm"
 					(click)="onAsignarEstudiantes()"
 					[disabled]="selectedEstudianteIds().length === 0 || saving()"

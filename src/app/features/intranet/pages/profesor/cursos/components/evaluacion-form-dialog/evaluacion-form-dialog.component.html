@@ -34,6 +34,7 @@
 				</div>
 				<p-select
 					id="eval-tipo"
+					data-info-anchor="profesor-evaluacion-tipo-select"
 					[options]="tiposOptions"
 					[ngModel]="formData().tipo"
 					(ngModelChange)="updateField('tipo', $event)"
@@ -84,6 +85,7 @@
 				</div>
 				<p-select
 					id="eval-semana"
+					data-info-anchor="profesor-evaluacion-semana-select"
 					[options]="semanaOptions()"
 					[ngModel]="formData().semanaId"
 					(ngModelChange)="updateField('semanaId', $event)"
@@ -112,10 +114,11 @@
 		<div class="form-field">
 			<div class="flex align-items-center gap-2">
 				<p-toggleSwitch
+					data-info-anchor="profesor-evaluacion-grupal-toggle"
 					[ngModel]="formData().esGrupal"
 					(ngModelChange)="updateField('esGrupal', $event)"
 				/>
-				<label class="cursor-pointer" (click)="updateField('esGrupal', !formData().esGrupal)">
+				<label class="cursor-pointer" data-info-anchor="profesor-evaluacion-grupal-toggle" (click)="updateField('esGrupal', !formData().esGrupal)">
 					Evaluación grupal
 				</label>
 				<i
@@ -134,12 +137,14 @@
 				pButton
 				label="Cancelar"
 				class="p-button-text"
+				data-info-anchor="profesor-evaluacion-cancelar"
 				(click)="onVisibleChange(false)"
 			></button>
 			<button
 				pButton
 				[label]="isEditing() ? 'Guardar' : 'Crear'"
 				icon="pi pi-check"
+				data-info-anchor="profesor-evaluacion-guardar"
 				[loading]="saving()"
 				[disabled]="!isFormValid() || saving()"
 				(click)="onSave()"

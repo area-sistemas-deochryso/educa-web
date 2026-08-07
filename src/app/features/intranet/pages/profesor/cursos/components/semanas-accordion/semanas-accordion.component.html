@@ -4,6 +4,7 @@
 		pButton
 		icon="pi pi-refresh"
 		class="p-button-rounded p-button-text p-button-sm"
+		data-info-anchor="profesor-semanas-refresh"
 		(click)="onRefreshContenido()"
 		[disabled]="vm().loading"
 		pTooltip="Refrescar"
@@ -25,6 +26,7 @@
 	@if (searchQuery()) {
 		<button
 			class="search-clear"
+			data-info-anchor="profesor-semanas-buscar-limpiar"
 			(click)="searchQuery.set('')"
 			type="button"
 			aria-label="Limpiar búsqueda"
@@ -46,7 +48,7 @@
 		<p-accordion [multiple]="true" [value]="openPanels()" (valueChange)="openPanels.set($any($event))">
 			@for (semana of filteredSemanas(); track semana.id) {
 				<p-accordionpanel [value]="semana.id">
-					<p-accordionheader>
+					<p-accordionheader data-info-anchor="profesor-semanas-accordion-header">
 						<div class="week-header">
 							<span class="week-number">{{ semana.numeroSemana }}</span>
 							<div class="week-title-group">
@@ -91,6 +93,7 @@
 							<!-- Editar semana -->
 							<button
 								class="edit-semana-link"
+								data-info-anchor="profesor-semanas-editar"
 								(click)="onEditSemana(semana); $event.stopPropagation()"
 							>
 								<i class="pi pi-pencil"></i>
@@ -103,6 +106,7 @@
 									<button
 										class="section-label section-action"
 										type="button"
+										data-info-anchor="profesor-semanas-subir-archivo"
 										(click)="fileInput.click()"
 										aria-label="Subir archivo"
 									>
@@ -131,6 +135,7 @@
 												</div>
 												<div
 													class="row-info clickable"
+													data-info-anchor="profesor-semanas-archivo-abrir"
 													(click)="openArchivo(archivo.urlArchivo)"
 												>
 													<strong>{{ archivo.nombreArchivo }}</strong>
@@ -147,6 +152,7 @@
 														class="p-button-text p-button-danger p-button-sm p-button-rounded"
 														pTooltip="Eliminar"
 														tooltipPosition="top"
+														data-info-anchor="profesor-semanas-archivo-eliminar"
 														(click)="
 															onDeleteArchivo(
 																semana.id,
@@ -174,6 +180,7 @@
 									<button
 										class="section-label section-action"
 										type="button"
+										data-info-anchor="profesor-semanas-agregar-tarea"
 										(click)="setActiveSemanaForTarea(semana); onAddTarea()"
 										aria-label="Agregar tarea"
 									>
@@ -211,6 +218,7 @@
 														class="p-button-text p-button-sm p-button-rounded"
 														pTooltip="Ver entregas de estudiantes"
 														tooltipPosition="top"
+														data-info-anchor="profesor-semanas-tarea-ver-entregas"
 														(click)="onViewTaskSubmissions(tarea)"
 														[pt]="{
 															root: {
@@ -224,6 +232,7 @@
 														class="p-button-text p-button-sm p-button-rounded"
 														pTooltip="Editar"
 														tooltipPosition="top"
+														data-info-anchor="profesor-semanas-tarea-editar"
 														(click)="
 															setActiveSemanaForTarea(semana);
 															onEditTarea(tarea)
@@ -240,6 +249,7 @@
 														class="p-button-text p-button-danger p-button-sm p-button-rounded"
 														pTooltip="Eliminar"
 														tooltipPosition="top"
+														data-info-anchor="profesor-semanas-tarea-eliminar"
 														(click)="
 															onDeleteTarea(
 																semana.id,
@@ -260,6 +270,7 @@
 												<button
 													class="tarea-attach-link"
 													type="button"
+													data-info-anchor="profesor-semanas-tarea-adjuntar"
 													(click)="tareaFileInput.click()"
 													aria-label="Adjuntar archivo a tarea"
 												>
@@ -283,6 +294,7 @@
 																</div>
 																<div
 																	class="row-info clickable"
+																	data-info-anchor="profesor-semanas-archivo-abrir"
 																	(click)="openArchivo(archivo.urlArchivo)"
 																>
 																	<strong>{{ archivo.nombreArchivo }}</strong>
@@ -296,6 +308,7 @@
 																	class="p-button-text p-button-danger p-button-sm p-button-rounded"
 																	pTooltip="Eliminar"
 																	tooltipPosition="top"
+																	data-info-anchor="profesor-semanas-archivo-eliminar"
 																	(click)="onDeleteTareaArchivo(semana.id, tarea.id, archivo.id, archivo.nombreArchivo)"
 																	[pt]="{
 																		root: {

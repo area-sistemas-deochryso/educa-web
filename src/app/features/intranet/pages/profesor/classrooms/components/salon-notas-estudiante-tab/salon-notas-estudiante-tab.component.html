@@ -2,6 +2,7 @@
 <div class="notas-filters">
 	@if (cursoOptions().length > 1) {
 		<p-select
+			data-info-anchor="curso-selector"
 			[options]="cursoOptions()"
 			[ngModel]="selectedCurso()"
 			(ngModelChange)="cursoChange.emit($event)"
@@ -13,6 +14,7 @@
 		/>
 	}
 	<p-select
+		data-info-anchor="profesor-notas-estudiante-select"
 		[options]="estudianteOptions()"
 		[ngModel]="selectedEstudianteId()"
 		(ngModelChange)="selectedEstudianteId.set($event)"
@@ -56,6 +58,7 @@
 				[label]="simulatorOpen() ? 'Cerrar simulador' : 'Simular notas'"
 				[icon]="simulatorOpen() ? 'pi pi-times' : 'pi pi-calculator'"
 				[class]="simulatorOpen() ? 'p-button-outlined p-button-secondary p-button-sm' : 'p-button-outlined p-button-sm'"
+				data-info-anchor="profesor-notas-simular"
 				(click)="toggleSimulator()"
 			></button>
 		}
@@ -102,6 +105,7 @@
 								pButton
 								icon="pi pi-check"
 								class="p-button-rounded p-button-text p-button-success p-button-sm"
+								data-info-anchor="profesor-notas-guardar-edicion"
 								(click)="saveEdit()"
 								[pt]="{ root: { 'aria-label': 'Guardar nota' } }"
 							></button>
@@ -109,6 +113,7 @@
 								pButton
 								icon="pi pi-times"
 								class="p-button-rounded p-button-text p-button-secondary p-button-sm"
+								data-info-anchor="profesor-notas-cancelar-edicion"
 								(click)="cancelEdit()"
 								[pt]="{ root: { 'aria-label': 'Cancelar edición' } }"
 							></button>
@@ -119,6 +124,7 @@
 							[severity]="getNotaSeverity(row.nota)"
 							[rounded]="true"
 							class="nota-tag-editable"
+							data-info-anchor="profesor-notas-tag-editar"
 							(click)="startEdit(row)"
 							pTooltip="Click para editar"
 							tooltipPosition="top"
@@ -132,6 +138,7 @@
 								pInputText
 								type="number"
 								class="sim-input p-inputtext-sm"
+								data-info-anchor="profesor-notas-simulador-input"
 								[ngModel]="getSimulatedNota(row.calificacionId)"
 								(ngModelChange)="onSimulatedNotaChange(row.calificacionId, $event)"
 								min="0"
@@ -156,6 +163,7 @@
 				label="Limpiar"
 				icon="pi pi-eraser"
 				class="p-button-text p-button-sm p-button-secondary"
+				data-info-anchor="profesor-notas-simulador-limpiar"
 				(click)="clearSimulation()"
 			></button>
 		</div>

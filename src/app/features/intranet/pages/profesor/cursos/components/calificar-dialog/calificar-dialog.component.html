@@ -114,6 +114,7 @@
 								<div class="nota-cell">
 									@if (isLiteral()) {
 										<p-select
+											data-info-anchor="profesor-calificar-nota-select"
 											[ngModel]="getLiteralForNota(row.nota)"
 											(ngModelChange)="updateNotaLiteral(row.estudianteId, $event)"
 											[options]="literalesOrdenados()"
@@ -202,6 +203,7 @@
 								@if (isLiteral()) {
 									<p-select
 										[ngModel]="getLiteralForNota(grupo.nota)"
+										data-info-anchor="profesor-calificar-nota-select"
 										(ngModelChange)="updateGrupoNotaLiteral(grupo.grupoId, $event)"
 										[options]="literalesOrdenados()"
 										optionLabel="letra"
@@ -255,6 +257,7 @@
 										@if (miembro.esOverride) {
 											@if (isLiteral()) {
 												<p-select
+													data-info-anchor="profesor-calificar-nota-select"
 													[ngModel]="getLiteralForNota(miembro.overrideNota)"
 													(ngModelChange)="updateMiembroOverrideLiteral(grupo.grupoId, miembro.estudianteId, $event)"
 													[options]="literalesOrdenados()"
@@ -293,6 +296,7 @@
 											pButton
 											[icon]="miembro.esOverride ? 'pi pi-times' : 'pi pi-pencil'"
 											[class]="miembro.esOverride ? 'p-button-rounded p-button-text p-button-sm p-button-danger' : 'p-button-rounded p-button-text p-button-sm'"
+											data-info-anchor="profesor-calificar-toggle-override"
 											(click)="toggleMiembroOverride(grupo.grupoId, miembro.estudianteId)"
 											[pt]="{
 												root: {
@@ -324,12 +328,14 @@
 				pButton
 				label="Cancelar"
 				class="p-button-text"
+				data-info-anchor="profesor-calificar-cancelar"
 				(click)="onVisibleChange(false)"
 			></button>
 			<button
 				pButton
 				[label]="isGrupal() ? 'Guardar Notas Grupales' : 'Guardar Notas'"
 				icon="pi pi-check"
+				data-info-anchor="profesor-calificar-guardar"
 				[loading]="saving()"
 				[disabled]="!hasChanges()"
 				(click)="onSave()"

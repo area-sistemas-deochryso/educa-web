@@ -12,6 +12,7 @@
 			icon="pi pi-cog"
 			class="p-button-outlined p-button-sm"
 			label="Periodos"
+			data-info-anchor="profesor-calificaciones-periodos"
 			(click)="configurarPeriodos.emit()"
 			[pt]="{ root: { 'aria-label': 'Configurar periodos' } }"
 		></button>
@@ -20,6 +21,7 @@
 			icon="pi pi-plus"
 			class="p-button-sm"
 			label="Nueva Evaluación"
+			data-info-anchor="profesor-calificaciones-nueva-evaluacion"
 			(click)="crearEvaluacion.emit()"
 			[pt]="{ root: { 'aria-label': 'Crear nueva evaluación' } }"
 		></button>
@@ -84,6 +86,7 @@
 									class="p-button-rounded p-button-text p-button-sm"
 									pTooltip="Calificar estudiantes"
 									tooltipPosition="top"
+									data-info-anchor="profesor-calificaciones-calificar-estudiantes"
 									(click)="calificarEstudiantes.emit(cal)"
 									[pt]="{ root: { 'aria-label': 'Calificar estudiantes' } }"
 								></button>
@@ -93,6 +96,7 @@
 									class="p-button-rounded p-button-text p-button-sm"
 									[pTooltip]="cal.esGrupal ? 'Cambiar a individual' : 'Cambiar a grupal'"
 									tooltipPosition="top"
+									data-info-anchor="profesor-calificaciones-cambiar-tipo"
 									(click)="cambiarTipo.emit(cal)"
 									[pt]="{ root: { 'aria-label': cal.esGrupal ? 'Cambiar a individual' : 'Cambiar a grupal' } }"
 								></button>
@@ -102,6 +106,7 @@
 									class="p-button-rounded p-button-text p-button-sm"
 									pTooltip="Editar evaluación"
 									tooltipPosition="top"
+									data-info-anchor="profesor-calificaciones-editar-evaluacion"
 									(click)="editarEvaluacion.emit(cal)"
 									[pt]="{ root: { 'aria-label': 'Editar evaluación' } }"
 								></button>
@@ -111,6 +116,7 @@
 									class="p-button-rounded p-button-text p-button-danger p-button-sm"
 									pTooltip="Eliminar evaluación"
 									tooltipPosition="top"
+									data-info-anchor="profesor-calificaciones-eliminar-evaluacion"
 									(click)="eliminarEvaluacion.emit(cal)"
 									[pt]="{ root: { 'aria-label': 'Eliminar evaluación' } }"
 								></button>

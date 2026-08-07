@@ -2,6 +2,7 @@
 <div class="notas-filters">
 	@if (cursoOptions().length > 1) {
 		<p-select
+			data-info-anchor="curso-selector"
 			[options]="cursoOptions()"
 			[ngModel]="selectedCurso()"
 			(ngModelChange)="cursoChange.emit($event)"
@@ -13,6 +14,7 @@
 		/>
 	}
 	<p-selectButton
+		data-info-anchor="profesor-notas-salon-vista-toggle"
 		[options]="vistaOptions"
 		[ngModel]="vistaActual()"
 		(ngModelChange)="vistaChange.emit($event)"
@@ -24,6 +26,7 @@
 			pButton
 			icon="pi pi-file-pdf"
 			class="p-button-outlined p-button-sm"
+			data-info-anchor="profesor-notas-salon-descargar-boletas"
 			(click)="descargarBoletas.emit()"
 			pTooltip="Descargar boletas de notas del salón"
 			tooltipPosition="top"
@@ -33,6 +36,7 @@
 	<a
 		pButton
 		class="p-button-text p-button-sm"
+		data-info-anchor="profesor-notas-salon-ir-calificaciones"
 		routerLink="/intranet/profesor/calificaciones"
 		icon="pi pi-arrow-right"
 		iconPos="right"

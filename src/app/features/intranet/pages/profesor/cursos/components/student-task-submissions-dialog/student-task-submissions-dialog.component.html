@@ -47,6 +47,7 @@
 					label="Ir a Calificaciones"
 					icon="pi pi-chart-bar"
 					class="p-button-text p-button-sm"
+					data-info-anchor="profesor-submissions-ir-calificaciones"
 					(click)="onIrACalificaciones()"
 					pTooltip="Calificar esta tarea en el tab de calificaciones"
 					tooltipPosition="top"
@@ -82,6 +83,7 @@
 									@for (archivo of estudiante.archivos; track archivo.id) {
 										<div
 											class="file-row clickable"
+											data-info-anchor="profesor-submissions-archivo-abrir"
 											(click)="openArchivo(archivo.urlArchivo)"
 										>
 											<div class="file-icon">

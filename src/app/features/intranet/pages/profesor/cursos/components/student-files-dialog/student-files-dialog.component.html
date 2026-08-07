@@ -27,6 +27,7 @@
 					label="Ir a Calificaciones"
 					icon="pi pi-chart-bar"
 					class="p-button-text p-button-sm"
+					data-info-anchor="profesor-student-files-ir-calificaciones"
 					(click)="onIrACalificaciones()"
 					pTooltip="Navegar al tab de calificaciones"
 					tooltipPosition="top"
@@ -37,7 +38,7 @@
 			@for (semana of data(); track semana.semanaId) {
 				@if (semana.estudiantes.length > 0) {
 					<div class="week-group">
-						<div class="week-group-header" (click)="toggleWeek(semana.semanaId)" style="cursor: pointer;">
+						<div class="week-group-header" data-info-anchor="profesor-student-files-semana-toggle" (click)="toggleWeek(semana.semanaId)" style="cursor: pointer;">
 							<i class="pi" [class.pi-chevron-down]="expandedWeek() === semana.semanaId" [class.pi-chevron-right]="expandedWeek() !== semana.semanaId"></i>
 							<span class="week-badge">{{ semana.numeroSemana }}</span>
 							<span class="week-group-title">
@@ -74,6 +75,7 @@
 									@for (archivo of estudiante.archivos; track archivo.id) {
 										<div
 											class="file-row clickable"
+											data-info-anchor="profesor-student-files-archivo-abrir"
 											(click)="openArchivo(archivo.urlArchivo)"
 										>
 											<div class="file-icon">

@@ -10,6 +10,7 @@
 } @else {
 	<app-page-header icon="pi pi-building" title="Mis Salones">
 		<app-period-toggle
+			data-info-anchor="period-toggle"
 			[value]="vm().esVerano"
 			(valueChange)="onPeriodoChange($event)"
 		/>
@@ -18,7 +19,7 @@
 	<div class="p-4 pt-0">
 		<div class="salon-grid">
 			@for (salon of vm().salonesConEstudiantes; track salon.salonId) {
-				<div class="salon-card" (click)="openSalonDialog(salon)">
+				<div class="salon-card" data-info-anchor="profesor-salon-card" (click)="openSalonDialog(salon)">
 					<div class="flex align-items-center justify-content-between mb-2">
 						<div class="flex align-items-center gap-2">
 							<span class="font-bold text-lg">{{ salon.salonDescripcion }}</span>
@@ -37,6 +38,7 @@
 							<p-tag
 								[value]="curso.nombre"
 								styleClass="tag-neutral cursor-pointer"
+								data-info-anchor="profesor-salon-card-curso-tag"
 								(click)="onVerCursoContenido(curso); $event.stopPropagation()"
 								pTooltip="Ver contenido"
 								tooltipPosition="top"

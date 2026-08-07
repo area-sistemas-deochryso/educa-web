@@ -3,6 +3,7 @@
 	<p-inputNumber
 		[ngModel]="vm().filtroAnio"
 		(ngModelChange)="onAnioChange($event)"
+		data-info-anchor="profesor-final-salones-filtro-anio"
 		[useGrouping]="false"
 		[min]="2020"
 		[max]="2030"
@@ -12,6 +13,7 @@
 		pButton
 		icon="pi pi-refresh"
 		class="p-button-outlined"
+		data-info-anchor="profesor-final-salones-refresh"
 		(click)="onRefresh()"
 		[pt]="{
 			root: {
@@ -59,7 +61,7 @@
 	<p-tabs [value]="nivelTabIndex(vm().selectedNivel)" (valueChange)="onTabChange($any($event))">
 		<p-tablist>
 			@for (nivel of vm().nivelesDisponibles; track nivel; let i = $index) {
-				<p-tab [value]="i">{{ nivel }}</p-tab>
+				<p-tab [value]="i" data-info-anchor="profesor-final-salones-tab-nivel">{{ nivel }}</p-tab>
 			}
 		</p-tablist>
 		<p-tabpanels>

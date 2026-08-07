@@ -15,6 +15,7 @@
 			<button
 				class="fullscreen-toggle-btn"
 				type="button"
+				data-info-anchor="profesor-curso-dialog-fullscreen-toggle"
 				(click)="toggleFullscreen()"
 				[attr.aria-label]="isFullscreen() ? 'Salir de pantalla completa' : 'Expandir a pantalla completa'"
 			>
@@ -27,26 +28,26 @@
 			<p-tabs [value]="activeTab()" (valueChange)="onTabChange($any($event))">
 				<div class="tabs-header-row">
 					<p-tablist>
-						<p-tab value="0">
+						<p-tab value="0" data-info-anchor="profesor-curso-dialog-tab">
 							<i class="pi pi-book tab-icon"></i>
 							Contenido
 						</p-tab>
-						<p-tab value="1">
+						<p-tab value="1" data-info-anchor="profesor-curso-dialog-tab">
 							<i class="pi pi-chart-bar tab-icon"></i>
 							Calificaciones
 						</p-tab>
-						<p-tab value="2">
+						<p-tab value="2" data-info-anchor="profesor-curso-dialog-tab">
 							<i class="pi pi-info-circle tab-icon"></i>
 							Información
 						</p-tab>
 					</p-tablist>
 					<div class="tabs-header-links">
-						<button type="button" class="ver-asistencia-link" (click)="onVerSalon()">
+						<button type="button" class="ver-asistencia-link" data-info-anchor="profesor-curso-dialog-ver-salon" (click)="onVerSalon()">
 							<i class="pi pi-building"></i>
 							Ver salón
 							<i class="pi pi-arrow-right"></i>
 						</button>
-						<button type="button" class="ver-asistencia-link" (click)="onVerAsistencia()">
+						<button type="button" class="ver-asistencia-link" data-info-anchor="profesor-curso-dialog-ver-asistencia" (click)="onVerAsistencia()">
 							<i class="pi pi-check-square"></i>
 							Ver asistencia
 							<i class="pi pi-arrow-right"></i>
@@ -71,6 +72,7 @@
 									pButton
 									icon="pi pi-refresh"
 									class="p-button-rounded p-button-text p-button-sm"
+									data-info-anchor="profesor-curso-dialog-refresh-calificaciones"
 									(click)="onRefreshCalificaciones()"
 									[disabled]="calVm().loading"
 									pTooltip="Refrescar"
@@ -132,6 +134,7 @@
 									<button
 										class="stat-box files clickable"
 										type="button"
+										data-info-anchor="profesor-curso-dialog-stat-box"
 										(click)="onOpenArchivosSummary()"
 										aria-label="Ver todos los archivos"
 									>
@@ -142,6 +145,7 @@
 									<button
 										class="stat-box tasks clickable"
 										type="button"
+										data-info-anchor="profesor-curso-dialog-stat-box"
 										(click)="onOpenTareasSummary()"
 										aria-label="Ver todas las tareas"
 									>
@@ -152,6 +156,7 @@
 									<button
 										class="stat-box students clickable"
 										type="button"
+										data-info-anchor="profesor-curso-dialog-stat-box"
 										(click)="onOpenStudentFiles()"
 										aria-label="Ver archivos de estudiantes"
 									>
@@ -162,6 +167,7 @@
 									<button
 										class="stat-box calificaciones clickable"
 										type="button"
+										data-info-anchor="profesor-curso-dialog-stat-box"
 										(click)="onTabChange('1')"
 										aria-label="Ir a calificaciones"
 									>
@@ -172,7 +178,7 @@
 								</div>
 							</div>
 
-							<button class="danger-link" (click)="onDeleteContenido()">
+							<button class="danger-link" data-info-anchor="profesor-curso-dialog-eliminar-contenido" (click)="onDeleteContenido()">
 								<i class="pi pi-trash"></i>
 								Eliminar todo el contenido
 							</button>
