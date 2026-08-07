@@ -359,6 +359,15 @@ button {
 	transition: all 0.3s;
 }
 
+body.informative-mode-active {
+	// El hold-to-bypass del modo informativo (InformativeModeService) depende de que el `click`
+	// sintético llegue tras mantener presionado ≥500ms — en touch, sin esto, el long-press nativo
+	// (selección de texto en Android, callout de iOS) se come el gesto antes de que el click
+	// se dispare, dejando el bypass inoperante (hallazgo brief 528, reportado desde mobile real).
+	-webkit-touch-callout: none;
+	user-select: none;
+}
+
 a {
 	color: var(--primary-text-color);
 	text-shadow: var(--primary-text-shadow);

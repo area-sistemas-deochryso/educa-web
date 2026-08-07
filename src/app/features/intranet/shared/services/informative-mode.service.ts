@@ -15,8 +15,13 @@ interface InformativeCallout {
 	rect: DOMRect;
 }
 
-/** Selectores exentos de la intercepción: el FAB (única salida del modo) y el propio callout. */
-const EXEMPT_SELECTOR = 'app-intranet-fab-menu, app-informative-mode-callout';
+/**
+ * Selectores exentos de la intercepción: el FAB (única salida del modo), el propio callout, y
+ * "Mostrar accesos flotantes" del menú de usuario — cuando el FAB está oculto, ese botón es la
+ * única forma de recuperarlo, así que hereda la misma condición de "salida del modo" que el FAB
+ * (hallazgo post-527: quedaba atrapado detrás del hold-to-bypass, que no es confiable en touch).
+ */
+const EXEMPT_SELECTOR = 'app-intranet-fab-menu, app-informative-mode-callout, [data-info-anchor="header-user-menu-show-fab"]';
 
 const GENERIC_MESSAGE = 'Todavía no hay una explicación cargada para este elemento.';
 
@@ -118,12 +123,14 @@ export class InformativeModeService {
 			if (this.active()) {
 				document.addEventListener('pointerdown', this.onDocumentPointerDown, true);
 				document.addEventListener('click', this.onDocumentClick, true);
+				document.body.classList.add('informative-mode-active');
 				this.closeOpenOverlays();
 				this.domObserver = new MutationObserver(this.onDomMutated);
 				this.domObserver.observe(document.body, { childList: true, subtree: true });
 			} else {
 				document.removeEventListener('pointerdown', this.onDocumentPointerDown, true);
 				document.removeEventListener('click', this.onDocumentClick, true);
+				document.body.classList.remove('informative-mode-active');
 				this._currentCallout.set(null);
 				this.pointerDownAt = null;
 				this._content.set(new Map());

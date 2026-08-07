@@ -77,6 +77,16 @@ describe('InformativeModeService', () => {
 		expect(service.active()).toBe(false);
 	});
 
+	it('toggles the informative-mode-active body class (suprime long-press nativo en touch, brief 528)', () => {
+		expect(document.body.classList.contains('informative-mode-active')).toBe(false);
+
+		toggle();
+		expect(document.body.classList.contains('informative-mode-active')).toBe(true);
+
+		toggle();
+		expect(document.body.classList.contains('informative-mode-active')).toBe(false);
+	});
+
 	it('blocks a click and shows the generic callout for an element without a declared anchor', () => {
 		const button = document.createElement('button');
 		document.body.appendChild(button);
@@ -122,6 +132,20 @@ describe('InformativeModeService', () => {
 		button.addEventListener('click', () => (ran = true));
 		fab.appendChild(button);
 		document.body.appendChild(fab);
+
+		toggle();
+		click(button);
+
+		expect(ran).toBe(true);
+		expect(service.currentCallout()).toBeNull();
+	});
+
+	it('exempts clicks on "Mostrar accesos flotantes" from interception (bug post-528: única salida cuando el FAB está oculto)', () => {
+		const button = document.createElement('button');
+		button.dataset['infoAnchor'] = 'header-user-menu-show-fab';
+		let ran = false;
+		button.addEventListener('click', () => (ran = true));
+		document.body.appendChild(button);
 
 		toggle();
 		click(button);
