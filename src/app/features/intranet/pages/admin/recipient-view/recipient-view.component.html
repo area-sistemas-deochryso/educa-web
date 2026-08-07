@@ -10,6 +10,7 @@
 			icon="pi pi-arrow-left"
 			class="p-button-text p-button-sm btn-icon"
 			pTooltip="Volver"
+			data-info-anchor="admin-recipient-view-back-btn"
 			(click)="goBack()"
 		></button>
 		<button
@@ -18,6 +19,7 @@
 			class="p-button-text p-button-sm btn-icon"
 			pTooltip="Actualizar"
 			[loading]="loading()"
+			data-info-anchor="admin-recipient-view-refresh-btn"
 			(click)="refresh()"
 		></button>
 	</div>
@@ -57,7 +59,7 @@
 	<div class="error-container">
 		<i class="pi pi-exclamation-circle" style="font-size: 2rem; color: var(--red-500)"></i>
 		<p>No se pudo cargar la información del destinatario.</p>
-		<button pButton label="Reintentar" icon="pi pi-refresh" class="p-button-outlined p-button-sm" (click)="refresh()"></button>
+		<button pButton label="Reintentar" icon="pi pi-refresh" class="p-button-outlined p-button-sm" data-info-anchor="reintentar" (click)="refresh()"></button>
 	</div>
 }
 <!-- #endregion -->
@@ -145,6 +147,7 @@
 					class="cross-link"
 					[routerLink]="['/intranet/admin/monitoreo/correos/bandeja']"
 					[queryParams]="{ correo: correo() }"
+					data-info-anchor="admin-recipient-view-ver-historial-link"
 				>
 					Ver historial completo <i class="pi pi-external-link"></i>
 				</a>
@@ -179,6 +182,7 @@
 					[icon]="blacklistActive() ? 'pi pi-lock-open' : 'pi pi-ban'"
 					[class]="blacklistActive() ? 'p-button-outlined p-button-sm' : 'p-button-danger p-button-sm'"
 					[loading]="actionInFlight()"
+					data-info-anchor="admin-recipient-view-toggle-blacklist-btn"
 					(click)="toggleBlacklist()"
 				></button>
 			</div>
@@ -219,6 +223,7 @@
 						icon="pi pi-unlock"
 						class="p-button-outlined p-button-sm"
 						[loading]="actionInFlight()"
+						data-info-anchor="admin-email-outbox-quarantine-liberar-btn"
 						(click)="releaseQuarantine()"
 					></button>
 				}
@@ -257,6 +262,7 @@
 					class="cross-link"
 					[routerLink]="['/intranet/admin/monitoreo/correos/defer-events']"
 					[queryParams]="{ correo: correo() }"
+					data-info-anchor="admin-recipient-view-ver-defer-eventos-link"
 				>
 					Ver eventos <i class="pi pi-external-link"></i>
 				</a>

@@ -9,6 +9,7 @@
 			<p-selectButton
 				[options]="rangeOptions"
 				[ngModel]="timeRange()"
+				data-info-anchor="admin-runtime-health-history-rango-toggle"
 				(ngModelChange)="onTimeRangeChange($event)"
 				optionLabel="label"
 				optionValue="value"
@@ -19,6 +20,7 @@
 				icon="pi pi-refresh"
 				class="p-button-text p-button-sm"
 				[loading]="loading()"
+				data-info-anchor="admin-runtime-health-history-refresh-btn"
 				(click)="onRefresh()"
 				[pt]="{ root: { 'aria-label': 'Refrescar historial' } }"
 			></button>
@@ -108,6 +110,7 @@
 						pButton
 						icon="pi pi-times"
 						class="p-button-text p-button-sm p-button-secondary"
+						data-info-anchor="admin-runtime-health-history-cerrar-correlacion-btn"
 						(click)="dismissCorrelation()"
 						[pt]="{ root: { 'aria-label': 'Cerrar correlación' } }"
 					></button>

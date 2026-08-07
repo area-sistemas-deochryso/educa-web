@@ -18,6 +18,7 @@
 		icon="pi pi-file-export"
 		label="Exportar CSV"
 		class="p-button-outlined p-button-sm"
+		data-info-anchor="admin-rate-limit-export-csv-btn"
 		(click)="onExportCsv()"
 		[pt]="{ root: { 'aria-label': 'Exportar eventos a CSV' } }"
 	></button>
@@ -25,6 +26,7 @@
 		pButton
 		icon="pi pi-refresh"
 		class="p-button-text p-button-sm"
+		data-info-anchor="admin-rate-limit-refresh-btn"
 		(click)="onRefresh()"
 		[loading]="vm().loading || vm().loadingStats"
 		[pt]="{ root: { 'aria-label': 'Refrescar' } }"

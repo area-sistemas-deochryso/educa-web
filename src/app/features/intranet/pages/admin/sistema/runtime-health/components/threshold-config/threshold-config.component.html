@@ -12,6 +12,7 @@
 					label="Editar"
 					class="p-button-outlined p-button-sm"
 					[loading]="loading()"
+					data-info-anchor="admin-runtime-health-thresholds-editar-btn"
 					(click)="onLoadClick()"
 				></button>
 			} @else {
@@ -22,6 +23,7 @@
 					class="p-button-sm p-button-success"
 					[loading]="saving()"
 					[disabled]="!dirty()"
+					data-info-anchor="admin-runtime-health-thresholds-guardar-btn"
 					(click)="onSave()"
 				></button>
 				<button
@@ -29,6 +31,7 @@
 					icon="pi pi-times"
 					label="Cancelar"
 					class="p-button-sm p-button-text"
+					data-info-anchor="admin-runtime-health-thresholds-cancelar-btn"
 					(click)="onCancel()"
 				></button>
 			}
@@ -55,6 +58,7 @@
 							[maxFractionDigits]="1"
 							mode="decimal"
 							[inputStyle]="{ width: '6rem' }"
+							data-info-anchor="admin-runtime-health-thresholds-warn-input"
 							(ngModelChange)="onFieldChange()"
 						/>
 					</td>
@@ -65,6 +69,7 @@
 							[maxFractionDigits]="1"
 							mode="decimal"
 							[inputStyle]="{ width: '6rem' }"
+							data-info-anchor="admin-runtime-health-thresholds-critical-input"
 							(ngModelChange)="onFieldChange()"
 						/>
 					</td>
@@ -75,6 +80,7 @@
 							optionLabel="label"
 							optionValue="value"
 							[style]="{ width: '10rem' }"
+							data-info-anchor="admin-runtime-health-thresholds-direction-select"
 							(ngModelChange)="onFieldChange()"
 						/>
 					</td>

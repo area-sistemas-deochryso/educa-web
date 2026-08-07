@@ -17,6 +17,7 @@
 					id="diaSemana"
 					[(ngModel)]="formData().diaSemana"
 					[options]="diasOptions"
+					data-info-anchor="admin-schedules-form-dia-select"
 					placeholder="Seleccionar dia"
 					optionLabel="label"
 					optionValue="value"
@@ -34,6 +35,7 @@
 					pInputText
 					min="07:00"
 					max="17:00"
+					data-info-anchor="admin-schedules-form-hora-inicio-input"
 					[(ngModel)]="formData().horaInicio"
 					class="w-full"
 				/>
@@ -48,6 +50,7 @@
 					pInputText
 					min="07:00"
 					max="17:00"
+					data-info-anchor="admin-schedules-form-hora-fin-input"
 					[(ngModel)]="formData().horaFin"
 					class="w-full"
 				/>
@@ -60,6 +63,7 @@
 					id="salon"
 					[(ngModel)]="formData().salonId"
 					[options]="salonesOptions()"
+					data-info-anchor="admin-schedules-form-salon-select"
 					placeholder="Seleccionar salon disponible"
 					optionLabel="label"
 					optionValue="value"
@@ -133,6 +137,7 @@
 						[label]="cursoSeleccionadoLabel()"
 						icon="pi pi-book"
 						class="p-button-outlined w-full justify-content-start"
+						data-info-anchor="curso-selector"
 						(click)="onOpenCursoDialog()"
 						[disabled]="optionsLoading()"
 						pTooltip="Seleccionar curso organizados por nivel educativo"
@@ -144,6 +149,7 @@
 							type="button"
 							icon="pi pi-times"
 							class="p-button-text p-button-danger"
+							data-info-anchor="admin-schedules-form-limpiar-curso-btn"
 							(click)="onClearCurso()"
 							pTooltip="Limpiar seleccion de curso"
 							tooltipPosition="top"
@@ -171,6 +177,7 @@
 			label="Cancelar"
 			icon="pi pi-times"
 			class="p-button-text"
+			data-info-anchor="admin-schedules-form-cancelar-btn"
 			(click)="onCancel()"
 			pTooltip="Cerrar sin guardar cambios"
 			tooltipPosition="top"
@@ -179,6 +186,7 @@
 			pButton
 			[label]="isEditing() ? 'Actualizar' : 'Crear'"
 			icon="pi pi-check"
+			data-info-anchor="admin-schedules-form-guardar-btn"
 			(click)="onSave()"
 			[disabled]="!formValid() || loading()"
 			[pTooltip]="isEditing() ? 'Guardar cambios del horario' : 'Crear nuevo horario'"

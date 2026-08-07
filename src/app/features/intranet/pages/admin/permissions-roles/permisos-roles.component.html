@@ -11,6 +11,7 @@
 			label="Refrescar"
 			icon="pi pi-refresh"
 			class="p-button-outlined"
+			data-info-anchor="admin-permissions-refresh-btn"
 			(click)="refresh()"
 		></button>
 	</app-page-header>
@@ -26,11 +27,11 @@
 	<!-- #region Tabs -->
 	<p-tabs [value]="'roles'">
 		<p-tablist>
-			<p-tab value="roles">
+			<p-tab value="roles" data-info-anchor="tab-switch">
 				<i class="pi pi-id-card"></i>
 				Por Rol
 			</p-tab>
-			<p-tab value="catalogo">
+			<p-tab value="catalogo" data-info-anchor="tab-switch">
 				<i class="pi pi-shield"></i>
 				Catálogo
 			</p-tab>
@@ -107,6 +108,7 @@
 											class="p-button-rounded p-button-text p-button-secondary"
 											pTooltip="Ver detalles"
 											aria-label="Ver detalles"
+											data-info-anchor="admin-permissions-roles-ver-detalle-btn"
 											(click)="openDetail(row)"
 										></button>
 										<button
@@ -115,6 +117,7 @@
 											class="p-button-rounded p-button-text p-button-success"
 											pTooltip="Editar"
 											aria-label="Editar"
+											data-info-anchor="admin-permissions-roles-editar-btn"
 											(click)="editRole(row)"
 										></button>
 									</div>
@@ -202,6 +205,7 @@
 				label="Cerrar"
 				icon="pi pi-times"
 				class="p-button-text"
+				data-info-anchor="cerrar-drawer-btn"
 				(click)="closeDetail()"
 			></button>
 			<button
@@ -209,6 +213,7 @@
 				label="Editar Capabilities"
 				icon="pi pi-pencil"
 				class="p-button-primary"
+				data-info-anchor="admin-permissions-roles-editar-desde-detalle-btn"
 				(click)="editFromDetail()"
 			></button>
 		</div>
@@ -245,6 +250,7 @@
 						<button
 							class="module-tab"
 							[class.active]="vm().activeModuloIndex === i"
+							data-info-anchor="admin-permissions-roles-modulo-tab"
 							(click)="onActiveModuloIndexChange(i)"
 						>
 							<i class="pi pi-folder"></i>
@@ -263,6 +269,7 @@
 						<label class="select-all">
 							<p-checkbox
 								[ngModel]="vm().isAllModuloSelected"
+								data-info-anchor="admin-permissions-roles-select-all-checkbox"
 								(ngModelChange)="toggleAllCapabilitiesModulo()"
 								[binary]="true"
 							/>
@@ -280,6 +287,7 @@
 							type="text"
 							pInputText
 							placeholder="Buscar por nombre o código..."
+							data-info-anchor="admin-permissions-roles-buscar-input"
 							[ngModel]="vm().capBusqueda"
 							(ngModelChange)="onCapBusquedaChange($event)"
 						/>
@@ -293,10 +301,11 @@
 							>
 								<p-checkbox
 									[ngModel]="vm().selectedCapIds.includes(cap.id)"
+									data-info-anchor="admin-permissions-roles-cap-checkbox"
 									(ngModelChange)="toggleCapability(cap.id)"
 									[binary]="true"
 								/>
-								<div class="vista-details" (click)="toggleCapability(cap.id)">
+								<div class="vista-details" data-info-anchor="admin-permissions-roles-cap-checkbox" (click)="toggleCapability(cap.id)">
 									<span class="vista-name">{{ cap.nombre }}</span>
 									<span class="vista-path">{{ cap.codigo }}</span>
 								</div>
@@ -315,6 +324,7 @@
 				label="Cancelar"
 				icon="pi pi-times"
 				class="p-button-text"
+				data-info-anchor="admin-permissions-roles-editar-cancelar-btn"
 				(click)="onDialogVisibleChange(false)"
 			></button>
 			<button
@@ -323,6 +333,7 @@
 				icon="pi pi-check"
 				class="p-button-success"
 				[loading]="saving()"
+				data-info-anchor="admin-permissions-roles-editar-guardar-btn"
 				(click)="saveCapabilities()"
 				[disabled]="vm().selectedCapIds.length === 0 || saving()"
 			></button>

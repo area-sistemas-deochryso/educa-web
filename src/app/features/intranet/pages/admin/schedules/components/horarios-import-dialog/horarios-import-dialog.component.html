@@ -36,6 +36,7 @@
 							icon="pi pi-file-excel"
 							label="Seleccionar archivo"
 							class="p-button-outlined"
+							data-info-anchor="admin-schedules-import-seleccionar-archivo-btn"
 							(click)="fileInput.click()"
 						></button>
 						@if (fileName()) {
@@ -84,6 +85,7 @@
 							icon="pi pi-arrow-left"
 							label="Cambiar archivo"
 							class="p-button-text p-button-sm"
+							data-info-anchor="admin-schedules-import-cambiar-archivo-btn"
 							(click)="onNuevoArchivo()"
 							[pt]="{ root: { 'aria-label': 'Cambiar archivo' } }"
 						></button>
@@ -200,6 +202,7 @@
 						type="button"
 						label="Cancelar"
 						class="p-button-text"
+						data-info-anchor="admin-schedules-import-cancelar-btn"
 						(click)="onClose()"
 					></button>
 				}
@@ -209,6 +212,7 @@
 						type="button"
 						label="Cancelar"
 						class="p-button-text"
+						data-info-anchor="admin-schedules-import-cancelar-btn"
 						(click)="onClose()"
 					></button>
 					<button
@@ -217,6 +221,7 @@
 						icon="pi pi-upload"
 						[label]="'Importar ' + validCount() + ' horarios'"
 						[disabled]="!canImport()"
+						data-info-anchor="admin-schedules-import-confirmar-btn"
 						(click)="onImportar()"
 					></button>
 				}
@@ -228,12 +233,14 @@
 							icon="pi pi-refresh"
 							label="Importar otro archivo"
 							class="p-button-outlined"
+							data-info-anchor="admin-schedules-import-cambiar-archivo-btn"
 							(click)="onNuevoArchivo()"
 						></button>
 						<button
 							pButton
 							type="button"
 							label="Cerrar"
+							data-info-anchor="admin-schedules-import-cerrar-btn"
 							(click)="onClose()"
 						></button>
 					}

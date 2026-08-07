@@ -9,6 +9,7 @@
 			icon="pi pi-refresh"
 			class="p-button-text p-button-sm"
 			[loading]="loading()"
+			data-info-anchor="admin-diagnostico-db-refresh-btn"
 			(click)="onRefresh()"
 		></button>
 	</header>
@@ -31,11 +32,11 @@
 		<p-table [value]="sessions()" [dataKey]="'sessionId'" [tableStyle]="{ 'min-width': '45rem' }" [sortField]="'waitTimeMs'" [sortOrder]="-1">
 			<ng-template #header>
 				<tr>
-					<th pSortableColumn="sessionId" style="width: 7rem">Session <p-sortIcon field="sessionId" /></th>
-					<th pSortableColumn="blockingSessionId" style="width: 8rem">Bloqueado por <p-sortIcon field="blockingSessionId" /></th>
-					<th pSortableColumn="waitType" style="width: 10rem">Tipo de espera <p-sortIcon field="waitType" /></th>
-					<th pSortableColumn="waitTimeMs" style="width: 8rem">Tiempo de espera <p-sortIcon field="waitTimeMs" /></th>
-					<th pSortableColumn="sqlText">SQL <p-sortIcon field="sqlText" /></th>
+					<th pSortableColumn="sessionId" style="width: 7rem" data-info-anchor="tabla-orden-columna">Session <p-sortIcon field="sessionId" /></th>
+					<th pSortableColumn="blockingSessionId" style="width: 8rem" data-info-anchor="tabla-orden-columna">Bloqueado por <p-sortIcon field="blockingSessionId" /></th>
+					<th pSortableColumn="waitType" style="width: 10rem" data-info-anchor="tabla-orden-columna">Tipo de espera <p-sortIcon field="waitType" /></th>
+					<th pSortableColumn="waitTimeMs" style="width: 8rem" data-info-anchor="tabla-orden-columna">Tiempo de espera <p-sortIcon field="waitTimeMs" /></th>
+					<th pSortableColumn="sqlText" data-info-anchor="tabla-orden-columna">SQL <p-sortIcon field="sqlText" /></th>
 				</tr>
 			</ng-template>
 			<ng-template #body let-row>

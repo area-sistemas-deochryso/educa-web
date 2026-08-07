@@ -5,6 +5,7 @@
 			type="text"
 			pInputText
 			placeholder="Buscar por endpoint..."
+			data-info-anchor="admin-rate-limit-buscar-endpoint-input"
 			[ngModel]="endpointSearch()"
 			(ngModelChange)="onEndpointChange($event)"
 		/>
@@ -14,6 +15,7 @@
 		<p-select
 			[options]="rolOptions()"
 			[ngModel]="filter().rol"
+			data-info-anchor="admin-rate-limit-rol-select"
 			(ngModelChange)="onRolChange($event)"
 			placeholder="Rol"
 			appendTo="body"
@@ -22,6 +24,7 @@
 		<p-select
 			[options]="policyOptions"
 			[ngModel]="filter().policy"
+			data-info-anchor="admin-rate-limit-policy-select"
 			(ngModelChange)="onPolicyChange($event)"
 			placeholder="Policy"
 			appendTo="body"
@@ -30,6 +33,7 @@
 		<p-datepicker
 			selectionMode="range"
 			[ngModel]="fechaRango()"
+			data-info-anchor="admin-rate-limit-fecha-rango-picker"
 			(ngModelChange)="onFechaRangoChange($event)"
 			[showIcon]="true"
 			appendTo="body"
@@ -41,6 +45,7 @@
 		<label class="toggle-label">
 			<p-toggleswitch
 				[ngModel]="filter().soloRechazados ?? false"
+				data-info-anchor="admin-rate-limit-solo-rechazados-toggle"
 				(ngModelChange)="onSoloRechazadosChange($event)"
 			/>
 			<span>Solo rechazados</span>
@@ -53,6 +58,7 @@
 		class="p-button-text p-button-sm btn-clear"
 		pTooltip="Limpiar filtros"
 		tooltipPosition="top"
+		data-info-anchor="admin-rate-limit-limpiar-filtros-btn"
 		(click)="onClear()"
 		[pt]="{ root: { 'aria-label': 'Limpiar filtros' } }"
 	></button>

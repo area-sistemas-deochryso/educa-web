@@ -9,6 +9,7 @@
 			icon="pi pi-refresh"
 			class="p-button-text p-button-sm"
 			[loading]="loading()"
+			data-info-anchor="admin-diagnostico-db-refresh-btn"
 			(click)="onRefresh()"
 		></button>
 	</header>
@@ -36,11 +37,11 @@
 		>
 			<ng-template #header>
 				<tr>
-					<th pSortableColumn="tableName">Tabla <p-sortIcon field="tableName" /></th>
-					<th pSortableColumn="indexName">Índice <p-sortIcon field="indexName" /></th>
+					<th pSortableColumn="tableName" data-info-anchor="tabla-orden-columna">Tabla <p-sortIcon field="tableName" /></th>
+					<th pSortableColumn="indexName" data-info-anchor="tabla-orden-columna">Índice <p-sortIcon field="indexName" /></th>
 					<th>Tipo</th>
-					<th pSortableColumn="pageCount">Páginas <p-sortIcon field="pageCount" /></th>
-					<th pSortableColumn="fragmentationPercent" style="width: 10rem">
+					<th pSortableColumn="pageCount" data-info-anchor="tabla-orden-columna">Páginas <p-sortIcon field="pageCount" /></th>
+					<th pSortableColumn="fragmentationPercent" style="width: 10rem" data-info-anchor="tabla-orden-columna">
 						Fragmentación <p-sortIcon field="fragmentationPercent" />
 					</th>
 				</tr>

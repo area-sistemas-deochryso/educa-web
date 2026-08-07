@@ -32,6 +32,7 @@
                 [class.inactive]="!block.horario.estado"
                 [pTooltip]="blockTooltipMap().get(block.horario.id)"
                 tooltipPosition="top"
+                data-info-anchor="admin-schedules-block"
                 (click)="onBlockClick(block)"
               >
                 <div class="block-content">
@@ -75,6 +76,7 @@
                       pButton
                       icon="pi pi-eye"
                       class="p-button-rounded p-button-text p-button-sm action-btn"
+                      data-info-anchor="admin-schedules-block-ver-detalle-btn"
                       (click)="onViewDetailClick($event, block)"
                       [pt]="{ root: { 'aria-label': 'Ver detalles' } }"
                     ></button>
@@ -84,6 +86,7 @@
                         pButton
                         icon="pi pi-pencil"
                         class="p-button-rounded p-button-text p-button-sm action-btn"
+                        data-info-anchor="admin-schedules-block-editar-btn"
                         (click)="onEditClick($event, block)"
                         [pt]="{ root: { 'aria-label': 'Editar' } }"
                       ></button>

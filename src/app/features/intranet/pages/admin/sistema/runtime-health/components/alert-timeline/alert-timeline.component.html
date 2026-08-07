@@ -16,6 +16,7 @@
 				placeholder="Métrica"
 				[showClear]="false"
 				styleClass="metric-filter"
+				data-info-anchor="admin-runtime-health-alerts-metrica-select"
 				(onChange)="onMetricChange()"
 			/>
 			<p-selectButton
@@ -24,6 +25,7 @@
 				optionLabel="label"
 				optionValue="value"
 				[allowEmpty]="false"
+				data-info-anchor="admin-runtime-health-alerts-severidad-toggle"
 				(onChange)="onSeverityChange()"
 			/>
 			<button
@@ -31,6 +33,7 @@
 				icon="pi pi-refresh"
 				class="p-button-text p-button-sm"
 				[loading]="loading()"
+				data-info-anchor="admin-runtime-health-alerts-refresh-btn"
 				(click)="onRefresh()"
 			></button>
 		</div>
@@ -48,6 +51,7 @@
 			<p-checkbox
 				[binary]="true"
 				[ngModel]="allPagedSelected()"
+				data-info-anchor="admin-runtime-health-alerts-select-all-checkbox"
 				(onChange)="toggleSelectAllPaged()"
 			/>
 			@if (selectedCount() > 0) {
@@ -57,6 +61,7 @@
 					icon="pi pi-trash"
 					label="Eliminar seleccionados"
 					class="p-button-danger p-button-sm"
+					data-info-anchor="admin-runtime-health-alerts-eliminar-seleccionados-btn"
 					(click)="deleteSelected()"
 				></button>
 			}
@@ -68,6 +73,7 @@
 						<p-checkbox
 							[binary]="true"
 							[ngModel]="isGroupSelected(group)"
+							data-info-anchor="admin-runtime-health-alerts-fila-checkbox"
 							(onChange)="toggleGroupSelected(group)"
 						/>
 						<p-tag
@@ -89,6 +95,7 @@
 							pButton
 							icon="pi pi-trash"
 							class="p-button-rounded p-button-text p-button-sm p-button-danger"
+							data-info-anchor="admin-runtime-health-alerts-eliminar-fila-btn"
 							(click)="deleteGroup(group)"
 							[pt]="{ root: { 'aria-label': 'Eliminar alerta' } }"
 						></button>
@@ -106,6 +113,7 @@
 						@if (getRecommendation(group.metricKey); as rec) {
 							<div class="recommendation"
 								[class.recommendation--link]="getTabTarget(group.metricKey)"
+								data-info-anchor="admin-runtime-health-alerts-recomendacion-link"
 								(click)="onRecommendationClick(group.metricKey)">
 								<i class="pi pi-lightbulb"></i>
 								<span>{{ rec }}</span>
@@ -126,6 +134,7 @@
 					icon="pi pi-chevron-left"
 					class="p-button-text p-button-sm"
 					[disabled]="page() <= 1"
+					data-info-anchor="admin-runtime-health-alerts-paginacion-btn"
 					(click)="prevPage()"
 				></button>
 				<span class="page-info">{{ page() }} / {{ totalPages() }}</span>
@@ -134,6 +143,7 @@
 					icon="pi pi-chevron-right"
 					class="p-button-text p-button-sm"
 					[disabled]="page() >= totalPages()"
+					data-info-anchor="admin-runtime-health-alerts-paginacion-btn"
 					(click)="nextPage()"
 				></button>
 			</div>

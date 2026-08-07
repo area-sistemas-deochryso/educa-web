@@ -29,26 +29,26 @@
 
 <p-tabs [value]="activeTab()" (valueChange)="onNavigateTab($any($event))">
 	<p-tablist>
-		<p-tab value="alerts">
+		<p-tab value="alerts" data-info-anchor="tab-switch">
 			<i class="pi pi-bell tab-icon"></i>
 			Alertas
 			@if (alertsVm().alerts.length > 0) {
 				<p-badge [value]="'' + alertsVm().alerts.length" severity="danger" />
 			}
 		</p-tab>
-		<p-tab value="history">
+		<p-tab value="history" data-info-anchor="tab-switch">
 			<i class="pi pi-chart-line tab-icon"></i>
 			Historial
 		</p-tab>
-		<p-tab value="snapshot">
+		<p-tab value="snapshot" data-info-anchor="tab-switch">
 			<i class="pi pi-server tab-icon"></i>
 			Snapshot
 		</p-tab>
-		<p-tab value="slow">
+		<p-tab value="slow" data-info-anchor="tab-switch">
 			<i class="pi pi-stopwatch tab-icon"></i>
 			Consultas lentas
 		</p-tab>
-		<p-tab value="thresholds">
+		<p-tab value="thresholds" data-info-anchor="tab-switch">
 			<i class="pi pi-sliders-h tab-icon"></i>
 			Umbrales
 		</p-tab>

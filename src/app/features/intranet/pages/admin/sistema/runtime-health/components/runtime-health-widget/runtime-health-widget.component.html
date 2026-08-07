@@ -6,6 +6,7 @@
 				type="button"
 				class="p-button-text p-button-sm btn-collapse"
 				[icon]="collapsed() ? 'pi pi-chevron-down' : 'pi pi-chevron-up'"
+				data-info-anchor="admin-runtime-health-widget-collapse-toggle"
 				(click)="onCollapsedToggle()"
 				[pt]="{ root: { 'aria-label': collapsed() ? 'Expandir widget' : 'Colapsar widget' } }"
 			></button>
@@ -23,6 +24,7 @@
 			<label class="auto-refresh-toggle">
 				<p-toggleSwitch
 					[ngModel]="autoRefresh()"
+					data-info-anchor="admin-runtime-health-widget-auto-refresh-toggle"
 					(ngModelChange)="onAutoRefreshChange($event)"
 				/>
 				<span>Auto 60s</span>
@@ -32,6 +34,7 @@
 				icon="pi pi-refresh"
 				class="p-button-text p-button-sm"
 				[loading]="loading()"
+				data-info-anchor="admin-runtime-health-widget-refresh-btn"
 				(click)="onRefreshClick()"
 				pTooltip="Refrescar ahora"
 				tooltipPosition="bottom"
@@ -102,6 +105,7 @@
 					@if (alerts['threadPool.queueLength']?.recommendation; as rec) {
 						<div class="info-card__rec"
 							[class.info-card__rec--link]="alerts['threadPool.queueLength']?.tabTarget"
+							data-info-anchor="admin-runtime-health-widget-recomendacion-link"
 							(click)="onRecommendationClick('threadPool.queueLength')">
 							<i class="pi pi-lightbulb"></i>
 							<span>{{ rec }}</span>
@@ -142,6 +146,7 @@
 					</dl>
 					@if (alerts['requests.p95']?.recommendation; as rec) {
 						<div class="info-card__rec info-card__rec--link"
+							data-info-anchor="admin-runtime-health-widget-recomendacion-link"
 							(click)="onRecommendationClick('requests.p95')">
 							<i class="pi pi-lightbulb"></i>
 							<span>{{ rec }}</span>
@@ -191,6 +196,7 @@
 							class="p-button-outlined p-button-sm p-button-warning"
 							pTooltip="Ejecutar Garbage Collection en el servidor"
 							tooltipPosition="bottom"
+							data-info-anchor="admin-runtime-health-widget-force-gc-btn"
 							(click)="onForceGc()"
 							[pt]="{ root: { 'aria-label': 'Forzar garbage collection' } }"
 						></button>
@@ -198,6 +204,7 @@
 					@if (alerts['gc.heapMb']?.recommendation; as rec) {
 						<div class="info-card__rec"
 							[class.info-card__rec--link]="alerts['gc.heapMb']?.tabTarget"
+							data-info-anchor="admin-runtime-health-widget-recomendacion-link"
 							(click)="onRecommendationClick('gc.heapMb')">
 							<i class="pi pi-lightbulb"></i>
 							<span>{{ rec }}</span>

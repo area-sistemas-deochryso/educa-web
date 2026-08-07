@@ -24,17 +24,17 @@
 		} @else {
 			<p-tabs value="inicial">
 				<p-tablist>
-					<p-tab value="inicial">
+					<p-tab value="inicial" data-info-anchor="tab-switch">
 						<i class="pi pi-sun"></i>
 						<span>Inicial</span>
 						<p-badge [value]="cursosPorNivel().inicial.length.toString()" />
 					</p-tab>
-					<p-tab value="primaria">
+					<p-tab value="primaria" data-info-anchor="tab-switch">
 						<i class="pi pi-pencil"></i>
 						<span>Primaria</span>
 						<p-badge [value]="cursosPorNivel().primaria.length.toString()" />
 					</p-tab>
-					<p-tab value="secundaria">
+					<p-tab value="secundaria" data-info-anchor="tab-switch">
 						<i class="pi pi-graduation-cap"></i>
 						<span>Secundaria</span>
 						<p-badge [value]="cursosPorNivel().secundaria.length.toString()" />
@@ -57,6 +57,7 @@
 								<div
 									class="curso-card"
 									[class.selected]="selectedCursoId() === curso.value"
+									data-info-anchor="curso-picker-grid"
 									(click)="onSelectCurso(curso.value)"
 								>
 									<div class="curso-card-content">
@@ -89,6 +90,7 @@
 								<div
 									class="curso-card"
 									[class.selected]="selectedCursoId() === curso.value"
+									data-info-anchor="curso-picker-grid"
 									(click)="onSelectCurso(curso.value)"
 								>
 									<div class="curso-card-content">
@@ -121,6 +123,7 @@
 								<div
 									class="curso-card"
 									[class.selected]="selectedCursoId() === curso.value"
+									data-info-anchor="curso-picker-grid"
 									(click)="onSelectCurso(curso.value)"
 								>
 									<div class="curso-card-content">
@@ -146,6 +149,7 @@
 			label="Cancelar"
 			icon="pi pi-times"
 			class="p-button-text"
+			data-info-anchor="admin-schedules-curso-picker-cancelar-btn"
 			(click)="onCancel()"
 			pTooltip="Cerrar sin seleccionar curso"
 			tooltipPosition="top"
@@ -155,6 +159,7 @@
 			label="Confirmar"
 			icon="pi pi-check"
 			[disabled]="!selectedCursoId()"
+			data-info-anchor="admin-schedules-curso-picker-confirmar-btn"
 			(click)="onConfirm()"
 			pTooltip="Confirmar seleccion de curso"
 			tooltipPosition="top"

@@ -26,7 +26,7 @@
 
           <div class="group-items">
             @for (item of group.items; track item.horarioId) {
-              <div class="problem-item" (click)="onViewDetail(item.horarioId)">
+              <div class="problem-item" data-info-anchor="admin-schedules-global-problema-fila" (click)="onViewDetail(item.horarioId)">
                 <div class="item-main">
                   <span class="item-curso">{{ item.curso }}</span>
                   <span class="item-schedule">{{ item.dia }} · {{ item.hora }}</span>

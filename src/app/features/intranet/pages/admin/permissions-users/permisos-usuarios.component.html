@@ -11,6 +11,7 @@
 			label="Registro de Vistas"
 			icon="pi pi-list"
 			class="p-button-outlined"
+			data-info-anchor="admin-permissions-users-registro-vistas-link"
 			routerLink="/intranet/admin/registro-vistas"
 		></button>
 		<button
@@ -19,6 +20,7 @@
 			icon="pi pi-refresh"
 			class="p-button-outlined"
 			aria-label="Refrescar datos"
+			data-info-anchor="admin-permissions-refresh-btn"
 			(click)="refresh()"
 		></button>
 	</app-page-header>
@@ -43,6 +45,7 @@
 					optionLabel="label"
 					optionValue="value"
 					[ngModel]="vm().selectedRolId"
+					data-info-anchor="admin-permissions-users-rol-select"
 					(ngModelChange)="onRolChange($event)"
 					placeholder="Seleccione un rol"
 					aria-label="Seleccionar rol"
@@ -56,6 +59,7 @@
 					id="userSearch"
 					[suggestions]="vm().usuariosSugeridos"
 					[ngModel]="vm().selectedUsuario"
+					data-info-anchor="admin-permissions-users-buscar-autocomplete"
 					(completeMethod)="onSearchUsers($event)"
 					(onSelect)="onSelectUsuario($event.value)"
 					optionLabel="nombreCompleto"
@@ -85,6 +89,7 @@
 						class="p-button-text p-button-secondary"
 						pTooltip="Limpiar selección"
 						aria-label="Limpiar selección"
+						data-info-anchor="admin-permissions-users-limpiar-seleccion-btn"
 						(click)="resetSelection()"
 					></button>
 				</div>
@@ -158,6 +163,7 @@
 						icon="pi pi-pencil"
 						class="p-button-outlined"
 						aria-label="Editar overrides del usuario"
+						data-info-anchor="admin-permissions-users-editar-overrides-btn"
 						(click)="openEditDialog()"
 					></button>
 				</div>
@@ -246,6 +252,7 @@
 						<button
 							class="module-tab"
 							[class.active]="vm().activeModuloIndex === i"
+							data-info-anchor="admin-permissions-users-modulo-tab"
 							(click)="onActiveModuloIndexChange(i)"
 						>
 							<i class="pi pi-folder"></i>
@@ -262,6 +269,7 @@
 							type="text"
 							pInputText
 							placeholder="Buscar capability..."
+							data-info-anchor="admin-permissions-users-buscar-cap-input"
 							[ngModel]="vm().capBusqueda"
 							(ngModelChange)="onCapBusquedaChange($event)"
 						/>
@@ -301,6 +309,7 @@
 										[class]="isGranted ? 'p-button-sm p-button-success' : 'p-button-sm p-button-outlined'"
 										pTooltip="Grant"
 										aria-label="Toggle grant"
+										data-info-anchor="admin-permissions-users-toggle-grant-btn"
 										(click)="toggleGrant(cap.id)"
 									></button>
 									<button
@@ -310,6 +319,7 @@
 										[class]="isDenied ? 'p-button-sm p-button-danger' : 'p-button-sm p-button-outlined'"
 										pTooltip="Deny"
 										aria-label="Toggle deny"
+										data-info-anchor="admin-permissions-users-toggle-deny-btn"
 										(click)="toggleDeny(cap.id)"
 									></button>
 								</div>
@@ -328,6 +338,7 @@
 				label="Cancelar"
 				icon="pi pi-times"
 				class="p-button-text"
+				data-info-anchor="admin-permissions-users-editar-cancelar-btn"
 				(click)="closeDialog()"
 			></button>
 			<button
@@ -336,6 +347,7 @@
 				icon="pi pi-check"
 				class="p-button-success"
 				[loading]="saving()"
+				data-info-anchor="admin-permissions-users-editar-guardar-btn"
 				[disabled]="saving()"
 				(click)="saveOverrides()"
 			></button>

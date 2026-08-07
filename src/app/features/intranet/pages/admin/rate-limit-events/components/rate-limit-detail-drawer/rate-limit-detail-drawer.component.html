@@ -107,6 +107,7 @@
 								icon="pi pi-copy"
 								label="Copiar"
 								class="p-button-text p-button-sm"
+								data-info-anchor="copiar-btn"
 								(click)="onCopyCorrelation(item()!.correlationId)"
 								[pt]="{ root: { 'aria-label': 'Copiar correlationId' } }"
 							></button>
@@ -115,6 +116,7 @@
 								icon="pi pi-share-alt"
 								label="Ver eventos correlacionados"
 								class="p-button-outlined p-button-sm"
+								data-info-anchor="admin-error-groups-ver-correlacionados-link"
 								(click)="onBuscarEnErrorLog(item()!.correlationId)"
 								[pt]="{ root: { 'aria-label': 'Ver eventos correlacionados en el hub' } }"
 							></button>

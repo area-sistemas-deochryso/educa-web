@@ -4,6 +4,7 @@
       <p-toggleswitch
         inputId="compress-empty-hours"
         [ngModel]="compressEmptyHours()"
+        data-info-anchor="admin-schedules-grid-comprimir-toggle"
         (ngModelChange)="onToggleCompress($event)"
       />
       <label for="compress-empty-hours">Comprimir horas sin clases</label>
@@ -31,6 +32,7 @@
         <button
           type="button"
           class="collapsed-row"
+          data-info-anchor="admin-schedules-grid-expandir-btn"
           (click)="expandRun(row.startIndex)"
           [pTooltip]="'Mostrar estas horas'"
           tooltipPosition="top"
@@ -50,6 +52,7 @@
           class="grid-cell"
           [class.empty-slot]="slotBlocks.length === 0"
           [class.clickable]="slotBlocks.length === 0 && isAdmin()"
+          data-info-anchor="admin-schedules-grid-empty-slot"
           (click)="slotBlocks.length === 0 && isAdmin() ? onEmptySlotClick(dia.value, hora) : null"
         >
           @if (slotBlocks.length === 0 && isAdmin()) {
@@ -67,6 +70,7 @@
               [class.no-profesor]="hasNoProfesor(block)"
               [pTooltip]="getBlockTooltip(block)"
               tooltipPosition="top"
+              data-info-anchor="admin-schedules-block"
               (click)="onBlockClick(block); $event.stopPropagation()"
             >
               <div class="block-content">
@@ -97,6 +101,7 @@
                   pButton
                   icon="pi pi-eye"
                   class="p-button-rounded p-button-text p-button-sm action-btn"
+                  data-info-anchor="admin-schedules-block-ver-detalle-btn"
                   (click)="onViewDetailClick($event, block)"
                   [pt]="{ root: { 'aria-label': 'Ver detalles' } }"
                 ></button>
@@ -105,6 +110,7 @@
                     pButton
                     icon="pi pi-pencil"
                     class="p-button-rounded p-button-text p-button-sm action-btn"
+                    data-info-anchor="admin-schedules-block-editar-btn"
                     (click)="onEditClick($event, block)"
                     [pt]="{ root: { 'aria-label': 'Editar' } }"
                   ></button>

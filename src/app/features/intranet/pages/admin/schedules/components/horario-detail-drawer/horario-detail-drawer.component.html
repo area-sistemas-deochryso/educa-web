@@ -41,6 +41,7 @@
 							pButton
 							icon="pi pi-pencil"
 							class="p-button-rounded p-button-text p-button-info"
+							data-info-anchor="admin-schedules-detail-editar-btn"
 							(click)="onEdit()"
 							pTooltip="Editar horario"
 							tooltipPosition="top"
@@ -57,6 +58,7 @@
 							class="p-button-rounded p-button-text"
 							[class.p-button-warning]="detalle()!.estado"
 							[class.p-button-success]="!detalle()!.estado"
+							data-info-anchor="admin-schedules-detail-toggle-estado-btn"
 							(click)="onToggleEstado()"
 							[pTooltip]="detalle()!.estado | estadoToggleLabel"
 							tooltipPosition="top"
@@ -71,6 +73,7 @@
 							pButton
 							icon="pi pi-trash"
 							class="p-button-rounded p-button-text p-button-danger"
+							data-info-anchor="admin-schedules-detail-eliminar-btn"
 							(click)="onDelete()"
 							pTooltip="Eliminar horario"
 							tooltipPosition="top"
@@ -161,6 +164,7 @@
 								pButton
 								icon="pi pi-pencil"
 								class="p-button-rounded p-button-text p-button-sm p-button-info"
+								data-info-anchor="admin-schedules-detail-toggle-profesor-edit-btn"
 								(click)="onToggleProfesorEdit()"
 								[pTooltip]="showProfesorEdit() ? 'Cancelar cambio' : 'Cambiar profesor'"
 								tooltipPosition="top"
@@ -174,6 +178,7 @@
 								pButton
 								icon="pi pi-user-minus"
 								class="p-button-rounded p-button-text p-button-sm p-button-danger"
+								data-info-anchor="admin-schedules-detail-desasignar-profesor-btn"
 								(click)="onDesasignarProfesor()"
 								pTooltip="Quitar profesor"
 								tooltipPosition="top"
@@ -206,6 +211,7 @@
 							<p-select
 								[options]="profesoresOptions()"
 								[(ngModel)]="selectedProfesorId"
+								data-info-anchor="admin-schedules-detail-profesor-select"
 								placeholder="Seleccionar nuevo profesor..."
 								optionLabel="label"
 								optionValue="value"
@@ -222,6 +228,7 @@
 								icon="pi pi-refresh"
 								class="p-button-sm w-full"
 								[disabled]="!selectedProfesorId"
+								data-info-anchor="admin-schedules-detail-asignar-profesor-btn"
 								(click)="onAsignarProfesor()"
 								pTooltip="Asignar el nuevo profesor seleccionado"
 								tooltipPosition="top"
@@ -238,6 +245,7 @@
 								<p-select
 									[options]="profesoresOptions()"
 									[(ngModel)]="selectedProfesorId"
+									data-info-anchor="admin-schedules-detail-profesor-select"
 									placeholder="Seleccionar profesor..."
 									optionLabel="label"
 									optionValue="value"
@@ -254,6 +262,7 @@
 									icon="pi pi-user-plus"
 									class="p-button-sm w-full"
 									[disabled]="!selectedProfesorId"
+									data-info-anchor="admin-schedules-detail-asignar-profesor-btn"
 									(click)="onAsignarProfesor()"
 									pTooltip="Asignar el profesor seleccionado a este horario"
 									tooltipPosition="top"
@@ -279,6 +288,7 @@
 								icon="pi pi-user-plus"
 								label="Asignar Todos"
 								class="p-button-text p-button-sm"
+								data-info-anchor="admin-schedules-detail-asignar-todos-btn"
 								(click)="onAsignarTodosEstudiantes()"
 								[disabled]="detalle()!.estudiantesDisponiblesSalon === 0"
 								[pTooltip]="detalle()!.estudiantesDisponiblesSalon === 0
@@ -306,6 +316,7 @@
 										pButton
 										icon="pi pi-times"
 										class="p-button-rounded p-button-text p-button-danger p-button-sm student-remove-btn"
+										data-info-anchor="admin-schedules-detail-desasignar-estudiante-btn"
 										(click)="onDesasignarEstudiante(estudiante.id)"
 										pTooltip="Quitar estudiante"
 										tooltipPosition="left"
@@ -369,6 +380,7 @@
 			label="Cerrar"
 			icon="pi pi-times"
 			class="p-button-text"
+			data-info-anchor="cerrar-drawer-btn"
 			(click)="onClose()"
 			pTooltip="Cerrar panel de detalles"
 			tooltipPosition="top"

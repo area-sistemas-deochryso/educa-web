@@ -9,6 +9,7 @@
 			icon="pi pi-refresh"
 			class="p-button-text p-button-sm"
 			[loading]="loading()"
+			data-info-anchor="admin-diagnostico-db-refresh-btn"
 			(click)="onRefresh()"
 		></button>
 	</header>
@@ -31,11 +32,11 @@
 		<p-table [value]="queries()" [tableStyle]="{ 'min-width': '50rem' }" [sortField]="'avgCpuMs'" [sortOrder]="-1">
 			<ng-template #header>
 				<tr>
-					<th pSortableColumn="sqlText">SQL <p-sortIcon field="sqlText" /></th>
-					<th pSortableColumn="executionCount" style="width: 8rem">Ejecuciones <p-sortIcon field="executionCount" /></th>
-					<th pSortableColumn="avgCpuMs" style="width: 8rem">CPU prom. <p-sortIcon field="avgCpuMs" /></th>
-					<th pSortableColumn="totalReads" style="width: 8rem">Lecturas <p-sortIcon field="totalReads" /></th>
-					<th pSortableColumn="lastExecutionTime" style="width: 10rem">Última ejecución <p-sortIcon field="lastExecutionTime" /></th>
+					<th pSortableColumn="sqlText" data-info-anchor="tabla-orden-columna">SQL <p-sortIcon field="sqlText" /></th>
+					<th pSortableColumn="executionCount" style="width: 8rem" data-info-anchor="tabla-orden-columna">Ejecuciones <p-sortIcon field="executionCount" /></th>
+					<th pSortableColumn="avgCpuMs" style="width: 8rem" data-info-anchor="tabla-orden-columna">CPU prom. <p-sortIcon field="avgCpuMs" /></th>
+					<th pSortableColumn="totalReads" style="width: 8rem" data-info-anchor="tabla-orden-columna">Lecturas <p-sortIcon field="totalReads" /></th>
+					<th pSortableColumn="lastExecutionTime" style="width: 10rem" data-info-anchor="tabla-orden-columna">Última ejecución <p-sortIcon field="lastExecutionTime" /></th>
 				</tr>
 			</ng-template>
 			<ng-template #body let-row>

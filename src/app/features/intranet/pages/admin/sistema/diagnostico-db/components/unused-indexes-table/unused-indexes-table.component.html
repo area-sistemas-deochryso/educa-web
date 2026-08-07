@@ -9,6 +9,7 @@
 			icon="pi pi-refresh"
 			class="p-button-text p-button-sm"
 			[loading]="loading()"
+			data-info-anchor="admin-diagnostico-db-refresh-btn"
 			(click)="onRefresh()"
 		></button>
 	</header>
@@ -31,9 +32,9 @@
 		<p-table [value]="indexes()" [tableStyle]="{ 'min-width': '40rem' }" [sortField]="'totalWrites'" [sortOrder]="-1">
 			<ng-template #header>
 				<tr>
-					<th pSortableColumn="tableName">Tabla <p-sortIcon field="tableName" /></th>
-					<th pSortableColumn="indexName">Índice <p-sortIcon field="indexName" /></th>
-					<th pSortableColumn="totalWrites" style="width: 10rem">Escrituras <p-sortIcon field="totalWrites" /></th>
+					<th pSortableColumn="tableName" data-info-anchor="tabla-orden-columna">Tabla <p-sortIcon field="tableName" /></th>
+					<th pSortableColumn="indexName" data-info-anchor="tabla-orden-columna">Índice <p-sortIcon field="indexName" /></th>
+					<th pSortableColumn="totalWrites" style="width: 10rem" data-info-anchor="tabla-orden-columna">Escrituras <p-sortIcon field="totalWrites" /></th>
 					<th style="width: 8rem">Lecturas</th>
 				</tr>
 			</ng-template>
