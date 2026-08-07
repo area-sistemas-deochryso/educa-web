@@ -61,6 +61,7 @@ import { toSelectOptionsFrom } from '@shared/models';
 			} @else {
 				<div class="filters-row mb-3">
 					<app-picker-grid
+						data-info-anchor="salon-picker-grid"
 						[options]="salonOptions()"
 						[selected]="selectedSalonId()"
 						searchPlaceholder="Buscar salón..."

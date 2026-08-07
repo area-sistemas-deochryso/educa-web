@@ -51,6 +51,7 @@ import { HealthJustificationDto } from '@features/intranet/pages/profesor/models
 								target="_blank"
 								rel="noopener noreferrer"
 								class="doc-link"
+								data-info-anchor="profesor-health-justificacion-documento"
 							>
 								<i class="pi pi-file-pdf"></i>
 								{{ j.documentoNombre }}
@@ -62,6 +63,7 @@ import { HealthJustificationDto } from '@features/intranet/pages/profesor/models
 								pButton
 								icon="pi pi-times"
 								class="p-button-rounded p-button-text p-button-danger p-button-sm"
+								data-info-anchor="profesor-health-anular-justificacion"
 								(click)="anular.emit(j.id)"
 								pTooltip="Anular justificación"
 								tooltipPosition="top"

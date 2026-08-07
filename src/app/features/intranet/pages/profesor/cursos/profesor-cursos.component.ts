@@ -89,7 +89,7 @@ import { HorarioProfesorDto, CrearCursoContenidoRequest } from '../models';
 			<app-empty-state icon="pi pi-book" title="Mis Cursos" message="No tienes cursos asignados" />
 		} @else {
 			<app-page-header icon="pi pi-book" title="Mis Cursos">
-				<a routerLink="/intranet/profesor/horarios" class="text-sm no-underline text-primary flex align-items-center gap-1">
+				<a routerLink="/intranet/profesor/horarios" data-info-anchor="profesor-cursos-ver-horario" class="text-sm no-underline text-primary flex align-items-center gap-1">
 					<i class="pi pi-calendar"></i> Ver horario
 				</a>
 			</app-page-header>
@@ -99,6 +99,7 @@ import { HorarioProfesorDto, CrearCursoContenidoRequest } from '../models';
 					@for (horario of vm().horarios; track horario.id) {
 						<div
 							class="course-card"
+							data-info-anchor="profesor-cursos-card"
 							[style.--card-accent]="colorMap().get(horario.cursoId)"
 							(click)="onVerContenido(horario)"
 							pTooltip="Ver contenido"
@@ -107,7 +108,7 @@ import { HorarioProfesorDto, CrearCursoContenidoRequest } from '../models';
 						>
 							<div class="flex align-items-start justify-content-between mb-2">
 								<span class="font-bold text-lg line-height-3">{{ horario.cursoNombre }}</span>
-								<a routerLink="/intranet/profesor/salones" class="no-underline" (click)="$event.stopPropagation()">
+								<a routerLink="/intranet/profesor/salones" data-info-anchor="profesor-cursos-card-salon-tag" class="no-underline" (click)="$event.stopPropagation()">
 									<p-tag [value]="horario.salonDescripcion" severity="info" />
 								</a>
 							</div>

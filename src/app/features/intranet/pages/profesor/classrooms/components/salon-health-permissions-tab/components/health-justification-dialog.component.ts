@@ -79,6 +79,7 @@ import { StudentForHealthDto, DateValidationResult } from '@features/intranet/pa
 				<p-fileUpload
 					mode="basic"
 					[auto]="false"
+					data-info-anchor="profesor-health-justificacion-adjuntar"
 					accept=".pdf,.jpg,.jpeg,.png,.webp"
 					[maxFileSize]="10485760"
 					chooseLabel="Seleccionar archivo"
@@ -112,12 +113,14 @@ import { StudentForHealthDto, DateValidationResult } from '@features/intranet/pa
 					pButton
 					label="Cancelar"
 					class="p-button-text"
+					data-info-anchor="profesor-health-justificacion-cancelar"
 					(click)="onVisibleChange(false)"
 				></button>
 				<button
 					pButton
 					label="Registrar Justificación"
 					icon="pi pi-check"
+					data-info-anchor="profesor-health-justificacion-guardar"
 					[disabled]="!canSave() || saving()"
 					[loading]="saving()"
 					(click)="onSave()"

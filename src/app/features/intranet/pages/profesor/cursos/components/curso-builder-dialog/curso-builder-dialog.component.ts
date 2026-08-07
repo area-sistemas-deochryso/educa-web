@@ -57,11 +57,12 @@ import { InputNumberModule } from 'primeng/inputnumber';
 
 			<ng-template #footer>
 				<div class="flex justify-content-end gap-2 pt-2">
-					<button pButton label="Cancelar" class="p-button-text" (click)="onCancel()"></button>
+					<button pButton label="Cancelar" class="p-button-text" data-info-anchor="profesor-curso-builder-cancelar" (click)="onCancel()"></button>
 					<button
 						pButton
 						label="Crear contenido"
 						icon="pi pi-check"
+						data-info-anchor="profesor-curso-builder-crear"
 						(click)="onCreate()"
 						[loading]="saving()"
 						[disabled]="!numeroSemanas"

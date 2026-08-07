@@ -84,12 +84,14 @@ import { StudentForHealthDto, SymptomDto } from '@features/intranet/pages/profes
 					pButton
 					label="Cancelar"
 					class="p-button-text"
+					data-info-anchor="profesor-health-exit-cancelar"
 					(click)="onVisibleChange(false)"
 				></button>
 				<button
 					pButton
 					label="Emitir Permiso"
 					icon="pi pi-check"
+					data-info-anchor="profesor-health-exit-guardar"
 					[disabled]="!canSave() || saving()"
 					[loading]="saving()"
 					(click)="onSave()"

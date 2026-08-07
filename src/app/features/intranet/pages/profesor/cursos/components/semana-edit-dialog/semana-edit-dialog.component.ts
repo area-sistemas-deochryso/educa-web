@@ -76,11 +76,12 @@ import { CursoContenidoSemanaDto, ActualizarSemanaRequest } from '@features/intr
 
 			<ng-template #footer>
 				<div class="flex justify-content-end gap-2">
-					<button pButton label="Cancelar" class="p-button-text" (click)="onCancel()"></button>
+					<button pButton label="Cancelar" class="p-button-text" data-info-anchor="profesor-semana-edit-cancelar" (click)="onCancel()"></button>
 					<button
 						pButton
 						label="Guardar"
 						icon="pi pi-check"
+						data-info-anchor="profesor-semana-edit-guardar"
 						(click)="onSave()"
 						[loading]="saving()"
 					></button>

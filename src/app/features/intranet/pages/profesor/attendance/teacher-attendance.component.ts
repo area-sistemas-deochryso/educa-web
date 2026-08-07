@@ -115,6 +115,7 @@ import { EstadoAsistenciaCurso } from '../models';
 				<div class="filters-row">
 					<label>Curso</label>
 					<app-picker-grid
+						data-info-anchor="curso-picker-grid"
 						[options]="cursoOptions()"
 						[selected]="selectedHorarioId()"
 						searchPlaceholder="Buscar curso..."
@@ -127,10 +128,10 @@ import { EstadoAsistenciaCurso } from '../models';
 				@if (selectedHorarioId()) {
 					<p-tabs value="0">
 						<p-tablist>
-							<p-tab value="0">
+							<p-tab value="0" data-info-anchor="profesor-asistencia-tab">
 								<i class="pi pi-check-square mr-2"></i>Registrar
 							</p-tab>
-							<p-tab value="1">
+							<p-tab value="1" data-info-anchor="profesor-asistencia-tab">
 								<i class="pi pi-chart-line mr-2"></i>Resumen
 							</p-tab>
 						</p-tablist>

@@ -52,6 +52,7 @@ import { HealthExitPermissionDto } from '@features/intranet/pages/profesor/model
 								pButton
 								icon="pi pi-times"
 								class="p-button-rounded p-button-text p-button-danger p-button-sm"
+								data-info-anchor="profesor-health-anular-permiso"
 								(click)="anular.emit(p.id)"
 								pTooltip="Anular permiso"
 								tooltipPosition="top"

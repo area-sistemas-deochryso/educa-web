@@ -93,7 +93,7 @@ import { CursoContenidoTareaDto, CrearTareaRequest, ActualizarTareaRequest } fro
 							Tarea grupal
 						</label>
 						<div class="grupal-toggle">
-							<p-toggleswitch [(ngModel)]="esGrupal" />
+							<p-toggleswitch data-info-anchor="profesor-tarea-dialog-grupal-toggle" [(ngModel)]="esGrupal" />
 							<span class="grupal-label">{{ esGrupal ? 'Grupal' : 'Individual' }}</span>
 						</div>
 						<span class="field-hint">
@@ -110,11 +110,12 @@ import { CursoContenidoTareaDto, CrearTareaRequest, ActualizarTareaRequest } fro
 
 			<ng-template #footer>
 				<div class="dialog-footer">
-					<button pButton label="Cancelar" class="p-button-text" (click)="onCancel()"></button>
+					<button pButton label="Cancelar" class="p-button-text" data-info-anchor="profesor-tarea-dialog-cancelar" (click)="onCancel()"></button>
 					<button
 						pButton
 						[label]="tarea() ? 'Guardar' : 'Crear'"
 						icon="pi pi-check"
+						data-info-anchor="profesor-tarea-dialog-guardar"
 						(click)="onSave()"
 						[loading]="saving()"
 						[disabled]="!titulo.trim()"
