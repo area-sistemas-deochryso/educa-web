@@ -12,6 +12,7 @@ import { TooltipModule } from 'primeng/tooltip';
 
 import { CapabilityCatalogItem, PermissionsService } from '@core/services/permissions';
 import { logger } from '@core/helpers';
+import { PageHeaderComponent } from '@intranet-shared/components';
 
 import { FaqAdminFormDialogComponent } from './components/faq-admin-form-dialog/faq-admin-form-dialog.component';
 import { FaqAdminTableComponent } from './components/faq-admin-table/faq-admin-table.component';
@@ -39,6 +40,7 @@ import { FaqAdminFacade } from './services/faq-admin.facade';
 		ToastModule,
 		TooltipModule,
 		ConfirmDialogModule,
+		PageHeaderComponent,
 		FaqAdminTableComponent,
 		FaqAdminFormDialogComponent,
 	],
