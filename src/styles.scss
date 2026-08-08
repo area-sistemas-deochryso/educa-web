@@ -951,6 +951,14 @@ app-intranet-layout {
 /*---------------------------------------
   PRIMENG TOAST - ACCESSIBILITY FIX
 -----------------------------------------*/
+.p-toast.p-toast-top-right {
+	// * Baja el toast por debajo del navbar sticky (60px + safe-area) para que
+	// * no tape el botón de usuario mientras el toast está visible. !important
+	// * porque PrimeNG fija `top` vía style inline (posicionamiento del
+	// * overlay), que gana a cualquier selector de clase sin él.
+	top: calc(env(safe-area-inset-top, 0px) + 76px) !important;
+}
+
 .p-toast {
 	// Estilos globales para los toasts
 	.p-toast-message-content {

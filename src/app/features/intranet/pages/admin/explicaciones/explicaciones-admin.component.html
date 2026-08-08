@@ -1,7 +1,6 @@
 <p-toast />
 
-<div class="explicaciones-admin-header">
-	<h2>Gestión del modo informativo</h2>
+<app-page-header icon="pi pi-info-circle" title="Gestión del modo informativo" subtitle="Administra las explicaciones que aparecen en el modo informativo">
 	<div class="explicaciones-admin-toolbar">
 		<div class="search-box">
 			<i class="pi pi-search"></i>
@@ -32,7 +31,7 @@
 			[pt]="{ root: { 'aria-label': 'Crear nueva explicación' } }"
 		></button>
 	</div>
-</div>
+</app-page-header>
 
 @if (facade.error()) {
 	<p class="explicaciones-admin-error">No se pudo cargar el listado de explicaciones. Intenta refrescar.</p>

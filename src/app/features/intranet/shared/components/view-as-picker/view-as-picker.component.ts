@@ -58,6 +58,15 @@ export class ViewAsPickerComponent implements OnInit {
 
 	readonly suggestions = signal<UsuarioBusqueda[]>([]);
 	readonly searching = signal(false);
+	/**
+	 * El overlay de resultados (appendTo="body") se abre hacia ARRIBA cuando
+	 * no hay espacio debajo del input (brief 531 hallazgo 3) y tapa el panel
+	 * de filtros que está justo encima en el layout. Se colapsa el panel
+	 * mientras el overlay está abierto en vez de pelear con el z-index —
+	 * PrimeNG recalcula la posición recién al mostrarse, así que ocultar el
+	 * panel antes le deja más espacio debajo del input en el próximo open.
+	 */
+	readonly resultsOpen = signal(false);
 	/** Local-only — reflects the current selection back into the input; never read by a parent. */
 	readonly selectedUsuario = signal<UsuarioBusqueda | null>(null);
 

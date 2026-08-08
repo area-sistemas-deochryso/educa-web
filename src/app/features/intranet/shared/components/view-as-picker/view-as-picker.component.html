@@ -1,32 +1,36 @@
 <!-- #region Template -->
 <div class="view-as-picker">
-	<div class="view-as-picker__filters">
-		<app-picker-grid
-			[options]="salonOptions()"
-			[selected]="selectedSalonId()"
-			[clearable]="true"
-			[maxHeight]="'12rem'"
-			searchPlaceholder="Buscar salón..."
-			emptyMessage="Sin salones"
-			ariaLabel="Filtrar por salón y año"
-			(selectionChange)="selectedSalonId.set($event); onFiltroChange()"
-		/>
-		<app-picker-grid
-			[options]="cursoOptions()"
-			[selected]="selectedCursoId()"
-			[clearable]="true"
-			[maxHeight]="'12rem'"
-			searchPlaceholder="Buscar curso..."
-			emptyMessage="Sin cursos"
-			ariaLabel="Filtrar por curso"
-			(selectionChange)="selectedCursoId.set($event); onFiltroChange()"
-		/>
-	</div>
+	@if (!resultsOpen()) {
+		<div class="view-as-picker__filters">
+			<app-picker-grid
+				[options]="salonOptions()"
+				[selected]="selectedSalonId()"
+				[clearable]="true"
+				[maxHeight]="'12rem'"
+				searchPlaceholder="Buscar salón..."
+				emptyMessage="Sin salones"
+				ariaLabel="Filtrar por salón y año"
+				(selectionChange)="selectedSalonId.set($event); onFiltroChange()"
+			/>
+			<app-picker-grid
+				[options]="cursoOptions()"
+				[selected]="selectedCursoId()"
+				[clearable]="true"
+				[maxHeight]="'12rem'"
+				searchPlaceholder="Buscar curso..."
+				emptyMessage="Sin cursos"
+				ariaLabel="Filtrar por curso"
+				(selectionChange)="selectedCursoId.set($event); onFiltroChange()"
+			/>
+		</div>
+	}
 	<p-autoComplete
 		[suggestions]="suggestions()"
 		[ngModel]="selectedUsuario()"
 		(completeMethod)="onSearch($event)"
 		(onSelect)="onSelect($event.value)"
+		(onShow)="resultsOpen.set(true)"
+		(onHide)="resultsOpen.set(false)"
 		optionLabel="nombreCompleto"
 		[placeholder]="placeholder()"
 		[attr.aria-label]="placeholder()"

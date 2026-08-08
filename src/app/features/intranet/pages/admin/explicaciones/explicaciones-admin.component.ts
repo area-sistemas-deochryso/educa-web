@@ -13,6 +13,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { CapabilityCatalogItem, PermissionsService } from '@core/services/permissions';
 import { RolService } from '@core/services/roles';
 import { logger } from '@core/helpers';
+import { PageHeaderComponent } from '@intranet-shared/components';
 
 import { ExplicacionAdminFormDialogComponent } from './components/explicacion-admin-form-dialog/explicacion-admin-form-dialog.component';
 import { ExplicacionAdminTableComponent } from './components/explicacion-admin-table/explicacion-admin-table.component';
@@ -41,6 +42,7 @@ import { ExplicacionAdminFacade } from './services/explicacion-admin.facade';
 		ToastModule,
 		TooltipModule,
 		ConfirmDialogModule,
+		PageHeaderComponent,
 		ExplicacionAdminTableComponent,
 		ExplicacionAdminFormDialogComponent,
 	],
