@@ -6,11 +6,13 @@
 	padding: 1.5rem;
 
 	&__picker-section {
-		max-width: 480px;
+		align-self: center;
+		width: 100%;
+		max-width: 960px;
 		background: var(--surface-card);
 		border: 1px solid var(--surface-border);
 		border-radius: 8px;
-		padding: 1.25rem;
+		padding: 1.5rem;
 	}
 }
 // #endregion

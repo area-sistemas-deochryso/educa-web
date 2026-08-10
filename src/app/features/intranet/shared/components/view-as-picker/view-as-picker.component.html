@@ -1,59 +1,69 @@
 <!-- #region Template -->
 <div class="view-as-picker">
+	<div class="view-as-picker__main">
+		<span class="view-as-picker__main-label">{{ placeholder() }}</span>
+		<div class="view-as-picker__main-input">
+			<i class="pi pi-search" aria-hidden="true"></i>
+			<p-autoComplete
+				[suggestions]="suggestions()"
+				[ngModel]="selectedUsuario()"
+				(completeMethod)="onSearch($event)"
+				(onSelect)="onSelect($event.value)"
+				(onShow)="resultsOpen.set(true)"
+				(onHide)="resultsOpen.set(false)"
+				optionLabel="nombreCompleto"
+				[placeholder]="placeholder()"
+				[attr.aria-label]="placeholder()"
+				[minLength]="2"
+				[dropdown]="true"
+				appendTo="body"
+				[style]="{ width: '100%' }"
+				[inputStyle]="{ width: '100%' }"
+			>
+				<ng-template let-usuario pTemplate="item">
+					<div class="view-as-picker__suggestion">
+						<i class="pi pi-user" aria-hidden="true"></i>
+						<div class="view-as-picker__suggestion-info">
+							<span class="view-as-picker__suggestion-name">{{ usuario.nombreCompleto }}</span>
+							<span class="view-as-picker__suggestion-detail">{{ usuario.rol }} &middot; {{ usuario.dni }}</span>
+						</div>
+					</div>
+				</ng-template>
+				<ng-template pTemplate="empty">
+					<div class="view-as-picker__empty">
+						{{ searching() ? 'Buscando...' : 'Sin resultados' }}
+					</div>
+				</ng-template>
+			</p-autoComplete>
+		</div>
+	</div>
+
 	@if (!resultsOpen()) {
-		<div class="view-as-picker__filters">
-			<app-picker-grid
-				[options]="salonOptions()"
-				[selected]="selectedSalonId()"
-				[clearable]="true"
-				[maxHeight]="'12rem'"
-				searchPlaceholder="Buscar salón..."
-				emptyMessage="Sin salones"
-				ariaLabel="Filtrar por salón y año"
-				(selectionChange)="selectedSalonId.set($event); onFiltroChange()"
-			/>
-			<app-picker-grid
-				[options]="cursoOptions()"
-				[selected]="selectedCursoId()"
-				[clearable]="true"
-				[maxHeight]="'12rem'"
-				searchPlaceholder="Buscar curso..."
-				emptyMessage="Sin cursos"
-				ariaLabel="Filtrar por curso"
-				(selectionChange)="selectedCursoId.set($event); onFiltroChange()"
-			/>
+		<div class="view-as-picker__filters-section">
+			<span class="view-as-picker__filters-label"><i class="pi pi-filter" aria-hidden="true"></i> Acotar por salón o curso (opcional)</span>
+			<div class="view-as-picker__filters">
+				<app-picker-grid
+					[options]="salonOptions()"
+					[selected]="selectedSalonId()"
+					[clearable]="true"
+					[maxHeight]="'12rem'"
+					searchPlaceholder="Buscar salón..."
+					emptyMessage="Sin salones"
+					ariaLabel="Filtrar por salón y año"
+					(selectionChange)="selectedSalonId.set($event); onFiltroChange()"
+				/>
+				<app-picker-grid
+					[options]="cursoOptions()"
+					[selected]="selectedCursoId()"
+					[clearable]="true"
+					[maxHeight]="'12rem'"
+					searchPlaceholder="Buscar curso..."
+					emptyMessage="Sin cursos"
+					ariaLabel="Filtrar por curso"
+					(selectionChange)="selectedCursoId.set($event); onFiltroChange()"
+				/>
+			</div>
 		</div>
 	}
-	<p-autoComplete
-		[suggestions]="suggestions()"
-		[ngModel]="selectedUsuario()"
-		(completeMethod)="onSearch($event)"
-		(onSelect)="onSelect($event.value)"
-		(onShow)="resultsOpen.set(true)"
-		(onHide)="resultsOpen.set(false)"
-		optionLabel="nombreCompleto"
-		[placeholder]="placeholder()"
-		[attr.aria-label]="placeholder()"
-		[minLength]="2"
-		[dropdown]="true"
-		appendTo="body"
-		[style]="{ width: '100%' }"
-		[inputStyle]="{ width: '100%' }"
-	>
-		<ng-template let-usuario pTemplate="item">
-			<div class="view-as-picker__suggestion">
-				<i class="pi pi-user" aria-hidden="true"></i>
-				<div class="view-as-picker__suggestion-info">
-					<span class="view-as-picker__suggestion-name">{{ usuario.nombreCompleto }}</span>
-					<span class="view-as-picker__suggestion-detail">{{ usuario.rol }} &middot; {{ usuario.dni }}</span>
-				</div>
-			</div>
-		</ng-template>
-		<ng-template pTemplate="empty">
-			<div class="view-as-picker__empty">
-				{{ searching() ? 'Buscando...' : 'Sin resultados' }}
-			</div>
-		</ng-template>
-	</p-autoComplete>
 </div>
 <!-- #endregion -->
