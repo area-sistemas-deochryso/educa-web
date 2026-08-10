@@ -108,6 +108,18 @@ export class SalonMensajeriaTabComponent {
 			}
 		});
 
+		// Precarga el selector de destinatario con el profesor del curso activo
+		// en vez de dejarlo vacío (brief 539, P98 F1).
+		effect(() => {
+			const horarioId = this.selectedHorarioId();
+			if (horarioId === null || this.selectedEstudianteDni()) return;
+
+			const profesores = this.vm().profesoresDisponibles;
+			if (profesores.length > 0) {
+				this.selectedEstudianteDni.set(profesores[0].dni);
+			}
+		});
+
 		// Caso 8 de la auditoría de diseño (2026-08-03): en vez de un estado
 		// vacío ("Selecciona una conversación"), abrir directamente la más
 		// reciente cuando existe. Guardado por horarioId para no reabrirla

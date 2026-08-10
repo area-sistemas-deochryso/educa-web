@@ -11,6 +11,8 @@ interface SalonMensajeriaState {
 	sending: boolean;
 	vistaDetalle: boolean;
 	destinatarios: DestinatarioDto[];
+	/** Subset de `destinatarios` que son profesores (sin aplanar) — usado para preseleccionar el selector de destinatario. */
+	profesoresDisponibles: DestinatarioDto[];
 	currentHorarioId: number | null;
 }
 
@@ -24,6 +26,7 @@ const initialState: SalonMensajeriaState = {
 	sending: false,
 	vistaDetalle: false,
 	destinatarios: [],
+	profesoresDisponibles: [],
 	currentHorarioId: null,
 };
 
@@ -43,6 +46,7 @@ export class SalonMensajeriaStore {
 	readonly sending = computed(() => this._state().sending);
 	readonly vistaDetalle = computed(() => this._state().vistaDetalle);
 	readonly destinatarios = computed(() => this._state().destinatarios);
+	readonly profesoresDisponibles = computed(() => this._state().profesoresDisponibles);
 	readonly currentHorarioId = computed(() => this._state().currentHorarioId);
 	// #endregion
 
@@ -70,6 +74,7 @@ export class SalonMensajeriaStore {
 		sending: this.sending(),
 		vistaDetalle: this.vistaDetalle(),
 		destinatarios: this.destinatarios(),
+		profesoresDisponibles: this.profesoresDisponibles(),
 	}));
 	// #endregion
 
@@ -108,6 +113,10 @@ export class SalonMensajeriaStore {
 
 	setDestinatarios(destinatarios: DestinatarioDto[]): void {
 		this._state.update((s) => ({ ...s, destinatarios }));
+	}
+
+	setProfesoresDisponibles(profesoresDisponibles: DestinatarioDto[]): void {
+		this._state.update((s) => ({ ...s, profesoresDisponibles }));
 	}
 
 	setCurrentHorarioId(id: number | null): void {

@@ -191,6 +191,7 @@ export class SalonMensajeriaFacade {
 				next: (data) => {
 					const all = [...data.profesores, ...data.estudiantes, ...data.companeros];
 					this.store.setDestinatarios(all);
+					this.store.setProfesoresDisponibles(data.profesores);
 				},
 				error: (err) => {
 					logger.error('SalonMensajeriaFacade: Error al cargar destinatarios', err);
