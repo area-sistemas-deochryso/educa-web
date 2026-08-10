@@ -11,6 +11,7 @@
 			<span class="hero-evaluado-note">
 				<i class="pi pi-info-circle mr-1"></i>
 				{{ porcentajeEvaluado() }}% del curso evaluado
+				(faltan {{ evaluacionesProgreso().faltantes }} de {{ evaluacionesProgreso().total }} evaluaciones)
 			</span>
 		}
 	</div>
@@ -60,6 +61,7 @@
 										<span class="eval-titulo">{{ eval.titulo }}</span>
 										<div class="eval-meta">
 											<p-tag [value]="getTipoLabel(eval.tipo)" styleClass="tag-neutral" [rounded]="true" />
+											<span class="text-xs text-color-secondary">{{ eval.fechaEvaluacion | date:'dd/MM/yyyy' }}</span>
 											<span class="text-xs text-color-secondary">Peso: {{ (eval.peso * 100).toFixed(0) }}%</span>
 										</div>
 									</div>

@@ -56,6 +56,18 @@ export class NotasCursoCardComponent {
 		return Math.round(pesoEvaluado * 100);
 	});
 
+	/**
+	 * Conteo simple de evaluaciones (no ponderado) — distinto de `porcentajeEvaluado`,
+	 * que pondera por peso. Se muestran juntos porque no siempre coinciden: una
+	 * evaluación de peso alto pendiente cuenta distinto que una de peso bajo.
+	 */
+	readonly evaluacionesProgreso = computed(() => {
+		const evaluaciones = this.curso().evaluaciones;
+		const total = evaluaciones.length;
+		const completadas = evaluaciones.filter((e) => e.nota !== null).length;
+		return { completadas, total, faltantes: total - completadas };
+	});
+
 	readonly periodoGroups = computed<PeriodoGroup[]>(() => {
 		const curso = this.curso();
 
