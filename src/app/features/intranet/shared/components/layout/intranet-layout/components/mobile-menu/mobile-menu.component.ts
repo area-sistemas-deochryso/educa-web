@@ -16,6 +16,7 @@ import { FormsModule } from '@angular/forms';
 import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, startWith } from 'rxjs/operators';
+import { TagModule } from 'primeng/tag';
 import { ModuloId } from '@shared/constants';
 import { QuickAccessFavoritesService } from '@intranet-shared/services';
 import { UserProfileMenuComponent } from '../user-profile-menu';
@@ -29,6 +30,8 @@ export interface NavMenuItem {
 	exact?: boolean;
 	queryParams?: Record<string, string>;
 	children?: NavMenuItem[];
+	/** Conteo de actividad no vista (ej. mensajes de Foro no leídos). 0/undefined = sin badge. */
+	badge?: number;
 }
 
 export interface ModuloMenu {
@@ -48,6 +51,7 @@ interface MobileSearchResult {
 	groupLabel: string;
 	queryParams?: Record<string, string>;
 	keywords: string;
+	badge?: number;
 }
 
 interface MobileTreeGroup {
@@ -65,7 +69,7 @@ interface MobileTreeGroup {
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	encapsulation: ViewEncapsulation.None,
-	imports: [FormsModule, RouterLink, UserProfileMenuComponent],
+	imports: [FormsModule, RouterLink, TagModule, UserProfileMenuComponent],
 	templateUrl: './mobile-menu.component.html',
 	styleUrl: './mobile-menu.component.scss',
 })
@@ -242,7 +246,13 @@ export class MobileMenuComponent {
 
 	// #region Helpers privados
 	private toResult(
-		item: { route?: string; label: string; icon: string; queryParams?: Record<string, string> },
+		item: {
+			route?: string;
+			label: string;
+			icon: string;
+			queryParams?: Record<string, string>;
+			badge?: number;
+		},
 		modulo: ModuloMenu,
 		groupLabel: string,
 	): MobileSearchResult {
@@ -260,6 +270,7 @@ export class MobileMenuComponent {
 			groupLabel,
 			queryParams: item.queryParams,
 			keywords,
+			badge: item.badge,
 		};
 	}
 

@@ -24,7 +24,7 @@ import { ModuloMenu, buildModuloMenus, detectModuloFromUrl } from './intranet-me
 import { findMenuItemDefByUrl, resolveMenuItemLabel } from '@intranet-shared/config/intranet-menu.config';
 import { ModuloId, MODULOS } from '@shared/constants';
 import { FeatureFlagsFacade } from '@core/services/feature-flags';
-import { QuickAccessFavoritesService } from '@intranet-shared/services';
+import { QuickAccessFavoritesService, ForoUnreadService } from '@intranet-shared/services';
 import { AccessDeniedModalComponent } from '@intranet-shared/components/access-denied-modal';
 import { WalMigrationBannerComponent } from '@intranet-shared/components/wal-migration-banner';
 import { WalDegradedBannerComponent } from '@intranet-shared/components/wal-degraded-banner';
@@ -107,6 +107,7 @@ export class IntranetLayoutComponent implements OnInit, AfterViewInit, OnDestroy
 	private keyboardService = inject(KeyboardShortcutsService);
 	private feedbackFacade = inject(FeedbackReportFacade);
 	readonly favoritesService = inject(QuickAccessFavoritesService);
+	private readonly foroUnread = inject(ForoUnreadService);
 	private readonly moduleSelector = viewChild(ModuleSelectorComponent);
 	private readonly mobileMenu = viewChild(MobileMenuComponent);
 
@@ -248,12 +249,21 @@ export class IntranetLayoutComponent implements OnInit, AfterViewInit, OnDestroy
 	 */
 	private readonly effectiveRol = computed(() => this.viewAsContext.activeContext()?.rol ?? this.authService.currentUser?.rol);
 
+	/** Badge del ítem "Foro" con mensajes no leídos (brief 542, P98 F4) — solo Estudiante por ahora. */
+	private buildBadgesByRoute(): Record<string, number> {
+		if (this.effectiveRol() !== 'Estudiante') return {};
+		const total = this.foroUnread.total();
+		return total > 0 ? { '/intranet/estudiante/foro': total } : {};
+	}
+
 	constructor() {
 		effect(() => {
 			const loaded = this.userPermissionsService.loaded();
 			const caps = this.userPermissionsService.userCapabilities();
+			if (this.effectiveRol() === 'Estudiante') this.foroUnread.refresh();
+			const badgesByRoute = this.buildBadgesByRoute();
 			if (loaded) {
-				const modulos = buildModuloMenus(caps, this.effectiveRol());
+				const modulos = buildModuloMenus(caps, this.effectiveRol(), badgesByRoute);
 				this._modulos.set(modulos);
 				const id = detectModuloFromUrl(this.router.url, modulos);
 				this.applySelection(id, modulos, this.router.url);
@@ -306,6 +316,7 @@ export class IntranetLayoutComponent implements OnInit, AfterViewInit, OnDestroy
 			const modulos = buildModuloMenus(
 				this.userPermissionsService.userCapabilities(),
 				this.effectiveRol(),
+				this.buildBadgesByRoute(),
 			);
 			this._modulos.set(modulos);
 			const id = detectModuloFromUrl(this.router.url, modulos);

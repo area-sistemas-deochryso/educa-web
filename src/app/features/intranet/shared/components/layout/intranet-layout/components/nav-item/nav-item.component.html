@@ -31,6 +31,9 @@
 						>
 							<i [class]="child.icon"></i>
 							<span>{{ child.label }}</span>
+							@if (child.badge) {
+								<p-tag [value]="child.badge.toString()" severity="danger" [rounded]="true" />
+							}
 						</a>
 					}
 				}
