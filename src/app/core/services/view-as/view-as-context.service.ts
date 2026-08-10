@@ -5,6 +5,7 @@ import { filter } from 'rxjs';
 
 import { ErrorHandlerService } from '@core/services/error';
 import { StorageService } from '@core/services/storage';
+import { SwService } from '@core/services/sw';
 
 import { ViewAsContext, ViewAsRol } from './view-as-context.model';
 // #endregion
@@ -37,6 +38,7 @@ export class ViewAsContextService {
 	private readonly router = inject(Router);
 	private readonly storage = inject(StorageService);
 	private readonly errorHandler = inject(ErrorHandlerService);
+	private readonly swService = inject(SwService);
 
 	private readonly _activeContext = signal<ViewAsContext | null>(
 		this.storage.getViewAsContext<ViewAsContext>(),
@@ -50,11 +52,15 @@ export class ViewAsContextService {
 	}
 
 	setContext(context: ViewAsContext): void {
+		// SW cache key is URL-only (no identity component, brief 536) — clear it on every
+		// identity switch or the previous subject's cached "mis-*" responses leak into this one.
+		this.swService.clearCache();
 		this._activeContext.set(context);
 		this.storage.setViewAsContext(context);
 	}
 
 	clearContext(): void {
+		this.swService.clearCache();
 		this._activeContext.set(null);
 		this.storage.setViewAsContext(null);
 	}
@@ -69,6 +75,7 @@ export class ViewAsContextService {
 
 		const modulePrefix = `/intranet/${context.rol.toLowerCase()}`;
 		if (!url.startsWith(modulePrefix)) {
+			this.swService.clearCache();
 			this._activeContext.set(null);
 			this.storage.setViewAsContext(null);
 			this.errorHandler.showInfo(
