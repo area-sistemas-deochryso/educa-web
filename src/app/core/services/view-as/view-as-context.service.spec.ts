@@ -121,6 +121,22 @@ describe('ViewAsContextService', () => {
 		expect(errorHandlerMock.showInfo).not.toHaveBeenCalled();
 	});
 
+	it('keeps the context when navigating to a shared cross-role route (calendario, videoconferencias, asistencia — brief 537)', async () => {
+		service.setContext({ entityId: 7, rol: 'Estudiante', nombreCompleto: 'Ana López' });
+		await router.navigateByUrl('/intranet/estudiante/cursos');
+
+		await router.navigateByUrl('/intranet/calendario');
+		expect(service.activeContext()).not.toBeNull();
+
+		await router.navigateByUrl('/intranet/videoconferencias');
+		expect(service.activeContext()).not.toBeNull();
+
+		await router.navigateByUrl('/intranet/asistencia');
+		expect(service.activeContext()).not.toBeNull();
+
+		expect(errorHandlerMock.showInfo).not.toHaveBeenCalled();
+	});
+
 	it('restores a persisted context on construction (F5/direct link — brief 511, F2 symptom)', () => {
 		TestBed.resetTestingModule();
 		configure({ entityId: 9, rol: 'Estudiante', nombreCompleto: 'Ana López' });

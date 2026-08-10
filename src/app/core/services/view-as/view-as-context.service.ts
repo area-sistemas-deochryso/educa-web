@@ -35,6 +35,18 @@ import { ViewAsContext, ViewAsRol } from './view-as-context.model';
  */
 @Injectable({ providedIn: 'root' })
 export class ViewAsContextService {
+	/**
+	 * Cross-role routes kept reachable during "ver como" on purpose (brief
+	 * 510 — see `intranet-layout.component.ts` `effectiveRol`): the menu
+	 * shows them while impersonating even though they live outside
+	 * `/intranet/<rol>`. Without this list, `clearIfOutsideModule` treated
+	 * landing on them as leaving the module, wiping the context mid-flow —
+	 * losing the `view-as.interceptor` headers on `asistencia` (wrong
+	 * subject's data) and forcing a re-pick after any back-navigation
+	 * (brief 537).
+	 */
+	private static readonly SHARED_ROUTES = ['/intranet/calendario', '/intranet/videoconferencias', '/intranet/asistencia'];
+
 	private readonly router = inject(Router);
 	private readonly storage = inject(StorageService);
 	private readonly errorHandler = inject(ErrorHandlerService);
@@ -74,7 +86,8 @@ export class ViewAsContextService {
 		if (!context) return;
 
 		const modulePrefix = `/intranet/${context.rol.toLowerCase()}`;
-		if (!url.startsWith(modulePrefix)) {
+		const isSharedRoute = ViewAsContextService.SHARED_ROUTES.some((route) => url.startsWith(route));
+		if (!url.startsWith(modulePrefix) && !isSharedRoute) {
 			this.swService.clearCache();
 			this._activeContext.set(null);
 			this.storage.setViewAsContext(null);
