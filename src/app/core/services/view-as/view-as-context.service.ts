@@ -81,13 +81,23 @@ export class ViewAsContextService {
 		return this._activeContext()?.rol === rol;
 	}
 
+	/**
+	 * Single source of truth for "is this URL within the impersonated rol's
+	 * scope" — consumed by `clearIfOutsideModule` below and by
+	 * `ViewAsBannerComponent.isVisible` (brief 548), so `SHARED_ROUTES`
+	 * additions never need a second, drifting copy of this rule.
+	 */
+	isUrlWithinScope(url: string, rol: ViewAsRol): boolean {
+		const modulePrefix = `/intranet/${rol.toLowerCase()}`;
+		const isSharedRoute = ViewAsContextService.SHARED_ROUTES.some((route) => url.startsWith(route));
+		return url.startsWith(modulePrefix) || isSharedRoute;
+	}
+
 	private clearIfOutsideModule(url: string): void {
 		const context = this._activeContext();
 		if (!context) return;
 
-		const modulePrefix = `/intranet/${context.rol.toLowerCase()}`;
-		const isSharedRoute = ViewAsContextService.SHARED_ROUTES.some((route) => url.startsWith(route));
-		if (!url.startsWith(modulePrefix) && !isSharedRoute) {
+		if (!this.isUrlWithinScope(url, context.rol)) {
 			this.swService.clearCache();
 			this._activeContext.set(null);
 			this.storage.setViewAsContext(null);

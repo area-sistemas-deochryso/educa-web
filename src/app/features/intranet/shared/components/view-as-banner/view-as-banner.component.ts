@@ -51,7 +51,7 @@ export class ViewAsBannerComponent {
 	readonly isVisible = computed(() => {
 		const context = this.activeContext();
 		if (!context) return false;
-		return this._currentUrl().startsWith(`/intranet/${context.rol.toLowerCase()}`);
+		return this.viewAsContext.isUrlWithinScope(this._currentUrl(), context.rol);
 	});
 
 	readonly pickerOpen = signal(false);
