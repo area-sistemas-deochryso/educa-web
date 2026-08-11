@@ -23,6 +23,16 @@
 	min-width: 0;
 }
 
+.literal-nota {
+	width: 70px;
+	flex-shrink: 0;
+}
+
+.literal-nota-separator {
+	color: var(--text-color-secondary);
+	flex-shrink: 0;
+}
+
 .literal-orden {
 	font-size: 0.8rem;
 	color: var(--text-color-secondary);
