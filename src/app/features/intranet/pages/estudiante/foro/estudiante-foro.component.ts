@@ -38,7 +38,7 @@ import { toSelectOptionsFrom } from '@shared/models';
 					<p>No tienes cursos asignados</p>
 				</div>
 			} @else {
-				<app-salon-foro-tab [cursoOptions]="cursoOptions()" [readOnly]="true" />
+				<app-salon-foro-tab [cursoOptions]="cursoOptions()" [salonDescripcion]="singleSalonDescripcion()" [readOnly]="true" />
 			}
 		</div>
 	`,
@@ -55,7 +55,7 @@ export class EstudianteForoComponent implements OnInit, OnDestroy {
 	private readonly _loading = signal(false);
 	readonly loading = this._loading.asReadonly();
 
-	readonly cursoOptions = computed(() => {
+	private readonly uniqueHorarios = computed(() => {
 		const horarios = this._horarios();
 		const seen = new Map<number, boolean>();
 		const unique: HorarioProfesorDto[] = [];
@@ -67,9 +67,18 @@ export class EstudianteForoComponent implements OnInit, OnDestroy {
 			}
 		}
 
-		return toSelectOptionsFrom(unique, 'cursoNombre', 'id').sort((a, b) =>
+		return unique;
+	});
+
+	readonly cursoOptions = computed(() =>
+		toSelectOptionsFrom(this.uniqueHorarios(), 'cursoNombre', 'id').sort((a, b) =>
 			a.label.localeCompare(b.label),
-		);
+		),
+	);
+
+	readonly singleSalonDescripcion = computed(() => {
+		const unique = this.uniqueHorarios();
+		return unique.length === 1 ? unique[0].salonDescripcion : '';
 	});
 	// #endregion
 

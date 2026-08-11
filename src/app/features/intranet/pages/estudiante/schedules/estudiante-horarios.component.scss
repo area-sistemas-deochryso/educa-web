@@ -207,6 +207,24 @@
 		-webkit-box-orient: vertical;
 	}
 
+	.block-salon {
+		display: flex;
+		align-items: center;
+		gap: 0.3rem;
+		font-size: 0.7rem;
+		font-weight: 500;
+		opacity: 0.9;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+
+		i {
+			font-size: 0.65rem;
+			opacity: 0.85;
+			flex-shrink: 0;
+		}
+	}
+
 	.block-footer {
 		display: flex;
 		align-items: center;
