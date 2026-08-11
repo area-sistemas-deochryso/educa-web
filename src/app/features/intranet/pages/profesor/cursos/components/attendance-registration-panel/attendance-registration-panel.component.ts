@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, input, output, computed, effect } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, output, computed, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
@@ -6,6 +6,8 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { TagModule } from 'primeng/tag';
 import { InputTextModule } from 'primeng/inputtext';
 import { TooltipModule } from 'primeng/tooltip';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService } from 'primeng/api';
 import {
 	AsistenciaCursoEstudianteDto,
 	EstadoAsistenciaCurso,
@@ -26,12 +28,16 @@ import { findNearestValidDate } from './attendance-registration-panel.helpers';
 		TagModule,
 		InputTextModule,
 		TooltipModule,
+		ConfirmDialogModule,
 	],
+	providers: [ConfirmationService],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './attendance-registration-panel.component.html',
 	styleUrl: './attendance-registration-panel.component.scss',
 })
 export class AttendanceRegistrationPanelComponent {
+	private readonly confirmationService = inject(ConfirmationService);
+
 	// #region Inputs
 	readonly estudiantes = input<AsistenciaCursoEstudianteDto[]>([]);
 	readonly loading = input(false);
@@ -59,6 +65,8 @@ export class AttendanceRegistrationPanelComponent {
 	// #region Estado local
 	selectedDate: Date = new Date();
 	private lastAppliedInitialFecha: string | null = null;
+	/** true solo mientras `selectedDate` sea la fecha atípica que el profesor confirmó explícitamente. */
+	readonly confirmadoFechaAtipica = signal(false);
 	// #endregion
 
 	constructor() {
@@ -75,6 +83,7 @@ export class AttendanceRegistrationPanelComponent {
 
 	// #region Computed
 	readonly hasEstudiantes = computed(() => this.estudiantes().length > 0);
+	readonly puedeGuardar = computed(() => !this.fechaFueraDeHorario() || this.confirmadoFechaAtipica());
 	// #endregion
 
 	// #region Constants
@@ -86,6 +95,7 @@ export class AttendanceRegistrationPanelComponent {
 
 	// #region Handlers
 	onDateSelect(): void {
+		this.confirmadoFechaAtipica.set(false);
 		const fecha = this.formatDate(this.selectedDate);
 		this.fechaChange.emit(fecha);
 	}
@@ -99,6 +109,7 @@ export class AttendanceRegistrationPanelComponent {
 	}
 
 	onSave(): void {
+		if (!this.puedeGuardar()) return;
 		this.save.emit();
 	}
 
@@ -115,6 +126,18 @@ export class AttendanceRegistrationPanelComponent {
 		if (dia === null) return;
 		this.selectedDate = findNearestValidDate(this.selectedDate, dia);
 		this.onDateSelect();
+	}
+
+	/** Pide confirmación explícita para guardar en una fecha fuera del día de horario (ej. clase de recuperación). */
+	confirmarFechaAtipica(): void {
+		this.confirmationService.confirm({
+			message:
+				'La fecha elegida no corresponde al día de horario del curso. ¿Confirmás que es una clase de recuperación u otra excepción válida?',
+			header: 'Confirmar fecha atípica',
+			acceptLabel: 'Sí, guardar igual',
+			rejectLabel: 'Cancelar',
+			accept: () => this.confirmadoFechaAtipica.set(true),
+		});
 	}
 	// #endregion
 
