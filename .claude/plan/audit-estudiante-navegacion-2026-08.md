@@ -39,7 +39,7 @@ Un tercer hallazgo (`estudiante-audit-justificacion-inasistencia`) se reencuadra
 | [`estudiante-audit-promedio-rojo-confuso.md`](../tasks/estudiante-audit-promedio-rojo-confuso.md) | Evaluaciones | 🔴 | UX / impacto en menores |
 | [`estudiante-audit-evaluaciones-pendientes-texto.md`](../tasks/estudiante-audit-evaluaciones-pendientes-texto.md) | Evaluaciones | 🟡 | UX / lenguaje |
 | [`estudiante-audit-foro-solo-lectura.md`](../tasks/estudiante-audit-foro-solo-lectura.md) | Foro | 🟡 | UX / expectativa vs función |
-| [`estudiante-audit-asistencia-duplicada.md`](../tasks/estudiante-audit-asistencia-duplicada.md) | Asistencia | 🟢 | Consistencia |
+| [`estudiante-audit-asistencia-duplicada.md`](../tasks/estudiante-audit-asistencia-duplicada.md) ✅ | Asistencia | 🟢 | Consistencia — no-op, brief 552 |
 | [`estudiante-audit-videoconf-estado-vivo.md`](../tasks/estudiante-audit-videoconf-estado-vivo.md) | Videoconferencias | 🔴 | UX / seguridad de menores |
 | [`estudiante-audit-justificacion-inasistencia.md`](../tasks/estudiante-audit-justificacion-inasistencia.md) | Asistencia | 🟡 | UX / responsable incorrecto |
 
@@ -59,7 +59,9 @@ Hecho. Resultado: 10 tasks arriba, creadas en `.claude/tasks/`.
 
 ### F3 — Execute · Uno o varios briefs según priorización de F2
 
-`estudiante-audit-icono-archivo-incorrecto` ✅ cerrado directo sin pasar por F2 (bug puro, sin ambigüedad de producto) — brief [`550`](../chats/closed/550-fe-icono-archivo-tipo-color.md), commit `bdc3fee1`. Resto de tasks: no arrancado.
+`estudiante-audit-icono-archivo-incorrecto` ✅ cerrado directo sin pasar por F2 (bug puro, sin ambigüedad de producto) — brief [`550`](../chats/closed/550-fe-icono-archivo-tipo-color.md), commit `bdc3fee1`.
+
+`estudiante-audit-asistencia-duplicada` ✅ cerrado directo como no-op (investigación de código + verificación en vivo confirmaron que el selector ya existía y el diseño "por curso" era correcto) — brief [`552`](../chats/closed/552-fe-asistencia-duplicada-noop.md), sin commit de código. Resto de tasks: no arrancado.
 
 ## Referencias
 
