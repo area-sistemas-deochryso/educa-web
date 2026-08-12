@@ -1,12 +1,12 @@
 <!-- created: 2026-08-11 -->
 
-# estudiante-audit-foro-solo-lectura
+# estudiante-audit-foro-solo-lectura ✅ Resuelto
 
 > **Origen**: F1 audit funcional del plan [`audit-estudiante-navegacion-2026-08.md`](../plan/audit-estudiante-navegacion-2026-08.md).
 > **Severidad**: 🟡 (expectativa de la nomenclatura vs. función real).
 > **Tipo**: decisión de producto tomada (2026-08-12) — listo para `/execute` directo (cambio de copy, no requiere `/design`).
-> **Implementado**: commit `4003fd5b` (2026-08-12) — menú estudiante, quick-access de Inicio y título/breadcrumb de la página renombrados a "Anuncios". Lint/build/test FE en verde (2505 pass / 0 fail).
-> **Validación prod**: ⏳ pendiente desde 2026-08-12.
+> **Implementado**: commits `4003fd5b` + `39a19c49` (2026-08-12) — menú estudiante, quick-access de Inicio, título/breadcrumb de la página, y título de la pestaña del navegador renombrados a "Anuncios". Lint/build/test FE en verde (2505 pass / 0 fail).
+> **Validado en prod**: 2026-08-12, FE+BE locales contra DB de prod, sesión real de estudiante (ALCALA SANDOVAL DANIELA) vía session switcher en `/intranet/login`. Confirmado en vivo: dropdown "Mensajes" muestra "Anuncios", breadcrumb "Estudiante > Mensajes > Anuncios", header de página "Anuncios", tab del navegador "Intranet - Anuncios". Sin mutaciones de datos (verificación read-only).
 
 ## Reproducción
 
