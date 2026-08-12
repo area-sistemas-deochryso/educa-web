@@ -102,6 +102,12 @@ export class AttendanceProfesorEstudiantesComponent implements OnInit {
 		const periodo = periodoEnMes(month);
 		return filtrarPorPeriodoAcademico(all, periodo, (s) => s.seccion);
 	});
+	/**
+	 * true si el profesor tiene salones asignados (tutoría u horario) aunque
+	 * `salones()` los filtre a cero por estar fuera de alcance biométrico.
+	 * Distingue "sin salones" de "salones fuera de alcance" en el template.
+	 */
+	readonly hasAnySalonAsignado = computed(() => this.allSalones().length > 0);
 	readonly selectedSalonId = signal<number | null>(null);
 	readonly selectedSalon = computed(() => {
 		const id = this.selectedSalonId();

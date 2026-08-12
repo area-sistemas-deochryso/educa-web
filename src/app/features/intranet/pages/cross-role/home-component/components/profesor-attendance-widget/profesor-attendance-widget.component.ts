@@ -52,10 +52,14 @@ export class ProfesorAttendanceWidgetComponent implements OnInit {
 	readonly miAsistencia = signal<AsistenciaDetalle | null>(null);
 	readonly stats = signal<EstadisticasAsistenciaDia | null>(null);
 	readonly salon = signal<SalonProfesor | null>(null);
+	readonly tutorSalonesCount = signal(0);
 	// #endregion
 
 	// #region Computed — Salón
 	readonly hasSalonData = computed(() => this.salon() !== null);
+
+	/** true cuando el profesor tutora más de 1 salón — Home solo muestra el principal. */
+	readonly hasMultipleSalonesTutor = computed(() => this.tutorSalonesCount() > 1);
 
 	readonly salonLabel = computed(() => {
 		const s = this.salon();
@@ -154,8 +158,10 @@ export class ProfesorAttendanceWidgetComponent implements OnInit {
 			}))
 			.subscribe((salones) => {
 				// Preferir salón donde es tutor (INV-AS04). Sin tutor: no hay sección "Mi salón".
-				const tutor = salones.find((s) => s.esTutor) ?? null;
+				const tutorSalones = salones.filter((s) => s.esTutor);
+				const tutor = tutorSalones[0] ?? null;
 				this.salon.set(tutor);
+				this.tutorSalonesCount.set(tutorSalones.length);
 
 				const salon$: Observable<AsistenciaDiaConEstadisticas | null> = tutor
 					? this.attendance.getAsistenciaDia(tutor.grado, tutor.seccion, hoy).pipe(

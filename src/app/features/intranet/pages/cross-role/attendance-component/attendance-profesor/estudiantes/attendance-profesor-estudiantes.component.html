@@ -166,6 +166,9 @@
 		/>
 	}
 	}
+} @else if (!view.loading() && hasAnySalonAsignado()) {
+	<!-- Plan 27 · INV-C11 — tiene salones, pero todos quedan fuera de alcance biométrico -->
+	<app-attendance-scope-student-notice />
 } @else if (!view.loading()) {
 	<!-- ! No assigned salons -->
 	<app-empty-state message="No tiene salones asignados." />
