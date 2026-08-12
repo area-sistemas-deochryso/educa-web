@@ -475,6 +475,12 @@
 		i { color: var(--red-500); }
 	}
 
+	&.ppt {
+		background: var(--red-50);
+		border-color: var(--red-200);
+		i { color: var(--red-500); }
+	}
+
 	&.word {
 		background: var(--blue-50);
 		border-color: var(--blue-200);
@@ -556,15 +562,6 @@
 	align-items: center;
 	gap: 0;
 	flex-shrink: 0;
-}
-
-// #endregion
-// #region Student files section
-.row-icon.student-file {
-	background: rgba(34, 197, 94, 0.06);
-	border-color: rgba(34, 197, 94, 0.2);
-
-	i { color: var(--green-600); }
 }
 
 // #endregion

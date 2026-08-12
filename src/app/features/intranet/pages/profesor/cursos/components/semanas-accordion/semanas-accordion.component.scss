@@ -375,6 +375,12 @@
 		i { color: var(--red-500); }
 	}
 
+	&.ppt {
+		background: var(--red-50);
+		border-color: var(--red-200);
+		i { color: var(--red-500); }
+	}
+
 	&.word {
 		background: var(--blue-50);
 		border-color: var(--blue-200);

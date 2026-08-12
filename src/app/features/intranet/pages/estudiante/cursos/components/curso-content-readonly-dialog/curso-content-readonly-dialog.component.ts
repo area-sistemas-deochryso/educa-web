@@ -253,9 +253,9 @@ export class CursoContentReadonlyDialogComponent {
 		if (tipoArchivo.includes('pdf')) return 'pi pi-file-pdf';
 		if (tipoArchivo.includes('image')) return 'pi pi-image';
 		if (tipoArchivo.includes('video')) return 'pi pi-video';
-		if (tipoArchivo.includes('word') || tipoArchivo.includes('document')) return 'pi pi-file-word';
 		if (tipoArchivo.includes('excel') || tipoArchivo.includes('sheet')) return 'pi pi-file-excel';
 		if (tipoArchivo.includes('presentation') || tipoArchivo.includes('powerpoint')) return 'pi pi-file';
+		if (tipoArchivo.includes('word') || tipoArchivo.includes('document')) return 'pi pi-file-word';
 		return 'pi pi-file';
 	}
 
@@ -264,8 +264,9 @@ export class CursoContentReadonlyDialogComponent {
 		if (tipoArchivo.includes('pdf')) return 'pdf';
 		if (tipoArchivo.includes('image')) return 'image';
 		if (tipoArchivo.includes('video')) return 'video';
-		if (tipoArchivo.includes('word') || tipoArchivo.includes('document')) return 'word';
 		if (tipoArchivo.includes('excel') || tipoArchivo.includes('sheet')) return 'excel';
+		if (tipoArchivo.includes('presentation') || tipoArchivo.includes('powerpoint')) return 'ppt';
+		if (tipoArchivo.includes('word') || tipoArchivo.includes('document')) return 'word';
 		return 'generic';
 	}
 
