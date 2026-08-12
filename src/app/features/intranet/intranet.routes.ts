@@ -94,7 +94,7 @@ const ESTUDIANTE_ROUTES_RAW: Route[] = [
 		path: 'estudiante/foro',
 		loadComponent: () =>
 			import('./pages/estudiante').then((m) => m.EstudianteForoComponent),
-		title: 'Intranet - Foro',
+		title: 'Intranet - Anuncios',
 	},
 	{
 		path: 'estudiante/horarios',
