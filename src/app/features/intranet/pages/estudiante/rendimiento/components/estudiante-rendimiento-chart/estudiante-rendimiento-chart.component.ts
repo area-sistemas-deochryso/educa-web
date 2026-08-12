@@ -27,6 +27,7 @@ const COLOR_NEUTRO = '#6366f1';
 })
 export class EstudianteRendimientoChartComponent implements AfterViewInit, OnDestroy {
 	readonly periodos = input.required<RendimientoPeriodoEstudianteDto[]>();
+	readonly sinPeriodosConfigurados = input.required<boolean>();
 
 	readonly chartCanvas = viewChild<ElementRef<HTMLCanvasElement>>('rendimientoChart');
 

@@ -16,6 +16,7 @@ export interface RendimientoPropioCursoDto {
 	cursoNombre: string;
 	anio: number;
 	periodos: RendimientoPeriodoEstudianteDto[];
+	sinPeriodosConfigurados: boolean;
 }
 
 export interface ReporteRendimientoPropioDto {
