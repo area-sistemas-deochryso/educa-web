@@ -123,4 +123,4 @@ Cerrado en chat 553 (`educa-web`, branch `chat/553-fe-salon-tutorado-home-mis-es
 
 **Bug encontrado y corregido durante la implementación**: el link nuevo de Home apuntaba inicialmente a `/intranet/profesor/asistencia` (pantalla de registro de asistencia por curso, `TeacherAttendanceComponent`) en vez de `/intranet/asistencia` (la vista con tabs "Mi asistencia"/"Mis estudiantes", `AttendanceComponent`) — corregido antes de cerrar.
 
-**Hallazgo fuera de alcance**: el link pre-existente "Ver detalle" del mismo widget de Home tiene el mismo problema de ruta (apunta a `/intranet/profesor/asistencia` en vez de `/intranet/asistencia`) — no se tocó por estar fuera del alcance de este brief.
+**Hallazgo fuera de alcance, corregido después (commit `8d26d71f`)**: el link pre-existente "Ver detalle" del mismo widget de Home tenía el mismo problema de ruta (apuntaba a `/intranet/profesor/asistencia` en vez de `/intranet/asistencia`) — quedó anotado como fuera de alcance al cerrar 553, se corrigió en un commit aparte inmediatamente después, mismo día.
