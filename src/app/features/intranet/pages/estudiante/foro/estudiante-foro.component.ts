@@ -25,7 +25,7 @@ import { toSelectOptionsFrom } from '@shared/models';
 		}
 	`,
 	template: `
-		<app-page-header icon="pi pi-comments" title="Foro" />
+		<app-page-header icon="pi pi-comments" title="Anuncios" />
 		<div class="page-container p-4 pt-0">
 
 			@if (loading()) {

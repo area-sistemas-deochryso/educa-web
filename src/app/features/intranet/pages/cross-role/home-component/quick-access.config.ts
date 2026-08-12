@@ -72,7 +72,7 @@ export const QUICK_ACCESS_BY_ROLE: Record<UserRole, QuickAccessItem[]> = {
 		{ route: '/intranet/estudiante/cursos', label: 'Mis Cursos', icon: 'pi-book', capability: 'ESTUDIANTE_CURSOS', description: 'Contenido y materiales de tus cursos', preview: 'course-cards' },
 		{ route: '/intranet/estudiante/notas', label: 'Mis Calificaciones', icon: 'pi-chart-bar', capability: 'ESTUDIANTE_NOTAS', description: 'Consultar tus calificaciones', preview: 'grades' },
 		{ route: '/intranet/estudiante/asistencia', label: 'Mi Asistencia', icon: 'pi-check-square', capability: 'ESTUDIANTE_ASISTENCIA', description: 'Revisar tu registro de asistencia', preview: 'attendance' },
-		{ route: '/intranet/estudiante/foro', label: 'Mi Foro', icon: 'pi-comments', capability: 'ESTUDIANTE_FORO', description: 'Participar en discusiones del aula', preview: 'forum' },
+		{ route: '/intranet/estudiante/foro', label: 'Mis Anuncios', icon: 'pi-comments', capability: 'ESTUDIANTE_FORO', description: 'Ver publicaciones del profesor', preview: 'forum' },
 		{ route: '/intranet/estudiante/mensajeria', label: 'Mi Mensajeria', icon: 'pi-envelope', capability: 'ESTUDIANTE_MENSAJERIA', description: 'Enviar y recibir mensajes', preview: 'messaging' },
 	],
 };
