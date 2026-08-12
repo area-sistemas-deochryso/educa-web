@@ -67,6 +67,24 @@
 		font-size: 0.7rem;
 	}
 }
+
+.salones-tutor-link {
+	font-size: 0.75rem;
+	color: var(--intranet-accent-color-blue, #253470);
+	text-decoration: none;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.25rem;
+	font-weight: 500;
+	margin-bottom: 0.75rem;
+
+	&:hover {
+		text-decoration: underline;
+	}
+	i {
+		font-size: 0.65rem;
+	}
+}
 // #endregion
 
 // #region Section header + divider
