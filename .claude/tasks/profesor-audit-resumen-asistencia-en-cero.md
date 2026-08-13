@@ -1,9 +1,17 @@
 <!-- created: 2026-08-11 -->
+<!-- closed: 2026-08-13 -->
 
 # profesor-audit-resumen-asistencia-en-cero
 
 > **Origen**: F1 audit funcional del plan [`audit-profesor-navegacion-2026-08.md`](../plan/audit-profesor-navegacion-2026-08.md).
 > **Severidad**: 🟡 (dato de gestión docente incorrecto — el profesor podría creer que no ha tomado asistencia cuando sí lo hizo).
+> **Estado**: ✅ Cerrado — ver DIAGNÓSTICO REAL abajo.
+
+## DIAGNÓSTICO REAL
+
+No era un bug de agregación ni de filtro de fechas. Confirmado por SQL (chat `499`, `Educa.API`): el curso del repro no tenía **ningún** registro real guardado en `AsistenciaCurso` para el rango consultado — 0 filas. El tab "Registrar" mostraba "Total: 20, Presentes: 20" porque `AsistenciaCursoService.ObtenerPorFechaAsync` rellena `Estado = "P"` por defecto para cada estudiante sin registro individual guardado, indistinguible en la UI de un guardado real. El tab "Resumen" agregaba correctamente sobre datos que nunca existieron — de ahí el 0%.
+
+**Fix**: `Educa.API` (chat `499`) expone `tieneRegistros: boolean` a nivel de clase en el DTO del endpoint de fecha. `educa-web` (chat `554`) consume el flag mostrando un tag "Sin guardar" en el tab "Registrar" cuando `tieneRegistros === false`, para que el profesor distinga un borrador sin guardar de un registro real — sin cambiar el comportamiento de guardado ni el agregado de "Resumen" (que ya era correcto).
 
 ## Reproducción
 
