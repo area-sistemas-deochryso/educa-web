@@ -15,8 +15,8 @@ import { ErrorHandlerService } from '@core/services';
 // #region Mocks
 const mockItem: VideoconferenciaItem = {
 	horarioId: 1, cursoId: 10, cursoNombre: 'Matemática', salonDescripcion: '1A',
-	diaSemanaDescripcion: 'Lunes', horaInicio: '08:00', horaFin: '09:30',
-	profesorNombreCompleto: 'Prof A', cantidadEstudiantes: 30,
+	diaSemana: 1, diaSemanaDescripcion: 'Lunes', horaInicio: '08:00', horaFin: '09:30',
+	profesorNombreCompleto: 'Prof A', cantidadEstudiantes: 30, habilitada: true,
 };
 
 function createMockUserProfile() {

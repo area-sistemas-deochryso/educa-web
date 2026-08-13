@@ -9,8 +9,8 @@ import { VideoconferenciasStore, VideoconferenciaItem } from './videoconferencia
 
 // #region Test fixtures
 const mockItems: VideoconferenciaItem[] = [
-	{ horarioId: 1, cursoId: 10, cursoNombre: 'Matemática', salonDescripcion: '1A', diaSemanaDescripcion: 'Lunes', horaInicio: '08:00', horaFin: '09:30', profesorNombreCompleto: 'Prof A', cantidadEstudiantes: 30 },
-	{ horarioId: 2, cursoId: 20, cursoNombre: 'Comunicación', salonDescripcion: '1A', diaSemanaDescripcion: 'Martes', horaInicio: '10:00', horaFin: '11:30', profesorNombreCompleto: null, cantidadEstudiantes: 28 },
+	{ horarioId: 1, cursoId: 10, cursoNombre: 'Matemática', salonDescripcion: '1A', diaSemana: 1, diaSemanaDescripcion: 'Lunes', horaInicio: '08:00', horaFin: '09:30', profesorNombreCompleto: 'Prof A', cantidadEstudiantes: 30, habilitada: true },
+	{ horarioId: 2, cursoId: 20, cursoNombre: 'Comunicación', salonDescripcion: '1A', diaSemana: 2, diaSemanaDescripcion: 'Martes', horaInicio: '10:00', horaFin: '11:30', profesorNombreCompleto: null, cantidadEstudiantes: 28, habilitada: false },
 ];
 // #endregion
 
@@ -62,6 +62,34 @@ describe('VideoconferenciasStore', () => {
 			store.leaveSala();
 			expect(store.activeSala()).toBeNull();
 			expect(store.inSala()).toBe(false);
+		});
+
+		it('should enter sala con excepción and carry the pre-fetched token', () => {
+			const token = { jwt: 'abc', appId: 'app1' };
+			store.enterSalaConExcepcion(mockItems[0], token);
+			expect(store.activeSala()).toEqual(mockItems[0]);
+			expect(store.exceptionToken()).toEqual(token);
+		});
+
+		it('should clear the exception token on leaveSala', () => {
+			store.enterSalaConExcepcion(mockItems[0], { jwt: 'abc', appId: 'app1' });
+			store.leaveSala();
+			expect(store.exceptionToken()).toBeNull();
+		});
+
+		it('should clear a stale exception token on plain enterSala', () => {
+			store.enterSalaConExcepcion(mockItems[0], { jwt: 'abc', appId: 'app1' });
+			store.enterSala(mockItems[1]);
+			expect(store.exceptionToken()).toBeNull();
+		});
+	});
+
+	describe('updateHabilitacion', () => {
+		it('should patch habilitada for the matching item only', () => {
+			store.setItems(mockItems);
+			store.updateHabilitacion(1, false);
+			expect(store.items()[0].habilitada).toBe(false);
+			expect(store.items()[1].habilitada).toBe(false);
 		});
 	});
 

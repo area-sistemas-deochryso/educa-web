@@ -265,6 +265,13 @@ export const UI_ERROR_CODES: Record<string, string> = {
 	BLOB_TAMANO_EXCEDIDO: 'El archivo excede el tamaño máximo permitido.',
 	BLOB_NO_SNAPSHOT: 'No hay un snapshot disponible para este archivo.',
 	VIDEOCONF_ROOM_NAME_REQUIRED: 'Debe indicar el nombre de la sala de videoconferencia.',
+	VIDEOCONF_ROOM_NAME_INVALID: 'El nombre de la sala no es válido.',
+	VIDEOCONF_HORARIO_NOT_FOUND: 'No se encontró el horario de esta sala.',
+	VIDEOCONF_ACCESS_DENIED: 'No tienes acceso a esta sala.',
+	VIDEOCONF_FUERA_DE_HORARIO: 'La sala no está disponible fuera del horario de clase.',
+	VIDEOCONF_SALA_NO_HABILITADA:
+		'El profesor aún no habilitó la sala. Espera a que la habilite para poder ingresar.',
+	VIDEOCONF_MOTIVO_REQUIRED: 'Debes indicar un motivo para habilitar la sala fuera de horario.',
 
 	// Notificaciones (email outbox, blacklist, cuarentena, pausa de dominio)
 	ESTADO_NO_FAILED: 'Solo se puede reintentar un correo en estado fallido.',

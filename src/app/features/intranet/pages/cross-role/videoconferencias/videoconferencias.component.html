@@ -4,6 +4,7 @@
 		[roomName]="activeRoomName()"
 		[cursoNombre]="vm().activeSala!.cursoNombre"
 		[profesorNombreCompleto]="vm().activeSala!.profesorNombreCompleto"
+		[preFetchedToken]="vm().exceptionToken"
 	/>
 	<!-- #endregion -->
 } @else {
@@ -81,13 +82,47 @@
 						</div>
 
 						<div class="curso-footer">
-							<button
-								pButton
-								label="Unirse a Sala"
-								icon="pi pi-video"
-								class="w-100"
-								(click)="onUnirse(item)"
-							></button>
+							<p-tag [value]="estadoLabel(item)" [severity]="estadoSeverity(item)" />
+
+							@if (isModerator()) {
+								<div class="moderator-toggle">
+									<label for="habilitada-{{ item.horarioId }}">Sala habilitada</label>
+									<p-toggleswitch
+										inputId="habilitada-{{ item.horarioId }}"
+										[ngModel]="item.habilitada"
+										[disabled]="isSavingHabilitacion(item)"
+										(ngModelChange)="onToggleHabilitacion(item, $event)"
+									/>
+								</div>
+							}
+
+							@if (estadoDe(item) === 'disponible') {
+								<button
+									pButton
+									label="Unirse a Sala"
+									icon="pi pi-video"
+									class="w-100"
+									(click)="onUnirse(item)"
+								></button>
+							} @else if (isModerator()) {
+								<button
+									pButton
+									label="Habilitar fuera de horario"
+									icon="pi pi-unlock"
+									class="w-100 p-button-outlined"
+									(click)="onSolicitarExcepcion(item)"
+								></button>
+							} @else {
+								<button
+									pButton
+									[label]="estadoLabel(item)"
+									icon="pi pi-video"
+									class="w-100"
+									[disabled]="true"
+									pTooltip="El estado se actualiza automáticamente — vuelve a intentar cuando esté disponible"
+									tooltipPosition="top"
+								></button>
+							}
 						</div>
 					</div>
 				}
@@ -96,4 +131,9 @@
 		}
 	</div>
 	<!-- #endregion -->
+
+	<app-videoconferencia-excepcion-dialog
+		[saving]="excepcionSaving()"
+		(confirmar)="onConfirmarExcepcion($event)"
+	/>
 }
