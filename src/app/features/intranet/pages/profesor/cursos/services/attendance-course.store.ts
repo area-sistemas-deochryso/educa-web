@@ -42,6 +42,9 @@ export class AttendanceCourseStore {
 	// #region Computed
 	readonly registroEstudiantes = computed(() => this.registroData()?.estudiantes ?? []);
 
+	/** undefined = backend sin el flag desplegado todavía (no mostrar indicador por error). */
+	readonly registroTieneRegistros = computed(() => this.registroData()?.tieneRegistros);
+
 	readonly registroStats = computed(() => {
 		const estudiantes = this.registroEstudiantes();
 		return {
@@ -60,6 +63,7 @@ export class AttendanceCourseStore {
 		registroLoading: this.registroLoading(),
 		registroSaving: this.registroSaving(),
 		registroStats: this.registroStats(),
+		registroTieneRegistros: this.registroTieneRegistros(),
 		resumen: this.resumen(),
 		resumenLoading: this.resumenLoading(),
 	}));
