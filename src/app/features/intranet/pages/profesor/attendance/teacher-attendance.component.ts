@@ -141,6 +141,7 @@ import { EstadoAsistenciaCurso } from '../models';
 									[loading]="asistenciaVm().registroLoading"
 									[saving]="asistenciaVm().registroSaving"
 									[stats]="asistenciaVm().registroStats"
+									[tieneRegistros]="asistenciaVm().registroTieneRegistros"
 									[diaSemanaEsperado]="selectedHorarioDiaSemana()"
 									[diaSemanaEsperadoDescripcion]="selectedHorarioDiaDescripcion()"
 									[initialFecha]="initialFecha()"

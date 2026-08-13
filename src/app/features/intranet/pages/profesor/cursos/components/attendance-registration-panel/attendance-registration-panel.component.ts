@@ -48,6 +48,8 @@ export class AttendanceRegistrationPanelComponent {
 		tardes: 0,
 		faltas: 0,
 	});
+	/** false = lista sin guardar (defaults). undefined = backend sin el flag desplegado todavía (no mostrar indicador). */
+	readonly tieneRegistros = input<boolean | undefined>(undefined);
 	/** día de semana (0=domingo, 1=lunes...5=viernes) esperado según el horario del curso — null si no aplica. */
 	readonly diaSemanaEsperado = input<number | null>(null);
 	readonly diaSemanaEsperadoDescripcion = input<string | null>(null);
@@ -84,6 +86,8 @@ export class AttendanceRegistrationPanelComponent {
 	// #region Computed
 	readonly hasEstudiantes = computed(() => this.estudiantes().length > 0);
 	readonly puedeGuardar = computed(() => !this.fechaFueraDeHorario() || this.confirmadoFechaAtipica());
+	/** true solo cuando el backend confirmó explícitamente que no hay registro guardado (evita falso positivo si el flag no llegó). */
+	readonly esListaSinGuardar = computed(() => this.tieneRegistros() === false);
 	// #endregion
 
 	// #region Constants

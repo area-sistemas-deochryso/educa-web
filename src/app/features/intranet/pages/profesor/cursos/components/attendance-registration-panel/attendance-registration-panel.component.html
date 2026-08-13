@@ -29,6 +29,9 @@
 			<p-tag [value]="'Presentes: ' + stats().presentes" severity="success" />
 			<p-tag [value]="'Tardes: ' + stats().tardes" severity="warn" />
 			<p-tag [value]="'Faltas: ' + stats().faltas" severity="danger" />
+			@if (esListaSinGuardar()) {
+				<p-tag value="Sin guardar" severity="warn" icon="pi pi-info-circle" />
+			}
 		</div>
 	}
 </div>

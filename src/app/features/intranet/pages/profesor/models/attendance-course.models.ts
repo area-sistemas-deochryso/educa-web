@@ -36,6 +36,8 @@ export interface AsistenciaCursoFechaDto {
 	cursoNombre: string;
 	salonDescripcion: string;
 	estudiantes: AsistenciaCursoEstudianteDto[];
+	/** false = lista sin guardar (defaults). undefined = backend sin el flag desplegado todavía. */
+	tieneRegistros?: boolean;
 }
 
 export interface AsistenciaCursoResumenEstudianteDto {
