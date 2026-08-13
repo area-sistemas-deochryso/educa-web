@@ -23,6 +23,11 @@ export {
 	isNotaAprobada,
 	convertToLiteral,
 	formatNotaConConfig,
+	UMBRAL_COBERTURA_PROMEDIO_GENERAL,
+	calcularPorcentajeEvaluado,
+	esPromedioProvisional,
+	clasificarPromedioConCobertura,
+	getPromedioSeverity,
 	type NotaClasificacion,
 } from '@shared/utils';
 // #endregion

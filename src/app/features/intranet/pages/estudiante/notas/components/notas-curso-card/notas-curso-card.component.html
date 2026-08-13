@@ -4,15 +4,20 @@
 		<span class="hero-label">Promedio General</span>
 		<span class="hero-number" [class]="'severity-' + promedioSeverity()">
 			{{ formatNota(promedioGeneral()) }}
+			@if (promedioProvisional()) {
+				<i
+					class="pi pi-clock hero-provisional-icon"
+					title="Promedio provisional — se actualizará conforme se califiquen más evaluaciones"
+				></i>
+			}
 		</span>
 		<span class="hero-curso">{{ curso().cursoNombre }}</span>
 		<span class="text-sm text-color-secondary">{{ curso().salonDescripcion }}</span>
 		@if (porcentajeEvaluado() < 100) {
-			<span class="hero-evaluado-note">
-				<i class="pi pi-info-circle mr-1"></i>
-				{{ porcentajeEvaluado() }}% del curso evaluado
-				(faltan {{ evaluacionesProgreso().faltantes }} de {{ evaluacionesProgreso().total }} evaluaciones)
-			</span>
+			<div class="hero-evaluado-note">
+				<span>Evaluaciones calificadas: {{ evaluacionesProgreso().completadas }}/{{ evaluacionesProgreso().total }}</span>
+				<span>Cobertura del curso: {{ porcentajeEvaluado() }}%</span>
+			</div>
 		}
 	</div>
 	<!-- #endregion -->

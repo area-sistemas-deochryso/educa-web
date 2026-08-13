@@ -35,6 +35,13 @@
 	&.severity-secondary { color: var(--text-color-secondary); }
 }
 
+.hero-provisional-icon {
+	font-size: 1.1rem;
+	margin-left: 0.4rem;
+	vertical-align: middle;
+	color: var(--text-color-secondary);
+}
+
 .hero-curso {
 	font-size: 1rem;
 	font-weight: 600;
@@ -42,9 +49,12 @@
 }
 
 .hero-evaluado-note {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.1rem;
 	font-size: 0.8rem;
 	color: var(--text-color-secondary);
-	font-style: italic;
 	margin-top: 0.25rem;
 }
 // #endregion

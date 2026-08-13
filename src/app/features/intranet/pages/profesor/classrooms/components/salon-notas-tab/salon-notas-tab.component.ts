@@ -15,7 +15,13 @@ import {
 	PeriodoCalificacionDto,
 	VistaPromedio,
 } from '@features/intranet/pages/profesor/models';
-import { getNotaSeverity, formatNotaConConfig } from '@intranet-shared/services/calificacion-config';
+import {
+	getNotaSeverity,
+	formatNotaConConfig,
+	calcularPorcentajeEvaluado,
+	getPromedioSeverity,
+	esPromedioProvisional,
+} from '@intranet-shared/services/calificacion-config';
 import type { ConfiguracionCalificacionListDto } from '@data/models';
 
 interface PeriodoColumnsGroup {
@@ -151,6 +157,24 @@ export class ClassroomGradesTabComponent {
 		}
 		return map;
 	});
+
+	/** estudianteId -> % del curso evaluado (INV-C04: pesos no se normalizan). */
+	readonly porcentajeEvaluadoLookup = computed(() => {
+		const data = this.notasData();
+		if (!data) return new Map<number, number>();
+
+		const notas = this.notasLookup();
+		const map = new Map<number, number>();
+		for (const est of data.estudiantes) {
+			const notasEst = notas.get(est.estudianteId);
+			const evaluaciones = data.evaluaciones.map((ev) => ({
+				peso: ev.peso,
+				nota: notasEst?.get(ev.id) ?? null,
+			}));
+			map.set(est.estudianteId, calcularPorcentajeEvaluado(evaluaciones));
+		}
+		return map;
+	});
 	// #endregion
 
 	readonly formattedNotas = computed(() => {
@@ -168,15 +192,28 @@ export class ClassroomGradesTabComponent {
 		return map;
 	});
 
+	/**
+	 * El promedio "General" usa color consciente de cobertura (neutro por debajo
+	 * del umbral); los promedios por periodo usan el semaforo real sin cambios.
+	 */
 	readonly formattedPromedios = computed(() => {
 		const lookup = this.promediosLookup();
 		const config = this.calificacionConfig();
-		const map = new Map<string, { text: string; severity: 'success' | 'warn' | 'danger' | 'secondary' }>();
+		const coberturaLookup = this.porcentajeEvaluadoLookup();
+		const map = new Map<
+			string,
+			{ text: string; severity: 'success' | 'warn' | 'danger' | 'secondary'; provisional: boolean }
+		>();
 		for (const [estId, inner] of lookup) {
+			const porcentajeEvaluado = coberturaLookup.get(estId) ?? 100;
 			for (const [periodo, promedio] of inner) {
+				const esGeneral = periodo === 'General';
 				map.set(`${estId}-${periodo}`, {
 					text: formatNotaConConfig(promedio, config),
-					severity: getNotaSeverity(promedio, config),
+					severity: esGeneral
+						? getPromedioSeverity(promedio, porcentajeEvaluado, config)
+						: getNotaSeverity(promedio, config),
+					provisional: esGeneral && esPromedioProvisional(promedio, porcentajeEvaluado),
 				});
 			}
 		}

@@ -7,7 +7,13 @@ import {
 	PeriodoCalificacionDto,
 	CalificacionConMiNotaDto,
 } from '@features/intranet/pages/estudiante/models';
-import { getNotaSeverity, formatNotaConConfig } from '@intranet-shared/services/calificacion-config';
+import {
+	getNotaSeverity,
+	formatNotaConConfig,
+	calcularPorcentajeEvaluado,
+	getPromedioSeverity,
+	esPromedioProvisional,
+} from '@intranet-shared/services/calificacion-config';
 import type { ConfiguracionCalificacionListDto } from '@data/models';
 
 interface PeriodoGroup {
@@ -42,19 +48,19 @@ export class NotasCursoCardComponent {
 
 	readonly promedioGeneral = computed(() => this.curso().promedios.general);
 
-	readonly promedioSeverity = computed(() =>
-		this.getNotaSeverity(this.promedioGeneral()),
+	/** % del peso total del curso que ya tiene nota registrada (INV-C04: pesos no se normalizan). */
+	readonly porcentajeEvaluado = computed(() =>
+		calcularPorcentajeEvaluado(this.curso().evaluaciones),
 	);
 
-	/** % del peso total del curso que ya tiene nota registrada (INV-C04: pesos no se normalizan). */
-	readonly porcentajeEvaluado = computed(() => {
-		const evaluaciones = this.curso().evaluaciones;
-		if (evaluaciones.length === 0) return 100;
-		const pesoEvaluado = evaluaciones
-			.filter((e) => e.nota !== null)
-			.reduce((acc, e) => acc + e.peso, 0);
-		return Math.round(pesoEvaluado * 100);
-	});
+	/** Color del promedio general, neutralizado mientras la cobertura evaluada esta por debajo del umbral. */
+	readonly promedioSeverity = computed(() =>
+		getPromedioSeverity(this.promedioGeneral(), this.porcentajeEvaluado(), this.calificacionConfig()),
+	);
+
+	readonly promedioProvisional = computed(() =>
+		esPromedioProvisional(this.promedioGeneral(), this.porcentajeEvaluado()),
+	);
 
 	/**
 	 * Conteo simple de evaluaciones (no ponderado) — distinto de `porcentajeEvaluado`,

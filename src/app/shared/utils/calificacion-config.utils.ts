@@ -90,3 +90,68 @@ export function formatNotaConConfig(
 	return scale.format(nota);
 }
 // #endregion
+
+// #region Cobertura del promedio general
+/**
+ * Umbral de % del curso evaluado por debajo del cual el promedio general
+ * se muestra en color neutro en vez del semaforo real. Ajustable — no es
+ * un valor de negocio cerrado.
+ */
+export const UMBRAL_COBERTURA_PROMEDIO_GENERAL = 50;
+
+/**
+ * % del peso total del curso que ya tiene nota registrada.
+ * Los pesos son fracciones absolutas del curso (INV-C04) — no se normalizan.
+ */
+export function calcularPorcentajeEvaluado(
+	evaluaciones: { peso: number; nota: number | null }[],
+): number {
+	if (evaluaciones.length === 0) return 100;
+	const pesoEvaluado = evaluaciones
+		.filter((e) => e.nota !== null && e.nota !== undefined)
+		.reduce((acc, e) => acc + e.peso, 0);
+	return Math.round(pesoEvaluado * 100);
+}
+
+/**
+ * Un promedio es "provisional" cuando todavia no alcanzo el umbral de
+ * cobertura del curso — el numero es matematicamente correcto pero no
+ * representativo aun.
+ */
+export function esPromedioProvisional(
+	promedio: number | null,
+	porcentajeEvaluado: number,
+	umbral: number = UMBRAL_COBERTURA_PROMEDIO_GENERAL,
+): boolean {
+	return promedio !== null && promedio !== undefined && porcentajeEvaluado < umbral;
+}
+
+/**
+ * Clasifica el promedio general considerando su cobertura: por debajo del
+ * umbral, neutraliza severity/cssClass/label (no aplica semaforo) sin
+ * cambiar el numero ni `esAprobatoria`. En o sobre el umbral, delega
+ * enteramente en `clasificarNota`.
+ */
+export function clasificarPromedioConCobertura(
+	promedio: number | null,
+	porcentajeEvaluado: number,
+	config: ConfiguracionCalificacionListDto | null = null,
+	umbral: number = UMBRAL_COBERTURA_PROMEDIO_GENERAL,
+): GradeClassification {
+	const base = clasificarNota(promedio, config);
+	if (!esPromedioProvisional(promedio, porcentajeEvaluado, umbral)) return base;
+	return { ...base, severity: 'secondary', cssClass: '', label: 'Provisional' };
+}
+
+/**
+ * Severity de PrimeNG para el promedio general, considerando cobertura.
+ */
+export function getPromedioSeverity(
+	promedio: number | null,
+	porcentajeEvaluado: number,
+	config: ConfiguracionCalificacionListDto | null = null,
+	umbral: number = UMBRAL_COBERTURA_PROMEDIO_GENERAL,
+): GradeClassification['severity'] {
+	return clasificarPromedioConCobertura(promedio, porcentajeEvaluado, config, umbral).severity;
+}
+// #endregion
