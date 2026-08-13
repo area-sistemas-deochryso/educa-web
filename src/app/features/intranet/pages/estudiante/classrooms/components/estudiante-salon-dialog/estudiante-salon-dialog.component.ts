@@ -6,6 +6,7 @@ import { TabsModule } from 'primeng/tabs';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { environment } from '@config/environment';
+import { detectarNivel } from '@core/helpers';
 import { EstudianteSalon, GruposResumenDto } from '@features/intranet/pages/estudiante/models';
 import { EstudianteGruposTabComponent } from '../estudiante-grupos-tab/estudiante-grupos-tab.component';
 import { StudentAttendanceTabComponent } from '../student-attendance-tab/student-attendance-tab.component';
@@ -165,6 +166,7 @@ import { MiAsistenciaCursoResumenDto } from '@features/intranet/pages/estudiante
 									[loading]="asistenciaLoading()"
 									[cursoOptions]="cursosOptions()"
 									[selectedCurso]="asistenciaCursoId()"
+									[nivel]="nivel()"
 									(cursoChange)="onAsistenciaCursoChange($event)"
 								/>
 							}
@@ -214,6 +216,10 @@ export class EstudianteSalonDialogComponent {
 	readonly activeTab = signal('0');
 
 	readonly cursoNombresOptions = computed(() => this.cursosOptions().map((o) => o.label));
+	readonly nivel = computed(() => {
+		const descripcion = this.salon()?.salonDescripcion;
+		return descripcion ? detectarNivel(descripcion) : null;
+	});
 
 	readonly dialogStyle = computed(() =>
 		this.isFullscreen()
