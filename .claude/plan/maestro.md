@@ -92,7 +92,7 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub F3-F6), *
 ### Notas operativas
 
 - **`running/`**: 1 brief (524, worktree `chat/524-fe-modo-informativo-fab-interceptor`) · **`open/`**: 5 briefs (332, 390, 391, 458, 462) · **`awaiting-prod/`**: 4 briefs (464, 465, 480, 481) · **`waiting/`**: vacío · **`troubles/`**: vacío
-- **Último cierre**: 467 (audit Administrador — shim global de tokens PrimeNG sin prefijo `--p-` en 229 archivos, fix puerto k6, fix "Rol del sistema") → `closed/`, 2026-07-18.
+- **Último cierre**: 550 (audit Estudiante — ícono de archivo con color de tipo incorrecto: orden de checks MIME `officedocument` + clase CSS `.student-file` pisando el color real) → `closed/`, 2026-08-12.
 - **Último saneamiento**: 2026-07-11 — sync-maestro: vaciado `awaiting-prod/` completo (estables, verificados con usuarios reales).
 
 ---

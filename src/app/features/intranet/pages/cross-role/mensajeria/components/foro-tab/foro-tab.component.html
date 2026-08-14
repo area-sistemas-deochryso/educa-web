@@ -14,7 +14,7 @@
 	</div>
 } @else if (singleCursoLabel(); as label) {
 	<div class="foro-curso-selector">
-		<p-tag [value]="label" styleClass="tag-neutral" icon="pi pi-book" />
+		<p-tag [value]="salonDescripcion() ? label + ' — ' + salonDescripcion() : label" styleClass="tag-neutral" icon="pi pi-book" />
 	</div>
 }
 <!-- #endregion -->

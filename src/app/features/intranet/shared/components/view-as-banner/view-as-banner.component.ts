@@ -51,7 +51,7 @@ export class ViewAsBannerComponent {
 	readonly isVisible = computed(() => {
 		const context = this.activeContext();
 		if (!context) return false;
-		return this._currentUrl().startsWith(`/intranet/${context.rol.toLowerCase()}`);
+		return this.viewAsContext.isUrlWithinScope(this._currentUrl(), context.rol);
 	});
 
 	readonly pickerOpen = signal(false);
@@ -67,6 +67,13 @@ export class ViewAsBannerComponent {
 	onUserSelected(context: ViewAsContext): void {
 		this.viewAsContext.setContext(context);
 		this.pickerOpen.set(false);
+		// Every "mis-*" facade (Cursos, Notas, Salones, Horarios, Foro, Mensajería)
+		// fetches once on mount and never re-subscribes when activeContext() changes,
+		// so switching subject here -- unlike the initial pick, which navigates to a
+		// different URL and mounts fresh -- left every already-mounted page showing
+		// the previous subject's data (brief 538, plan xrepo-97 F2/F3 follow-up).
+		// A full reload is the only change that reliably remounts all of them.
+		window.location.reload();
 	}
 
 	exit(): void {

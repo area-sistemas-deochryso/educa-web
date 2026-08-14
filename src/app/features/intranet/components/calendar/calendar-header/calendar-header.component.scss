@@ -14,19 +14,17 @@
 		gap: 1rem;
 	}
 
+	// * Ícono plano sin caja, mismo patrón que app-page-header (Design system
+	// * §B9) — antes era una caja 56px con gradiente azul, único header admin
+	// * que no seguía el resto del patrón visual.
 	.header-icon {
-		width: 56px;
-		height: 56px;
-		border-radius: 16px;
-		background: linear-gradient(135deg, var(--intranet-accent-color-blue, #253470), var(--intranet-accent-color-blue-dark));
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		box-shadow: 0 4px 12px rgba(37, 52, 112, 0.25);
 
 		i {
-			font-size: 1.6rem;
-			color: white;
+			font-size: 1.5rem;
+			color: var(--intranet-default-text-color, #171717);
 		}
 	}
 

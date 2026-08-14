@@ -14,7 +14,7 @@ import { VideoconferenciaItem } from './videoconferencias.models';
 
 // #endregion
 
-interface JaaSTokenResponse {
+export interface JaaSTokenResponse {
 	jwt: string;
 	appId: string;
 }
@@ -24,11 +24,13 @@ interface HorarioDto {
 	cursoId: number;
 	cursoNombre: string;
 	salonDescripcion: string;
+	diaSemana: number;
 	diaSemanaDescripcion: string;
 	horaInicio: string;
 	horaFin: string;
 	profesorNombreCompleto: string | null;
 	cantidadEstudiantes: number;
+	habilitada: boolean;
 }
 
 // #region Implementation
@@ -84,6 +86,10 @@ export class VideoconferenciasFacade {
 		this.store.enterSala(item);
 	}
 
+	enterSalaConExcepcion(item: VideoconferenciaItem, token: JaaSTokenResponse): void {
+		this.store.enterSalaConExcepcion(item, token);
+	}
+
 	leaveSala(): void {
 		this.store.leaveSala();
 	}
@@ -94,6 +100,27 @@ export class VideoconferenciasFacade {
 			`${this.baseUrl}/api/Videoconferencia/token`,
 			{ params: { roomName } },
 		);
+	}
+
+	/** Habilita/deshabilita la sala de un horario (solo rol moderador — el backend re-valida). */
+	setHabilitacion(horarioId: number, habilitada: boolean): Observable<boolean> {
+		return this.http.put<boolean>(
+			`${this.baseUrl}/api/Videoconferencia/${horarioId}/habilitacion`,
+			{ habilitada },
+		);
+	}
+
+	/** Excepción auditada del moderador para entrar fuera de la ventana horaria (motivo obligatorio). */
+	requestExcepcion(roomName: string, motivo: string): Observable<JaaSTokenResponse> {
+		return this.http.post<JaaSTokenResponse>(
+			`${this.baseUrl}/api/Videoconferencia/token/excepcion`,
+			{ roomName, motivo },
+		);
+	}
+
+	/** Refleja en el store el valor de habilitación confirmado por el backend. */
+	applyHabilitacionLocal(horarioId: number, habilitada: boolean): void {
+		this.store.updateHabilitacion(horarioId, habilitada);
 	}
 
 	/** Genera el nombre de sala determinístico para Jitsi. */
@@ -134,11 +161,13 @@ export class VideoconferenciasFacade {
 			cursoId: h.cursoId,
 			cursoNombre: h.cursoNombre,
 			salonDescripcion: h.salonDescripcion,
+			diaSemana: h.diaSemana,
 			diaSemanaDescripcion: h.diaSemanaDescripcion,
 			horaInicio: h.horaInicio,
 			horaFin: h.horaFin,
 			profesorNombreCompleto: h.profesorNombreCompleto,
 			cantidadEstudiantes: h.cantidadEstudiantes,
+			habilitada: h.habilitada,
 		}));
 	}
 	// #endregion

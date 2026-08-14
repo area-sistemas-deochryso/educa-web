@@ -10,6 +10,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ErrorHandlerService } from '@core/services/error';
 import { StorageService } from '@core/services/storage';
+import { SwService } from '@core/services/sw';
 
 import { ViewAsContext } from './view-as-context.model';
 import { ViewAsContextService } from './view-as-context.service';
@@ -38,16 +39,19 @@ describe('ViewAsContextService', () => {
 	let router: Router;
 	let storageMock: ReturnType<typeof createStorageMock>;
 	let errorHandlerMock: { showInfo: ReturnType<typeof vi.fn> };
+	let swServiceMock: { clearCache: ReturnType<typeof vi.fn> };
 
 	function configure(initialStorage: ViewAsContext | null = null): void {
 		storageMock = createStorageMock(initialStorage);
 		errorHandlerMock = { showInfo: vi.fn() };
+		swServiceMock = { clearCache: vi.fn() };
 
 		TestBed.configureTestingModule({
 			providers: [
 				provideRouter([{ path: '**', component: DummyComponent }]),
 				{ provide: StorageService, useValue: storageMock },
 				{ provide: ErrorHandlerService, useValue: errorHandlerMock },
+				{ provide: SwService, useValue: swServiceMock },
 			],
 		});
 
@@ -117,6 +121,22 @@ describe('ViewAsContextService', () => {
 		expect(errorHandlerMock.showInfo).not.toHaveBeenCalled();
 	});
 
+	it('keeps the context when navigating to a shared cross-role route (calendario, videoconferencias, asistencia — brief 537)', async () => {
+		service.setContext({ entityId: 7, rol: 'Estudiante', nombreCompleto: 'Ana López' });
+		await router.navigateByUrl('/intranet/estudiante/cursos');
+
+		await router.navigateByUrl('/intranet/calendario');
+		expect(service.activeContext()).not.toBeNull();
+
+		await router.navigateByUrl('/intranet/videoconferencias');
+		expect(service.activeContext()).not.toBeNull();
+
+		await router.navigateByUrl('/intranet/asistencia');
+		expect(service.activeContext()).not.toBeNull();
+
+		expect(errorHandlerMock.showInfo).not.toHaveBeenCalled();
+	});
+
 	it('restores a persisted context on construction (F5/direct link — brief 511, F2 symptom)', () => {
 		TestBed.resetTestingModule();
 		configure({ entityId: 9, rol: 'Estudiante', nombreCompleto: 'Ana López' });
@@ -133,6 +153,35 @@ describe('ViewAsContextService', () => {
 
 		expect(service.activeContext()).toBeNull();
 		expect(errorHandlerMock.showInfo).toHaveBeenCalledTimes(1);
+	});
+
+	// brief 536: SW cache key is URL-only (no identity component) — every identity
+	// transition must clear it or the previous subject's data leaks into the next.
+	it('setContext clears the SW cache before switching identity', () => {
+		service.setContext({ entityId: 7, rol: 'Profesor', nombreCompleto: 'Juan Pérez' });
+		expect(swServiceMock.clearCache).toHaveBeenCalledTimes(1);
+
+		service.setContext({ entityId: 8, rol: 'Estudiante', nombreCompleto: 'Ana López' });
+		expect(swServiceMock.clearCache).toHaveBeenCalledTimes(2);
+	});
+
+	it('clearContext clears the SW cache when exiting "ver como"', () => {
+		service.setContext({ entityId: 7, rol: 'Profesor', nombreCompleto: 'Juan Pérez' });
+		swServiceMock.clearCache.mockClear();
+
+		service.clearContext();
+
+		expect(swServiceMock.clearCache).toHaveBeenCalledTimes(1);
+	});
+
+	it('auto-clear on module exit also clears the SW cache', async () => {
+		service.setContext({ entityId: 7, rol: 'Profesor', nombreCompleto: 'Juan Pérez' });
+		await router.navigateByUrl('/intranet/profesor/cursos');
+		swServiceMock.clearCache.mockClear();
+
+		await router.navigateByUrl('/intranet/ayuda');
+
+		expect(swServiceMock.clearCache).toHaveBeenCalledTimes(1);
 	});
 });
 // #endregion

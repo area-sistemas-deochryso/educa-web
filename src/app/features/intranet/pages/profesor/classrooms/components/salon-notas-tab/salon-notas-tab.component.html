@@ -211,6 +211,12 @@
 						[class]="'promedio-' + (gen?.severity ?? 'secondary')"
 					>
 						{{ gen?.text ?? '—' }}
+						@if (gen?.provisional) {
+							<i
+								class="pi pi-clock"
+								title="Promedio provisional — se actualizará conforme se califiquen más evaluaciones"
+							></i>
+						}
 					</span>
 				</td>
 			</tr>

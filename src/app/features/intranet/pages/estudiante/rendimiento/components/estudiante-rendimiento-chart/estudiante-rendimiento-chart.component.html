@@ -3,7 +3,11 @@
 	@if (periodos().length === 0) {
 		<div class="chart-empty">
 			<i class="pi pi-chart-line" aria-hidden="true"></i>
-			<span>Sin datos para este período</span>
+			@if (sinPeriodosConfigurados()) {
+				<span>Este curso aún no tiene los períodos de evaluación configurados</span>
+			} @else {
+				<span>Sin datos para este período</span>
+			}
 		</div>
 	}
 </div>

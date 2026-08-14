@@ -192,8 +192,16 @@
 										}
 										{{ prom.periodo }}
 									</span>
-									<span [class]="'promedio-value promedio-' + getNotaSeverity(prom.promedio)">
+									<span
+										[class]="'promedio-value promedio-' + getPromedioItemSeverity(prom.periodo, prom.promedio, prom.simulated)"
+									>
 										{{ formatNota(prom.promedio) }}
+										@if (isPromedioItemProvisional(prom.periodo, prom.promedio, prom.simulated)) {
+											<i
+												class="pi pi-clock"
+												title="Promedio provisional — se actualizará conforme se califiquen más evaluaciones"
+											></i>
+										}
 									</span>
 								</div>
 							}

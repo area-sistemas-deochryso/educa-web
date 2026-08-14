@@ -16,7 +16,7 @@ import { TagModule } from 'primeng/tag';
 import { TableModule } from 'primeng/table';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { logger, withRetry } from '@core/helpers';
+import { logger, withRetry, detectarNivel } from '@core/helpers';
 import { PageHeaderComponent } from '@intranet-shared/components';
 import { EstudianteFacade } from '../services/estudiante.facade';
 import {
@@ -25,6 +25,8 @@ import {
 	ESTADO_ASISTENCIA_LABELS,
 	ESTADO_ASISTENCIA_SEVERITIES,
 } from '../models/estudiante.models';
+
+const MENSAJE_JUSTIFICACION_GESTIONADA = 'Las justificaciones las gestiona el colegio con tu apoderado';
 
 @Component({
 	selector: 'app-student-attendance',
@@ -116,7 +118,7 @@ import {
 											[severity]="getEstadoSeverity(item.estado)"
 										/>
 									</td>
-									<td>{{ item.justificacion || '-' }}</td>
+									<td>{{ getJustificacionDisplay(item.justificacion) }}</td>
 								</tr>
 							</ng-template>
 						</p-table>
@@ -172,6 +174,11 @@ export class StudentAttendanceComponent implements OnInit {
 		const data = this.asistencia();
 		if (!data || data.totalClases === 0) return 0;
 		return Math.round(((data.totalPresente + data.totalTarde) / data.totalClases) * 100);
+	});
+
+	readonly selectedNivel = computed(() => {
+		const horario = this._horarios().find((h) => h.id === this.selectedHorarioId());
+		return horario ? detectarNivel(horario.salonDescripcion) : null;
 	});
 	// #endregion
 
@@ -233,6 +240,13 @@ export class StudentAttendanceComponent implements OnInit {
 	): 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast' {
 		return (ESTADO_ASISTENCIA_SEVERITIES[estado as keyof typeof ESTADO_ASISTENCIA_SEVERITIES] ??
 			'info') as 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast';
+	}
+
+	getJustificacionDisplay(justificacion: string | null): string {
+		if (justificacion) return justificacion;
+		const nivel = this.selectedNivel();
+		if (nivel === 'Inicial' || nivel === 'Primaria') return MENSAJE_JUSTIFICACION_GESTIONADA;
+		return '-';
 	}
 	// #endregion
 

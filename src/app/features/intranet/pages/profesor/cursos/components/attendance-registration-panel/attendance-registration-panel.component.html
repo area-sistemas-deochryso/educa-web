@@ -30,6 +30,9 @@
 			<p-tag [value]="'Presentes: ' + stats().presentes" severity="success" />
 			<p-tag [value]="'Tardes: ' + stats().tardes" severity="warn" />
 			<p-tag [value]="'Faltas: ' + stats().faltas" severity="danger" />
+			@if (esListaSinGuardar()) {
+				<p-tag value="Sin guardar" severity="warn" icon="pi pi-info-circle" />
+			}
 		</div>
 	}
 </div>
@@ -39,6 +42,11 @@
 		<i class="pi pi-exclamation-triangle"></i>
 		<span>
 			La fecha elegida no corresponde al día de horario del curso ({{ diaSemanaEsperadoDescripcion() }}).
+			@if (confirmadoFechaAtipica()) {
+				Confirmaste que es una excepción válida — el guardado está habilitado.
+			} @else {
+				El guardado está bloqueado hasta confirmar que es una excepción válida (ej. clase de recuperación).
+			}
 		</span>
 		<button
 			pButton
@@ -49,9 +57,21 @@
 			data-info-anchor="profesor-asistencia-ir-fecha-valida"
 			(click)="irAFechaValida()"
 		></button>
+		@if (!confirmadoFechaAtipica()) {
+			<button
+				pButton
+				type="button"
+				label="Confirmar excepción"
+				icon="pi pi-check"
+				class="p-button-text p-button-sm"
+				(click)="confirmarFechaAtipica()"
+			></button>
+		}
 	</div>
 }
 <!-- #endregion -->
+
+<p-confirmDialog />
 
 <!-- #region Loading -->
 @if (loading()) {
@@ -121,7 +141,9 @@
 			data-info-anchor="profesor-asistencia-guardar"
 			(click)="onSave()"
 			[loading]="saving()"
-			[disabled]="saving()"
+			[disabled]="saving() || !puedeGuardar()"
+			[pTooltip]="!puedeGuardar() ? 'Confirmá que la fecha es una excepción válida para poder guardar' : undefined"
+			tooltipPosition="top"
 		></button>
 	</div>
 }

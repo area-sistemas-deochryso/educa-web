@@ -14,6 +14,7 @@ const mockCursos: RendimientoPropioCursoDto[] = [
 			{ periodoId: 1, periodoNombre: 'Periodo 1', periodoOrden: 1, promedio: 14, outlierVsPeriodoAnterior: null, outlierVsAnioAnterior: 3 },
 			{ periodoId: 2, periodoNombre: 'Periodo 2', periodoOrden: 2, promedio: 16, outlierVsPeriodoAnterior: 2, outlierVsAnioAnterior: 5 },
 		],
+		sinPeriodosConfigurados: false,
 	},
 ];
 

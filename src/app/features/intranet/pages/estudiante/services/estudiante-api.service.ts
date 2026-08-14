@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, shareReplay, catchError, throwError } from 'rxjs';
 import { environment } from '@config/environment';
 import { FileUploadBuilder } from '@core/helpers';
+import { ViewAsContextService } from '@core/services/view-as';
 import {
 	HorarioProfesorDto,
 	CursoContenidoDetalleDto,
@@ -18,6 +19,7 @@ import {
 @Injectable({ providedIn: 'root' })
 export class EstudianteApiService {
 	private readonly http = inject(HttpClient);
+	private readonly viewAsContext = inject(ViewAsContextService);
 	private readonly baseUrl = `${environment.apiUrl}/api/EstudianteCurso`;
 	private readonly blobUrl = `${environment.apiUrl}/api/blobstorage`;
 
@@ -26,9 +28,18 @@ export class EstudianteApiService {
 	// Session-cached: attendance/foro/mensajeria/notas/horarios/salones each call this
 	// on their own init, so without caching the same horarios get re-fetched on every
 	// route the student navigates to. Reset on error so a failed attempt retries.
+	// Keyed by the active "ver como" entityId so switching subject mid-tab (admin
+	// impersonating a different student without reload) doesn't serve stale data.
 	private misHorarios$: Observable<HorarioProfesorDto[]> | null = null;
+	private misHorariosIdentityKey: number | null = null;
 
 	getMisHorarios(): Observable<HorarioProfesorDto[]> {
+		const identityKey = this.viewAsContext.activeContext()?.entityId ?? null;
+		if (identityKey !== this.misHorariosIdentityKey) {
+			this.misHorarios$ = null;
+			this.misHorariosIdentityKey = identityKey;
+		}
+
 		if (!this.misHorarios$) {
 			this.misHorarios$ = this.http.get<HorarioProfesorDto[]>(`${this.baseUrl}/mis-horarios`).pipe(
 				shareReplay(1),

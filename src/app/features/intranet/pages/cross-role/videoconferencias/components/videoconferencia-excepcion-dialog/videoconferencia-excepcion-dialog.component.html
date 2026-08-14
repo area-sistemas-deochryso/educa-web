@@ -1,0 +1,54 @@
+<p-dialog
+	[visible]="visible()"
+	(visibleChange)="onVisibleChange($event)"
+	[modal]="true"
+	[draggable]="false"
+	[resizable]="false"
+	[closable]="true"
+	header="Habilitar sala fuera de horario"
+	styleClass="excepcion-dialog"
+	[style]="{ width: '450px' }"
+	appendTo="body"
+>
+	@if (context(); as ctx) {
+		<div class="dialog-content">
+			<div class="warning-banner">
+				<i class="pi pi-exclamation-triangle"></i>
+				<span>
+					Vas a ingresar a <strong>{{ ctx.cursoNombre }}</strong> fuera de la ventana horaria de la clase.
+					Esta excepción queda registrada con tu nombre y el motivo indicado.
+				</span>
+			</div>
+
+			<div class="field">
+				<label for="motivo">Motivo <span class="required">*</span></label>
+				<textarea
+					pTextarea
+					id="motivo"
+					rows="4"
+					[ngModel]="motivoText()"
+					(ngModelChange)="motivoText.set($event)"
+					placeholder="Ingrese el motivo de la excepción (ej: clase de recuperación, reunión extraordinaria)"
+					class="w-full"
+				></textarea>
+			</div>
+
+			<div class="dialog-footer">
+				<p-button
+					label="Cancelar"
+					severity="secondary"
+					[text]="true"
+					[disabled]="saving()"
+					(onClick)="close()"
+				/>
+				<p-button
+					label="Habilitar e ingresar"
+					icon="pi pi-video"
+					[loading]="saving()"
+					[disabled]="!motivoText().trim()"
+					(onClick)="confirmarClick()"
+				/>
+			</div>
+		</div>
+	}
+</p-dialog>

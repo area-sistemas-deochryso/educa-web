@@ -74,12 +74,41 @@ export class ConfigGradeDialogComponent implements OnChanges {
 		value: tipo,
 	}));
 
+	readonly rangoError = computed(() => {
+		if (this.tipoCalificacion() !== 'LITERAL') {
+			return null;
+		}
+		const rangos = this.literales()
+			.filter((l) => l.notaMinima !== null && l.notaMaxima !== null)
+			.map((l) => ({ letra: l.letra, min: l.notaMinima!, max: l.notaMaxima! }));
+
+		const invertido = rangos.find((r) => r.min > r.max);
+		if (invertido) {
+			return `El rango de "${invertido.letra || '(sin letra)'}" tiene la nota mínima mayor que la máxima.`;
+		}
+
+		for (let i = 0; i < rangos.length; i++) {
+			for (let j = i + 1; j < rangos.length; j++) {
+				const a = rangos[i];
+				const b = rangos[j];
+				if (a.min <= b.max && b.min <= a.max) {
+					return `Los rangos de "${a.letra || '(sin letra)'}" y "${b.letra || '(sin letra)'}" se solapan.`;
+				}
+			}
+		}
+		return null;
+	});
+
 	readonly isFormValid = computed(() => {
 		const tipo = this.tipoCalificacion();
 		if (tipo === 'NUMERICO') {
 			return this.notaMinAprobatoria() !== null && this.notaMinAprobatoria()! > 0;
 		}
-		return this.literales().length > 0 && this.literales().every((l) => l.letra.trim() && l.descripcion.trim());
+		return (
+			this.literales().length > 0 &&
+			this.literales().every((l) => l.letra.trim() && l.descripcion.trim()) &&
+			this.rangoError() === null
+		);
 	});
 	// #endregion
 

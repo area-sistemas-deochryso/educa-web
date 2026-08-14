@@ -4,14 +4,20 @@
 		<span class="hero-label">Promedio General</span>
 		<span class="hero-number" [class]="'severity-' + promedioSeverity()">
 			{{ formatNota(promedioGeneral()) }}
+			@if (promedioProvisional()) {
+				<i
+					class="pi pi-clock hero-provisional-icon"
+					title="Promedio provisional — se actualizará conforme se califiquen más evaluaciones"
+				></i>
+			}
 		</span>
 		<span class="hero-curso">{{ curso().cursoNombre }}</span>
 		<span class="text-sm text-color-secondary">{{ curso().salonDescripcion }}</span>
 		@if (porcentajeEvaluado() < 100) {
-			<span class="hero-evaluado-note">
-				<i class="pi pi-info-circle mr-1"></i>
-				{{ porcentajeEvaluado() }}% del curso evaluado
-			</span>
+			<div class="hero-evaluado-note">
+				<span>Evaluaciones calificadas: {{ evaluacionesProgreso().completadas }}/{{ evaluacionesProgreso().total }}</span>
+				<span>Cobertura del curso: {{ porcentajeEvaluado() }}%</span>
+			</div>
 		}
 	</div>
 	<!-- #endregion -->
@@ -60,6 +66,7 @@
 										<span class="eval-titulo">{{ eval.titulo }}</span>
 										<div class="eval-meta">
 											<p-tag [value]="getTipoLabel(eval.tipo)" styleClass="tag-neutral" [rounded]="true" />
+											<span class="text-xs text-color-secondary">{{ eval.fechaEvaluacion | date:'dd/MM/yyyy' }}</span>
 											<span class="text-xs text-color-secondary">Peso: {{ (eval.peso * 100).toFixed(0) }}%</span>
 										</div>
 									</div>

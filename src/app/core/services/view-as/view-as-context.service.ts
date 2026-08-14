@@ -5,6 +5,7 @@ import { filter } from 'rxjs';
 
 import { ErrorHandlerService } from '@core/services/error';
 import { StorageService } from '@core/services/storage';
+import { SwService } from '@core/services/sw';
 
 import { ViewAsContext, ViewAsRol } from './view-as-context.model';
 // #endregion
@@ -34,9 +35,22 @@ import { ViewAsContext, ViewAsRol } from './view-as-context.model';
  */
 @Injectable({ providedIn: 'root' })
 export class ViewAsContextService {
+	/**
+	 * Cross-role routes kept reachable during "ver como" on purpose (brief
+	 * 510 — see `intranet-layout.component.ts` `effectiveRol`): the menu
+	 * shows them while impersonating even though they live outside
+	 * `/intranet/<rol>`. Without this list, `clearIfOutsideModule` treated
+	 * landing on them as leaving the module, wiping the context mid-flow —
+	 * losing the `view-as.interceptor` headers on `asistencia` (wrong
+	 * subject's data) and forcing a re-pick after any back-navigation
+	 * (brief 537).
+	 */
+	private static readonly SHARED_ROUTES = ['/intranet/calendario', '/intranet/videoconferencias', '/intranet/asistencia'];
+
 	private readonly router = inject(Router);
 	private readonly storage = inject(StorageService);
 	private readonly errorHandler = inject(ErrorHandlerService);
+	private readonly swService = inject(SwService);
 
 	private readonly _activeContext = signal<ViewAsContext | null>(
 		this.storage.getViewAsContext<ViewAsContext>(),
@@ -50,11 +64,15 @@ export class ViewAsContextService {
 	}
 
 	setContext(context: ViewAsContext): void {
+		// SW cache key is URL-only (no identity component, brief 536) — clear it on every
+		// identity switch or the previous subject's cached "mis-*" responses leak into this one.
+		this.swService.clearCache();
 		this._activeContext.set(context);
 		this.storage.setViewAsContext(context);
 	}
 
 	clearContext(): void {
+		this.swService.clearCache();
 		this._activeContext.set(null);
 		this.storage.setViewAsContext(null);
 	}
@@ -63,12 +81,24 @@ export class ViewAsContextService {
 		return this._activeContext()?.rol === rol;
 	}
 
+	/**
+	 * Single source of truth for "is this URL within the impersonated rol's
+	 * scope" — consumed by `clearIfOutsideModule` below and by
+	 * `ViewAsBannerComponent.isVisible` (brief 548), so `SHARED_ROUTES`
+	 * additions never need a second, drifting copy of this rule.
+	 */
+	isUrlWithinScope(url: string, rol: ViewAsRol): boolean {
+		const modulePrefix = `/intranet/${rol.toLowerCase()}`;
+		const isSharedRoute = ViewAsContextService.SHARED_ROUTES.some((route) => url.startsWith(route));
+		return url.startsWith(modulePrefix) || isSharedRoute;
+	}
+
 	private clearIfOutsideModule(url: string): void {
 		const context = this._activeContext();
 		if (!context) return;
 
-		const modulePrefix = `/intranet/${context.rol.toLowerCase()}`;
-		if (!url.startsWith(modulePrefix)) {
+		if (!this.isUrlWithinScope(url, context.rol)) {
+			this.swService.clearCache();
 			this._activeContext.set(null);
 			this.storage.setViewAsContext(null);
 			this.errorHandler.showInfo(

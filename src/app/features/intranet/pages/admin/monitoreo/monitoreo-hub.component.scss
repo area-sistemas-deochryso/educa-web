@@ -34,16 +34,19 @@
 	margin-top: 1rem;
 	padding: 1rem 1.25rem;
 	border-radius: 12px;
-	border: 1px solid var(--surface-300);
+	// * --surface-0/-300 NO se remapean en dark-mode (son la base de la rampa
+	// * Aura, no un alias --p-* recalculado — a diferencia de --surface-card/
+	// * -border, que sí lo están); usarlos acá dejaba este panel blanco fijo.
+	border: 1px solid var(--surface-border);
 
 	&[data-state='ok'] {
-		background: color-mix(in srgb, var(--green-500, #22c55e) 6%, var(--surface-0));
-		border-color: color-mix(in srgb, var(--green-500, #22c55e) 25%, var(--surface-300));
+		background: color-mix(in srgb, var(--green-500, #22c55e) 6%, var(--surface-card));
+		border-color: color-mix(in srgb, var(--green-500, #22c55e) 25%, var(--surface-border));
 	}
 
 	&[data-state='alert'] {
-		background: color-mix(in srgb, var(--red-600, #dc2626) 4%, var(--surface-0));
-		border-color: color-mix(in srgb, var(--red-600, #dc2626) 20%, var(--surface-300));
+		background: color-mix(in srgb, var(--red-600, #dc2626) 4%, var(--surface-card));
+		border-color: color-mix(in srgb, var(--red-600, #dc2626) 20%, var(--surface-border));
 	}
 }
 
@@ -285,23 +288,23 @@
 	background: var(--summary-bg);
 
 	&[data-tone='blue'] {
-		--summary-bg: color-mix(in srgb, var(--blue-500, #3b82f6) 6%, var(--surface-0));
-		--summary-border: color-mix(in srgb, var(--blue-500, #3b82f6) 20%, var(--surface-300));
+		--summary-bg: color-mix(in srgb, var(--blue-500, #3b82f6) 6%, var(--surface-card));
+		--summary-border: color-mix(in srgb, var(--blue-500, #3b82f6) 20%, var(--surface-border));
 		--summary-icon: var(--blue-700, #1d4ed8);
 	}
 	&[data-tone='red'] {
-		--summary-bg: color-mix(in srgb, var(--red-600, #dc2626) 6%, var(--surface-0));
-		--summary-border: color-mix(in srgb, var(--red-600, #dc2626) 20%, var(--surface-300));
+		--summary-bg: color-mix(in srgb, var(--red-600, #dc2626) 6%, var(--surface-card));
+		--summary-border: color-mix(in srgb, var(--red-600, #dc2626) 20%, var(--surface-border));
 		--summary-icon: var(--red-700, #b91c1c);
 	}
 	&[data-tone='amber'] {
-		--summary-bg: color-mix(in srgb, var(--orange-500, #f97316) 6%, var(--surface-0));
-		--summary-border: color-mix(in srgb, var(--orange-500, #f97316) 20%, var(--surface-300));
+		--summary-bg: color-mix(in srgb, var(--orange-500, #f97316) 6%, var(--surface-card));
+		--summary-border: color-mix(in srgb, var(--orange-500, #f97316) 20%, var(--surface-border));
 		--summary-icon: var(--orange-700, #c2410c);
 	}
 	&[data-tone='green'] {
-		--summary-bg: color-mix(in srgb, var(--green-500, #22c55e) 6%, var(--surface-0));
-		--summary-border: color-mix(in srgb, var(--green-500, #22c55e) 20%, var(--surface-300));
+		--summary-bg: color-mix(in srgb, var(--green-500, #22c55e) 6%, var(--surface-card));
+		--summary-border: color-mix(in srgb, var(--green-500, #22c55e) 20%, var(--surface-border));
 		--summary-icon: var(--green-700, #15803d);
 	}
 

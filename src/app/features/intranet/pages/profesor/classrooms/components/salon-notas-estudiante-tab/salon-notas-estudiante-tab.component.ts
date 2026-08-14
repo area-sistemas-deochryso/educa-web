@@ -8,7 +8,13 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { SalonNotasResumenDto, calcularPromedioPonderado, NOTA_MAXIMA } from '@features/intranet/pages/profesor/models';
-import { getNotaSeverity, formatNotaConConfig } from '@intranet-shared/services/calificacion-config';
+import {
+	getNotaSeverity,
+	formatNotaConConfig,
+	calcularPorcentajeEvaluado,
+	getPromedioSeverity,
+	esPromedioProvisional,
+} from '@intranet-shared/services/calificacion-config';
 import type { ConfiguracionCalificacionListDto } from '@data/models';
 
 export interface NotaSaveEvent {
@@ -101,6 +107,9 @@ export class SalonNotasEstudianteTabComponent {
 
 	/** Count of evaluaciones without a grade (simulable) */
 	readonly pendingCount = computed(() => this.evaluacionRows().filter((r) => r.nota === null).length);
+
+	/** % del peso total del curso que ya tiene nota real registrada (INV-C04: pesos no se normalizan). */
+	readonly porcentajeEvaluado = computed(() => calcularPorcentajeEvaluado(this.evaluacionRows()));
 
 	readonly hasSimulation = computed(() => Object.keys(this.simulatedNotas()).length > 0);
 
@@ -260,6 +269,23 @@ export class SalonNotasEstudianteTabComponent {
 
 	formatNota(nota: number | null): string {
 		return formatNotaConConfig(nota, this.calificacionConfig());
+	}
+
+	/** El "General" (no simulado) usa color consciente de cobertura; el resto, el semaforo real. */
+	getPromedioItemSeverity(
+		periodo: string,
+		promedio: number | null,
+		simulated: boolean,
+	): 'success' | 'warn' | 'danger' | 'secondary' {
+		if (periodo === 'General' && !simulated) {
+			return getPromedioSeverity(promedio, this.porcentajeEvaluado(), this.calificacionConfig());
+		}
+		return getNotaSeverity(promedio, this.calificacionConfig());
+	}
+
+	isPromedioItemProvisional(periodo: string, promedio: number | null, simulated: boolean): boolean {
+		if (periodo !== 'General' || simulated) return false;
+		return esPromedioProvisional(promedio, this.porcentajeEvaluado());
 	}
 	// #endregion
 }

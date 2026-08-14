@@ -119,7 +119,7 @@
 											(ngModelChange)="updateNotaLiteral(row.estudianteId, $event)"
 											[options]="literalesOrdenados()"
 											optionLabel="letra"
-											placeholder="Letra"
+											placeholder="–"
 											[style]="{ width: '90px' }"
 										/>
 									} @else {
@@ -207,7 +207,7 @@
 										(ngModelChange)="updateGrupoNotaLiteral(grupo.grupoId, $event)"
 										[options]="literalesOrdenados()"
 										optionLabel="letra"
-										placeholder="Letra"
+										placeholder="–"
 										[style]="{ width: '90px' }"
 									/>
 								} @else {
@@ -262,7 +262,7 @@
 													(ngModelChange)="updateMiembroOverrideLiteral(grupo.grupoId, miembro.estudianteId, $event)"
 													[options]="literalesOrdenados()"
 													optionLabel="letra"
-													placeholder="Letra"
+													placeholder="–"
 													[style]="{ width: '80px', fontSize: '0.85rem' }"
 												/>
 											} @else {

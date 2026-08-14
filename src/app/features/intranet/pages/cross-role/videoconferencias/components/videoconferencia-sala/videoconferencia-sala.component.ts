@@ -15,7 +15,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { logger } from '@core/helpers';
+import { logger, resolveErrorMessage } from '@core/helpers';
 import { VideoconferenciasFacade } from '../../services/videoconferencias.facade';
 import {
 	JitsiApi,
@@ -49,6 +49,8 @@ export class VideoconferenciaSalaComponent implements OnInit, OnDestroy {
 	readonly roomName = input.required<string>();
 	readonly cursoNombre = input.required<string>();
 	readonly profesorNombreCompleto = input<string | null>(null);
+	/** Token ya emitido vía excepción del moderador — si viene seteado, se salta el GET normal (que volvería a fallar por la misma razón que disparó la excepción). */
+	readonly preFetchedToken = input<{ jwt: string; appId: string } | null>(null);
 	// #endregion
 
 	// #region Estado local
@@ -150,6 +152,19 @@ export class VideoconferenciaSalaComponent implements OnInit, OnDestroy {
 	/** Obtiene JWT + appId del backend antes de cargar el script de JaaS */
 	private fetchTokenAndLoad(): void {
 		this.connectingStep.set('auth');
+
+		const preFetched = this.preFetchedToken();
+		if (preFetched) {
+			if (!preFetched.appId) {
+				this.errorMsg.set('Servicio de videoconferencia no configurado');
+				this.connecting.set(false);
+				return;
+			}
+			this.connectingStep.set('script');
+			this.loadJitsiScript(preFetched.appId, preFetched.jwt);
+			return;
+		}
+
 		this.facade.getJaaSToken(this.roomName()).subscribe({
 			next: (response) => {
 				if (!response.appId) {
@@ -160,8 +175,11 @@ export class VideoconferenciaSalaComponent implements OnInit, OnDestroy {
 				this.connectingStep.set('script');
 				this.loadJitsiScript(response.appId, response.jwt);
 			},
-			error: () => {
-				this.errorMsg.set('No se pudo obtener acceso a la sala');
+			error: (err) => {
+				// Cubre la carrera "el estado mostrado en la tarjeta quedó desactualizado" (ej. el
+				// profesor deshabilitó la sala mientras el estudiante tenía la tarjeta abierta): el
+				// mensaje refleja el errorCode real del gate en vez de un genérico.
+				this.errorMsg.set(resolveErrorMessage(err, 'No se pudo obtener acceso a la sala'));
 				this.connecting.set(false);
 			},
 		});

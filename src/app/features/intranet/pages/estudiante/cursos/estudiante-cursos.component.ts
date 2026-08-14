@@ -40,7 +40,8 @@ const DAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Vierne
 		}
 		.course-card {
 			flex: 1 1 320px;
-			min-width: 320px;
+			min-width: 0;
+			max-width: 100%;
 			border-radius: 8px;
 			border: 1px solid var(--p-surface-200);
 			border-left: 4px solid var(--card-accent, var(--p-primary-color));

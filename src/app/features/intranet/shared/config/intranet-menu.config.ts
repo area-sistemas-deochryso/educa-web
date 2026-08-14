@@ -81,7 +81,7 @@ export const MENU_ITEMS: MenuItemDef[] = [
 	{ route: '/intranet/estudiante/asistencia', label: 'Mi Asistencia', icon: 'pi pi-check-square', capability: 'ESTUDIANTE_ASISTENCIA', modulo: 'estudiante', featureFlag: 'estudiante', group: { label: 'Mi Seguimiento', icon: 'pi pi-user' }, preview: 'attendance', description: 'Revisar tu registro de asistencia' },
 	{ route: '/intranet/estudiante/rendimiento', label: 'Mi Rendimiento', icon: 'pi pi-chart-line', capability: 'REPORTES_RENDIMIENTO', modulo: 'estudiante', featureFlag: 'estudiante', group: { label: 'Mi Seguimiento', icon: 'pi pi-user' }, description: 'Ver tu tendencia de rendimiento académico' },
 	{ route: '/intranet/asistencia', label: 'Historial de Asistencia', icon: 'pi pi-chart-line', capability: 'ASISTENCIA', modulo: 'estudiante', soloParaRol: ['Estudiante'], featureFlag: 'estudiante', group: { label: 'Mi Seguimiento', icon: 'pi pi-user' }, preview: 'attendance', description: 'Historial mensual con resumen de asistencia' },
-	{ route: '/intranet/estudiante/foro', label: 'Foro', icon: 'pi pi-comments', capability: 'ESTUDIANTE_FORO', modulo: 'estudiante', featureFlag: 'estudiante', group: { label: 'Mensajes', icon: 'pi pi-inbox' }, preview: 'forum', description: 'Participar en discusiones del aula' },
+	{ route: '/intranet/estudiante/foro', label: 'Anuncios', icon: 'pi pi-comments', capability: 'ESTUDIANTE_FORO', modulo: 'estudiante', featureFlag: 'estudiante', group: { label: 'Mensajes', icon: 'pi pi-inbox' }, preview: 'forum', description: 'Ver publicaciones del profesor' },
 	{ route: '/intranet/estudiante/mensajeria', label: 'Mensajería', icon: 'pi pi-envelope', capability: 'ESTUDIANTE_MENSAJERIA', modulo: 'estudiante', featureFlag: 'estudiante', group: { label: 'Mensajes', icon: 'pi pi-inbox' }, preview: 'messaging', description: 'Enviar y recibir mensajes' },
 	// Compartido (duplicado, ver §1 brief 444) — capability sin dueño de rol fijo, soloParaRol evita que otros roles con la misma capability disparen este módulo
 	{ route: '/intranet/calendario', label: 'Calendario', icon: 'pi pi-calendar', capability: 'CALENDARIO', modulo: 'estudiante', featureFlag: 'calendario', soloParaRol: ['Estudiante'], preview: 'admin-table', description: 'Calendario de eventos y actividades' },
@@ -198,7 +198,16 @@ export function resolveMenuItemLabel(item: Pick<MenuItemDef, 'label'>, rol?: Use
 }
 
 // #region Builder
-export function buildModuloMenus(userCapabilities: Set<string>, rol?: UserRole): ModuloMenu[] {
+/**
+ * `badgesByRoute` — conteos de actividad no vista (ej. Foro no leído, brief 542/P98 F4) a
+ * inyectar en el leaf de esa `route`. Vive fuera de `MenuItemDef` porque no es declarativo
+ * (cambia en runtime), a diferencia del resto del árbol.
+ */
+export function buildModuloMenus(
+	userCapabilities: Set<string>,
+	rol?: UserRole,
+	badgesByRoute?: Record<string, number>,
+): ModuloMenu[] {
 	const hasPermisos = userCapabilities.size > 0;
 
 	const enabledItems = MENU_ITEMS.filter(
@@ -232,7 +241,7 @@ export function buildModuloMenus(userCapabilities: Set<string>, rol?: UserRole):
 			id: modulo.id,
 			label: modulo.label,
 			icon: modulo.icon,
-			items: groupItems(items, modulo.id),
+			items: groupItems(items, modulo.id, badgesByRoute),
 		});
 	}
 
@@ -325,13 +334,15 @@ export function modulosToNavItems(modulos: ModuloMenu[]): NavMenuItem[] {
 }
 
 /** Nodo hoja: item navegable sin hijos. */
-function toLeaf(item: MenuItemDef): NavMenuItem {
+function toLeaf(item: MenuItemDef, badgesByRoute?: Record<string, number>): NavMenuItem {
+	const badge = badgesByRoute?.[item.route];
 	return {
 		route: item.route,
 		label: item.label,
 		icon: item.icon,
 		exact: item.exact,
 		queryParams: item.queryParams,
+		...(badge ? { badge } : {}),
 	};
 }
 
@@ -341,7 +352,11 @@ function toLeaf(item: MenuItemDef): NavMenuItem {
  * quedan como hoja; los que comparten el label del nivel actual se agrupan en un submenú y
  * siguen recursando para el próximo nivel.
  */
-function groupChildren(groupedItems: MenuItemDef[], depth = 0): NavMenuItem[] {
+function groupChildren(
+	groupedItems: MenuItemDef[],
+	depth = 0,
+	badgesByRoute?: Record<string, number>,
+): NavMenuItem[] {
 	const flat: MenuItemDef[] = [];
 	const subgroups = new Map<string, { icon: string; items: MenuItemDef[] }>();
 
@@ -359,9 +374,9 @@ function groupChildren(groupedItems: MenuItemDef[], depth = 0): NavMenuItem[] {
 		}
 	}
 
-	const children: NavMenuItem[] = flat.map(toLeaf);
+	const children: NavMenuItem[] = flat.map((item) => toLeaf(item, badgesByRoute));
 	for (const [label, { icon, items: subItems }] of subgroups) {
-		children.push({ label, icon, children: groupChildren(subItems, depth + 1) });
+		children.push({ label, icon, children: groupChildren(subItems, depth + 1, badgesByRoute) });
 	}
 
 	return children.sort((a, b) => a.label.localeCompare(b.label, 'es'));
@@ -374,7 +389,11 @@ function groupChildren(groupedItems: MenuItemDef[], depth = 0): NavMenuItem[] {
  * después de "Inicio" en el module-selector (Ctrl+K) y el acordeón mobile, no antes por
  * orden alfabético.
  */
-function groupItems(items: MenuItemDef[], moduloId?: ModuloId): NavMenuItem[] {
+function groupItems(
+	items: MenuItemDef[],
+	moduloId?: ModuloId,
+	badgesByRoute?: Record<string, number>,
+): NavMenuItem[] {
 	const result: NavMenuItem[] = [];
 	const groups = new Map<string, { icon: string; items: MenuItemDef[] }>();
 
@@ -387,7 +406,7 @@ function groupItems(items: MenuItemDef[], moduloId?: ModuloId): NavMenuItem[] {
 				groups.set(item.group.label, { icon: item.group.icon, items: [item] });
 			}
 		} else {
-			result.push(toLeaf(item));
+			result.push(toLeaf(item, badgesByRoute));
 		}
 	}
 
@@ -395,7 +414,7 @@ function groupItems(items: MenuItemDef[], moduloId?: ModuloId): NavMenuItem[] {
 		result.push({
 			label,
 			icon,
-			children: groupChildren(groupedItems),
+			children: groupChildren(groupedItems, 0, badgesByRoute),
 		});
 	}
 

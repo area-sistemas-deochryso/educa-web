@@ -27,7 +27,10 @@
 							<span class="text-color-secondary text-sm">{{ curso.anio }}</span>
 						</div>
 					</ng-template>
-					<app-estudiante-rendimiento-chart [periodos]="curso.periodos" />
+					<app-estudiante-rendimiento-chart
+						[periodos]="curso.periodos"
+						[sinPeriodosConfigurados]="curso.sinPeriodosConfigurados"
+					/>
 				</p-card>
 			}
 		</div>

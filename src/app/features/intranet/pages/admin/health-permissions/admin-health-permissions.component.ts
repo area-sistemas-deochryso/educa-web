@@ -25,7 +25,7 @@ import { SalonHealthPermissionsTabComponent } from '@features/intranet/pages/pro
 	],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
-		<app-page-header icon="pi pi-heart" title="Permisos de Salud" />
+		<app-page-header icon="pi pi-heart" title="Permisos de Salud" subtitle="Administra los permisos de salud registrados por estudiante" />
 
 		<div class="p-4 pt-0">
 			<!-- #region Selector de salon -->

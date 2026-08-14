@@ -74,7 +74,7 @@
 						[severity]="getEstadoSeverity(item.estado)"
 					/>
 				</td>
-				<td>{{ item.justificacion || '—' }}</td>
+				<td>{{ getJustificacionDisplay(item.justificacion) }}</td>
 			</tr>
 		</ng-template>
 		<ng-template #emptymessage>

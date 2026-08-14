@@ -1,7 +1,6 @@
 <p-toast />
 
-<div class="faq-admin-header">
-	<h2>Gestión de FAQ</h2>
+<app-page-header icon="pi pi-question-circle" title="Gestión de FAQ" subtitle="Administra las preguntas frecuentes visibles en Ayuda">
 	<div class="faq-admin-toolbar">
 		<div class="search-box">
 			<i class="pi pi-search"></i>
@@ -35,7 +34,7 @@
 			data-info-anchor="admin-faq-nueva-btn"
 		></button>
 	</div>
-</div>
+</app-page-header>
 
 @if (facade.error()) {
 	<p class="faq-admin-error">No se pudo cargar el listado de FAQ. Intenta refrescar.</p>

@@ -74,6 +74,29 @@
 					class="literal-desc"
 					data-info-anchor="admin-salon-config-calificacion-literal-desc-input"
 				/>
+				<p-inputNumber
+					[ngModel]="literal.notaMinima"
+					(ngModelChange)="updateLiteral(i, 'notaMinima', $event)"
+					[min]="0"
+					[max]="20"
+					[minFractionDigits]="0"
+					[maxFractionDigits]="2"
+					mode="decimal"
+					placeholder="Mín"
+					styleClass="literal-nota"
+				/>
+				<span class="literal-nota-separator">–</span>
+				<p-inputNumber
+					[ngModel]="literal.notaMaxima"
+					(ngModelChange)="updateLiteral(i, 'notaMaxima', $event)"
+					[min]="0"
+					[max]="20"
+					[minFractionDigits]="0"
+					[maxFractionDigits]="2"
+					mode="decimal"
+					placeholder="Máx"
+					styleClass="literal-nota"
+				/>
 				<p-checkbox
 					[ngModel]="literal.esAprobatoria"
 					(ngModelChange)="updateLiteral(i, 'esAprobatoria', $event)"
@@ -94,6 +117,10 @@
 					data-info-anchor="admin-salon-config-calificacion-literal-remove-btn"
 				></button>
 			</div>
+		}
+
+		@if (rangoError(); as error) {
+			<small class="p-error block mt-2">{{ error }}</small>
 		}
 	}
 	<!-- #endregion -->

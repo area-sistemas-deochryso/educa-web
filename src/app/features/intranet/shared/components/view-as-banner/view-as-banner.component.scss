@@ -60,4 +60,18 @@
 		padding: 0.6rem 1rem;
 	}
 }
+
+// * En mobile angosto, "Cambiar"/"Salir" no entran junto al texto "Viendo
+// * como..." (que ya envuelve en varias líneas) y quedaban cortados fuera
+// * del viewport. Los bajamos a su propia línea, alineados a la derecha.
+@media screen and (max-width: 480px) {
+	.view-as-banner__inner {
+		flex-wrap: wrap;
+	}
+
+	.view-as-banner__actions {
+		width: 100%;
+		justify-content: flex-end;
+	}
+}
 // #endregion

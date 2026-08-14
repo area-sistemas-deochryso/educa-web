@@ -4,12 +4,15 @@ import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { SelectModule } from 'primeng/select';
+import { NivelEducativo } from '@core/helpers';
 import {
 	MiAsistenciaCursoResumenDto,
 	EstadoAsistenciaCurso,
 	ESTADO_ASISTENCIA_LABELS,
 	ESTADO_ASISTENCIA_SEVERITIES,
 } from '@features/intranet/pages/estudiante/models';
+
+const MENSAJE_JUSTIFICACION_GESTIONADA = 'Las justificaciones las gestiona el colegio con tu apoderado';
 
 @Component({
 	selector: 'app-student-attendance-tab',
@@ -25,6 +28,7 @@ export class StudentAttendanceTabComponent implements OnInit {
 	readonly loading = input<boolean>(false);
 	readonly cursoOptions = input<{ label: string; value: number }[]>([]);
 	readonly selectedCurso = input<number | null>(null);
+	readonly nivel = input<NivelEducativo | null>(null);
 	readonly cursoChange = output<number>();
 	// #endregion
 
@@ -76,6 +80,13 @@ export class StudentAttendanceTabComponent implements OnInit {
 
 	getEstadoSeverity(estado: string): 'success' | 'warn' | 'danger' | 'info' {
 		return (ESTADO_ASISTENCIA_SEVERITIES[estado as EstadoAsistenciaCurso] ?? 'info') as 'success' | 'warn' | 'danger' | 'info';
+	}
+
+	getJustificacionDisplay(justificacion: string | null): string {
+		if (justificacion) return justificacion;
+		const nivel = this.nivel();
+		if (nivel === 'Inicial' || nivel === 'Primaria') return MENSAJE_JUSTIFICACION_GESTIONADA;
+		return '—';
 	}
 
 	onCursoChange(value: number): void {

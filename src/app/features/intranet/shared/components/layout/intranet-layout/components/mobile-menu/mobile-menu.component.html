@@ -119,6 +119,9 @@
 												>
 													<i [class]="item.icon" class="result-icon"></i>
 													<span class="result-label">{{ item.label }}</span>
+													@if (item.badge) {
+														<p-tag [value]="item.badge.toString()" severity="danger" [rounded]="true" />
+													}
 													<button
 														type="button"
 														class="star-btn"
@@ -147,6 +150,9 @@
 												>
 													<i [class]="item.icon" class="result-icon"></i>
 													<span class="result-label">{{ item.label }}</span>
+													@if (item.badge) {
+														<p-tag [value]="item.badge.toString()" severity="danger" [rounded]="true" />
+													}
 													<button
 														type="button"
 														class="star-btn"
