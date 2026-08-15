@@ -6,9 +6,7 @@ import { catchError, forkJoin, of } from 'rxjs';
 import { facadeErrorHandler, logger, type FacadeErrorHandler } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services/error';
 
-import { DashboardDiaErrorCode } from '../models/email-dashboard-dia.models';
-
-import { EmailOutboxDashboardDiaService } from './email-outbox-dashboard-dia.service';
+import { DashboardDiaErrorCode, EmailOutboxDashboardDiaService } from '@features/intranet/pages/admin/email-outbox-shared';
 import { EmailOutboxDashboardDiaStore } from './email-outbox-dashboard-dia.store';
 
 @Injectable({ providedIn: 'root' })

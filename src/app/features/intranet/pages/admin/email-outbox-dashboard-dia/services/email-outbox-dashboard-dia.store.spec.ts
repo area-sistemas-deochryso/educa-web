@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { EmailDashboardDiaDto } from '../models/email-dashboard-dia.models';
+import { EmailDashboardDiaDto } from '@features/intranet/pages/admin/email-outbox-shared';
 import { EmailOutboxDashboardDiaStore } from './email-outbox-dashboard-dia.store';
 
 function makeDto(overrides: Partial<EmailDashboardDiaDto> = {}): EmailDashboardDiaDto {

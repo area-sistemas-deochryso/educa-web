@@ -2,7 +2,7 @@ import { computed, Injectable, signal } from '@angular/core';
 
 import { EmailOutboxLista } from '@data/models';
 
-import { EmailDashboardDiaDto, EmailDashboardFallosPorSender } from '../models/email-dashboard-dia.models';
+import { EmailDashboardDiaDto, EmailDashboardFallosPorSender } from '@features/intranet/pages/admin/email-outbox-shared';
 
 @Injectable({ providedIn: 'root' })
 export class EmailOutboxDashboardDiaStore {

@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ErrorHandlerService } from '@core/services/error';
 
-import { EmailOutboxDashboardDiaService } from '@features/intranet/pages/admin/email-outbox-dashboard-dia/services/email-outbox-dashboard-dia.service';
+import { EmailOutboxDashboardDiaService } from '@features/intranet/pages/admin/email-outbox-shared';
 
 import { DiagnosticoCorreosDiaDto } from '../models/correos-dia.models';
 

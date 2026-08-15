@@ -6,7 +6,7 @@ vi.mock('@config/environment', () => ({
 	environment: { features: { emailDeferAlerts: true } },
 }));
 
-import { EmailMonitoreoFacade } from '../../services/email-monitoreo.facade';
+import { EmailMonitoreoFacade } from '../email-outbox-dashboard-dia/services/email-monitoreo.facade';
 
 import { EmailDeferFailBannerComponent } from './email-defer-fail-banner.component';
 

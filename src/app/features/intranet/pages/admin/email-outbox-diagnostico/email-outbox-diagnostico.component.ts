@@ -6,7 +6,7 @@ import { TabsModule } from 'primeng/tabs';
 
 import { TabCorreoIndividualComponent } from './tab-correo-individual/tab-correo-individual.component';
 import { TabCorreosDiaComponent } from './tab-correos-dia/tab-correos-dia.component';
-import { EmailDeferFailBannerComponent } from '@features/intranet/pages/admin/email-outbox-dashboard-dia/components/email-defer-fail-banner/email-defer-fail-banner.component';
+import { EmailDeferFailBannerComponent } from '@features/intranet/pages/admin/email-outbox-shared';
 
 type TabId = 'gap' | 'correo';
 

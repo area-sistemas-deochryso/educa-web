@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import { environment } from '@config/environment';
 import { EmailOutboxLista } from '@data/models';
 
-import { AttendanceGapRow, EmailDashboardDiaDto, EmailDashboardFallosPorSender } from '../models/email-dashboard-dia.models';
+import { AttendanceGapRow, EmailDashboardDiaDto, EmailDashboardFallosPorSender } from './email-dashboard-dia.models';
 
 @Injectable({ providedIn: 'root' })
 export class EmailOutboxDashboardDiaService {

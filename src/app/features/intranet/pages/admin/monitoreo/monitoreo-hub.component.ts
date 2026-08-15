@@ -9,7 +9,7 @@ import { PageHeaderComponent } from '@intranet-shared/components/page-header/pag
 import { UserPermissionsService } from '@core/services';
 import { environment } from '@config/environment';
 import { EmailMonitoreoFacade } from '../email-outbox-dashboard-dia/services';
-import { EmailDeferFailBannerComponent } from '../email-outbox-dashboard-dia/components/email-defer-fail-banner/email-defer-fail-banner.component';
+import { EmailDeferFailBannerComponent } from '../email-outbox-shared';
 import { MonitoreoHubBadgesFacade } from './services/monitoreo-hub-badges.facade';
 import {
 	DomainId,

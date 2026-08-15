@@ -7,7 +7,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { ErrorHandlerService } from '@core/services/error';
 import { EmailOutboxLista } from '@data/models';
 
-import { TipoFalloLabelPipe } from '@features/intranet/pages/admin/email-outbox/pipes/tipo-fallo-label.pipe';
+import { TipoFalloLabelPipe } from '@features/intranet/pages/admin/email-outbox-shared';
 
 @Component({
 	selector: 'app-dashboard-fallos-table',

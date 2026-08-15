@@ -13,7 +13,7 @@ import { DashboardPorTipoTableComponent } from './components/dashboard-por-tipo-
 import { DashboardResumenComponent } from './components/dashboard-resumen/dashboard-resumen.component';
 import { DashboardFallosPorSenderTableComponent } from './components/dashboard-fallos-por-sender-table/dashboard-fallos-por-sender-table.component';
 import { MapaEnvioTabComponent } from './components/mapa-envio-tab/mapa-envio-tab.component';
-import { EmailDeferFailBannerComponent } from './components/email-defer-fail-banner/email-defer-fail-banner.component';
+import { EmailDeferFailBannerComponent } from '../email-outbox-shared';
 import { EmailOutboxDashboardDiaFacade } from './services';
 
 const PORTIPO_SKELETON_COLUMNS: SkeletonColumnDef[] = [

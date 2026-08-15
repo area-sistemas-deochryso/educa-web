@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
-import { EmailDashboardPorHora } from '../../models/email-dashboard-dia.models';
+import { EmailDashboardPorHora } from '@features/intranet/pages/admin/email-outbox-shared';
 
 // * Dimensiones del viewBox SVG — responsive via preserveAspectRatio="none"
 const VIEW_W = 720;

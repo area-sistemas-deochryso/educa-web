@@ -11,7 +11,7 @@ import {
 	DashboardSerieTemporalPunto,
 	DashboardTopDestinatario,
 	SerieTemporalGranularidad,
-} from '../models/email-monitoreo.models';
+} from '@features/intranet/pages/admin/email-outbox-shared';
 
 /**
  * Plan 39 Chat C — gateway HTTP a los 5 endpoints del Chat A (077) +

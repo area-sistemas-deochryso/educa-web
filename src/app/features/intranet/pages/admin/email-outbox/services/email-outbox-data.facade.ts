@@ -6,7 +6,7 @@ import { facadeErrorHandler, type FacadeErrorHandler } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services/error';
 import { StorageService } from '@core/services/storage';
 
-import { EmailOutboxApiService } from './email-outbox.service';
+import { EmailOutboxApiService } from '@features/intranet/pages/admin/email-outbox-shared';
 import { EmailOutboxStore } from './email-outbox.store';
 
 const THROTTLE_POLL_INTERVAL_MS = 30_000;

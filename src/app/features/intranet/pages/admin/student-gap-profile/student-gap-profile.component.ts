@@ -12,8 +12,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { logger } from '@core/helpers';
 import { EmailOutboxLista } from '@data/models';
 import { UsersService } from '../users/services';
-import { EmailOutboxDashboardDiaService } from '../email-outbox-dashboard-dia/services/email-outbox-dashboard-dia.service';
-import { AttendanceGapRow } from '../email-outbox-dashboard-dia/models/email-dashboard-dia.models';
+import { AttendanceGapRow, EmailOutboxDashboardDiaService } from '../email-outbox-shared';
 
 interface StudentIdentity {
 	alumno: string;

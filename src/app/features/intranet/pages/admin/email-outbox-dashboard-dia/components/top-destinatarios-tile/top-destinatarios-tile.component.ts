@@ -12,7 +12,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { TableSkeletonComponent } from '@intranet-shared/components';
 import type { SkeletonColumnDef } from '@intranet-shared/components';
 
-import { DashboardTopDestinatario } from '../../models/email-monitoreo.models';
+import { DashboardTopDestinatario } from '@features/intranet/pages/admin/email-outbox-shared';
 
 const SKELETON_COLUMNS: SkeletonColumnDef[] = [
 	{ width: 'flex', cellType: 'text' },

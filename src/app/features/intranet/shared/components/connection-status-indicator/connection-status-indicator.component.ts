@@ -3,7 +3,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 
 import { SignalRService, AttendanceSignalRService } from '@core/services/signalr';
-import { EmailHubService } from '@app/features/intranet/pages/admin/email-outbox-dashboard-dia/services/email-hub.service';
+import { EmailHubService } from '@app/features/intranet/pages/admin/email-outbox-shared';
 import { SwService } from '@core/services/sw';
 
 @Component({

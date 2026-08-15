@@ -23,12 +23,12 @@ import { ErrorStateComponent } from '@shared/components';
 import { CorrelationIdPillComponent } from '@intranet-shared/components';
 import { ExcelService } from '@core/services/excel';
 import { environment } from '@config/environment';
-import { EmailHubService } from '@features/intranet/pages/admin/email-outbox-dashboard-dia/services';
-import { EmailDeferFailBannerComponent } from '@features/intranet/pages/admin/email-outbox-dashboard-dia/components/email-defer-fail-banner/email-defer-fail-banner.component';
 import {
+	EmailHubService,
+	EmailDeferFailBannerComponent,
 	BlacklistEntryCreatedEvent,
 	CandidatoBlacklistDetectadoEvent,
-} from '@features/intranet/pages/admin/email-outbox-dashboard-dia/models/email-monitoreo.models';
+} from '@features/intranet/pages/admin/email-outbox-shared';
 
 import { HubContextBannerComponent, readHubContext } from '../monitoreo/shared';
 import { EmailOutboxDataFacade, EmailOutboxUiFacade } from './services';

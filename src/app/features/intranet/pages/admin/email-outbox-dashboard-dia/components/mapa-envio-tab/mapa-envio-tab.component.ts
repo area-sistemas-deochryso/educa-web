@@ -16,8 +16,8 @@ import { DominiosReceptoresTileComponent } from '../dominios-receptores-tile/dom
 import { SenderStatsTileComponent } from '../sender-stats-tile/sender-stats-tile.component';
 import { SerieTemporalTileComponent } from '../serie-temporal-tile/serie-temporal-tile.component';
 import { TopDestinatariosTileComponent } from '../top-destinatarios-tile/top-destinatarios-tile.component';
-import { EmailHubService, EmailMonitoreoFacade } from '../../services';
-import { SerieTemporalGranularidad } from '../../models/email-monitoreo.models';
+import { EmailMonitoreoFacade } from '../../services';
+import { EmailHubService, SerieTemporalGranularidad } from '@features/intranet/pages/admin/email-outbox-shared';
 
 /**
  * Plan 39 Chat C — container del tab "Mapa de envío". Monta los 6 tiles en

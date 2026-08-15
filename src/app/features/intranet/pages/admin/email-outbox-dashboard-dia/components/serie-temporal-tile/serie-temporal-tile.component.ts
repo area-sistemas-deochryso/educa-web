@@ -14,7 +14,7 @@ import { SkeletonLoaderComponent } from '@shared/components';
 import {
 	DashboardSerieTemporalPunto,
 	SerieTemporalGranularidad,
-} from '../../models/email-monitoreo.models';
+} from '@features/intranet/pages/admin/email-outbox-shared';
 
 interface Bucket {
 	bucket: string;

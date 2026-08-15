@@ -10,7 +10,7 @@ import {
 	EmailOutboxTendencia,
 	EmailOutboxTipo,
 } from '@data/models';
-import { DeferFailStatus } from '../models/defer-fail-status.models';
+import { DeferFailStatus } from '@features/intranet/pages/admin/email-outbox-shared';
 import { EmailOutboxExportDto } from '../models/email-outbox-export.models';
 import { EmailOutboxManualAttemptDto, ManualRetryResultDto } from '../models/manual-retry.models';
 import { ThrottleStatus } from '../models/throttle-status.models';

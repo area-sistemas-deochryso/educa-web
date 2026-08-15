@@ -15,7 +15,7 @@ import type { SkeletonColumnDef } from '@intranet-shared/components';
 import { CorrelationIdPillComponent } from '@intranet-shared/components';
 
 import { esPermanente } from '../../models/tipo-fallo.models';
-import { TipoFalloLabelPipe } from '../../pipes/tipo-fallo-label.pipe';
+import { TipoFalloLabelPipe } from '@features/intranet/pages/admin/email-outbox-shared';
 import { TipoFalloSeverityPipe } from '../../pipes/tipo-fallo-severity.pipe';
 
 @Component({

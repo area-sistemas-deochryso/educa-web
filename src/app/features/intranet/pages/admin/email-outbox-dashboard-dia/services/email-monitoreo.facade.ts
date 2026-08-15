@@ -5,13 +5,10 @@ import { Subscription, timer } from 'rxjs';
 import { logger, facadeErrorHandler, type FacadeErrorHandler } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
 
-import { EmailOutboxApiService } from '@features/intranet/pages/admin/email-outbox/services/email-outbox.service';
-
-import { SerieTemporalGranularidad } from '../models/email-monitoreo.models';
+import { EmailHubService, EmailOutboxApiService, SerieTemporalGranularidad } from '@features/intranet/pages/admin/email-outbox-shared';
 
 const LOG_TAG = 'EmailMonitoreo:Facade';
 
-import { EmailHubService } from './email-hub.service';
 import { EmailMonitoreoApiService } from './email-monitoreo.api.service';
 import { EmailMonitoreoStore } from './email-monitoreo.store';
 

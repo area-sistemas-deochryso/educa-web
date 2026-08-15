@@ -2,8 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 
-import { EmailDashboardFallosPorSender } from '../../models/email-dashboard-dia.models';
-import { TipoFalloLabelPipe } from '@features/intranet/pages/admin/email-outbox/pipes/tipo-fallo-label.pipe';
+import { EmailDashboardFallosPorSender, TipoFalloLabelPipe } from '@features/intranet/pages/admin/email-outbox-shared';
 
 @Component({
 	selector: 'app-dashboard-fallos-por-sender-table',

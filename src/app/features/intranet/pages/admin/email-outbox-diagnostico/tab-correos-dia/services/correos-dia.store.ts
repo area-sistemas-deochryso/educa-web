@@ -1,6 +1,6 @@
 import { computed, Injectable, signal } from '@angular/core';
 
-import { AttendanceGapRow } from '@features/intranet/pages/admin/email-outbox-dashboard-dia/models/email-dashboard-dia.models';
+import { AttendanceGapRow } from '@features/intranet/pages/admin/email-outbox-shared';
 
 import { DiagnosticoCorreosDiaDto } from '../models/correos-dia.models';
 

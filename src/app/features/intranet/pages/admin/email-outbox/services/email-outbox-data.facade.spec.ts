@@ -8,7 +8,7 @@ import { of, throwError } from 'rxjs';
 import { ErrorHandlerService } from '@core/services/error';
 import { StorageService } from '@core/services/storage';
 
-import { EmailOutboxApiService } from './email-outbox.service';
+import { EmailOutboxApiService } from '@features/intranet/pages/admin/email-outbox-shared';
 import { EmailOutboxStore } from './email-outbox.store';
 import { EmailOutboxDataFacade } from './email-outbox-data.facade';
 import { ThrottleStatus } from '../models/throttle-status.models';

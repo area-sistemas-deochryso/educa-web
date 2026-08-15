@@ -6,7 +6,7 @@ import { TooltipModule } from 'primeng/tooltip';
 
 import { ErrorHandlerService } from '@core/services/error';
 
-import { EmailBouncesAcumulados } from '../../models/email-dashboard-dia.models';
+import { EmailBouncesAcumulados } from '@features/intranet/pages/admin/email-outbox-shared';
 
 const WARNING_THRESHOLD = 2;
 const CRITICAL_THRESHOLD = 3;

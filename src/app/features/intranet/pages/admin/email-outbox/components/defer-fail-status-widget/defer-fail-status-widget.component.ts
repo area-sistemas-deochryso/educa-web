@@ -16,7 +16,7 @@ import {
 	DeferFailStatus,
 	DeferFailStatusLevel,
 	isProbableTelemetryFailure,
-} from '../../models/defer-fail-status.models';
+} from '@features/intranet/pages/admin/email-outbox-shared';
 
 type LevelSeverity = 'success' | 'warn' | 'danger';
 

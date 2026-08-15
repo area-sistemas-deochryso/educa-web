@@ -11,8 +11,9 @@ import {
 	BlacklistEntryCreatedEvent,
 	CandidatoBlacklistDetectadoEvent,
 	DeferFailStatusUpdatedEvent,
-} from '../../models/email-monitoreo.models';
-import { EmailHubService, EmailMonitoreoFacade } from '../../services';
+	EmailHubService,
+} from '@features/intranet/pages/admin/email-outbox-shared';
+import { EmailMonitoreoFacade } from '../../services';
 
 describe('MapaEnvioTabComponent', () => {
 	let fixture: ComponentFixture<MapaEnvioTabComponent>;

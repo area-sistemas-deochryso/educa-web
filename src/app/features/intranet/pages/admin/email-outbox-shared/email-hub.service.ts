@@ -9,7 +9,7 @@ import {
 	BlacklistEntryCreatedEvent,
 	CandidatoBlacklistDetectadoEvent,
 	DeferFailStatusUpdatedEvent,
-} from '../models/email-monitoreo.models';
+} from './email-monitoreo.models';
 
 const LOG_TAG = 'EmailHub:Service';
 const HUB_GROUP = 'email-alerts';

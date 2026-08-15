@@ -8,7 +8,7 @@ import { DatePipe, DecimalPipe } from '@angular/common';
 
 import { TableSkeletonComponent } from '@intranet-shared/components';
 import type { SkeletonColumnDef } from '@intranet-shared/components';
-import { DashboardSenderStat } from '../../models/email-monitoreo.models';
+import { DashboardSenderStat } from '@features/intranet/pages/admin/email-outbox-shared';
 
 const SKELETON_COLUMNS: SkeletonColumnDef[] = [
 	{ width: 'flex', cellType: 'text' },

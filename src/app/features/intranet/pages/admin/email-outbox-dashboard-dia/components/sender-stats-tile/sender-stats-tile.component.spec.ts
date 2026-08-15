@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { SenderStatsTileComponent } from './sender-stats-tile.component';
-import { DashboardSenderStat } from '../../models/email-monitoreo.models';
+import { DashboardSenderStat } from '@features/intranet/pages/admin/email-outbox-shared';
 
 const SAMPLE: DashboardSenderStat[] = [
 	{

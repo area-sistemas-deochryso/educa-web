@@ -17,7 +17,7 @@ import {
 } from '@data/models';
 
 import { TIPOS_FALLO } from '../../models/tipo-fallo.models';
-import { TipoFalloLabelPipe } from '../../pipes/tipo-fallo-label.pipe';
+import { TipoFalloLabelPipe } from '@features/intranet/pages/admin/email-outbox-shared';
 
 interface SelectOption {
 	label: string;

@@ -7,7 +7,7 @@ import {
 import { TagModule } from 'primeng/tag';
 
 import { SkeletonLoaderComponent } from '@shared/components';
-import { DeferFailStatus } from '@features/intranet/pages/admin/email-outbox/models/defer-fail-status.models';
+import { DeferFailStatus } from '@features/intranet/pages/admin/email-outbox-shared';
 
 type LevelSeverity = 'success' | 'warn' | 'danger';
 

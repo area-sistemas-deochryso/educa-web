@@ -5,9 +5,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ErrorHandlerService } from '@core/services/error';
 
-import { EmailDashboardDiaDto } from '../models/email-dashboard-dia.models';
+import { EmailDashboardDiaDto } from '@features/intranet/pages/admin/email-outbox-shared';
 import { EmailOutboxDashboardDiaFacade } from './email-outbox-dashboard-dia.facade';
-import { EmailOutboxDashboardDiaService } from './email-outbox-dashboard-dia.service';
+import { EmailOutboxDashboardDiaService } from '@features/intranet/pages/admin/email-outbox-shared';
 import { EmailOutboxDashboardDiaStore } from './email-outbox-dashboard-dia.store';
 
 function makeDto(overrides: Partial<EmailDashboardDiaDto> = {}): EmailDashboardDiaDto {

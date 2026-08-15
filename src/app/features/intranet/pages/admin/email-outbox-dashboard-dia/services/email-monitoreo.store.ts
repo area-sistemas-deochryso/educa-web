@@ -1,17 +1,16 @@
 import { computed, Injectable, signal } from '@angular/core';
 
-import { DeferFailStatus } from '@features/intranet/pages/admin/email-outbox/models/defer-fail-status.models';
-
 import {
 	DashboardCandidatoBlacklist,
 	DashboardDominioReceptor,
 	DashboardSenderStat,
 	DashboardSerieTemporalPunto,
 	DashboardTopDestinatario,
+	DeferFailStatus,
 	MAPA_ENVIO_DEFAULTS,
 	MapaEnvioFilters,
 	SerieTemporalGranularidad,
-} from '../models/email-monitoreo.models';
+} from '@features/intranet/pages/admin/email-outbox-shared';
 
 /**
  * Plan 39 Chat C — estado independiente por tile (D11): cada tile carga,

@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { DeferFailLiveCounterTileComponent } from './defer-fail-live-counter-tile.component';
-import { DeferFailStatus } from '@features/intranet/pages/admin/email-outbox/models/defer-fail-status.models';
+import { DeferFailStatus } from '@features/intranet/pages/admin/email-outbox-shared';
 
 function makeStatus(over: Partial<DeferFailStatus> = {}): DeferFailStatus {
 	return {

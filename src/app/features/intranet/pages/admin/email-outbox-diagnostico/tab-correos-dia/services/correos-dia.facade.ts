@@ -6,7 +6,7 @@ import { catchError, forkJoin, of } from 'rxjs';
 import { ErrorHandlerService } from '@core/services/error';
 import { logger } from '@core/helpers';
 
-import { EmailOutboxDashboardDiaService } from '@features/intranet/pages/admin/email-outbox-dashboard-dia/services/email-outbox-dashboard-dia.service';
+import { EmailOutboxDashboardDiaService } from '@features/intranet/pages/admin/email-outbox-shared';
 
 import { CorreosDiaErrorCode } from '../models/correos-dia.models';
 

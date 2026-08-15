@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 
-import { EmailDashboardPorTipo } from '../../models/email-dashboard-dia.models';
+import { EmailDashboardPorTipo } from '@features/intranet/pages/admin/email-outbox-shared';
 
 @Component({
 	selector: 'app-dashboard-por-tipo-table',

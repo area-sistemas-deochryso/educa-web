@@ -8,10 +8,10 @@ import {
 	EmailOutboxLista,
 	EmailOutboxTendencia,
 } from '@data/models';
-import { DeferFailStatus } from '../models/defer-fail-status.models';
-import { EmailOutboxExportDto } from '../models/email-outbox-export.models';
-import { EmailOutboxManualAttemptDto, ManualRetryResultDto } from '../models/manual-retry.models';
-import { ThrottleStatus } from '../models/throttle-status.models';
+import { DeferFailStatus } from './defer-fail-status.models';
+import { EmailOutboxExportDto } from '../email-outbox/models/email-outbox-export.models';
+import { EmailOutboxManualAttemptDto, ManualRetryResultDto } from '../email-outbox/models/manual-retry.models';
+import { ThrottleStatus } from '../email-outbox/models/throttle-status.models';
 
 @Injectable({ providedIn: 'root' })
 export class EmailOutboxApiService {

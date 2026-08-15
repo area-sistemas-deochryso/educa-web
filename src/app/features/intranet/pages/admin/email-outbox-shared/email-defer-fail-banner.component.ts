@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 
 import { environment } from '@config/environment';
-import { EmailMonitoreoFacade } from '../../services/email-monitoreo.facade';
+import { EmailMonitoreoFacade } from '../email-outbox-dashboard-dia/services/email-monitoreo.facade';
 // #endregion
 
 // #region Constants

@@ -24,12 +24,12 @@ import { TooltipModule } from 'primeng/tooltip';
 
 import { MiniSparklineComponent, TableSkeletonComponent } from '@intranet-shared/components';
 import { environment } from '@config/environment';
-import { EmailHubService } from '@features/intranet/pages/admin/email-outbox-dashboard-dia/services';
-import { EmailDeferFailBannerComponent } from '@features/intranet/pages/admin/email-outbox-dashboard-dia/components/email-defer-fail-banner/email-defer-fail-banner.component';
 import {
+	EmailHubService,
+	EmailDeferFailBannerComponent,
 	BlacklistEntryCreatedEvent,
 	CandidatoBlacklistDetectadoEvent,
-} from '@features/intranet/pages/admin/email-outbox-dashboard-dia/models/email-monitoreo.models';
+} from '@features/intranet/pages/admin/email-outbox-shared';
 import {
 	CrearBlacklistRequest,
 	EmailBlacklistEntry,

@@ -7,7 +7,7 @@ import { DeferFailStatusWidgetComponent } from './defer-fail-status-widget.compo
 import {
 	DeferFailStatus,
 	DeferFailStatusLevel,
-} from '../../models/defer-fail-status.models';
+} from '@features/intranet/pages/admin/email-outbox-shared';
 // #endregion
 
 // #region Factories

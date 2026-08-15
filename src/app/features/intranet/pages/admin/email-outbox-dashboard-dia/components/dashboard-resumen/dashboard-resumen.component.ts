@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { EmailDashboardResumen } from '../../models/email-dashboard-dia.models';
+import { EmailDashboardResumen } from '@features/intranet/pages/admin/email-outbox-shared';
 
 // * Threshold del techo cPanel defer/fail (5 fails+defers por hora por dominio, política hosting).
 // * El contador del DTO es del día completo — aquí el semáforo se aplica al acumulado diario como
