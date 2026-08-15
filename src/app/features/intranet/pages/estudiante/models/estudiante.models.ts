@@ -79,6 +79,7 @@ export {
 } from '../../profesor/models';
 
 export interface MiAsistenciaCursoItemDto {
+	asistenciaCursoId: number;
 	fecha: string;
 	estado: EstadoAsistenciaCurso;
 	justificacion: string | null;
@@ -93,5 +94,34 @@ export interface MiAsistenciaCursoResumenDto {
 	totalFalto: number;
 	totalClases: number;
 	detalle: MiAsistenciaCursoItemDto[];
+}
+// #endregion
+
+// #region Solicitud de justificación (autoservicio estudiante)
+export type EstadoSolicitudJustificacion = 'PENDIENTE' | 'APROBADA' | 'RECHAZADA';
+
+export interface SolicitudJustificacionAsistenciaDto {
+	id: number;
+	asistenciaCursoId: number;
+	horarioId: number;
+	cursoNombre: string;
+	salonDescripcion: string;
+	fecha: string;
+	estudianteId: number;
+	estudianteNombre: string;
+	estado: EstadoSolicitudJustificacion;
+	comentario: string | null;
+	documentoUrl: string | null;
+	documentoNombre: string | null;
+	motivoRechazo: string | null;
+	resueltoPorRol: string | null;
+	fechaResolucion: string | null;
+	fechaSolicitud: string;
+}
+
+export interface JustificarInasistenciaContext {
+	asistenciaCursoId: number;
+	fecha: string;
+	motivoRechazoAnterior: string | null;
 }
 // #endregion

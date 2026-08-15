@@ -7,12 +7,17 @@ import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { environment } from '@config/environment';
 import { detectarNivel } from '@core/helpers';
-import { EstudianteSalon, GruposResumenDto } from '@features/intranet/pages/estudiante/models';
+import {
+	EstudianteSalon,
+	GruposResumenDto,
+	MiAsistenciaCursoResumenDto,
+	SolicitudJustificacionAsistenciaDto,
+	JustificarInasistenciaContext,
+} from '@features/intranet/pages/estudiante/models';
 import { EstudianteGruposTabComponent } from '../estudiante-grupos-tab/estudiante-grupos-tab.component';
 import { StudentAttendanceTabComponent } from '../student-attendance-tab/student-attendance-tab.component';
 import { CampusNavigationComponent } from '@features/intranet/pages/cross-role/campus-navigation/campus-navigation.component';
 import { EstudianteNotasComponent } from '@features/intranet/pages/estudiante/notas/estudiante-notas.component';
-import { MiAsistenciaCursoResumenDto } from '@features/intranet/pages/estudiante/models';
 
 // #endregion
 @Component({
@@ -169,7 +174,14 @@ import { MiAsistenciaCursoResumenDto } from '@features/intranet/pages/estudiante
 									[cursoOptions]="cursosOptions()"
 									[selectedCurso]="asistenciaCursoId()"
 									[nivel]="nivel()"
+									[solicitudes]="solicitudes()"
+									[justificarDialogVisible]="justificarDialogVisible()"
+									[justificarContext]="justificarContext()"
+									[solicitudSaving]="solicitudSaving()"
 									(cursoChange)="onAsistenciaCursoChange($event)"
+									(abrirJustificar)="abrirJustificar.emit($event)"
+									(justificarDialogVisibleChange)="justificarDialogVisibleChange.emit($event)"
+									(guardarJustificacion)="guardarJustificacion.emit($event)"
 								/>
 							}
 						</p-tabpanel>
@@ -204,12 +216,19 @@ export class EstudianteSalonDialogComponent {
 	readonly asistenciaData = input<MiAsistenciaCursoResumenDto | null>(null);
 	readonly asistenciaLoading = input<boolean>(false);
 	readonly asistenciaCursoId = input<number | null>(null);
+	readonly solicitudes = input<SolicitudJustificacionAsistenciaDto[]>([]);
+	readonly justificarDialogVisible = input<boolean>(false);
+	readonly justificarContext = input<JustificarInasistenciaContext | null>(null);
+	readonly solicitudSaving = input<boolean>(false);
 	// #endregion
 
 	// #region Outputs
 	readonly visibleChange = output<boolean>();
 	readonly gruposChange = output<number>();
 	readonly asistenciaChange = output<number>();
+	readonly abrirJustificar = output<JustificarInasistenciaContext>();
+	readonly justificarDialogVisibleChange = output<boolean>();
+	readonly guardarJustificacion = output<{ asistenciaCursoId: number; formData: FormData }>();
 	// #endregion
 
 	// #region Estado local

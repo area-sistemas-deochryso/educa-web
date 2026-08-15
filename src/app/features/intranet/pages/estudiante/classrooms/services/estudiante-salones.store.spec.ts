@@ -187,5 +187,33 @@ describe('StudentClassroomsStore', () => {
 		});
 	});
 	// #endregion
+
+	// #region Solicitudes de justificación
+	describe('solicitudes de justificación', () => {
+		it('should set solicitudes', () => {
+			store.setSolicitudes([{ id: 1, asistenciaCursoId: 5 } as never]);
+			expect(store.solicitudes()).toHaveLength(1);
+		});
+
+		it('should append a solicitud', () => {
+			store.setSolicitudes([{ id: 1, asistenciaCursoId: 5 } as never]);
+			store.addSolicitud({ id: 2, asistenciaCursoId: 6 } as never);
+			expect(store.solicitudes()).toHaveLength(2);
+		});
+
+		it('should open and close the justificar dialog', () => {
+			const context = { asistenciaCursoId: 5, fecha: '2026-08-10', motivoRechazoAnterior: null };
+			store.openJustificarDialog(context);
+
+			expect(store.justificarDialogVisible()).toBe(true);
+			expect(store.justificarContext()).toEqual(context);
+
+			store.closeJustificarDialog();
+
+			expect(store.justificarDialogVisible()).toBe(false);
+			expect(store.justificarContext()).toBeNull();
+		});
+	});
+	// #endregion
 });
 // #endregion

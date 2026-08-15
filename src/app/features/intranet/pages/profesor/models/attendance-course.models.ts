@@ -1,23 +1,26 @@
 // #region Constants
-export const ESTADOS_ASISTENCIA_CURSO = ['P', 'T', 'F'] as const;
+export const ESTADOS_ASISTENCIA_CURSO = ['P', 'T', 'F', 'J'] as const;
 export type EstadoAsistenciaCurso = (typeof ESTADOS_ASISTENCIA_CURSO)[number];
 
 export const ESTADO_ASISTENCIA_LABELS: Record<EstadoAsistenciaCurso, string> = {
 	P: 'Presente',
 	T: 'Tarde',
 	F: 'Faltó',
+	J: 'Justificado',
 };
 
 export const ESTADO_ASISTENCIA_SEVERITIES: Record<EstadoAsistenciaCurso, string> = {
 	P: 'success',
 	T: 'warn',
 	F: 'danger',
+	J: 'info',
 };
 
 export const ESTADO_ASISTENCIA_ICONS: Record<EstadoAsistenciaCurso, string> = {
 	P: 'pi pi-check-circle',
 	T: 'pi pi-clock',
 	F: 'pi pi-times-circle',
+	J: 'pi pi-file-check',
 };
 // #endregion
 

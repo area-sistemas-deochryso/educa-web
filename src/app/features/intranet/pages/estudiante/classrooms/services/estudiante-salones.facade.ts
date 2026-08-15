@@ -1,10 +1,12 @@
 import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
+import { environment } from '@config';
 import { StudentClassroomsStore } from './estudiante-salones.store';
 import { EstudianteApiService } from '../../services/estudiante-api.service';
 import { logger } from '@core/helpers';
-import { ErrorHandlerService } from '@core/services';
+import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
+import { JustificarInasistenciaContext } from '../../models';
 
 @Injectable({ providedIn: 'root' })
 export class StudentClassroomsFacade {
@@ -13,6 +15,8 @@ export class StudentClassroomsFacade {
 	private readonly api = inject(EstudianteApiService);
 	private readonly destroyRef = inject(DestroyRef);
 	private readonly errorHandler = inject(ErrorHandlerService);
+	private readonly wal = inject(WalFacadeHelper);
+	private readonly justificacionUrl = `${environment.apiUrl}/api/justificacion-asistencia`;
 	// #endregion
 
 	// #region Estado expuesto
@@ -27,12 +31,14 @@ export class StudentClassroomsFacade {
 		forkJoin({
 			horarios: this.api.getMisHorarios(),
 			notas: this.api.getMisNotas(),
+			solicitudes: this.api.getMisSolicitudes(),
 		})
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
-				next: ({ horarios, notas }) => {
+				next: ({ horarios, notas, solicitudes }) => {
 					this.store.setHorarios(horarios);
 					this.store.setNotasData(notas);
+					this.store.setSolicitudes(solicitudes);
 					this.store.setLoading(false);
 				},
 				error: (err) => {
@@ -97,6 +103,42 @@ export class StudentClassroomsFacade {
 					this.store.setAsistenciaLoading(false);
 				},
 			});
+	}
+	// #endregion
+
+	// #region Solicitudes de justificación
+	openJustificarDialog(context: JustificarInasistenciaContext): void {
+		this.store.openJustificarDialog(context);
+	}
+
+	closeJustificarDialog(): void {
+		this.store.closeJustificarDialog();
+	}
+
+	crearSolicitudJustificacion(formData: FormData): void {
+		this.store.setSolicitudSaving(true);
+
+		// server-confirmed (no WAL/optimistic queue): la solicitud requiere
+		// confirmación real del backend antes de cerrar el dialog — no tiene
+		// sentido reflejar éxito optimista para un adjunto que aún no se subió.
+		this.wal.execute({
+			operation: 'CREATE',
+			resourceType: 'justificacionAsistencia',
+			endpoint: this.justificacionUrl,
+			method: 'POST',
+			payload: formData,
+			consistencyLevel: 'server-confirmed',
+			http$: () => this.api.crearSolicitudJustificacion(formData),
+			onCommit: (solicitud) => {
+				this.store.addSolicitud(solicitud);
+				this.store.setSolicitudSaving(false);
+				this.store.closeJustificarDialog();
+			},
+			onError: (err) => {
+				logger.error('Error al crear solicitud de justificación', err);
+				this.store.setSolicitudSaving(false);
+			},
+		});
 	}
 	// #endregion
 

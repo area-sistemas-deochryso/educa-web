@@ -14,6 +14,7 @@ import {
 	EstudianteMisNotasDto,
 	MiAsistenciaCursoResumenDto,
 	GruposResumenDto,
+	SolicitudJustificacionAsistenciaDto,
 } from '../models';
 
 @Injectable({ providedIn: 'root' })
@@ -22,6 +23,7 @@ export class EstudianteApiService {
 	private readonly viewAsContext = inject(ViewAsContextService);
 	private readonly baseUrl = `${environment.apiUrl}/api/EstudianteCurso`;
 	private readonly blobUrl = `${environment.apiUrl}/api/blobstorage`;
+	private readonly justificacionAsistenciaUrl = `${environment.apiUrl}/api/justificacion-asistencia`;
 
 	// #region Consultas
 
@@ -124,6 +126,18 @@ export class EstudianteApiService {
 
 	getGruposHorario(horarioId: number): Observable<GruposResumenDto | null> {
 		return this.http.get<GruposResumenDto>(`${this.baseUrl}/horario/${horarioId}/grupos`);
+	}
+
+	// #endregion
+
+	// #region Justificación de inasistencia (autoservicio)
+
+	crearSolicitudJustificacion(formData: FormData): Observable<SolicitudJustificacionAsistenciaDto> {
+		return this.http.post<SolicitudJustificacionAsistenciaDto>(this.justificacionAsistenciaUrl, formData);
+	}
+
+	getMisSolicitudes(): Observable<SolicitudJustificacionAsistenciaDto[]> {
+		return this.http.get<SolicitudJustificacionAsistenciaDto[]>(`${this.justificacionAsistenciaUrl}/mis-solicitudes`);
 	}
 
 	// #endregion

@@ -1,0 +1,132 @@
+<app-page-header icon="pi pi-check-square" title="Mi Asistencia" />
+
+<div class="p-4 pt-0">
+	@if (pageLoading()) {
+		<div class="flex justify-content-center p-5">
+			<p-progressSpinner strokeWidth="4" />
+		</div>
+	} @else if (cursoOptions().length === 0) {
+		<div class="flex flex-column align-items-center p-5 text-color-secondary">
+			<i class="pi pi-check-square text-4xl mb-3"></i>
+			<p>No tienes cursos asignados</p>
+		</div>
+	} @else {
+		@if (cursoOptions().length > 1) {
+			<div class="filters-row mb-3">
+				<p-select
+					data-info-anchor="curso-selector"
+					[options]="cursoOptions()"
+					[(ngModel)]="selectedHorarioId"
+					placeholder="Seleccionar curso"
+					appendTo="body"
+					(ngModelChange)="onCursoChange($event)"
+				/>
+			</div>
+		}
+
+		@if (asistenciaLoading()) {
+			<div class="flex justify-content-center p-5">
+				<p-progressSpinner strokeWidth="4" />
+			</div>
+		} @else if (asistencia()) {
+			<!-- Stats -->
+			<div class="stat-cards mb-4">
+				<div class="stat-card stat-success">
+					<div class="stat-value">{{ asistencia()!.totalPresente }}</div>
+					<div class="stat-label">Presente</div>
+				</div>
+				<div class="stat-card stat-warn">
+					<div class="stat-value">{{ asistencia()!.totalTarde }}</div>
+					<div class="stat-label">Tarde</div>
+				</div>
+				<div class="stat-card stat-danger">
+					<div class="stat-value">{{ asistencia()!.totalFalto }}</div>
+					<div class="stat-label">Faltó</div>
+				</div>
+				<div class="stat-card stat-info">
+					<div class="stat-value">{{ porcentaje() }}%</div>
+					<div class="stat-label">Asistencia</div>
+				</div>
+			</div>
+
+			<!-- Tabla detalle -->
+			@if (asistencia()!.detalle.length > 0) {
+				<p-table
+					[value]="asistencia()!.detalle"
+					[paginator]="true"
+					[rows]="10"
+					styleClass="p-datatable-sm"
+				>
+					<ng-template #header>
+						<tr>
+							<th>Fecha</th>
+							<th>Estado</th>
+							<th>Justificación</th>
+						</tr>
+					</ng-template>
+					<ng-template #body let-item>
+						<tr>
+							<td>{{ item.fecha | date : 'dd/MM/yyyy' }}</td>
+							<td>
+								<p-tag
+									[value]="getEstadoLabel(item.estado)"
+									[severity]="getEstadoSeverity(item.estado)"
+								/>
+							</td>
+							<td>
+								@let jstate = getJustificacionState(item);
+								@switch (jstate.kind) {
+									@case ('text') { {{ jstate.text }} }
+									@case ('gestionada') { {{ mensajeGestionada }} }
+									@case ('pendiente') {
+										<p-tag value="Pendiente de aprobación" severity="info" />
+									}
+									@case ('rechazada') {
+										<p-tag
+											value="Rechazada"
+											severity="danger"
+											[pTooltip]="jstate.motivoRechazo ?? 'Sin motivo registrado'"
+											tooltipPosition="top"
+										/>
+										<button
+											pButton
+											type="button"
+											label="Reintentar"
+											class="p-button-text p-button-sm"
+											data-info-anchor="estudiante-justificar-reintentar-standalone"
+											(click)="onAbrirJustificar(item)"
+										></button>
+									}
+									@case ('justificar') {
+										<button
+											pButton
+											type="button"
+											label="Justificar"
+											icon="pi pi-upload"
+											class="p-button-text p-button-sm"
+											data-info-anchor="estudiante-justificar-inasistencia-standalone"
+											(click)="onAbrirJustificar(item)"
+										></button>
+									}
+									@default { — }
+								}
+							</td>
+						</tr>
+					</ng-template>
+				</p-table>
+			} @else {
+				<div class="flex flex-column align-items-center p-4 text-color-secondary">
+					<p>No hay registros de asistencia</p>
+				</div>
+			}
+		}
+	}
+</div>
+
+<app-justificar-inasistencia-dialog
+	[visible]="justificarDialogVisible()"
+	[contexto]="justificarContext()"
+	[saving]="solicitudSaving()"
+	(visibleChange)="onJustificarDialogVisibleChange($event)"
+	(save)="onGuardarJustificacion($event)"
+/>

@@ -6,6 +6,8 @@ import {
 	MiAsistenciaCursoResumenDto,
 	EstudianteMisNotasDto,
 	GruposResumenDto,
+	SolicitudJustificacionAsistenciaDto,
+	JustificarInasistenciaContext,
 } from '../../models';
 
 @Injectable({ providedIn: 'root' })
@@ -34,6 +36,12 @@ export class StudentClassroomsStore {
 	// Notas tab
 	private readonly _notasData = signal<EstudianteMisNotasDto[]>([]);
 	private readonly _notasLoading = signal(false);
+
+	// Solicitudes de justificación
+	private readonly _solicitudes = signal<SolicitudJustificacionAsistenciaDto[]>([]);
+	private readonly _solicitudSaving = signal(false);
+	private readonly _justificarDialogVisible = signal(false);
+	private readonly _justificarContext = signal<JustificarInasistenciaContext | null>(null);
 	// #endregion
 
 	// #region Computed — Salones derivados de horarios
@@ -99,6 +107,10 @@ export class StudentClassroomsStore {
 	readonly gruposCursoId = this._gruposCursoId.asReadonly();
 	readonly notasData = this._notasData.asReadonly();
 	readonly notasLoading = this._notasLoading.asReadonly();
+	readonly solicitudes = this._solicitudes.asReadonly();
+	readonly solicitudSaving = this._solicitudSaving.asReadonly();
+	readonly justificarDialogVisible = this._justificarDialogVisible.asReadonly();
+	readonly justificarContext = this._justificarContext.asReadonly();
 	readonly isEmpty = computed(() => this.salones().length === 0 && !this._loading());
 	// #endregion
 
@@ -120,6 +132,10 @@ export class StudentClassroomsStore {
 		gruposCursoId: this.gruposCursoId(),
 		notasData: this.notasData(),
 		notasLoading: this.notasLoading(),
+		solicitudes: this.solicitudes(),
+		solicitudSaving: this.solicitudSaving(),
+		justificarDialogVisible: this.justificarDialogVisible(),
+		justificarContext: this.justificarContext(),
 	}));
 	// #endregion
 
@@ -146,6 +162,30 @@ export class StudentClassroomsStore {
 
 	setNotasLoading(loading: boolean): void {
 		this._notasLoading.set(loading);
+	}
+	// #endregion
+
+	// #region Comandos de solicitudes de justificación
+	setSolicitudes(solicitudes: SolicitudJustificacionAsistenciaDto[]): void {
+		this._solicitudes.set(solicitudes);
+	}
+
+	addSolicitud(solicitud: SolicitudJustificacionAsistenciaDto): void {
+		this._solicitudes.update((current) => [...current, solicitud]);
+	}
+
+	setSolicitudSaving(saving: boolean): void {
+		this._solicitudSaving.set(saving);
+	}
+
+	openJustificarDialog(context: JustificarInasistenciaContext): void {
+		this._justificarContext.set(context);
+		this._justificarDialogVisible.set(true);
+	}
+
+	closeJustificarDialog(): void {
+		this._justificarDialogVisible.set(false);
+		this._justificarContext.set(null);
 	}
 	// #endregion
 

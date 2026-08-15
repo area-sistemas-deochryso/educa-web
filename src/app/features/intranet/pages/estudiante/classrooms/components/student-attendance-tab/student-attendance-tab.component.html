@@ -74,7 +74,44 @@
 						[severity]="getEstadoSeverity(item.estado)"
 					/>
 				</td>
-				<td>{{ getJustificacionDisplay(item.justificacion) }}</td>
+				<td>
+					@let jstate = getJustificacionState(item);
+					@switch (jstate.kind) {
+						@case ('text') { {{ jstate.text }} }
+						@case ('gestionada') { {{ mensajeGestionada }} }
+						@case ('pendiente') {
+							<p-tag value="Pendiente de aprobación" severity="info" />
+						}
+						@case ('rechazada') {
+							<p-tag
+								value="Rechazada"
+								severity="danger"
+								[pTooltip]="jstate.motivoRechazo ?? 'Sin motivo registrado'"
+								tooltipPosition="top"
+							/>
+							<button
+								pButton
+								type="button"
+								label="Reintentar"
+								class="p-button-text p-button-sm"
+								data-info-anchor="estudiante-justificar-reintentar"
+								(click)="onAbrirJustificar(item)"
+							></button>
+						}
+						@case ('justificar') {
+							<button
+								pButton
+								type="button"
+								label="Justificar"
+								icon="pi pi-upload"
+								class="p-button-text p-button-sm"
+								data-info-anchor="estudiante-justificar-inasistencia"
+								(click)="onAbrirJustificar(item)"
+							></button>
+						}
+						@default { — }
+					}
+				</td>
 			</tr>
 		</ng-template>
 		<ng-template #emptymessage>
@@ -88,3 +125,11 @@
 	<!-- #endregion -->
 }
 <!-- #endregion -->
+
+<app-justificar-inasistencia-dialog
+	[visible]="justificarDialogVisible()"
+	[contexto]="justificarContext()"
+	[saving]="solicitudSaving()"
+	(visibleChange)="justificarDialogVisibleChange.emit($event)"
+	(save)="guardarJustificacion.emit($event)"
+/>

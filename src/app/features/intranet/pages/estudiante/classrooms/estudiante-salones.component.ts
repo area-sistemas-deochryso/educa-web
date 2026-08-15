@@ -6,7 +6,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { PageHeaderComponent, PeriodToggleComponent, EmptyStateComponent } from '@intranet-shared/components';
 import { StudentClassroomsFacade } from './services/estudiante-salones.facade';
-import { EstudianteSalon, EstudianteSalonCurso } from '../models';
+import { EstudianteSalon, EstudianteSalonCurso, JustificarInasistenciaContext } from '../models';
 import { EstudianteSalonDialogComponent } from './components/estudiante-salon-dialog/estudiante-salon-dialog.component';
 
 @Component({
@@ -102,9 +102,16 @@ import { EstudianteSalonDialogComponent } from './components/estudiante-salon-di
 			[asistenciaData]="vm().asistenciaData"
 			[asistenciaLoading]="vm().asistenciaLoading"
 			[asistenciaCursoId]="vm().asistenciaCursoId"
+			[solicitudes]="vm().solicitudes"
+			[justificarDialogVisible]="vm().justificarDialogVisible"
+			[justificarContext]="vm().justificarContext"
+			[solicitudSaving]="vm().solicitudSaving"
 			(visibleChange)="onDialogVisibleChange($event)"
 			(gruposChange)="onGruposChange($event)"
 			(asistenciaChange)="onAsistenciaChange($event)"
+			(abrirJustificar)="onAbrirJustificar($event)"
+			(justificarDialogVisibleChange)="onJustificarDialogVisibleChange($event)"
+			(guardarJustificacion)="onGuardarJustificacion($event)"
 		/>
 	`,
 })
@@ -165,5 +172,17 @@ export class StudentClassroomsComponent implements OnInit {
 
 	onAsistenciaChange(horarioId: number): void {
 		this.facade.loadAsistencia(horarioId);
+	}
+
+	onAbrirJustificar(context: JustificarInasistenciaContext): void {
+		this.facade.openJustificarDialog(context);
+	}
+
+	onJustificarDialogVisibleChange(visible: boolean): void {
+		if (!visible) this.facade.closeJustificarDialog();
+	}
+
+	onGuardarJustificacion(payload: { asistenciaCursoId: number; formData: FormData }): void {
+		this.facade.crearSolicitudJustificacion(payload.formData);
 	}
 }

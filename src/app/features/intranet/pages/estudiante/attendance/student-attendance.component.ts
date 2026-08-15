@@ -15,6 +15,8 @@ import { Select } from 'primeng/select';
 import { TagModule } from 'primeng/tag';
 import { TableModule } from 'primeng/table';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { ButtonModule } from 'primeng/button';
+import { TooltipModule } from 'primeng/tooltip';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { logger, withRetry, detectarNivel } from '@core/helpers';
 import { PageHeaderComponent } from '@intranet-shared/components';
@@ -22,11 +24,23 @@ import { EstudianteFacade } from '../services/estudiante.facade';
 import {
 	HorarioProfesorDto,
 	MiAsistenciaCursoResumenDto,
+	MiAsistenciaCursoItemDto,
 	ESTADO_ASISTENCIA_LABELS,
 	ESTADO_ASISTENCIA_SEVERITIES,
+	SolicitudJustificacionAsistenciaDto,
+	JustificarInasistenciaContext,
 } from '../models/estudiante.models';
+import { JustificarInasistenciaDialogComponent } from '../components/justificar-inasistencia-dialog/justificar-inasistencia-dialog.component';
 
 const MENSAJE_JUSTIFICACION_GESTIONADA = 'Las justificaciones las gestiona el colegio con tu apoderado';
+
+type JustificacionCellState =
+	| { kind: 'text'; text: string }
+	| { kind: 'gestionada' }
+	| { kind: 'pendiente' }
+	| { kind: 'justificar' }
+	| { kind: 'rechazada'; motivoRechazo: string | null }
+	| { kind: 'dash' };
 
 @Component({
 	selector: 'app-student-attendance',
@@ -38,99 +52,14 @@ const MENSAJE_JUSTIFICACION_GESTIONADA = 'Las justificaciones las gestiona el co
 		TagModule,
 		TableModule,
 		ProgressSpinnerModule,
+		ButtonModule,
+		TooltipModule,
 		PageHeaderComponent,
+		JustificarInasistenciaDialogComponent,
 	],
 	changeDetection: ChangeDetectionStrategy.OnPush,
+	templateUrl: './student-attendance.component.html',
 	styleUrl: './student-attendance.component.scss',
-	template: `
-		<app-page-header icon="pi pi-check-square" title="Mi Asistencia" />
-
-		<div class="p-4 pt-0">
-			@if (pageLoading()) {
-				<div class="flex justify-content-center p-5">
-					<p-progressSpinner strokeWidth="4" />
-				</div>
-			} @else if (cursoOptions().length === 0) {
-				<div class="flex flex-column align-items-center p-5 text-color-secondary">
-					<i class="pi pi-check-square text-4xl mb-3"></i>
-					<p>No tienes cursos asignados</p>
-				</div>
-			} @else {
-				@if (cursoOptions().length > 1) {
-					<div class="filters-row mb-3">
-						<p-select
-							data-info-anchor="curso-selector"
-							[options]="cursoOptions()"
-							[(ngModel)]="selectedHorarioId"
-							placeholder="Seleccionar curso"
-							appendTo="body"
-							(ngModelChange)="onCursoChange($event)"
-						/>
-					</div>
-				}
-
-				@if (asistenciaLoading()) {
-					<div class="flex justify-content-center p-5">
-						<p-progressSpinner strokeWidth="4" />
-					</div>
-				} @else if (asistencia()) {
-					<!-- Stats -->
-					<div class="stat-cards mb-4">
-						<div class="stat-card stat-success">
-							<div class="stat-value">{{ asistencia()!.totalPresente }}</div>
-							<div class="stat-label">Presente</div>
-						</div>
-						<div class="stat-card stat-warn">
-							<div class="stat-value">{{ asistencia()!.totalTarde }}</div>
-							<div class="stat-label">Tarde</div>
-						</div>
-						<div class="stat-card stat-danger">
-							<div class="stat-value">{{ asistencia()!.totalFalto }}</div>
-							<div class="stat-label">Faltó</div>
-						</div>
-						<div class="stat-card stat-info">
-							<div class="stat-value">{{ porcentaje() }}%</div>
-							<div class="stat-label">Asistencia</div>
-						</div>
-					</div>
-
-					<!-- Tabla detalle -->
-					@if (asistencia()!.detalle.length > 0) {
-						<p-table
-							[value]="asistencia()!.detalle"
-							[paginator]="true"
-							[rows]="10"
-							styleClass="p-datatable-sm"
-						>
-							<ng-template #header>
-								<tr>
-									<th>Fecha</th>
-									<th>Estado</th>
-									<th>Justificación</th>
-								</tr>
-							</ng-template>
-							<ng-template #body let-item>
-								<tr>
-									<td>{{ item.fecha | date : 'dd/MM/yyyy' }}</td>
-									<td>
-										<p-tag
-											[value]="getEstadoLabel(item.estado)"
-											[severity]="getEstadoSeverity(item.estado)"
-										/>
-									</td>
-									<td>{{ getJustificacionDisplay(item.justificacion) }}</td>
-								</tr>
-							</ng-template>
-						</p-table>
-					} @else {
-						<div class="flex flex-column align-items-center p-4 text-color-secondary">
-							<p>No hay registros de asistencia</p>
-						</div>
-					}
-				}
-			}
-		</div>
-	`,
 })
 export class StudentAttendanceComponent implements OnInit {
 	// #region Dependencias
@@ -144,10 +73,30 @@ export class StudentAttendanceComponent implements OnInit {
 	private readonly _pageLoading = signal(false);
 	private readonly _asistencia = signal<MiAsistenciaCursoResumenDto | null>(null);
 	private readonly _asistenciaLoading = signal(false);
+	private readonly _solicitudes = signal<SolicitudJustificacionAsistenciaDto[]>([]);
+	private readonly _justificarDialogVisible = signal(false);
+	private readonly _justificarContext = signal<JustificarInasistenciaContext | null>(null);
+	private readonly _solicitudSaving = signal(false);
 
 	readonly pageLoading = this._pageLoading.asReadonly();
 	readonly asistencia = this._asistencia.asReadonly();
 	readonly asistenciaLoading = this._asistenciaLoading.asReadonly();
+	readonly solicitudes = this._solicitudes.asReadonly();
+	readonly justificarDialogVisible = this._justificarDialogVisible.asReadonly();
+	readonly justificarContext = this._justificarContext.asReadonly();
+	readonly solicitudSaving = this._solicitudSaving.asReadonly();
+	readonly mensajeGestionada = MENSAJE_JUSTIFICACION_GESTIONADA;
+
+	private readonly solicitudesPorAsistencia = computed(() => {
+		const map = new Map<number, SolicitudJustificacionAsistenciaDto>();
+		for (const s of this._solicitudes()) {
+			const vigente = map.get(s.asistenciaCursoId);
+			if (!vigente || new Date(s.fechaSolicitud).getTime() > new Date(vigente.fechaSolicitud).getTime()) {
+				map.set(s.asistenciaCursoId, s);
+			}
+		}
+		return map;
+	});
 
 	selectedHorarioId = signal<number | null>(null);
 
@@ -222,6 +171,14 @@ export class StudentAttendanceComponent implements OnInit {
 					this._pageLoading.set(false);
 				},
 			});
+
+		this.api
+			.getMisSolicitudes()
+			.pipe(withRetry({ tag: 'EstudianteAsistencia:loadSolicitudes' }), takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (solicitudes) => this._solicitudes.set(solicitudes),
+				error: (err) => logger.error('EstudianteAsistencia: Error al cargar solicitudes', err),
+			});
 	}
 	// #endregion
 
@@ -242,11 +199,55 @@ export class StudentAttendanceComponent implements OnInit {
 			'info') as 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast';
 	}
 
-	getJustificacionDisplay(justificacion: string | null): string {
-		if (justificacion) return justificacion;
+	getJustificacionState(item: MiAsistenciaCursoItemDto): JustificacionCellState {
+		if (item.justificacion) return { kind: 'text', text: item.justificacion };
+		if (item.estado !== 'F') return { kind: 'dash' };
+
 		const nivel = this.selectedNivel();
-		if (nivel === 'Inicial' || nivel === 'Primaria') return MENSAJE_JUSTIFICACION_GESTIONADA;
-		return '-';
+		if (nivel === 'Inicial' || nivel === 'Primaria') return { kind: 'gestionada' };
+
+		const solicitud = this.solicitudesPorAsistencia().get(item.asistenciaCursoId);
+		if (solicitud?.estado === 'PENDIENTE') return { kind: 'pendiente' };
+		if (solicitud?.estado === 'RECHAZADA') {
+			return { kind: 'rechazada', motivoRechazo: solicitud.motivoRechazo };
+		}
+		if (solicitud?.estado === 'APROBADA') return { kind: 'dash' };
+
+		return { kind: 'justificar' };
+	}
+
+	onAbrirJustificar(item: MiAsistenciaCursoItemDto): void {
+		const solicitud = this.solicitudesPorAsistencia().get(item.asistenciaCursoId);
+		this._justificarContext.set({
+			asistenciaCursoId: item.asistenciaCursoId,
+			fecha: item.fecha,
+			motivoRechazoAnterior: solicitud?.estado === 'RECHAZADA' ? solicitud.motivoRechazo : null,
+		});
+		this._justificarDialogVisible.set(true);
+	}
+
+	onJustificarDialogVisibleChange(visible: boolean): void {
+		this._justificarDialogVisible.set(visible);
+		if (!visible) this._justificarContext.set(null);
+	}
+
+	onGuardarJustificacion(payload: { asistenciaCursoId: number; formData: FormData }): void {
+		this._solicitudSaving.set(true);
+		this.api
+			.crearSolicitudJustificacion(payload.formData)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (solicitud) => {
+					this._solicitudes.update((current) => [...current, solicitud]);
+					this._solicitudSaving.set(false);
+					this._justificarDialogVisible.set(false);
+					this._justificarContext.set(null);
+				},
+				error: (err) => {
+					logger.error('EstudianteAsistencia: Error al crear solicitud de justificación', err);
+					this._solicitudSaving.set(false);
+				},
+			});
 	}
 	// #endregion
 

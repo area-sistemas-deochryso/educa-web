@@ -2,11 +2,11 @@
 // #region Imports
 import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { of, throwError } from 'rxjs';
+import { of, throwError, firstValueFrom } from 'rxjs';
 
 import { StudentClassroomsFacade } from './estudiante-salones.facade';
 import { StudentClassroomsStore } from './estudiante-salones.store';
-import { ErrorHandlerService } from '@core/services';
+import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
 import { EstudianteApiService } from '../../services/estudiante-api.service';
 
 // #endregion
@@ -24,6 +24,24 @@ function createMockApi() {
 		getMisNotas: vi.fn().mockReturnValue(of(mockNotas)),
 		getMiAsistencia: vi.fn().mockReturnValue(of({ totalClases: 20, asistencias: 18 })),
 		getGruposHorario: vi.fn().mockReturnValue(of({ grupos: [] })),
+		getMisSolicitudes: vi.fn().mockReturnValue(of([])),
+		crearSolicitudJustificacion: vi.fn().mockReturnValue(of({ id: 1 })),
+	};
+}
+
+function createMockWal() {
+	return {
+		execute: vi.fn().mockImplementation(async (config: Record<string, unknown>) => {
+			const http$ = config['http$'] as () => import('rxjs').Observable<unknown>;
+			const onCommit = config['onCommit'] as ((r: unknown) => void) | undefined;
+			const onError = config['onError'] as ((e: unknown) => void) | undefined;
+			try {
+				const result = await firstValueFrom(http$());
+				onCommit?.(result);
+			} catch (err) {
+				onError?.(err);
+			}
+		}),
 	};
 }
 // #endregion
@@ -43,6 +61,7 @@ describe('StudentClassroomsFacade', () => {
 				StudentClassroomsStore,
 				{ provide: EstudianteApiService, useValue: api },
 				{ provide: ErrorHandlerService, useValue: { showError: vi.fn() } },
+				{ provide: WalFacadeHelper, useValue: createMockWal() },
 			],
 		});
 
@@ -126,6 +145,67 @@ describe('StudentClassroomsFacade', () => {
 		it('should refresh notas data', () => {
 			facade.refreshNotas();
 			expect(store.notasLoading()).toBe(false);
+		});
+	});
+	// #endregion
+
+	// #region loadData — solicitudes
+	describe('loadData — solicitudes', () => {
+		it('should load solicitudes into store', () => {
+			const mockSolicitudes = [{ id: 1, asistenciaCursoId: 5, estado: 'PENDIENTE' }] as never[];
+			api.getMisSolicitudes.mockReturnValue(of(mockSolicitudes));
+
+			facade.loadData();
+
+			expect(store.solicitudes()).toEqual(mockSolicitudes);
+		});
+	});
+	// #endregion
+
+	// #region Solicitudes de justificación
+	describe('justificar dialog', () => {
+		it('should open with context', () => {
+			const context = { asistenciaCursoId: 5, fecha: '2026-08-10', motivoRechazoAnterior: null };
+			facade.openJustificarDialog(context);
+
+			expect(store.justificarDialogVisible()).toBe(true);
+			expect(store.justificarContext()).toEqual(context);
+		});
+
+		it('should close and clear context', () => {
+			facade.openJustificarDialog({ asistenciaCursoId: 5, fecha: '2026-08-10', motivoRechazoAnterior: null });
+			facade.closeJustificarDialog();
+
+			expect(store.justificarDialogVisible()).toBe(false);
+			expect(store.justificarContext()).toBeNull();
+		});
+	});
+
+	describe('crearSolicitudJustificacion', () => {
+		it('should add solicitud and close dialog on success', async () => {
+			const nuevaSolicitud = { id: 99, asistenciaCursoId: 5, estado: 'PENDIENTE' } as never;
+			api.crearSolicitudJustificacion.mockReturnValue(of(nuevaSolicitud));
+			facade.openJustificarDialog({ asistenciaCursoId: 5, fecha: '2026-08-10', motivoRechazoAnterior: null });
+
+			facade.crearSolicitudJustificacion(new FormData());
+
+			await vi.waitFor(() => {
+				expect(store.solicitudes()).toContainEqual(nuevaSolicitud);
+			});
+			expect(store.solicitudSaving()).toBe(false);
+			expect(store.justificarDialogVisible()).toBe(false);
+		});
+
+		it('should reset saving and keep dialog open on error', async () => {
+			api.crearSolicitudJustificacion.mockReturnValue(throwError(() => new Error('fail')));
+			facade.openJustificarDialog({ asistenciaCursoId: 5, fecha: '2026-08-10', motivoRechazoAnterior: null });
+
+			facade.crearSolicitudJustificacion(new FormData());
+
+			await vi.waitFor(() => {
+				expect(store.solicitudSaving()).toBe(false);
+			});
+			expect(store.justificarDialogVisible()).toBe(true);
 		});
 	});
 	// #endregion

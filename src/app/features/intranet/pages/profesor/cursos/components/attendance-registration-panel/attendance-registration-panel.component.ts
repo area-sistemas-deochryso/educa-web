@@ -146,11 +146,12 @@ export class AttendanceRegistrationPanelComponent {
 	// #endregion
 
 	// #region Helpers
-	getEstadoSeverity(estado: EstadoAsistenciaCurso): 'success' | 'warn' | 'danger' {
-		const map: Record<EstadoAsistenciaCurso, 'success' | 'warn' | 'danger'> = {
+	getEstadoSeverity(estado: EstadoAsistenciaCurso): 'success' | 'warn' | 'danger' | 'info' {
+		const map: Record<EstadoAsistenciaCurso, 'success' | 'warn' | 'danger' | 'info'> = {
 			P: 'success',
 			T: 'warn',
 			F: 'danger',
+			J: 'info',
 		};
 		return map[estado];
 	}

@@ -5,6 +5,7 @@ import { EstudianteApiService } from './estudiante-api.service';
 import {
 	HorarioProfesorDto,
 	MiAsistenciaCursoResumenDto,
+	SolicitudJustificacionAsistenciaDto,
 } from '../models';
 
 /**
@@ -27,5 +28,13 @@ export class EstudianteFacade {
 
 	getServerTime(): Observable<string | null> {
 		return this.api.getServerTime();
+	}
+
+	crearSolicitudJustificacion(formData: FormData): Observable<SolicitudJustificacionAsistenciaDto> {
+		return this.api.crearSolicitudJustificacion(formData);
+	}
+
+	getMisSolicitudes(): Observable<SolicitudJustificacionAsistenciaDto[]> {
+		return this.api.getMisSolicitudes();
 	}
 }
