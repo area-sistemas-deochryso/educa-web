@@ -95,39 +95,48 @@
 					</div>
 				</div>
 
-				<div class="estado-buttons">
-					@for (estado of estados; track estado) {
-						<button
-							pButton
-							[class]="'estado-btn estado-btn--' + estado"
-							[class.active]="est.estado === estado"
-							data-info-anchor="profesor-asistencia-estado-btn"
-							(click)="onEstadoChange(est.estudianteId, estado)"
-							[pTooltip]="labels[estado]"
-							tooltipPosition="top"
-							[pt]="{
-								root: {
-									'aria-label': labels[estado],
-								},
-							}"
-						>
-							<i [class]="icons[estado]"></i>
-							<span class="estado-letter">{{ estado }}</span>
-						</button>
-					}
-				</div>
-
-				@if (est.estado === 'T' || est.estado === 'F') {
-					<div class="justificacion-row">
-						<input
-							pInputText
-							type="text"
-							placeholder="Justificación (opcional)"
-							[value]="est.justificacion ?? ''"
-							(input)="onJustificacionChange(est.estudianteId, $any($event.target).value)"
-							class="justificacion-input"
-						/>
+				@if (est.estado === 'J') {
+					<p-tag
+						[value]="labels['J']"
+						[severity]="getEstadoSeverity('J')"
+						[pTooltip]="est.justificacion ?? undefined"
+						tooltipPosition="top"
+					/>
+				} @else {
+					<div class="estado-buttons">
+						@for (estado of estados; track estado) {
+							<button
+								pButton
+								[class]="'estado-btn estado-btn--' + estado"
+								[class.active]="est.estado === estado"
+								data-info-anchor="profesor-asistencia-estado-btn"
+								(click)="onEstadoChange(est.estudianteId, estado)"
+								[pTooltip]="labels[estado]"
+								tooltipPosition="top"
+								[pt]="{
+									root: {
+										'aria-label': labels[estado],
+									},
+								}"
+							>
+								<i [class]="icons[estado]"></i>
+								<span class="estado-letter">{{ estado }}</span>
+							</button>
+						}
 					</div>
+
+					@if (est.estado === 'T' || est.estado === 'F') {
+						<div class="justificacion-row">
+							<input
+								pInputText
+								type="text"
+								placeholder="Justificación (opcional)"
+								[value]="est.justificacion ?? ''"
+								(input)="onJustificacionChange(est.estudianteId, $any($event.target).value)"
+								class="justificacion-input"
+							/>
+						</div>
+					}
 				}
 			</div>
 		}

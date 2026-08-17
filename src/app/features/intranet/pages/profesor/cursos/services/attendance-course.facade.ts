@@ -111,11 +111,16 @@ export class AttendanceCourseFacade {
 
 		const dto: RegistrarAsistenciaCursoDto = {
 			fecha: data.fecha,
-			asistencias: data.estudiantes.map((e) => ({
-				estudianteId: e.estudianteId,
-				estado: e.estado,
-				justificacion: e.estado !== 'P' ? e.justificacion : null,
-			})),
+			// Filas 'J' (justificadas por una solicitud aprobada) se excluyen: no son un estado
+			// editable por el profesor y el backend solo acepta P/T/F en este endpoint — incluirlas
+			// tumba el lote completo con 400 (Plan 101, hallazgo en verificación de F4).
+			asistencias: data.estudiantes
+				.filter((e) => e.estado !== 'J')
+				.map((e) => ({
+					estudianteId: e.estudianteId,
+					estado: e.estado,
+					justificacion: e.estado !== 'P' ? e.justificacion : null,
+				})),
 		};
 
 		this.store.setRegistroSaving(true);
