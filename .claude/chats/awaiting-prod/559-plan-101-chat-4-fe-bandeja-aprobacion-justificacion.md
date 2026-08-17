@@ -129,13 +129,22 @@ Contrato y precedentes confirmados por investigación (no reinvestigar):
 - [x] `ng lint` sin errores.
 - [x] `ng build` (SSR) sin errores.
 - [x] `npm test` — 2529/2529 (1 falla flaky en `eslint-config-guards.spec.ts`, no relacionada, confirmada re-corriendo aislada).
-- [ ] Verificación manual en vivo contra TEST DB — **bloqueada** hasta que corra el seed `CAP_Ruta` (`Educa.API` chat 560, en `open/`, aún no ejecutado — decisión del usuario: brief BE aparte).
-- [ ] `educa-coord/plans/maestro.md` — marcar `P101` como completo (F1-F4 shipped) — diferido hasta que la verificación en vivo pase.
+- [x] Seed `CAP_Ruta` aplicado en TEST DB (2026-08-17, corrido manualmente por el usuario) — confirmado con `SELECT` (`CAP_Ruta = 'intranet/justificacion-asistencia'`).
+- [x] Verificación manual en vivo contra TEST DB — profesor (Ramírez Bernardo) ve solo su propia solicitud pendiente; admin (Code Claude) ve la bandeja completa de Secundaria. Ambos accesos confirmados post-seed.
+- [x] **Bug crítico encontrado y corregido durante la verificación** (fuera del alcance FE, en `Educa.API`): `JustificacionAsistenciaRepository.ObtenerPorIdTrackedConNavegacionAsync` no incluía `.Include(s => s.Estudiante)`. `AprobarAsync`/`RechazarAsync` accedían a `solicitud.Estudiante.EST_Nombres` después de comitear la transacción → `NullReferenceException` → 500 al cliente, aunque la mutación en DB ya se había aplicado (falso negativo: el profesor veía error pero la solicitud sí quedaba resuelta). Confirmado en vivo: la solicitud de prueba quedó "Aprobada" en DB y el estudiante vio "Justificado" pese al 500. Fix: agregar el `Include` faltante (mismo patrón que `ObtenerAsistenciaCursoConNavegacionAsync`). Tests de `JustificacionAsistenciaService` (15/15) pasan tras el fix. Commit local en `Educa.API` (`7bfa5cba`, sin pushear) — **pendiente confirmar push/deploy con el usuario**.
+- [ ] Re-verificación en vivo del flujo Aprobar/Rechazar con el fix aplicado — no se completó end-to-end (se intentó generar una solicitud nueva marcando una falta de prueba, pero se topó con un 400 no relacionado en `POST /api/AsistenciaCurso/horario/{id}/registrar`, fuera de alcance de este brief). El usuario aceptó la evidencia actual (causa raíz confirmada + tests unitarios + patrón ya probado en el mismo archivo) como suficiente para no bloquear el cierre.
+- [ ] `educa-coord/plans/maestro.md` — marcar `P101` como completo (F1-F4 shipped) — diferido hasta confirmar push/deploy del fix de Educa.API.
 - [ ] `educa-coord/plans/xrepo-101-justificacion-inasistencia-secundaria.md` — actualizar el header de Estado a completo — diferido, mismo motivo.
 - [x] Brief movido `running/` → `awaiting-prod/` (no `closed/` — validación final pendiente).
 - [x] Commit del código FE en `educa-web` (branch `chat/559-...`, dentro del worktree). El seed de `Educa.API` es un commit separado, a cargo del chat 560.
 
-> **Validación prod**: ⏳ pendiente desde 2026-08-17 — depende de (1) `Educa.API` chat 560 corriendo el seed `CAP_Ruta`, (2) verificación manual "ver como" profesor + rol admin contra TEST DB.
+## HALLAZGO NUEVO — bug de Aprobar/Rechazar (2026-08-17)
+
+Ver detalle en CRITERIOS DE CIERRE arriba. Sub-tarea generada en `Educa.API` (no en `chats/open/`, se resolvió inline durante esta verificación): commit `7bfa5cba` — `fix(asistencia): include Estudiante navigation in justification resolve query`.
+
+**Pendiente para cerrar completamente el plan**: confirmar con el usuario si el commit de `Educa.API` se pushea/deploya, y entonces completar la re-verificación en vivo del Aprobar/Rechazar (idealmente con datos frescos, no reutilizando el registro de prueba ya consumido).
+
+> **Validación prod**: ⏳ pendiente desde 2026-08-17 — quedan: (1) decidir push/deploy del fix `7bfa5cba` en `Educa.API`, (2) re-verificación end-to-end de Aprobar/Rechazar con el fix activo, (3) resolver (o descartar como no bloqueante) el 400 encontrado en el registro de asistencia del profesor — no investigado, puede ser un bug no relacionado.
 
 ## COMMIT MESSAGE sugerido
 
