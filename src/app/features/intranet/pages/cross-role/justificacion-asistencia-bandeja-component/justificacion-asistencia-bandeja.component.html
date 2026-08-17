@@ -1,0 +1,152 @@
+<div class="p-4">
+	@if (!canAccess) {
+		<div class="empty-state">
+			<i class="pi pi-lock text-3xl mb-2"></i>
+			<p>No tenés permiso para acceder a la bandeja de justificaciones.</p>
+		</div>
+	} @else {
+		<!-- #region Filtro -->
+		<div class="filtro-bar">
+			<label for="filtro-estado" class="font-semibold">Estado</label>
+			<p-select
+				id="filtro-estado"
+				[options]="estadoFiltroOptions"
+				[ngModel]="filtroEstado()"
+				(ngModelChange)="onFiltroChange($event)"
+				optionLabel="label"
+				optionValue="value"
+				appendTo="body"
+				styleClass="filtro-dropdown"
+				data-info-anchor="justificacion-bandeja-filtro-estado-select"
+			/>
+		</div>
+		<!-- #endregion -->
+
+		@if (loading()) {
+			<div class="loading-state">
+				<p-progressSpinner styleClass="w-3rem h-3rem" strokeWidth="4" />
+			</div>
+		} @else if (error()) {
+			<div class="empty-state">
+				<i class="pi pi-exclamation-triangle text-3xl mb-2"></i>
+				<p>No se pudo cargar la bandeja. Intentá de nuevo.</p>
+			</div>
+		} @else if (solicitudesFiltradas().length === 0) {
+			<div class="empty-state">
+				<i class="pi pi-inbox text-3xl mb-2"></i>
+				<p>No hay solicitudes.</p>
+			</div>
+		} @else {
+			<section class="table-section">
+				<p-table [value]="solicitudesFiltradas()" dataKey="id" [scrollable]="true" styleClass="p-datatable-sm">
+					<ng-template #header>
+						<tr>
+							<th>ESTUDIANTE</th>
+							<th>CURSO</th>
+							<th>FECHA</th>
+							<th>COMENTARIO</th>
+							<th>ADJUNTO</th>
+							<th>ESTADO</th>
+							<th>ACCIONES</th>
+						</tr>
+					</ng-template>
+					<ng-template #body let-solicitud>
+						<tr>
+							<td>{{ solicitud.estudianteNombre }}</td>
+							<td>{{ solicitud.cursoNombre }} — {{ solicitud.salonDescripcion }}</td>
+							<td>{{ solicitud.fecha | date: 'dd/MM/yyyy' }}</td>
+							<td class="comentario-cell">{{ solicitud.comentario || '—' }}</td>
+							<td>
+								@if (solicitud.documentoUrl) {
+									<a
+										[href]="solicitud.documentoUrl"
+										target="_blank"
+										rel="noopener"
+										class="adjunto-link"
+										[attr.aria-label]="'Ver documento: ' + (solicitud.documentoNombre || 'adjunto')"
+									>
+										<i class="pi pi-paperclip"></i>
+										{{ solicitud.documentoNombre || 'Ver documento' }}
+									</a>
+								} @else {
+									—
+								}
+							</td>
+							<td>
+								<p-tag [value]="labelFor(solicitud.estado)" [severity]="severityFor(solicitud.estado)" />
+								@if (solicitud.estado === 'RECHAZADA' && solicitud.motivoRechazo) {
+									<p class="motivo-rechazo">{{ solicitud.motivoRechazo }}</p>
+								}
+							</td>
+							<td>
+								@if (solicitud.estado === 'PENDIENTE') {
+									<button
+										pButton
+										label="Aprobar"
+										icon="pi pi-check"
+										class="p-button-success p-button-sm"
+										[disabled]="resolvingId() === solicitud.id"
+										[loading]="resolvingId() === solicitud.id"
+										(click)="onAprobar(solicitud)"
+										data-info-anchor="justificacion-bandeja-aprobar-btn"
+									></button>
+									<button
+										pButton
+										label="Rechazar"
+										icon="pi pi-times"
+										class="p-button-danger p-button-outlined p-button-sm"
+										[disabled]="resolvingId() === solicitud.id"
+										(click)="onAbrirRechazo(solicitud)"
+										data-info-anchor="justificacion-bandeja-rechazar-btn"
+									></button>
+								} @else {
+									—
+								}
+							</td>
+						</tr>
+					</ng-template>
+				</p-table>
+			</section>
+		}
+	}
+</div>
+
+<p-dialog
+	header="Rechazar solicitud"
+	[visible]="rechazarDialogVisible()"
+	(visibleChange)="onRechazarDialogVisibleChange($event)"
+	[modal]="true"
+	[style]="{ width: '450px', maxWidth: '95vw' }"
+>
+	@if (solicitudSeleccionada(); as solicitud) {
+		<div class="rechazo-form">
+			<p>Justificación de <strong>{{ solicitud.estudianteNombre }}</strong> — {{ solicitud.fecha | date: 'dd/MM/yyyy' }}</p>
+			<label for="motivo-rechazo">Motivo (obligatorio)</label>
+			<textarea
+				pTextarea
+				id="motivo-rechazo"
+				[ngModel]="motivoRechazo()"
+				(ngModelChange)="motivoRechazo.set($event)"
+				placeholder="Explicá por qué se rechaza la solicitud..."
+				[rows]="3"
+				[maxlength]="500"
+				class="w-full"
+			></textarea>
+		</div>
+	}
+
+	<ng-template #footer>
+		<button pButton label="Cancelar" class="p-button-text" (click)="onCancelarRechazo()"></button>
+		<button
+			pButton
+			label="Rechazar"
+			icon="pi pi-times"
+			class="p-button-danger"
+			[disabled]="!motivoRechazo().trim()"
+			[loading]="resolvingId() === solicitudSeleccionada()?.id"
+			(click)="onConfirmarRechazo()"
+		></button>
+	</ng-template>
+</p-dialog>
+
+<p-confirmDialog />

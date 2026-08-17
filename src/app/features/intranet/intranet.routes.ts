@@ -302,6 +302,17 @@ export const INTRANET_ROUTES: Routes = [
 				title: 'Intranet - Asistencia',
 			},
 			{
+				// Bandeja de aprobación de justificaciones de inasistencia (Plan 101 F4).
+				// Cross-role (Profesor + roles administrativos), scoping resuelto server-side
+				// — ver decisión en brief 559. CAP_Ruta seedeada en Educa.API chat 560.
+				path: 'justificacion-asistencia',
+				loadComponent: () =>
+					import(
+						'./pages/cross-role/justificacion-asistencia-bandeja-component/justificacion-asistencia-bandeja.component'
+					).then((m) => m.JustificacionAsistenciaBandejaComponent),
+				title: 'Intranet - Justificaciones de inasistencia',
+			},
+			{
 				// Panel de ayuda (xrepo-panel-ayuda-intranet F4) — visible a todo usuario
 				// logueado, sin gate de capability propio: el `permissionPath` apunta al
 				// mismo path que Home ('intranet'), que la capability genérica `INTRANET`

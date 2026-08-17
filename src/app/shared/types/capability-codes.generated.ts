@@ -61,6 +61,13 @@ export type CapabilityCode =
 	// Remover este comentario cuando un regen naturalmente la incluya.
 	| 'EXPLICACIONES_MANAGE'
 	| 'INTRANET'
+	// Manually appended (brief 559, Plan 101 F4) — `JUSTIFICACION_ASISTENCIA_APROBAR`
+	// fue seedeada en `Educa.API` (migración manual
+	// `20260813_CreateSolicitudJustificacionAsistenciaTable.sql`, brief 557) pero
+	// `npm run gen:caps` necesita una sesión autenticada que no puede enviar en este
+	// entorno. Mismo caso que `ADMIN_RENDIMIENTO`/`AYUDA_MANAGE` arriba.
+	// Remover este comentario cuando un regen naturalmente la incluya.
+	| 'JUSTIFICACION_ASISTENCIA_APROBAR'
 	| 'MENSAJERIA'
 	| 'PROFESOR_ASISTENCIA'
 	| 'PROFESOR_CALIFICACIONES'
