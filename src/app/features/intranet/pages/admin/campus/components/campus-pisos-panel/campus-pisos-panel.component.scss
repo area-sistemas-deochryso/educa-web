@@ -7,6 +7,15 @@
 	width: 260px;
 	min-width: 260px;
 	border-right: 1px solid var(--surface-200);
+
+	@media (max-width: 768px) {
+		width: 100%;
+		min-width: 0;
+		height: auto;
+		max-height: 200px;
+		border-right: none;
+		border-bottom: 1px solid var(--surface-200);
+	}
 }
 // #endregion
 

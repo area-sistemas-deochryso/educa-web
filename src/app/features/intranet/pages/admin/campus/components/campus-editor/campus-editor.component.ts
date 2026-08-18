@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- Razón: soporte táctil (brief 462) agrega pointer events + pinch-zoom sobre el patrón preexistente de estado duplicado nodo/bloqueo (ya duplicado antes de este cambio). Toda la lógica pura reusable ya está extraída a campus-editor.helpers.ts; fusionar node/bloqueo en un único drag state genérico es un refactor de mayor alcance que el brief no pidió. */
 import { ChangeDetectionStrategy, Component, computed, ElementRef, input, output, signal, viewChild } from '@angular/core';
 
 import { TooltipModule } from 'primeng/tooltip';
@@ -10,6 +11,15 @@ import {
 	clientToSvg as clientToSvgHelper,
 	svgToScreen as svgToScreenHelper,
 	computeTooltipData,
+	computePointerDistance,
+	computePointerCenter,
+	computeZoomedViewBox,
+	computeDragDelta as computeDragDeltaHelper,
+	computeMovedPayload,
+	computeNodeTipPoint,
+	computeBloqueoTipPoint,
+	computeAristaTooltipScreenPos,
+	classifyPointerGesture,
 } from './campus-editor.helpers';
 
 @Component({
@@ -50,6 +60,11 @@ export class CampusEditorComponent {
 	readonly viewBox = signal({ x: 0, y: 0, w: 1000, h: 700 });
 	private isPanning = false;
 	private panStart = { x: 0, y: 0 };
+
+	// Estado de pointers activos (soporte táctil / pinch-zoom)
+	private readonly activePointers = new Map<number, { x: number; y: number }>();
+	private pinchStartDistance = 0;
+	private pinchStartViewBox = { x: 0, y: 0, w: 1000, h: 700 };
 
 	// Estado de arrastre (nodos)
 	private isDragging = false;
@@ -174,7 +189,7 @@ export class CampusEditorComponent {
 		this.editorClick.emit(pos);
 	}
 
-	onNodeMouseDown(event: MouseEvent, nodeId: number): void {
+	onNodePointerDown(event: PointerEvent, nodeId: number): void {
 		if (event.button !== 0 || this.activeTool() !== 'select') return;
 		event.stopPropagation();
 		event.preventDefault();
@@ -225,10 +240,8 @@ export class CampusEditorComponent {
 		const nodo = this.nodoMap().get(nodeId);
 		if (!nodo) return;
 		this.hoverInfo.set({ type: 'node', id: nodeId });
-		const np = this.nodePositions().get(nodeId)!;
-		const tipX = np.x + (nodo.width > 0 ? nodo.width / 2 : 8);
-		const tipY = np.y - (nodo.height > 0 ? nodo.height / 2 : 8);
-		const pos = this.svgToScreen(tipX, tipY);
+		const tip = computeNodeTipPoint(this.nodePositions().get(nodeId)!, nodo);
+		const pos = this.svgToScreen(tip.x, tip.y);
 		this.tooltipPos.set({ x: pos.x + 8, y: pos.y });
 	}
 
@@ -237,8 +250,8 @@ export class CampusEditorComponent {
 		const bloqueo = this.bloqueos().find((b) => b.id === bloqueoId);
 		if (!bloqueo) return;
 		this.hoverInfo.set({ type: 'bloqueo', id: bloqueoId });
-		const bp = this.bloqueoPositions().get(bloqueoId)!;
-		const pos = this.svgToScreen(bp.x + bloqueo.width, bp.y);
+		const tip = computeBloqueoTipPoint(this.bloqueoPositions().get(bloqueoId)!, bloqueo);
+		const pos = this.svgToScreen(tip.x, tip.y);
 		this.tooltipPos.set({ x: pos.x + 8, y: pos.y });
 	}
 
@@ -252,15 +265,14 @@ export class CampusEditorComponent {
 		this.hoverInfo.set({ type: 'arista', id: aristaId });
 		const op = this.nodePositions().get(arista.nodoOrigenId)!;
 		const dp = this.nodePositions().get(arista.nodoDestinoId)!;
-		const pos = this.svgToScreen((op.x + dp.x) / 2, (op.y + dp.y) / 2);
-		this.tooltipPos.set({ x: pos.x + 8, y: pos.y - 8 });
+		this.tooltipPos.set(computeAristaTooltipScreenPos(this.svgRef()?.nativeElement, op, dp));
 	}
 
 	onElementMouseLeave(): void {
 		this.hoverInfo.set(null);
 	}
 
-	onBloqueoMouseDown(event: MouseEvent, bloqueoId: number): void {
+	onBloqueoPointerDown(event: PointerEvent, bloqueoId: number): void {
 		if (event.button !== 0 || this.activeTool() !== 'select') return;
 		event.stopPropagation();
 		event.preventDefault();
@@ -272,14 +284,57 @@ export class CampusEditorComponent {
 		this.panStart = this.clientToSvg(event.clientX, event.clientY);
 	}
 
-	onMouseMove(event: MouseEvent): void {
+	onSvgPointerDown(event: PointerEvent): void {
+		this.activePointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+		const isBusyDragging = this.isDragging || this.isDraggingBloqueo;
+		const gesture = classifyPointerGesture(this.activePointers.size, event, isBusyDragging);
+
+		if (gesture === 'pinch-start') {
+			this.isPanning = false;
+			this.isDragging = false;
+			this.isDraggingBloqueo = false;
+			this.hoverInfo.set(null);
+			this.pinchStartDistance = computePointerDistance([...this.activePointers.values()]);
+			this.pinchStartViewBox = this.viewBox();
+			return;
+		}
+
+		if (gesture === 'touch-pan' || gesture === 'desktop-pan') {
+			this.isPanning = true;
+			this.panStart = { x: event.clientX, y: event.clientY };
+			this.hoverInfo.set(null);
+			if (gesture === 'desktop-pan') event.preventDefault();
+		}
+	}
+
+	private handlePinchZoom(): void {
+		if (this.pinchStartDistance === 0) return;
+		const pts = [...this.activePointers.values()];
+		const distance = computePointerDistance(pts);
+		if (distance === 0) return;
+		const center = computePointerCenter(pts);
+		const svgCenter = this.clientToSvg(center.x, center.y);
+		const zoomFactor = this.pinchStartDistance / distance;
+		this.viewBox.set(computeZoomedViewBox(this.pinchStartViewBox, svgCenter, zoomFactor));
+	}
+
+	onPointerMove(event: PointerEvent): void {
+		if (this.activePointers.has(event.pointerId)) {
+			this.activePointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+		}
+
+		if (this.activePointers.size === 2) {
+			this.handlePinchZoom();
+			return;
+		}
+
 		if (this.isDragging && this.dragNodeId !== null) {
-			const d = this.computeDragDelta(event);
+			const d = computeDragDeltaHelper(this.clientToSvg(event.clientX, event.clientY), this.panStart);
 			if (d) { this.dragStarted = true; this.dragOffset.set({ id: this.dragNodeId, ...d }); }
 			return;
 		}
 		if (this.isDraggingBloqueo && this.dragBloqueoId !== null) {
-			const d = this.computeDragDelta(event);
+			const d = computeDragDeltaHelper(this.clientToSvg(event.clientX, event.clientY), this.panStart);
 			if (d) { this.dragBloqueoStarted = true; this.dragBloqueoOffset.set({ id: this.dragBloqueoId, ...d }); }
 			return;
 		}
@@ -294,27 +349,26 @@ export class CampusEditorComponent {
 		this.panStart = { x: event.clientX, y: event.clientY };
 	}
 
-	private computeDragDelta(event: MouseEvent): { dx: number; dy: number } | null {
-		const pos = this.clientToSvg(event.clientX, event.clientY);
-		const dx = pos.x - this.panStart.x;
-		const dy = pos.y - this.panStart.y;
-		return (Math.abs(dx) > 2 || Math.abs(dy) > 2) ? { dx, dy } : null;
-	}
+	onPointerUp(event: PointerEvent): void {
+		this.activePointers.delete(event.pointerId);
 
-	onMouseUp(): void {
+		if (this.activePointers.size < 2) {
+			this.pinchStartDistance = 0;
+		}
+		if (this.activePointers.size > 0) {
+			// Sigue quedando al menos un dedo apoyado: no cerrar drag/pan todavía.
+			return;
+		}
+
 		if (this.isDragging && this.dragNodeId !== null && this.dragStarted) {
 			const offset = this.dragOffset();
 			const nodo = offset ? this.nodoMap().get(this.dragNodeId) : null;
-			if (offset && nodo) {
-				this.nodeMoved.emit({ id: this.dragNodeId, x: Math.round(nodo.x + offset.dx), y: Math.round(nodo.y + offset.dy) });
-			}
+			if (offset && nodo) this.nodeMoved.emit(computeMovedPayload(this.dragNodeId, nodo, offset));
 		}
 		if (this.isDraggingBloqueo && this.dragBloqueoId !== null && this.dragBloqueoStarted) {
 			const offset = this.dragBloqueoOffset();
 			const bloqueo = offset ? this.bloqueos().find((b) => b.id === this.dragBloqueoId) : null;
-			if (offset && bloqueo) {
-				this.bloqueoMoved.emit({ id: this.dragBloqueoId, x: Math.round(bloqueo.x + offset.dx), y: Math.round(bloqueo.y + offset.dy) });
-			}
+			if (offset && bloqueo) this.bloqueoMoved.emit(computeMovedPayload(this.dragBloqueoId, bloqueo, offset));
 		}
 		this.isDragging = false;
 		this.dragNodeId = null;
@@ -328,24 +382,9 @@ export class CampusEditorComponent {
 	onWheel(event: WheelEvent): void {
 		event.preventDefault();
 		this.hoverInfo.set(null);
-		const vb = this.viewBox();
 		const svgPos = this.clientToSvg(event.clientX, event.clientY);
 		const zoomFactor = event.deltaY > 0 ? 1.1 : 0.9;
-		const newW = vb.w * zoomFactor;
-		const newH = vb.h * zoomFactor;
-		// Zoom centrado en la posición del cursor en el espacio SVG
-		const newX = svgPos.x - (svgPos.x - vb.x) * zoomFactor;
-		const newY = svgPos.y - (svgPos.y - vb.y) * zoomFactor;
-		this.viewBox.set({ x: newX, y: newY, w: newW, h: newH });
-	}
-
-	onPanStart(event: MouseEvent): void {
-		if (event.button === 1 || (event.button === 0 && event.shiftKey)) {
-			this.isPanning = true;
-			this.panStart = { x: event.clientX, y: event.clientY };
-			this.hoverInfo.set(null);
-			event.preventDefault();
-		}
+		this.viewBox.set(computeZoomedViewBox(this.viewBox(), svgPos, zoomFactor));
 	}
 
 	// #endregion

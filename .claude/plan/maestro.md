@@ -86,13 +86,14 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub F3-F6), *
 
 ### 🟣 Verificaciones post-deploy (`/verify <NNN>`)
 
+- ⏳ **462** — soporte táctil `admin/campus` (Pointer Events + pinch-zoom + responsive). Lint/build OK, layout responsive verificado con iframe 375px. Pendiente: QA en vivo de pan/pinch/drag táctil real — bloqueado en la sesión por cuenta de prueba sin `SedeId` (400 en `/api/campus/pisos`).
 - ⏳ **465** — audit visual+funcional Profesor: fix `AsistenciaCursoRepository` (lee `EstudianteSalon` en vez de `HorarioEstudiante`) + rename `<h1>` "Mis Salones" → "Notas y Asistencia". Pendiente: QA en vivo en TEST DB del escenario real (`MENDO CALDERON MARIELA`, curso Arte) — no se hizo browser QA en la sesión de cierre.
 - ⏳ **464** — fix 500 en `ReportesAsistencia/tendencia?rango=mes` al cruzar meses (`IndexarPorDia` con `ToDictionary` explotaba ante doble marcación en la misma fecha; alineado con `TryAdd` como en `ProcesarSalonRango`). Pendiente: smoke test en vivo con `fecha=2026-06-21` (y otra que cruce mes) confirmando 200 sin excepción.
 
 ### Notas operativas
 
-- **`running/`**: vacío · **`open/`**: 3 briefs (332, 458, 462) · **`awaiting-prod/`**: 4 briefs (464, 465, 480, 481) · **`waiting/`**: vacío · **`troubles/`**: vacío
-- **Último cierre**: 391 (borrado de `horarios-filters.component.ts` — código muerto, sin importadores; el filtro de estado/completitud ya vive inline en `horarios.component.html`) → `closed/`, worktree `chat/391-fe-remove-dead-horarios-filters-component`, 2026-08-18.
+- **`running/`**: vacío · **`open/`**: 2 briefs (332, 458) · **`awaiting-prod/`**: 5 briefs (462, 464, 465, 480, 481) · **`waiting/`**: vacío · **`troubles/`**: vacío
+- **Último cierre**: 462 (Pointer Events + pinch-zoom + responsive en `admin/campus`; QA táctil en vivo pendiente) → `awaiting-prod/`, worktree `chat/462-campus-editor-touch-support`, 2026-08-18.
 - **Último saneamiento**: 2026-07-11 — sync-maestro: vaciado `awaiting-prod/` completo (estables, verificados con usuarios reales).
 
 ---
