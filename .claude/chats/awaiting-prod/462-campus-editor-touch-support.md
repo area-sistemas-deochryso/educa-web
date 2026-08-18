@@ -35,3 +35,15 @@ Hallazgos confirmados por lectura de código (no verificados en vivo — requier
 ## Tiempo estimado
 
 A definir en `/design` — el rework del editor (soporte táctil de un canvas SVG) probablemente exceda 2h, distinto al resto de fixes de 461 que fueron de minutos.
+
+## Cierre (2026-08-18)
+
+**Implementado**:
+- `campus-editor.component.ts/html/scss` — mouse events reemplazados por Pointer Events unificados. Pan táctil de 1 dedo, pinch-zoom de 2 dedos (`handlePinchZoom`, `classifyPointerGesture`, `computePointerDistance/Center`, `computeZoomedViewBox` en `campus-editor.helpers.ts`), `touch-action: none` en el SVG.
+- `campus.component.scss` — `.campus-admin` pasa a `flex-direction: column` en `@media (max-width: 768px)`.
+- `campus-pisos-panel.component.scss` — deja el `width: 260px` fijo, pasa a `width: 100%` / `max-height: 200px` en mobile.
+- Lint y build pasan limpio (`bun run lint` / `bun run build`). El componente superaba `max-lines` (300) tras la expansión; se extrajo toda la lógica pura reusable a `campus-editor.helpers.ts` y se documentó un escape hatch `eslint-disable max-lines` justificado por el patrón preexistente de estado duplicado nodo/bloqueo (no introducido por este cambio).
+
+**Verificado en vivo**: layout responsive confirmado con el método de iframe 375px (`.campus-admin` en columna, panel `max-height: 200px`, editor ocupa el resto).
+
+**NO verificado en vivo**: interacción táctil real sobre el canvas (pan/pinch/drag de nodos). Bloqueador: el usuario de prueba en TestConnection (`CODE CLAUDE Administrador`) no tiene `SedeId` asignado → `GET /api/campus/pisos` devuelve 400 `INVALID_OPERATION` (`CampusController.cs:53`) → sin pisos cargados, `app-campus-editor` no renderiza el SVG. Es un problema de datos de la cuenta de prueba, no del código de este brief. Pendiente: QA en vivo con una cuenta que tenga sede asignada, en dispositivo/viewport táctil real (o emulación touch de Chrome DevTools).

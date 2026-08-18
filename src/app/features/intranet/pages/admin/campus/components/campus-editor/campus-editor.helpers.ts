@@ -49,6 +49,82 @@ export function svgToScreen(svgEl: SVGSVGElement | undefined, svgX: number, svgY
 	return { x: screenPt.x - rect.left, y: screenPt.y - rect.top };
 }
 
+export interface ViewBox {
+	x: number;
+	y: number;
+	w: number;
+	h: number;
+}
+
+/** Distancia euclidiana entre los dos primeros pointers activos (pinch-zoom) */
+export function computePointerDistance(pts: { x: number; y: number }[]): number {
+	if (pts.length < 2) return 0;
+	return Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y);
+}
+
+/** Punto medio entre los dos primeros pointers activos (pinch-zoom) */
+export function computePointerCenter(pts: { x: number; y: number }[]): { x: number; y: number } {
+	return { x: (pts[0].x + pts[1].x) / 2, y: (pts[0].y + pts[1].y) / 2 };
+}
+
+/** Nuevo viewBox al aplicar un factor de zoom centrado en un punto del espacio SVG */
+export function computeZoomedViewBox(startVb: ViewBox, svgCenter: { x: number; y: number }, zoomFactor: number): ViewBox {
+	const newW = startVb.w * zoomFactor;
+	const newH = startVb.h * zoomFactor;
+	const newX = svgCenter.x - (svgCenter.x - startVb.x) * zoomFactor;
+	const newY = svgCenter.y - (svgCenter.y - startVb.y) * zoomFactor;
+	return { x: newX, y: newY, w: newW, h: newH };
+}
+
+/** Delta arrastrado desde `panStart`, o null si está bajo el umbral de tap (2px) */
+export function computeDragDelta(pos: { x: number; y: number }, panStart: { x: number; y: number }): { dx: number; dy: number } | null {
+	const dx = pos.x - panStart.x;
+	const dy = pos.y - panStart.y;
+	return (Math.abs(dx) > 2 || Math.abs(dy) > 2) ? { dx, dy } : null;
+}
+
+/** Payload redondeado a emitir cuando termina un arrastre (nodo o bloqueo) */
+export function computeMovedPayload(id: number, entity: { x: number; y: number }, offset: { dx: number; dy: number }): { id: number; x: number; y: number } {
+	return { id, x: Math.round(entity.x + offset.dx), y: Math.round(entity.y + offset.dy) };
+}
+
+export type PointerGesture = 'pinch-start' | 'touch-pan' | 'desktop-pan' | 'none';
+
+/** Determina qué gesto de puntero arranca según pointers activos, tipo y modificadores */
+export function classifyPointerGesture(
+	activePointerCount: number,
+	event: { pointerType: string; button: number; shiftKey: boolean },
+	isBusyDragging: boolean,
+): PointerGesture {
+	if (activePointerCount === 2) return 'pinch-start';
+	if (event.pointerType === 'touch' && activePointerCount === 1 && !isBusyDragging) return 'touch-pan';
+	if (event.button === 1 || (event.button === 0 && event.shiftKey)) return 'desktop-pan';
+	return 'none';
+}
+
+/** Punto (en espacio SVG) donde anclar el tooltip de un nodo */
+export function computeNodeTipPoint(np: { x: number; y: number }, nodo: { width: number; height: number }): { x: number; y: number } {
+	return {
+		x: np.x + (nodo.width > 0 ? nodo.width / 2 : 8),
+		y: np.y - (nodo.height > 0 ? nodo.height / 2 : 8),
+	};
+}
+
+/** Punto (en espacio SVG) donde anclar el tooltip de un bloqueo */
+export function computeBloqueoTipPoint(bp: { x: number; y: number }, bloqueo: { width: number }): { x: number; y: number } {
+	return { x: bp.x + bloqueo.width, y: bp.y };
+}
+
+/** Punto (en espacio SVG) donde anclar el tooltip de una arista, con offset propio de "arriba a la izquierda" */
+export function computeAristaTooltipScreenPos(
+	svgEl: SVGSVGElement | undefined,
+	op: { x: number; y: number },
+	dp: { x: number; y: number },
+): { x: number; y: number } {
+	const pos = svgToScreen(svgEl, (op.x + dp.x) / 2, (op.y + dp.y) / 2);
+	return { x: pos.x + 8, y: pos.y - 8 };
+}
+
 export interface TooltipData {
 	color: string;
 	type: string;
