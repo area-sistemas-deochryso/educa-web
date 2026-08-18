@@ -68,6 +68,7 @@
               [style.border-left]="'4px solid ' + darkenColor(block.color)"
               [class.inactive]="!block.horario.estado"
               [class.no-profesor]="hasNoProfesor(block)"
+              [class.has-conflict]="hasConflict(block)"
               [pTooltip]="getBlockTooltip(block)"
               tooltipPosition="top"
               data-info-anchor="admin-schedules-block"
@@ -91,6 +92,12 @@
                   <span class="block-estudiantes warning">
                     <i class="pi pi-exclamation-triangle"></i>
                     Sin estudiantes
+                  </span>
+                }
+                @if (hasConflict(block)) {
+                  <span class="block-conflicto error">
+                    <i class="pi pi-exclamation-circle"></i>
+                    Conflicto de horario
                   </span>
                 }
               </div>

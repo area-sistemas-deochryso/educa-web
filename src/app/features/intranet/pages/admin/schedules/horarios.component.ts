@@ -139,7 +139,8 @@ export class SchedulesComponent implements OnInit {
 			{
 				icon: 'pi pi-exclamation-circle',
 				label: 'Conflictos',
-				value: 0,
+				value: stats.horariosConConflicto,
+				variant: stats.horariosConConflicto > 0 ? 'error' : undefined,
 			},
 		];
 	});

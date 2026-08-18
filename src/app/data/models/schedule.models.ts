@@ -1,6 +1,9 @@
 // #region Tipos semánticos
 /** Día de la semana (1=Lunes ... 7=Domingo, convención Peru/BD). */
 export type DiaSemana = 1 | 2 | 3 | 4 | 5 | 6 | 7;
+
+/** Estado de validación calculado por el backend (HorarioService.ComputeValidationStatus). */
+export type HorarioValidationStatus = 'valid' | 'incomplete' | 'conflict' | 'conflict_incomplete';
 // #endregion
 
 // #region Response DTOs compartidos (Backend → Frontend)
@@ -22,6 +25,7 @@ export interface HorarioResponseDto {
   profesorNombreCompleto: string | null;
   cantidadEstudiantes: number;
   estudiantes: null;
+  validationStatus: HorarioValidationStatus;
   rowVersion?: string;
 }
 
@@ -46,6 +50,7 @@ export interface HorarioDetalleResponseDto {
   cantidadEstudiantes: number;
   estudiantesDisponiblesSalon: number;
   estudiantes: EstudianteHorarioDto[];
+  validationStatus: HorarioValidationStatus;
   tutorNombre: string | null;
   usuarioReg: string;
   fechaReg: string;

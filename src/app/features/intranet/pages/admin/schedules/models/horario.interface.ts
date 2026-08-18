@@ -6,6 +6,7 @@ export type {
   EstudianteHorarioDto,
   HorarioDetalleResponseDto,
   HorarioResponseDto,
+  HorarioValidationStatus,
 } from '@data/models';
 
 type DiaSemana = _DiaSemana;
@@ -85,6 +86,7 @@ export interface HorariosEstadisticas {
   horariosConProfesor: number;
   horariosSinProfesor: number;
   horariosSinEstudiantes: number;
+  horariosConConflicto: number;
   promedioEstudiantesPorHorario?: number;
 }
 

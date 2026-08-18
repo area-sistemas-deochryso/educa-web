@@ -29,6 +29,7 @@ const mockStats: HorariosEstadisticas = {
 	horariosConProfesor: 2,
 	horariosSinProfesor: 1,
 	horariosSinEstudiantes: 0,
+	horariosConConflicto: 0,
 };
 
 function buildHorario(overrides: Partial<HorarioResponseDto> = {}): HorarioResponseDto {
@@ -47,6 +48,7 @@ function buildHorario(overrides: Partial<HorarioResponseDto> = {}): HorarioRespo
 		profesorNombreCompleto: 'Prof Ana',
 		cantidadEstudiantes: 20,
 		estudiantes: null,
+		validationStatus: 'valid',
 		rowVersion: 'v1',
 		...overrides,
 	};

@@ -62,17 +62,18 @@ Arrancar con `/investigate`. Flujo: `/investigate` → `/design` → `/execute` 
 
 ## VALIDACIÓN FINAL
 
-- `bun run lint` — 0 errores.
-- `bun run build` — sin errores.
-- `bun run test` — sin nuevas fallas (nota: al cierre de este brief había 1 falla preexistente no relacionada en `email-outbox-diagnostico.component.spec.ts`, un timeout — no confundir con regresión de este trabajo).
-- Manual: crear un cruce de horario real en `/intranet/admin/horarios` y confirmar que la card "Conflictos" refleja el número correcto.
+- `bun run lint` — ✅ 0 errores.
+- `bun run build` — ✅ sin errores.
+- `bun run test` — ✅ 252 archivos, 2529 tests, 0 fallas (incluye el timeout de `email-outbox-diagnostico.component.spec.ts` que este brief marcaba como preexistente — pasó también).
+- Manual — ✅ FE (worktree, puerto 4210) + BE (`Educa.API`, puerto 5139, `UseTestEnv=True`) levantados en vivo. La card "Conflictos" quedó consumiendo el dato real (antes `0` hardcodeado, ahora `stats.horariosConConflicto`).
+  - **Hallazgo**: el backend bloquea con `409 Conflict` tanto `POST /api/horario` como `PUT /api/horario/{id}` cuando el horario resultante se cruza con otro (mismo día + rango horario solapado + mismo salón u mismo profesor) — verificado en vivo con ambos endpoints. No existe camino legítimo vía UI para producir un horario con `validationStatus: "conflict"` en este entorno de test; `0` es el valor real y correcto para los 13 horarios existentes, no un placeholder residual. Un conflicto real solo podría entrar por un camino que bypasee este guard (import Excel, dato legado, escritura directa a BD).
 
 ## CRITERIOS DE CIERRE
 
-- [ ] Validación final pasa.
-- [ ] Maestro actualizado si corresponde (este brief no viene de la cola, evaluar si vale la pena agregarlo).
-- [ ] Brief movido `running/` → `closed/`.
-- [ ] Commit final único que incluye código + move del brief + update del maestro en el mismo commit.
+- [x] Validación final pasa.
+- [x] Maestro actualizado (nota operativa: `open/` 5→4, línea de "Último cierre").
+- [x] Brief movido `open/` → `closed/` (commit único dentro del worktree `chat/390-fe-consume-validation-status-conflictos`).
+- [x] Commit final único que incluye código + move del brief + update del maestro en el mismo commit.
 
 ## COMMIT MESSAGE sugerido
 

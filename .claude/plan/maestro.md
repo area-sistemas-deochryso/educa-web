@@ -91,8 +91,8 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub F3-F6), *
 
 ### Notas operativas
 
-- **`running/`**: 1 brief (524, worktree `chat/524-fe-modo-informativo-fab-interceptor`) · **`open/`**: 5 briefs (332, 390, 391, 458, 462) · **`awaiting-prod/`**: 4 briefs (464, 465, 480, 481) · **`waiting/`**: vacío · **`troubles/`**: vacío
-- **Último cierre**: 550 (audit Estudiante — ícono de archivo con color de tipo incorrecto: orden de checks MIME `officedocument` + clase CSS `.student-file` pisando el color real) → `closed/`, 2026-08-12.
+- **`running/`**: 1 brief (524, worktree `chat/524-fe-modo-informativo-fab-interceptor`) · **`open/`**: 4 briefs (332, 391, 458, 462) · **`awaiting-prod/`**: 4 briefs (464, 465, 480, 481) · **`waiting/`**: vacío · **`troubles/`**: vacío
+- **Último cierre**: 390 (consumir `validationStatus` del backend en la card "Conflictos" de `/intranet/admin/horarios`, antes hardcodeada a `0`; hallazgo: el backend bloquea con 409 crear/editar horarios que se crucen, por lo que `0` es el valor real actual, no un placeholder) → `closed/`, worktree `chat/390-fe-consume-validation-status-conflictos`, 2026-08-18.
 - **Último saneamiento**: 2026-07-11 — sync-maestro: vaciado `awaiting-prod/` completo (estables, verificados con usuarios reales).
 
 ---

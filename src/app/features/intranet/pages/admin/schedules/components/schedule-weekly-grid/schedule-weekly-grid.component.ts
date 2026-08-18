@@ -168,6 +168,11 @@ export class ScheduleWeeklyGridComponent {
     return block.horario.cantidadEstudiantes === 0;
   }
 
+  hasConflict(block: HorarioWeeklyBlock): boolean {
+    const status = block.horario.validationStatus;
+    return status === 'conflict' || status === 'conflict_incomplete';
+  }
+
   getBlockTooltip(block: HorarioWeeklyBlock): string {
     const h = block.horario;
     const lines = [
@@ -184,6 +189,9 @@ export class ScheduleWeeklyGridComponent {
       lines.push(`${h.cantidadEstudiantes} estudiantes`);
     } else {
       lines.push('⚠ Sin estudiantes asignados');
+    }
+    if (this.hasConflict(block)) {
+      lines.push('⚠ Conflicto de horario (cruce de salón o profesor)');
     }
     return lines.join('\n');
   }

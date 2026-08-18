@@ -12,7 +12,12 @@ import {
 import { CursosApiService } from './cursos-api.service';
 import { SchedulesApiService } from './horarios-api.service';
 import { SchedulesStore } from './horarios.store';
-import type { DiaSemana, HorarioCompletitudFiltro, HorarioVistaType } from '../models/horario.interface';
+import type {
+  DiaSemana,
+  HorarioCompletitudFiltro,
+  HorarioValidationStatus,
+  HorarioVistaType,
+} from '../models/horario.interface';
 import { ProfesorCursoApiService } from './profesor-curso-api.service';
 import { ProfesoresApiService } from './profesores-api.service';
 import { ClassroomsApiService } from './salones-api.service';
@@ -301,7 +306,12 @@ export class SchedulesDataFacade {
    * Calcular estadísticas desde los datos
    */
   private calculateEstadisticas(
-    horarios: { estado: boolean; profesorId: number | null; cantidadEstudiantes: number }[],
+    horarios: {
+      estado: boolean;
+      profesorId: number | null;
+      cantidadEstudiantes: number;
+      validationStatus: HorarioValidationStatus;
+    }[],
   ): void {
     const stats = {
       totalHorarios: horarios.length,
@@ -310,6 +320,9 @@ export class SchedulesDataFacade {
       horariosConProfesor: horarios.filter((h) => h.profesorId !== null).length,
       horariosSinProfesor: horarios.filter((h) => h.profesorId === null).length,
       horariosSinEstudiantes: horarios.filter((h) => h.cantidadEstudiantes === 0).length,
+      horariosConConflicto: horarios.filter(
+        (h) => h.validationStatus === 'conflict' || h.validationStatus === 'conflict_incomplete',
+      ).length,
     };
     this.store.setEstadisticas(stats);
   }
