@@ -163,6 +163,12 @@ export class CursosFacade extends BaseCrudFacade<Curso, CursoFormData, CursosEst
 		this.store.setPage(1);
 		this.refreshItemsOnly();
 	}
+
+	setFilterCompletitud(
+		valor: 'completo' | 'incompleto' | 'sin-horario' | 'sin-profesor' | 'con-conflictos' | null,
+	): void {
+		this.store.setFilterCompletitud(valor);
+	}
 	// #endregion
 
 	// #region Error labels
