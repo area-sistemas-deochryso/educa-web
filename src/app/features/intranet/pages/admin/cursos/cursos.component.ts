@@ -100,6 +100,15 @@ export class CursosComponent implements OnInit {
 		{ label: 'Primaria', value: 'PRIMARIA' },
 		{ label: 'Secundaria', value: 'SECUNDARIA' },
 	];
+
+	readonly completitudOptions = [
+		{ label: 'Todos', value: null },
+		{ label: 'Completo', value: 'completo' },
+		{ label: 'Incompleto', value: 'incompleto' },
+		{ label: 'Sin horario', value: 'sin-horario' },
+		{ label: 'Sin profesor', value: 'sin-profesor' },
+		{ label: 'Con conflictos', value: 'con-conflictos' },
+	];
 	// #endregion
 
 	// #region Lifecycle
@@ -174,6 +183,12 @@ export class CursosComponent implements OnInit {
 
 	onFilterNivelChange(nivel: string | null): void {
 		this.facade.setFilterNivel(nivel);
+	}
+
+	onFilterCompletitudChange(
+		valor: 'completo' | 'incompleto' | 'sin-horario' | 'sin-profesor' | 'con-conflictos' | null,
+	): void {
+		this.facade.setFilterCompletitud(valor);
 	}
 	// #endregion
 

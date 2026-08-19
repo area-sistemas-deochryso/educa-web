@@ -53,7 +53,41 @@ export class CursosStore extends BaseCrudStore<Curso, CursoFormData, CursosEstad
 
 	protected override onClearFiltros(): void {
 		this._filterNivel.set(null);
+		this._filterCompletitud.set(null);
 	}
+	// #endregion
+
+	// #region Estado específico — Filtro completitud (client-side)
+	private readonly _filterCompletitud = signal<
+		'completo' | 'incompleto' | 'sin-horario' | 'sin-profesor' | 'con-conflictos' | null
+	>(null);
+	readonly filterCompletitud = this._filterCompletitud.asReadonly();
+
+	setFilterCompletitud(
+		valor: 'completo' | 'incompleto' | 'sin-horario' | 'sin-profesor' | 'con-conflictos' | null,
+	): void {
+		this._filterCompletitud.set(valor);
+	}
+
+	readonly cursosFiltrados = computed(() => {
+		const filtro = this._filterCompletitud();
+		if (!filtro) return this.items();
+
+		return this.items().filter((curso) => {
+			const c = this.completitudPorCurso().get(curso.id);
+			if (!c) return false;
+
+			const esCompleto = c.tieneHorario && c.tieneProfesorAsignado && c.cantidadConflictos === 0;
+
+			switch (filtro) {
+				case 'completo': return esCompleto;
+				case 'incompleto': return !esCompleto;
+				case 'sin-horario': return !c.tieneHorario;
+				case 'sin-profesor': return c.tieneHorario && !c.tieneProfesorAsignado;
+				case 'con-conflictos': return c.cantidadConflictos > 0;
+			}
+		});
+	});
 	// #endregion
 
 	/**
@@ -248,7 +282,7 @@ export class CursosStore extends BaseCrudStore<Curso, CursoFormData, CursosEstad
 
 	// #region Sub-ViewModels
 	readonly dataVm = computed(() => ({
-		cursos: this.items(),
+		cursos: this.cursosFiltrados(),
 		estadisticas: this.estadisticas()!,
 		page: this.page(),
 		pageSize: this.pageSize(),
@@ -267,6 +301,7 @@ export class CursosStore extends BaseCrudStore<Curso, CursoFormData, CursosEstad
 		searchTerm: this.searchTerm(),
 		filterEstado: this.filterEstado(),
 		filterNivel: this.filterNivel(),
+		filterCompletitud: this.filterCompletitud(),
 	}));
 
 	readonly formVm = computed(() => ({

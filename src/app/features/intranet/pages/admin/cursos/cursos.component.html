@@ -61,6 +61,16 @@
 			data-info-anchor="admin-cursos-nivel-select"
 		/>
 
+		<p-select
+			[options]="completitudOptions"
+			[ngModel]="vm().filterCompletitud"
+			(ngModelChange)="onFilterCompletitudChange($event)"
+			placeholder="Completitud"
+			[style]="{ minWidth: '160px' }"
+			appendTo="body"
+			data-info-anchor="admin-cursos-completitud-select"
+		/>
+
 		<button
 			pButton
 			label="Limpiar"
