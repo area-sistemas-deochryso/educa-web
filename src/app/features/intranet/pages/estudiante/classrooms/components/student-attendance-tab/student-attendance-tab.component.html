@@ -20,6 +20,8 @@
 		<i class="pi pi-spin pi-spinner" style="font-size: 1.5rem"></i>
 		<p>Cargando asistencia...</p>
 	</div>
+} @else if (error()) {
+	<app-error-state [message]="error()!" (retry)="onRetry()" />
 } @else if (!asistenciaData()) {
 	<div class="empty-state">
 		<i class="pi pi-check-square" style="font-size: 2rem; opacity: 0.3"></i>

@@ -19,6 +19,7 @@ import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { logger, withRetry, detectarNivel } from '@core/helpers';
+import { ErrorStateComponent } from '@shared/components';
 import { PageHeaderComponent } from '@intranet-shared/components';
 import { EstudianteFacade } from '../services/estudiante.facade';
 import {
@@ -56,6 +57,7 @@ type JustificacionCellState =
 		TooltipModule,
 		PageHeaderComponent,
 		JustificarInasistenciaDialogComponent,
+		ErrorStateComponent,
 	],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './student-attendance.component.html',
@@ -71,16 +73,20 @@ export class StudentAttendanceComponent implements OnInit {
 	// #region Estado
 	private readonly _horarios = signal<HorarioProfesorDto[]>([]);
 	private readonly _pageLoading = signal(false);
+	private readonly _horariosError = signal<string | null>(null);
 	private readonly _asistencia = signal<MiAsistenciaCursoResumenDto | null>(null);
 	private readonly _asistenciaLoading = signal(false);
+	private readonly _asistenciaError = signal<string | null>(null);
 	private readonly _solicitudes = signal<SolicitudJustificacionAsistenciaDto[]>([]);
 	private readonly _justificarDialogVisible = signal(false);
 	private readonly _justificarContext = signal<JustificarInasistenciaContext | null>(null);
 	private readonly _solicitudSaving = signal(false);
 
 	readonly pageLoading = this._pageLoading.asReadonly();
+	readonly horariosError = this._horariosError.asReadonly();
 	readonly asistencia = this._asistencia.asReadonly();
 	readonly asistenciaLoading = this._asistenciaLoading.asReadonly();
+	readonly asistenciaError = this._asistenciaError.asReadonly();
 	readonly solicitudes = this._solicitudes.asReadonly();
 	readonly justificarDialogVisible = this._justificarDialogVisible.asReadonly();
 	readonly justificarContext = this._justificarContext.asReadonly();
@@ -150,27 +156,7 @@ export class StudentAttendanceComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
-		this._pageLoading.set(true);
-		this.api
-			.getMisHorarios()
-			.pipe(withRetry({ tag: 'EstudianteAsistencia:loadHorarios' }), takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: (horarios) => {
-					this._horarios.set(horarios);
-					this._pageLoading.set(false);
-
-					// Auto-select first if only one and no pending query-param selection
-					const opts = this.cursoOptions();
-					if (opts.length === 1 && !this.pendingHorarioId()) {
-						this.selectedHorarioId.set(opts[0].value);
-						this.loadAsistencia(opts[0].value);
-					}
-				},
-				error: (err) => {
-					logger.error('EstudianteAsistencia: Error al cargar horarios', err);
-					this._pageLoading.set(false);
-				},
-			});
+		this.loadHorarios();
 
 		this.api
 			.getMisSolicitudes()
@@ -186,6 +172,15 @@ export class StudentAttendanceComponent implements OnInit {
 	onCursoChange(horarioId: number): void {
 		this.selectedHorarioId.set(horarioId);
 		this.loadAsistencia(horarioId);
+	}
+
+	onRetryHorarios(): void {
+		this.loadHorarios();
+	}
+
+	onRetryAsistencia(): void {
+		const horarioId = this.selectedHorarioId();
+		if (horarioId) this.loadAsistencia(horarioId);
 	}
 
 	getEstadoLabel(estado: string): string {
@@ -252,8 +247,35 @@ export class StudentAttendanceComponent implements OnInit {
 	// #endregion
 
 	// #region Helpers privados
+	private loadHorarios(): void {
+		this._pageLoading.set(true);
+		this._horariosError.set(null);
+		this.api
+			.getMisHorarios()
+			.pipe(withRetry({ tag: 'EstudianteAsistencia:loadHorarios' }), takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (horarios) => {
+					this._horarios.set(horarios);
+					this._pageLoading.set(false);
+
+					// Auto-select first if only one and no pending query-param selection
+					const opts = this.cursoOptions();
+					if (opts.length === 1 && !this.pendingHorarioId()) {
+						this.selectedHorarioId.set(opts[0].value);
+						this.loadAsistencia(opts[0].value);
+					}
+				},
+				error: (err) => {
+					logger.error('EstudianteAsistencia: Error al cargar horarios', err);
+					this._pageLoading.set(false);
+					this._horariosError.set('No se pudieron cargar tus cursos.');
+				},
+			});
+	}
+
 	private loadAsistencia(horarioId: number): void {
 		this._asistenciaLoading.set(true);
+		this._asistenciaError.set(null);
 		this.api
 			.getMiAsistencia(horarioId)
 			.pipe(withRetry({ tag: 'EstudianteAsistencia:load' }), takeUntilDestroyed(this.destroyRef))
@@ -265,6 +287,7 @@ export class StudentAttendanceComponent implements OnInit {
 				error: (err) => {
 					logger.error('EstudianteAsistencia: Error al cargar asistencia', err);
 					this._asistenciaLoading.set(false);
+					this._asistenciaError.set('No se pudo cargar tu asistencia.');
 				},
 			});
 	}

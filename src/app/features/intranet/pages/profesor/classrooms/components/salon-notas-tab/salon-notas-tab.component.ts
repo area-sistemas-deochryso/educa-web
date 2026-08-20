@@ -23,6 +23,7 @@ import {
 	esPromedioProvisional,
 } from '@intranet-shared/services/calificacion-config';
 import type { ConfiguracionCalificacionListDto } from '@data/models';
+import { ErrorStateComponent } from '@shared/components';
 
 interface PeriodoColumnsGroup {
 	periodo: PeriodoCalificacionDto;
@@ -51,6 +52,7 @@ interface SemanaColumnsGroup {
 		SkeletonModule,
 		ButtonModule,
 		TooltipModule,
+		ErrorStateComponent,
 	],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './salon-notas-tab.component.html',
@@ -60,6 +62,7 @@ export class ClassroomGradesTabComponent {
 	// #region Inputs
 	readonly notasData = input<SalonNotasResumenDto | null>(null);
 	readonly loading = input(false);
+	readonly error = input<string | null>(null);
 	readonly cursoOptions = input<{ label: string; value: number }[]>([]);
 	readonly selectedCurso = input<number | null>(null);
 	readonly vistaActual = input<VistaPromedio>('semana');
@@ -68,6 +71,7 @@ export class ClassroomGradesTabComponent {
 
 	// #region Outputs
 	readonly cursoChange = output<number>();
+	readonly retry = output<void>();
 	readonly vistaChange = output<VistaPromedio>();
 	readonly descargarBoletas = output<void>();
 	// #endregion

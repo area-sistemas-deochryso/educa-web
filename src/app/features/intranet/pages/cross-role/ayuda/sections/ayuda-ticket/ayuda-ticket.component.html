@@ -99,7 +99,10 @@
 			<p-progressSpinner styleClass="w-3rem h-3rem" strokeWidth="4" />
 		</div>
 	} @else if (error()) {
-		<p class="ticket-history__error">No se pudo cargar tu historial de tickets. Intenta de nuevo más tarde.</p>
+		<app-error-state
+			message="No se pudo cargar tu historial de tickets."
+			(retry)="onRetryTickets()"
+		/>
 	} @else if (tickets().length === 0) {
 		<p class="ticket-history__empty">Todavía no generaste ningún ticket.</p>
 	} @else {

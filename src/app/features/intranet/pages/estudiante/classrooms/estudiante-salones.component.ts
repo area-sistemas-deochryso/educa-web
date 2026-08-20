@@ -101,6 +101,7 @@ import { EstudianteSalonDialogComponent } from './components/estudiante-salon-di
 			[gruposCursoId]="vm().gruposCursoId"
 			[asistenciaData]="vm().asistenciaData"
 			[asistenciaLoading]="vm().asistenciaLoading"
+			[asistenciaError]="vm().asistenciaError"
 			[asistenciaCursoId]="vm().asistenciaCursoId"
 			[solicitudes]="vm().solicitudes"
 			[justificarDialogVisible]="vm().justificarDialogVisible"

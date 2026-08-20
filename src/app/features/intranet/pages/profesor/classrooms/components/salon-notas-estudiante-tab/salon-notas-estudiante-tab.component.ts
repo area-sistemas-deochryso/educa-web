@@ -16,6 +16,7 @@ import {
 	esPromedioProvisional,
 } from '@intranet-shared/services/calificacion-config';
 import type { ConfiguracionCalificacionListDto } from '@data/models';
+import { ErrorStateComponent } from '@shared/components';
 
 export interface NotaSaveEvent {
 	calificacionId: number;
@@ -44,6 +45,7 @@ interface EvaluacionRow {
 		SkeletonModule,
 		ButtonModule,
 		InputTextModule,
+		ErrorStateComponent,
 	],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './salon-notas-estudiante-tab.component.html',
@@ -53,6 +55,7 @@ export class SalonNotasEstudianteTabComponent {
 	// #region Inputs
 	readonly notasData = input<SalonNotasResumenDto | null>(null);
 	readonly loading = input(false);
+	readonly error = input<string | null>(null);
 	readonly cursoOptions = input<{ label: string; value: number }[]>([]);
 	readonly selectedCurso = input<number | null>(null);
 	readonly estudiantes = input<{ estudianteId: number; dni: string; nombreCompleto: string }[]>([]);
@@ -61,6 +64,7 @@ export class SalonNotasEstudianteTabComponent {
 
 	// #region Outputs
 	readonly cursoChange = output<number>();
+	readonly retry = output<void>();
 	readonly notaSave = output<NotaSaveEvent>();
 	// #endregion
 

@@ -14,6 +14,7 @@ interface AsistenciaCursoState {
 	// #region Resumen
 	resumen: AsistenciaCursoResumenDto | null;
 	resumenLoading: boolean;
+	resumenError: string | null;
 	// #endregion
 }
 
@@ -23,6 +24,7 @@ const initialState: AsistenciaCursoState = {
 	registroSaving: false,
 	resumen: null,
 	resumenLoading: false,
+	resumenError: null,
 };
 
 @Injectable({ providedIn: 'root' })
@@ -37,6 +39,7 @@ export class AttendanceCourseStore {
 	readonly registroSaving = computed(() => this._state().registroSaving);
 	readonly resumen = computed(() => this._state().resumen);
 	readonly resumenLoading = computed(() => this._state().resumenLoading);
+	readonly resumenError = computed(() => this._state().resumenError);
 	// #endregion
 
 	// #region Computed
@@ -66,6 +69,7 @@ export class AttendanceCourseStore {
 		registroTieneRegistros: this.registroTieneRegistros(),
 		resumen: this.resumen(),
 		resumenLoading: this.resumenLoading(),
+		resumenError: this.resumenError(),
 	}));
 	// #endregion
 
@@ -88,6 +92,10 @@ export class AttendanceCourseStore {
 
 	setResumenLoading(loading: boolean): void {
 		this._state.update((s) => ({ ...s, resumenLoading: loading }));
+	}
+
+	setResumenError(error: string | null): void {
+		this._state.update((s) => ({ ...s, resumenError: error }));
 	}
 	// #endregion
 

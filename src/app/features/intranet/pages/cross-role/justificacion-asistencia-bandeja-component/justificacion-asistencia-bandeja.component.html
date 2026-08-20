@@ -27,10 +27,7 @@
 				<p-progressSpinner styleClass="w-3rem h-3rem" strokeWidth="4" />
 			</div>
 		} @else if (error()) {
-			<div class="empty-state">
-				<i class="pi pi-exclamation-triangle text-3xl mb-2"></i>
-				<p>No se pudo cargar la bandeja. Intentá de nuevo.</p>
-			</div>
+			<app-error-state message="No se pudo cargar la bandeja." (retry)="onRetry()" />
 		} @else if (solicitudesFiltradas().length === 0) {
 			<div class="empty-state">
 				<i class="pi pi-inbox text-3xl mb-2"></i>

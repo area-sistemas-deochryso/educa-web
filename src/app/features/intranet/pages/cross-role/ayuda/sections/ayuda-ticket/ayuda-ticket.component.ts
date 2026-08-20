@@ -18,6 +18,7 @@ import {
 	TICKET_PROPUESTA_MAX,
 	TicketEstado,
 } from '../../models/ticket.models';
+import { ErrorStateComponent } from '@shared/components';
 import { AyudaTicketFacade } from './services/ayuda-ticket.facade';
 
 interface TipoOption {
@@ -57,6 +58,7 @@ const ESTADO_SEVERITY: Record<TicketEstado, 'warn' | 'info' | 'success'> = {
 		TableModule,
 		TagModule,
 		ToastModule,
+		ErrorStateComponent,
 	],
 	providers: [AyudaTicketFacade, MessageService],
 	templateUrl: './ayuda-ticket.component.html',
@@ -110,6 +112,10 @@ export class AyudaTicketComponent implements OnInit {
 	// #endregion
 
 	ngOnInit(): void {
+		this.facade.init();
+	}
+
+	onRetryTickets(): void {
 		this.facade.init();
 	}
 

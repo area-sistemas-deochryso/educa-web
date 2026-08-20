@@ -52,6 +52,8 @@
 			<p-skeleton height="2rem" />
 		}
 	</div>
+} @else if (error()) {
+	<app-error-state [message]="error()!" (retry)="retry.emit()" />
 } @else if (!hasData()) {
 	<div class="empty-state">
 		<i class="pi pi-chart-bar text-3xl mb-2"></i>

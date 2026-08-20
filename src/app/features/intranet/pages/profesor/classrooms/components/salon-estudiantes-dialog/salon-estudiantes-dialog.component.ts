@@ -58,6 +58,7 @@ export class SalonEstudiantesDialogComponent {
 	// #region Notas inputs
 	readonly notasData = input<SalonNotasResumenDto | null>(null);
 	readonly notasLoading = input<boolean>(false);
+	readonly notasError = input<string | null>(null);
 	readonly selectedCurso = input<number | null>(null);
 	readonly vistaActual = input<VistaPromedio>('semana');
 	// #endregion

@@ -36,6 +36,8 @@
 			<p-skeleton height="2rem" />
 		}
 	</div>
+} @else if (error()) {
+	<app-error-state [message]="error()!" (retry)="retry.emit()" />
 } @else if (!selectedEstudianteId()) {
 	<div class="empty-state">
 		<i class="pi pi-user"></i>

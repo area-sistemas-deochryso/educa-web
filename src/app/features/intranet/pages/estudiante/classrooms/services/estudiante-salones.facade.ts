@@ -89,6 +89,7 @@ export class StudentClassroomsFacade {
 		if (this.store.asistenciaLoading()) return;
 		this.store.setAsistenciaCursoId(horarioId);
 		this.store.setAsistenciaLoading(true);
+		this.store.setAsistenciaError(null);
 
 		this.api
 			.getMiAsistencia(horarioId)
@@ -101,6 +102,7 @@ export class StudentClassroomsFacade {
 				error: (err) => {
 					logger.error('Error al cargar asistencia', err);
 					this.store.setAsistenciaLoading(false);
+					this.store.setAsistenciaError('No se pudo cargar tu asistencia.');
 				},
 			});
 	}

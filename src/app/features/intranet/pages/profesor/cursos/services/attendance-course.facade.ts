@@ -80,6 +80,7 @@ export class AttendanceCourseFacade {
 		if (!horarioId) return;
 
 		this.store.setResumenLoading(true);
+		this.store.setResumenError(null);
 
 		this.api
 			.getAsistenciaCursoResumen(horarioId, fechaInicio, fechaFin)
@@ -95,6 +96,7 @@ export class AttendanceCourseFacade {
 				error: (err) => {
 					this.errHandler.handle(err, 'cargar resumen de asistencia');
 					this.store.setResumenLoading(false);
+					this.store.setResumenError('No se pudo cargar el resumen de asistencia.');
 				},
 			});
 	}

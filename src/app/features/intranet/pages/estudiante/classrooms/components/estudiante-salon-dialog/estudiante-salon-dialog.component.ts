@@ -171,6 +171,7 @@ import { EstudianteNotasComponent } from '@features/intranet/pages/estudiante/no
 								<app-student-attendance-tab
 									[asistenciaData]="asistenciaData()"
 									[loading]="asistenciaLoading()"
+									[error]="asistenciaError()"
 									[cursoOptions]="cursosOptions()"
 									[selectedCurso]="asistenciaCursoId()"
 									[nivel]="nivel()"
@@ -179,6 +180,7 @@ import { EstudianteNotasComponent } from '@features/intranet/pages/estudiante/no
 									[justificarContext]="justificarContext()"
 									[solicitudSaving]="solicitudSaving()"
 									(cursoChange)="onAsistenciaCursoChange($event)"
+									(retry)="onRetryAsistencia()"
 									(abrirJustificar)="abrirJustificar.emit($event)"
 									(justificarDialogVisibleChange)="justificarDialogVisibleChange.emit($event)"
 									(guardarJustificacion)="guardarJustificacion.emit($event)"
@@ -215,6 +217,7 @@ export class EstudianteSalonDialogComponent {
 	readonly gruposCursoId = input<number | null>(null);
 	readonly asistenciaData = input<MiAsistenciaCursoResumenDto | null>(null);
 	readonly asistenciaLoading = input<boolean>(false);
+	readonly asistenciaError = input<string | null>(null);
 	readonly asistenciaCursoId = input<number | null>(null);
 	readonly solicitudes = input<SolicitudJustificacionAsistenciaDto[]>([]);
 	readonly justificarDialogVisible = input<boolean>(false);
@@ -280,6 +283,11 @@ export class EstudianteSalonDialogComponent {
 
 	onAsistenciaCursoChange(horarioId: number): void {
 		this.asistenciaChange.emit(horarioId);
+	}
+
+	onRetryAsistencia(): void {
+		const cursoId = this.asistenciaCursoId();
+		if (cursoId) this.asistenciaChange.emit(cursoId);
 	}
 	// #endregion
 }

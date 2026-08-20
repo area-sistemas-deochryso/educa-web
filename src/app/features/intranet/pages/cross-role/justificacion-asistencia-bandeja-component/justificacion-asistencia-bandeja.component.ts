@@ -14,6 +14,7 @@ import { TagModule } from 'primeng/tag';
 import { TextareaModule } from 'primeng/textarea';
 
 import { UserPermissionsService } from '@core/services';
+import { ErrorStateComponent } from '@shared/components';
 import { SolicitudJustificacionAsistenciaDto, EstadoSolicitudJustificacion } from '@features/intranet/pages/estudiante/models';
 
 import { JustificacionAsistenciaBandejaFacade } from './justificacion-asistencia-bandeja.facade';
@@ -67,6 +68,7 @@ const ESTADO_LABEL: Record<EstadoSolicitudJustificacion, string> = {
 		TableModule,
 		TagModule,
 		TextareaModule,
+		ErrorStateComponent,
 	],
 	providers: [JustificacionAsistenciaBandejaFacade, ConfirmationService],
 	templateUrl: './justificacion-asistencia-bandeja.component.html',
@@ -106,6 +108,10 @@ export class JustificacionAsistenciaBandejaComponent implements OnInit {
 	}
 
 	// #region Handlers
+	onRetry(): void {
+		this.facade.init();
+	}
+
 	onFiltroChange(estado: EstadoSolicitudJustificacion | null): void {
 		this._filtroEstado.set(estado);
 	}

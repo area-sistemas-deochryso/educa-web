@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { TableSkeletonComponent } from '@intranet-shared/components/table-skeleton/table-skeleton.component';
 import { StatsSkeletonComponent } from '@intranet-shared/components/stats-skeleton/stats-skeleton.component';
+import { ErrorStateComponent } from '@shared/components';
 import { TABLE_SKELETON_COLUMNS } from './config/attendance-reports.config';
 import { ReportsFiltersComponent } from './components/reports-filters/reports-filters.component';
 import { ReportsSummaryComponent } from './components/reports-summary/reports-summary.component';
@@ -28,6 +29,7 @@ import {
 		ReportsResultComponent,
 		TableSkeletonComponent,
 		StatsSkeletonComponent,
+		ErrorStateComponent,
 	],
 	templateUrl: './attendance-reports.component.html',
 	styleUrl: './attendance-reports.component.scss',

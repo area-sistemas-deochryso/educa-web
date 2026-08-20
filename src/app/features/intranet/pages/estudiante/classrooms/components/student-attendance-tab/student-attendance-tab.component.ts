@@ -7,6 +7,7 @@ import { SelectModule } from 'primeng/select';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { NivelEducativo } from '@core/helpers';
+import { ErrorStateComponent } from '@shared/components';
 import {
 	MiAsistenciaCursoResumenDto,
 	MiAsistenciaCursoItemDto,
@@ -31,7 +32,7 @@ export type JustificacionCellState =
 @Component({
 	selector: 'app-student-attendance-tab',
 	standalone: true,
-	imports: [CommonModule, FormsModule, TableModule, TagModule, SelectModule, ButtonModule, TooltipModule, JustificarInasistenciaDialogComponent],
+	imports: [CommonModule, FormsModule, TableModule, TagModule, SelectModule, ButtonModule, TooltipModule, JustificarInasistenciaDialogComponent, ErrorStateComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './student-attendance-tab.component.html',
 	styleUrl: './student-attendance-tab.component.scss',
@@ -40,6 +41,7 @@ export class StudentAttendanceTabComponent implements OnInit {
 	// #region Inputs/Outputs
 	readonly asistenciaData = input<MiAsistenciaCursoResumenDto | null>(null);
 	readonly loading = input<boolean>(false);
+	readonly error = input<string | null>(null);
 	readonly cursoOptions = input<{ label: string; value: number }[]>([]);
 	readonly selectedCurso = input<number | null>(null);
 	readonly nivel = input<NivelEducativo | null>(null);
@@ -48,6 +50,7 @@ export class StudentAttendanceTabComponent implements OnInit {
 	readonly justificarContext = input<JustificarInasistenciaContext | null>(null);
 	readonly solicitudSaving = input<boolean>(false);
 	readonly cursoChange = output<number>();
+	readonly retry = output<void>();
 	readonly abrirJustificar = output<JustificarInasistenciaContext>();
 	readonly justificarDialogVisibleChange = output<boolean>();
 	readonly guardarJustificacion = output<{ asistenciaCursoId: number; formData: FormData }>();
@@ -135,6 +138,10 @@ export class StudentAttendanceTabComponent implements OnInit {
 	onCursoChange(value: number): void {
 		this.selectedCursoLocal = value;
 		this.cursoChange.emit(value);
+	}
+
+	onRetry(): void {
+		this.retry.emit();
 	}
 
 	onAbrirJustificar(item: MiAsistenciaCursoItemDto): void {

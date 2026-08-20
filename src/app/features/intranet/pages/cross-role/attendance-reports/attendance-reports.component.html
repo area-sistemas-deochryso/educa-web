@@ -46,10 +46,7 @@
 
 <!-- #region Error -->
 @if (vm().error) {
-	<div class="error-message">
-		<i class="pi pi-exclamation-triangle"></i>
-		{{ vm().error }}
-	</div>
+	<app-error-state [message]="vm().error!" (retry)="onGenerar()" />
 }
 <!-- #endregion -->
 

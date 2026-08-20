@@ -6,11 +6,12 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { AsistenciaCursoResumenDto } from '@features/intranet/pages/profesor/models';
+import { ErrorStateComponent } from '@shared/components';
 
 @Component({
 	selector: 'app-attendance-summary-panel',
 	standalone: true,
-	imports: [CommonModule, FormsModule, ButtonModule, DatePickerModule, TableModule, TagModule],
+	imports: [CommonModule, FormsModule, ButtonModule, DatePickerModule, TableModule, TagModule, ErrorStateComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './attendance-summary-panel.component.html',
 	styleUrl: './attendance-summary-panel.component.scss',
@@ -19,6 +20,7 @@ export class AttendanceSummaryPanelComponent {
 	// #region Inputs
 	readonly resumen = input<AsistenciaCursoResumenDto | null>(null);
 	readonly loading = input(false);
+	readonly error = input<string | null>(null);
 	// #endregion
 
 	// #region Outputs

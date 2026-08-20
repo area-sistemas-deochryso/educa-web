@@ -128,6 +128,7 @@ export class ProfesorFacade {
 	loadNotasSalon(salonId: number, cursoId: number): void {
 		if (this.store.notasSalonLoading()) return;
 		this.store.setNotasSalonLoading(true);
+		this.store.setNotasSalonError(null);
 		this.store.setNotasCursoId(cursoId);
 
 		this.api
@@ -144,6 +145,7 @@ export class ProfesorFacade {
 				error: (err) => {
 					logger.error('ProfesorFacade: Error al cargar notas del salón', err);
 					this.store.setNotasSalonLoading(false);
+					this.store.setNotasSalonError('No se pudieron cargar las notas del salón.');
 				},
 			});
 	}

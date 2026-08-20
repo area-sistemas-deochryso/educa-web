@@ -5,6 +5,8 @@
 		<div class="flex justify-content-center p-5">
 			<p-progressSpinner strokeWidth="4" />
 		</div>
+	} @else if (horariosError()) {
+		<app-error-state [message]="horariosError()!" (retry)="onRetryHorarios()" />
 	} @else if (cursoOptions().length === 0) {
 		<div class="flex flex-column align-items-center p-5 text-color-secondary">
 			<i class="pi pi-check-square text-4xl mb-3"></i>
@@ -28,6 +30,8 @@
 			<div class="flex justify-content-center p-5">
 				<p-progressSpinner strokeWidth="4" />
 			</div>
+		} @else if (asistenciaError()) {
+			<app-error-state [message]="asistenciaError()!" (retry)="onRetryAsistencia()" />
 		} @else if (asistencia()) {
 			<!-- Stats -->
 			<div class="stat-cards mb-4">

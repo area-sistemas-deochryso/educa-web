@@ -111,10 +111,12 @@
 					<app-salon-notas-estudiante-tab
 						[notasData]="notasData()"
 						[loading]="notasLoading()"
+						[error]="notasError()"
 						[cursoOptions]="cursoOptions()"
 						[selectedCurso]="selectedCurso()"
 						[estudiantes]="salon()?.estudiantes ?? []"
 						(cursoChange)="notasCursoChange.emit($event)"
+						(retry)="onRefreshNotas()"
 						(notaSave)="notaSave.emit($event)"
 					/>
 				</p-tabpanel>
@@ -138,10 +140,12 @@
 					<app-classroom-grades-tab
 						[notasData]="notasData()"
 						[loading]="notasLoading()"
+						[error]="notasError()"
 						[cursoOptions]="cursoOptions()"
 						[selectedCurso]="selectedCurso()"
 						[vistaActual]="vistaActual()"
 						(cursoChange)="notasCursoChange.emit($event)"
+						(retry)="onRefreshNotas()"
 						(vistaChange)="notasVistaChange.emit($event)"
 						(descargarBoletas)="descargarBoletas.emit()"
 					/>

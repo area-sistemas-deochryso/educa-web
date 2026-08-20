@@ -29,6 +29,7 @@ interface ProfesorStoreState {
 	// #region Notas salón state
 	notasSalon: SalonNotasResumenDto | null;
 	notasSalonLoading: boolean;
+	notasSalonError: string | null;
 	notasCursoId: number | null;
 	notasVistaActual: VistaPromedio;
 	// #endregion
@@ -46,6 +47,7 @@ const initialState: ProfesorStoreState = {
 	selectedSalon: null,
 	notasSalon: null,
 	notasSalonLoading: false,
+	notasSalonError: null,
 	notasCursoId: null,
 	notasVistaActual: 'semana',
 };
@@ -68,6 +70,7 @@ export class ProfesorStore {
 	readonly selectedSalon = computed(() => this._state().selectedSalon);
 	readonly notasSalon = computed(() => this._state().notasSalon);
 	readonly notasSalonLoading = computed(() => this._state().notasSalonLoading);
+	readonly notasSalonError = computed(() => this._state().notasSalonError);
 	readonly notasCursoId = computed(() => this._state().notasCursoId);
 	readonly notasVistaActual = computed(() => this._state().notasVistaActual);
 
@@ -222,6 +225,7 @@ export class ProfesorStore {
 		selectedSalon: this.selectedSalon(),
 		notasSalon: this.notasSalon(),
 		notasSalonLoading: this.notasSalonLoading(),
+		notasSalonError: this.notasSalonError(),
 		notasCursoId: this.notasCursoId(),
 		notasVistaActual: this.notasVistaActual(),
 		cursosForSelectedSalon: this.cursosForSelectedSalon(),
@@ -279,6 +283,7 @@ export class ProfesorStore {
 			selectedSalon: null,
 			notasSalon: null,
 			notasSalonLoading: false,
+			notasSalonError: null,
 			notasCursoId: null,
 		}));
 	}
@@ -291,6 +296,10 @@ export class ProfesorStore {
 
 	setNotasSalonLoading(loading: boolean): void {
 		this._state.update((s) => ({ ...s, notasSalonLoading: loading }));
+	}
+
+	setNotasSalonError(error: string | null): void {
+		this._state.update((s) => ({ ...s, notasSalonError: error }));
 	}
 
 	setNotasCursoId(cursoId: number | null): void {

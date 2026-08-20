@@ -156,6 +156,7 @@ import { EstadoAsistenciaCurso } from '../models';
 								<app-attendance-summary-panel
 									[resumen]="asistenciaVm().resumen"
 									[loading]="asistenciaVm().resumenLoading"
+									[error]="asistenciaVm().resumenError"
 									(buscar)="onBuscarResumen($event)"
 								/>
 							</p-tabpanel>

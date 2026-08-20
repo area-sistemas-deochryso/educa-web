@@ -57,8 +57,6 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub F3-F6), *
 
 | Pos | Key | Plan | Próximo paso concreto | Repo | Desbloquea | Gate |
 |---|---|---|---|---|---|---|
-| 2 | P10 | Fallbacks críticos | P0.4+ FE (P0.1 ✅ brief 249, P0.2 ✅ brief 262, P0.3 ✅ brief 263) | local | 1 (Plan 10 F1+) | libre |
-
 #### Tier 3 — Independientes (sin downstream)
 
 | Pos | Key | Plan | Próximo paso concreto | Gate |
@@ -92,9 +90,9 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub F3-F6), *
 
 ### Notas operativas
 
-- **`running/`**: vacío · **`open/`**: 2 briefs (332, 458) · **`awaiting-prod/`**: 5 briefs (462, 464, 465, 480, 481) · **`waiting/`**: vacío · **`troubles/`**: vacío
-- **Último cierre**: 462 (Pointer Events + pinch-zoom + responsive en `admin/campus`; QA táctil en vivo pendiente) → `awaiting-prod/`, worktree `chat/462-campus-editor-touch-support`, 2026-08-18.
-- **Último saneamiento**: 2026-07-11 — sync-maestro: vaciado `awaiting-prod/` completo (estables, verificados con usuarios reales).
+- **`running/`**: vacío · **`open/`**: vacío · **`awaiting-prod/`**: 6 briefs (461, 462, 464, 465, 554, 559) · **`waiting/`**: vacío · **`troubles/`**: vacío
+- **Último cierre**: 560 (Plan 10 P0.4 — UI defensiva fuera de admin: error signal + `app-error-state` + retry threadeado en profesor/estudiante/cross-role, 28 archivos, 2529 tests OK) → `closed/`, worktree `chat/560-fe-ui-defensiva-no-admin`, 2026-08-20. Plan 10 P0 completo (P0.1-P0.4); resta solo F1+ (flujos alternos, bloqueado por Carril B).
+- **Último saneamiento**: 2026-08-20 — reconciliación manual (sin comando `/sync-maestro` implementado): briefs 332/458/480/481 referenciados como pendientes ya estaban cerrados y purgados en `e0a2b9c6`; se eliminó un duplicado stray sin trackear de 392 en `open/`.
 
 ---
 
@@ -127,8 +125,8 @@ Plan 6 completado. 1321 tests. Detalle en §Inventario (archivados inline).
 
 ### Carril D — Confiabilidad sistémica
 
-→ En cola: F13 (pos 7), P15 F3-F5 (pos 8), P10 P0 (pos 4).
-Cerrados: Plan 15 F1 ✅ · F2 ✅. Plan 16 F1 ✅ (BE-only). Plan 12 F1 ✅ (BE-only).
+→ En cola: F13 (pos 7), P15 F3-F5 (pos 8).
+Cerrados: Plan 15 F1 ✅ · F2 ✅. Plan 16 F1 ✅ (BE-only). Plan 12 F1 ✅ (BE-only). Plan 10 P0 ✅ (P0.1-P0.4, brief 560).
 BE-only (no en cola FE): Plan 16 F2-F5, Plan 12 F2-F5, Plan 7 F1-F2. Cross-repo: Plan 14 F1-F6.
 
 ### Carril B — Deuda técnica

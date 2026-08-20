@@ -53,8 +53,14 @@
 }
 <!-- #endregion -->
 
+<!-- #region Error -->
+@if (!loading() && error()) {
+	<app-error-state [message]="error()!" (retry)="onBuscar()" />
+}
+<!-- #endregion -->
+
 <!-- #region Table -->
-@if (!loading() && hasData()) {
+@if (!loading() && !error() && hasData()) {
 	<p-table
 		[value]="resumen()!.estudiantes"
 			dataKey="dni"
@@ -102,7 +108,7 @@
 <!-- #endregion -->
 
 <!-- #region Empty state -->
-@if (!loading() && !hasData()) {
+@if (!loading() && !error() && !hasData()) {
 	<div class="empty-state">
 		<i class="pi pi-chart-bar"></i>
 		<p>Seleccione un rango de fechas y presione Buscar para ver el resumen</p>

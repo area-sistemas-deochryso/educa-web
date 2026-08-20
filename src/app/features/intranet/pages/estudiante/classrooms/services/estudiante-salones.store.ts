@@ -26,6 +26,7 @@ export class StudentClassroomsStore {
 	// Asistencia tab
 	private readonly _asistenciaData = signal<MiAsistenciaCursoResumenDto | null>(null);
 	private readonly _asistenciaLoading = signal(false);
+	private readonly _asistenciaError = signal<string | null>(null);
 	private readonly _asistenciaCursoId = signal<number | null>(null);
 
 	// Grupos tab
@@ -101,6 +102,7 @@ export class StudentClassroomsStore {
 	readonly dialogVisible = this._dialogVisible.asReadonly();
 	readonly asistenciaData = this._asistenciaData.asReadonly();
 	readonly asistenciaLoading = this._asistenciaLoading.asReadonly();
+	readonly asistenciaError = this._asistenciaError.asReadonly();
 	readonly asistenciaCursoId = this._asistenciaCursoId.asReadonly();
 	readonly gruposData = this._gruposData.asReadonly();
 	readonly gruposLoading = this._gruposLoading.asReadonly();
@@ -126,6 +128,7 @@ export class StudentClassroomsStore {
 		cursosForSelectedSalon: this.cursosForSelectedSalon(),
 		asistenciaData: this.asistenciaData(),
 		asistenciaLoading: this.asistenciaLoading(),
+		asistenciaError: this.asistenciaError(),
 		asistenciaCursoId: this.asistenciaCursoId(),
 		gruposData: this.gruposData(),
 		gruposLoading: this.gruposLoading(),
@@ -198,6 +201,10 @@ export class StudentClassroomsStore {
 		this._asistenciaLoading.set(loading);
 	}
 
+	setAsistenciaError(error: string | null): void {
+		this._asistenciaError.set(error);
+	}
+
 	setAsistenciaCursoId(id: number | null): void {
 		this._asistenciaCursoId.set(id);
 	}
@@ -228,6 +235,7 @@ export class StudentClassroomsStore {
 		this._selectedSalonId.set(null);
 		// Clear tab data
 		this._asistenciaData.set(null);
+		this._asistenciaError.set(null);
 		this._asistenciaCursoId.set(null);
 		this._gruposData.set(null);
 		this._gruposCursoId.set(null);
