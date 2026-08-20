@@ -133,7 +133,8 @@ export class StudentAttendanceComponent implements OnInit {
 
 	readonly selectedNivel = computed(() => {
 		const horario = this._horarios().find((h) => h.id === this.selectedHorarioId());
-		return horario ? detectarNivel(horario.salonDescripcion) : null;
+		const salonDescripcion = horario?.salonDescripcion ?? this.asistencia()?.salonDescripcion;
+		return salonDescripcion ? detectarNivel(salonDescripcion) : null;
 	});
 	// #endregion
 
@@ -251,12 +252,21 @@ export class StudentAttendanceComponent implements OnInit {
 		this._pageLoading.set(true);
 		this._horariosError.set(null);
 		this.api
-			.getMisHorarios()
+			.getMiAsistenciaActiva()
 			.pipe(withRetry({ tag: 'EstudianteAsistencia:loadHorarios' }), takeUntilDestroyed(this.destroyRef))
 			.subscribe({
-				next: (horarios) => {
-					this._horarios.set(horarios);
+				next: (resolucion) => {
 					this._pageLoading.set(false);
+
+					// Curso activo resuelto server-side (único horario) — ya viene el resumen,
+					// no hace falta la segunda llamada.
+					if (resolucion.resumen) {
+						this.selectedHorarioId.set(resolucion.resumen.horarioId);
+						this._asistencia.set(resolucion.resumen);
+						return;
+					}
+
+					this._horarios.set(resolucion.horarios ?? []);
 
 					// Auto-select first if only one and no pending query-param selection
 					const opts = this.cursoOptions();

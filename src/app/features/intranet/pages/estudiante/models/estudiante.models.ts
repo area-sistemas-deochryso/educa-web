@@ -1,4 +1,5 @@
 // Re-export shared DTOs from profesor models
+import type { HorarioProfesorDto } from '../../profesor/models';
 export type {
 	HorarioProfesorDto,
 	CursoContenidoDetalleDto,
@@ -94,6 +95,14 @@ export interface MiAsistenciaCursoResumenDto {
 	totalFalto: number;
 	totalClases: number;
 	detalle: MiAsistenciaCursoItemDto[];
+}
+
+// Respuesta discriminada de la resolución de curso activo: con un único horario
+// activo `resumen` viene poblado (ahorra un round-trip); con 0 o varios, `horarios`
+// viene poblado (mismo shape que mis-horarios) para caer al selector manual.
+export interface MiAsistenciaResolucionDto {
+	resumen?: MiAsistenciaCursoResumenDto;
+	horarios?: HorarioProfesorDto[];
 }
 // #endregion
 

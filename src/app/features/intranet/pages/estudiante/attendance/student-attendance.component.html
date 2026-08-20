@@ -7,7 +7,7 @@
 		</div>
 	} @else if (horariosError()) {
 		<app-error-state [message]="horariosError()!" (retry)="onRetryHorarios()" />
-	} @else if (cursoOptions().length === 0) {
+	} @else if (cursoOptions().length === 0 && !asistencia()) {
 		<div class="flex flex-column align-items-center p-5 text-color-secondary">
 			<i class="pi pi-check-square text-4xl mb-3"></i>
 			<p>No tienes cursos asignados</p>

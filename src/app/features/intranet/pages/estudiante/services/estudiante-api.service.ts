@@ -13,6 +13,7 @@ import {
 	RegistrarEstudianteTareaArchivoRequest,
 	EstudianteMisNotasDto,
 	MiAsistenciaCursoResumenDto,
+	MiAsistenciaResolucionDto,
 	GruposResumenDto,
 	SolicitudJustificacionAsistenciaDto,
 } from '../models';
@@ -122,6 +123,10 @@ export class EstudianteApiService {
 
 	getMiAsistencia(horarioId: number): Observable<MiAsistenciaCursoResumenDto | null> {
 		return this.http.get<MiAsistenciaCursoResumenDto>(`${this.baseUrl}/horario/${horarioId}/mi-asistencia`);
+	}
+
+	getMiAsistenciaActiva(): Observable<MiAsistenciaResolucionDto> {
+		return this.http.get<MiAsistenciaResolucionDto>(`${this.baseUrl}/mi-asistencia`);
 	}
 
 	getGruposHorario(horarioId: number): Observable<GruposResumenDto | null> {
