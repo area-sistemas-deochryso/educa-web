@@ -7,7 +7,7 @@
 > **touches**:
 >   - `Educa.API/Educa.API/Services/Asistencias/ReporteTendenciaAsistenciaService.cs` (o el archivo que agrupe por semana dentro de mes)
 >   - posiblemente `educa-web/.../attendance-panel/services/attendance-panel.service.ts` (una vez arreglado el backend, remover el `catchError` de contención)
-> **Validación prod**: ⏳ pendiente desde 2026-07-22 — smoke test manual de `GET /api/ReportesAsistencia/tendencia?rango=mes&fecha=2026-06-21&sedeId=1` (y otra fecha que cruce mes), confirmar 200 sin excepción.
+> **Validación prod**: ✅ verificada 2026-08-20 — smoke test contra TestConnection (backend local `dotnet run`, sesión admin autenticada vía browser). `GET /api/ReportesAsistencia/tendencia?rango=mes&fecha=2026-06-21&sedeId=1` → 200 con datos. `GET .../tendencia?rango=mes&fecha=2026-08-05&sedeId=1` (otra fecha cruzando mes) → 200 con datos. Sin excepción en ninguna de las 2.
 
 ## Contexto
 

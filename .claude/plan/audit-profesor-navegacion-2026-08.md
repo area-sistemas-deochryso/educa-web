@@ -28,12 +28,14 @@ Un hallazgo se reencuadra: la contradicción sobre "salón asignado" no es un de
 
 ## Inventario (resumen)
 
+> **Nota (2026-08-20, `/triage`)**: 2 hallazgos ✅ ya no tienen task file en `.claude/tasks/` — se borraron por estar confirmados cerrados. Quedan 4 abiertos.
+
 | Task | Módulo | Severidad | Tipo |
 |---|---|---|---|
-| [profesor-audit-salon-asignado-contradiccion.md](../tasks/profesor-audit-salon-asignado-contradiccion.md) | Home / Historial de Asistencia / Resumen de Salones | 🔴 | Bug de datos/lógica — ✅ cerrado (chat 553) |
+| `profesor-audit-salon-asignado-contradiccion.md` ✅ | Home / Historial de Asistencia / Resumen de Salones | 🔴 | Bug de datos/lógica — cerrado (chat 553) |
 | [profesor-audit-promedio-confuso.md](../tasks/profesor-audit-promedio-confuso.md) | Mis Salones → Notas por Estudiante / Notas del Salón | 🔴 | Decisión ya tomada — ejecutar |
 | [profesor-audit-videoconf-control-sala.md](../tasks/profesor-audit-videoconf-control-sala.md) | Videoconferencias | 🔴 | Gap de feature (seguridad/supervisión) |
-| [profesor-audit-resumen-asistencia-en-cero.md](../tasks/profesor-audit-resumen-asistencia-en-cero.md) | Mi Asistencia → tab Resumen | 🟡 | Bug a confirmar (FE o BE) |
+| `profesor-audit-resumen-asistencia-en-cero.md` ✅ | Mi Asistencia → tab Resumen | 🟡 | Bug a confirmar (FE o BE) — cerrado |
 | [profesor-audit-resumen-salones-contador-ambiguo.md](../tasks/profesor-audit-resumen-salones-contador-ambiguo.md) | Resumen de Salones | 🟢 | UX menor |
 | [profesor-audit-notas-select-placeholder.md](../tasks/profesor-audit-notas-select-placeholder.md) | Mis Cursos / Mis Salones → Calificar | 🟢 | UI menor |
 

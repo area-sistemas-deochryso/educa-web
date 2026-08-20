@@ -1,6 +1,6 @@
 # 465 — Auditoría visual + funcional: Perfil Profesor
 
-> **Validación prod**: ⏳ pendiente desde 2026-07-18 — QA en vivo en TEST DB del escenario real (`MENDO CALDERON MARIELA`, curso Arte, salón `INICIAL 3 AÑOS B`), no se hizo browser QA en la sesión de cierre.
+> **Validación prod**: ✅ verificada 2026-08-20 — QA en vivo en TEST DB, sesión real `MENDO CALDERON MARIELA` (switcher de login). Hallazgo #1: `Mi Asistencia` → curso Arte → 19/08/2026 ahora lista los 2 estudiantes matriculados (`RICALDI PACHECO MELISA` + `RIVERA PEYRONE ALVARO`, Total: 2), antes solo aparecía 1. Hallazgo #2: menú "Mi Seguimiento" y `<h1>` de la página coinciden — ambos dicen "Resumen de Salones" (el nombre final terminó siendo distinto al propuesto en el brief original, "Notas y Asistencia", pero el criterio real — que coincidan — se cumple).
 > **Repo destino**: `educa-web`
 > **Creado**: 2026-07-17 · **Modo sugerido**: `/investigate` (el hallazgo #1 necesita confirmar causa exacta antes de poder diseñar el fix)
 > **Plan**: —

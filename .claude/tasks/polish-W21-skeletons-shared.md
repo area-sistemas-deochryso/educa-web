@@ -3,23 +3,30 @@
 # polish-W21-skeletons-shared
 
 > **Origen**: F1 audit del plan [`intranet-fe-polish-W21.md`](../plan/intranet-fe-polish-W21.md), 2026-05-18.
-> **Severidad**: 🔴 (drift vs `rules/skeletons.md` — spinners genéricos donde el design-system pide skeleton shared).
+> **Severidad**: 🟡 (bajó de 🔴 — la mayoría del hallazgo original ya se resolvió, ver verificación 2026-08-20).
+> **Verificado 2026-08-20**: 4 de 6 hallazgos originales ya migrados a `app-skeleton-loader`. Quedan 2 componentes con `<i class="pi pi-spinner pi-spin">` crudo.
 
 ## Scope
 
 Migrar `pi-spinner` / `p-progressSpinner` / overlays de loading genéricos a los componentes shared `app-skeleton-loader`, `app-table-skeleton`, `app-stats-skeleton` en las pages que cargan datos de API.
 
-## Hallazgos concretos
+## Hallazgos — estado actual (verificado en código, no solo en este doc)
 
-| Archivo / page | Patrón actual | Skeleton sugerido |
+| Archivo / page | Estado | Nota |
 |---|---|---|
-| `pages/estudiante/schedules/` | Loading overlay con spinner genérico | `app-skeleton-loader` (grid de bloques semanales) |
-| `pages/estudiante/notas/` | Sin `p-skeleton` | `app-table-skeleton` para la tabla de notas + `app-stats-skeleton` si hay KPIs |
-| `pages/profesor/grades/profesor-calificaciones.component.ts` | Solo `ProgressSpinner` | `app-table-skeleton` para tabla de evaluaciones (resuelto si F3 corre) |
-| `pages/profesor/cursos/` | spinners genéricos (pi-spinner) sin shared component | `app-skeleton-loader` en secciones de archivos / tareas / evaluaciones |
-| `pages/estudiante/cursos/` | Idem profesor/cursos — spinner genérico en `misNotasLoading` | `app-skeleton-loader` consistente con el resto |
+| `pages/estudiante/schedules/estudiante-horarios.component.html` | ✅ Migrado | `app-skeleton-loader` presente |
+| `pages/estudiante/notas/estudiante-notas.component.html` | ✅ Migrado | `app-skeleton-loader` presente, sin spinner residual |
+| `pages/profesor/grades/profesor-calificaciones.component.html` | ✅ N/A | Componente refactorizado — ya no es el monolito original, sin spinner propio |
+| `pages/profesor/cursos/components/calificaciones-panel/` | ✅ Migrado | `app-skeleton-loader` |
+| `pages/profesor/cursos/components/student-files-dialog/` | ✅ Migrado | `app-skeleton-loader` |
+| `pages/profesor/cursos/components/student-task-submissions-dialog/` | ✅ Migrado | `app-skeleton-loader` |
+| `pages/profesor/cursos/components/attendance-summary-panel/` | ❌ Pendiente | `<i class="pi pi-spinner pi-spin">` crudo (línea ~50) |
+| `pages/profesor/cursos/components/attendance-registration-panel/` | ❌ Pendiente | `<i class="pi pi-spinner pi-spin">` crudo (línea ~79) |
+| `pages/estudiante/cursos/estudiante-cursos.component.ts` | ❌ Pendiente | `<p-progressSpinner>` crudo (línea ~85) |
 
-> **Nota**: `profesor/grades` absorbido por F3 si se ejecuta primero.
+## Scope restante (real)
+
+Solo 3 componentes: `attendance-summary-panel`, `attendance-registration-panel` (profesor/cursos) y `estudiante-cursos.component.ts`. El resto ya está migrado.
 
 ## Criterio de cierre
 
@@ -34,4 +41,4 @@ Migrar `pi-spinner` / `p-progressSpinner` / overlays de loading genéricos a los
 
 ## Estimación
 
-Medio (~3-4h). Requiere definir `SkeletonColumnDef[]` por cada tabla y reemplazar markup.
+Chico (~30-45min). Solo 3 reemplazos puntuales de spinner crudo por `app-skeleton-loader` (sin tablas con columnas que mapear — son paneles/cards simples).

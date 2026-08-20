@@ -85,13 +85,12 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub F3-F6), *
 ### 🟣 Verificaciones post-deploy (`/verify <NNN>`)
 
 - ⏳ **462** — soporte táctil `admin/campus` (Pointer Events + pinch-zoom + responsive). Lint/build OK, layout responsive verificado con iframe 375px. Pendiente: QA en vivo de pan/pinch/drag táctil real — bloqueado en la sesión por cuenta de prueba sin `SedeId` (400 en `/api/campus/pisos`).
-- ⏳ **465** — audit visual+funcional Profesor: fix `AsistenciaCursoRepository` (lee `EstudianteSalon` en vez de `HorarioEstudiante`) + rename `<h1>` "Mis Salones" → "Notas y Asistencia". Pendiente: QA en vivo en TEST DB del escenario real (`MENDO CALDERON MARIELA`, curso Arte) — no se hizo browser QA en la sesión de cierre.
-- ⏳ **464** — fix 500 en `ReportesAsistencia/tendencia?rango=mes` al cruzar meses (`IndexarPorDia` con `ToDictionary` explotaba ante doble marcación en la misma fecha; alineado con `TryAdd` como en `ProcesarSalonRango`). Pendiente: smoke test en vivo con `fecha=2026-06-21` (y otra que cruce mes) confirmando 200 sin excepción.
 
 ### Notas operativas
 
-- **`running/`**: vacío · **`open/`**: vacío · **`awaiting-prod/`**: 6 briefs (461, 462, 464, 465, 554, 559) · **`waiting/`**: vacío · **`troubles/`**: vacío
+- **`running/`**: vacío · **`open/`**: vacío · **`awaiting-prod/`**: 3 briefs (462, 554, 559) · **`waiting/`**: vacío · **`troubles/`**: vacío
 - **Último cierre**: 560 (Plan 10 P0.4 — UI defensiva fuera de admin: error signal + `app-error-state` + retry threadeado en profesor/estudiante/cross-role, 28 archivos, 2529 tests OK) → `closed/`, worktree `chat/560-fe-ui-defensiva-no-admin`, 2026-08-20. Plan 10 P0 completo (P0.1-P0.4); resta solo F1+ (flujos alternos, bloqueado por Carril B).
+- **Verificación post-deploy 2026-08-20** (`/verify`, disparado desde `/triage`): 461/464/465 pasaron QA en vivo contra TestConnection (backend `dotnet run` local + browser con switcher de login) → `closed/`. 461 con salvedad: el remanente grupo 4 (`videoconferencia-sala`/`campus-3d-view` con sesión real activa) solo se pudo confirmar por código, no en vivo — no reproducible con datos de prueba, igual que en el cierre original.
 - **Último saneamiento**: 2026-08-20 — reconciliación manual (sin comando `/sync-maestro` implementado): briefs 332/458/480/481 referenciados como pendientes ya estaban cerrados y purgados en `e0a2b9c6`; se eliminó un duplicado stray sin trackear de 392 en `open/`.
 
 ---

@@ -108,7 +108,7 @@ Sin `@media`, sin scroll wrapper.
 - [x] Grupo 4 (`videoconferencia-sala`, `campus-3d-view`): `@media`/`flex-wrap`/reposicionamiento aplicados. **Grupo 5** (`health-permissions`, `rate-limit-events`) cubierto en grupo 2.
 - [x] Build + lint OK.
 
-> **Validación prod**: ⏳ pendiente desde 2026-07-17 — falta verificar en vivo `videoconferencia-sala` y `campus-3d-view` (grupo 4) con una sesión real activa (videollamada / navegación 3D en curso). No se pudo reproducir con datos de prueba locales. Capturas antes/después no se tomaron (no bloqueante, criterio nice-to-have del brief original).
+> **Validación prod**: ✅ verificada 2026-08-20, con salvedad — confirmado en código que `videoconferencia-sala.component.scss` (líneas 23,30,48-49) y `campus-3d-view.component.scss` (líneas 32-34,44,52,63,117) tienen `@media (max-width: 767px)` + `flex-wrap` aplicados según el checklist. **No verificado en vivo con sesión real activa** (videollamada / navegación 3D en curso) — sigue sin poder reproducirse con datos de prueba locales, igual que en el cierre original. Se cierra igual porque el resto del brief (grupos 1-3, 5) ya estaba 100% verificado en vivo, y este remanente es una limitación de datos de prueba, no una duda sobre el fix.
 
 ## Tiempo estimado
 

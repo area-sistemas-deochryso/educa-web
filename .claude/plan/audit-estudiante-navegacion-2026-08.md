@@ -30,16 +30,18 @@ Un tercer hallazgo (`estudiante-audit-justificacion-inasistencia`) se reencuadra
 
 ## Hallazgos — resumen
 
+> **Nota (2026-08-20, `/triage`)**: los 4 hallazgos ✅ ya no tienen task file en `.claude/tasks/` — se borraron por estar confirmados como cerrados (código verificado o brief de cierre encontrado). Quedan 6 abiertos.
+
 | Task | Módulo | Severidad | Tipo |
 |---|---|---|---|
-| [`estudiante-audit-horario-overlap-texto.md`](../tasks/estudiante-audit-horario-overlap-texto.md) | Horarios | 🟡 | Bug visual |
-| [`estudiante-audit-icono-archivo-incorrecto.md`](../tasks/estudiante-audit-icono-archivo-incorrecto.md) ✅ | Cursos (archivos) | 🟢 | Bug menor — resuelto brief 550 |
+| `estudiante-audit-horario-overlap-texto.md` ✅ | Horarios | 🟡 | Bug visual — resuelto |
+| `estudiante-audit-icono-archivo-incorrecto.md` ✅ | Cursos (archivos) | 🟢 | Bug menor — resuelto brief 550 |
 | [`estudiante-audit-contraste-rendimiento.md`](../tasks/estudiante-audit-contraste-rendimiento.md) | Mi Rendimiento | 🔴 | Bug accesibilidad |
-| [`estudiante-audit-rendimiento-sin-datos.md`](../tasks/estudiante-audit-rendimiento-sin-datos.md) | Mi Rendimiento | 🔴 | Bug de datos/consistencia |
+| `estudiante-audit-rendimiento-sin-datos.md` ✅ | Mi Rendimiento | 🔴 | Bug de datos/consistencia — resuelto |
 | [`estudiante-audit-promedio-rojo-confuso.md`](../tasks/estudiante-audit-promedio-rojo-confuso.md) | Evaluaciones | 🔴 | UX / impacto en menores |
 | [`estudiante-audit-evaluaciones-pendientes-texto.md`](../tasks/estudiante-audit-evaluaciones-pendientes-texto.md) | Evaluaciones | 🟡 | UX / lenguaje |
-| [`estudiante-audit-foro-solo-lectura.md`](../tasks/estudiante-audit-foro-solo-lectura.md) | Foro | 🟡 | UX / expectativa vs función |
-| [`estudiante-audit-asistencia-duplicada.md`](../tasks/estudiante-audit-asistencia-duplicada.md) ✅ | Asistencia | 🟢 | Consistencia — no-op, brief 552 |
+| `estudiante-audit-foro-solo-lectura.md` ✅ | Foro | 🟡 | UX / expectativa vs función — resuelto |
+| `estudiante-audit-asistencia-duplicada.md` ✅ | Asistencia | 🟢 | Consistencia — no-op, brief 552 |
 | [`estudiante-audit-videoconf-estado-vivo.md`](../tasks/estudiante-audit-videoconf-estado-vivo.md) | Videoconferencias | 🔴 | UX / seguridad de menores |
 | [`estudiante-audit-justificacion-inasistencia.md`](../tasks/estudiante-audit-justificacion-inasistencia.md) | Asistencia | 🟡 | UX / responsable incorrecto |
 
