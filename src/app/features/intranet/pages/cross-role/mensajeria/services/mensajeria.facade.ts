@@ -103,7 +103,7 @@ export class SalonMensajeriaFacade {
 	// #region Foro commands
 	/**
 	 * Find or create the foro conversation for a salon.
-	 * Searches existing conversations for one with "Foro: [description]".
+	 * Resolves the foro conversation (with detail) for the horario in a single request.
 	 * If not found, creates it with all students as participants.
 	 */
 	initForo(salonDescripcion: string, estudiantesDni: string[], horarioId: number): void {
@@ -113,20 +113,15 @@ export class SalonMensajeriaFacade {
 		this.store.setCurrentHorarioId(horarioId);
 
 		this.api
-			.listarConversaciones(horarioId)
+			.obtenerForo(horarioId)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
-				next: (conversaciones) => {
-					this.store.setConversaciones(conversaciones);
-
-					// Find foro: exact match if salonDescripcion provided, otherwise any "Foro:" conversation
-					const foro = salonDescripcion
-						? conversaciones.find((c) => c.asunto === `${FORO_PREFIX} ${salonDescripcion}`)
-						: conversaciones.find((c) => c.asunto.startsWith(FORO_PREFIX));
-
+				next: (foro) => {
 					if (foro) {
 						this.store.setForoConversacionId(foro.id);
-						this.loadConversacionDetalle(foro.id);
+						this.store.setConversacionDetalle(foro);
+						this.store.setForoLoading(false);
+						this.joinConversacion(foro.id);
 					} else if (salonDescripcion && estudiantesDni.length > 0) {
 						const foroAsunto = `${FORO_PREFIX} ${salonDescripcion}`;
 						this.crearForoConversacion(foroAsunto, estudiantesDni, salonDescripcion, horarioId);
@@ -136,7 +131,7 @@ export class SalonMensajeriaFacade {
 					}
 				},
 				error: (err) => {
-					this.errHandler.handle(err, 'cargar conversaciones');
+					this.errHandler.handle(err, 'cargar foro');
 					this.store.setForoLoading(false);
 				},
 			});

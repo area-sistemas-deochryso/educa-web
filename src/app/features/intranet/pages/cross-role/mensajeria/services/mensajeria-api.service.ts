@@ -27,6 +27,10 @@ export class SalonMensajeriaApiService {
 		return this.http.get<ConversacionDetalleDto>(`${this.baseUrl}/${id}`);
 	}
 
+	obtenerForo(horarioId: number): Observable<ConversacionDetalleDto | null> {
+		return this.http.get<ConversacionDetalleDto | null>(`${this.baseUrl}/foro?horarioId=${horarioId}`);
+	}
+
 	getDestinatarios(): Observable<DestinatariosDisponiblesDto> {
 		return this.http.get<DestinatariosDisponiblesDto>(`${this.baseUrl}/destinatarios`);
 	}
