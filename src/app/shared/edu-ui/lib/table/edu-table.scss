@@ -1,4 +1,5 @@
 .edu-table-wrapper {
+	position: relative;
 	overflow-x: auto;
 	border: 1px solid var(--eduui-content-border-color);
 	border-radius: var(--eduui-content-border-radius);
@@ -7,6 +8,15 @@
 		max-height: 28rem;
 		overflow-y: auto;
 	}
+}
+
+.edu-table__loading-overlay {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: color-mix(in srgb, var(--eduui-content-background) 60%, transparent);
 }
 
 .edu-table {
@@ -53,7 +63,7 @@
 	}
 }
 
-.edu-table__tbody ::ng-deep tr:hover {
+.edu-table--row-hover .edu-table__tbody ::ng-deep tr:hover {
 	background: var(--eduui-surface-100);
 
 	:host-context(.dark-mode) & {

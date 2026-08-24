@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, effect, inject, input, output } from '@angular/core';
-import { EduStepperService } from './edu-stepper.service';
+import { EduStepperService, EduStepValue } from './edu-stepper.service';
 
 @Component({
 	selector: 'edu-stepper',
@@ -10,8 +10,8 @@ import { EduStepperService } from './edu-stepper.service';
 	styleUrl: './edu-stepper.scss',
 })
 export class EduStepper {
-	readonly value = input<string>();
-	readonly valueChange = output<string>();
+	readonly value = input<EduStepValue>();
+	readonly valueChange = output<EduStepValue>();
 
 	private readonly service = inject(EduStepperService);
 

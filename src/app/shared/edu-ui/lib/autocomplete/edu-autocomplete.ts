@@ -1,14 +1,37 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { FocusTrapFactory } from '@angular/cdk/a11y';
 import { ConnectedPosition, Overlay } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
-import { ChangeDetectionStrategy, Component, OnDestroy, TemplateRef, ViewContainerRef, forwardRef, inject, input, output, signal, viewChild } from '@angular/core';
+import {
+	ChangeDetectionStrategy,
+	Component,
+	OnDestroy,
+	TemplateRef,
+	ViewContainerRef,
+	computed,
+	contentChild,
+	contentChildren,
+	forwardRef,
+	inject,
+	input,
+	output,
+	signal,
+	viewChild,
+} from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { EduOverlayHandle } from '../overlay/edu-overlay-handle';
 import { resolveOptionLabel, resolveOptionValue } from '../select/select-option-utils';
 import { SelectListNav } from '../select/select-list-nav';
+import { EduTemplate } from '../table/edu-template';
+import { EduPassThrough, EduPtRoot } from '../passthrough/edu-pt-root';
 
 export interface EduAutoCompleteCompleteEvent {
 	query: string;
+}
+
+export interface EduAutoCompleteSelectEvent {
+	originalEvent: Event;
+	value: unknown;
 }
 
 const PANEL_POSITIONS: ConnectedPosition[] = [
@@ -19,6 +42,7 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 @Component({
 	selector: 'edu-autocomplete',
 	standalone: true,
+	imports: [NgTemplateOutlet, EduPtRoot],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	providers: [
 		{
@@ -28,23 +52,33 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 		},
 	],
 	template: `
-		<input
-			class="edu-input-text edu-autocomplete__input"
-			type="text"
-			role="combobox"
-			aria-haspopup="listbox"
-			[attr.aria-expanded]="isOpen()"
-			[value]="query()"
-			[disabled]="disabled()"
-			[placeholder]="placeholder()"
-			(input)="onInput($event)"
-			(focus)="onFocus($event)"
-			(blur)="onBlur()"
-			(keydown)="onKeydown($event)"
-		/>
+		<span class="edu-autocomplete" [style]="style()" [eduPtRoot]="pt()?.root">
+			<input
+				class="edu-input-text edu-autocomplete__input"
+				[class.edu-autocomplete__input--with-dropdown]="dropdown()"
+				type="text"
+				role="combobox"
+				aria-haspopup="listbox"
+				[attr.aria-expanded]="isOpen()"
+				[attr.maxlength]="maxlength()"
+				[value]="query()"
+				[disabled]="disabled()"
+				[placeholder]="placeholder()"
+				[style]="inputStyle()"
+				(input)="onInput($event)"
+				(focus)="onFocus($event)"
+				(blur)="onInputBlur()"
+				(keydown)="onKeydown($event)"
+			/>
+			@if (dropdown()) {
+				<button type="button" class="edu-autocomplete__dropdown" tabindex="-1" [disabled]="disabled()" (mousedown)="onDropdownMousedown($event)">
+					<i class="pi pi-chevron-down"></i>
+				</button>
+			}
+		</span>
 
 		<ng-template #overlayTemplate>
-			<div class="edu-autocomplete-panel">
+			<div class="edu-autocomplete-panel" [style]="panelStyle()">
 				<ul class="edu-autocomplete-panel__list" role="listbox">
 					@for (opt of suggestions(); track $index) {
 						<li
@@ -54,11 +88,21 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 							[attr.aria-selected]="$index === activeIndex()"
 							(mousedown)="onOptionMousedown($event, opt)"
 						>
-							{{ resolveLabel(opt) }}
+							@if (itemTemplate(); as tpl) {
+								<ng-container [ngTemplateOutlet]="tpl" [ngTemplateOutletContext]="{ $implicit: opt }"></ng-container>
+							} @else {
+								{{ resolveLabel(opt) }}
+							}
 						</li>
 					}
-					@if (suggestions().length === 0) {
-						<li class="edu-autocomplete-panel__empty" role="presentation">Sin resultados</li>
+					@if (suggestions().length === 0 && showEmptyMessage()) {
+						<li class="edu-autocomplete-panel__empty" role="presentation">
+							@if (emptyTemplate(); as tpl) {
+								<ng-container [ngTemplateOutlet]="tpl"></ng-container>
+							} @else {
+								{{ emptyMessage() }}
+							}
+						</li>
 					}
 				</ul>
 			</div>
@@ -72,11 +116,34 @@ export class EduAutoComplete implements ControlValueAccessor, OnDestroy {
 	readonly optionValue = input<string>();
 	readonly placeholder = input<string>();
 	readonly disabled = input(false);
+	readonly minLength = input(1);
+	/** Debounce (ms) before `completeMethod` fires after a keystroke — matches PrimeNG's `delay`. */
+	readonly delay = input(0);
+	readonly maxlength = input<number>();
+	readonly dropdown = input(false);
+	readonly forceSelection = input(false);
+	readonly showEmptyMessage = input(true);
+	readonly emptyMessage = input('Sin resultados');
+	readonly style = input<Record<string, string> | null>(null);
+	readonly inputStyle = input<Record<string, string> | null>(null);
+	readonly panelStyle = input<Record<string, string> | null>(null);
+	readonly pt = input<EduPassThrough>();
 
 	readonly completeMethod = output<EduAutoCompleteCompleteEvent>();
+	readonly onSelect = output<EduAutoCompleteSelectEvent>();
+	readonly onShow = output<void>();
+	readonly onHide = output<void>();
 
 	protected readonly query = signal('');
 	private value: unknown = null;
+	private delayTimer: ReturnType<typeof setTimeout> | null = null;
+
+	private readonly itemTemplateRef = contentChild<TemplateRef<unknown>>('item');
+	private readonly emptyTemplateRef = contentChild<TemplateRef<unknown>>('empty');
+	private readonly legacyTemplates = contentChildren(EduTemplate);
+
+	protected readonly itemTemplate = computed(() => this.itemTemplateRef() ?? this.legacyTemplate('item'));
+	protected readonly emptyTemplate = computed(() => this.emptyTemplateRef() ?? this.legacyTemplate('empty'));
 
 	private readonly overlayTemplateRef = viewChild<TemplateRef<unknown>>('overlayTemplate');
 	private readonly viewContainerRef = inject(ViewContainerRef);
@@ -96,6 +163,7 @@ export class EduAutoComplete implements ControlValueAccessor, OnDestroy {
 
 	ngOnDestroy(): void {
 		this.handle.close();
+		if (this.delayTimer) clearTimeout(this.delayTimer);
 	}
 
 	writeValue(value: unknown): void {
@@ -120,20 +188,56 @@ export class EduAutoComplete implements ControlValueAccessor, OnDestroy {
 		const raw = (event.target as HTMLInputElement).value;
 		this.query.set(raw);
 		this.nav.reset();
-		this.completeMethod.emit({ query: raw });
-		this.open(event.target as HTMLElement);
+
+		if (!this.forceSelection()) {
+			this.value = raw;
+			this.onChange(raw);
+		}
+
+		if (raw.length < this.minLength()) {
+			return;
+		}
+
+		if (this.delayTimer) clearTimeout(this.delayTimer);
+		const fire = () => {
+			this.completeMethod.emit({ query: raw });
+			this.open(event.target as HTMLElement);
+		};
+		if (this.delay() > 0) {
+			this.delayTimer = setTimeout(fire, this.delay());
+		} else {
+			fire();
+		}
 	}
 
 	protected onFocus(event: Event): void {
 		if (this.disabled()) {
 			return;
 		}
-		this.open(event.target as HTMLElement);
+		if (this.query().length >= this.minLength()) {
+			this.open(event.target as HTMLElement);
+		}
 	}
 
-	protected onBlur(): void {
+	protected onInputBlur(): void {
 		this.onTouched();
+		if (this.forceSelection() && !this.hasMatchingSuggestion()) {
+			this.query.set('');
+			this.value = null;
+			this.onChange(null);
+		}
 		this.close();
+	}
+
+	protected onDropdownMousedown(event: Event): void {
+		event.preventDefault();
+		if (this.disabled()) return;
+		if (this.handle.isOpen) {
+			this.close();
+		} else {
+			this.completeMethod.emit({ query: this.query() });
+			this.open(event.currentTarget as HTMLElement);
+		}
 	}
 
 	protected onKeydown(event: KeyboardEvent): void {
@@ -151,7 +255,7 @@ export class EduAutoComplete implements ControlValueAccessor, OnDestroy {
 			const opt = this.suggestions()[this.activeIndex()];
 			if (this.handle.isOpen && opt !== undefined) {
 				event.preventDefault();
-				this.selectOption(opt);
+				this.selectOption(opt, event);
 			}
 		} else if (event.key === 'Escape') {
 			this.close();
@@ -160,20 +264,32 @@ export class EduAutoComplete implements ControlValueAccessor, OnDestroy {
 
 	protected onOptionMousedown(event: Event, opt: unknown): void {
 		event.preventDefault();
-		this.selectOption(opt);
+		this.selectOption(opt, event);
 	}
 
-	private selectOption(opt: unknown): void {
+	private hasMatchingSuggestion(): boolean {
+		return this.suggestions().some((opt) => this.resolveLabel(opt) === this.query());
+	}
+
+	private selectOption(opt: unknown, originalEvent: Event): void {
 		const optValue = resolveOptionValue(opt, this.optionValue());
 		this.value = optValue;
 		this.query.set(this.resolveLabel(opt));
 		this.onChange(optValue);
 		this.onTouched();
+		this.onSelect.emit({ originalEvent, value: optValue });
 		this.close();
 	}
 
+	private legacyTemplate(name: string): TemplateRef<unknown> | undefined {
+		return this.legacyTemplates().find((template) => template.pTemplate() === name)?.templateRef;
+	}
+
 	private close(): void {
-		this.handle.close();
+		if (this.handle.isOpen) {
+			this.handle.close();
+			this.onHide.emit();
+		}
 		this.nav.reset();
 	}
 
@@ -201,5 +317,6 @@ export class EduAutoComplete implements ControlValueAccessor, OnDestroy {
 			},
 			() => this.close(),
 		);
+		this.onShow.emit();
 	}
 }

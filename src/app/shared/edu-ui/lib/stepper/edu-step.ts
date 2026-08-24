@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
-import { EduStepperService } from './edu-stepper.service';
+import { EduStepperService, EduStepValue } from './edu-stepper.service';
 
 @Component({
 	selector: 'edu-step',
@@ -22,7 +22,7 @@ import { EduStepperService } from './edu-stepper.service';
 	styleUrl: './edu-step.scss',
 })
 export class EduStep {
-	readonly value = input.required<string>();
+	readonly value = input.required<EduStepValue>();
 	readonly disabled = input(false);
 
 	private readonly service = inject(EduStepperService);

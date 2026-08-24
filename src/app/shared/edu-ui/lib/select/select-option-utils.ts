@@ -12,10 +12,10 @@ export function resolveOptionValue(option: unknown, optionValue: string | undefi
 	return option;
 }
 
-export function filterOptionsByLabel<T>(options: T[], query: string, optionLabel: string | undefined): T[] {
+export function filterOptionsByLabel<T>(options: T[], query: string, optionLabel: string | undefined, filterBy?: string): T[] {
 	if (!query) {
 		return options;
 	}
 	const normalized = query.toLowerCase();
-	return options.filter((option) => resolveOptionLabel(option, optionLabel).toLowerCase().includes(normalized));
+	return options.filter((option) => resolveOptionLabel(option, filterBy ?? optionLabel).toLowerCase().includes(normalized));
 }

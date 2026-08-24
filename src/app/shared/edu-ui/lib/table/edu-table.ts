@@ -3,6 +3,8 @@ import { ChangeDetectionStrategy, Component, TemplateRef, computed, contentChild
 import { EduPaginator, EduPaginatorPageEvent } from '../paginator/edu-paginator';
 import { EduTemplate } from './edu-template';
 import { EduTableService } from './edu-table.service';
+import { EduPassThrough, EduPtRoot } from '../passthrough/edu-pt-root';
+import { EduSpinner } from '../spinner/edu-spinner';
 
 export type EduTableSortOrder = 'asc' | 'desc' | null;
 
@@ -20,12 +22,20 @@ export interface EduTableSortEvent {
 @Component({
 	selector: 'edu-table',
 	standalone: true,
-	imports: [NgTemplateOutlet, EduPaginator],
+	imports: [NgTemplateOutlet, EduPaginator, EduSpinner, EduPtRoot],
 	providers: [EduTableService],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
-		<div class="edu-table-wrapper" [class.edu-table-wrapper--scrollable]="scrollable()">
-			<table class="edu-table">
+		<div
+			class="edu-table-wrapper"
+			[class.edu-table-wrapper--scrollable]="scrollable()"
+			[eduPtRoot]="pt()?.root"
+		>
+			<table
+				class="edu-table"
+				[class.edu-table--row-hover]="rowHover()"
+				[style]="tableStyle()"
+			>
 				@if (headerTemplate(); as header) {
 					<thead class="edu-table__thead">
 						<ng-container [ngTemplateOutlet]="header"></ng-container>
@@ -44,6 +54,12 @@ export interface EduTableSortEvent {
 					</tfoot>
 				}
 			</table>
+
+			@if (loading()) {
+				<div class="edu-table__loading-overlay">
+					<edu-spinner></edu-spinner>
+				</div>
+			}
 		</div>
 
 		@if (paginator()) {
@@ -64,6 +80,14 @@ export class EduTable<T = unknown> {
 	readonly value = input<readonly T[]>([]);
 	readonly scrollable = input(false);
 	readonly trackBy = input<(row: T) => unknown>();
+	/** Field name used as row identity when `trackBy` isn't set — declarative equivalent of `trackBy`, same purpose PrimeNG's `dataKey` serves. */
+	readonly dataKey = input<string>();
+	readonly loading = input(false);
+	readonly tableStyle = input<Record<string, string> | null>(null);
+	/** Accepted for template-binding parity with real usage — edu-table never slices `value()` locally (the paginator only emits page events), so it's already server-driven and this flag doesn't change rendering. */
+	readonly lazy = input(false);
+	readonly rowHover = input(true);
+	readonly pt = input<EduPassThrough>();
 
 	readonly paginator = input(false);
 	readonly rows = input(10);
@@ -97,7 +121,15 @@ export class EduTable<T = unknown> {
 		this.service.sortChange.subscribe((event) => this.sortChange.emit(event));
 	}
 
-	protected trackByFn = (row: T, index: number): unknown => this.trackBy()?.(row) ?? index;
+	protected trackByFn = (row: T, index: number): unknown => {
+		const trackBy = this.trackBy();
+		if (trackBy) return trackBy(row);
+
+		const dataKey = this.dataKey();
+		if (dataKey && row && typeof row === 'object') return (row as Record<string, unknown>)[dataKey];
+
+		return index;
+	};
 
 	private legacyTemplate(name: string): TemplateRef<unknown> | undefined {
 		return this.legacyTemplates().find((template) => template.pTemplate() === name)?.templateRef;

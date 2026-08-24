@@ -175,6 +175,41 @@
 	padding: 0.25rem;
 }
 
+.edu-datepicker-panel__meridiem {
+	background: var(--eduui-surface-100);
+	border: 1px solid var(--eduui-form-field-border-color);
+	border-radius: var(--eduui-radius-sm);
+	color: var(--eduui-form-field-color);
+	padding: 0.25rem 0.5rem;
+	cursor: pointer;
+}
+
+.edu-datepicker-panel__buttonbar {
+	display: flex;
+	justify-content: space-between;
+	gap: 0.5rem;
+	padding-top: 0.5rem;
+	border-top: 1px solid var(--eduui-content-border-color);
+}
+
+.edu-datepicker-panel__buttonbar-btn {
+	background: none;
+	border: none;
+	color: var(--eduui-primary-color);
+	font-size: 0.875rem;
+	font-weight: 600;
+	cursor: pointer;
+	padding: 0.25rem 0.5rem;
+
+	&:hover {
+		text-decoration: underline;
+	}
+}
+
+:host-context(.dark-mode) .edu-datepicker-panel__meridiem {
+	background: var(--eduui-surface-800);
+}
+
 :host-context(.dark-mode) .edu-datepicker-panel__nav:hover,
 :host-context(.dark-mode) .edu-datepicker-panel__day:hover:not(:disabled) {
 	background: var(--eduui-surface-800);

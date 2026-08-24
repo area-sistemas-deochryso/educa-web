@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { EduPassThrough, EduPtRoot } from '../passthrough/edu-pt-root';
 
 export type EduButtonSeverity =
 	| 'primary'
@@ -15,11 +16,13 @@ export type EduButtonSize = 'small' | 'large';
 @Component({
 	selector: 'edu-button',
 	standalone: true,
+	imports: [EduPtRoot],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
 		<button
 			class="edu-button"
 			type="button"
+			[eduPtRoot]="pt()?.root"
 			[disabled]="disabled()"
 			[attr.data-severity]="severity()"
 			[class.edu-button--text]="text()"
@@ -49,4 +52,5 @@ export class EduButton {
 	readonly rounded = input(false);
 	readonly outlined = input(false);
 	readonly disabled = input(false);
+	readonly pt = input<EduPassThrough>();
 }

@@ -18,6 +18,15 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { EduOverlayHandle } from '../overlay/edu-overlay-handle';
 import { filterOptionsByLabel, resolveOptionLabel, resolveOptionValue } from '../select/select-option-utils';
 import { SelectListNav } from '../select/select-list-nav';
+import { EduPassThrough, EduPtRoot } from '../passthrough/edu-pt-root';
+import { EduSpinner } from '../spinner/edu-spinner';
+
+interface EduMultiSelectGroup {
+	label: string;
+	children: unknown[];
+}
+
+export type EduMultiSelectDisplay = 'chip' | 'comma';
 
 const PANEL_POSITIONS: ConnectedPosition[] = [
 	{ originX: 'start', originY: 'bottom', overlayX: 'start', overlayY: 'top', offsetY: 4 },
@@ -27,6 +36,7 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 @Component({
 	selector: 'edu-multi-select',
 	standalone: true,
+	imports: [EduPtRoot, EduSpinner],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	providers: [
 		{
@@ -39,26 +49,36 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 		<div
 			class="edu-multi-select"
 			[class.edu-multi-select--disabled]="disabled()"
+			[class]="styleClass()"
+			[attr.id]="inputId()"
 			role="combobox"
 			aria-haspopup="listbox"
 			[attr.aria-expanded]="isOpen()"
 			[attr.tabindex]="disabled() ? -1 : 0"
+			[eduPtRoot]="pt()?.root"
 			(click)="toggle($event)"
 			(keydown)="onTriggerKeydown($event)"
 		>
 			@if (hasValue()) {
-				<ul class="edu-multi-select__tokens">
-					@for (opt of selectedOptions(); track $index) {
-						<li class="edu-multi-select__token">
-							<span class="edu-multi-select__token-label">{{ resolveLabel(opt) }}</span>
-							@if (!disabled()) {
-								<button type="button" class="edu-multi-select__token-remove" tabindex="-1" (click)="removeOption(opt, $event)">
-									<i class="pi pi-times"></i>
-								</button>
-							}
-						</li>
-					}
-				</ul>
+				@if (display() === 'chip') {
+					<ul class="edu-multi-select__tokens">
+						@for (opt of visibleSelectedOptions(); track $index) {
+							<li class="edu-multi-select__token">
+								<span class="edu-multi-select__token-label">{{ resolveLabel(opt) }}</span>
+								@if (!disabled()) {
+									<button type="button" class="edu-multi-select__token-remove" tabindex="-1" (click)="removeOption(opt, $event)">
+										<i class="pi pi-times"></i>
+									</button>
+								}
+							</li>
+						}
+						@if (overflowLabel(); as label) {
+							<li class="edu-multi-select__token edu-multi-select__token--overflow">{{ label }}</li>
+						}
+					</ul>
+				} @else {
+					<span class="edu-multi-select__label">{{ commaLabel() }}</span>
+				}
 			} @else {
 				<span class="edu-multi-select__label edu-multi-select__label--placeholder">{{ placeholder() ?? '' }}</span>
 			}
@@ -77,30 +97,56 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 						<input
 							class="edu-input-text"
 							type="text"
+							[placeholder]="filterPlaceholder() ?? ''"
 							[value]="query()"
 							(input)="onFilterInput($event)"
 							(keydown)="onListKeydown($event)"
 						/>
 					</div>
 				}
-				<ul class="edu-multi-select-panel__list" role="listbox" aria-multiselectable="true" (keydown)="onListKeydown($event)">
-					@for (opt of filteredOptions(); track $index) {
-						<li
-							class="edu-multi-select-panel__option"
-							[class.edu-multi-select-panel__option--active]="optionIndex(opt) === activeIndex()"
-							[class.edu-multi-select-panel__option--selected]="isSelected(opt)"
-							role="option"
-							[attr.aria-selected]="isSelected(opt)"
-							(click)="toggleOption(opt)"
-						>
-							<i class="edu-multi-select-panel__check pi pi-check" [class.edu-multi-select-panel__check--visible]="isSelected(opt)"></i>
-							<span>{{ resolveLabel(opt) }}</span>
-						</li>
-					}
-					@if (filteredOptions().length === 0) {
-						<li class="edu-multi-select-panel__empty" role="presentation">Sin resultados</li>
-					}
-				</ul>
+				@if (loading()) {
+					<div class="edu-multi-select-panel__loading">
+						<edu-spinner></edu-spinner>
+					</div>
+				} @else {
+					<ul class="edu-multi-select-panel__list" role="listbox" aria-multiselectable="true" (keydown)="onListKeydown($event)">
+						@if (group()) {
+							@for (g of filteredGroups(); track $index) {
+								<li class="edu-multi-select-panel__group-label" role="presentation">{{ g.label }}</li>
+								@for (opt of g.children; track $index) {
+									<li
+										class="edu-multi-select-panel__option"
+										[class.edu-multi-select-panel__option--active]="optionIndex(opt) === activeIndex()"
+										[class.edu-multi-select-panel__option--selected]="isSelected(opt)"
+										role="option"
+										[attr.aria-selected]="isSelected(opt)"
+										(click)="toggleOption(opt)"
+									>
+										<i class="edu-multi-select-panel__check pi pi-check" [class.edu-multi-select-panel__check--visible]="isSelected(opt)"></i>
+										<span>{{ resolveLabel(opt) }}</span>
+									</li>
+								}
+							}
+						} @else {
+							@for (opt of filteredOptions(); track $index) {
+								<li
+									class="edu-multi-select-panel__option"
+									[class.edu-multi-select-panel__option--active]="optionIndex(opt) === activeIndex()"
+									[class.edu-multi-select-panel__option--selected]="isSelected(opt)"
+									role="option"
+									[attr.aria-selected]="isSelected(opt)"
+									(click)="toggleOption(opt)"
+								>
+									<i class="edu-multi-select-panel__check pi pi-check" [class.edu-multi-select-panel__check--visible]="isSelected(opt)"></i>
+									<span>{{ resolveLabel(opt) }}</span>
+								</li>
+							}
+						}
+						@if (flatOptions().length === 0) {
+							<li class="edu-multi-select-panel__empty" role="presentation">Sin resultados</li>
+						}
+					</ul>
+				}
 			</div>
 		</ng-template>
 	`,
@@ -111,10 +157,23 @@ export class EduMultiSelect implements ControlValueAccessor, OnDestroy {
 	readonly optionLabel = input<string>();
 	readonly optionValue = input<string>();
 	readonly filter = input(false);
+	readonly filterBy = input<string>();
+	readonly filterPlaceholder = input<string>();
 	readonly showClear = input(false);
 	readonly placeholder = input<string>();
 	readonly disabled = input(false);
 	readonly appendTo = input<'body'>('body');
+	readonly group = input(false);
+	readonly optionGroupLabel = input<string>();
+	readonly optionGroupChildren = input<string>();
+	readonly maxSelectedLabels = input<number>();
+	readonly selectedItemsLabel = input('{0} elementos seleccionados');
+	/** `chip` (default) matches what edu-multi-select has always rendered — kept as default to avoid a visual regression against the F5 baseline (586). `comma` mirrors PrimeNG's real default, opt-in via this input. */
+	readonly display = input<EduMultiSelectDisplay>('chip');
+	readonly loading = input(false);
+	readonly inputId = input<string>();
+	readonly styleClass = input<string>();
+	readonly pt = input<EduPassThrough>();
 
 	protected readonly value = signal<unknown[]>([]);
 	protected readonly query = signal('');
@@ -130,12 +189,59 @@ export class EduMultiSelect implements ControlValueAccessor, OnDestroy {
 
 	protected readonly hasValue = computed(() => this.value().length > 0);
 
-	protected readonly selectedOptions = computed(() => {
-		const values = this.value();
-		return this.options().filter((opt) => values.includes(resolveOptionValue(opt, this.optionValue())));
+	private readonly flatOptionsUnfiltered = computed(() => {
+		if (!this.group()) {
+			return this.options();
+		}
+		const childrenKey = this.optionGroupChildren();
+		return (this.options() as Record<string, unknown>[]).flatMap((g) => (childrenKey ? ((g[childrenKey] as unknown[]) ?? []) : []));
 	});
 
-	protected readonly filteredOptions = computed(() => filterOptionsByLabel(this.options(), this.query(), this.optionLabel()));
+	protected readonly selectedOptions = computed(() => {
+		const values = this.value();
+		return this.flatOptionsUnfiltered().filter((opt) => values.includes(resolveOptionValue(opt, this.optionValue())));
+	});
+
+	protected readonly visibleSelectedOptions = computed(() => {
+		const max = this.maxSelectedLabels();
+		const selected = this.selectedOptions();
+		return max != null && selected.length > max ? selected.slice(0, max) : selected;
+	});
+
+	protected readonly overflowLabel = computed(() => {
+		const max = this.maxSelectedLabels();
+		const selected = this.selectedOptions();
+		if (max == null || selected.length <= max) return null;
+		return this.selectedItemsLabel().replace('{0}', String(selected.length));
+	});
+
+	protected readonly commaLabel = computed(() => {
+		const max = this.maxSelectedLabels();
+		const selected = this.selectedOptions();
+		if (max != null && selected.length > max) {
+			return this.selectedItemsLabel().replace('{0}', String(selected.length));
+		}
+		return selected.map((opt) => this.resolveLabel(opt)).join(', ');
+	});
+
+	protected readonly filteredOptions = computed(() => filterOptionsByLabel(this.options(), this.query(), this.optionLabel(), this.filterBy()));
+
+	protected readonly filteredGroups = computed<EduMultiSelectGroup[]>(() => {
+		const groupLabelKey = this.optionGroupLabel();
+		const childrenKey = this.optionGroupChildren();
+		const q = this.query();
+		return (this.options() as Record<string, unknown>[])
+			.map((g) => {
+				const children = (childrenKey ? (g[childrenKey] as unknown[]) : []) ?? [];
+				return {
+					label: groupLabelKey ? String(g[groupLabelKey]) : '',
+					children: filterOptionsByLabel(children, q, this.optionLabel(), this.filterBy()),
+				};
+			})
+			.filter((g) => g.children.length > 0);
+	});
+
+	protected readonly flatOptions = computed(() => (this.group() ? this.filteredGroups().flatMap((g) => g.children) : this.filteredOptions()));
 
 	private onChange: (value: unknown[]) => void = () => {};
 	private onTouched: () => void = () => {};
@@ -165,7 +271,7 @@ export class EduMultiSelect implements ControlValueAccessor, OnDestroy {
 	}
 
 	protected optionIndex(opt: unknown): number {
-		return this.filteredOptions().indexOf(opt);
+		return this.flatOptions().indexOf(opt);
 	}
 
 	protected isSelected(opt: unknown): boolean {
@@ -209,7 +315,7 @@ export class EduMultiSelect implements ControlValueAccessor, OnDestroy {
 	}
 
 	protected onListKeydown(event: KeyboardEvent): void {
-		const length = this.filteredOptions().length;
+		const length = this.flatOptions().length;
 		if (event.key === 'ArrowDown') {
 			event.preventDefault();
 			this.nav.next(length);
@@ -218,7 +324,7 @@ export class EduMultiSelect implements ControlValueAccessor, OnDestroy {
 			this.nav.prev();
 		} else if (event.key === 'Enter') {
 			event.preventDefault();
-			const opt = this.filteredOptions()[this.activeIndex()];
+			const opt = this.flatOptions()[this.activeIndex()];
 			if (opt !== undefined) {
 				this.toggleOption(opt);
 			}

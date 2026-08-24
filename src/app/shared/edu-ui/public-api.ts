@@ -1,11 +1,11 @@
-// Vendored from educa-libs (packages/edu-ui/src) — commit 3531f8a. Not published to a
-// registry (P79 F6); source-of-truth stays in educa-libs, re-sync manually on changes.
-//
 // F1 — Foundation + trivial components (CSS-only wrappers).
-// Design tokens: import 'tokens.css' (./styles/tokens.css) in the consuming app (F6).
+// Design tokens: import 'dist/edu-ui/tokens.css' in the consuming app (F6).
 
 export { EduButton } from './lib/button/edu-button';
 export type { EduButtonSeverity, EduButtonSize } from './lib/button/edu-button';
+
+export { EduPtRoot } from './lib/passthrough/edu-pt-root';
+export type { EduPassThrough, EduPassThroughRoot } from './lib/passthrough/edu-pt-root';
 
 export { EduTooltip } from './lib/tooltip/edu-tooltip';
 export type { EduTooltipPosition } from './lib/tooltip/edu-tooltip';
@@ -68,11 +68,15 @@ export { EduTabPanel } from './lib/tabs/edu-tabpanel';
 export { EduStepper } from './lib/stepper/edu-stepper';
 export { EduStepList } from './lib/stepper/edu-step-list';
 export { EduStep } from './lib/stepper/edu-step';
+export { EduStepPanels } from './lib/stepper/edu-step-panels';
+export { EduStepPanel } from './lib/stepper/edu-step-panel';
+export type { EduStepValue } from './lib/stepper/edu-stepper.service';
 
 // F2c — SelectButton, InputNumber, Password, Paginator (behavioral, ControlValueAccessor, no CDK).
 export { EduSelectButton } from './lib/select-button/edu-select-button';
 
 export { EduInputNumber } from './lib/input-number/edu-input-number';
+export type { EduInputNumberInputEvent } from './lib/input-number/edu-input-number';
 
 export { EduPassword } from './lib/password/edu-password';
 export type { EduPasswordStrength } from './lib/password/edu-password';
@@ -85,9 +89,10 @@ export type { EduPaginatorPageEvent } from './lib/paginator/edu-paginator';
 export { EduSelect } from './lib/select/edu-select';
 
 export { EduMultiSelect } from './lib/multi-select/edu-multi-select';
+export type { EduMultiSelectDisplay } from './lib/multi-select/edu-multi-select';
 
 export { EduAutoComplete } from './lib/autocomplete/edu-autocomplete';
-export type { EduAutoCompleteCompleteEvent } from './lib/autocomplete/edu-autocomplete';
+export type { EduAutoCompleteCompleteEvent, EduAutoCompleteSelectEvent } from './lib/autocomplete/edu-autocomplete';
 
 export { EduPopover } from './lib/popover/edu-popover';
 
@@ -105,7 +110,7 @@ export { EduTemplate } from './lib/table/edu-template';
 // selectionMode single/range/multiple) y FileUpload (mode="basic" únicamente, sin evidencia
 // de uso real del modo "advanced" de PrimeNG).
 export { EduDatePicker } from './lib/datepicker/edu-datepicker';
-export type { EduDatePickerSelectionMode } from './lib/datepicker/edu-datepicker';
+export type { EduDatePickerSelectionMode, EduDatePickerHourFormat } from './lib/datepicker/edu-datepicker';
 
 export { EduFileUpload } from './lib/file-upload/edu-file-upload';
 export type { EduFileUploadSelectEvent } from './lib/file-upload/edu-file-upload';

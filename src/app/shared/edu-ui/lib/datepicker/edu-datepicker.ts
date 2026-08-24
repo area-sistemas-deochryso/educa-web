@@ -17,6 +17,7 @@ import {
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { EduOverlayHandle } from '../overlay/edu-overlay-handle';
+import { EduPassThrough, EduPtRoot } from '../passthrough/edu-pt-root';
 import {
 	MonthCell,
 	formatDate,
@@ -33,6 +34,7 @@ import {
 } from './date-picker-utils';
 
 export type EduDatePickerSelectionMode = 'single' | 'range' | 'multiple';
+export type EduDatePickerHourFormat = '12' | '24';
 
 const PANEL_POSITIONS: ConnectedPosition[] = [
 	{ originX: 'start', originY: 'bottom', overlayX: 'start', overlayY: 'top', offsetY: 4 },
@@ -42,7 +44,7 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 @Component({
 	selector: 'edu-datepicker',
 	standalone: true,
-	imports: [NgTemplateOutlet],
+	imports: [NgTemplateOutlet, EduPtRoot],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	providers: [
 		{
@@ -60,6 +62,7 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 				aria-haspopup="dialog"
 				[attr.aria-expanded]="isOpen()"
 				[attr.tabindex]="isInputReadonly() && !disabled() ? 0 : -1"
+				[eduPtRoot]="pt()?.root"
 				(click)="onWrapperClick($event)"
 				(keydown)="onTriggerKeydown($event)"
 			>
@@ -120,9 +123,26 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 				}
 				@if (showTime() || timeOnly()) {
 					<div class="edu-datepicker-panel__time">
-						<input class="edu-datepicker-panel__time-input" type="number" min="0" max="23" [value]="hours()" (change)="onHourInput($event)" aria-label="Hora" />
+						@if (hourFormat() === '12') {
+							<input class="edu-datepicker-panel__time-input" type="number" min="1" max="12" [value]="hours12()" (change)="onHourInput12($event)" aria-label="Hora" />
+						} @else {
+							<input class="edu-datepicker-panel__time-input" type="number" min="0" max="23" [value]="hours()" (change)="onHourInput($event)" aria-label="Hora" />
+						}
 						<span>:</span>
 						<input class="edu-datepicker-panel__time-input" type="number" min="0" max="59" [value]="minutes()" (change)="onMinuteInput($event)" aria-label="Minutos" />
+						@if (showSeconds()) {
+							<span>:</span>
+							<input class="edu-datepicker-panel__time-input" type="number" min="0" max="59" [value]="seconds()" (change)="onSecondInput($event)" aria-label="Segundos" />
+						}
+						@if (hourFormat() === '12') {
+							<button type="button" class="edu-datepicker-panel__meridiem" (click)="toggleMeridiem()">{{ meridiem() }}</button>
+						}
+					</div>
+				}
+				@if (showButtonBar()) {
+					<div class="edu-datepicker-panel__buttonbar">
+						<button type="button" class="edu-datepicker-panel__buttonbar-btn" (click)="goToday()">Hoy</button>
+						<button type="button" class="edu-datepicker-panel__buttonbar-btn" (click)="clearValue()">Limpiar</button>
 					</div>
 				}
 			</div>
@@ -142,6 +162,19 @@ export class EduDatePicker implements ControlValueAccessor, OnDestroy {
 	readonly placeholder = input<string>();
 	readonly disabled = input(false);
 	readonly dateFormat = input('dd/mm/yy');
+	readonly showButtonBar = input(false);
+	readonly hourFormat = input<EduDatePickerHourFormat>('24');
+	readonly showSeconds = input(false);
+	/**
+	 * PrimeNG's `appendTo` only decides WHERE in the DOM the overlay is appended (for stacking
+	 * context / z-index escape hatches). edu-datepicker already positions its overlay via CDK
+	 * `flexibleConnectedTo(trigger)`, which handles the equivalent problem structurally (the
+	 * overlay is appended to the CDK overlay container by default, above any local stacking
+	 * context) — so this input has no real gap to fill. Confirmed no-op, kept only so real
+	 * templates that pass it still type-check.
+	 */
+	readonly appendTo = input<'body' | undefined>();
+	readonly pt = input<EduPassThrough>();
 
 	protected readonly weekdays = weekdayNames();
 
@@ -168,6 +201,12 @@ export class EduDatePicker implements ControlValueAccessor, OnDestroy {
 
 	protected readonly hours = computed(() => this.selectedDates()[0]?.getHours() ?? 0);
 	protected readonly minutes = computed(() => this.selectedDates()[0]?.getMinutes() ?? 0);
+	protected readonly seconds = computed(() => this.selectedDates()[0]?.getSeconds() ?? 0);
+	protected readonly hours12 = computed(() => {
+		const h = this.hours() % 12;
+		return h === 0 ? 12 : h;
+	});
+	protected readonly meridiem = computed(() => (this.hours() >= 12 ? 'PM' : 'AM'));
 
 	protected readonly displayLabel = computed(() => {
 		const mode = this.selectionMode();
@@ -343,12 +382,36 @@ export class EduDatePicker implements ControlValueAccessor, OnDestroy {
 
 	protected onHourInput(event: Event): void {
 		const hours = this.clampTimeUnit((event.target as HTMLInputElement).value, 23);
-		this.commitTime(hours, this.minutes());
+		this.commitTime(hours, this.minutes(), this.seconds());
+	}
+
+	protected onHourInput12(event: Event): void {
+		const h12 = Math.min(Math.max(this.clampTimeUnit((event.target as HTMLInputElement).value, 12), 1), 12);
+		const isPm = this.meridiem() === 'PM';
+		const hours = isPm ? (h12 === 12 ? 12 : h12 + 12) : h12 === 12 ? 0 : h12;
+		this.commitTime(hours, this.minutes(), this.seconds());
 	}
 
 	protected onMinuteInput(event: Event): void {
 		const minutes = this.clampTimeUnit((event.target as HTMLInputElement).value, 59);
-		this.commitTime(this.hours(), minutes);
+		this.commitTime(this.hours(), minutes, this.seconds());
+	}
+
+	protected onSecondInput(event: Event): void {
+		const seconds = this.clampTimeUnit((event.target as HTMLInputElement).value, 59);
+		this.commitTime(this.hours(), this.minutes(), seconds);
+	}
+
+	protected toggleMeridiem(): void {
+		this.commitTime((this.hours() + 12) % 24, this.minutes(), this.seconds());
+	}
+
+	protected goToday(): void {
+		this.selectDate(new Date());
+	}
+
+	protected clearValue(): void {
+		this.commit(null);
 	}
 
 	private clampTimeUnit(rawValue: string, max: number): number {
@@ -359,10 +422,10 @@ export class EduDatePicker implements ControlValueAccessor, OnDestroy {
 		return Math.min(Math.max(parsed, 0), max);
 	}
 
-	private commitTime(hours: number, minutes: number): void {
+	private commitTime(hours: number, minutes: number, seconds: number): void {
 		const base = this.selectedDates()[0] ?? new Date();
 		const next = new Date(base);
-		next.setHours(hours, minutes, 0, 0);
+		next.setHours(hours, minutes, seconds, 0);
 		this.commit(next);
 	}
 

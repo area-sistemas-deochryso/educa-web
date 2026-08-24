@@ -1,9 +1,11 @@
 import { ChangeDetectionStrategy, Component, forwardRef, input, signal } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { EduPassThrough, EduPtRoot } from '../passthrough/edu-pt-root';
 
 @Component({
 	selector: 'edu-checkbox',
 	standalone: true,
+	imports: [EduPtRoot],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	providers: [
 		{
@@ -18,9 +20,11 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 				type="button"
 				role="checkbox"
 				class="edu-checkbox__box"
+				[attr.id]="inputId()"
 				[attr.aria-checked]="checked()"
 				[class.edu-checkbox__box--checked]="checked()"
 				[disabled]="disabled()"
+				[eduPtRoot]="pt()?.root"
 				(click)="toggle()"
 			>
 				@if (checked()) {
@@ -39,6 +43,10 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 export class EduCheckbox implements ControlValueAccessor {
 	readonly label = input<string>();
 	readonly disabled = input(false);
+	readonly inputId = input<string>();
+	/** Accepted for template-binding parity — edu-checkbox has no non-binary (multi-value) mode, so this is always effectively true; no real usage needs the PrimeNG group mode. */
+	readonly binary = input(true);
+	readonly pt = input<EduPassThrough>();
 
 	protected readonly checked = signal(false);
 

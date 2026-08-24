@@ -1,5 +1,42 @@
+.edu-autocomplete {
+	display: inline-flex;
+	align-items: center;
+	position: relative;
+	width: auto;
+}
+
 .edu-autocomplete__input {
 	display: block;
+	flex: 1 1 auto;
+	min-width: 0;
+
+	&--with-dropdown {
+		border-top-right-radius: 0;
+		border-bottom-right-radius: 0;
+	}
+}
+
+.edu-autocomplete__dropdown {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: 0 0 auto;
+	width: calc(1rem + var(--eduui-form-field-padding-y) * 2);
+	align-self: stretch;
+	background: var(--eduui-surface-100);
+	border: 1px solid var(--eduui-form-field-border-color);
+	border-left: none;
+	border-radius: 0 var(--eduui-form-field-border-radius) var(--eduui-form-field-border-radius) 0;
+	color: var(--eduui-text-muted-color);
+	cursor: pointer;
+
+	&:disabled {
+		cursor: default;
+	}
+}
+
+:host-context(.dark-mode) .edu-autocomplete__dropdown {
+	background: var(--eduui-surface-800);
 }
 
 .edu-autocomplete-panel {

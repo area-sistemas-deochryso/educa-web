@@ -105,9 +105,21 @@
 	box-shadow: var(--eduui-overlay-select-shadow);
 }
 
+.edu-multi-select__token--overflow {
+	background: none;
+	color: var(--eduui-text-muted-color);
+}
+
 .edu-multi-select-panel__filter {
 	padding: 0.5rem;
 	border-bottom: 1px solid var(--eduui-content-border-color);
+}
+
+.edu-multi-select-panel__loading {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 1.5rem;
 }
 
 .edu-multi-select-panel__list {
@@ -136,6 +148,14 @@
 
 .edu-multi-select-panel__option--selected {
 	font-weight: 600;
+}
+
+.edu-multi-select-panel__group-label {
+	padding: 0.5rem 0.75rem;
+	font-size: 0.75rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	color: var(--eduui-text-muted-color);
 }
 
 .edu-multi-select-panel__check {

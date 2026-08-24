@@ -1,9 +1,15 @@
-import { ChangeDetectionStrategy, Component, forwardRef, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, forwardRef, input, output, signal } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 const LOCALE_PARTS = new Intl.NumberFormat(undefined, { useGrouping: true }).formatToParts(1234.5);
 const GROUP_CHAR = LOCALE_PARTS.find((p) => p.type === 'group')?.value ?? ',';
 const DECIMAL_CHAR = LOCALE_PARTS.find((p) => p.type === 'decimal')?.value ?? '.';
+
+export interface EduInputNumberInputEvent {
+	originalEvent: Event;
+	value: number | null;
+	formattedValue: string;
+}
 
 @Component({
 	selector: 'edu-input-number',
@@ -25,8 +31,8 @@ const DECIMAL_CHAR = LOCALE_PARTS.find((p) => p.type === 'decimal')?.value ?? '.
 				[value]="text()"
 				[disabled]="disabled()"
 				[placeholder]="placeholder()"
-				(input)="onInput($event)"
-				(blur)="onBlur()"
+				(input)="handleInput($event)"
+				(blur)="handleBlur($event)"
 				(keydown.ArrowUp)="onArrowStep($event, 1)"
 				(keydown.ArrowDown)="onArrowStep($event, -1)"
 			/>
@@ -55,6 +61,10 @@ export class EduInputNumber implements ControlValueAccessor {
 	readonly disabled = input(false);
 	readonly placeholder = input<string>();
 
+	/** Emits the raw (pre-clamp) value on every keystroke — mirrors PrimeNG's `(onInput)`, which fires before `(onBlur)` clamps to `min`/`max`. */
+	readonly onInput = output<EduInputNumberInputEvent>();
+	readonly onBlur = output<FocusEvent>();
+
 	protected readonly text = signal('');
 
 	private value: number | null = null;
@@ -74,18 +84,20 @@ export class EduInputNumber implements ControlValueAccessor {
 		this.onTouched = fn;
 	}
 
-	protected onInput(event: Event): void {
+	protected handleInput(event: Event): void {
 		const raw = (event.target as HTMLInputElement).value;
 		this.text.set(raw);
 		this.value = this.parse(raw);
 		this.onChange(this.value);
+		this.onInput.emit({ originalEvent: event, value: this.value, formattedValue: raw });
 	}
 
-	protected onBlur(): void {
+	protected handleBlur(event: FocusEvent): void {
 		this.value = this.clamp(this.value);
 		this.text.set(this.format(this.value));
 		this.onChange(this.value);
 		this.onTouched();
+		this.onBlur.emit(event);
 	}
 
 	protected onArrowStep(event: Event, direction: 1 | -1): void {

@@ -14,20 +14,31 @@ import {
 	viewChild,
 } from '@angular/core';
 import { EduOverlayHandle } from '../overlay/edu-overlay-handle';
+import { EduPassThrough, EduPtRoot } from '../passthrough/edu-pt-root';
 
 export type EduDrawerPosition = 'left' | 'right' | 'top' | 'bottom';
 
 @Component({
 	selector: 'edu-drawer',
 	standalone: true,
+	imports: [EduPtRoot],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
 		<ng-template #overlayTemplate>
-			<div class="edu-drawer-panel" [attr.data-position]="position()" [style]="style()" role="dialog" [attr.aria-label]="header() || null">
-				<div class="edu-drawer-header">
-					<span class="edu-drawer-header__title">{{ header() }}</span>
-					<button type="button" class="edu-drawer-header__close" (click)="requestClose()" aria-label="Cerrar">✕</button>
-				</div>
+			<div
+				class="edu-drawer-panel"
+				[attr.data-position]="position()"
+				[style]="style()"
+				role="dialog"
+				[attr.aria-label]="header() || null"
+				[eduPtRoot]="pt()?.root"
+			>
+				@if (showHeader()) {
+					<div class="edu-drawer-header">
+						<span class="edu-drawer-header__title">{{ header() }}</span>
+						<button type="button" class="edu-drawer-header__close" (click)="requestClose()" aria-label="Cerrar">✕</button>
+					</div>
+				}
 				<div class="edu-drawer-body">
 					<ng-content></ng-content>
 				</div>
@@ -42,6 +53,9 @@ export class EduDrawer implements OnDestroy {
 	readonly header = input('');
 	readonly modal = input(true);
 	readonly style = input<Record<string, string> | null>(null);
+	readonly showHeader = input(true);
+	readonly closeOnEscape = input(true);
+	readonly pt = input<EduPassThrough>();
 
 	private readonly overlayTemplateRef = viewChild.required<TemplateRef<unknown>>('overlayTemplate');
 	private readonly viewContainerRef = inject(ViewContainerRef);
@@ -79,6 +93,7 @@ export class EduDrawer implements OnDestroy {
 				hasBackdrop: this.modal(),
 				backdropClass: 'cdk-overlay-dark-backdrop',
 				closeOnBackdropClick: this.modal(),
+				closeOnEscape: this.closeOnEscape(),
 			},
 			() => this.requestClose(),
 		);

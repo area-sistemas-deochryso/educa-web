@@ -16,6 +16,7 @@ export interface EduOverlayOpenOptions {
 	hasBackdrop: boolean;
 	backdropClass?: string;
 	closeOnBackdropClick: boolean;
+	closeOnEscape?: boolean;
 }
 
 export class EduOverlayHandle {
@@ -57,12 +58,14 @@ export class EduOverlayHandle {
 		this.focusTrap = this.focusTrapFactory.create(this.overlayRef.overlayElement);
 		this.focusTrap.focusInitialElementWhenReady();
 
-		this.subscriptions.add(
-			this.overlayRef
-				.keydownEvents()
-				.pipe(filter((event) => event.keyCode === ESCAPE))
-				.subscribe(() => onCloseRequest()),
-		);
+		if (options.closeOnEscape ?? true) {
+			this.subscriptions.add(
+				this.overlayRef
+					.keydownEvents()
+					.pipe(filter((event) => event.keyCode === ESCAPE))
+					.subscribe(() => onCloseRequest()),
+			);
+		}
 
 		if (options.closeOnBackdropClick) {
 			this.subscriptions.add(this.overlayRef.backdropClick().subscribe(() => onCloseRequest()));

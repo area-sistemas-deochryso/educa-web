@@ -15,10 +15,12 @@ import {
 	viewChild,
 } from '@angular/core';
 import { EduOverlayHandle } from '../overlay/edu-overlay-handle';
+import { EduPassThrough, EduPtRoot } from '../passthrough/edu-pt-root';
 
 @Component({
 	selector: 'edu-dialog',
 	standalone: true,
+	imports: [EduPtRoot],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
 		<ng-template #overlayTemplate>
@@ -29,14 +31,17 @@ import { EduOverlayHandle } from '../overlay/edu-overlay-handle';
 				[attr.role]="modal() ? 'dialog' : null"
 				[attr.aria-modal]="modal() ? 'true' : null"
 				[attr.aria-label]="header() || null"
+				[eduPtRoot]="pt()?.root"
 			>
-				<div class="edu-dialog-header" [class.edu-dialog-header--draggable]="draggable()" (mousedown)="onHeaderMouseDown($event)">
-					<span class="edu-dialog-header__title">{{ header() }}</span>
-					@if (closable()) {
-						<button type="button" class="edu-dialog-header__close" (click)="requestClose()" aria-label="Cerrar">✕</button>
-					}
-				</div>
-				<div class="edu-dialog-body">
+				@if (showHeader()) {
+					<div class="edu-dialog-header" [class.edu-dialog-header--draggable]="draggable()" (mousedown)="onHeaderMouseDown($event)">
+						<span class="edu-dialog-header__title">{{ header() }}</span>
+						@if (closable()) {
+							<button type="button" class="edu-dialog-header__close" (click)="requestClose()" aria-label="Cerrar">✕</button>
+						}
+					</div>
+				}
+				<div class="edu-dialog-body" [style]="contentStyle()">
 					<ng-content></ng-content>
 				</div>
 				@if (resizable()) {
@@ -53,10 +58,14 @@ export class EduDialog implements OnDestroy {
 	readonly draggable = input(false);
 	readonly resizable = input(false);
 	readonly closable = input(true);
+	readonly closeOnEscape = input(true);
 	readonly dismissableMask = input(false);
+	readonly showHeader = input(true);
 	readonly header = input('');
 	readonly style = input<Record<string, string> | null>(null);
 	readonly styleClass = input('');
+	readonly contentStyle = input<Record<string, string> | null>(null);
+	readonly pt = input<EduPassThrough>();
 
 	private readonly overlayTemplateRef = viewChild.required<TemplateRef<unknown>>('overlayTemplate');
 	private readonly viewContainerRef = inject(ViewContainerRef);
@@ -151,6 +160,7 @@ export class EduDialog implements OnDestroy {
 				hasBackdrop: this.modal(),
 				backdropClass: 'cdk-overlay-dark-backdrop',
 				closeOnBackdropClick: this.dismissableMask(),
+				closeOnEscape: this.closeOnEscape(),
 			},
 			() => this.requestClose(),
 		);
