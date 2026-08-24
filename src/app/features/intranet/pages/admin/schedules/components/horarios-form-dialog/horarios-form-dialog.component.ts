@@ -4,20 +4,16 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
-import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
-import { TooltipModule } from 'primeng/tooltip';
-
 import type { HorarioFormData } from '../../models/horario.interface';
 import type { SalonOption } from '../../models/salon.interface';
+import { EduDialog, EduInputText, EduSelect, EduTooltip } from '@edu-ui';
 
 // #endregion
 // #region Implementation
 @Component({
 	selector: 'app-schedules-form-dialog',
 	standalone: true,
-	imports: [CommonModule, FormsModule, ButtonModule, DialogModule, InputTextModule, SelectModule, TooltipModule],
+	imports: [CommonModule, FormsModule, ButtonModule, EduDialog, EduInputText, EduSelect, EduTooltip],
 	templateUrl: './horarios-form-dialog.component.html',
 	styleUrl: './horarios-form-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -48,8 +44,7 @@ export class SchedulesFormDialogComponent {
 		{ label: 'Martes', value: 2 },
 		{ label: 'Miercoles', value: 3 },
 		{ label: 'Jueves', value: 4 },
-		{ label: 'Viernes', value: 5 },
-	];
+		{ label: 'Viernes', value: 5 }];
 	// #endregion
 
 	// #region Event handlers

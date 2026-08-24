@@ -2,13 +2,7 @@ import { Component, ChangeDetectionStrategy, inject, signal, computed } from '@a
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { DialogModule } from 'primeng/dialog';
-import { AccordionModule } from 'primeng/accordion';
 import { ButtonModule } from 'primeng/button';
-import { TooltipModule } from 'primeng/tooltip';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { TabsModule } from 'primeng/tabs';
-import { ConfirmationService } from 'primeng/api';
 import { FormatFileSizePipe } from '@intranet-shared/pipes';
 import { EstudianteCursosFacade } from '@features/intranet/pages/estudiante/services/estudiante-cursos.facade';
 import { EstudianteArchivoDto, EstudianteTareaArchivoDto } from '@features/intranet/pages/estudiante/models';
@@ -17,6 +11,7 @@ import { ArchivosSummaryDialogComponent } from '@features/intranet/pages/profeso
 // eslint-disable-next-line layer-enforcement/imports-error -- Razón: ver import anterior — mismo dialog cross-role.
 import { TareasSummaryDialogComponent } from '@features/intranet/pages/profesor/cursos/components/tareas-summary-dialog/tareas-summary-dialog.component';
 import { NotasCursoCardComponent } from '@features/intranet/pages/estudiante/notas/components/notas-curso-card/notas-curso-card.component';
+import { EduAccordion, EduAccordionHeader, EduAccordionPanel, EduConfirmDialog, EduConfirmationService, EduDialog, EduTab, EduTabPanel, EduTabs, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-curso-content-readonly-dialog',
@@ -24,18 +19,17 @@ import { NotasCursoCardComponent } from '@features/intranet/pages/estudiante/not
 	imports: [
 		CommonModule,
 		FormsModule,
-		DialogModule,
-		AccordionModule,
+		EduDialog,
+		EduAccordion, EduAccordionHeader, EduAccordionPanel,
 		ButtonModule,
-		TooltipModule,
-		ConfirmDialogModule,
-		TabsModule,
+		EduTooltip,
+		EduConfirmDialog,
+		EduTabs, EduTab, EduTabPanel,
 		FormatFileSizePipe,
 		ArchivosSummaryDialogComponent,
 		TareasSummaryDialogComponent,
-		NotasCursoCardComponent,
-	],
-	providers: [ConfirmationService],
+		NotasCursoCardComponent],
+	providers: [EduConfirmationService],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './curso-content-readonly-dialog.component.html',
 	styleUrl: './curso-content-readonly-dialog.component.scss',
@@ -43,7 +37,7 @@ import { NotasCursoCardComponent } from '@features/intranet/pages/estudiante/not
 export class CursoContentReadonlyDialogComponent {
 	// #region Dependencias
 	private readonly facade = inject(EstudianteCursosFacade);
-	private readonly confirmationService = inject(ConfirmationService);
+	private readonly confirmationService = inject(EduConfirmationService);
 	private readonly router = inject(Router);
 	// #endregion
 
@@ -60,14 +54,18 @@ export class CursoContentReadonlyDialogComponent {
 	// #endregion
 
 	// #region Computed
-	readonly dialogStyle = computed(() =>
-		this.isFullscreen()
-			? { width: '100vw', maxWidth: '100vw', height: '100vh', maxHeight: '100vh' }
-			: { width: '960px', maxWidth: '95vw' },
-	);
-	readonly contentStyle = computed(() =>
-		this.isFullscreen() ? { 'overflow-y': 'auto' } : { 'max-height': '80vh', 'overflow-y': 'auto' },
-	);
+	// edu-accordion's [value] is string-based (no numeric convention) — semana ids are
+	// numeric, so this bridges the two at the template boundary only.
+	readonly openPanelsStr = computed(() => this.openPanels().map((v) => v.toString()));
+
+	readonly dialogStyle = computed((): Record<string, string> => {
+		if (this.isFullscreen()) return { width: '100vw', maxWidth: '100vw', height: '100vh', maxHeight: '100vh' };
+		return { width: '960px', maxWidth: '95vw' };
+	});
+	readonly contentStyle = computed((): Record<string, string> => {
+		if (this.isFullscreen()) return { 'overflow-y': 'auto' };
+		return { 'max-height': '80vh', 'overflow-y': 'auto' };
+	});
 	readonly filteredSemanas = computed(() => {
 		const semanas = this.vm().semanas;
 		const query = this.searchQuery().toLowerCase().trim();
@@ -146,6 +144,10 @@ export class CursoContentReadonlyDialogComponent {
 	// #endregion
 
 	// #region Accordion handlers
+	onAccordionChangeStr(values: string[]): void {
+		this.onAccordionChange(values.map((v) => Number(v)));
+	}
+
 	onAccordionChange(openValues: number[]): void {
 		const previouslyOpen = this.openPanels();
 		this.openPanels.set(openValues);

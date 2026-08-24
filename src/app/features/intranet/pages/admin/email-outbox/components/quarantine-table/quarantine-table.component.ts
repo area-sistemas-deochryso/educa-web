@@ -8,13 +8,11 @@ import {
 } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { RouterLink } from '@angular/router';
-import { TableLazyLoadEvent, TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
-
 import type { SkeletonColumnDef } from '@intranet-shared/components';
 import { UiMappingService } from '@intranet-shared/services';
 import { EmailQuarantineListaDto } from '@data/models';
+import { EduTable, EduTag, EduTooltip } from '@edu-ui';
+import type { EduTableLazyLoadEvent } from '@edu-ui';
 
 /**
  * Plan 37 Chat 3 — tabla server-paginated de cuarentenas activas/liberadas.
@@ -23,7 +21,7 @@ import { EmailQuarantineListaDto } from '@data/models';
 @Component({
 	selector: 'app-quarantine-table',
 	standalone: true,
-	imports: [TableModule, TagModule, ButtonModule, TooltipModule, DatePipe, RouterLink],
+	imports: [EduTable, EduTag, ButtonModule, EduTooltip, DatePipe, RouterLink],
 	templateUrl: './quarantine-table.component.html',
 	styleUrl: './quarantine-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -40,7 +38,7 @@ export class QuarantineTableComponent {
 
 	readonly viewDetail = output<EmailQuarantineListaDto>();
 	readonly release = output<EmailQuarantineListaDto>();
-	readonly lazyLoad = output<TableLazyLoadEvent>();
+	readonly lazyLoad = output<EduTableLazyLoadEvent>();
 
 	static readonly skeletonColumns: SkeletonColumnDef[] = [
 		{ width: '50px', cellType: 'text' },
@@ -49,8 +47,7 @@ export class QuarantineTableComponent {
 		{ width: '90px', cellType: 'badge' },
 		{ width: '160px', cellType: 'text' },
 		{ width: '90px', cellType: 'badge' },
-		{ width: '110px', cellType: 'actions' },
-	];
+		{ width: '110px', cellType: 'actions' }];
 
 	onViewDetail(item: EmailQuarantineListaDto): void {
 		this.viewDetail.emit(item);
@@ -60,7 +57,7 @@ export class QuarantineTableComponent {
 		this.release.emit(item);
 	}
 
-	onLazyLoad(event: TableLazyLoadEvent): void {
+	onLazyLoad(event: EduTableLazyLoadEvent): void {
 		this.lazyLoad.emit(event);
 	}
 

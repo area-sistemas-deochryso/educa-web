@@ -32,7 +32,7 @@
 <!-- #endregion -->
 
 <div class="filters-bar">
-	<p-select
+	<edu-select
 		data-info-anchor="admin-email-outbox-defer-tipo-select"
 		[options]="vm().tipoOptions"
 		optionLabel="label"
@@ -46,7 +46,7 @@
 	/>
 	<input
 		type="text"
-		pInputText
+		eduInputText
 		data-info-anchor="admin-email-outbox-defer-dominio-input"
 		placeholder="Dominio (ej: gmail.com)"
 		[ngModel]="vm().filterDominio"
@@ -54,7 +54,7 @@
 		(blur)="onDominioApply()"
 		(keyup.enter)="onDominioApply()"
 	/>
-	<p-datepicker
+	<edu-datepicker
 		data-info-anchor="admin-email-outbox-defer-desde-datepicker"
 		[ngModel]="vm().filterDesde"
 		(ngModelChange)="onDesdeChange($event)"
@@ -63,7 +63,7 @@
 		[showClear]="true"
 		appendTo="body"
 	/>
-	<p-datepicker
+	<edu-datepicker
 		data-info-anchor="admin-email-outbox-defer-hasta-datepicker"
 		[ngModel]="vm().filterHasta"
 		(ngModelChange)="onHastaChange($event)"
@@ -77,8 +77,8 @@
 		pButton
 		icon="pi pi-filter-slash"
 		class="p-button-text p-button-sm btn-clear"
-		pTooltip="Limpiar filtros"
-		tooltipPosition="top"
+		eduTooltip="Limpiar filtros"
+		eduTooltipPosition="top"
 		data-info-anchor="email-outbox-clear-filters-btn"
 		(click)="onClearFilters()"
 		[pt]="{ root: { 'aria-label': 'Limpiar filtros' } }"
@@ -88,8 +88,8 @@
 		pButton
 		icon="pi pi-refresh"
 		class="p-button-text p-button-sm"
-		pTooltip="Refrescar"
-		tooltipPosition="top"
+		eduTooltip="Refrescar"
+		eduTooltipPosition="top"
 		data-info-anchor="email-outbox-refresh-btn"
 		(click)="onRefresh()"
 		[pt]="{ root: { 'aria-label': 'Refrescar' } }"
@@ -125,7 +125,7 @@
 		}
 	</section>
 
-	<p-paginator
+	<edu-paginator
 		[rows]="pageSize"
 		[first]="vm().first"
 		[totalRecords]="vm().total"

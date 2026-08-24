@@ -10,8 +10,6 @@ import { DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 
-import { TableLazyLoadEvent } from 'primeng/table';
-
 import { MiniSparklineComponent, TableSkeletonComponent } from '@intranet-shared/components';
 import {
 	CrearEmailQuarantineDto,
@@ -35,8 +33,8 @@ import { QuarantineTableComponent } from '../quarantine-table/quarantine-table.c
 import { QuarantineAddDialogComponent } from '../quarantine-add-dialog/quarantine-add-dialog.component';
 import { QuarantineDetailDrawerComponent } from '../quarantine-detail-drawer/quarantine-detail-drawer.component';
 import { DomainBlockedAlertBannerComponent } from '../domain-blocked-alert-banner/domain-blocked-alert-banner.component';
-import { EduConfirmationService, EduConfirmDialog, EduInputText, EduSelect, EduTooltip } from '@edu-ui';
-
+import { EduConfirmDialog, EduConfirmationService, EduInputText, EduSelect, EduTooltip } from '@edu-ui';
+import type { EduTableLazyLoadEvent } from '@edu-ui';
 interface SelectOption<T> {
 	label: string;
 	value: T;
@@ -45,8 +43,7 @@ interface SelectOption<T> {
 const ESTADO_OPTIONS: SelectOption<EmailQuarantineFiltroEstado>[] = [
 	{ label: 'Activas', value: 'activa' },
 	{ label: 'Liberadas', value: 'liberada' },
-	{ label: 'Todas', value: 'todas' },
-];
+	{ label: 'Todas', value: 'todas' }];
 
 const MOTIVO_LABELS: Record<QuarantineMotivo, string> = {
 	MAILBOX_FULL: 'Buzón lleno (4.2.2)',
@@ -75,8 +72,7 @@ const MOTIVO_OPTIONS: SelectOption<QuarantineMotivo>[] = EMAIL_QUARANTINE_MOTIVO
 		QuarantineAddDialogComponent,
 		QuarantineDetailDrawerComponent,
 		DomainBlockedAlertBannerComponent,
-		HubContextBannerComponent,
-	],
+		HubContextBannerComponent],
 	providers: [EduConfirmationService],
 	templateUrl: './quarantine-tab.component.html',
 	styleUrl: './quarantine-tab.component.scss',
@@ -136,7 +132,7 @@ export class QuarantineTabComponent implements OnInit {
 		this.dataFacade.refresh();
 	}
 
-	onLazyLoad(event: TableLazyLoadEvent): void {
+	onLazyLoad(event: EduTableLazyLoadEvent): void {
 		const first = event.first ?? 0;
 		const rows = event.rows ?? this.vm().pageSize;
 		const page = Math.floor(first / rows) + 1;
@@ -215,14 +211,12 @@ export class QuarantineTabComponent implements OnInit {
 					e.quarantineCount,
 					e.estado ? 'Activa' : 'Liberada',
 					e.retryAfter,
-					(e.observacion ?? '').replace(/[\r\n,]/g, ' '),
+					(e.observacion ?? '').replace(/[\r\n]/g, ' '),
 					e.fechaReg,
-					e.usuarioReg,
-				]
+					e.usuarioReg]
 					.map((v) => `"${String(v).replace(/"/g, '""')}"`)
 					.join(','),
-			),
-		];
+			)];
 		const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
 		const url = URL.createObjectURL(blob);
 		const a = document.createElement('a');

@@ -8,24 +8,24 @@
 <app-attendance-scope-banner />
 
 <!-- #region Tabs -->
-<p-tabs [value]="activeTab()" (valueChange)="onTabChange($event)" data-info-anchor="admin-asistencia-tabs">
-	<p-tablist>
-		<p-tab value="gestion">
+<edu-tabs [value]="activeTab()" (valueChange)="onTabChange($event)" data-info-anchor="admin-asistencia-tabs">
+	
+		<edu-tab value="gestion">
 			<i class="pi pi-cog mr-2"></i>
 			Gestión
-		</p-tab>
-		<p-tab value="reportes">
+		</edu-tab>
+		<edu-tab value="reportes">
 			<i class="pi pi-chart-bar mr-2"></i>
 			Reportes
-		</p-tab>
-		<p-tab value="panel">
+		</edu-tab>
+		<edu-tab value="panel">
 			<i class="pi pi-th-large mr-2"></i>
 			Panel
-		</p-tab>
-	</p-tablist>
+		</edu-tab>
+	
 
 	<!-- Tab: Gestión -->
-	<p-tabpanel value="gestion">
+	<edu-tabpanel value="gestion">
 
 <!-- #region Header -->
 <div class="header">
@@ -60,8 +60,8 @@
 						'aria-label': 'Enviar correos de asistencia a los apoderados seleccionados',
 					},
 				}"
-				pTooltip="Envía el correo de asistencia al apoderado de cada estudiante seleccionado"
-				tooltipPosition="bottom"
+				eduTooltip="Envía el correo de asistencia al apoderado de cada estudiante seleccionado"
+				eduTooltipPosition="bottom"
 				data-info-anchor="admin-asistencia-enviar-correos-btn"
 			></button>
 		}
@@ -78,12 +78,12 @@
 					'aria-label': 'Sincronizar asistencias desde CrossChex para la fecha seleccionada',
 				},
 			}"
-			[pTooltip]="
+			[eduTooltip]="
 				syncActive()
 					? 'Hay un sync en curso. Espera a que termine.'
 					: 'Sincroniza ambos tipos (estudiantes y profesores). El filtro de tipo solo afecta la visualización.'
 			"
-			tooltipPosition="bottom"
+			eduTooltipPosition="bottom"
 			data-info-anchor="admin-asistencia-sincronizar-btn"
 		></button>
 		<button
@@ -98,8 +98,8 @@
 					'aria-label': 'Abrir diálogo para sincronizar un rango de fechas desde CrossChex',
 				},
 			}"
-			pTooltip="Sincronizar un rango de fechas con filtro opcional de personas"
-			tooltipPosition="bottom"
+			eduTooltip="Sincronizar un rango de fechas con filtro opcional de personas"
+			eduTooltipPosition="bottom"
 			data-info-anchor="admin-asistencia-sincronizar-rango-btn"
 		></button>
 		<button
@@ -108,8 +108,8 @@
 			label="Debug Paginación"
 			class="p-button-outlined p-button-danger"
 			(click)="onDebugPagination()"
-			pTooltip="DEBUG: llama páginas 1-3 de CrossChex y guarda raw JSON en SQL"
-			tooltipPosition="bottom"
+			eduTooltip="DEBUG: llama páginas 1-3 de CrossChex y guarda raw JSON en SQL"
+			eduTooltipPosition="bottom"
 			data-info-anchor="admin-asistencia-debug-paginacion-btn"
 		></button>
 		<button
@@ -137,7 +137,7 @@
 
 <!-- #region Filtro tipo persona -->
 <div class="tipo-persona-bar">
-	<p-selectButton
+	<edu-select-button
 		[options]="tipoPersonaOptions()"
 		[ngModel]="vm().tipoPersonaFilter"
 		(ngModelChange)="onTipoPersonaFilterChange($event)"
@@ -181,7 +181,7 @@
 
 <!-- #region Filtros -->
 <div class="filters-bar">
-	<p-datepicker
+	<edu-datepicker
 		[(ngModel)]="fechaCalendar"
 		(ngModelChange)="onFechaChange($event)"
 		dateFormat="yy-mm-dd"
@@ -190,19 +190,19 @@
 		placeholder="Fecha"
 		data-info-anchor="admin-asistencia-fecha-picker"
 	/>
-	<p-iconfield>
-		<p-inputicon styleClass="pi pi-search" />
+	<edu-icon-field>
+		<edu-input-icon styleClass="pi pi-search" />
 		<input
 			type="text"
-			pInputText
+			eduInputText
 			placeholder="Buscar por nombre/apellido o DNI completo (8 dígitos)"
-			pTooltip="Por seguridad, el DNI está encriptado: la búsqueda parcial por DNI no es posible. Use los 8 dígitos exactos o busque por nombre/apellido."
-			tooltipPosition="bottom"
+			eduTooltip="Por seguridad, el DNI está encriptado: la búsqueda parcial por DNI no es posible. Use los 8 dígitos exactos o busque por nombre/apellido."
+			eduTooltipPosition="bottom"
 			[value]="vm().searchTerm"
 			(input)="onSearch($event)"
 			data-info-anchor="admin-asistencia-buscar-input"
 		/>
-	</p-iconfield>
+	</edu-icon-field>
 </div>
 <!-- #endregion -->
 
@@ -212,7 +212,7 @@
 } @else if (vm().error) {
 	<app-error-state [message]="vm().error!" (retry)="dataFacade.loadData()" />
 } @else {
-	<p-table
+	<edu-table
 		[value]="vm().items"
 		[dataKey]="'asistenciaId'"
 		[paginator]="true"
@@ -225,7 +225,7 @@
 		<ng-template #header>
 			<tr>
 				<th style="width: 40px">
-					<p-checkbox
+					<edu-checkbox
 						[binary]="true"
 						[ngModel]="vm().allSelected"
 						(ngModelChange)="store.toggleSelectAll()"
@@ -245,7 +245,7 @@
 		<ng-template #body let-item let-i="rowIndex">
 			<tr>
 				<td>
-					<p-checkbox
+					<edu-checkbox
 						[binary]="true"
 						[ngModel]="vm().selectedIds.has(item.asistenciaId)"
 						(ngModelChange)="store.toggleSelection(item.asistenciaId)"
@@ -257,7 +257,7 @@
 					<div class="student-cell">
 						<div class="student-name-row">
 							<span class="student-name">{{ item.nombreCompleto }}</span>
-							<p-tag
+							<edu-tag
 								[value]="getTipoPersonaLabel(item.tipoPersona)"
 								styleClass="tag-neutral"
 							/>
@@ -269,10 +269,10 @@
 				<td>{{ item.horaEntrada ? (item.horaEntrada | date: 'HH:mm') : '—' }}</td>
 				<td>{{ item.horaSalida ? (item.horaSalida | date: 'HH:mm') : '—' }}</td>
 				<td>
-					<p-tag [value]="item.estado" [severity]="getEstadoSeverity(item.estado)" />
+					<edu-tag [value]="item.estado" [severity]="getEstadoSeverity(item.estado)" />
 				</td>
 				<td>
-					<p-tag
+					<edu-tag
 						[value]="getOrigenLabel(item)"
 						[severity]="getOrigenSeverity(item)"
 					/>
@@ -284,8 +284,8 @@
 								pButton
 								icon="pi pi-sign-out"
 								class="p-button-rounded p-button-text btn-agregar-salida"
-								pTooltip="Agregar salida"
-								tooltipPosition="top"
+								eduTooltip="Agregar salida"
+								eduTooltipPosition="top"
 								(click)="onAgregarSalida(item)"
 								[pt]="{
 									root: {
@@ -299,8 +299,8 @@
 							pButton
 							icon="pi pi-pencil"
 							class="p-button-rounded p-button-text"
-							pTooltip="Editar horas"
-							tooltipPosition="top"
+							eduTooltip="Editar horas"
+							eduTooltipPosition="top"
 							(click)="onEditar(item)"
 							[pt]="{
 								root: {
@@ -313,8 +313,8 @@
 							pButton
 							icon="pi pi-trash"
 							class="p-button-rounded p-button-text p-button-danger"
-							pTooltip="Eliminar"
-							tooltipPosition="top"
+							eduTooltip="Eliminar"
+							eduTooltipPosition="top"
 							(click)="onEliminar(item)"
 							[pt]="{
 								root: {
@@ -334,12 +334,12 @@
 				</td>
 			</tr>
 		</ng-template>
-	</p-table>
+	</edu-table>
 }
 <!-- #endregion -->
 
 <!-- #region Dialog de asistencia -->
-<p-dialog
+<edu-dialog
 	[header]="vm().isEditing ? 'Editar horas de asistencia' : 'Registrar asistencia manual'"
 	[visible]="vm().dialogVisible"
 	(visibleChange)="onDialogVisibleChange($event)"
@@ -351,7 +351,7 @@
 			<!-- Tipo de persona (pestañas Estudiante / Profesor) -->
 			<div class="form-field">
 				<label>Tipo de persona</label>
-				<p-selectButton
+				<edu-select-button
 					[options]="tipoPersonaFormOptions()"
 					[ngModel]="vm().formData.tipoPersona"
 					(ngModelChange)="onFormTipoPersonaChange($event)"
@@ -370,7 +370,7 @@
 			<!-- Tipo de operacion -->
 			<div class="form-field">
 				<label>Tipo de registro</label>
-				<p-select
+				<edu-select
 					[options]="tipoOptions()"
 					[ngModel]="vm().formData.tipoOperacion"
 					(ngModelChange)="store.updateFormData({ tipoOperacion: $event })"
@@ -383,7 +383,7 @@
 				<!-- Persona -->
 				<div class="form-field">
 					<label>{{ getTipoPersonaLabel(vm().formData.tipoPersona) }}</label>
-					<p-select
+					<edu-select
 						[options]="vm().personas"
 						optionLabel="nombreCompleto"
 						optionValue="estudianteId"
@@ -408,7 +408,7 @@
 				@if (vm().isEditing) {
 					<div class="field-with-action">
 						@if (vm().formData.horaEntrada) {
-							<p-datepicker
+							<edu-datepicker
 								[ngModel]="vm().formData.horaEntrada"
 								(ngModelChange)="store.updateFormData({ horaEntrada: $event })"
 								[timeOnly]="true"
@@ -425,8 +425,8 @@
 								class="p-button-danger p-button-text p-button-sm"
 								(click)="store.updateFormData({ horaEntrada: null })"
 								[pt]="{ root: { 'aria-label': 'Quitar hora de entrada' } }"
-								pTooltip="Quitar entrada"
-								tooltipPosition="top"
+								eduTooltip="Quitar entrada"
+								eduTooltipPosition="top"
 								data-info-anchor="admin-asistencia-form-quitar-entrada-btn"
 							></button>
 						} @else {
@@ -441,7 +441,7 @@
 						}
 					</div>
 				} @else {
-					<p-datepicker
+					<edu-datepicker
 						[ngModel]="vm().formData.horaEntrada"
 						(ngModelChange)="store.updateFormData({ horaEntrada: $event })"
 						[showTime]="true"
@@ -463,7 +463,7 @@
 				<div class="field-with-action">
 					@if (vm().isEditing) {
 						@if (vm().formData.horaSalida) {
-							<p-datepicker
+							<edu-datepicker
 								[ngModel]="vm().formData.horaSalida"
 								(ngModelChange)="store.updateFormData({ horaSalida: $event })"
 								[timeOnly]="true"
@@ -480,8 +480,8 @@
 								class="p-button-danger p-button-text p-button-sm"
 								(click)="store.updateFormData({ horaSalida: null })"
 								[pt]="{ root: { 'aria-label': 'Quitar hora de salida' } }"
-								pTooltip="Quitar salida"
-								tooltipPosition="top"
+								eduTooltip="Quitar salida"
+								eduTooltipPosition="top"
 								data-info-anchor="admin-asistencia-form-quitar-salida-btn"
 							></button>
 						} @else {
@@ -495,7 +495,7 @@
 							></button>
 						}
 					} @else {
-						<p-datepicker
+						<edu-datepicker
 							[ngModel]="vm().formData.horaSalida"
 							(ngModelChange)="store.updateFormData({ horaSalida: $event })"
 							[showTime]="true"
@@ -516,7 +516,7 @@
 			<label>Observación (opcional)</label>
 			<input
 				type="text"
-				pInputText
+				eduInputText
 				[ngModel]="vm().formData.observacion"
 				(ngModelChange)="store.updateFormData({ observacion: $event })"
 				placeholder="Motivo de la corrección..."
@@ -542,11 +542,11 @@
 			data-info-anchor="admin-asistencia-form-guardar-btn"
 		></button>
 	</ng-template>
-</p-dialog>
+</edu-dialog>
 <!-- #endregion -->
 
 <!-- #region Dialog de cierre mensual -->
-<p-dialog
+<edu-dialog
 	header="Cierre mensual de asistencia"
 	[visible]="vm().cierreDialogVisible"
 	(visibleChange)="onCierreDialogVisibleChange($event)"
@@ -557,7 +557,7 @@
 	<div class="cierre-form">
 		<h4>Cerrar mes</h4>
 		<div class="cierre-fields">
-			<p-select
+			<edu-select
 				[options]="mesesOptions()"
 				[(ngModel)]="cierreMes"
 				placeholder="Mes"
@@ -566,14 +566,14 @@
 			/>
 			<input
 				type="number"
-				pInputText
+				eduInputText
 				[(ngModel)]="cierreAnio"
 				style="width: 100px"
 				data-info-anchor="admin-asistencia-cierre-anio-input"
 			/>
 			<input
 				type="text"
-				pInputText
+				eduInputText
 				[(ngModel)]="cierreObservacion"
 				placeholder="Observación (opcional)"
 				data-info-anchor="admin-asistencia-cierre-observacion-input"
@@ -605,7 +605,7 @@
 					<div class="cierre-revertir">
 						<input
 							type="text"
-							pInputText
+							eduInputText
 							[(ngModel)]="revertirObservacion"
 							placeholder="Motivo (mín 10 chars)..."
 							style="width: 200px"
@@ -626,18 +626,18 @@
 			}
 		</div>
 	}
-</p-dialog>
+</edu-dialog>
 <!-- #endregion -->
 
 <!-- #region Confirm dialog + Toast -->
-<p-confirmDialog (onHide)="onConfirmDialogHide()" />
-<p-toast position="top-right" />
+<edu-confirm-dialog (onHide)="onConfirmDialogHide()" />
+<edu-toast position="top-right" />
 <!-- #endregion -->
 
-	</p-tabpanel>
+	</edu-tabpanel>
 
 	<!-- Tab: Reportes -->
-	<p-tabpanel value="reportes">
+	<edu-tabpanel value="reportes">
 		<div class="reportes-panel-link">
 			<button
 				pButton
@@ -653,13 +653,13 @@
 			></button>
 		</div>
 		<app-attendance-reports />
-	</p-tabpanel>
+	</edu-tabpanel>
 
 	<!-- Tab: Panel -->
-	<p-tabpanel value="panel">
+	<edu-tabpanel value="panel">
 		<app-attendance-panel />
-	</p-tabpanel>
-</p-tabs>
+	</edu-tabpanel>
+</edu-tabs>
 <!-- #endregion -->
 
 <!-- Dialog: Sync rango -->

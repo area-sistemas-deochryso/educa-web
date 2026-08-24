@@ -35,7 +35,7 @@
 					<div class="identity-card__header">
 						<span class="identity-card__name"><code>{{ col.tableName }}</code>.{{ col.columnName }}</span>
 					</div>
-					<p-progressBar [value]="col.percentConsumed" [showValue]="true" />
+					<edu-progress-bar [value]="col.percentConsumed" [showValue]="true" />
 					<div class="identity-card__meta">
 						<span>Actual: {{ formatValue(col.currentValue) }}</span>
 						<span>Máx: {{ formatValue(col.maxValue) }}</span>

@@ -38,7 +38,7 @@
 		<div class="search-row">
 			<div class="search-field">
 				<label for="rolSelect">Rol</label>
-				<p-select
+				<edu-select
 					id="rolSelect"
 					appendTo="body"
 					[options]="vm().roles"
@@ -55,7 +55,7 @@
 
 			<div class="search-field search-field--wide">
 				<label for="userSearch">Usuario</label>
-				<p-autoComplete
+				<edu-autocomplete
 					id="userSearch"
 					[suggestions]="vm().usuariosSugeridos"
 					[ngModel]="vm().selectedUsuario"
@@ -78,7 +78,7 @@
 							</div>
 						</div>
 					</ng-template>
-				</p-autoComplete>
+				</edu-autocomplete>
 			</div>
 
 			@if (vm().selectedUsuario) {
@@ -87,7 +87,7 @@
 						pButton
 						icon="pi pi-times"
 						class="p-button-text p-button-secondary"
-						pTooltip="Limpiar selección"
+						eduTooltip="Limpiar selección"
 						aria-label="Limpiar selección"
 						data-info-anchor="admin-permissions-users-limpiar-seleccion-btn"
 						(click)="resetSelection()"
@@ -218,7 +218,7 @@
 </div>
 
 <!-- #region Edit Dialog -->
-<p-dialog
+<edu-dialog
 	[visible]="vm().dialogVisible"
 	(visibleChange)="onDialogVisibleChange($event)"
 	[header]="'Overrides - ' + (vm().selectedUsuario?.nombreCompleto || '')"
@@ -233,7 +233,7 @@
 			<div class="user-info">
 				<i class="pi pi-user"></i>
 				<span>{{ vm().selectedUsuario?.nombreCompleto }}</span>
-				<p-tag [value]="vm().selectedUsuario?.rol || ''" styleClass="tag-neutral" />
+				<edu-tag [value]="vm().selectedUsuario?.rol || ''" styleClass="tag-neutral" />
 			</div>
 			<div class="override-count">
 				<span class="override-grants">
@@ -267,7 +267,7 @@
 						<i class="pi pi-search"></i>
 						<input
 							type="text"
-							pInputText
+							eduInputText
 							placeholder="Buscar capability..."
 							data-info-anchor="admin-permissions-users-buscar-cap-input"
 							[ngModel]="vm().capBusqueda"
@@ -307,7 +307,7 @@
 										type="button"
 										[icon]="isGranted ? 'pi pi-check' : 'pi pi-plus'"
 										[class]="isGranted ? 'p-button-sm p-button-success' : 'p-button-sm p-button-outlined'"
-										pTooltip="Grant"
+										eduTooltip="Grant"
 										aria-label="Toggle grant"
 										data-info-anchor="admin-permissions-users-toggle-grant-btn"
 										(click)="toggleGrant(cap.id)"
@@ -317,7 +317,7 @@
 										type="button"
 										[icon]="isDenied ? 'pi pi-check' : 'pi pi-minus'"
 										[class]="isDenied ? 'p-button-sm p-button-danger' : 'p-button-sm p-button-outlined'"
-										pTooltip="Deny"
+										eduTooltip="Deny"
 										aria-label="Toggle deny"
 										data-info-anchor="admin-permissions-users-toggle-deny-btn"
 										(click)="toggleDeny(cap.id)"
@@ -353,6 +353,6 @@
 			></button>
 		</div>
 	</ng-template>
-</p-dialog>
+</edu-dialog>
 <!-- #endregion -->
 <!-- #endregion -->

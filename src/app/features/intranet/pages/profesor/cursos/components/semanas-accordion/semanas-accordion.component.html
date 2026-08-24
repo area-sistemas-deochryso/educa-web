@@ -45,10 +45,10 @@
 	</div>
 } @else {
 	<div class="weeks-accordion">
-		<p-accordion [multiple]="true" [value]="openPanels()" (valueChange)="openPanels.set($any($event))">
+		<edu-accordion [multiple]="true" [value]="openPanelsStr()" (valueChange)="onOpenPanelsChangeStr($any($event))">
 			@for (semana of filteredSemanas(); track semana.id) {
-				<p-accordionpanel [value]="semana.id">
-					<p-accordionheader data-info-anchor="profesor-semanas-accordion-header">
+				<edu-accordion-panel [value]="semana.id.toString()">
+					<edu-accordion-header data-info-anchor="profesor-semanas-accordion-header">
 						<div class="week-header">
 							<span class="week-number">{{ semana.numeroSemana }}</span>
 							<div class="week-title-group">
@@ -72,8 +72,8 @@
 								}
 							</div>
 						</div>
-					</p-accordionheader>
-					<p-accordioncontent>
+					</edu-accordion-header>
+					
 						<div class="semana-body">
 							<!-- Descripción y mensaje -->
 							@if (semana.descripcion || semana.mensajeDocente) {
@@ -327,10 +327,10 @@
 							</div>
 							<!-- #endregion -->
 						</div>
-					</p-accordioncontent>
-				</p-accordionpanel>
+					
+				</edu-accordion-panel>
 			}
-		</p-accordion>
+		</edu-accordion>
 	</div>
 }
 <!-- #endregion -->

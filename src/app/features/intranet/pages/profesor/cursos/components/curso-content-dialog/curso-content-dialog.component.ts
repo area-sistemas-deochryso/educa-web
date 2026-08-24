@@ -1,12 +1,7 @@
 import { Component, ChangeDetectionStrategy, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
-import { TooltipModule } from 'primeng/tooltip';
-import { TabsModule } from 'primeng/tabs';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ConfirmationService } from 'primeng/api';
 import { CursoContenidoDataFacade } from '../../services/curso-contenido-data.facade';
 import { CursoContenidoCrudFacade } from '../../services/curso-contenido-crud.facade';
 import { CursoContenidoUiFacade } from '../../services/curso-contenido-ui.facade';
@@ -32,17 +27,18 @@ import { EvaluacionFormDialogComponent } from '../evaluacion-form-dialog/evaluac
 import { CalificarDialogComponent } from '../calificar-dialog/calificar-dialog.component';
 import { PeriodosConfigDialogComponent } from '../periodos-config-dialog/periodos-config-dialog.component';
 import { SemanasAccordionComponent } from '../semanas-accordion/semanas-accordion.component';
+import { EduConfirmDialog, EduConfirmationService, EduDialog, EduTab, EduTabPanel, EduTabs, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-curso-content-dialog',
 	standalone: true,
 	imports: [
 		CommonModule,
-		DialogModule,
+		EduDialog,
 		ButtonModule,
-		TooltipModule,
-		TabsModule,
-		ConfirmDialogModule,
+		EduTooltip,
+		EduTabs, EduTab, EduTabPanel,
+		EduConfirmDialog,
 		SemanasAccordionComponent,
 		SemanaEditDialogComponent,
 		TareaDialogComponent,
@@ -53,9 +49,8 @@ import { SemanasAccordionComponent } from '../semanas-accordion/semanas-accordio
 		CalificacionesPanelComponent,
 		EvaluacionFormDialogComponent,
 		CalificarDialogComponent,
-		PeriodosConfigDialogComponent,
-	],
-	providers: [ConfirmationService],
+		PeriodosConfigDialogComponent],
+	providers: [EduConfirmationService],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './curso-content-dialog.component.html',
 	styleUrl: './curso-content-dialog.component.scss',
@@ -65,7 +60,7 @@ export class CursoContentDialogComponent {
 	private readonly crudFacade = inject(CursoContenidoCrudFacade);
 	private readonly uiFacade = inject(CursoContenidoUiFacade);
 	private readonly calFacade = inject(CalificacionesFacade);
-	private readonly confirmationService = inject(ConfirmationService);
+	private readonly confirmationService = inject(EduConfirmationService);
 	private readonly router = inject(Router);
 
 	readonly vm = this.uiFacade.vm;
@@ -76,14 +71,14 @@ export class CursoContentDialogComponent {
 	readonly isFullscreen = signal(false);
 	private calificacionesLoaded = false;
 
-	readonly dialogStyle = computed(() =>
-		this.isFullscreen()
-			? { width: '100vw', maxWidth: '100vw', height: '100vh', maxHeight: '100vh' }
-			: { width: '960px', maxWidth: '95vw' },
-	);
-	readonly contentStyle = computed(() =>
-		this.isFullscreen() ? { 'overflow-y': 'auto' } : { 'max-height': '80vh', 'overflow-y': 'auto' },
-	);
+	readonly dialogStyle = computed((): Record<string, string> => {
+		if (this.isFullscreen()) return { width: '100vw', maxWidth: '100vw', height: '100vh', maxHeight: '100vh' };
+		return { width: '960px', maxWidth: '95vw' };
+	});
+	readonly contentStyle = computed((): Record<string, string> => {
+		if (this.isFullscreen()) return { 'overflow-y': 'auto' };
+		return { 'max-height': '80vh', 'overflow-y': 'auto' };
+	});
 
 	/** Students for the calificar dialog. Uses salon students or falls back to existing notas. */
 	readonly estudiantesList = computed(() => {
@@ -226,7 +221,7 @@ export class CursoContentDialogComponent {
 
 	// #endregion
 
-	// #region Tab handlers
+	// #region EduTab handlers
 	onTabChange(value: string): void {
 		this.activeTab.set(value);
 		if (value === '1' && !this.calificacionesLoaded) {

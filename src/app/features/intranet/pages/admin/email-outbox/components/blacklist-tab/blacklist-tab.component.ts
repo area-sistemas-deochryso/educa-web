@@ -13,8 +13,6 @@ import { ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonModule } from 'primeng/button';
 
-import { TableLazyLoadEvent } from 'primeng/table';
-
 import { MiniSparklineComponent, TableSkeletonComponent } from '@intranet-shared/components';
 import { environment } from '@config/environment';
 import {
@@ -40,8 +38,8 @@ import { trendSummary, TrendSummary } from '../../utils/trend-summary';
 import { BlacklistTableComponent } from '../blacklist-table/blacklist-table.component';
 import { BlacklistAddDialogComponent } from '../blacklist-add-dialog/blacklist-add-dialog.component';
 import { BlacklistDetailDrawerComponent } from '../blacklist-detail-drawer/blacklist-detail-drawer.component';
-import { EduConfirmationService, EduConfirmDialog, EduDialog, EduInputText, EduMessageService, EduSelect, EduTextarea, EduToast, EduTooltip } from '@edu-ui';
-
+import { EduConfirmDialog, EduConfirmationService, EduDialog, EduInputText, EduMessageService, EduSelect, EduTextarea, EduToast, EduTooltip } from '@edu-ui';
+import type { EduTableLazyLoadEvent } from '@edu-ui';
 interface SelectOption<T> {
 	label: string;
 	value: T;
@@ -49,16 +47,14 @@ interface SelectOption<T> {
 
 const ESTADO_OPTIONS: SelectOption<EmailBlacklistFiltroEstado>[] = [
 	{ label: 'Activa', value: 'activa' },
-	{ label: 'Despejada', value: 'inactiva' },
-];
+	{ label: 'Despejada', value: 'inactiva' }];
 
 const MOTIVO_OPTIONS: SelectOption<EmailBlacklistMotivo>[] = [
 	{ label: 'Bounce permanente 5.x.x', value: 'BOUNCE_5XX' },
 	{ label: 'Buzón lleno crónico (4.2.2)', value: 'BOUNCE_MAILBOX_FULL' },
 	{ label: 'Bloqueo manual', value: 'MANUAL' },
 	{ label: 'Carga masiva', value: 'BULK_IMPORT' },
-	{ label: 'Formato inválido', value: 'FORMAT_INVALID' },
-];
+	{ label: 'Formato inválido', value: 'FORMAT_INVALID' }];
 
 /**
  * Plan 38 Chat 5 — Smart container del tab "Blacklist".
@@ -86,8 +82,7 @@ const MOTIVO_OPTIONS: SelectOption<EmailBlacklistMotivo>[] = [
 		BlacklistTableComponent,
 		BlacklistAddDialogComponent,
 		BlacklistDetailDrawerComponent,
-		HubContextBannerComponent,
-	],
+		HubContextBannerComponent],
 	providers: [EduConfirmationService, EduMessageService],
 	templateUrl: './blacklist-tab.component.html',
 	styleUrl: './blacklist-tab.component.scss',
@@ -186,7 +181,7 @@ export class BlacklistTabComponent implements OnInit {
 	// #endregion
 
 	// #region Tabla
-	onLazyLoad(event: TableLazyLoadEvent): void {
+	onLazyLoad(event: EduTableLazyLoadEvent): void {
 		const first = event.first ?? 0;
 		const rows = event.rows ?? this.vm().pageSize;
 		const page = Math.floor(first / rows) + 1;
@@ -304,16 +299,14 @@ export class BlacklistTabComponent implements OnInit {
 					e.motivoLabel,
 					e.estado ? 'Activa' : 'Despejada',
 					e.intentosFallidos,
-					(e.ultimoError ?? '').replace(/[\r\n,]/g, ' '),
+					(e.ultimoError ?? '').replace(/[\r\n]/g, ' '),
 					e.fechaPrimerFallo ?? '',
 					e.fechaUltimoFallo ?? '',
 					e.fechaReg,
-					e.usuarioReg,
-				]
+					e.usuarioReg]
 					.map((v) => `"${String(v).replace(/"/g, '""')}"`)
 					.join(','),
-			),
-		];
+			)];
 		const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
 		const url = URL.createObjectURL(blob);
 		const a = document.createElement('a');

@@ -12,9 +12,6 @@ import {
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { filter, take } from 'rxjs';
 import { PageHeaderComponent, EmptyStateComponent } from '@intranet-shared/components';
 import { PluralizePipe } from '@intranet-shared/pipes';
@@ -25,22 +22,22 @@ import { CursoContenidoUiFacade } from './services/curso-contenido-ui.facade';
 import { CursoContentDialogComponent } from './components/curso-content-dialog/curso-content-dialog.component';
 import { CursoBuilderDialogComponent } from './components/curso-builder-dialog/curso-builder-dialog.component';
 import { HorarioProfesorDto, CrearCursoContenidoRequest } from '../models';
+import { EduSpinner, EduTag, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-profesor-cursos',
 	standalone: true,
 	imports: [
 		CommonModule,
-		TagModule,
-		TooltipModule,
-		ProgressSpinnerModule,
+		EduTag,
+		EduTooltip,
+		EduSpinner,
 		RouterLink,
 		PageHeaderComponent,
 		EmptyStateComponent,
 		PluralizePipe,
 		CursoContentDialogComponent,
-		CursoBuilderDialogComponent,
-	],
+		CursoBuilderDialogComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	styles: `
 		.course-grid {
@@ -83,7 +80,7 @@ import { HorarioProfesorDto, CrearCursoContenidoRequest } from '../models';
 	template: `
 		@if (vm().loading) {
 			<div class="flex justify-content-center p-5">
-				<p-progressSpinner strokeWidth="4" />
+				<edu-spinner strokeWidth="4" />
 			</div>
 		} @else if (vm().horarios.length === 0) {
 			<app-empty-state icon="pi pi-book" title="Mis Cursos" message="No tienes cursos asignados" />
@@ -102,14 +99,14 @@ import { HorarioProfesorDto, CrearCursoContenidoRequest } from '../models';
 							data-info-anchor="profesor-cursos-card"
 							[style.--card-accent]="colorMap().get(horario.cursoId)"
 							(click)="onVerContenido(horario)"
-							pTooltip="Ver contenido"
-							tooltipPosition="top"
+							eduTooltip="Ver contenido"
+							eduTooltipPosition="top"
 							[tooltipDisabled]="!tooltipsReady()"
 						>
 							<div class="flex align-items-start justify-content-between mb-2">
 								<span class="font-bold text-lg line-height-3">{{ horario.cursoNombre }}</span>
 								<a routerLink="/intranet/profesor/salones" data-info-anchor="profesor-cursos-card-salon-tag" class="no-underline" (click)="$event.stopPropagation()">
-									<p-tag [value]="horario.salonDescripcion" severity="info" />
+									<edu-tag [value]="horario.salonDescripcion" severity="info" />
 								</a>
 							</div>
 							<div class="flex flex-column gap-1 text-sm text-color-secondary">

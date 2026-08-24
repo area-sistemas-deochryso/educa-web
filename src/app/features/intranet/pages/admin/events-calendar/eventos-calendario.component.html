@@ -1,6 +1,6 @@
 <!-- #region Header -->
 <app-page-header icon="pi pi-calendar" title="Gestión de Eventos del Calendario" subtitle="Administra los eventos que aparecen en el calendario escolar">
-	<p-select
+	<edu-select
 		[options]="[{ label: '2025', value: 2025 }, { label: '2026', value: 2026 }, { label: '2027', value: 2027 }]"
 		[ngModel]="vm().filterAnio"
 		(ngModelChange)="onChangeAnio($event)"
@@ -31,18 +31,18 @@
 
 <!-- #region Filtros -->
 <div class="filters-bar">
-	<p-iconfield>
-		<p-inputicon styleClass="pi pi-search" />
+	<edu-icon-field>
+		<edu-input-icon styleClass="pi pi-search" />
 		<input
-			pInputText
+			eduInputText
 			type="text"
 			placeholder="Buscar por título o descripción..."
 			[ngModel]="vm().searchTerm"
 			(ngModelChange)="onSearch($event)"
 			data-info-anchor="admin-eventos-buscar-input"
 		/>
-	</p-iconfield>
-	<p-select
+	</edu-icon-field>
+	<edu-select
 		[options]="tipoOptions"
 		[ngModel]="vm().filterTipo"
 		(ngModelChange)="onFilterTipo($event)"
@@ -50,7 +50,7 @@
 		placeholder="Tipo"
 		data-info-anchor="admin-eventos-tipo-select"
 	/>
-	<p-select
+	<edu-select
 		[options]="estadoOptions"
 		[ngModel]="vm().filterEstado"
 		(ngModelChange)="onFilterEstado($event)"
@@ -63,8 +63,8 @@
 		icon="pi pi-filter-slash"
 		class="p-button-outlined"
 		(click)="onClearFiltros()"
-		pTooltip="Limpiar filtros"
-		tooltipPosition="top"
+		eduTooltip="Limpiar filtros"
+		eduTooltipPosition="top"
 		[pt]="{ root: { 'aria-label': 'Limpiar filtros' } }"
 		data-info-anchor="admin-eventos-limpiar-filtros-btn"
 	></button>
@@ -72,7 +72,7 @@
 <!-- #endregion -->
 
 <!-- #region Tabla -->
-<p-table
+<edu-table
 	[value]="vm().items"
 	[dataKey]="'id'"
 	[loading]="vm().loading"
@@ -87,12 +87,12 @@
 >
 	<ng-template #header>
 		<tr>
-			<th pSortableColumn="titulo" data-info-anchor="tabla-orden-columna">Título <p-sortIcon field="titulo" /></th>
-			<th pSortableColumn="tipo" style="width: 110px" data-info-anchor="tabla-orden-columna">Tipo <p-sortIcon field="tipo" /></th>
+			<th eduSortableColumn="titulo" data-info-anchor="tabla-orden-columna">Título</th>
+			<th eduSortableColumn="tipo" style="width: 110px" data-info-anchor="tabla-orden-columna">Tipo</th>
 			<th style="width: 110px">Fecha Inicio</th>
 			<th style="width: 110px">Fecha Fin</th>
 			<th style="width: 100px">Hora</th>
-			<th pSortableColumn="estado" style="width: 90px" data-info-anchor="tabla-orden-columna">Estado <p-sortIcon field="estado" /></th>
+			<th eduSortableColumn="estado" style="width: 90px" data-info-anchor="tabla-orden-columna">Estado</th>
 			<th style="width: 140px">Acciones</th>
 		</tr>
 	</ng-template>
@@ -111,13 +111,13 @@
 				</div>
 			</td>
 			<td>
-				<p-tag [value]="uiMapping.getEventoTipoLabel(item.tipo)" styleClass="tag-neutral" />
+				<edu-tag [value]="uiMapping.getEventoTipoLabel(item.tipo)" styleClass="tag-neutral" />
 			</td>
 			<td>{{ item.fechaInicio | date: 'dd/MM/yyyy' }}</td>
 			<td>{{ item.fechaFin ? (item.fechaFin | date: 'dd/MM/yyyy') : '—' }}</td>
 			<td>{{ item.hora || '—' }}</td>
 			<td>
-				<p-tag
+				<edu-tag
 					[value]="item.estado | estadoLabel"
 					[severity]="item.estado | estadoSeverity"
 				/>
@@ -129,8 +129,8 @@
 						icon="pi pi-pencil"
 						class="p-button-rounded p-button-text"
 						(click)="onEdit(item)"
-						pTooltip="Editar"
-						tooltipPosition="top"
+						eduTooltip="Editar"
+						eduTooltipPosition="top"
 						[pt]="{ root: { 'aria-label': 'Editar' } }"
 						data-info-anchor="admin-eventos-editar-btn"
 					></button>
@@ -141,8 +141,8 @@
 						[class.p-button-warning]="item.estado"
 						[class.p-button-success]="!item.estado"
 						(click)="onToggleEstado(item)"
-						[pTooltip]="item.estado | estadoToggleLabel"
-						tooltipPosition="top"
+						[eduTooltip]="item.estado | estadoToggleLabel"
+						eduTooltipPosition="top"
 						[pt]="{ root: { 'aria-label': item.estado | estadoToggleLabel } }"
 						data-info-anchor="admin-eventos-toggle-estado-btn"
 					></button>
@@ -151,8 +151,8 @@
 						icon="pi pi-trash"
 						class="p-button-rounded p-button-text p-button-danger"
 						(click)="onDelete(item)"
-						pTooltip="Eliminar"
-						tooltipPosition="top"
+						eduTooltip="Eliminar"
+						eduTooltipPosition="top"
 						[pt]="{ root: { 'aria-label': 'Eliminar' } }"
 						data-info-anchor="admin-eventos-eliminar-btn"
 					></button>
@@ -169,11 +169,11 @@
 			</td>
 		</tr>
 	</ng-template>
-</p-table>
+</edu-table>
 <!-- #endregion -->
 
 <!-- #region Dialog Crear/Editar -->
-<p-dialog
+<edu-dialog
 	[header]="vm().isEditing ? 'Editar Evento' : 'Nuevo Evento'"
 	[visible]="vm().dialogVisible"
 	(visibleChange)="onDialogVisibleChange($event)"
@@ -185,7 +185,7 @@
 		<div class="form-field full">
 			<label for="titulo">Título *</label>
 			<input
-				pInputText
+				eduInputText
 				id="titulo"
 				[ngModel]="vm().formData.titulo"
 				(ngModelChange)="updateField('titulo', $event)"
@@ -200,7 +200,7 @@
 		<div class="form-field full">
 			<label for="descripcion">Descripción *</label>
 			<textarea
-				pTextarea
+				eduTextarea
 				id="descripcion"
 				[ngModel]="vm().formData.descripcion"
 				(ngModelChange)="updateField('descripcion', $event)"
@@ -216,7 +216,7 @@
 
 		<div class="form-field">
 			<label for="tipo">Tipo</label>
-			<p-select
+			<edu-select
 				id="tipo"
 				[options]="tipoOptions.slice(1)"
 				[ngModel]="vm().formData.tipo"
@@ -228,7 +228,7 @@
 
 		<div class="form-field">
 			<label for="icono">Ícono</label>
-			<p-select
+			<edu-select
 				id="icono"
 				[options]="iconoOptions"
 				[ngModel]="vm().formData.icono"
@@ -248,12 +248,12 @@
 						<span>{{ item.label }}</span>
 					</div>
 				</ng-template>
-			</p-select>
+			</edu-select>
 		</div>
 
 		<div class="form-field">
 			<label for="fechaInicio">Fecha Inicio *</label>
-			<p-datepicker
+			<edu-datepicker
 				id="fechaInicio"
 				[ngModel]="vm().formData.fechaInicio"
 				(ngModelChange)="updateField('fechaInicio', $event)"
@@ -268,7 +268,7 @@
 
 		<div class="form-field">
 			<label for="fechaFin">Fecha Fin (opcional)</label>
-			<p-datepicker
+			<edu-datepicker
 				id="fechaFin"
 				[ngModel]="vm().formData.fechaFin"
 				(ngModelChange)="updateField('fechaFin', $event)"
@@ -281,7 +281,7 @@
 		<div class="form-field">
 			<label for="hora">Hora</label>
 			<input
-				pInputText
+				eduInputText
 				id="hora"
 				[ngModel]="vm().formData.hora"
 				(ngModelChange)="updateField('hora', $event)"
@@ -293,7 +293,7 @@
 		<div class="form-field">
 			<label for="ubicacion">Ubicación</label>
 			<input
-				pInputText
+				eduInputText
 				id="ubicacion"
 				[ngModel]="vm().formData.ubicacion"
 				(ngModelChange)="updateField('ubicacion', $event)"
@@ -305,7 +305,7 @@
 		<div class="form-field toggles">
 			<div class="toggle-item">
 				<label>Activo</label>
-				<p-toggleswitch
+				<edu-toggle
 					[ngModel]="vm().formData.estado"
 					(ngModelChange)="updateField('estado', $event)"
 					data-info-anchor="admin-eventos-form-activo-toggle"
@@ -326,9 +326,9 @@
 			data-info-anchor="admin-eventos-form-guardar-btn"
 		></button>
 	</ng-template>
-</p-dialog>
+</edu-dialog>
 <!-- #endregion -->
 
 <!-- #region Confirm Dialog -->
-<p-confirmDialog (onHide)="onConfirmDialogHide()" />
+<edu-confirm-dialog (onHide)="onConfirmDialogHide()" />
 <!-- #endregion -->

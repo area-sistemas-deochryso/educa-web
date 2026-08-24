@@ -2,21 +2,19 @@
 import { Component, ChangeDetectionStrategy, input, output, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { TextareaModule } from 'primeng/textarea';
 import { CursoContenidoSemanaDto, ActualizarSemanaRequest } from '@features/intranet/pages/profesor/models';
+import { EduDialog, EduInputText, EduTextarea } from '@edu-ui';
 
 // #endregion
 // #region Implementation
 @Component({
 	selector: 'app-semana-edit-dialog',
 	standalone: true,
-	imports: [CommonModule, FormsModule, DialogModule, ButtonModule, InputTextModule, TextareaModule],
+	imports: [CommonModule, FormsModule, EduDialog, ButtonModule, EduInputText, EduTextarea],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
-		<p-dialog
+		<edu-dialog
 			[visible]="visible()"
 			(visibleChange)="onVisibleChange($event)"
 			[modal]="true"
@@ -30,7 +28,7 @@ import { CursoContenidoSemanaDto, ActualizarSemanaRequest } from '@features/intr
 						Título
 					</label>
 					<input
-						pInputText
+						eduInputText
 						id="titulo"
 						[(ngModel)]="titulo"
 						placeholder="Ej: Introducción al tema"
@@ -45,7 +43,7 @@ import { CursoContenidoSemanaDto, ActualizarSemanaRequest } from '@features/intr
 						Descripción
 					</label>
 					<textarea
-						pTextarea
+						eduTextarea
 						id="descripcion"
 						[(ngModel)]="descripcion"
 						[rows]="3"
@@ -62,7 +60,7 @@ import { CursoContenidoSemanaDto, ActualizarSemanaRequest } from '@features/intr
 						Mensaje para estudiantes
 					</label>
 					<textarea
-						pTextarea
+						eduTextarea
 						id="mensaje"
 						[(ngModel)]="mensajeDocente"
 						[rows]="2"
@@ -87,7 +85,7 @@ import { CursoContenidoSemanaDto, ActualizarSemanaRequest } from '@features/intr
 					></button>
 				</div>
 			</ng-template>
-		</p-dialog>
+		</edu-dialog>
 	`,
 	styles: `
 		.edit-form {

@@ -1,13 +1,6 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { InputTextModule } from 'primeng/inputtext';
-import { Select } from 'primeng/select';
-import { DatePicker } from 'primeng/datepicker';
-import { IconFieldModule } from 'primeng/iconfield';
-import { InputIconModule } from 'primeng/inputicon';
 import { ButtonModule } from 'primeng/button';
-import { TooltipModule } from 'primeng/tooltip';
-
 import {
 	EMAIL_OUTBOX_ESTADOS,
 	EMAIL_OUTBOX_TIPO_LABELS,
@@ -18,6 +11,7 @@ import {
 
 import { TIPOS_FALLO } from '../../models/tipo-fallo.models';
 import { TipoFalloLabelPipe } from '@features/intranet/pages/admin/email-outbox-shared';
+import { EduDatePicker, EduIconField, EduInputIcon, EduInputText, EduSelect, EduTooltip } from '@edu-ui';
 
 interface SelectOption {
 	label: string;
@@ -29,14 +23,13 @@ interface SelectOption {
 	standalone: true,
 	imports: [
 		FormsModule,
-		InputTextModule,
-		Select,
-		DatePicker,
-		IconFieldModule,
-		InputIconModule,
+		EduInputText,
+		EduSelect,
+		EduDatePicker,
+		EduIconField,
+		EduInputIcon,
 		ButtonModule,
-		TooltipModule,
-	],
+		EduTooltip],
 	templateUrl: './email-outbox-filters.component.html',
 	styleUrl: './email-outbox-filters.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -62,38 +55,42 @@ export class EmailOutboxFiltersComponent {
 	readonly clearFiltersChange = output<void>();
 	// #endregion
 
+	// #region Estado local (edu-datepicker es CVA puro -- sin (onSelect)/(onClear), se
+	// controla vía [(ngModel)])
+	readonly desde = signal<Date | null>(null);
+	readonly hasta = signal<Date | null>(null);
+	// #endregion
+
 	// #region Opciones
 	readonly tipoOptions: SelectOption[] = [
 		{ label: 'Todos', value: null },
-		...EMAIL_OUTBOX_TIPOS.map((t) => ({ label: EMAIL_OUTBOX_TIPO_LABELS[t], value: t })),
-	];
+		...EMAIL_OUTBOX_TIPOS.map((t) => ({ label: EMAIL_OUTBOX_TIPO_LABELS[t], value: t }))];
 
 	readonly estadoOptions: SelectOption[] = [
 		{ label: 'Todos', value: null },
-		...EMAIL_OUTBOX_ESTADOS.map((e) => ({ label: e, value: e })),
-	];
+		...EMAIL_OUTBOX_ESTADOS.map((e) => ({ label: e, value: e }))];
 
 	readonly tipoFalloOptions: SelectOption[] = (() => {
 		const labelPipe = new TipoFalloLabelPipe();
 		return [
 			{ label: 'Todos', value: null },
-			...TIPOS_FALLO.map((t) => ({ label: labelPipe.transform(t), value: t })),
-		];
+			...TIPOS_FALLO.map((t) => ({ label: labelPipe.transform(t), value: t }))];
 	})();
 	readonly smtpCodeOptions: SelectOption[] = [
 		{ label: 'Todos', value: null },
 		{ label: '421 — Rate limit', value: '421' },
 		{ label: '535 — Auth failure', value: '535' },
-		{ label: '550 — Mailbox not found', value: '550' },
-	];
+		{ label: '550 — Mailbox not found', value: '550' }];
 	// #endregion
 
 	// #region Handlers
 	onDesdeChange(date: Date | null): void {
+		this.desde.set(date);
 		this.filterDesdeChange.emit(date ? date.toISOString().split('T')[0] : null);
 	}
 
 	onHastaChange(date: Date | null): void {
+		this.hasta.set(date);
 		this.filterHastaChange.emit(date ? date.toISOString().split('T')[0] : null);
 	}
 

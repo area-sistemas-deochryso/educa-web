@@ -29,20 +29,20 @@
 	}
 
 	@if (queries().length > 0) {
-		<p-table [value]="queries()" [tableStyle]="{ 'min-width': '50rem' }" [sortField]="'avgCpuMs'" [sortOrder]="-1">
+		<edu-table [value]="queries()" [tableStyle]="{ 'min-width': '50rem' }" [sortField]="'avgCpuMs'" [sortOrder]="-1">
 			<ng-template #header>
 				<tr>
-					<th pSortableColumn="sqlText" data-info-anchor="tabla-orden-columna">SQL <p-sortIcon field="sqlText" /></th>
-					<th pSortableColumn="executionCount" style="width: 8rem" data-info-anchor="tabla-orden-columna">Ejecuciones <p-sortIcon field="executionCount" /></th>
-					<th pSortableColumn="avgCpuMs" style="width: 8rem" data-info-anchor="tabla-orden-columna">CPU prom. <p-sortIcon field="avgCpuMs" /></th>
-					<th pSortableColumn="totalReads" style="width: 8rem" data-info-anchor="tabla-orden-columna">Lecturas <p-sortIcon field="totalReads" /></th>
-					<th pSortableColumn="lastExecutionTime" style="width: 10rem" data-info-anchor="tabla-orden-columna">Última ejecución <p-sortIcon field="lastExecutionTime" /></th>
+					<th eduSortableColumn="sqlText" data-info-anchor="tabla-orden-columna">SQL</th>
+					<th eduSortableColumn="executionCount" style="width: 8rem" data-info-anchor="tabla-orden-columna">Ejecuciones</th>
+					<th eduSortableColumn="avgCpuMs" style="width: 8rem" data-info-anchor="tabla-orden-columna">CPU prom.</th>
+					<th eduSortableColumn="totalReads" style="width: 8rem" data-info-anchor="tabla-orden-columna">Lecturas</th>
+					<th eduSortableColumn="lastExecutionTime" style="width: 10rem" data-info-anchor="tabla-orden-columna">Última ejecución</th>
 				</tr>
 			</ng-template>
 			<ng-template #body let-row>
 				<tr>
 					<td class="sql-cell">
-						<code class="sql-text" [pTooltip]="row.sqlText" tooltipPosition="top">{{ row.sqlText }}</code>
+						<code class="sql-text" [eduTooltip]="row.sqlText" eduTooltipPosition="top">{{ row.sqlText }}</code>
 					</td>
 					<td>{{ row.executionCount | number }}</td>
 					<td>{{ row.avgCpuMs | number: '1.0-1' }} ms</td>
@@ -50,6 +50,6 @@
 					<td>{{ row.lastExecutionTime | date: 'short' }}</td>
 				</tr>
 			</ng-template>
-		</p-table>
+		</edu-table>
 	}
 </section>

@@ -4,18 +4,11 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
 import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
-import { TooltipModule } from 'primeng/tooltip';
-import { TagModule } from 'primeng/tag';
-import { SelectModule } from 'primeng/select';
-import { InputTextModule } from 'primeng/inputtext';
-import { CheckboxModule } from 'primeng/checkbox';
-import { AutoCompleteModule } from 'primeng/autocomplete';
-
 import { PageHeaderComponent } from '@intranet-shared/components';
 import type { UsuarioBusqueda } from '@core/services';
 
 import { PermissionsUsersDataFacade } from './services';
+import { EduAutoComplete, EduDialog, EduInputText, EduSelect, EduTag, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-permissions-users',
@@ -24,16 +17,14 @@ import { PermissionsUsersDataFacade } from './services';
 		CommonModule,
 		FormsModule,
 		ButtonModule,
-		DialogModule,
-		TooltipModule,
-		TagModule,
-		SelectModule,
-		InputTextModule,
-		CheckboxModule,
-		AutoCompleteModule,
+		EduDialog,
+		EduTooltip,
+		EduTag,
+		EduSelect,
+		EduInputText,
+		EduAutoComplete,
 		RouterLink,
-		PageHeaderComponent,
-	],
+		PageHeaderComponent],
 	templateUrl: './permisos-usuarios.component.html',
 	styleUrl: './permisos-usuarios.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

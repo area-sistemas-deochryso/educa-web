@@ -10,16 +10,13 @@ import {
 	viewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Popover } from 'primeng/popover';
 import { ButtonModule } from 'primeng/button';
-import { AvatarModule } from 'primeng/avatar';
-import { BadgeModule } from 'primeng/badge';
-import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { UserProfileService, NotificationsService } from '@core/services';
 import { FeatureFlagsFacade } from '@core/services/feature-flags';
 import { ThemeService } from '@core/services/theme';
 import { FabMenuVisibilityService } from '@intranet-shared/services';
 import { UserInfoDialogComponent } from '../user-info-dialog/user-info-dialog.component';
+import { EduAvatar, EduBadge, EduPopover, EduToggle } from '@edu-ui';
 
 // #endregion
 // #region Implementation
@@ -27,14 +24,13 @@ import { UserInfoDialogComponent } from '../user-info-dialog/user-info-dialog.co
 	selector: 'app-user-profile-menu',
 	standalone: true,
 	imports: [
-		Popover,
+		EduPopover,
 		ButtonModule,
-		AvatarModule,
-		BadgeModule,
-		ToggleSwitchModule,
+		EduAvatar,
+		EduBadge,
+		EduToggle,
 		FormsModule,
-		UserInfoDialogComponent,
-	],
+		UserInfoDialogComponent],
 	templateUrl: './user-profile-menu.component.html',
 	styleUrl: './user-profile-menu.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -54,7 +50,7 @@ export class UserProfileMenuComponent {
 	// #endregion
 
 	// #region Estado
-	readonly popover = viewChild.required<Popover>('profilePopover');
+	readonly popover = viewChild.required<EduPopover>('profilePopover');
 	readonly isOpen = signal(false);
 	readonly infoDialogVisible = signal(false);
 

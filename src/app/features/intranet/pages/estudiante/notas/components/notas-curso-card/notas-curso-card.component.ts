@@ -1,7 +1,6 @@
 import { Component, ChangeDetectionStrategy, computed, effect, input, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { AccordionModule } from 'primeng/accordion';
 import {
 	EstudianteMisNotasDto,
 	PeriodoCalificacionDto,
@@ -15,8 +14,7 @@ import {
 	esPromedioProvisional,
 } from '@intranet-shared/services/calificacion-config';
 import type { ConfiguracionCalificacionListDto } from '@data/models';
-import { EduTag } from '@edu-ui';
-
+import { EduAccordion, EduAccordionHeader, EduAccordionPanel, EduTag } from '@edu-ui';
 interface PeriodoGroup {
 	periodo: PeriodoCalificacionDto;
 	promedio: number | null;
@@ -26,7 +24,7 @@ interface PeriodoGroup {
 @Component({
 	selector: 'app-notas-curso-card',
 	standalone: true,
-	imports: [CommonModule, EduTag, AccordionModule],
+	imports: [CommonModule, EduTag, EduAccordion, EduAccordionHeader, EduAccordionPanel],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './notas-curso-card.component.html',
 	styleUrl: './notas-curso-card.component.scss',
@@ -36,6 +34,14 @@ export class NotasCursoCardComponent {
 	readonly calificacionConfig = input<ConfiguracionCalificacionListDto | null>(null);
 
 	readonly openPanels = signal<number[]>([]);
+
+	// edu-accordion's [value] is string-based (no numeric convention) — periodo ids are
+	// numeric, so this bridges the two at the template boundary only.
+	readonly openPanelsStr = computed(() => this.openPanels().map((v) => v.toString()));
+
+	onOpenPanelsChangeStr(values: string[]): void {
+		this.openPanels.set(values.map((v) => Number(v)));
+	}
 
 	constructor() {
 		// Expande todos los períodos por defecto para que la nota real sea visible sin clics extra.
@@ -86,8 +92,7 @@ export class NotasCursoCardComponent {
 					periodo: { id: -1, nombre: 'General', orden: 0, semanaInicio: 0, semanaFin: 0 },
 					promedio: curso.promedios.general,
 					evaluaciones: curso.evaluaciones,
-				},
-			];
+				}];
 		}
 
 		const periodos = [...curso.periodos].sort((a, b) => a.orden - b.orden);

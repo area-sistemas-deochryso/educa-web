@@ -27,8 +27,8 @@
 						<!-- * Selected: show only name, grade as tooltip -->
 						<ng-template #selectedItem let-selectedOption>
 							<span
-								[pTooltip]="selectedOption.gradeInfo"
-								tooltipPosition="top"
+								[eduTooltip]="selectedOption.gradeInfo"
+								eduTooltipPosition="top"
 							>
 								{{ selectedOption.shortLabel }}
 							</span>
@@ -44,23 +44,23 @@
 			</h2>
 			<!-- * Status summary badges -->
 			<div class="status-summary">
-				<div class="summary-item" pTooltip="Asistencias" tooltipPosition="top">
+				<div class="summary-item" eduTooltip="Asistencias" eduTooltipPosition="top">
 					<span class="summary-color status-asistio"></span>
 					<span class="summary-count">{{ table().counts.A }}A</span>
 				</div>
-				<div class="summary-item" pTooltip="Tardanzas" tooltipPosition="top">
+				<div class="summary-item" eduTooltip="Tardanzas" eduTooltipPosition="top">
 					<span class="summary-color status-tardanza"></span>
 					<span class="summary-count">{{ table().counts.T }}T</span>
 				</div>
-				<div class="summary-item" pTooltip="Faltas" tooltipPosition="top">
+				<div class="summary-item" eduTooltip="Faltas" eduTooltipPosition="top">
 					<span class="summary-color status-falta"></span>
 					<span class="summary-count">{{ table().counts.F }}F</span>
 				</div>
-				<div class="summary-item" pTooltip="Justificadas" tooltipPosition="top">
+				<div class="summary-item" eduTooltip="Justificadas" eduTooltipPosition="top">
 					<span class="summary-color status-justificado"></span>
 					<span class="summary-count">{{ table().counts.J }}J</span>
 				</div>
-				<div class="summary-item" pTooltip="Pendientes" tooltipPosition="top">
+				<div class="summary-item" eduTooltip="Pendientes" eduTooltipPosition="top">
 					<span class="summary-color status-pendiente"></span>
 					<span class="summary-count">{{ table().counts['-'] }}-</span>
 				</div>
@@ -96,7 +96,7 @@
 	</div>
 
 	<!-- * Double-entry attendance grid -->
-	<p-table [value]="table().weeks" class="attendance-table double-entry">
+	<edu-table [value]="table().weeks" class="attendance-table double-entry">
 		<ng-template pTemplate="header">
 			<tr>
 				<th class="week-col header-cell"></th>
@@ -151,6 +151,6 @@
 				<td class="total-col footer-total grand-total">{{ table().grandTotal }}</td>
 			</tr>
 		</ng-template>
-	</p-table>
+	</edu-table>
 </section>
 <!-- #endregion -->

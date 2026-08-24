@@ -2,18 +2,14 @@ import { Component, ChangeDetectionStrategy, input, output, computed, signal } f
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { TableModule } from 'primeng/table';
-import { SelectModule } from 'primeng/select';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
-
 import { HorarioResponseDto, SalonNotasResumenDto, ConfiguracionCalificacionListDto } from '@data/models';
 import { isNotaAprobada, formatNotaConConfig } from '@intranet-shared/services/calificacion-config';
+import { EduSelect, EduTable, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-classroom-grades-tab',
 	standalone: true,
-	imports: [CommonModule, FormsModule, TableModule, SelectModule, TagModule, TooltipModule],
+	imports: [CommonModule, FormsModule, EduTable, EduSelect, EduTooltip],
 	templateUrl: './salon-notas-tab.component.html',
 	styleUrl: './salon-notas-tab.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

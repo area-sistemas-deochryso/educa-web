@@ -2,7 +2,6 @@ import { Component, ChangeDetectionStrategy, inject, OnInit } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { TabsModule } from 'primeng/tabs';
 import { ButtonModule } from 'primeng/button';
 
 import { PageHeaderComponent } from '@intranet-shared/components';
@@ -12,23 +11,21 @@ import { ClassroomsAdminTableComponent } from '@features/intranet/pages/admin/cl
 import { ClassroomDetailDialogComponent } from '@features/intranet/pages/admin/classrooms/components/salon-detail-dialog/salon-detail-dialog.component';
 import { AprobarEstudianteDto, AprobacionMasivaDto, NivelEducativo } from './models';
 import { TeacherFinalClassroomsFacade } from './services/profesor-final-salones.facade';
-import { EduInputNumber, EduMessageService, EduTag, EduToast } from '@edu-ui';
-
+import { EduInputNumber, EduMessageService, EduTab, EduTabPanel, EduTabs, EduTag, EduToast } from '@edu-ui';
 @Component({
 	selector: 'app-teacher-final-classrooms',
 	standalone: true,
 	imports: [
 		CommonModule,
 		FormsModule,
-		TabsModule,
+		EduTabs, EduTab, EduTabPanel,
 		ButtonModule,
 		EduTag,
 		EduInputNumber,
 		EduToast,
 		PageHeaderComponent,
 		ClassroomsAdminTableComponent,
-		ClassroomDetailDialogComponent,
-	],
+		ClassroomDetailDialogComponent],
 	providers: [EduMessageService],
 	templateUrl: './profesor-final-salones.component.html',
 	styleUrl: './profesor-final-salones.component.scss',
@@ -56,7 +53,7 @@ export class TeacherFinalClassroomsComponent implements OnInit {
 	}
 	// #endregion
 
-	// #region Event handlers — Tabs
+	// #region Event handlers — EduTabs
 	onTabChange(index: number): void {
 		const niveles = this.vm().nivelesDisponibles;
 		const nivel = niveles[index];

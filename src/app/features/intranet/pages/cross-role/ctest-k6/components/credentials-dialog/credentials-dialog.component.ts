@@ -1,38 +1,26 @@
 import { Component, ChangeDetectionStrategy, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { PasswordModule } from 'primeng/password';
-import { SelectModule } from 'primeng/select';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { DividerModule } from 'primeng/divider';
-import { InputNumberModule } from 'primeng/inputnumber';
-import { TextareaModule } from 'primeng/textarea';
-
 import { K6Credential, K6RoleDistribution } from '../../models';
 import { LOGIN_ROLE_OPTIONS } from '../../models';
+import { EduDialog, EduDivider, EduInputNumber, EduInputText, EduPassword, EduSelect, EduTag, EduTextarea, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-credentials-dialog',
 	standalone: true,
 	imports: [
 		FormsModule,
-		DialogModule,
+		EduDialog,
 		ButtonModule,
-		InputTextModule,
-		PasswordModule,
-		SelectModule,
-		TagModule,
-		TooltipModule,
-		ProgressSpinnerModule,
-		DividerModule,
-		InputNumberModule,
-		TextareaModule,
-	],
+		EduInputText,
+		EduPassword,
+		EduSelect,
+		EduTag,
+		EduTooltip,
+		EduDivider,
+		EduInputNumber,
+		EduTextarea],
 	templateUrl: './credentials-dialog.component.html',
 	styleUrl: './credentials-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

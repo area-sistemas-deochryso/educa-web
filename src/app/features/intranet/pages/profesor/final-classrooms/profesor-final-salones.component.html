@@ -58,15 +58,15 @@
 
 <!-- #region Tabs por nivel -->
 @if (vm().nivelesDisponibles.length > 0) {
-	<p-tabs [value]="nivelTabIndex(vm().selectedNivel)" (valueChange)="onTabChange($any($event))">
-		<p-tablist>
+	<edu-tabs [value]="nivelTabIndex(vm().selectedNivel)" (valueChange)="onTabChange($any($event))">
+		
 			@for (nivel of vm().nivelesDisponibles; track nivel; let i = $index) {
-				<p-tab [value]="i" data-info-anchor="profesor-final-salones-tab-nivel">{{ nivel }}</p-tab>
+				<edu-tab [value]="i" data-info-anchor="profesor-final-salones-tab-nivel">{{ nivel }}</edu-tab>
 			}
-		</p-tablist>
-		<p-tabpanels>
+		
+		
 			@for (nivel of vm().nivelesDisponibles; track nivel; let i = $index) {
-				<p-tabpanel [value]="i">
+				<edu-tabpanel [value]="i">
 					<!-- Toolbar del nivel -->
 					<div class="nivel-toolbar">
 						<div class="flex items-center gap-2">
@@ -94,10 +94,10 @@
 						[loading]="vm().loading"
 						(selectSalon)="onSelectSalon($event)"
 					/>
-				</p-tabpanel>
+				</edu-tabpanel>
 			}
-		</p-tabpanels>
-	</p-tabs>
+		
+	</edu-tabs>
 } @else if (vm().tableReady) {
 	<div class="empty-state">
 		<i class="pi pi-building empty-icon"></i>

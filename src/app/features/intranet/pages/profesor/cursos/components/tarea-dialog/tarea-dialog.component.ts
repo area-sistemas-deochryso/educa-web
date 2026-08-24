@@ -2,14 +2,10 @@
 import { Component, ChangeDetectionStrategy, input, output, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { TextareaModule } from 'primeng/textarea';
-import { DatePickerModule } from 'primeng/datepicker';
-import { ToggleSwitch } from 'primeng/toggleswitch';
 import { toLocalIso } from '@core/helpers';
 import { CursoContenidoTareaDto, CrearTareaRequest, ActualizarTareaRequest } from '@features/intranet/pages/profesor/models';
+import { EduDatePicker, EduDialog, EduInputText, EduTextarea, EduToggle } from '@edu-ui';
 
 // #endregion
 // #region Implementation
@@ -19,16 +15,15 @@ import { CursoContenidoTareaDto, CrearTareaRequest, ActualizarTareaRequest } fro
 	imports: [
 		CommonModule,
 		FormsModule,
-		DialogModule,
+		EduDialog,
 		ButtonModule,
-		InputTextModule,
-		TextareaModule,
-		DatePickerModule,
-		ToggleSwitch,
-	],
+		EduInputText,
+		EduTextarea,
+		EduDatePicker,
+		EduToggle],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
-		<p-dialog
+		<edu-dialog
 			[visible]="visible()"
 			(visibleChange)="onVisibleChange($event)"
 			[modal]="true"
@@ -42,7 +37,7 @@ import { CursoContenidoTareaDto, CrearTareaRequest, ActualizarTareaRequest } fro
 						Título *
 					</label>
 					<input
-						pInputText
+						eduInputText
 						id="tareaTitle"
 						[(ngModel)]="titulo"
 						placeholder="Título de la tarea"
@@ -57,7 +52,7 @@ import { CursoContenidoTareaDto, CrearTareaRequest, ActualizarTareaRequest } fro
 						Descripción
 					</label>
 					<textarea
-						pTextarea
+						eduTextarea
 						id="tareaDesc"
 						[(ngModel)]="descripcion"
 						[rows]="3"
@@ -74,10 +69,10 @@ import { CursoContenidoTareaDto, CrearTareaRequest, ActualizarTareaRequest } fro
 							<i class="pi pi-calendar" style="font-size: 0.78rem"></i>
 							Fecha límite
 						</label>
-						<p-datepicker
+						<edu-datepicker
 							id="tareaFecha"
 							[(ngModel)]="fechaLimite"
-							[minDate]="minFechaLimite"
+							[minDate]="minFechaLimite ?? undefined"
 							[showIcon]="true"
 							[showButtonBar]="true"
 							dateFormat="dd/mm/yy"
@@ -93,7 +88,7 @@ import { CursoContenidoTareaDto, CrearTareaRequest, ActualizarTareaRequest } fro
 							Tarea grupal
 						</label>
 						<div class="grupal-toggle">
-							<p-toggleswitch data-info-anchor="profesor-tarea-dialog-grupal-toggle" [(ngModel)]="esGrupal" />
+							<edu-toggle data-info-anchor="profesor-tarea-dialog-grupal-toggle" [(ngModel)]="esGrupal" />
 							<span class="grupal-label">{{ esGrupal ? 'Grupal' : 'Individual' }}</span>
 						</div>
 						<span class="field-hint">
@@ -122,7 +117,7 @@ import { CursoContenidoTareaDto, CrearTareaRequest, ActualizarTareaRequest } fro
 					></button>
 				</div>
 			</ng-template>
-		</p-dialog>
+		</edu-dialog>
 	`,
 	styles: `
 		.edit-form {

@@ -4,7 +4,7 @@
 		<i class="pi pi-search"></i>
 		<input
 			type="text"
-			pInputText
+			eduInputText
 			[ngModel]="searchTerm()"
 			(ngModelChange)="searchTerm.set($event)"
 			placeholder="Buscar por nombre o DNI..."
@@ -29,7 +29,7 @@
 	<div class="filters-right">
 		@if (showPdfButton()) {
 			@if (tipoReporteOptions().length > 0) {
-				<p-select
+				<edu-select
 					[options]="tipoReporteOptions()"
 					[ngModel]="tipoReporte()"
 					(ngModelChange)="tipoReporteChange.emit($event)"
@@ -49,8 +49,8 @@
 				[text]="true"
 				[rounded]="true"
 				(onClick)="togglePdfMenu($event)"
-				pTooltip="Opciones de PDF"
-				tooltipPosition="top"
+				eduTooltip="Opciones de PDF"
+				eduTooltipPosition="top"
 				class="pdf-button"
 				[pt]="{
 					root: {
@@ -58,7 +58,7 @@
 					},
 				}"
 			/>
-			<p-menu #pdfMenu [model]="pdfMenuItems()" [popup]="true" appendTo="body" />
+			<edu-menu #pdfMenu [model]="pdfMenuItems()" [popup]="true" appendTo="body" />
 		}
 		@if (!hideTemporalNav()) {
 			<app-attendance-temporal-nav
@@ -100,7 +100,7 @@
 	>
 		<!-- #region Desktop: tabla estándar -->
 		<ng-template #desktopView>
-			<p-table [value]="filteredPersonas()" class="p-datatable-sm asistencia-table">
+			<edu-table [value]="filteredPersonas()" class="p-datatable-sm asistencia-table">
 				<ng-template #header>
 					<tr>
 						<th style="width: 50px">#</th>
@@ -136,8 +136,8 @@
 								@if (persona.observacion) {
 									<span
 										class="observacion"
-										pTooltip="{{ persona.observacion }}"
-										tooltipPosition="top"
+										eduTooltip="{{ persona.observacion }}"
+										eduTooltipPosition="top"
 									>
 										<i class="pi pi-info-circle"></i>
 										{{ persona.observacion | slice: 0 : 30
@@ -174,8 +174,8 @@
 									type="button"
 									icon="pi pi-pencil"
 									class="p-button-rounded p-button-text p-button-info"
-									pTooltip="Editar asistencia del profesor"
-									tooltipPosition="top"
+									eduTooltip="Editar asistencia del profesor"
+									eduTooltipPosition="top"
 									(click)="onEditAdminClick($event, persona)"
 									[pt]="{
 										root: {
@@ -187,7 +187,7 @@
 						}
 					</tr>
 				</ng-template>
-			</p-table>
+			</edu-table>
 		</ng-template>
 		<!-- #endregion -->
 
@@ -255,7 +255,7 @@
 <!-- #endregion -->
 
 <!-- #region Diálogo de Justificación -->
-<p-dialog
+<edu-dialog
 	[visible]="dialogVisible()"
 	(visibleChange)="onDialogVisibleChange($event)"
 	[modal]="true"
@@ -286,7 +286,7 @@
 					>Motivo de la justificación <span class="required">*</span></label
 				>
 				<textarea
-					pTextarea
+					eduTextarea
 					id="observacion"
 					rows="4"
 					[ngModel]="observacionText()"
@@ -323,5 +323,5 @@
 			</div>
 		</div>
 	}
-</p-dialog>
+</edu-dialog>
 <!-- #endregion -->

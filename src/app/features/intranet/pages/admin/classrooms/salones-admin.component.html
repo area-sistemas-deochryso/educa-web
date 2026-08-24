@@ -51,15 +51,15 @@
 <!-- #endregion -->
 
 <!-- #region Tabs por nivel -->
-<p-tabs [value]="nivelTabIndex[vm().selectedNivel]" (valueChange)="onTabChange($any($event))">
-	<p-tablist>
+<edu-tabs [value]="nivelTabIndex[vm().selectedNivel]" (valueChange)="onTabChange($any($event))">
+	
 		@for (nivel of niveles; track nivel; let i = $index) {
-			<p-tab [value]="i" data-info-anchor="admin-salones-nivel-tab">{{ nivel }}</p-tab>
+			<edu-tab [value]="i" data-info-anchor="admin-salones-nivel-tab">{{ nivel }}</edu-tab>
 		}
-	</p-tablist>
-	<p-tabpanels>
+	
+	
 		@for (nivel of niveles; track nivel; let i = $index) {
-			<p-tabpanel [value]="i">
+			<edu-tabpanel [value]="i">
 				<!-- Toolbar del nivel -->
 				<div class="nivel-toolbar">
 					<div class="toolbar-tags">
@@ -109,10 +109,10 @@
 					(goToHorarios)="onGoToHorarios($event)"
 					(goToUsuarios)="onGoToUsuarios($event)"
 				/>
-			</p-tabpanel>
+			</edu-tabpanel>
 		}
-	</p-tabpanels>
-</p-tabs>
+	
+</edu-tabs>
 <!-- #endregion -->
 
 <!-- #region Dialogs — siempre en el DOM -->

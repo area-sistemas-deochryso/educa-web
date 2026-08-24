@@ -1,26 +1,19 @@
 import { Component, ChangeDetectionStrategy, input, output, signal, computed, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DialogModule } from 'primeng/dialog';
-import { SelectModule } from 'primeng/select';
-import { DatePickerModule } from 'primeng/datepicker';
-import { FileUploadModule } from 'primeng/fileupload';
-import { TextareaModule } from 'primeng/textarea';
 import { ButtonModule } from 'primeng/button';
-import { TagModule } from 'primeng/tag';
-
 import { StudentForHealthDto, DateValidationResult } from '@features/intranet/pages/profesor/models';
+import { EduDatePicker, EduDialog, EduFileUpload, EduSelect, EduTag, EduTextarea } from '@edu-ui';
 
 @Component({
 	selector: 'app-health-justification-dialog',
 	standalone: true,
 	imports: [
-		CommonModule, FormsModule, DialogModule, SelectModule, DatePickerModule,
-		FileUploadModule, TextareaModule, ButtonModule, TagModule,
-	],
+		CommonModule, FormsModule, EduDialog, EduSelect, EduDatePicker,
+		EduFileUpload, EduTextarea, ButtonModule, EduTag],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
-		<p-dialog
+		<edu-dialog
 			header="Justificación Médica"
 			[visible]="visible()"
 			(visibleChange)="onVisibleChange($event)"
@@ -30,7 +23,7 @@ import { StudentForHealthDto, DateValidationResult } from '@features/intranet/pa
 			<div class="form-grid">
 				<!-- Estudiante -->
 				<label for="just-student">Estudiante</label>
-				<p-select
+				<edu-select
 					id="just-student"
 					[options]="studentOptions()"
 					[(ngModel)]="selectedStudent"
@@ -46,7 +39,7 @@ import { StudentForHealthDto, DateValidationResult } from '@features/intranet/pa
 
 				<!-- Fechas -->
 				<label>Días a justificar</label>
-				<p-datepicker
+				<edu-datepicker
 					[(ngModel)]="selectedDates"
 					selectionMode="multiple"
 					[inline]="true"
@@ -65,9 +58,9 @@ import { StudentForHealthDto, DateValidationResult } from '@features/intranet/pa
 							<div class="fecha-validacion-item">
 								<span>{{ fv.fecha }}</span>
 								@if (fv.valida) {
-									<p-tag value="Válida" severity="success" />
+									<edu-tag value="Válida" severity="success" />
 								} @else {
-									<p-tag [value]="fv.razon ?? 'No válida'" severity="danger" />
+									<edu-tag [value]="fv.razon ?? 'No válida'" severity="danger" />
 								}
 							</div>
 						}
@@ -76,7 +69,7 @@ import { StudentForHealthDto, DateValidationResult } from '@features/intranet/pa
 
 				<!-- Documento -->
 				<label>Documento médico (PDF o imagen)</label>
-				<p-fileUpload
+				<edu-file-upload
 					mode="basic"
 					[auto]="false"
 					data-info-anchor="profesor-health-justificacion-adjuntar"
@@ -98,7 +91,7 @@ import { StudentForHealthDto, DateValidationResult } from '@features/intranet/pa
 				<!-- Observacion -->
 				<label for="just-obs">Observación (opcional)</label>
 				<textarea
-					pTextarea
+					eduTextarea
 					id="just-obs"
 					[(ngModel)]="observacion"
 					placeholder="Observación adicional..."
@@ -126,7 +119,7 @@ import { StudentForHealthDto, DateValidationResult } from '@features/intranet/pa
 					(click)="onSave()"
 				></button>
 			</ng-template>
-		</p-dialog>
+		</edu-dialog>
 	`,
 	styles: [
 		`
@@ -165,8 +158,7 @@ import { StudentForHealthDto, DateValidationResult } from '@features/intranet/pa
 				font-size: 0.85rem;
 				color: var(--text-color-secondary);
 			}
-		`,
-	],
+		`],
 })
 export class HealthJustificationDialogComponent implements OnChanges {
 	// #region Inputs/Outputs

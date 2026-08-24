@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { TabsModule } from 'primeng/tabs';
 import { ButtonModule } from 'primeng/button';
 
 import { PageHeaderComponent, PeriodToggleComponent, KpiStatsComponent, type KpiStatItem } from '@intranet-shared/components';
@@ -22,15 +21,14 @@ import {
 	CrearSalonDto,
 } from './models';
 import { NuevoSalonDialogComponent } from './components/nuevo-salon-dialog/nuevo-salon-dialog.component';
-import { EduInputNumber, EduMessageService, EduTag, EduToast } from '@edu-ui';
-
+import { EduInputNumber, EduMessageService, EduTab, EduTabPanel, EduTabs, EduTag, EduToast } from '@edu-ui';
 @Component({
 	selector: 'app-classrooms-admin',
 	standalone: true,
 	imports: [
 		CommonModule,
 		FormsModule,
-		TabsModule,
+		EduTabs, EduTab, EduTabPanel,
 		ButtonModule,
 		EduTag,
 		EduInputNumber,
@@ -42,8 +40,7 @@ import { EduInputNumber, EduMessageService, EduTag, EduToast } from '@edu-ui';
 		ConfigGradeDialogComponent,
 		ClosePeriodDialogComponent,
 		ClassroomDetailDialogComponent,
-		NuevoSalonDialogComponent,
-	],
+		NuevoSalonDialogComponent],
 	providers: [EduMessageService],
 	templateUrl: './salones-admin.component.html',
 	styleUrl: './salones-admin.component.scss',
@@ -77,8 +74,7 @@ export class ClassroomsAdminComponent implements OnInit {
 			{ icon: 'pi pi-users', label: 'Estudiantes', value: stats.totalEstudiantes },
 			{ icon: 'pi pi-check-circle', label: 'Aprobados', value: stats.totalAprobados, variant: 'success' },
 			{ icon: 'pi pi-times-circle', label: 'Desaprobados', value: stats.totalDesaprobados, variant: 'critical' },
-			{ icon: 'pi pi-clock', label: 'Pendientes', value: stats.totalPendientes, variant: 'warning' },
-		];
+			{ icon: 'pi pi-clock', label: 'Pendientes', value: stats.totalPendientes, variant: 'warning' }];
 	});
 	// #endregion
 
@@ -97,7 +93,7 @@ export class ClassroomsAdminComponent implements OnInit {
 	}
 	// #endregion
 
-	// #region Event handlers — Tabs
+	// #region Event handlers — EduTabs
 	onTabChange(index: number): void {
 		const nivel = this.niveles[index];
 		if (nivel) {

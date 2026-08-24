@@ -36,7 +36,7 @@
 						<span class="file-card__name">{{ file.fileName }}</span>
 						<span class="file-card__type">{{ file.fileType }}</span>
 					</div>
-					<p-progressBar
+					<edu-progress-bar
 						[value]="file.fillPercent"
 						[showValue]="true"
 						[color]="getFillColor(file.fillPercent)"

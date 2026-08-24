@@ -1,15 +1,12 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 
-import { AccordionModule } from 'primeng/accordion';
-
 import { FaqDto } from '@features/intranet/pages/cross-role/ayuda/models/faq.models';
-import { EduButton } from '@edu-ui';
-
+import { EduAccordion, EduAccordionHeader, EduAccordionPanel, EduButton } from '@edu-ui';
 /** Lista presentacional de FAQ — el botón "ir→" solo aparece si `faq.wizard` no es null. */
 @Component({
 	selector: 'app-faq-list',
 	standalone: true,
-	imports: [AccordionModule, EduButton],
+	imports: [EduAccordion, EduAccordionHeader, EduAccordionPanel, EduButton],
 	templateUrl: './faq-list.component.html',
 	styleUrl: './faq-list.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

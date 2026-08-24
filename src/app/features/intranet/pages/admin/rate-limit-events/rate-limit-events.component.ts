@@ -5,8 +5,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { ButtonModule } from 'primeng/button';
 
-import { TableLazyLoadEvent } from 'primeng/table';
-
 import { PageHeaderComponent } from '@intranet-shared/components';
 import {
 	SkeletonColumnDef,
@@ -21,7 +19,7 @@ import { HubContextBannerComponent, readHubContext } from '../monitoreo/shared';
 import { RateLimitEventFiltro, RateLimitEventListaDto } from './models';
 import { RateLimitEventsFacade } from './services';
 import { EduMessageService, EduToast } from '@edu-ui';
-
+import type { EduTableLazyLoadEvent } from '@edu-ui';
 @Component({
 	selector: 'app-rate-limit-events',
 	standalone: true,
@@ -35,8 +33,7 @@ import { EduMessageService, EduToast } from '@edu-ui';
 		RateLimitFiltersComponent,
 		RateLimitTableComponent,
 		RateLimitDetailDrawerComponent,
-		HubContextBannerComponent,
-	],
+		HubContextBannerComponent],
 	providers: [EduMessageService],
 	templateUrl: './rate-limit-events.component.html',
 	styleUrl: './rate-limit-events.component.scss',
@@ -67,8 +64,7 @@ export class RateLimitEventsComponent implements OnInit {
 		{ width: '90px', cellType: 'badge' },
 		{ width: '100px', cellType: 'text' },
 		{ width: '140px', cellType: 'text' },
-		{ width: '60px', cellType: 'actions' },
-	];
+		{ width: '60px', cellType: 'actions' }];
 	// #endregion
 
 	// #region Lifecycle
@@ -102,7 +98,7 @@ export class RateLimitEventsComponent implements OnInit {
 		this.facade.updateFilter(partial);
 	}
 
-	onLazyLoad(event: TableLazyLoadEvent): void {
+	onLazyLoad(event: EduTableLazyLoadEvent): void {
 		const rows = event.rows ?? this.vm().pageSize;
 		const first = event.first ?? 0;
 		const page = Math.floor(first / rows) + 1;

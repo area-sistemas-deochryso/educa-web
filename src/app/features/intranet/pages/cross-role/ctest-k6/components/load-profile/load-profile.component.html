@@ -115,17 +115,17 @@
 
 		@if (usePhaseTabs()) {
 			<!-- Tabs por fase: cada tab muestra su propio flujo -->
-			<p-tabs [value]="0">
-				<p-tablist>
+			<edu-tabs [value]="0">
+				
 					@for (stage of stages(); track $index; let si = $index) {
-						<p-tab [value]="si">
+						<edu-tab [value]="si">
 							Fase {{ si + 1 }}: {{ stage.target }} VUs ({{ stage.duration }})
-						</p-tab>
+						</edu-tab>
 					}
-				</p-tablist>
-				<p-tabpanels>
+				
+				
 					@for (stage of stages(); track $index; let si = $index) {
-						<p-tabpanel [value]="si">
+						<edu-tabpanel [value]="si">
 							<div
 								class="simulation-flow phase-flow"
 								[style.--cycle-duration]="phaseCycleDurations()[si] + 's'"
@@ -223,10 +223,10 @@
 									</div>
 								}
 							</div>
-						</p-tabpanel>
+						</edu-tabpanel>
 					}
-				</p-tabpanels>
-			</p-tabs>
+				
+			</edu-tabs>
 		} @else {
 			<!-- Vista sin tabs: flujo único (como antes) -->
 			<div class="simulation-flow">

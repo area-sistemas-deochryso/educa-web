@@ -9,8 +9,8 @@
 				icon="pi pi-download"
 				class="p-button-outlined p-button-sm"
 				(click)="onLoadPresets()"
-				pTooltip="Cargar endpoints predefinidos del proyecto (usuarios, cursos, asistencias, etc.)"
-				tooltipPosition="top"
+				eduTooltip="Cargar endpoints predefinidos del proyecto (usuarios, cursos, asistencias, etc.)"
+				eduTooltipPosition="top"
 			></button>
 			<button
 				pButton
@@ -18,8 +18,8 @@
 				icon="pi pi-plus"
 				class="p-button-sm"
 				(click)="onAddEndpoint()"
-				pTooltip="Agregar un endpoint personalizado"
-				tooltipPosition="top"
+				eduTooltip="Agregar un endpoint personalizado"
+				eduTooltipPosition="top"
 			></button>
 		</div>
 	</div>
@@ -55,14 +55,14 @@
 				<div class="endpoint-card" [class.disabled]="!ep.enabled" cdkDrag>
 					<div class="endpoint-header">
 						<i class="pi pi-bars drag-handle" cdkDragHandle></i>
-						<p-checkbox
+						<edu-checkbox
 							[ngModel]="ep.enabled"
 							(ngModelChange)="onToggleEndpoint(i)"
 							[binary]="true"
 							[inputId]="'ep-' + i"
 						/>
 
-						<p-select
+						<edu-select
 							[options]="httpMethodOptions"
 							optionLabel="label"
 							optionValue="value"
@@ -73,7 +73,7 @@
 
 						<input
 							type="text"
-							pInputText
+							eduInputText
 							placeholder="/api/usuarios"
 							[ngModel]="ep.path"
 							(ngModelChange)="onEndpointPathChange(i, $event)"
@@ -82,13 +82,13 @@
 
 						<input
 							type="text"
-							pInputText
+							eduInputText
 							placeholder="nombre-check"
 							[ngModel]="ep.name"
 							(ngModelChange)="onEndpointNameChange(i, $event)"
 							class="endpoint-name-input"
-							pTooltip="Nombre para identificar este endpoint en los checks de k6"
-							tooltipPosition="top"
+							eduTooltip="Nombre para identificar este endpoint en los checks de k6"
+							eduTooltipPosition="top"
 						/>
 
 						<button
@@ -103,7 +103,7 @@
 					@if (showBody(ep)) {
 						<div class="endpoint-body">
 							<textarea
-								pTextarea
+								eduTextarea
 								placeholder='{ "campo": "valor" }'
 								[ngModel]="ep.body"
 								(ngModelChange)="onEndpointBodyChange(i, $event)"

@@ -11,12 +11,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
-import { DatePickerModule } from 'primeng/datepicker';
-import { InputTextModule } from 'primeng/inputtext';
-import { PaginatorModule, PaginatorState } from 'primeng/paginator';
-import { SelectModule } from 'primeng/select';
-import { TooltipModule } from 'primeng/tooltip';
-
 import { DecimalPipe } from '@angular/common';
 
 import { DeferEventTipo } from '@data/models';
@@ -27,6 +21,8 @@ import { EmailDeferEventDataFacade } from '../../services';
 import { trendSummary, TrendSummary } from '../../utils/trend-summary';
 import { DeferEventItemComponent } from '../defer-event-item/defer-event-item.component';
 import { DomainBlockedAlertBannerComponent } from '../domain-blocked-alert-banner/domain-blocked-alert-banner.component';
+import { EduDatePicker, EduInputText, EduPaginator, EduSelect, EduTooltip } from '@edu-ui';
+import type { EduPaginatorPageEvent } from '@edu-ui';
 
 const PAGE_SIZE = 25;
 
@@ -37,16 +33,15 @@ const PAGE_SIZE = 25;
 		DecimalPipe,
 		FormsModule,
 		ButtonModule,
-		DatePickerModule,
-		InputTextModule,
-		PaginatorModule,
-		SelectModule,
-		TooltipModule,
+		EduDatePicker,
+		EduInputText,
+		EduPaginator,
+		EduSelect,
+		EduTooltip,
 		MiniSparklineComponent,
 		DeferEventItemComponent,
 		DomainBlockedAlertBannerComponent,
-		HubContextBannerComponent,
-	],
+		HubContextBannerComponent],
 	templateUrl: './defer-events-tab.component.html',
 	styleUrl: './defer-events-tab.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -132,7 +127,7 @@ export class DeferEventsTabComponent implements OnInit {
 		this.dataFacade.refresh();
 	}
 
-	onPageChange(event: PaginatorState): void {
+	onPageChange(event: EduPaginatorPageEvent): void {
 		const first = event.first ?? 0;
 		const newPage = Math.floor(first / PAGE_SIZE) + 1;
 		if (newPage === this.vm().page) return;
@@ -150,8 +145,7 @@ export class DeferEventsTabComponent implements OnInit {
 				'statusCode',
 				'diagnosticCode',
 				'emailOutboxId',
-				'correlationId',
-			].join(','),
+				'correlationId'].join(','),
 			...this.vm().events.map((e) =>
 				[
 					e.id,
@@ -160,14 +154,12 @@ export class DeferEventsTabComponent implements OnInit {
 					e.destinatario ?? '',
 					e.dominio ?? '',
 					e.statusCode ?? '',
-					(e.diagnosticCode ?? '').replace(/[\r\n,]/g, ' '),
+					(e.diagnosticCode ?? '').replace(/[\r\n]/g, ' '),
 					e.emailOutboxId ?? '',
-					e.correlationId ?? '',
-				]
+					e.correlationId ?? '']
 					.map((v) => `"${String(v).replace(/"/g, '""')}"`)
 					.join(','),
-			),
-		];
+			)];
 		const csv = rows.join('\n');
 		const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
 		const url = URL.createObjectURL(blob);

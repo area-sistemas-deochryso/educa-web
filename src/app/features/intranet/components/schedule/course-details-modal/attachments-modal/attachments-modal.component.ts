@@ -1,21 +1,19 @@
 // #region Imports
 import { Component, EventEmitter, Input, Output, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { FileUploadModule } from 'primeng/fileupload';
 import type { Attachment } from './attachments-modal.models';
 // eslint-disable-next-line layer-enforcement/imports-error -- Razón: AttachmentsModalStore es ephemeral/scoped, se registra como provider del component junto al facade (patrón wizard/modal local). No se consumen sus APIs directamente.
 import { AttachmentsModalStore } from './attachments-modal.store';
 import { AttachmentsModalFacade } from './attachments-modal.facade';
+import { EduDialog, EduFileUpload, EduSpinner } from '@edu-ui';
 
 // #endregion
 // #region Implementation
 @Component({
 	selector: 'app-attachments-modal',
 	standalone: true,
-	imports: [CommonModule, DialogModule, ButtonModule, ProgressSpinnerModule, FileUploadModule],
+	imports: [CommonModule, EduDialog, ButtonModule, EduSpinner, EduFileUpload],
 	providers: [AttachmentsModalStore, AttachmentsModalFacade],
 	templateUrl: './attachments-modal.component.html',
 	styleUrl: './attachments-modal.component.scss',

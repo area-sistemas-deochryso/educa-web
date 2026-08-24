@@ -18,7 +18,7 @@
 		<!-- #region Loading -->
 		@if (vm().loading) {
 			<div class="state-container">
-				<p-progressSpinner strokeWidth="4" />
+				<edu-spinner strokeWidth="4" />
 			</div>
 		} @else if (vm().error) {
 			<!-- #region Error -->
@@ -56,7 +56,7 @@
 							</div>
 							<div>
 								<h3 class="mt-0 mb-1" style="font-size: 1.0625rem">{{ item.cursoNombre }}</h3>
-								<p-tag [value]="item.salonDescripcion" styleClass="tag-neutral" />
+								<edu-tag [value]="item.salonDescripcion" styleClass="tag-neutral" />
 							</div>
 						</div>
 
@@ -82,12 +82,12 @@
 						</div>
 
 						<div class="curso-footer">
-							<p-tag [value]="estadoLabel(item)" [severity]="estadoSeverity(item)" />
+							<edu-tag [value]="estadoLabel(item)" [severity]="estadoSeverity(item)" />
 
 							@if (isModerator()) {
 								<div class="moderator-toggle">
 									<label for="habilitada-{{ item.horarioId }}">Sala habilitada</label>
-									<p-toggleswitch
+									<edu-toggle
 										inputId="habilitada-{{ item.horarioId }}"
 										[ngModel]="item.habilitada"
 										[disabled]="isSavingHabilitacion(item)"
@@ -119,8 +119,8 @@
 									icon="pi pi-video"
 									class="w-100"
 									[disabled]="true"
-									pTooltip="El estado se actualiza automáticamente — vuelve a intentar cuando esté disponible"
-									tooltipPosition="top"
+									eduTooltip="El estado se actualiza automáticamente — vuelve a intentar cuando esté disponible"
+									eduTooltipPosition="top"
 								></button>
 							}
 						</div>

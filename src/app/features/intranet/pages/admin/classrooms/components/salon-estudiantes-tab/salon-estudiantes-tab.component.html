@@ -1,6 +1,6 @@
 <!-- #region Agregar estudiante -->
 <div class="agregar-row">
-	<p-autoComplete
+	<edu-autocomplete
 		[suggestions]="vm().disponibles"
 		[ngModel]="selectedDisponible()"
 		(completeMethod)="onSearchDisponibles($event)"
@@ -18,7 +18,7 @@
 				<span class="text-color-secondary">{{ estudiante.dni }}</span>
 			</div>
 		</ng-template>
-	</p-autoComplete>
+	</edu-autocomplete>
 </div>
 <!-- #endregion -->
 
@@ -30,7 +30,7 @@
 }
 
 <!-- #region Tabla de estudiantes -->
-<p-table [value]="vm().estudiantes" [dataKey]="'estudianteId'" [loading]="vm().loading" styleClass="p-datatable-sm">
+<edu-table [value]="vm().estudiantes" [dataKey]="'estudianteId'" [loading]="vm().loading" styleClass="p-datatable-sm">
 	<ng-template #header>
 		<tr>
 			<th>DNI</th>
@@ -43,14 +43,14 @@
 		<tr>
 			<td>{{ estudiante.dni }}</td>
 			<td>{{ estudiante.nombreCompleto }}</td>
-			<td><p-tag [value]="estudiante.estadoMatricula" /></td>
+			<td><edu-tag [value]="estudiante.estadoMatricula" /></td>
 			<td class="text-center">
 				@if (activeRowAction()?.estudianteId !== estudiante.estudianteId) {
 					<button
 						pButton
 						icon="pi pi-arrow-right-arrow-left"
 						class="p-button-rounded p-button-text p-button-sm"
-						pTooltip="Transferir a otro salón"
+						eduTooltip="Transferir a otro salón"
 						(click)="openTransferir(estudiante.estudianteId)"
 						data-info-anchor="admin-salon-estudiantes-transferir-btn"
 					></button>
@@ -58,7 +58,7 @@
 						pButton
 						icon="pi pi-user-minus"
 						class="p-button-rounded p-button-text p-button-sm p-button-danger"
-						pTooltip="Retirar del salón"
+						eduTooltip="Retirar del salón"
 						(click)="openRetirar(estudiante.estudianteId)"
 						data-info-anchor="admin-salon-estudiantes-retirar-btn"
 					></button>
@@ -71,7 +71,7 @@
 				<tr class="accion-row">
 					<td colspan="4">
 						@if (vm().pendingConfirm && vm().pendingConfirm?.estudianteId === estudiante.estudianteId) {
-							<p-message severity="warn" [closable]="false">
+							<edu-message severity="warn" [closable]="false">
 								<div class="advertencias">
 									@for (advertencia of vm().pendingConfirm?.advertencias; track advertencia) {
 										<div>{{ advertencia }}</div>
@@ -81,10 +81,10 @@
 									<button pButton label="Confirmar de todos modos" class="p-button-sm p-button-warning" (click)="confirmarPendienteConAdvertencia()" data-info-anchor="admin-salon-estudiantes-confirmar-advertencia-btn"></button>
 									<button pButton label="Cancelar" class="p-button-sm p-button-text" (click)="cancelarPendiente()" data-info-anchor="admin-salon-estudiantes-cancelar-pendiente-btn"></button>
 								</div>
-							</p-message>
+							</edu-message>
 						} @else if (accion.tipo === 'transferir') {
 							<div class="accion-form">
-								<p-select
+								<edu-select
 									[options]="salonesDisponibles()"
 									[ngModel]="selectedSalonDestino()"
 									(ngModelChange)="selectedSalonDestino.set($event)"
@@ -107,7 +107,7 @@
 							</div>
 						} @else {
 							<div class="accion-form">
-								<p-select
+								<edu-select
 									[options]="motivos"
 									[ngModel]="selectedMotivo()"
 									(ngModelChange)="selectedMotivo.set($event)"
@@ -139,5 +139,5 @@
 			<td colspan="4" class="text-center p-4">No hay estudiantes matriculados en este salón.</td>
 		</tr>
 	</ng-template>
-</p-table>
+</edu-table>
 <!-- #endregion -->

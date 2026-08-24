@@ -1,8 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Select } from 'primeng/select';
-import { Tooltip } from 'primeng/tooltip';
 import { HijoApoderado } from '@data/models';
 import {
 	AttendanceTable,
@@ -15,6 +13,11 @@ import {
 	getStatusClass,
 } from '@features/intranet/pages/cross-role/attendance-component/config/attendance.constants';
 import { AttendanceTemporalNavComponent } from '../attendance-temporal-nav/attendance-temporal-nav.component';
+// Exception (588 retry, F6c): edu-select has no `pt` passthrough input (pt landed on
+// edu-select-button only, confirmed missing on edu-select) -- kept on PrimeNG here since
+// [pt] is load-bearing a11y (aria-label on the trigger).
+import { SelectModule } from 'primeng/select';
+import { EduTooltip } from '@edu-ui';
 
 export interface HijoOption {
 	label: string;
@@ -31,7 +34,7 @@ export interface HeatmapCellClick {
 @Component({
 	selector: 'app-attendance-heatmap',
 	standalone: true,
-	imports: [CommonModule, FormsModule, Select, Tooltip, AttendanceTemporalNavComponent],
+	imports: [CommonModule, FormsModule, SelectModule, EduTooltip, AttendanceTemporalNavComponent],
 	templateUrl: './attendance-heatmap.component.html',
 	styleUrl: './attendance-heatmap.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

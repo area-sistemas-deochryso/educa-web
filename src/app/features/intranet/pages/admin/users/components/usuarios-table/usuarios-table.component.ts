@@ -1,20 +1,18 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
-import { TableLazyLoadEvent, TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
 import { UsuarioLista } from '../../services';
 import { RoleTab } from '../../models';
 import { UiMappingService } from '@intranet-shared/services';
 import { FullNamePipe } from '@shared/pipes';
 import { TableLoadingDirective } from '@intranet-shared/directives';
+import { EduDialog, EduTable, EduTag, EduTooltip } from '@edu-ui';
+import type { EduTableLazyLoadEvent } from '@edu-ui';
 
 @Component({
 	selector: 'app-users-table',
 	standalone: true,
-	imports: [CommonModule, TableModule, ButtonModule, DialogModule, TagModule, TooltipModule, TableLoadingDirective, FullNamePipe],
+	imports: [CommonModule, EduTable, ButtonModule, EduDialog, EduTag, EduTooltip, TableLoadingDirective, FullNamePipe],
 	templateUrl: './usuarios-table.component.html',
 	styleUrl: './usuarios-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -41,11 +39,6 @@ export class UsersTableComponent {
 		sortOrder: 'asc' | 'desc' | null;
 	}>();
 	readonly copyDni = output<string>();
-
-	readonly primeSortOrder = computed(() => {
-		const order = this.sortOrder();
-		return order === 'asc' ? 1 : order === 'desc' ? -1 : 0;
-	});
 
 	readonly colCount = () => {
 		const tab = this.activeTab();
@@ -105,7 +98,7 @@ export class UsersTableComponent {
 		this.copyDni.emit(dni);
 	}
 
-	onLazyLoad(event: TableLazyLoadEvent): void {
+	onLazyLoad(event: EduTableLazyLoadEvent): void {
 		if (!this.initialLoadDone) {
 			this.initialLoadDone = true;
 			return;
@@ -113,8 +106,8 @@ export class UsersTableComponent {
 		const first = event.first ?? 0;
 		const rows = event.rows ?? this.rows();
 		const page = Math.floor(first / rows) + 1;
-		const sortField = Array.isArray(event.sortField) ? event.sortField[0] ?? null : event.sortField ?? null;
-		const sortOrder = event.sortOrder === 1 ? 'asc' : event.sortOrder === -1 ? 'desc' : null;
+		const sortField = event.sortField ?? null;
+		const sortOrder = event.sortOrder ?? null;
 		this.lazyLoad.emit({ page, pageSize: rows, sortField, sortOrder });
 	}
 }

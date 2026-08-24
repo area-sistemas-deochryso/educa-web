@@ -5,7 +5,7 @@
 			Mapa de calor
 		</h3>
 		<div class="heatmap-controls">
-			<p-selectbutton
+			<edu-select-button
 				[options]="periodOptions"
 				[ngModel]="totalDays()"
 				(ngModelChange)="onPeriodChange($event)"
@@ -20,8 +20,8 @@
 					icon="pi pi-chevron-left"
 					class="p-button-text p-button-sm heatmap-nav-btn"
 					(click)="onPrev()"
-					[pTooltip]="isWeekMode() ? 'Semana anterior' : 'Mes anterior'"
-					tooltipPosition="top"
+					[eduTooltip]="isWeekMode() ? 'Semana anterior' : 'Mes anterior'"
+					eduTooltipPosition="top"
 					[pt]="{ root: { 'aria-label': isWeekMode() ? 'Semana anterior' : 'Mes anterior' } }"
 					data-info-anchor="admin-error-groups-heatmap-prev-btn"
 				></button>
@@ -34,14 +34,14 @@
 					class="p-button-text p-button-sm heatmap-nav-btn"
 					(click)="onNext()"
 					[disabled]="!canGoNext()"
-					[pTooltip]="isWeekMode() ? 'Semana siguiente' : 'Mes siguiente'"
-					tooltipPosition="top"
+					[eduTooltip]="isWeekMode() ? 'Semana siguiente' : 'Mes siguiente'"
+					eduTooltipPosition="top"
 					[pt]="{ root: { 'aria-label': isWeekMode() ? 'Semana siguiente' : 'Mes siguiente' } }"
 					data-info-anchor="admin-error-groups-heatmap-next-btn"
 				></button>
 			</div>
-			<span [pTooltip]="calendarTooltip()" tooltipPosition="top">
-				<p-datepicker
+			<span [eduTooltip]="calendarTooltip()" eduTooltipPosition="top">
+				<edu-datepicker
 					[ngModel]="endDate()"
 					(ngModelChange)="onEndDateChange($event)"
 					[maxDate]="today"
@@ -79,8 +79,8 @@
 							class="heatmap-cell"
 							role="cell"
 							[style.background-color]="getCellColor(cell.intensity)"
-							[pTooltip]="cell.tooltip"
-							tooltipPosition="top"
+							[eduTooltip]="cell.tooltip"
+							eduTooltipPosition="top"
 							[attr.aria-label]="cell.tooltip"
 						></span>
 					}

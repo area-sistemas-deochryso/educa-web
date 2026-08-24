@@ -1,5 +1,5 @@
 <!-- #region Dialog: Crear/Editar Horario -->
-<p-dialog
+<edu-dialog
 	[visible]="visible()"
 	(visibleChange)="onVisibleChange($event)"
 	[header]="isEditing() ? 'Editar Horario' : 'Crear Horario'"
@@ -13,7 +13,7 @@
 			<!-- Dia de la semana -->
 			<div class="form-field">
 				<label for="diaSemana">Dia de la semana *</label>
-				<p-select
+				<edu-select
 					id="diaSemana"
 					[(ngModel)]="formData().diaSemana"
 					[options]="diasOptions"
@@ -32,7 +32,7 @@
 				<input
 					id="horaInicio"
 					type="time"
-					pInputText
+					eduInputText
 					min="07:00"
 					max="17:00"
 					data-info-anchor="admin-schedules-form-hora-inicio-input"
@@ -47,7 +47,7 @@
 				<input
 					id="horaFin"
 					type="time"
-					pInputText
+					eduInputText
 					min="07:00"
 					max="17:00"
 					data-info-anchor="admin-schedules-form-hora-fin-input"
@@ -59,7 +59,7 @@
 			<!-- Salon -->
 			<div class="form-field full-width">
 				<label for="salon">Salon *</label>
-				<p-select
+				<edu-select
 					id="salon"
 					[(ngModel)]="formData().salonId"
 					[options]="salonesOptions()"
@@ -118,7 +118,7 @@
 							</div>
 						</div>
 					</ng-template>
-				</p-select>
+				</edu-select>
 				@if (formData().diaSemana && formData().horaInicio && formData().horaFin) {
 					<small class="text-muted">
 						<i class="pi pi-info-circle"></i>
@@ -140,8 +140,8 @@
 						data-info-anchor="curso-selector"
 						(click)="onOpenCursoDialog()"
 						[disabled]="optionsLoading()"
-						pTooltip="Seleccionar curso organizados por nivel educativo"
-						tooltipPosition="top"
+						eduTooltip="Seleccionar curso organizados por nivel educativo"
+						eduTooltipPosition="top"
 					></button>
 					@if (formData().cursoId) {
 						<button
@@ -151,8 +151,8 @@
 							class="p-button-text p-button-danger"
 							data-info-anchor="admin-schedules-form-limpiar-curso-btn"
 							(click)="onClearCurso()"
-							pTooltip="Limpiar seleccion de curso"
-							tooltipPosition="top"
+							eduTooltip="Limpiar seleccion de curso"
+							eduTooltipPosition="top"
 							[pt]="{
 								root: {
 									'aria-label': 'Limpiar seleccion',
@@ -179,8 +179,8 @@
 			class="p-button-text"
 			data-info-anchor="admin-schedules-form-cancelar-btn"
 			(click)="onCancel()"
-			pTooltip="Cerrar sin guardar cambios"
-			tooltipPosition="top"
+			eduTooltip="Cerrar sin guardar cambios"
+			eduTooltipPosition="top"
 		></button>
 		<button
 			pButton
@@ -189,9 +189,9 @@
 			data-info-anchor="admin-schedules-form-guardar-btn"
 			(click)="onSave()"
 			[disabled]="!formValid() || loading()"
-			[pTooltip]="isEditing() ? 'Guardar cambios del horario' : 'Crear nuevo horario'"
-			tooltipPosition="top"
+			[eduTooltip]="isEditing() ? 'Guardar cambios del horario' : 'Crear nuevo horario'"
+			eduTooltipPosition="top"
 		></button>
 	</ng-template>
-</p-dialog>
+</edu-dialog>
 <!-- #endregion -->

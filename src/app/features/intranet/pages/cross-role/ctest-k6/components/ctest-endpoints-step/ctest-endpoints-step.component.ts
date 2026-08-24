@@ -3,14 +3,9 @@ import { FormsModule } from '@angular/forms';
 
 import { CdkDropList, CdkDrag, CdkDragHandle, CdkDragDrop } from '@intranet-shared/directives/drag-drop';
 import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
-import { CheckboxModule } from 'primeng/checkbox';
-import { TooltipModule } from 'primeng/tooltip';
-import { TextareaModule } from 'primeng/textarea';
-
 import { CTestK6Facade } from '../../services/ctest-k6.facade';
 import { HTTP_METHOD_OPTIONS, HttpMethod, K6Endpoint } from '../../models';
+import { EduCheckbox, EduInputText, EduSelect, EduTextarea, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-ctest-endpoints-step',
@@ -21,12 +16,11 @@ import { HTTP_METHOD_OPTIONS, HttpMethod, K6Endpoint } from '../../models';
 		CdkDrag,
 		CdkDragHandle,
 		ButtonModule,
-		InputTextModule,
-		SelectModule,
-		CheckboxModule,
-		TooltipModule,
-		TextareaModule,
-	],
+		EduInputText,
+		EduSelect,
+		EduCheckbox,
+		EduTooltip,
+		EduTextarea],
 	templateUrl: './ctest-endpoints-step.component.html',
 	styleUrl: './ctest-endpoints-step.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

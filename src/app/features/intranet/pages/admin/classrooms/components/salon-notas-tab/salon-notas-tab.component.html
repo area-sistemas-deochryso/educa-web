@@ -1,6 +1,6 @@
 <!-- #region Selector de curso -->
 <div class="filtro-row">
-	<p-select
+	<edu-select
 		[options]="cursoOptions()"
 		[ngModel]="selectedCursoId()"
 		(ngModelChange)="onCursoChange($event)"
@@ -17,7 +17,7 @@
 
 <!-- #region Tabla de notas -->
 @if (notasData(); as data) {
-	<p-table
+	<edu-table
 		[value]="data.estudiantes"
 		[dataKey]="'estudianteId'"
 		[loading]="loading()"
@@ -47,8 +47,8 @@
 				@for (eval of evaluacionColumns(); track eval.id) {
 					<th
 						class="text-center eval-header"
-						pTooltip="{{ eval.titulo }} — {{ eval.tipo }} ({{ eval.peso * 100 | number: '1.0-0' }}%)"
-						tooltipPosition="top"
+						eduTooltip="{{ eval.titulo }} — {{ eval.tipo }} ({{ eval.peso * 100 | number: '1.0-0' }}%)"
+						eduTooltipPosition="top"
 					>
 						<span class="eval-titulo">{{ eval.titulo }}</span>
 						<span class="eval-peso">{{ eval.peso * 100 | number: '1.0-0' }}%</span>
@@ -89,7 +89,7 @@
 				</td>
 			</tr>
 		</ng-template>
-	</p-table>
+	</edu-table>
 } @else if (!loading()) {
 	<div class="empty-state">
 		<i class="pi pi-chart-bar" style="font-size: 2rem; opacity: 0.3"></i>
