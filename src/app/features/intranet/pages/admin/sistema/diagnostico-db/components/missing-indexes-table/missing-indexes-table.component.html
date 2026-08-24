@@ -29,7 +29,7 @@
 	}
 
 	@if (indexes().length > 0) {
-		<p-table [value]="sorted()" [tableStyle]="{ 'min-width': '50rem' }">
+		<edu-table [value]="sorted()" [tableStyle]="{ 'min-width': '50rem' }">
 			<ng-template #header>
 				<tr>
 					<th>Tabla</th>
@@ -46,13 +46,13 @@
 					<td>{{ row.inequalityColumns || '—' }}</td>
 					<td>{{ row.includedColumns || '—' }}</td>
 					<td>
-						<p-tag
+						<edu-tag
 							[value]="(row.estimatedImpact | number: '1.0-0') ?? ''"
 							[severity]="impactSeverity(row.estimatedImpact)"
 						/>
 					</td>
 				</tr>
 			</ng-template>
-		</p-table>
+		</edu-table>
 	}
 </section>

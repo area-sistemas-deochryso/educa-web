@@ -35,14 +35,14 @@ import {
 	computeSummaries,
 	formatAxisTick,
 } from './history-chart.helpers';
-import { EduSelectButton, EduSpinner, EduTag } from '@edu-ui';
+import { EduSelect, EduSelectButton, EduSpinner, EduTag } from '@edu-ui';
 
 Chart.register(...registerables);
 
 @Component({
 	selector: 'app-runtime-health-history',
 	standalone: true,
-	imports: [DatePipe, EduSelectButton, FormsModule, ButtonModule, EduSpinner, EduTag],
+	imports: [DatePipe, EduSelectButton, FormsModule, ButtonModule, EduSpinner, EduTag, EduSelect],
 	templateUrl: './runtime-health-history.component.html',
 	styleUrl: './runtime-health-history.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -143,8 +143,7 @@ export class RuntimeHealthHistoryComponent implements AfterViewInit {
 				data: {
 					datasets: [
 						buildDataset('Workers busy', this.toPoints(data, d => d.threadPool.workersBusy), CHART_COLORS.blue),
-						buildDataset('Cola pendiente', this.toPoints(data, d => d.threadPool.queueLength), CHART_COLORS.orange),
-					],
+						buildDataset('Cola pendiente', this.toPoints(data, d => d.threadPool.queueLength), CHART_COLORS.orange)],
 				},
 				options: baseOpts,
 			}));
@@ -158,8 +157,7 @@ export class RuntimeHealthHistoryComponent implements AfterViewInit {
 					datasets: [
 						buildDataset('p50', this.toPoints(data, d => d.requests.p50Ms), CHART_COLORS.green),
 						buildDataset('p95', this.toPoints(data, d => d.requests.p95Ms), CHART_COLORS.yellow),
-						buildDataset('p99', this.toPoints(data, d => d.requests.p99Ms), CHART_COLORS.red),
-					],
+						buildDataset('p99', this.toPoints(data, d => d.requests.p99Ms), CHART_COLORS.red)],
 				},
 				options: {
 					...baseOpts,
@@ -180,8 +178,7 @@ export class RuntimeHealthHistoryComponent implements AfterViewInit {
 						buildDataset('Heap', this.toPoints(data, d => d.gc.heapMb), CHART_COLORS.blue, 'y'),
 						buildDataset('Gen0', this.toPoints(data, d => d.gc.gen0), CHART_COLORS.green, 'y1'),
 						buildDataset('Gen1', this.toPoints(data, d => d.gc.gen1), CHART_COLORS.yellow, 'y1'),
-						buildDataset('Gen2', this.toPoints(data, d => d.gc.gen2), CHART_COLORS.red, 'y1'),
-					],
+						buildDataset('Gen2', this.toPoints(data, d => d.gc.gen2), CHART_COLORS.red, 'y1')],
 				},
 				options: {
 					...baseOpts,
@@ -210,8 +207,7 @@ export class RuntimeHealthHistoryComponent implements AfterViewInit {
 		const dataGroups = [
 			[this.toPoints(data, d => d.threadPool.workersBusy), this.toPoints(data, d => d.threadPool.queueLength)],
 			[this.toPoints(data, d => d.requests.p50Ms), this.toPoints(data, d => d.requests.p95Ms), this.toPoints(data, d => d.requests.p99Ms)],
-			[this.toPoints(data, d => d.gc.heapMb), this.toPoints(data, d => d.gc.gen0), this.toPoints(data, d => d.gc.gen1), this.toPoints(data, d => d.gc.gen2)],
-		];
+			[this.toPoints(data, d => d.gc.heapMb), this.toPoints(data, d => d.gc.gen0), this.toPoints(data, d => d.gc.gen1), this.toPoints(data, d => d.gc.gen2)]];
 
 		const { from, to } = resolveTimeRange(this.timeRange());
 		const fromMs = from.getTime();

@@ -11,14 +11,7 @@ import { EduInputNumber, EduInputText, EduSelect, EduTooltip } from '@edu-ui';
 @Component({
 	selector: 'app-ctest-config-step',
 	standalone: true,
-	imports: [
-		FormsModule,
-		ButtonModule,
-		EduInputText,
-		EduInputNumber,
-		EduSelect,
-		EduTooltip,
-	],
+	imports: [FormsModule, ButtonModule, EduInputText, EduInputNumber, EduSelect, EduTooltip],
 	templateUrl: './ctest-config-step.component.html',
 	styleUrl: './ctest-config-step.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

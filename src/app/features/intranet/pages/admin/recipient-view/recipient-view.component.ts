@@ -9,21 +9,13 @@ import { PageHeaderComponent } from '@intranet-shared/components';
 
 import { RecipientViewActionsFacade } from './facades/recipient-view-actions.facade';
 import { RecipientViewDataFacade } from './facades/recipient-view-data.facade';
-import { EduConfirmationService, EduConfirmDialog, EduTag, EduTooltip } from '@edu-ui';
+import { EduConfirmDialog, EduConfirmationService, EduTag, EduTooltip } from '@edu-ui';
 // #endregion
 
 @Component({
 	selector: 'app-recipient-view',
 	standalone: true,
-	imports: [
-		DatePipe,
-		RouterLink,
-		ButtonModule,
-		EduConfirmDialog,
-		EduTag,
-		EduTooltip,
-		PageHeaderComponent,
-	],
+	imports: [DatePipe, RouterLink, ButtonModule, EduConfirmDialog, EduTag, EduTooltip, PageHeaderComponent],
 	providers: [EduConfirmationService],
 	templateUrl: './recipient-view.component.html',
 	styleUrl: './recipient-view.component.scss',

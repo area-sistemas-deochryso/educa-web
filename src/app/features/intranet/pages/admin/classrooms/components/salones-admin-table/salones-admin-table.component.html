@@ -1,5 +1,5 @@
 <!-- #region Tabla de salones -->
-<p-table
+<edu-table
 	[value]="salones()"
 	[dataKey]="'id'"
 	[loading]="loading()"
@@ -15,19 +15,19 @@
 	<ng-template #header>
 		<tr>
 			<th style="width: 50px">#</th>
-			<th pSortableColumn="grado" style="min-width: 120px" data-info-anchor="tabla-orden-columna">
-				GRADO <p-sortIcon field="grado" />
+			<th eduSortableColumn="grado" style="min-width: 120px" data-info-anchor="tabla-orden-columna">
+				GRADO 
 			</th>
-			<th pSortableColumn="seccion" style="width: 80px" data-info-anchor="tabla-orden-columna">
-				SECCIÓN <p-sortIcon field="seccion" />
+			<th eduSortableColumn="seccion" style="width: 80px" data-info-anchor="tabla-orden-columna">
+				SECCIÓN 
 			</th>
 			<th style="width: 110px" class="text-center">MODO</th>
-			<th pSortableColumn="sede" style="min-width: 100px" data-info-anchor="tabla-orden-columna">
-				SEDE <p-sortIcon field="sede" />
+			<th eduSortableColumn="sede" style="min-width: 100px" data-info-anchor="tabla-orden-columna">
+				SEDE 
 			</th>
 			<th style="min-width: 180px">TUTOR</th>
-			<th pSortableColumn="totalEstudiantes" style="width: 80px" class="text-center" data-info-anchor="tabla-orden-columna">
-				ESTUDIANTES <p-sortIcon field="totalEstudiantes" />
+			<th eduSortableColumn="totalEstudiantes" style="width: 80px" class="text-center" data-info-anchor="tabla-orden-columna">
+				ESTUDIANTES 
 			</th>
 			<th style="width: 100px" class="text-center">APROBADOS</th>
 			<th style="width: 110px" class="text-center">DESAPROBADOS</th>
@@ -51,27 +51,27 @@
 			</td>
 			<td class="text-center">
 				@if (salon.aprobados > 0) {
-					<p-tag [value]="'' + salon.aprobados" severity="success" />
+					<edu-tag [value]="'' + salon.aprobados" severity="success" />
 				} @else {
 					<span class="text-color-secondary">0</span>
 				}
 			</td>
 			<td class="text-center">
 				@if (salon.desaprobados > 0) {
-					<p-tag [value]="'' + salon.desaprobados" severity="danger" />
+					<edu-tag [value]="'' + salon.desaprobados" severity="danger" />
 				} @else {
 					<span class="text-color-secondary">0</span>
 				}
 			</td>
 			<td class="text-center">
 				@if (salon.pendientes > 0) {
-					<p-tag [value]="'' + salon.pendientes" severity="warn" />
+					<edu-tag [value]="'' + salon.pendientes" severity="warn" />
 				} @else {
 					<span class="text-color-secondary">0</span>
 				}
 			</td>
 			<td class="text-center">
-				<p-tag
+				<edu-tag
 					[value]="getEstadoPeriodoLabel(salon.estadoPeriodo)"
 					[severity]="getEstadoPeriodoSeverity(salon.estadoPeriodo)"
 				/>
@@ -81,8 +81,8 @@
 					pButton
 					icon="pi pi-eye"
 					class="p-button-rounded p-button-text p-button-sm"
-					pTooltip="Ver salón"
-					tooltipPosition="top"
+					eduTooltip="Ver salón"
+					eduTooltipPosition="top"
 					(click)="selectSalon.emit(salon.id)"
 					[pt]="{
 						root: {
@@ -95,8 +95,8 @@
 					pButton
 					icon="pi pi-calendar"
 					class="p-button-rounded p-button-text p-button-sm"
-					pTooltip="Ver horarios de este salón"
-					tooltipPosition="top"
+					eduTooltip="Ver horarios de este salón"
+					eduTooltipPosition="top"
 					(click)="goToHorarios.emit(salon.id)"
 					[pt]="{
 						root: {
@@ -109,8 +109,8 @@
 					pButton
 					icon="pi pi-users"
 					class="p-button-rounded p-button-text p-button-sm"
-					pTooltip="Ver usuarios de este salón"
-					tooltipPosition="top"
+					eduTooltip="Ver usuarios de este salón"
+					eduTooltipPosition="top"
 					(click)="goToUsuarios.emit(salon.id)"
 					[pt]="{
 						root: {
@@ -129,5 +129,5 @@
 			</td>
 		</tr>
 	</ng-template>
-</p-table>
+</edu-table>
 <!-- #endregion -->

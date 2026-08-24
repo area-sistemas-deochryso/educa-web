@@ -13,7 +13,7 @@ import {
 	FaqAdminDto,
 	WizardPasoInput,
 } from '../../models/faq-admin.models';
-import { EduDialog, EduInputText, EduSelect, EduTextarea, EduTooltip } from '@edu-ui';
+import { EduDialog, EduInputText, EduSelect, EduTemplate, EduTextarea, EduTooltip } from '@edu-ui';
 // #endregion
 
 interface CapabilityOption {
@@ -30,16 +30,7 @@ interface CapabilityOption {
 @Component({
 	selector: 'app-faq-admin-form-dialog',
 	standalone: true,
-	imports: [
-		CommonModule,
-		FormsModule,
-		ButtonModule,
-		EduDialog,
-		EduInputText,
-		EduSelect,
-		EduTextarea,
-		EduTooltip,
-	],
+	imports: [CommonModule, FormsModule, ButtonModule, EduDialog, EduInputText, EduSelect, EduTextarea, EduTooltip, EduTemplate],
 	templateUrl: './faq-admin-form-dialog.component.html',
 	styleUrl: './faq-admin-form-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -69,8 +60,7 @@ export class FaqAdminFormDialogComponent {
 
 	readonly capabilityOptions = computed<CapabilityOption[]>(() => [
 		{ label: 'Todos (sin capability)', value: null },
-		...this.capabilities().map((c) => ({ label: `${c.nombre} (${c.codigo})`, value: c.id })),
-	]);
+		...this.capabilities().map((c) => ({ label: `${c.nombre} (${c.codigo})`, value: c.id }))]);
 
 	readonly isValid = computed(() => this.pregunta().trim().length > 0 && this.respuesta().trim().length > 0);
 	// #endregion

@@ -10,8 +10,8 @@
 		/>
 
 		@if (loading()) {
-			<p-skeleton width="60%" height="1.5rem" />
-			<p-skeleton width="40%" height="1rem" />
+			<edu-skeleton width="60%" height="1.5rem" />
+			<edu-skeleton width="40%" height="1rem" />
 		} @else if (identity(); as student) {
 			<h2>{{ student.alumno }}</h2>
 			<div class="student-meta">
@@ -50,7 +50,7 @@
 		<h3>Gaps de asistencia (hoy)</h3>
 
 		@if (loading()) {
-			<p-skeleton width="100%" height="8rem" />
+			<edu-skeleton width="100%" height="8rem" />
 		} @else if (error()) {
 			<!-- Error ya mostrado arriba; se omite el cuerpo para no mostrar un empty state engañoso. -->
 		} @else if (gaps().length === 0) {
@@ -59,7 +59,7 @@
 				<p>Sin gaps de asistencia registrados hoy.</p>
 			</div>
 		} @else {
-			<p-table [value]="gaps()" [rows]="10" styleClass="p-datatable-sm">
+			<edu-table [value]="gaps()" [rows]="10" styleClass="p-datatable-sm">
 				<ng-template #header>
 					<tr>
 						<th>Tipo</th>
@@ -73,14 +73,14 @@
 						<td>{{ row.horaRegistro }}</td>
 						<td>
 							@if (row.outboxEstado) {
-								<p-tag [value]="row.outboxEstado" [severity]="getEstadoSeverity(row.outboxEstado)" />
+								<edu-tag [value]="row.outboxEstado" [severity]="getEstadoSeverity(row.outboxEstado)" />
 							} @else {
 								<span class="text-secondary">No generado</span>
 							}
 						</td>
 					</tr>
 				</ng-template>
-			</p-table>
+			</edu-table>
 		}
 	</section>
 
@@ -89,7 +89,7 @@
 		<h3>Historial de correos</h3>
 
 		@if (loading()) {
-			<p-skeleton width="100%" height="8rem" />
+			<edu-skeleton width="100%" height="8rem" />
 		} @else if (error()) {
 			<!-- Error ya mostrado arriba; se omite el cuerpo para no mostrar un empty state engañoso. -->
 		} @else if (emails().length === 0) {
@@ -98,7 +98,7 @@
 				<p>Sin correos registrados para este estudiante.</p>
 			</div>
 		} @else {
-			<p-table [value]="emails()" [dataKey]="'id'" [rows]="10" [paginator]="emails().length > 10" styleClass="p-datatable-sm">
+			<edu-table [value]="emails()" [dataKey]="'id'" [rows]="10" [paginator]="emails().length > 10" styleClass="p-datatable-sm">
 				<ng-template #header>
 					<tr>
 						<th>Asunto</th>
@@ -111,13 +111,13 @@
 					<tr>
 						<td class="text-truncate">{{ row.asunto }}</td>
 						<td>
-							<p-tag [value]="row.estado" [severity]="getEstadoSeverity(row.estado)" />
+							<edu-tag [value]="row.estado" [severity]="getEstadoSeverity(row.estado)" />
 						</td>
 						<td>{{ row.fechaReg | date: 'dd/MM/yyyy HH:mm' }}</td>
 						<td>{{ row.intentos }}/{{ row.maxIntentos }}</td>
 					</tr>
 				</ng-template>
-			</p-table>
+			</edu-table>
 		}
 	</section>
 </section>

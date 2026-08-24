@@ -5,14 +5,12 @@ import { firstValueFrom, map } from 'rxjs';
 import { CommonModule } from '@angular/common';
 
 import { ButtonModule } from 'primeng/button';
-import { TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
-import { SkeletonModule } from 'primeng/skeleton';
 
 import { logger } from '@core/helpers';
 import { EmailOutboxLista } from '@data/models';
 import { UsersService } from '../users/services';
 import { AttendanceGapRow, EmailOutboxDashboardDiaService } from '../email-outbox-shared';
+import { EduSkeleton, EduTable, EduTag } from '@edu-ui';
 
 interface StudentIdentity {
 	alumno: string;
@@ -24,7 +22,7 @@ interface StudentIdentity {
 @Component({
 	selector: 'app-student-gap-profile',
 	standalone: true,
-	imports: [CommonModule, ButtonModule, TableModule, TagModule, SkeletonModule, RouterLink],
+	imports: [CommonModule, ButtonModule, EduTable, EduTag, EduSkeleton, RouterLink],
 	templateUrl: './student-gap-profile.component.html',
 	styleUrl: './student-gap-profile.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -97,8 +95,7 @@ export class StudentGapProfileComponent implements OnInit {
 			const [identity, gapRows, emailRows] = await Promise.all([
 				firstValueFrom(this.usersService.obtenerUsuario('Estudiante', id)),
 				firstValueFrom(this.dashboardService.obtenerAsistenciasSinCorreo(undefined, id)),
-				firstValueFrom(this.dashboardService.listarPorEstudiante(id)),
-			]);
+				firstValueFrom(this.dashboardService.listarPorEstudiante(id))]);
 
 			if (identity) {
 				this.identity.set({

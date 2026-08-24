@@ -12,41 +12,28 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
-import { AvatarModule } from 'primeng/avatar';
-import { TabsModule } from 'primeng/tabs';
-import { TagModule } from 'primeng/tag';
-import { InputTextModule } from 'primeng/inputtext';
-import { MessageService } from 'primeng/api';
 import { AuthService } from '@core/services';
 import { UserProfileService } from '@core/services';
 import { extractErrorMessage } from '@core/helpers';
+import { EduAvatar, EduDialog, EduInputText, EduMessageService, EduTab, EduTabPanel, EduTabs, EduTag } from '@edu-ui';
 
 // #endregion
 // #region Implementation
 @Component({
 	selector: 'app-user-info-dialog',
 	standalone: true,
-	imports: [
-		DialogModule,
-		ButtonModule,
-		AvatarModule,
-		TabsModule,
-		TagModule,
-		InputTextModule,
-		FormsModule,
-	],
+	imports: [EduDialog, ButtonModule, EduAvatar, EduTag, EduInputText, FormsModule, EduTab, EduTabPanel, EduTabs],
 	templateUrl: './user-info-dialog.component.html',
 	styleUrl: './user-info-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	providers: [MessageService],
+	providers: [EduMessageService],
 })
 export class UserInfoDialogComponent {
 	// #region Dependencias
 	private authService = inject(AuthService);
 	private userProfile = inject(UserProfileService);
-	private messageService = inject(MessageService);
+	private messageService = inject(EduMessageService);
 	private destroyRef = inject(DestroyRef);
 	// #endregion
 

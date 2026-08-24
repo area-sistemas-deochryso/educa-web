@@ -2,11 +2,11 @@ import { Component, ChangeDetectionStrategy, input, output, computed, signal } f
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { TableModule } from 'primeng/table';
+
 import { ButtonModule } from 'primeng/button';
-import { TagModule } from 'primeng/tag';
-import { CheckboxModule } from 'primeng/checkbox';
-import { TooltipModule } from 'primeng/tooltip';
+
+
+
 
 import {
 	AprobacionEstudianteListDto,
@@ -15,6 +15,7 @@ import {
 	SalonAdminListDto,
 	AprobacionEstado,
 } from '../../models';
+import { EduCheckbox, EduTable, EduTag, EduTooltip } from '@edu-ui';
 
 const PROMEDIO_MIN = 0;
 const PROMEDIO_MAX = 20;
@@ -22,7 +23,7 @@ const PROMEDIO_MAX = 20;
 @Component({
 	selector: 'app-classroom-approval-tab',
 	standalone: true,
-	imports: [CommonModule, FormsModule, TableModule, ButtonModule, TagModule, CheckboxModule, TooltipModule],
+	imports: [CommonModule, FormsModule, EduTable, ButtonModule, EduTag, EduCheckbox, EduTooltip],
 	templateUrl: './salon-aprobacion-tab.component.html',
 	styleUrl: './salon-aprobacion-tab.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

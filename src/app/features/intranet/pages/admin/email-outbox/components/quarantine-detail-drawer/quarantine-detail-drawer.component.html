@@ -1,4 +1,4 @@
-<p-drawer
+<edu-drawer
 	[visible]="visible()"
 	(visibleChange)="onVisibleChange($event)"
 	position="right"
@@ -13,7 +13,7 @@
 			</div>
 			<div class="detail-name">{{ item.destinatario }}</div>
 
-			<p-tag
+			<edu-tag
 				[value]="uiMapping.getQuarantineMotivoLabel(item.motivo)"
 				[severity]="uiMapping.getQuarantineMotivoSeverity(item.motivo)"
 			/>
@@ -25,7 +25,7 @@
 				</div>
 				<div class="info-item">
 					<span class="info-label">Estado</span>
-					<p-tag
+					<edu-tag
 						[value]="item.estado ? 'Activa' : 'Liberada'"
 						[severity]="item.estado ? 'success' : 'danger'"
 						styleClass="tag-neutral"
@@ -65,7 +65,7 @@
 				<div class="smtp-header">
 					<span class="info-label">SMTP response</span>
 					@if (detalle()?.originalSmtpResponseSource === 'reconstructed') {
-						<p-tag
+						<edu-tag
 							value="reconstruido"
 							styleClass="tag-neutral"
 							[pt]="{ root: { 'aria-label': 'Valor reconstruido desde EmailOutbox' } }"
@@ -79,8 +79,8 @@
 				) {
 					<span
 						class="smtp-empty"
-						pTooltip="Sin trazas disponibles"
-						tooltipPosition="top"
+						eduTooltip="Sin trazas disponibles"
+						eduTooltipPosition="top"
 						>—</span
 					>
 				} @else {
@@ -91,7 +91,7 @@
 			<div class="detail-hits">
 				<span class="info-label">Histórico de hits</span>
 				@if (detalle()?.recentHits?.length) {
-					<p-table
+					<edu-table
 						[value]="detalle()!.recentHits!"
 						styleClass="p-datatable-sm hits-table"
 					>
@@ -114,7 +114,7 @@
 								<td colspan="3" class="text-center p-4">Sin hits registrados.</td>
 							</tr>
 						</ng-template>
-					</p-table>
+					</edu-table>
 				} @else {
 					<span class="hits-empty">Sin hits previos registrados</span>
 				}
@@ -151,4 +151,4 @@
 			}
 		</div>
 	}
-</p-drawer>
+</edu-drawer>

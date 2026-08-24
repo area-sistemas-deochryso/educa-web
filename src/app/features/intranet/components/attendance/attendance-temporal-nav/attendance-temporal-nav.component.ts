@@ -109,8 +109,7 @@ export class AttendanceTemporalNavComponent {
 	private formatMonthLabel(date: Date): string {
 		const months = [
 			'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-			'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre',
-		];
+			'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 		return `${months[date.getMonth()]} ${date.getFullYear()}`;
 	}
 

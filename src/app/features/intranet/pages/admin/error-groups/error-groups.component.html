@@ -43,7 +43,7 @@
 </app-page-header>
 <!-- #endregion -->
 
-<p-confirmDialog />
+<edu-confirm-dialog />
 
 @if (error()) {
 	<div class="error-banner">
@@ -58,22 +58,22 @@
 
 <!-- #region Filtros -->
 <div class="filters-bar">
-	<p-iconfield class="search-box">
-		<p-inputicon class="pi pi-search" />
+	<edu-icon-field class="search-box">
+		<edu-input-icon class="pi pi-search" />
 		<input
 			type="text"
-			pInputText
+			eduInputText
 			placeholder="Buscar en mensaje..."
 			[ngModel]="searchTerm()"
 			(ngModelChange)="onSearchChange($event)"
 			[maxlength]="searchMax"
 			data-info-anchor="admin-error-groups-buscar-input"
 		/>
-	</p-iconfield>
+	</edu-icon-field>
 
 	<div class="filter-dropdowns">
 		@if (viewMode() === 'table') {
-			<p-select
+			<edu-select
 				[options]="estadoOptions"
 				[ngModel]="filterEstado()"
 				(ngModelChange)="onFilterEstadoChange($event)"
@@ -82,7 +82,7 @@
 				data-info-anchor="admin-error-groups-estado-select"
 			/>
 		}
-		<p-select
+		<edu-select
 			[options]="severidadOptions"
 			[ngModel]="filterSeveridad()"
 			(ngModelChange)="onFilterSeveridadChange($event)"
@@ -90,7 +90,7 @@
 			appendTo="body"
 			data-info-anchor="admin-error-groups-severidad-select"
 		/>
-		<p-select
+		<edu-select
 			[options]="origenOptions"
 			[ngModel]="filterOrigen()"
 			(ngModelChange)="onFilterOrigenChange($event)"
@@ -98,7 +98,7 @@
 			appendTo="body"
 			data-info-anchor="admin-error-groups-origen-select"
 		/>
-		<p-inputNumber
+		<edu-input-number
 			[ngModel]="filterOcurrenciasMin()"
 			(ngModelChange)="onFilterOcurrenciasMinChange($event)"
 			placeholder="Ocurrencias mín."
@@ -111,7 +111,7 @@
 	</div>
 
 	<div class="filter-toggle">
-		<p-checkbox
+		<edu-checkbox
 			inputId="hideResolvedIgnored"
 			[ngModel]="hideResolvedIgnored()"
 			(ngModelChange)="onHideResolvedIgnoredChange($event)"
@@ -123,8 +123,8 @@
 		</label>
 	</div>
 
-	<div class="filter-toggle" pTooltip="Oculta NETWORK_REVALIDATION_FAILED siempre, y SLOW_REQUEST solo cuando pega contra endpoints de diagnóstico pesados por diseño (ej. db-diagnostics). Fuera de eso, una request lenta sigue siendo señal real." tooltipPosition="top">
-		<p-checkbox
+	<div class="filter-toggle" eduTooltip="Oculta NETWORK_REVALIDATION_FAILED siempre, y SLOW_REQUEST solo cuando pega contra endpoints de diagnóstico pesados por diseño (ej. db-diagnostics). Fuera de eso, una request lenta sigue siendo señal real." eduTooltipPosition="top">
+		<edu-checkbox
 			inputId="excluirRuido"
 			[ngModel]="excluirRuido()"
 			(ngModelChange)="onExcluirRuidoChange($event)"
@@ -136,8 +136,8 @@
 		</label>
 	</div>
 
-	<div class="filter-toggle" pTooltip="Oculta grupos de errores de negocio (4xx esperados) — no son bugs reales." tooltipPosition="top">
-		<p-checkbox
+	<div class="filter-toggle" eduTooltip="Oculta grupos de errores de negocio (4xx esperados) — no son bugs reales." eduTooltipPosition="top">
+		<edu-checkbox
 			inputId="excluirNegocio"
 			[ngModel]="excluirNegocio()"
 			(ngModelChange)="onExcluirNegocioChange($event)"
@@ -153,7 +153,7 @@
 		pButton
 		icon="pi pi-filter-slash"
 		class="p-button-text p-button-sm btn-clear"
-		pTooltip="Limpiar filtros"
+		eduTooltip="Limpiar filtros"
 		(click)="onClearFilters()"
 		[pt]="{ root: { 'aria-label': 'Limpiar filtros' } }"
 		data-info-anchor="admin-error-groups-limpiar-filtros-btn"
@@ -181,7 +181,7 @@
 		<app-table-skeleton [columns]="tableSkeletonColumns" [rows]="10" />
 	} @else {
 		<section class="table-section">
-			<p-table
+			<edu-table
 				[value]="eventItems()"
 				[dataKey]="'id'"
 				[rowHover]="true"
@@ -201,16 +201,16 @@
 				<ng-template #body let-item>
 					<tr (click)="onEventRowClick(item)" class="group-row" data-info-anchor="admin-error-groups-evento-fila">
 						<td>
-							<p-tag
+							<edu-tag
 								[value]="item.severidad"
 								[severity]="getSeveridadSeverity(item.severidad)"
 							/>
 						</td>
 						<td>
-							<p-tag [value]="item.origen" [icon]="getOrigenIcon(item.origen)" severity="info" />
+							<edu-tag [value]="item.origen" [icon]="getOrigenIcon(item.origen)" severity="info" />
 						</td>
 						<td class="col-mensaje">
-							<span class="mensaje-text" [pTooltip]="item.mensaje" tooltipPosition="top">
+							<span class="mensaje-text" [eduTooltip]="item.mensaje" eduTooltipPosition="top">
 								{{ item.mensaje }}
 							</span>
 							@if (item.errorCode) {
@@ -218,13 +218,13 @@
 							}
 						</td>
 						<td class="col-url">
-							<span class="url-text" [pTooltip]="item.url" tooltipPosition="top">
+							<span class="url-text" [eduTooltip]="item.url" eduTooltipPosition="top">
 								{{ item.url }}
 							</span>
 						</td>
 						<td>
 							@if (item.httpStatus) {
-								<p-tag
+								<edu-tag
 									[value]="'' + item.httpStatus"
 									[severity]="item.httpStatus >= 500 ? 'danger' : 'warn'"
 								/>
@@ -248,8 +248,8 @@
 						</td>
 					</tr>
 				</ng-template>
-			</p-table>
-			<p-paginator
+			</edu-table>
+			<edu-paginator
 				[rows]="eventPageSize()"
 				[first]="eventPaginatorFirst()"
 				[totalRecords]="eventTotalEstimate()"
@@ -291,7 +291,7 @@
 				></button>
 			</div>
 		}
-		<p-table
+		<edu-table
 			[value]="items()"
 			[dataKey]="'id'"
 			[rowHover]="true"
@@ -300,7 +300,7 @@
 			<ng-template #header>
 				<tr>
 					<th style="width: 3rem">
-						<p-checkbox
+						<edu-checkbox
 							[binary]="true"
 							[ngModel]="allSelected()"
 							(onChange)="toggleSelectAll()"
@@ -328,7 +328,7 @@
 						></i>
 					</th>
 					<th>Ocurrencias 30d</th>
-					<th pTooltip="Usuarios distintos afectados" tooltipPosition="top">Usuarios únicos</th>
+					<th eduTooltip="Usuarios distintos afectados" eduTooltipPosition="top">Usuarios únicos</th>
 					<th>Origen</th>
 					<th class="sortable-header" (click)="onSortChange('ultimaFecha')" data-info-anchor="tabla-orden-columna">
 						Última fecha
@@ -345,7 +345,7 @@
 			<ng-template #body let-item>
 				<tr (click)="onRowClick(item)" class="group-row" data-info-anchor="admin-error-groups-ver-detalle-btn">
 					<td (click)="$event.stopPropagation()">
-						<p-checkbox
+						<edu-checkbox
 							[binary]="true"
 							[ngModel]="selectedIds().has(item.id)"
 							(onChange)="store.toggleSelected(item.id)"
@@ -353,19 +353,19 @@
 						/>
 					</td>
 					<td>
-						<p-tag
+						<edu-tag
 							[value]="item.severidad"
 							[severity]="getSeveridadSeverity(item.severidad)"
 						/>
 					</td>
 					<td>
-						<p-tag
+						<edu-tag
 							[value]="getEstadoLabel(item.estado)"
 							[severity]="getEstadoSeverity(item.estado)"
 						/>
 					</td>
 					<td class="col-mensaje">
-						<span class="mensaje-text" [pTooltip]="item.mensajeRepresentativo" tooltipPosition="top">
+						<span class="mensaje-text" [eduTooltip]="item.mensajeRepresentativo" eduTooltipPosition="top">
 							{{ item.mensajeRepresentativo }}
 						</span>
 						@if (item.errorCode) {
@@ -376,12 +376,12 @@
 						<span class="contador">
 							{{ item.contadorTotal }}
 							@if (item.contadorPostResolucion > 0) {
-								<p-tag
+								<edu-tag
 									value="Reabierto"
 									severity="danger"
 									icon="pi pi-history"
-									[pTooltip]="'Reabierto — ' + item.contadorPostResolucion + ' ocurrencia(s) después de resolver'"
-									tooltipPosition="top"
+									[eduTooltip]="'Reabierto — ' + item.contadorPostResolucion + ' ocurrencia(s) después de resolver'"
+									eduTooltipPosition="top"
 								/>
 							}
 						</span>
@@ -390,8 +390,8 @@
 						<button
 							type="button"
 							class="sparkline-cell-btn"
-							pTooltip="Ver ocurrencias 30 días ampliado"
-							tooltipPosition="top"
+							eduTooltip="Ver ocurrencias 30 días ampliado"
+							eduTooltipPosition="top"
 							[attr.aria-label]="'Ver ocurrencias 30 días ampliado de ' + item.mensajeRepresentativo"
 							data-info-anchor="admin-error-groups-sparkline-btn"
 						>
@@ -402,12 +402,12 @@
 							/>
 						</button>
 					</td>
-					<td class="col-usuarios" pTooltip="Usuarios únicos afectados">
+					<td class="col-usuarios" eduTooltip="Usuarios únicos afectados">
 						<i class="pi pi-users"></i>
 						{{ item.usuariosUnicos }}
 					</td>
 					<td>
-						<p-tag [value]="item.origen" [icon]="getOrigenIcon(item.origen)" severity="info" />
+						<edu-tag [value]="item.origen" [icon]="getOrigenIcon(item.origen)" severity="info" />
 					</td>
 					<td class="col-fecha">{{ item.ultimaFecha | date: 'dd/MM HH:mm' }}</td>
 					<td (click)="$event.stopPropagation()">
@@ -415,8 +415,8 @@
 							pButton
 							icon="pi pi-eye"
 							class="p-button-rounded p-button-text p-button-sm"
-							pTooltip="Ver detalle"
-							tooltipPosition="left"
+							eduTooltip="Ver detalle"
+							eduTooltipPosition="left"
 							(click)="onRowClick(item)"
 							[pt]="{ root: { 'aria-label': 'Ver detalle del grupo' } }"
 							data-info-anchor="admin-error-groups-ver-detalle-btn"
@@ -425,8 +425,8 @@
 							pButton
 							icon="pi pi-pencil"
 							class="p-button-rounded p-button-text p-button-sm"
-							pTooltip="Cambiar estado"
-							tooltipPosition="left"
+							eduTooltip="Cambiar estado"
+							eduTooltipPosition="left"
 							(click)="onStatusChangeRequested(item)"
 							[pt]="{ root: { 'aria-label': 'Cambiar estado del grupo' } }"
 							data-info-anchor="admin-error-groups-cambiar-estado-btn"
@@ -435,8 +435,8 @@
 							pButton
 							icon="pi pi-trash"
 							class="p-button-rounded p-button-text p-button-sm p-button-danger"
-							pTooltip="Eliminar"
-							tooltipPosition="left"
+							eduTooltip="Eliminar"
+							eduTooltipPosition="left"
 							(click)="onDeleteRequested(item)"
 							[pt]="{ root: { 'aria-label': 'Eliminar grupo' } }"
 							data-info-anchor="admin-error-groups-eliminar-btn"
@@ -452,8 +452,8 @@
 					</td>
 				</tr>
 			</ng-template>
-		</p-table>
-		<p-paginator
+		</edu-table>
+		<edu-paginator
 			[rows]="pageSize()"
 			[first]="paginatorFirst()"
 			[totalRecords]="totalRecordsEstimate()"
@@ -507,7 +507,7 @@
 <!-- #endregion -->
 
 <!-- #region Dialog trend ampliado (siempre en DOM — Plan 43 Chat 1.2) -->
-<p-dialog
+<edu-dialog
 	[visible]="trendDialogVisible()"
 	(visibleChange)="onTrendDialogVisibleChange($event)"
 	[modal]="true"
@@ -538,5 +538,5 @@
 			}
 		</div>
 	}
-</p-dialog>
+</edu-dialog>
 <!-- #endregion -->

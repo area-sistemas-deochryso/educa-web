@@ -1,4 +1,4 @@
-<p-drawer
+<edu-drawer
 	[visible]="visible()"
 	(visibleChange)="onVisibleChange($event)"
 	position="right"
@@ -13,7 +13,7 @@
 			</div>
 			<div class="detail-name">{{ item.correo }}</div>
 
-			<p-tag
+			<edu-tag
 				[value]="uiMapping.getBlacklistMotivoLabel(item.motivo)"
 				[severity]="uiMapping.getBlacklistMotivoSeverity(item.motivo)"
 			/>
@@ -25,7 +25,7 @@
 				</div>
 				<div class="info-item">
 					<span class="info-label">Estado</span>
-					<p-tag
+					<edu-tag
 						[value]="item.estado ? 'Activa' : 'Despejada'"
 						[severity]="item.estado ? 'success' : 'danger'"
 						styleClass="tag-neutral"
@@ -73,7 +73,7 @@
 				<div class="smtp-header">
 					<span class="info-label">SMTP response</span>
 					@if (item.originalSmtpResponseSource === 'reconstructed') {
-						<p-tag
+						<edu-tag
 							value="reconstruido"
 							styleClass="tag-neutral"
 							[pt]="{ root: { 'aria-label': 'Valor reconstruido desde EmailOutbox' } }"
@@ -83,8 +83,8 @@
 				@if (item.originalSmtpResponseSource === 'unavailable' || !item.originalSmtpResponse) {
 					<span
 						class="smtp-empty"
-						pTooltip="Sin trazas disponibles"
-						tooltipPosition="top"
+						eduTooltip="Sin trazas disponibles"
+						eduTooltipPosition="top"
 						>—</span
 					>
 				} @else {
@@ -123,4 +123,4 @@
 			}
 		</div>
 	}
-</p-drawer>
+</edu-drawer>

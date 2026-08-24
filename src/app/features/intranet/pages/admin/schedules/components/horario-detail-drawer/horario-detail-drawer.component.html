@@ -1,5 +1,5 @@
 <!-- #region Template -->
-<p-drawer
+<edu-drawer
 	[visible]="visible()"
 	(visibleChange)="onVisibleChange($event)"
 	position="right"
@@ -30,7 +30,7 @@
 		<div class="detail-content">
 			<!-- * Estado y acciones rápidas -->
 			<div class="status-section">
-				<p-tag
+				<edu-tag
 					[value]="detalle()!.estado | estadoLabel"
 					[severity]="detalle()!.estado | estadoSeverity"
 				/>
@@ -43,8 +43,8 @@
 							class="p-button-rounded p-button-text p-button-info"
 							data-info-anchor="admin-schedules-detail-editar-btn"
 							(click)="onEdit()"
-							pTooltip="Editar horario"
-							tooltipPosition="top"
+							eduTooltip="Editar horario"
+							eduTooltipPosition="top"
 							[pt]="{
 								root: {
 									'aria-label': 'Editar horario',
@@ -60,8 +60,8 @@
 							[class.p-button-success]="!detalle()!.estado"
 							data-info-anchor="admin-schedules-detail-toggle-estado-btn"
 							(click)="onToggleEstado()"
-							[pTooltip]="detalle()!.estado | estadoToggleLabel"
-							tooltipPosition="top"
+							[eduTooltip]="detalle()!.estado | estadoToggleLabel"
+							eduTooltipPosition="top"
 							[pt]="{
 								root: {
 									'aria-label': detalle()!.estado | estadoToggleLabel,
@@ -75,8 +75,8 @@
 							class="p-button-rounded p-button-text p-button-danger"
 							data-info-anchor="admin-schedules-detail-eliminar-btn"
 							(click)="onDelete()"
-							pTooltip="Eliminar horario"
-							tooltipPosition="top"
+							eduTooltip="Eliminar horario"
+							eduTooltipPosition="top"
 							[pt]="{
 								root: {
 									'aria-label': 'Eliminar',
@@ -156,7 +156,7 @@
 						Profesor Asignado
 					</h3>
 					@if (modoAsignacion() === 'TutorPleno') {
-						<p-tag value="Tutor" styleClass="tag-neutral" class="modo-tag" />
+						<edu-tag value="Tutor" styleClass="tag-neutral" class="modo-tag" />
 					}
 					@if (isAdmin() && detalle()!.profesorId) {
 						<div class="section-actions">
@@ -166,8 +166,8 @@
 								class="p-button-rounded p-button-text p-button-sm p-button-info"
 								data-info-anchor="admin-schedules-detail-toggle-profesor-edit-btn"
 								(click)="onToggleProfesorEdit()"
-								[pTooltip]="showProfesorEdit() ? 'Cancelar cambio' : 'Cambiar profesor'"
-								tooltipPosition="top"
+								[eduTooltip]="showProfesorEdit() ? 'Cancelar cambio' : 'Cambiar profesor'"
+								eduTooltipPosition="top"
 								[pt]="{
 									root: {
 										'aria-label': showProfesorEdit() ? 'Cancelar cambio' : 'Cambiar profesor',
@@ -180,8 +180,8 @@
 								class="p-button-rounded p-button-text p-button-sm p-button-danger"
 								data-info-anchor="admin-schedules-detail-desasignar-profesor-btn"
 								(click)="onDesasignarProfesor()"
-								pTooltip="Quitar profesor"
-								tooltipPosition="top"
+								eduTooltip="Quitar profesor"
+								eduTooltipPosition="top"
 								[pt]="{
 									root: {
 										'aria-label': 'Quitar profesor',
@@ -208,7 +208,7 @@
 					<!-- Dropdown para cambiar profesor (admin only) -->
 					@if (isAdmin() && showProfesorEdit()) {
 						<div class="assign-professor-form mt-3">
-							<p-select
+							<edu-select
 								[options]="profesoresOptions()"
 								[(ngModel)]="selectedProfesorId"
 								data-info-anchor="admin-schedules-detail-profesor-select"
@@ -230,8 +230,8 @@
 								[disabled]="!selectedProfesorId"
 								data-info-anchor="admin-schedules-detail-asignar-profesor-btn"
 								(click)="onAsignarProfesor()"
-								pTooltip="Asignar el nuevo profesor seleccionado"
-								tooltipPosition="top"
+								eduTooltip="Asignar el nuevo profesor seleccionado"
+								eduTooltipPosition="top"
 							></button>
 						</div>
 					}
@@ -242,7 +242,7 @@
 
 						@if (isAdmin()) {
 							<div class="assign-professor-form">
-								<p-select
+								<edu-select
 									[options]="profesoresOptions()"
 									[(ngModel)]="selectedProfesorId"
 									data-info-anchor="admin-schedules-detail-profesor-select"
@@ -264,8 +264,8 @@
 									[disabled]="!selectedProfesorId"
 									data-info-anchor="admin-schedules-detail-asignar-profesor-btn"
 									(click)="onAsignarProfesor()"
-									pTooltip="Asignar el profesor seleccionado a este horario"
-									tooltipPosition="top"
+									eduTooltip="Asignar el profesor seleccionado a este horario"
+									eduTooltipPosition="top"
 								></button>
 							</div>
 						}
@@ -279,7 +279,7 @@
 					<h3 class="section-title">
 						<i class="pi pi-users"></i>
 						Estudiantes Asignados
-						<p-badge [value]="detalle()!.estudiantes.length.toString()" />
+						<edu-badge [value]="detalle()!.estudiantes.length.toString()" />
 					</h3>
 					@if (isAdmin()) {
 						<div class="section-actions">
@@ -291,10 +291,10 @@
 								data-info-anchor="admin-schedules-detail-asignar-todos-btn"
 								(click)="onAsignarTodosEstudiantes()"
 								[disabled]="detalle()!.estudiantesDisponiblesSalon === 0"
-								[pTooltip]="detalle()!.estudiantesDisponiblesSalon === 0
+								[eduTooltip]="detalle()!.estudiantesDisponiblesSalon === 0
 									? 'No hay estudiantes matriculados en este salón'
 									: 'Asignar todos los estudiantes del salón'"
-								tooltipPosition="top"
+								eduTooltipPosition="top"
 							></button>
 						</div>
 					}
@@ -318,8 +318,8 @@
 										class="p-button-rounded p-button-text p-button-danger p-button-sm student-remove-btn"
 										data-info-anchor="admin-schedules-detail-desasignar-estudiante-btn"
 										(click)="onDesasignarEstudiante(estudiante.id)"
-										pTooltip="Quitar estudiante"
-										tooltipPosition="left"
+										eduTooltip="Quitar estudiante"
+										eduTooltipPosition="left"
 										[pt]="{
 											root: {
 												'aria-label': 'Quitar estudiante',
@@ -382,9 +382,9 @@
 			class="p-button-text"
 			data-info-anchor="cerrar-drawer-btn"
 			(click)="onClose()"
-			pTooltip="Cerrar panel de detalles"
-			tooltipPosition="top"
+			eduTooltip="Cerrar panel de detalles"
+			eduTooltipPosition="top"
 		></button>
 	</ng-template>
-</p-drawer>
+</edu-drawer>
 <!-- #endregion -->

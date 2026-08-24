@@ -1,4 +1,4 @@
-<p-dialog
+<edu-dialog
 	[visible]="visible()"
 	(visibleChange)="onVisibleChange($event)"
 	[modal]="true"
@@ -26,7 +26,7 @@
 				Nombre / Etiqueta
 			</label>
 			<input
-				pInputText
+				eduInputText
 				id="nodeEtiqueta"
 				[ngModel]="formData().etiqueta"
 				(ngModelChange)="onEtiquetaChange($event)"
@@ -39,7 +39,7 @@
 				<i class="pi pi-th-large"></i>
 				Tipo
 			</label>
-			<p-select
+			<edu-select
 				id="nodeTipo"
 				[options]="nodeTypeOptions()"
 				[ngModel]="formData().tipo"
@@ -56,7 +56,7 @@
 					<i class="pi pi-arrows-h"></i>
 					Ancho
 				</label>
-				<p-inputNumber
+				<edu-input-number
 					id="nodeWidth"
 					[ngModel]="formData().width"
 					(ngModelChange)="onWidthChange($event)"
@@ -72,7 +72,7 @@
 					<i class="pi pi-arrows-v"></i>
 					Alto
 				</label>
-				<p-inputNumber
+				<edu-input-number
 					id="nodeHeight"
 					[ngModel]="formData().height"
 					(ngModelChange)="onHeightChange($event)"
@@ -106,4 +106,4 @@
 		></button>
 	</div>
 	<!-- #endregion -->
-</p-dialog>
+</edu-dialog>

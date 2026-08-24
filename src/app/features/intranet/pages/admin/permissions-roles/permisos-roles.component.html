@@ -25,26 +25,26 @@
 	}
 
 	<!-- #region Tabs -->
-	<p-tabs [value]="'roles'">
-		<p-tablist>
-			<p-tab value="roles" data-info-anchor="tab-switch">
+	<edu-tabs [value]="'roles'">
+		
+			<edu-tab value="roles" data-info-anchor="tab-switch">
 				<i class="pi pi-id-card"></i>
 				Por Rol
-			</p-tab>
-			<p-tab value="catalogo" data-info-anchor="tab-switch">
+			</edu-tab>
+			<edu-tab value="catalogo" data-info-anchor="tab-switch">
 				<i class="pi pi-shield"></i>
 				Catálogo
-			</p-tab>
-		</p-tablist>
+			</edu-tab>
+		
 
-		<p-tabpanel value="roles">
+		<edu-tabpanel value="roles">
 			<!-- #region Stats cards -->
 			<app-kpi-stats [items]="statsItems()" />
 			<!-- #endregion -->
 
 			<!-- #region Table -->
 			<section class="table-section">
-				<p-table
+				<edu-table
 					[value]="vm().matrixRows"
 					[dataKey]="'rolId'"
 					[loading]="vm().loading"
@@ -62,7 +62,7 @@
 						<ng-template #body let-row>
 							<tr>
 								<td>
-									<p-tag [value]="row.rolNombre" styleClass="tag-neutral" />
+									<edu-tag [value]="row.rolNombre" styleClass="tag-neutral" />
 								</td>
 								<td class="text-center">
 									<span class="count-badge">{{ row.capabilityIds.length }}</span>
@@ -106,7 +106,7 @@
 											pButton
 											icon="pi pi-eye"
 											class="p-button-rounded p-button-text p-button-secondary"
-											pTooltip="Ver detalles"
+											eduTooltip="Ver detalles"
 											aria-label="Ver detalles"
 											data-info-anchor="admin-permissions-roles-ver-detalle-btn"
 											(click)="openDetail(row)"
@@ -115,7 +115,7 @@
 											pButton
 											icon="pi pi-pencil"
 											class="p-button-rounded p-button-text p-button-success"
-											pTooltip="Editar"
+											eduTooltip="Editar"
 											aria-label="Editar"
 											data-info-anchor="admin-permissions-roles-editar-btn"
 											(click)="editRole(row)"
@@ -135,20 +135,20 @@
 								</td>
 							</tr>
 						</ng-template>
-					</p-table>
+					</edu-table>
 				</section>
 			<!-- #endregion -->
-		</p-tabpanel>
+		</edu-tabpanel>
 
-		<p-tabpanel value="catalogo">
+		<edu-tabpanel value="catalogo">
 			<app-vistas />
-		</p-tabpanel>
-	</p-tabs>
+		</edu-tabpanel>
+	</edu-tabs>
 	<!-- #endregion -->
 </div>
 
 <!-- #region Detail Drawer -->
-<p-drawer
+<edu-drawer
 	[visible]="vm().detailDrawerVisible"
 	(visibleChange)="onDrawerVisibleChange($event)"
 	position="right"
@@ -166,7 +166,7 @@
 			<div class="detail-summary">
 				<div class="summary-item">
 					<span class="summary-label">Rol</span>
-					<p-tag [value]="vm().selectedRow?.rolNombre || ''" styleClass="tag-neutral" />
+					<edu-tag [value]="vm().selectedRow?.rolNombre || ''" styleClass="tag-neutral" />
 				</div>
 				<div class="summary-item">
 					<span class="summary-label">Capabilities</span>
@@ -218,11 +218,11 @@
 			></button>
 		</div>
 	}
-</p-drawer>
+</edu-drawer>
 <!-- #endregion -->
 
 <!-- #region Edit Dialog -->
-<p-dialog
+<edu-dialog
 	[visible]="vm().dialogVisible"
 	(visibleChange)="onDialogVisibleChange($event)"
 	[header]="'Editar Capabilities - ' + (vm().selectedRow?.rolNombre || '')"
@@ -236,7 +236,7 @@
 		<div class="dialog-role-header">
 			<div class="role-info">
 				<i class="pi pi-id-card"></i>
-				<p-tag [value]="vm().selectedRow?.rolNombre || ''" styleClass="tag-neutral" />
+				<edu-tag [value]="vm().selectedRow?.rolNombre || ''" styleClass="tag-neutral" />
 			</div>
 			<div class="vistas-count">
 				<i class="pi pi-check"></i> {{ vm().capsCountLabel }}
@@ -267,7 +267,7 @@
 				<div class="vistas-content">
 					<div class="vistas-header">
 						<label class="select-all">
-							<p-checkbox
+							<edu-checkbox
 								[ngModel]="vm().isAllModuloSelected"
 								data-info-anchor="admin-permissions-roles-select-all-checkbox"
 								(ngModelChange)="toggleAllCapabilitiesModulo()"
@@ -285,7 +285,7 @@
 						<i class="pi pi-search"></i>
 						<input
 							type="text"
-							pInputText
+							eduInputText
 							placeholder="Buscar por nombre o código..."
 							data-info-anchor="admin-permissions-roles-buscar-input"
 							[ngModel]="vm().capBusqueda"
@@ -299,7 +299,7 @@
 								class="vista-checkbox"
 								[class.selected]="vm().selectedCapIds.includes(cap.id)"
 							>
-								<p-checkbox
+								<edu-checkbox
 									[ngModel]="vm().selectedCapIds.includes(cap.id)"
 									data-info-anchor="admin-permissions-roles-cap-checkbox"
 									(ngModelChange)="toggleCapability(cap.id)"
@@ -339,6 +339,6 @@
 			></button>
 		</div>
 	</ng-template>
-</p-dialog>
+</edu-dialog>
 <!-- #endregion -->
 <!-- #endregion -->

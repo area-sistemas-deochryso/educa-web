@@ -10,18 +10,18 @@
 		subtitle="Bandeja de tickets recibidos y catálogo de tipos de problema"
 	/>
 
-	<p-tabs [value]="activeTab()" (valueChange)="onTabChange($event)" data-info-anchor="admin-tickets-tabs">
-		<p-tablist>
-			<p-tab value="bandeja">
+	<edu-tabs [value]="activeTab()" (valueChange)="onTabChange($event)" data-info-anchor="admin-tickets-tabs">
+		
+			<edu-tab value="bandeja">
 				<i class="pi pi-inbox mr-2"></i>
 				Bandeja
-			</p-tab>
-			<p-tab value="tipos">
+			</edu-tab>
+			<edu-tab value="tipos">
 				<i class="pi pi-tags mr-2"></i>
 				Tipos de ticket
-			</p-tab>
-		</p-tablist>
-	</p-tabs>
+			</edu-tab>
+		
+	</edu-tabs>
 
 	@if (activeTab() === 'bandeja') {
 		<app-ticket-bandeja />

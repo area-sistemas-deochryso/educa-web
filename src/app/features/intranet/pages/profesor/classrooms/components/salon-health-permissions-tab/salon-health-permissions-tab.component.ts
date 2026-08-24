@@ -13,21 +13,12 @@ import { HealthExitListComponent } from './components/health-exit-list.component
 import { HealthJustificationListComponent } from './components/health-justification-list.component';
 import { HealthExitDialogComponent } from './components/health-exit-dialog.component';
 import { HealthJustificationDialogComponent } from './components/health-justification-dialog.component';
-import { EduConfirmationService, EduConfirmDialog, EduTooltip } from '@edu-ui';
+import { EduConfirmDialog, EduConfirmationService, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-salon-health-permissions-tab',
 	standalone: true,
-	imports: [
-		CommonModule,
-		ButtonModule,
-		EduTooltip,
-		EduConfirmDialog,
-		HealthExitListComponent,
-		HealthJustificationListComponent,
-		HealthExitDialogComponent,
-		HealthJustificationDialogComponent,
-	],
+	imports: [CommonModule, ButtonModule, EduTooltip, EduConfirmDialog, HealthExitListComponent, HealthJustificationListComponent, HealthExitDialogComponent, HealthJustificationDialogComponent],
 	providers: [EduConfirmationService],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
@@ -118,8 +109,7 @@ import { EduConfirmationService, EduConfirmDialog, EduTooltip } from '@edu-ui';
 				font-size: 1rem;
 				font-weight: 600;
 			}
-		`,
-	],
+		`],
 })
 export class SalonHealthPermissionsTabComponent {
 	// #region Inputs

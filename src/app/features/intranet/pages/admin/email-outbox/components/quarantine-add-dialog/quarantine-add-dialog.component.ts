@@ -32,14 +32,7 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 @Component({
 	selector: 'app-quarantine-add-dialog',
 	standalone: true,
-	imports: [
-		FormsModule,
-		EduDialog,
-		ButtonModule,
-		EduInputText,
-		EduSelect,
-		EduTextarea,
-	],
+	imports: [FormsModule, EduDialog, ButtonModule, EduInputText, EduSelect, EduTextarea],
 	templateUrl: './quarantine-add-dialog.component.html',
 	styleUrl: './quarantine-add-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

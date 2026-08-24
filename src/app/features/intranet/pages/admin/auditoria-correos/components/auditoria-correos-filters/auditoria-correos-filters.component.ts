@@ -32,8 +32,7 @@ export class AuditoriaCorreosFiltersComponent {
 		{ label: 'Todos los tipos', value: null },
 		{ label: 'Estudiante', value: 'Estudiante' },
 		{ label: 'Apoderado', value: 'Apoderado' },
-		{ label: 'Profesor', value: 'Profesor' },
-	];
+		{ label: 'Profesor', value: 'Profesor' }];
 
 	onSearchChange(value: string): void {
 		this.searchChange.emit(value);

@@ -1,4 +1,4 @@
-<p-dialog
+<edu-dialog
 	header="Configuración de Calificaciones — {{ nivel() }}"
 	[visible]="visible()"
 	(visibleChange)="onVisibleChange($event)"
@@ -9,7 +9,7 @@
 	<!-- #region Tipo de calificación -->
 	<div class="mb-4">
 		<label class="block mb-2 font-medium">Tipo de Calificación</label>
-		<p-select
+		<edu-select
 			[options]="tipoOptions"
 			[ngModel]="tipoCalificacion()"
 			(ngModelChange)="tipoCalificacion.set($event)"
@@ -26,7 +26,7 @@
 	@if (tipoCalificacion() === 'NUMERICO') {
 		<div class="mb-4">
 			<label class="block mb-2 font-medium">Nota Mínima Aprobatoria</label>
-			<p-inputNumber
+			<edu-input-number
 				[ngModel]="notaMinAprobatoria()"
 				(ngModelChange)="notaMinAprobatoria.set($event)"
 				[min]="0"
@@ -43,7 +43,7 @@
 
 	<!-- #region Configuración literal -->
 	@if (tipoCalificacion() === 'LITERAL') {
-		<p-divider />
+		<edu-divider />
 		<div class="flex justify-between items-center mb-3">
 			<span class="font-medium">Literales</span>
 			<button
@@ -59,7 +59,7 @@
 		@for (literal of literales(); track literal.orden; let i = $index) {
 			<div class="literal-row">
 				<input
-					pInputText
+					eduInputText
 					[ngModel]="literal.letra"
 					(ngModelChange)="updateLiteral(i, 'letra', $event)"
 					placeholder="AD"
@@ -67,14 +67,14 @@
 					data-info-anchor="admin-salon-config-calificacion-literal-letra-input"
 				/>
 				<input
-					pInputText
+					eduInputText
 					[ngModel]="literal.descripcion"
 					(ngModelChange)="updateLiteral(i, 'descripcion', $event)"
 					placeholder="Descripción"
 					class="literal-desc"
 					data-info-anchor="admin-salon-config-calificacion-literal-desc-input"
 				/>
-				<p-inputNumber
+				<edu-input-number
 					[ngModel]="literal.notaMinima"
 					(ngModelChange)="updateLiteral(i, 'notaMinima', $event)"
 					[min]="0"
@@ -86,7 +86,7 @@
 					styleClass="literal-nota"
 				/>
 				<span class="literal-nota-separator">–</span>
-				<p-inputNumber
+				<edu-input-number
 					[ngModel]="literal.notaMaxima"
 					(ngModelChange)="updateLiteral(i, 'notaMaxima', $event)"
 					[min]="0"
@@ -97,7 +97,7 @@
 					placeholder="Máx"
 					styleClass="literal-nota"
 				/>
-				<p-checkbox
+				<edu-checkbox
 					[ngModel]="literal.esAprobatoria"
 					(ngModelChange)="updateLiteral(i, 'esAprobatoria', $event)"
 					[binary]="true"
@@ -145,4 +145,4 @@
 		></button>
 	</ng-template>
 	<!-- #endregion -->
-</p-dialog>
+</edu-dialog>

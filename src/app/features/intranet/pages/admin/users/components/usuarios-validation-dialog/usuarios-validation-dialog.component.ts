@@ -2,12 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, input, output, signal } f
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
-import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
-import { TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
+import { EduDialog, EduInputText, EduSelect, EduTable, EduTag, EduTooltip } from '@edu-ui';
 
 // #region Model
 export interface UsuarioValidacionItem {
@@ -28,7 +23,7 @@ export interface ErrorFilterOption {
 @Component({
 	selector: 'app-users-validation-dialog',
 	standalone: true,
-	imports: [CommonModule, FormsModule, ButtonModule, DialogModule, InputTextModule, SelectModule, TableModule, TagModule, TooltipModule],
+	imports: [CommonModule, FormsModule, ButtonModule, EduDialog, EduInputText, EduSelect, EduTable, EduTag, EduTooltip],
 	templateUrl: './usuarios-validation-dialog.component.html',
 	styleUrl: './usuarios-validation-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -57,8 +52,7 @@ export class UsersValidationDialogComponent {
 		}
 		return [
 			{ label: 'Todos los errores', value: null },
-			...[...erroresSet].sort().map((e) => ({ label: e, value: e })),
-		];
+			...[...erroresSet].sort().map((e) => ({ label: e, value: e }))];
 	});
 
 	readonly filteredItems = computed(() => {

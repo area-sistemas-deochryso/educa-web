@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { TabsModule } from 'primeng/tabs';
 
 import { StatsSkeletonComponent, TableSkeletonComponent } from '@intranet-shared/components';
 import type { SkeletonColumnDef } from '@intranet-shared/components';
@@ -12,19 +11,18 @@ import { EntradasConCorreoTableComponent } from './components/entradas-con-corre
 import { EntradasSinCorreoTableComponent } from './components/entradas-sin-correo-table/entradas-sin-correo-table.component';
 import { EstudiantesSinCorreoTableComponent } from './components/estudiantes-sin-correo-table/estudiantes-sin-correo-table.component';
 import { CorreosDiaFacade } from './services';
+import { EduTab, EduTabPanel, EduTabs } from '@edu-ui';
 
 const LISTA_SIMPLE_COLUMNS: SkeletonColumnDef[] = [
 	{ width: '110px', cellType: 'text' },
 	{ width: 'flex', cellType: 'text' },
-	{ width: '160px', cellType: 'badge' },
-];
+	{ width: '160px', cellType: 'badge' }];
 
 const BLACKLIST_COLUMNS: SkeletonColumnDef[] = [
 	{ width: 'flex', cellType: 'text' },
 	{ width: '140px', cellType: 'badge' },
 	{ width: '170px', cellType: 'text' },
-	{ width: '120px', cellType: 'badge' },
-];
+	{ width: '120px', cellType: 'badge' }];
 
 const ENTRADAS_COLUMNS: SkeletonColumnDef[] = [
 	{ width: '110px', cellType: 'text' },
@@ -32,8 +30,7 @@ const ENTRADAS_COLUMNS: SkeletonColumnDef[] = [
 	{ width: '160px', cellType: 'badge' },
 	{ width: '100px', cellType: 'text' },
 	{ width: '200px', cellType: 'badge' },
-	{ width: '160px', cellType: 'text' },
-];
+	{ width: '160px', cellType: 'text' }];
 
 const ENVIADOS_COLUMNS: SkeletonColumnDef[] = [
 	{ width: '110px', cellType: 'text' },
@@ -43,24 +40,12 @@ const ENVIADOS_COLUMNS: SkeletonColumnDef[] = [
 	{ width: '180px', cellType: 'text' },
 	{ width: '90px', cellType: 'text' },
 	{ width: '90px', cellType: 'badge' },
-	{ width: '110px', cellType: 'badge' },
-];
+	{ width: '110px', cellType: 'badge' }];
 
 @Component({
 	selector: 'app-tab-correos-dia',
 	standalone: true,
-	imports: [
-		TabsModule,
-		StatsSkeletonComponent,
-		TableSkeletonComponent,
-		CorreosDiaHeaderComponent,
-		CorreosDiaResumenComponent,
-		EstudiantesSinCorreoTableComponent,
-		ApoderadosBlacklisteadosTableComponent,
-		EntradasSinCorreoTableComponent,
-		EntradasConCorreoTableComponent,
-		AttendanceGapTileComponent,
-	],
+	imports: [StatsSkeletonComponent, TableSkeletonComponent, CorreosDiaHeaderComponent, CorreosDiaResumenComponent, EstudiantesSinCorreoTableComponent, ApoderadosBlacklisteadosTableComponent, EntradasSinCorreoTableComponent, EntradasConCorreoTableComponent, AttendanceGapTileComponent, EduTab, EduTabPanel, EduTabs],
 	templateUrl: './tab-correos-dia.component.html',
 	styleUrl: './tab-correos-dia.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

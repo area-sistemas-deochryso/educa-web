@@ -11,12 +11,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
-import { DatePickerModule } from 'primeng/datepicker';
-import { DialogModule } from 'primeng/dialog';
-import { MultiSelectModule } from 'primeng/multiselect';
-import { ToggleSwitchModule } from 'primeng/toggleswitch';
 
 import { AttendancesAdminStore, PersonaParaSeleccion } from '../../services';
+import { EduDatePicker, EduDialog, EduMultiSelect, EduToggle } from '@edu-ui';
 
 const MAX_RANGE_DAYS = 366;
 
@@ -29,15 +26,7 @@ export interface SyncRangePayload {
 @Component({
 	selector: 'app-sync-range-dialog',
 	standalone: true,
-	imports: [
-		CommonModule,
-		FormsModule,
-		ButtonModule,
-		DatePickerModule,
-		DialogModule,
-		MultiSelectModule,
-		ToggleSwitchModule,
-	],
+	imports: [CommonModule, FormsModule, ButtonModule, EduDatePicker, EduDialog, EduMultiSelect, EduToggle],
 	templateUrl: './sync-range-dialog.component.html',
 	styleUrl: './sync-range-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

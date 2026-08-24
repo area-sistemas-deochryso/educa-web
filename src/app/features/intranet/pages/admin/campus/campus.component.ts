@@ -31,21 +31,7 @@ import { EduSelect, EduTag, EduTooltip } from '@edu-ui';
 @Component({
 	selector: 'app-campus-admin',
 	standalone: true,
-	imports: [
-		FormsModule,
-		ButtonModule,
-		EduSelect,
-		EduTag,
-		EduTooltip,
-		CampusPisosPanelComponent,
-		CampusEditorComponent,
-		CampusPisoDialogComponent,
-		CampusNodeDialogComponent,
-		CampusBloqueoDialogComponent,
-		CampusVerticalConnectionDialogComponent,
-		ErrorStateComponent,
-		PageHeaderComponent,
-	],
+	imports: [FormsModule, ButtonModule, EduSelect, EduTag, EduTooltip, CampusPisosPanelComponent, CampusEditorComponent, CampusPisoDialogComponent, CampusNodeDialogComponent, CampusBloqueoDialogComponent, CampusVerticalConnectionDialogComponent, ErrorStateComponent, PageHeaderComponent],
 	templateUrl: './campus.component.html',
 	styleUrl: './campus.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -103,8 +89,7 @@ export class CampusComponent implements OnInit {
 		{ tool: 'addEdge', icon: 'pi pi-arrows-h', label: 'Conectar nodos' },
 		{ tool: 'addBlock', icon: 'pi pi-ban', label: 'Agregar bloqueo' },
 		{ tool: 'addVertical', icon: 'pi pi-arrows-v', label: 'Conexión vertical' },
-		{ tool: 'delete', icon: 'pi pi-trash', label: 'Eliminar' },
-	];
+		{ tool: 'delete', icon: 'pi pi-trash', label: 'Eliminar' }];
 
 	/** Pisos disponibles como destino (excluye el piso actual) */
 	readonly otherPisos = computed(() => {

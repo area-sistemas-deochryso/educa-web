@@ -2,7 +2,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideRouter } from '@angular/router';
-import { MessageService } from 'primeng/api';
 import { Subject } from 'rxjs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -14,6 +13,7 @@ import {
 	EmailHubService,
 } from '@features/intranet/pages/admin/email-outbox-shared';
 import { EmailMonitoreoFacade } from '../../services';
+import { EduMessageService } from '@edu-ui';
 
 describe('MapaEnvioTabComponent', () => {
 	let fixture: ComponentFixture<MapaEnvioTabComponent>;
@@ -64,15 +64,14 @@ describe('MapaEnvioTabComponent', () => {
 				provideHttpClientTesting(),
 				provideRouter([]),
 				{ provide: EmailHubService, useValue: hubMock },
-				{ provide: EmailMonitoreoFacade, useValue: facadeMock },
-			],
+				{ provide: EmailMonitoreoFacade, useValue: facadeMock }],
 		}).compileComponents();
 		fixture = TestBed.createComponent(MapaEnvioTabComponent);
 		component = fixture.componentInstance;
 	});
 
-	it('SignalR mock dispara MessageService.add con severity warn ante BlacklistEntryCreated', () => {
-		const messageService = fixture.componentRef.injector.get(MessageService);
+	it('SignalR mock dispara EduMessageService.add con severity warn ante BlacklistEntryCreated', () => {
+		const messageService = fixture.componentRef.injector.get(EduMessageService);
 		const spy = vi.spyOn(messageService, 'add');
 
 		fixture.detectChanges();
@@ -89,7 +88,7 @@ describe('MapaEnvioTabComponent', () => {
 	});
 
 	it('CandidatoBlacklistDetectado dispara toast severity info', () => {
-		const messageService = fixture.componentRef.injector.get(MessageService);
+		const messageService = fixture.componentRef.injector.get(EduMessageService);
 		const spy = vi.spyOn(messageService, 'add');
 
 		fixture.detectChanges();

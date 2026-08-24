@@ -105,10 +105,10 @@
 
 <!-- #region Tabs -->
 @if (hasAnyDomain()) {
-	<p-tabs [value]="activeDomain()" (valueChange)="setActiveDomain($event)">
-		<p-tablist>
+	<edu-tabs [value]="activeDomain()" (valueChange)="setActiveDomain($event)">
+		
 			@for (domain of domains(); track domain.id) {
-				<p-tab [value]="domain.id" data-info-anchor="tab-switch">
+				<edu-tab [value]="domain.id" data-info-anchor="tab-switch">
 					<span class="tab-trigger" [attr.data-tone]="domain.tone">
 						<i [class]="domain.icon"></i>
 						<span class="tab-label">{{ domain.label }}</span>
@@ -118,13 +118,13 @@
 							<span class="tab-count tab-count-ok"><i class="pi pi-check-circle"></i></span>
 						}
 					</span>
-				</p-tab>
+				</edu-tab>
 			}
-		</p-tablist>
+		
 
-		<p-tabpanels>
+		
 			@for (domain of domains(); track domain.id) {
-				<p-tabpanel [value]="domain.id">
+				<edu-tabpanel [value]="domain.id">
 					<!-- Domain summary card (compact) -->
 					<section class="domain-summary" [attr.data-tone]="domain.tone">
 						<i [class]="domain.icon + ' summary-icon'"></i>
@@ -220,10 +220,10 @@
 							</a>
 						}
 					</section>
-				</p-tabpanel>
+				</edu-tabpanel>
 			}
-		</p-tabpanels>
-	</p-tabs>
+		
+	</edu-tabs>
 } @else {
 	<div class="empty-state">
 		<i class="pi pi-lock"></i>

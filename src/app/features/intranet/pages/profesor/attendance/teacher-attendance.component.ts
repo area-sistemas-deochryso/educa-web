@@ -11,7 +11,6 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { TabsModule } from 'primeng/tabs';
 
 import { PageHeaderComponent, PickerGridComponent } from '@intranet-shared/components';
 import { ProfesorFacade } from '../services/profesor.facade';
@@ -19,21 +18,12 @@ import { AttendanceCourseFacade } from '../cursos/services/attendance-course.fac
 import { AttendanceRegistrationPanelComponent } from '../cursos/components/attendance-registration-panel/attendance-registration-panel.component';
 import { AttendanceSummaryPanelComponent } from '../cursos/components/attendance-summary-panel/attendance-summary-panel.component';
 import { EstadoAsistenciaCurso } from '../models';
-import { EduSpinner } from '@edu-ui';
+import { EduSpinner, EduTab, EduTabPanel, EduTabs } from '@edu-ui';
 
 @Component({
 	selector: 'app-teacher-attendance',
 	standalone: true,
-	imports: [
-		CommonModule,
-		FormsModule,
-		TabsModule,
-		EduSpinner,
-		AttendanceRegistrationPanelComponent,
-		AttendanceSummaryPanelComponent,
-		PageHeaderComponent,
-		PickerGridComponent,
-	],
+	imports: [CommonModule, FormsModule, EduSpinner, AttendanceRegistrationPanelComponent, AttendanceSummaryPanelComponent, PageHeaderComponent, PickerGridComponent, EduTab, EduTabPanel, EduTabs],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	styles: `
 		:host {
@@ -127,17 +117,17 @@ import { EduSpinner } from '@edu-ui';
 				</div>
 
 				@if (selectedHorarioId()) {
-					<p-tabs value="0">
-						<p-tablist>
-							<p-tab value="0" data-info-anchor="profesor-asistencia-tab">
+					<edu-tabs value="0">
+						
+							<edu-tab value="0" data-info-anchor="profesor-asistencia-tab">
 								<i class="pi pi-check-square mr-2"></i>Registrar
-							</p-tab>
-							<p-tab value="1" data-info-anchor="profesor-asistencia-tab">
+							</edu-tab>
+							<edu-tab value="1" data-info-anchor="profesor-asistencia-tab">
 								<i class="pi pi-chart-line mr-2"></i>Resumen
-							</p-tab>
-						</p-tablist>
-						<p-tabpanels>
-							<p-tabpanel value="0">
+							</edu-tab>
+						
+						
+							<edu-tabpanel value="0">
 								<app-attendance-registration-panel
 									[estudiantes]="asistenciaVm().registroEstudiantes"
 									[loading]="asistenciaVm().registroLoading"
@@ -152,17 +142,17 @@ import { EduSpinner } from '@edu-ui';
 									(justificacionChange)="onJustificacionChange($event)"
 									(save)="onSaveAsistencia()"
 								/>
-							</p-tabpanel>
-							<p-tabpanel value="1">
+							</edu-tabpanel>
+							<edu-tabpanel value="1">
 								<app-attendance-summary-panel
 									[resumen]="asistenciaVm().resumen"
 									[loading]="asistenciaVm().resumenLoading"
 									[error]="asistenciaVm().resumenError"
 									(buscar)="onBuscarResumen($event)"
 								/>
-							</p-tabpanel>
-						</p-tabpanels>
-					</p-tabs>
+							</edu-tabpanel>
+						
+					</edu-tabs>
 				} @else {
 					<div class="empty-page-state">
 						<i class="pi pi-arrow-up"></i>

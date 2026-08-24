@@ -41,26 +41,14 @@ import { AsistenciaAsistenteAdminApiService } from '@intranet-shared/services';
 import { formatDateLocalIso } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
 import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { TooltipModule } from 'primeng/tooltip';
 
 import { MonthSearchState } from '../month-search-state';
+import { EduInputText, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-attendance-director-asistentes-admin',
 	standalone: true,
-	imports: [
-		AttendanceLegendStatsComponent,
-		AttendancePersonaDayListComponent,
-		AttendanceHeatmapComponent,
-		AttendanceTemporalNavComponent,
-		AttendanceTableSkeletonComponent,
-		EmptyStateComponent,
-		ButtonModule,
-		FormsModule,
-		InputTextModule,
-		TooltipModule,
-	],
+	imports: [AttendanceLegendStatsComponent, AttendancePersonaDayListComponent, AttendanceHeatmapComponent, AttendanceTemporalNavComponent, AttendanceTableSkeletonComponent, EmptyStateComponent, ButtonModule, FormsModule, EduInputText, EduTooltip],
 	templateUrl: './attendance-director-asistentes-admin.component.html',
 	styleUrl: './attendance-director-asistentes-admin.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

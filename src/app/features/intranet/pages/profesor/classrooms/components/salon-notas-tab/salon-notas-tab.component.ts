@@ -38,20 +38,7 @@ interface SemanaColumnsGroup {
 @Component({
 	selector: 'app-classroom-grades-tab',
 	standalone: true,
-	imports: [
-		CommonModule,
-		SlicePipe,
-		RouterLink,
-		EduTable,
-		EduTag,
-		EduSelect,
-		FormsModule,
-		EduSelectButton,
-		EduSkeleton,
-		ButtonModule,
-		EduTooltip,
-		ErrorStateComponent,
-	],
+	imports: [CommonModule, SlicePipe, RouterLink, EduTable, EduTag, EduSelect, FormsModule, EduSelectButton, EduSkeleton, ButtonModule, EduTooltip, ErrorStateComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './salon-notas-tab.component.html',
 	styleUrl: './salon-notas-tab.component.scss',
@@ -78,8 +65,7 @@ export class ClassroomGradesTabComponent {
 	readonly vistaOptions = [
 		{ label: 'Semana', value: 'semana' },
 		{ label: 'Periodo', value: 'periodo' },
-		{ label: 'Año', value: 'anual' },
-	];
+		{ label: 'Año', value: 'anual' }];
 	// #endregion
 
 	// #region Computed

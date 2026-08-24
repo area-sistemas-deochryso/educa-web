@@ -16,16 +16,7 @@ import { EmailDeferFailBannerComponent } from '@features/intranet/pages/admin/em
 @Component({
 	selector: 'app-auditoria-correos',
 	standalone: true,
-	imports: [
-		CommonModule,
-		ButtonModule,
-		PageHeaderComponent,
-		AuditoriaCorreosStatsComponent,
-		AuditoriaCorreosFiltersComponent,
-		AuditoriaCorreosTableComponent,
-		AuditoriaCorreosSkeletonComponent,
-		EmailDeferFailBannerComponent,
-	],
+	imports: [CommonModule, ButtonModule, PageHeaderComponent, AuditoriaCorreosStatsComponent, AuditoriaCorreosFiltersComponent, AuditoriaCorreosTableComponent, AuditoriaCorreosSkeletonComponent, EmailDeferFailBannerComponent],
 	templateUrl: './auditoria-correos.component.html',
 	styleUrl: './auditoria-correos.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

@@ -1,4 +1,4 @@
-<p-table [value]="items()" [loading]="loading()" dataKey="id" responsiveLayout="scroll" styleClass="explicacion-admin-table">
+<edu-table [value]="items()" [loading]="loading()" dataKey="id" responsiveLayout="scroll" styleClass="explicacion-admin-table">
 	<ng-template pTemplate="header">
 		<tr>
 			<th>Ancla</th>
@@ -14,7 +14,7 @@
 			<td>{{ explicacion.ancla }}</td>
 			<td>
 				@if (!explicacion.rolId) {
-					<p-tag severity="info" value="Default" />
+					<edu-tag severity="info" value="Default" />
 				} @else {
 					{{ explicacion.rolNombre }}
 				}
@@ -22,15 +22,15 @@
 			<td class="texto-cell">{{ explicacion.texto }}</td>
 			<td>{{ explicacion.capabilityCodigo || 'Todos' }}</td>
 			<td>
-				<p-tag [severity]="explicacion.estado ? 'success' : 'danger'" [value]="explicacion.estado ? 'Activa' : 'Inactiva'" />
+				<edu-tag [severity]="explicacion.estado ? 'success' : 'danger'" [value]="explicacion.estado ? 'Activa' : 'Inactiva'" />
 			</td>
 			<td>
 				<button
 					pButton
 					icon="pi pi-pencil"
 					class="p-button-text p-button-sm"
-					pTooltip="Editar"
-					tooltipPosition="top"
+					eduTooltip="Editar"
+					eduTooltipPosition="top"
 					(click)="edit.emit(explicacion)"
 					[pt]="{ root: { 'aria-label': 'Editar ' + explicacion.ancla } }"
 					data-info-anchor="admin-explicaciones-fila-editar-btn"
@@ -39,8 +39,8 @@
 					pButton
 					icon="pi pi-trash"
 					class="p-button-text p-button-sm p-button-danger"
-					pTooltip="Eliminar"
-					tooltipPosition="top"
+					eduTooltip="Eliminar"
+					eduTooltipPosition="top"
 					(click)="remove.emit(explicacion)"
 					[pt]="{ root: { 'aria-label': 'Eliminar ' + explicacion.ancla } }"
 					data-info-anchor="admin-explicaciones-fila-eliminar-btn"
@@ -53,4 +53,4 @@
 			<td colspan="6">No hay explicaciones registradas.</td>
 		</tr>
 	</ng-template>
-</p-table>
+</edu-table>

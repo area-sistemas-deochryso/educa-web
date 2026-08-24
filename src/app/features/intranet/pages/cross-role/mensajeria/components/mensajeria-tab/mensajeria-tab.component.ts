@@ -20,22 +20,12 @@ const AVATAR_COLORS = [
 	'#db2777',
 	'#2563eb',
 	'#ca8a04',
-	'#0d9488',
-];
+	'#0d9488'];
 
 @Component({
 	selector: 'app-salon-mensajeria-tab',
 	standalone: true,
-	imports: [
-		CommonModule,
-		FormsModule,
-		ButtonModule,
-		EduInputText,
-		EduDialog,
-		EduSelect,
-		EduTag,
-		EduSpinner,
-	],
+	imports: [CommonModule, FormsModule, ButtonModule, EduInputText, EduDialog, EduSelect, EduTag, EduSpinner],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './mensajeria-tab.component.html',
 	styleUrl: './mensajeria-tab.component.scss',

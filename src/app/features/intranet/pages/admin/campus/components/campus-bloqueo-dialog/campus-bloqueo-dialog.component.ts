@@ -2,16 +2,14 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
 import { FormsModule } from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
-import { InputTextModule } from 'primeng/inputtext';
-import { InputNumberModule } from 'primeng/inputnumber';
 
 import { BloqueoFormData } from '../../models';
+import { EduDialog, EduInputNumber, EduInputText } from '@edu-ui';
 
 @Component({
 	selector: 'app-campus-bloqueo-dialog',
 	standalone: true,
-	imports: [FormsModule, ButtonModule, DialogModule, InputTextModule, InputNumberModule],
+	imports: [FormsModule, ButtonModule, EduDialog, EduInputText, EduInputNumber],
 	templateUrl: './campus-bloqueo-dialog.component.html',
 	styleUrl: './campus-bloqueo-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

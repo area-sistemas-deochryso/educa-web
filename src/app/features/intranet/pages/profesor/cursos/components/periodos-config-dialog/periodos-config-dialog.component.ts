@@ -10,15 +10,7 @@ import { EduDialog, EduInputNumber, EduInputText, EduTooltip } from '@edu-ui';
 @Component({
 	selector: 'app-periodos-config-dialog',
 	standalone: true,
-	imports: [
-		CommonModule,
-		FormsModule,
-		EduDialog,
-		ButtonModule,
-		EduInputText,
-		EduInputNumber,
-		EduTooltip,
-	],
+	imports: [CommonModule, FormsModule, EduDialog, ButtonModule, EduInputText, EduInputNumber, EduTooltip],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './periodos-config-dialog.component.html',
 	styleUrl: './periodos-config-dialog.component.scss',

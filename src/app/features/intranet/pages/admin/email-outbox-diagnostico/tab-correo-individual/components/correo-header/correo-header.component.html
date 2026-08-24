@@ -4,7 +4,7 @@
 	[subtitle]="generatedAtLabel() || 'Buscá por nombre, apellido, correo o DNI'"
 >
 	<form class="header-actions" (ngSubmit)="onSubmit()">
-		<p-autoComplete
+		<edu-autocomplete
 			class="correo-autocomplete"
 			[ngModel]="correoInput()"
 			name="correo"
@@ -73,7 +73,7 @@
 					</div>
 				</ng-template>
 			}
-		</p-autoComplete>
+		</edu-autocomplete>
 
 		<button
 			type="submit"
@@ -92,7 +92,7 @@
 				pButton
 				icon="pi pi-times"
 				class="p-button-text p-button-sm btn-icon"
-				pTooltip="Limpiar"
+				eduTooltip="Limpiar"
 				(click)="onLimpiar()"
 				[pt]="{ root: { 'aria-label': 'Limpiar' } }"
 				data-info-anchor="admin-email-outbox-diagnostico-limpiar-btn"
@@ -111,7 +111,7 @@
 			pButton
 			icon="pi pi-copy"
 			class="p-button-text p-button-sm btn-icon"
-			pTooltip="Copiar correo"
+			eduTooltip="Copiar correo"
 			(click)="onCopyConsultado()"
 			[pt]="{ root: { 'aria-label': 'Copiar correo consultado' } }"
 			data-info-anchor="copiar-btn"

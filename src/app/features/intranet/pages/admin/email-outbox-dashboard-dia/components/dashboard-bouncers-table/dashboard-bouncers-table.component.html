@@ -9,7 +9,7 @@
 		</span>
 	</header>
 
-	<p-table [value]="data()" [dataKey]="'destinatarioMasked'" class="p-datatable-sm" styleClass="p-datatable-gridlines">
+	<edu-table [value]="data()" [dataKey]="'destinatarioMasked'" class="p-datatable-sm" styleClass="p-datatable-gridlines">
 		<ng-template #header>
 			<tr>
 				<th class="label-uppercase">Destinatario</th>
@@ -28,7 +28,7 @@
 					<code>{{ row.destinatarioMasked }}</code>
 				</td>
 				<td class="col-num">
-					<p-tag
+					<edu-tag
 						[value]="row.bouncesAcumulados"
 						[severity]="severity(row.bouncesAcumulados)"
 					/>
@@ -40,7 +40,7 @@
 						pButton
 						icon="pi pi-copy"
 						class="p-button-text p-button-sm btn-icon"
-						pTooltip="Copiar destinatario"
+						eduTooltip="Copiar destinatario"
 						(click)="onCopy(row.destinatarioMasked)"
 						data-info-anchor="admin-email-outbox-dashboard-copiar-destinatario"
 						[pt]="{ root: { 'aria-label': 'Copiar destinatario' } }"
@@ -58,6 +58,6 @@
 				</td>
 			</tr>
 		</ng-template>
-	</p-table>
+	</edu-table>
 </section>
 <!-- #endregion -->

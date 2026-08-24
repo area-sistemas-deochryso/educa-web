@@ -27,34 +27,34 @@
 	</div>
 }
 
-<p-tabs [value]="activeTab()" (valueChange)="onNavigateTab($any($event))">
-	<p-tablist>
-		<p-tab value="alerts" data-info-anchor="tab-switch">
+<edu-tabs [value]="activeTab()" (valueChange)="onNavigateTab($any($event))">
+	
+		<edu-tab value="alerts" data-info-anchor="tab-switch">
 			<i class="pi pi-bell tab-icon"></i>
 			Alertas
 			@if (alertsVm().alerts.length > 0) {
 				<edu-badge [value]="'' + alertsVm().alerts.length" severity="danger" />
 			}
-		</p-tab>
-		<p-tab value="history" data-info-anchor="tab-switch">
+		</edu-tab>
+		<edu-tab value="history" data-info-anchor="tab-switch">
 			<i class="pi pi-chart-line tab-icon"></i>
 			Historial
-		</p-tab>
-		<p-tab value="snapshot" data-info-anchor="tab-switch">
+		</edu-tab>
+		<edu-tab value="snapshot" data-info-anchor="tab-switch">
 			<i class="pi pi-server tab-icon"></i>
 			Snapshot
-		</p-tab>
-		<p-tab value="slow" data-info-anchor="tab-switch">
+		</edu-tab>
+		<edu-tab value="slow" data-info-anchor="tab-switch">
 			<i class="pi pi-stopwatch tab-icon"></i>
 			Consultas lentas
-		</p-tab>
-		<p-tab value="thresholds" data-info-anchor="tab-switch">
+		</edu-tab>
+		<edu-tab value="thresholds" data-info-anchor="tab-switch">
 			<i class="pi pi-sliders-h tab-icon"></i>
 			Umbrales
-		</p-tab>
-	</p-tablist>
+		</edu-tab>
+	
 
-	<p-tabpanel value="alerts">
+	<edu-tabpanel value="alerts">
 		<app-alert-timeline
 			[alerts]="alertsVm().alerts"
 			[loading]="alertsVm().loading"
@@ -62,9 +62,9 @@
 			(navigateTab)="onNavigateTab($event)"
 			(deleteIds)="onDeleteAlerts($event)"
 		/>
-	</p-tabpanel>
+	</edu-tabpanel>
 
-	<p-tabpanel value="history">
+	<edu-tabpanel value="history">
 		<app-runtime-health-history
 			[data]="historyVm().data"
 			[loading]="historyVm().loading"
@@ -73,9 +73,9 @@
 			(timeRangeChange)="onTimeRangeChange($event)"
 			(refresh)="onHistoryRefresh()"
 		/>
-	</p-tabpanel>
+	</edu-tabpanel>
 
-	<p-tabpanel value="snapshot">
+	<edu-tabpanel value="snapshot">
 		<app-runtime-health-widget
 			[snapshot]="vm().snapshot"
 			[loading]="vm().loading"
@@ -88,22 +88,22 @@
 			(forceGc)="onForceGc()"
 			(navigateTab)="onNavigateTab($event)"
 		/>
-	</p-tabpanel>
+	</edu-tabpanel>
 
-	<p-tabpanel value="slow">
+	<edu-tabpanel value="slow">
 		<app-slow-requests-table
 			[slowRequests]="diagnosticsVm().slowRequests"
 			[loading]="diagnosticsVm().slowRequestsLoading"
 			(refresh)="onSlowRequestsRefresh()"
 		/>
-	</p-tabpanel>
+	</edu-tabpanel>
 
-	<p-tabpanel value="thresholds">
+	<edu-tabpanel value="thresholds">
 		<app-threshold-config
 			[thresholds]="thresholdsVm().thresholds"
 			[loading]="thresholdsVm().loading"
 			[saving]="thresholdsVm().saving"
 			(save)="onThresholdsSave($event)"
 		/>
-	</p-tabpanel>
-</p-tabs>
+	</edu-tabpanel>
+</edu-tabs>

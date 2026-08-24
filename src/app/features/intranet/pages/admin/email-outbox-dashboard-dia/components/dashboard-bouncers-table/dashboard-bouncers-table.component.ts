@@ -1,12 +1,10 @@
 import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
-import { TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
 
 import { ErrorHandlerService } from '@core/services/error';
 
 import { EmailBouncesAcumulados } from '@features/intranet/pages/admin/email-outbox-shared';
+import { EduTable, EduTag, EduTooltip } from '@edu-ui';
 
 const WARNING_THRESHOLD = 2;
 const CRITICAL_THRESHOLD = 3;
@@ -14,7 +12,7 @@ const CRITICAL_THRESHOLD = 3;
 @Component({
 	selector: 'app-dashboard-bouncers-table',
 	standalone: true,
-	imports: [TableModule, TagModule, ButtonModule, TooltipModule],
+	imports: [EduTable, EduTag, ButtonModule, EduTooltip],
 	templateUrl: './dashboard-bouncers-table.component.html',
 	styleUrl: './dashboard-bouncers-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

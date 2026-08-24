@@ -22,27 +22,27 @@
 				<edu-spinner />
 			</div>
 		} @else {
-			<p-tabs value="inicial">
-				<p-tablist>
-					<p-tab value="inicial" data-info-anchor="tab-switch">
+			<edu-tabs value="inicial">
+				
+					<edu-tab value="inicial" data-info-anchor="tab-switch">
 						<i class="pi pi-sun"></i>
 						<span>Inicial</span>
 						<edu-badge [value]="cursosPorNivel().inicial.length.toString()" />
-					</p-tab>
-					<p-tab value="primaria" data-info-anchor="tab-switch">
+					</edu-tab>
+					<edu-tab value="primaria" data-info-anchor="tab-switch">
 						<i class="pi pi-pencil"></i>
 						<span>Primaria</span>
 						<edu-badge [value]="cursosPorNivel().primaria.length.toString()" />
-					</p-tab>
-					<p-tab value="secundaria" data-info-anchor="tab-switch">
+					</edu-tab>
+					<edu-tab value="secundaria" data-info-anchor="tab-switch">
 						<i class="pi pi-graduation-cap"></i>
 						<span>Secundaria</span>
 						<edu-badge [value]="cursosPorNivel().secundaria.length.toString()" />
-					</p-tab>
-				</p-tablist>
+					</edu-tab>
+				
 
 				<!-- Panel: Inicial -->
-				<p-tabpanel value="inicial">
+				<edu-tabpanel value="inicial">
 					@if (cursosPorNivel().inicial.length === 0) {
 						<div class="text-center p-4 text-color-secondary">
 							<i class="pi pi-info-circle" style="font-size: 2rem"></i>
@@ -72,10 +72,10 @@
 							}
 						</div>
 					}
-				</p-tabpanel>
+				</edu-tabpanel>
 
 				<!-- Panel: Primaria -->
-				<p-tabpanel value="primaria">
+				<edu-tabpanel value="primaria">
 					@if (cursosPorNivel().primaria.length === 0) {
 						<div class="text-center p-4 text-color-secondary">
 							<i class="pi pi-info-circle" style="font-size: 2rem"></i>
@@ -105,10 +105,10 @@
 							}
 						</div>
 					}
-				</p-tabpanel>
+				</edu-tabpanel>
 
 				<!-- Panel: Secundaria -->
-				<p-tabpanel value="secundaria">
+				<edu-tabpanel value="secundaria">
 					@if (cursosPorNivel().secundaria.length === 0) {
 						<div class="text-center p-4 text-color-secondary">
 							<i class="pi pi-info-circle" style="font-size: 2rem"></i>
@@ -138,8 +138,8 @@
 							}
 						</div>
 					}
-				</p-tabpanel>
-			</p-tabs>
+				</edu-tabpanel>
+			</edu-tabs>
 		}
 	</div>
 

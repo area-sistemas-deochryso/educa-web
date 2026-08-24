@@ -6,7 +6,7 @@ import { ButtonModule } from 'primeng/button';
 import { periodoActual, esVerano } from '@shared/models';
 
 import { RoleTab } from '../../models';
-import { EduDialog, EduMenu, type EduMenuItem, EduSelect, EduTooltip } from '@edu-ui';
+import { EduDialog, EduMenu, EduSelect, EduTooltip, type EduMenuItem } from '@edu-ui';
 
 const NEW_BUTTON_LABELS: Record<string, string> = {
 	estudiantes: 'Nuevo Estudiante',
@@ -45,8 +45,7 @@ export class UsersHeaderComponent {
 		const items: EduMenuItem[] = [
 			{ label: 'Refrescar', icon: 'pi pi-refresh', command: () => this.refresh.emit() },
 			{ label: 'Exportar', icon: 'pi pi-download', command: () => this.onOpenExportDialog() },
-			{ label: 'Validar Datos', icon: 'pi pi-check-circle', command: () => this.validarDatos.emit() },
-		];
+			{ label: 'Validar Datos', icon: 'pi pi-check-circle', command: () => this.validarDatos.emit() }];
 		if (this.activeTab() === 'estudiantes' || this.activeTab() === null) {
 			items.splice(2, 0, {
 				label: 'Importar',

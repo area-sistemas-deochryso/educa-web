@@ -18,8 +18,7 @@ const SKELETON_COLUMNS: SkeletonColumnDef[] = [
 	{ width: 'flex', cellType: 'text' },
 	{ width: '60px', cellType: 'text' },
 	{ width: '140px', cellType: 'text' },
-	{ width: '90px', cellType: 'actions' },
-];
+	{ width: '90px', cellType: 'actions' }];
 
 const BLACKLIST_ROUTE = '/intranet/admin/monitoreo/correos/blacklist';
 

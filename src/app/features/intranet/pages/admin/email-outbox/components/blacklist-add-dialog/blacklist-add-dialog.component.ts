@@ -43,14 +43,7 @@ export const BLACKLIST_OBSERVACION_MIN_MANUAL = 20;
 @Component({
 	selector: 'app-blacklist-add-dialog',
 	standalone: true,
-	imports: [
-		FormsModule,
-		EduDialog,
-		ButtonModule,
-		EduInputText,
-		EduSelect,
-		EduTextarea,
-	],
+	imports: [FormsModule, EduDialog, ButtonModule, EduInputText, EduSelect, EduTextarea],
 	templateUrl: './blacklist-add-dialog.component.html',
 	styleUrl: './blacklist-add-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

@@ -3,21 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CdkDropList, CdkDrag, CdkDragHandle, CdkDragDrop } from '@intranet-shared/directives/drag-drop';
 import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
-import { DialogModule } from 'primeng/dialog';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { SkeletonModule } from 'primeng/skeleton';
-import { CheckboxModule } from 'primeng/checkbox';
-import { ConfirmationService } from 'primeng/api';
 import { ErrorHandlerService } from '@core/services';
 import {
 	GrupoContenidoDto,
 	GrupoEstudianteDto,
 	EstudianteSinGrupoDto,
 } from '@features/intranet/pages/profesor/models';
+import { EduCheckbox, EduConfirmDialog, EduConfirmationService, EduDialog, EduInputText, EduSelect, EduSkeleton, EduTag, EduTooltip } from '@edu-ui';
 
 interface DragData {
 	estudianteId: number;
@@ -31,29 +23,14 @@ interface DropListData {
 @Component({
 	selector: 'app-salon-grupos-tab',
 	standalone: true,
-	imports: [
-		CommonModule,
-		FormsModule,
-		CdkDropList,
-		CdkDrag,
-		CdkDragHandle,
-		ButtonModule,
-		InputTextModule,
-		SelectModule,
-		TagModule,
-		TooltipModule,
-		DialogModule,
-		ConfirmDialogModule,
-		SkeletonModule,
-		CheckboxModule,
-	],
-	providers: [ConfirmationService],
+	imports: [CommonModule, FormsModule, CdkDropList, CdkDrag, CdkDragHandle, ButtonModule, EduInputText, EduSelect, EduTag, EduTooltip, EduDialog, EduConfirmDialog, EduSkeleton, EduCheckbox],
+	providers: [EduConfirmationService],
 	templateUrl: './salon-grupos-tab.component.html',
 	styleUrl: './salon-grupos-tab.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SalonGruposTabComponent {
-	private readonly confirmationService = inject(ConfirmationService);
+	private readonly confirmationService = inject(EduConfirmationService);
 	private readonly errorHandler = inject(ErrorHandlerService);
 
 	// #region Inputs
@@ -113,8 +90,7 @@ export class SalonGruposTabComponent {
 
 	readonly dropListIds = computed(() => [
 		...this.grupos().map((g) => 'grupo-' + g.id),
-		'sin-grupo',
-	]);
+		'sin-grupo']);
 	// #endregion
 
 	constructor() {

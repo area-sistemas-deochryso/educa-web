@@ -8,7 +8,7 @@
 			}
 		</div>
 		<div class="section-actions">
-			<p-select
+			<edu-select
 				[options]="metricOptions()"
 				[(ngModel)]="metricFilter"
 				optionLabel="label"
@@ -19,7 +19,7 @@
 				data-info-anchor="admin-runtime-health-alerts-metrica-select"
 				(onChange)="onMetricChange()"
 			/>
-			<p-selectButton
+			<edu-select-button
 				[options]="filterOptions"
 				[(ngModel)]="severityFilter"
 				optionLabel="label"
@@ -48,7 +48,7 @@
 
 	@if (pagedAlerts().length > 0) {
 		<div class="selection-toolbar">
-			<p-checkbox
+			<edu-checkbox
 				[binary]="true"
 				[ngModel]="allPagedSelected()"
 				data-info-anchor="admin-runtime-health-alerts-select-all-checkbox"
@@ -70,13 +70,13 @@
 			@for (group of pagedAlerts(); track groupKey(group)) {
 				<div class="timeline-item" [class.timeline-item--critical]="group.alertLevel === 'critical'">
 					<div class="timeline-item__header">
-						<p-checkbox
+						<edu-checkbox
 							[binary]="true"
 							[ngModel]="isGroupSelected(group)"
 							data-info-anchor="admin-runtime-health-alerts-fila-checkbox"
 							(onChange)="toggleGroupSelected(group)"
 						/>
-						<p-tag
+						<edu-tag
 							[value]="group.alertLevel"
 							[severity]="getSeverityTag(group.alertLevel)"
 						/>

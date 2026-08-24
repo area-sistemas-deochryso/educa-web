@@ -111,8 +111,7 @@ import { EduSkeleton, EduTable, EduTag, EduTooltip } from '@edu-ui';
 				.p-datatable-tbody > tr > td { background: transparent; }
 				.p-paginator { background: transparent; }
 			}
-		`,
-	],
+		`],
 })
 export class HealthJustificationListComponent {
 	readonly justificaciones = input<HealthJustificationDto[]>([]);

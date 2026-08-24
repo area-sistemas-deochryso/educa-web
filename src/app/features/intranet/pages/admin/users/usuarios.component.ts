@@ -52,29 +52,14 @@ import {
 	findAutoOpenMatch,
 	readAutoOpenQueryParams,
 } from './helpers/auto-open-from-query.helper';
-import { EduConfirmationService, EduConfirmDialog } from '@edu-ui';
+import { EduConfirmDialog, EduConfirmationService, EduTab } from '@edu-ui';
 
 // #endregion
 // #region Implementation
 @Component({
 	selector: 'app-users',
 	standalone: true,
-	imports: [
-		ButtonModule,
-		CommonModule,
-		EduConfirmDialog,
-		UsersHeaderComponent,
-		UsersStatsComponent,
-		UsersStatsSkeletonComponent,
-		UsersFiltersComponent,
-		UsersTableComponent,
-		UsersTableSkeletonComponent,
-		UserFormDialogComponent,
-		UsersImportDialogComponent,
-		UsersValidationDialogComponent,
-		UserDetailDrawerComponent,
-		ErrorStateComponent,
-	],
+	imports: [ButtonModule, CommonModule, EduConfirmDialog, UsersHeaderComponent, UsersStatsComponent, UsersStatsSkeletonComponent, UsersFiltersComponent, UsersTableComponent, UsersTableSkeletonComponent, UserFormDialogComponent, UsersImportDialogComponent, UsersValidationDialogComponent, UserDetailDrawerComponent, ErrorStateComponent, EduTab],
 	providers: [EduConfirmationService],
 	templateUrl: './usuarios.component.html',
 	styleUrl: './usuarios.component.scss',
@@ -112,8 +97,7 @@ export class UsersComponent implements AfterViewInit {
 	readonly filterOptions: FilterOptions = {
 		estadoOptions: withAllOption([
 			{ label: 'Activos', value: true },
-			{ label: 'Inactivos', value: false },
-		]),
+			{ label: 'Inactivos', value: false }]),
 	};
 
 	readonly formData = computed<UsuarioFormData>(() => this.vm().formData as UsuarioFormData);
@@ -160,7 +144,7 @@ export class UsersComponent implements AfterViewInit {
 		this.fixConfirmDialogAria('Confirmación');
 	}
 
-	// #region Tab + Data & Filter handlers
+	// #region EduTab + Data & Filter handlers
 	onTabChange(tab: RoleTab): void {
 		this.dataFacade.setActiveTab(tab);
 		this.router.navigate([], {
@@ -313,8 +297,7 @@ export class UsersComponent implements AfterViewInit {
 				{ header: 'DNI', key: 'dni', width: 15 },
 				{ header: 'Contraseña', key: 'contrasena', width: 20 },
 				{ header: 'Grado', key: 'grado', width: 20 },
-				{ header: 'Sección', key: 'seccion', width: 12 },
-			],
+				{ header: 'Sección', key: 'seccion', width: 12 }],
 			data: credenciales.map((c) => ({
 				nombreCompleto: c.nombreCompleto,
 				dni: c.dni,

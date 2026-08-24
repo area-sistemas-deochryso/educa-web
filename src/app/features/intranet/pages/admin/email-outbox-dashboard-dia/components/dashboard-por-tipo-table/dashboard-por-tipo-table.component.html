@@ -5,7 +5,7 @@
 		<span class="section-subtitle">Agregación por <code>EO_Tipo</code></span>
 	</header>
 
-	<p-table [value]="data()" [dataKey]="'tipo'" class="p-datatable-sm" styleClass="p-datatable-gridlines">
+	<edu-table [value]="data()" [dataKey]="'tipo'" class="p-datatable-sm" styleClass="p-datatable-gridlines">
 		<ng-template #header>
 			<tr>
 				<th class="label-uppercase">Tipo</th>
@@ -17,7 +17,7 @@
 		<ng-template #body let-row>
 			<tr>
 				<td>
-					<p-tag [value]="row.tipo" styleClass="tag-neutral" />
+					<edu-tag [value]="row.tipo" styleClass="tag-neutral" />
 				</td>
 				<td class="col-num val-sent">{{ row.enviados }}</td>
 				<td class="col-num val-failed">{{ row.fallidos }}</td>
@@ -29,6 +29,6 @@
 				<td colspan="4" class="empty-message">Sin datos</td>
 			</tr>
 		</ng-template>
-	</p-table>
+	</edu-table>
 </section>
 <!-- #endregion -->

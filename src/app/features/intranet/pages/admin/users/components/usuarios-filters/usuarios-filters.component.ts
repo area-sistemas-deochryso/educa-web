@@ -53,8 +53,7 @@ export class UsersFiltersComponent {
 		opts.sort((a, b) => a.gradoOrden - b.gradoOrden || a.label.localeCompare(b.label));
 		return [
 			{ label: 'Todos los salones', value: null as number | null, gradoOrden: 0 },
-			...opts,
-		];
+			...opts];
 	});
 
 	readonly hasActiveFilters = computed(() =>

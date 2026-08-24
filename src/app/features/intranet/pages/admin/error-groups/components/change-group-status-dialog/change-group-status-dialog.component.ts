@@ -41,16 +41,7 @@ interface EstadoOption {
 	selector: 'app-change-group-status-dialog',
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [
-		CommonModule,
-		FormsModule,
-		ButtonModule,
-		EduDialog,
-		EduInputText,
-		EduSelect,
-		EduTag,
-		EduTextarea,
-	],
+	imports: [CommonModule, FormsModule, ButtonModule, EduDialog, EduInputText, EduSelect, EduTag, EduTextarea],
 	templateUrl: './change-group-status-dialog.component.html',
 	styleUrl: './change-group-status-dialog.component.scss',
 })

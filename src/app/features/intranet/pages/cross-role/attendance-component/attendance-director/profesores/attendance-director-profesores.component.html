@@ -6,7 +6,7 @@
 			<i class="pi pi-search"></i>
 			<input
 				type="text"
-				pInputText
+				eduInputText
 				[ngModel]="monthSearchTerm()"
 				(ngModelChange)="monthSearchTerm.set($event)"
 				(focus)="onMonthSearchFocus()"
@@ -47,8 +47,8 @@
 				[text]="true"
 				[rounded]="true"
 				(onClick)="onEditarEnAdminMes()"
-				pTooltip="Editar asistencia del profesor en admin"
-				tooltipPosition="top"
+				eduTooltip="Editar asistencia del profesor en admin"
+				eduTooltipPosition="top"
 				[pt]="{ root: { 'aria-label': 'Editar asistencia del profesor en admin' } }"
 			/>
 		}
@@ -58,8 +58,8 @@
 			[text]="true"
 			[rounded]="true"
 			(onClick)="navigateToReportes()"
-			pTooltip="Reportes de asistencia"
-			tooltipPosition="top"
+			eduTooltip="Reportes de asistencia"
+			eduTooltipPosition="top"
 			[pt]="{ root: { 'aria-label': 'Reportes de asistencia' } }"
 		/>
 	</div>
@@ -123,8 +123,8 @@
 				[text]="true"
 				[rounded]="true"
 				(onClick)="navigateToGestion()"
-				pTooltip="Gestión de asistencia"
-				tooltipPosition="top"
+				eduTooltip="Gestión de asistencia"
+				eduTooltipPosition="top"
 				[pt]="{ root: { 'aria-label': 'Gestión de asistencia' } }"
 			/>
 			<p-button
@@ -133,8 +133,8 @@
 				[text]="true"
 				[rounded]="true"
 				(onClick)="navigateToReportes()"
-				pTooltip="Reportes de asistencia"
-				tooltipPosition="top"
+				eduTooltip="Reportes de asistencia"
+				eduTooltipPosition="top"
 				[pt]="{ root: { 'aria-label': 'Reportes de asistencia' } }"
 			/>
 		</ng-container>

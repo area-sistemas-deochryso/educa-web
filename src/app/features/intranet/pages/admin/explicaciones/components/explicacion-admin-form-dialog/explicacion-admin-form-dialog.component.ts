@@ -13,7 +13,7 @@ import {
 	CrearExplicacionRequest,
 	ExplicacionAdminDto,
 } from '../../models/explicacion-admin.models';
-import { EduDialog, EduInputText, EduSelect, EduTextarea, EduTooltip } from '@edu-ui';
+import { EduDialog, EduInputText, EduSelect, EduTemplate, EduTextarea, EduTooltip } from '@edu-ui';
 // #endregion
 
 interface SelectOption<T> {
@@ -29,16 +29,7 @@ interface SelectOption<T> {
 @Component({
 	selector: 'app-explicacion-admin-form-dialog',
 	standalone: true,
-	imports: [
-		CommonModule,
-		FormsModule,
-		ButtonModule,
-		EduDialog,
-		EduInputText,
-		EduSelect,
-		EduTextarea,
-		EduTooltip,
-	],
+	imports: [CommonModule, FormsModule, ButtonModule, EduDialog, EduInputText, EduSelect, EduTextarea, EduTooltip, EduTemplate],
 	templateUrl: './explicacion-admin-form-dialog.component.html',
 	styleUrl: './explicacion-admin-form-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -67,13 +58,11 @@ export class ExplicacionAdminFormDialogComponent {
 
 	readonly rolOptions = computed<SelectOption<number | null>[]>(() => [
 		{ label: 'Default (todos los roles)', value: null },
-		...this.roles().map((r) => ({ label: r.nombre, value: r.id })),
-	]);
+		...this.roles().map((r) => ({ label: r.nombre, value: r.id }))]);
 
 	readonly capabilityOptions = computed<SelectOption<number | null>[]>(() => [
 		{ label: 'Sin gating (todos)', value: null },
-		...this.capabilities().map((c) => ({ label: `${c.nombre} (${c.codigo})`, value: c.id })),
-	]);
+		...this.capabilities().map((c) => ({ label: `${c.nombre} (${c.codigo})`, value: c.id }))]);
 
 	readonly isValid = computed(() => this.ancla().trim().length > 0 && this.texto().trim().length > 0);
 	// #endregion

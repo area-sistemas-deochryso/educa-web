@@ -31,20 +31,7 @@ const CAPABILITY_SEDE_CRUZADA = 'ASISTENCIA_ADMIN';
 @Component({
 	selector: 'app-attendance-panel',
 	standalone: true,
-	imports: [
-		CommonModule,
-		FormsModule,
-		ButtonModule,
-		EduSelect,
-		EduSelectButton,
-		EduDatePicker,
-		StatsSkeletonComponent,
-		AttendancePanelKpiTileComponent,
-		AttendancePanelBreakdownComponent,
-		AttendancePanelChartDiaComponent,
-		AttendancePanelChartLineComponent,
-		AttendancePanelChartHeatmapComponent,
-	],
+	imports: [CommonModule, FormsModule, ButtonModule, EduSelect, EduSelectButton, EduDatePicker, StatsSkeletonComponent, AttendancePanelKpiTileComponent, AttendancePanelBreakdownComponent, AttendancePanelChartDiaComponent, AttendancePanelChartLineComponent, AttendancePanelChartHeatmapComponent],
 	templateUrl: './attendance-panel.component.html',
 	styleUrl: './attendance-panel.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -64,8 +51,7 @@ export class AttendancePanelComponent implements OnInit {
 	readonly rangoOptions: { label: string; value: RangoTipo }[] = [
 		{ label: 'Día', value: 'dia' },
 		{ label: 'Semana', value: 'semana' },
-		{ label: 'Mes', value: 'mes' },
-	];
+		{ label: 'Mes', value: 'mes' }];
 	// #endregion
 
 	// #region Computed

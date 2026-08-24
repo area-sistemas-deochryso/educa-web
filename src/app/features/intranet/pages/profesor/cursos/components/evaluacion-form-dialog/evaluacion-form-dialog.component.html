@@ -1,4 +1,4 @@
-<p-dialog
+<edu-dialog
 	[header]="dialogTitle()"
 	[visible]="visible()"
 	(visibleChange)="onVisibleChange($event)"
@@ -11,7 +11,7 @@
 		<div class="form-field">
 			<label for="eval-titulo">Título *</label>
 			<input
-				pInputText
+				eduInputText
 				id="eval-titulo"
 				[ngModel]="formData().titulo"
 				(ngModelChange)="updateField('titulo', $event)"
@@ -28,11 +28,11 @@
 					<label for="eval-tipo">Tipo *</label>
 					<i
 						class="pi pi-question-circle help-icon"
-						pTooltip="Categoría de la evaluación: Examen, Tarea, Exposición, Participación u Otro"
-						tooltipPosition="top"
+						eduTooltip="Categoría de la evaluación: Examen, Tarea, Exposición, Participación u Otro"
+						eduTooltipPosition="top"
 					></i>
 				</div>
-				<p-select
+				<edu-select
 					id="eval-tipo"
 					data-info-anchor="profesor-evaluacion-tipo-select"
 					[options]="tiposOptions"
@@ -49,11 +49,11 @@
 					<label for="eval-peso">Peso *</label>
 					<i
 						class="pi pi-question-circle help-icon"
-						pTooltip="Porcentaje del peso total. Ej: 0.20 = 20%. La suma de pesos de todas las evaluaciones debería ser 1.0"
-						tooltipPosition="top"
+						eduTooltip="Porcentaje del peso total. Ej: 0.20 = 20%. La suma de pesos de todas las evaluaciones debería ser 1.0"
+						eduTooltipPosition="top"
 					></i>
 				</div>
-				<p-inputNumber
+				<edu-input-number
 					id="eval-peso"
 					[ngModel]="formData().peso"
 					(ngModelChange)="updateField('peso', $event)"
@@ -79,11 +79,11 @@
 					<label for="eval-semana">Semana *</label>
 					<i
 						class="pi pi-question-circle help-icon"
-						pTooltip="Semana del curso en la que se realiza esta evaluación"
-						tooltipPosition="top"
+						eduTooltip="Semana del curso en la que se realiza esta evaluación"
+						eduTooltipPosition="top"
 					></i>
 				</div>
-				<p-select
+				<edu-select
 					id="eval-semana"
 					data-info-anchor="profesor-evaluacion-semana-select"
 					[options]="semanaOptions()"
@@ -98,7 +98,7 @@
 			</div>
 			<div class="form-field flex-1">
 				<label for="eval-fecha">Fecha *</label>
-				<p-datepicker
+				<edu-datepicker
 					id="eval-fecha"
 					[ngModel]="formData().fechaEvaluacion"
 					(ngModelChange)="updateField('fechaEvaluacion', $event)"
@@ -113,7 +113,7 @@
 		<!-- #region Evaluación grupal -->
 		<div class="form-field">
 			<div class="flex align-items-center gap-2">
-				<p-toggleSwitch
+				<edu-toggle
 					data-info-anchor="profesor-evaluacion-grupal-toggle"
 					[ngModel]="formData().esGrupal"
 					(ngModelChange)="updateField('esGrupal', $event)"
@@ -123,8 +123,8 @@
 				</label>
 				<i
 					class="pi pi-question-circle help-icon"
-					pTooltip="Si está activo, la calificación se ingresa por grupo y todos los miembros reciben la misma nota"
-					tooltipPosition="top"
+					eduTooltip="Si está activo, la calificación se ingresa por grupo y todos los miembros reciben la misma nota"
+					eduTooltipPosition="top"
 				></i>
 			</div>
 		</div>
@@ -151,4 +151,4 @@
 			></button>
 		</div>
 	</ng-template>
-</p-dialog>
+</edu-dialog>

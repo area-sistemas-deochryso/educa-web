@@ -22,15 +22,7 @@ import {
 @Component({
 	selector: 'app-attendance-reports',
 	standalone: true,
-	imports: [
-		ButtonModule,
-		ReportsFiltersComponent,
-		ReportsSummaryComponent,
-		ReportsResultComponent,
-		TableSkeletonComponent,
-		StatsSkeletonComponent,
-		ErrorStateComponent,
-	],
+	imports: [ButtonModule, ReportsFiltersComponent, ReportsSummaryComponent, ReportsResultComponent, TableSkeletonComponent, StatsSkeletonComponent, ErrorStateComponent],
 	templateUrl: './attendance-reports.component.html',
 	styleUrl: './attendance-reports.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

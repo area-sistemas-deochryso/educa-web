@@ -3,27 +3,14 @@ import { FormsModule } from '@angular/forms';
 
 import { CdkDropList, CdkDrag, CdkDragHandle, CdkDragDrop } from '@intranet-shared/directives/drag-drop';
 import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { InputNumberModule } from 'primeng/inputnumber';
-import { CheckboxModule } from 'primeng/checkbox';
-import { TooltipModule } from 'primeng/tooltip';
 
 import { CTestK6Facade } from '../../services/ctest-k6.facade';
+import { EduCheckbox, EduInputNumber, EduInputText, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-ctest-stages-step',
 	standalone: true,
-	imports: [
-		FormsModule,
-		CdkDropList,
-		CdkDrag,
-		CdkDragHandle,
-		ButtonModule,
-		InputTextModule,
-		InputNumberModule,
-		CheckboxModule,
-		TooltipModule,
-	],
+	imports: [FormsModule, CdkDropList, CdkDrag, CdkDragHandle, ButtonModule, EduInputText, EduInputNumber, EduCheckbox, EduTooltip],
 	templateUrl: './ctest-stages-step.component.html',
 	styleUrl: './ctest-stages-step.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

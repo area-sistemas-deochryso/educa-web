@@ -1,4 +1,4 @@
-<p-dialog
+<edu-dialog
 	[visible]="visible()"
 	(visibleChange)="onVisibleChange($event)"
 	[modal]="true"
@@ -25,7 +25,7 @@
 			<div class="field">
 				<label for="observacion">Motivo de la justificación <span class="required">*</span></label>
 				<textarea
-					pTextarea
+					eduTextarea
 					id="observacion"
 					rows="4"
 					[ngModel]="observacionText()"
@@ -62,4 +62,4 @@
 			</div>
 		</div>
 	}
-</p-dialog>
+</edu-dialog>

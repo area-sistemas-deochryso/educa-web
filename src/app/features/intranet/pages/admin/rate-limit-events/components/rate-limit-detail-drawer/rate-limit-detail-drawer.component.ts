@@ -8,20 +8,12 @@ import { logger } from '@core/helpers';
 import { CorrelationIdPillComponent } from '@intranet-shared/components';
 
 import { RateLimitEventListaDto, displayPolicy } from '../../models';
-import { EduDrawer, EduMessageService, EduTag, EduTooltip } from '@edu-ui';
+import { EduDrawer, EduMessageService, EduTag, EduTemplate, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-rate-limit-detail-drawer',
 	standalone: true,
-	imports: [
-		CommonModule,
-		DatePipe,
-		ButtonModule,
-		EduDrawer,
-		EduTag,
-		EduTooltip,
-		CorrelationIdPillComponent,
-	],
+	imports: [CommonModule, DatePipe, ButtonModule, EduDrawer, EduTag, EduTooltip, CorrelationIdPillComponent, EduTemplate],
 	templateUrl: './rate-limit-detail-drawer.component.html',
 	styleUrl: './rate-limit-detail-drawer.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

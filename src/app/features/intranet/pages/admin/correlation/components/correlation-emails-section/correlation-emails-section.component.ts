@@ -3,20 +3,18 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 
 import { ButtonModule } from 'primeng/button';
-import { TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
 
 import {
 	CorrelationEmailOutboxDto,
 	OUTBOX_ESTADO_SEVERITY_MAP,
 	SECTION_DEFENSIVE_CAP,
 } from '../../models';
+import { EduTable, EduTag, EduTemplate, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-correlation-emails-section',
 	standalone: true,
-	imports: [CommonModule, DatePipe, RouterLink, ButtonModule, TableModule, TagModule, TooltipModule],
+	imports: [CommonModule, DatePipe, RouterLink, ButtonModule, EduTable, EduTag, EduTooltip, EduTemplate],
 	templateUrl: './correlation-emails-section.component.html',
 	styleUrl: './correlation-emails-section.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

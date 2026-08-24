@@ -24,7 +24,7 @@
 			></i>
 			<span class="defer-fail-widget__title">Defer / Fail (cPanel)</span>
 			@if (hasData()) {
-				<p-tag [value]="levelLabel()" [severity]="levelSeverity()" [icon]="levelIcon()" />
+				<edu-tag [value]="levelLabel()" [severity]="levelSeverity()" [icon]="levelIcon()" />
 			}
 		</button>
 
@@ -37,14 +37,14 @@
 					class="p-button-outlined p-button-sm p-button-warning"
 					data-info-anchor="admin-email-outbox-defer-fail-ver-eventos-btn"
 					(click)="onGoToEventsClick()"
-					pTooltip="Ir al timeline de eventos defer"
-					tooltipPosition="top"
+					eduTooltip="Ir al timeline de eventos defer"
+					eduTooltipPosition="top"
 					[pt]="{ root: { 'aria-label': 'Ir a eventos defer' } }"
 				></button>
 			}
 			<label class="defer-fail-widget__autorefresh">
 				<span>Auto-refresh 60s</span>
-				<p-toggleswitch
+				<edu-toggle
 					data-info-anchor="email-outbox-autorefresh-toggle"
 					[ngModel]="autoRefresh()"
 					(ngModelChange)="onAutoRefreshToggle($event)"
@@ -57,8 +57,8 @@
 				class="p-button-outlined p-button-sm"
 				data-info-anchor="email-outbox-refresh-btn"
 				(click)="onRefreshClick()"
-				pTooltip="Refrescar ahora"
-				tooltipPosition="top"
+				eduTooltip="Refrescar ahora"
+				eduTooltipPosition="top"
 				[loading]="loading()"
 				[pt]="{ root: { 'aria-label': 'Refrescar estado defer/fail' } }"
 			></button>
@@ -118,7 +118,7 @@
 						<span class="defer-fail-stat__label">Pendientes</span>
 						<span class="defer-fail-stat__value">{{ status()!.last24h.pending }}</span>
 					</div>
-					<div class="defer-fail-stat defer-fail-stat--retry" pTooltip="Cola que migración a retry manual deberá resolver" tooltipPosition="top">
+					<div class="defer-fail-stat defer-fail-stat--retry" eduTooltip="Cola que migración a retry manual deberá resolver" eduTooltipPosition="top">
 						<span class="defer-fail-stat__label">Retrying</span>
 						<span class="defer-fail-stat__value">{{ status()!.last24h.retrying }}</span>
 					</div>

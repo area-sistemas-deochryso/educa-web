@@ -1,4 +1,4 @@
-<p-dialog
+<edu-dialog
 	[visible]="visible()"
 	(visibleChange)="onVisibleChange($event)"
 	[modal]="true"
@@ -26,7 +26,7 @@
 				Nombre del piso
 			</label>
 			<input
-				pInputText
+				eduInputText
 				id="pisoNombre"
 				[ngModel]="formData().nombre"
 				(ngModelChange)="onNombreChange($event)"
@@ -40,7 +40,7 @@
 					<i class="pi pi-sort-numeric-up"></i>
 					Orden
 				</label>
-				<p-inputNumber
+				<edu-input-number
 					id="pisoOrden"
 					[ngModel]="formData().orden"
 					(ngModelChange)="onOrdenChange($event)"
@@ -55,7 +55,7 @@
 					<i class="pi pi-arrows-v"></i>
 					Altura (m)
 				</label>
-				<p-inputNumber
+				<edu-input-number
 					id="pisoAltura"
 					[ngModel]="formData().alturaMetros"
 					(ngModelChange)="onAlturaChange($event)"
@@ -90,4 +90,4 @@
 		></button>
 	</div>
 	<!-- #endregion -->
-</p-dialog>
+</edu-dialog>

@@ -2,17 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } 
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
-import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
-import { TooltipModule } from 'primeng/tooltip';
-import { TagModule } from 'primeng/tag';
-
-import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
-import { ToggleSwitch } from 'primeng/toggleswitch';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ConfirmationService } from 'primeng/api';
 
 import { UiMappingService } from '@intranet-shared/services';
 import { PageHeaderComponent, KpiStatsComponent, type KpiStatItem } from '@intranet-shared/components';
@@ -21,30 +11,13 @@ import { buildDeleteCursoMessage } from '@app/shared/constants';
 
 import { CursosFacade } from './services';
 import type { Curso } from './models';
+import { EduConfirmDialog, EduConfirmationService, EduDialog, EduInputText, EduSelect, EduSortableColumn, EduTable, EduTag, EduToggle, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-cursos',
 	standalone: true,
-	imports: [
-		CommonModule,
-		FormsModule,
-		TableModule,
-		ButtonModule,
-		DialogModule,
-		TooltipModule,
-		TagModule,
-		InputTextModule,
-		SelectModule,
-		ToggleSwitch,
-		ConfirmDialogModule,
-		PageHeaderComponent,
-		KpiStatsComponent,
-		EstadoLabelPipe,
-		EstadoSeverityPipe,
-		EstadoToggleIconPipe,
-		EstadoToggleLabelPipe,
-	],
-	providers: [ConfirmationService],
+	imports: [CommonModule, FormsModule, EduTable, ButtonModule, EduDialog, EduTooltip, EduTag, EduInputText, EduSelect, EduToggle, EduConfirmDialog, PageHeaderComponent, KpiStatsComponent, EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleIconPipe, EstadoToggleLabelPipe, EduSortableColumn],
+	providers: [EduConfirmationService],
 	templateUrl: './cursos.component.html',
 	styleUrl: './cursos.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -52,7 +25,7 @@ import type { Curso } from './models';
 export class CursosComponent implements OnInit {
 	// #region Dependencias
 	private facade = inject(CursosFacade);
-	private confirmationService = inject(ConfirmationService);
+	private confirmationService = inject(EduConfirmationService);
 	readonly uiMapping = inject(UiMappingService);
 	// #endregion
 
@@ -83,23 +56,20 @@ export class CursosComponent implements OnInit {
 			label: 'Cursos Inactivos',
 			value: this.vm().estadisticas.cursosInactivos,
 			sublabel: 'deshabilitados',
-		},
-	]);
+		}]);
 	// #endregion
 
 	// #region Opciones estáticas
 	readonly estadoOptions = [
 		{ label: 'Todos', value: null },
 		{ label: 'Activos', value: true },
-		{ label: 'Inactivos', value: false },
-	];
+		{ label: 'Inactivos', value: false }];
 
 	readonly nivelOptions = [
 		{ label: 'Todos los niveles', value: null },
 		{ label: 'Inicial', value: 'INICIAL' },
 		{ label: 'Primaria', value: 'PRIMARIA' },
-		{ label: 'Secundaria', value: 'SECUNDARIA' },
-	];
+		{ label: 'Secundaria', value: 'SECUNDARIA' }];
 
 	readonly completitudOptions = [
 		{ label: 'Todos', value: null },
@@ -107,8 +77,7 @@ export class CursosComponent implements OnInit {
 		{ label: 'Incompleto', value: 'incompleto' },
 		{ label: 'Sin horario', value: 'sin-horario' },
 		{ label: 'Sin profesor', value: 'sin-profesor' },
-		{ label: 'Con conflictos', value: 'con-conflictos' },
-	];
+		{ label: 'Con conflictos', value: 'con-conflictos' }];
 	// #endregion
 
 	// #region Lifecycle

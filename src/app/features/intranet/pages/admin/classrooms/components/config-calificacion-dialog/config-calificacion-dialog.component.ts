@@ -2,13 +2,7 @@ import { Component, ChangeDetectionStrategy, input, output, signal, computed, On
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
-import { SelectModule } from 'primeng/select';
-import { InputNumberModule } from 'primeng/inputnumber';
-import { InputTextModule } from 'primeng/inputtext';
-import { CheckboxModule } from 'primeng/checkbox';
-import { DividerModule } from 'primeng/divider';
 
 import {
 	ConfiguracionCalificacionListDto,
@@ -19,6 +13,7 @@ import {
 	TipoCalificacion,
 	TIPOS_CALIFICACION,
 } from '../../models';
+import { EduCheckbox, EduDialog, EduDivider, EduInputNumber, EduInputText, EduSelect } from '@edu-ui';
 
 interface LiteralRow {
 	letra: string;
@@ -32,17 +27,7 @@ interface LiteralRow {
 @Component({
 	selector: 'app-config-grade-dialog',
 	standalone: true,
-	imports: [
-		CommonModule,
-		FormsModule,
-		DialogModule,
-		ButtonModule,
-		SelectModule,
-		InputNumberModule,
-		InputTextModule,
-		CheckboxModule,
-		DividerModule,
-	],
+	imports: [CommonModule, FormsModule, EduDialog, ButtonModule, EduSelect, EduInputNumber, EduInputText, EduCheckbox, EduDivider],
 	templateUrl: './config-calificacion-dialog.component.html',
 	styleUrl: './config-calificacion-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -181,8 +166,7 @@ export class ConfigGradeDialogComponent implements OnChanges {
 				notaMaxima: null,
 				orden: current.length + 1,
 				esAprobatoria: false,
-			},
-		]);
+			}]);
 	}
 
 	removeLiteral(index: number): void {
@@ -202,8 +186,7 @@ export class ConfigGradeDialogComponent implements OnChanges {
 			{ letra: 'AD', descripcion: 'Logro Destacado', notaMinima: null, notaMaxima: null, orden: 1, esAprobatoria: true },
 			{ letra: 'A', descripcion: 'Logro Esperado', notaMinima: null, notaMaxima: null, orden: 2, esAprobatoria: true },
 			{ letra: 'B', descripcion: 'En Proceso', notaMinima: null, notaMaxima: null, orden: 3, esAprobatoria: false },
-			{ letra: 'C', descripcion: 'En Inicio', notaMinima: null, notaMaxima: null, orden: 4, esAprobatoria: false },
-		];
+			{ letra: 'C', descripcion: 'En Inicio', notaMinima: null, notaMaxima: null, orden: 4, esAprobatoria: false }];
 	}
 	// #endregion
 }

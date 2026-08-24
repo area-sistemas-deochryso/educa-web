@@ -60,13 +60,7 @@ const PAGE_SIZE_INCREMENT = 20;
 	selector: 'app-error-groups-kanban-board',
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [
-		CommonModule,
-		ButtonModule,
-		CdkDropList,
-		CdkDrag,
-		ErrorGroupCardComponent,
-	],
+	imports: [CommonModule, ButtonModule, CdkDropList, CdkDrag, ErrorGroupCardComponent],
 	templateUrl: './error-groups-kanban-board.component.html',
 	styleUrl: './error-groups-kanban-board.component.scss',
 })

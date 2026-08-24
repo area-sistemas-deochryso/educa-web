@@ -3,11 +3,11 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter, map } from 'rxjs/operators';
+import { EduTab, EduTabs } from '@edu-ui';
 
-import { TabsModule } from 'primeng/tabs';
 // #endregion
 
-// #region Tabs del shell (fijas — QA implementada, Ticket/Salud de sede son placeholders hasta F5/F6)
+// #region EduTabs del shell (fijas — QA implementada, Ticket/Salud de sede son placeholders hasta F5/F6)
 interface ShellTab {
 	value: string;
 	label: string;
@@ -17,8 +17,7 @@ interface ShellTab {
 const AYUDA_TABS: ShellTab[] = [
 	{ value: 'qa', label: 'Preguntas frecuentes', icon: 'pi pi-question-circle' },
 	{ value: 'ticket', label: 'Generar ticket', icon: 'pi pi-ticket' },
-	{ value: 'salud-sede', label: 'Salud de sede', icon: 'pi pi-wave-pulse' },
-];
+	{ value: 'salud-sede', label: 'Salud de sede', icon: 'pi pi-wave-pulse' }];
 // #endregion
 
 /**
@@ -30,7 +29,7 @@ const AYUDA_TABS: ShellTab[] = [
 @Component({
 	selector: 'app-ayuda-shell',
 	standalone: true,
-	imports: [RouterOutlet, TabsModule],
+	imports: [RouterOutlet, EduTab, EduTabs],
 	templateUrl: './ayuda-shell.component.html',
 	styleUrl: './ayuda-shell.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -41,7 +40,7 @@ export class AyudaShellComponent {
 	private readonly router = inject(Router);
 	// #endregion
 
-	// #region Tabs
+	// #region EduTabs
 	readonly tabs = AYUDA_TABS;
 
 	readonly activeTab = toSignal(

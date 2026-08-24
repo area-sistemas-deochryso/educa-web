@@ -29,7 +29,7 @@ import {
 import { DomainPausesTableComponent } from '../domain-pauses-table/domain-pauses-table.component';
 import { DomainPausesAddDialogComponent } from '../domain-pauses-add-dialog/domain-pauses-add-dialog.component';
 import { DomainBlockedAlertBannerComponent } from '../domain-blocked-alert-banner/domain-blocked-alert-banner.component';
-import { EduConfirmationService, EduConfirmDialog, EduInputText, EduSelect, EduTooltip } from '@edu-ui';
+import { EduConfirmDialog, EduConfirmationService, EduInputText, EduSelect, EduTooltip } from '@edu-ui';
 
 interface SelectOption<T> {
 	label: string;
@@ -48,25 +48,12 @@ const MOTIVO_OPTIONS: SelectOption<DomainPauseMotivo>[] = EMAIL_DOMAIN_PAUSE_MOT
 
 const ESTADO_OPTIONS: SelectOption<EmailDomainPauseFiltroEstado>[] = [
 	{ label: 'Activas', value: 'activa' },
-	{ label: 'Liberadas', value: 'liberada' },
-];
+	{ label: 'Liberadas', value: 'liberada' }];
 
 @Component({
 	selector: 'app-domain-pauses-tab',
 	standalone: true,
-	imports: [
-		FormsModule,
-		ButtonModule,
-		EduInputText,
-		EduSelect,
-		EduTooltip,
-		EduConfirmDialog,
-		TableSkeletonComponent,
-		DomainPausesTableComponent,
-		DomainPausesAddDialogComponent,
-		DomainBlockedAlertBannerComponent,
-		HubContextBannerComponent,
-	],
+	imports: [FormsModule, ButtonModule, EduInputText, EduSelect, EduTooltip, EduConfirmDialog, TableSkeletonComponent, DomainPausesTableComponent, DomainPausesAddDialogComponent, DomainBlockedAlertBannerComponent, HubContextBannerComponent],
 	providers: [EduConfirmationService],
 	templateUrl: './domain-pauses-tab.component.html',
 	styleUrl: './domain-pauses-tab.component.scss',
@@ -176,14 +163,12 @@ export class DomainPausesTabComponent implements OnInit {
 					e.triggerEventCount,
 					e.estado ? 'Activa' : 'Liberada',
 					e.pausedUntil,
-					(e.observacion ?? '').replace(/[\r\n,]/g, ' '),
+					(e.observacion ?? '').replace(/[\r\n]/g, ' '),
 					e.fechaReg,
-					e.usuarioReg,
-				]
+					e.usuarioReg]
 					.map((v) => `"${String(v).replace(/"/g, '""')}"`)
 					.join(','),
-			),
-		];
+			)];
 		const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
 		const url = URL.createObjectURL(blob);
 		const a = document.createElement('a');

@@ -18,7 +18,7 @@ import {
 	ExplicacionAdminDto,
 } from './models/explicacion-admin.models';
 import { ExplicacionAdminFacade } from './services/explicacion-admin.facade';
-import { EduConfirmationService, EduConfirmDialog, EduInputText, EduMessageService, EduToast, EduTooltip } from '@edu-ui';
+import { EduConfirmDialog, EduConfirmationService, EduInputText, EduMessageService, EduToast, EduTooltip } from '@edu-ui';
 // #endregion
 
 /**
@@ -31,17 +31,7 @@ import { EduConfirmationService, EduConfirmDialog, EduInputText, EduMessageServi
 @Component({
 	selector: 'app-explicaciones-admin',
 	standalone: true,
-	imports: [
-		FormsModule,
-		ButtonModule,
-		EduInputText,
-		EduToast,
-		EduTooltip,
-		EduConfirmDialog,
-		PageHeaderComponent,
-		ExplicacionAdminTableComponent,
-		ExplicacionAdminFormDialogComponent,
-	],
+	imports: [FormsModule, ButtonModule, EduInputText, EduToast, EduTooltip, EduConfirmDialog, PageHeaderComponent, ExplicacionAdminTableComponent, ExplicacionAdminFormDialogComponent],
 	providers: [ExplicacionAdminFacade, EduConfirmationService, EduMessageService],
 	templateUrl: './explicaciones-admin.component.html',
 	styleUrl: './explicaciones-admin.component.scss',

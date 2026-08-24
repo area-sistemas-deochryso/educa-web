@@ -12,7 +12,7 @@
 			></button>
 			<h3>Salud del runtime</h3>
 			@if (hasData()) {
-				<p-tag
+				<edu-tag
 					[value]="patternLabel()"
 					[severity]="patternSeverity()"
 					[icon]="patternIcon()"
@@ -22,7 +22,7 @@
 
 		<div class="widget-actions">
 			<label class="auto-refresh-toggle">
-				<p-toggleSwitch
+				<edu-toggle
 					[ngModel]="autoRefresh()"
 					data-info-anchor="admin-runtime-health-widget-auto-refresh-toggle"
 					(ngModelChange)="onAutoRefreshChange($event)"
@@ -36,8 +36,8 @@
 				[loading]="loading()"
 				data-info-anchor="admin-runtime-health-widget-refresh-btn"
 				(click)="onRefreshClick()"
-				pTooltip="Refrescar ahora"
-				tooltipPosition="bottom"
+				eduTooltip="Refrescar ahora"
+				eduTooltipPosition="bottom"
 				[pt]="{ root: { 'aria-label': 'Refrescar' } }"
 			></button>
 		</div>
@@ -71,13 +71,13 @@
 						<i class="pi pi-server"></i>
 						<span>ThreadPool</span>
 						@if (alerts['threadPool.queueLength']; as a) {
-							<p-tag
+							<edu-tag
 								[value]="a.level"
 								[severity]="a.severity"
 								class="alert-badge"
 							/>
 						} @else {
-							<p-tag value="OK" severity="success" class="alert-badge" />
+							<edu-tag value="OK" severity="success" class="alert-badge" />
 						}
 					</div>
 					<dl class="info-card__list">
@@ -122,13 +122,13 @@
 						<i class="pi pi-bolt"></i>
 						<span>Requests</span>
 						@if (alerts['requests.p95']; as a) {
-							<p-tag
+							<edu-tag
 								[value]="a.level"
 								[severity]="a.severity"
 								class="alert-badge"
 							/>
 						} @else {
-							<p-tag value="OK" severity="success" class="alert-badge" />
+							<edu-tag value="OK" severity="success" class="alert-badge" />
 						}
 					</div>
 					<dl class="info-card__list">
@@ -161,13 +161,13 @@
 						<i class="pi pi-chart-bar"></i>
 						<span>GC</span>
 						@if (alerts['gc.heapMb']; as a) {
-							<p-tag
+							<edu-tag
 								[value]="a.level"
 								[severity]="a.severity"
 								class="alert-badge"
 							/>
 						} @else {
-							<p-tag value="OK" severity="success" class="alert-badge" />
+							<edu-tag value="OK" severity="success" class="alert-badge" />
 						}
 					</div>
 					<dl class="info-card__list">
@@ -194,8 +194,8 @@
 							icon="pi pi-trash"
 							label="Force GC"
 							class="p-button-outlined p-button-sm p-button-warning"
-							pTooltip="Ejecutar Garbage Collection en el servidor"
-							tooltipPosition="bottom"
+							eduTooltip="Ejecutar Garbage Collection en el servidor"
+							eduTooltipPosition="bottom"
 							data-info-anchor="admin-runtime-health-widget-force-gc-btn"
 							(click)="onForceGc()"
 							[pt]="{ root: { 'aria-label': 'Forzar garbage collection' } }"

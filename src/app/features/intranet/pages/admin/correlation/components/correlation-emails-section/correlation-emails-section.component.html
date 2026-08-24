@@ -23,7 +23,7 @@
 			<p>Sin correos en el outbox con este correlation id.</p>
 		</div>
 	} @else {
-		<p-table [value]="items()" [dataKey]="'id'" class="p-datatable-sm" [scrollable]="true" scrollHeight="flex">
+		<edu-table [value]="items()" [dataKey]="'id'" class="p-datatable-sm" [scrollable]="true" scrollHeight="flex">
 			<ng-template #header>
 				<tr>
 					<th style="width: 130px">Tipo</th>
@@ -38,10 +38,10 @@
 			</ng-template>
 			<ng-template #body let-row>
 				<tr>
-					<td><p-tag [value]="row.tipo" styleClass="tag-neutral" /></td>
-					<td><p-tag [value]="row.estado" [severity]="getEstadoSeverity(row.estado)" /></td>
+					<td><edu-tag [value]="row.tipo" styleClass="tag-neutral" /></td>
+					<td><edu-tag [value]="row.estado" [severity]="getEstadoSeverity(row.estado)" /></td>
 					<td>
-						<span class="cell-message" [pTooltip]="row.asunto" tooltipPosition="top">
+						<span class="cell-message" [eduTooltip]="row.asunto" eduTooltipPosition="top">
 							{{ row.asunto }}
 						</span>
 					</td>
@@ -49,7 +49,7 @@
 					<td><span class="cell-mono">{{ row.intentos }}</span></td>
 					<td>
 						@if (row.ultimoErrorResumen) {
-							<span class="cell-message" [pTooltip]="row.ultimoErrorResumen" tooltipPosition="top">
+							<span class="cell-message" [eduTooltip]="row.ultimoErrorResumen" eduTooltipPosition="top">
 								{{ row.ultimoErrorResumen }}
 							</span>
 						} @else {
@@ -82,7 +82,7 @@
 					<td colspan="8" class="text-center p-4">No hay correos asociados a esta correlación.</td>
 				</tr>
 			</ng-template>
-		</p-table>
+		</edu-table>
 
 		@if (cappedRows()) {
 			<p class="correlation-section__cap">

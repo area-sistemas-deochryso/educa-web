@@ -1,9 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { SelectModule } from 'primeng/select';
-import { SelectButtonModule } from 'primeng/selectbutton';
-import { MultiSelectModule } from 'primeng/multiselect';
-import { DatePickerModule } from 'primeng/datepicker';
 import { ButtonModule } from 'primeng/button';
 import {
 	ESTADO_OPTIONS,
@@ -11,18 +7,12 @@ import {
 	TIPO_PERSONA_OPTIONS,
 } from '../../config/attendance-reports.config';
 import type { EstadoFiltro, RangoTipo, SalonOption, TipoPersonaReporte } from '../../models';
+import { EduDatePicker, EduMultiSelect, EduSelect, EduSelectButton } from '@edu-ui';
 
 @Component({
 	selector: 'app-reports-filters',
 	standalone: true,
-	imports: [
-		FormsModule,
-		SelectModule,
-		SelectButtonModule,
-		MultiSelectModule,
-		DatePickerModule,
-		ButtonModule,
-	],
+	imports: [FormsModule, EduSelect, EduSelectButton, EduMultiSelect, EduDatePicker, ButtonModule],
 	templateUrl: './reports-filters.component.html',
 	styleUrl: './reports-filters.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

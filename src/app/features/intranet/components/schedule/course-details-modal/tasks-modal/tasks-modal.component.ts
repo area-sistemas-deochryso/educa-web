@@ -1,8 +1,8 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DialogModule } from 'primeng/dialog';
 import { logger } from '@core/helpers';
+import { EduDialog } from '@edu-ui';
 
 // #endregion
 // #region Implementation
@@ -26,7 +26,7 @@ export interface Task {
 
 @Component({
 	selector: 'app-tasks-modal',
-	imports: [CommonModule, DialogModule],
+	imports: [CommonModule, EduDialog],
 	templateUrl: './tasks-modal.component.html',
 	styleUrl: './tasks-modal.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -62,8 +62,7 @@ export class TasksModalComponent {
 			dueDate: '28/01/2026',
 			status: 'pending',
 			isRead: false,
-		},
-	];
+		}];
 	// #endregion
 
 	/**

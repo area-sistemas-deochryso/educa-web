@@ -177,8 +177,7 @@ export class ScheduleWeeklyGridComponent {
     const lines = [
       h.cursoNombre,
       `${h.horaInicio} - ${h.horaFin}`,
-      `Salón: ${h.salonDescripcion}`,
-    ];
+      `Salón: ${h.salonDescripcion}`];
     if (h.profesorNombreCompleto) {
       lines.push(`Profesor: ${h.profesorNombreCompleto}`);
     } else {

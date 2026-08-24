@@ -88,8 +88,7 @@ import { EduSkeleton, EduTable, EduTag, EduTooltip } from '@edu-ui';
 				.p-datatable-tbody > tr > td { background: transparent; }
 				.p-paginator { background: transparent; }
 			}
-		`,
-	],
+		`],
 })
 export class HealthExitListComponent {
 	readonly permisos = input<HealthExitPermissionDto[]>([]);

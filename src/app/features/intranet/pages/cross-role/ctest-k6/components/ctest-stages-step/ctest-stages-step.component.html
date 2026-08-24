@@ -3,13 +3,13 @@
 	<div class="section-header">
 		<h3><i class="pi pi-chart-line"></i> Stages (Ramp-up/down)</h3>
 		<div class="section-toggle">
-			<p-checkbox
+			<edu-checkbox
 				[ngModel]="vm().config.useStages"
 				(ngModelChange)="onUseStagesChange($event)"
 				[binary]="true"
 				inputId="use-stages"
-				pTooltip="Stages permiten ramp-up gradual en lugar de VUs fijos"
-				tooltipPosition="top"
+				eduTooltip="Stages permiten ramp-up gradual en lugar de VUs fijos"
+				eduTooltipPosition="top"
 			/>
 			<label for="use-stages" class="toggle-label">Usar stages</label>
 		</div>
@@ -32,25 +32,25 @@
 							<label>Duración</label>
 							<input
 								type="text"
-								pInputText
+								eduInputText
 								placeholder="30s"
 								[ngModel]="stage.duration"
 								(ngModelChange)="onStageDurationChange(i, $event)"
 								[style]="{ width: '100%' }"
-								pTooltip="Duración de esta fase (ej: 30s, 1m, 5m)"
-								tooltipPosition="top"
+								eduTooltip="Duración de esta fase (ej: 30s, 1m, 5m)"
+								eduTooltipPosition="top"
 							/>
 						</div>
 						<div class="field stage-field">
 							<label>Target VUs</label>
-							<p-inputNumber
+							<edu-input-number
 								[ngModel]="stage.target"
 								(ngModelChange)="onStageTargetChange(i, $event)"
 								[min]="0"
 								[max]="10000"
 								[style]="{ width: '100%' }"
-								pTooltip="Cantidad de VUs al final de esta fase"
-								tooltipPosition="top"
+								eduTooltip="Cantidad de VUs al final de esta fase"
+								eduTooltipPosition="top"
 							/>
 						</div>
 						<button
@@ -59,8 +59,8 @@
 							class="p-button-rounded p-button-text p-button-sm"
 							[class.p-button-info]="stage.endpointIndices.length > 0"
 							(click)="onToggleStageEndpoints(i)"
-							pTooltip="Asignar endpoints a esta fase"
-							tooltipPosition="top"
+							eduTooltip="Asignar endpoints a esta fase"
+							eduTooltipPosition="top"
 							[pt]="{
 								root: {
 									'aria-label': 'Configurar endpoints de fase',
@@ -92,7 +92,7 @@
 								let ei = $index
 							) {
 								<label class="stage-endpoint-item">
-									<p-checkbox
+									<edu-checkbox
 										[ngModel]="
 											stage.endpointIndices.includes(ei)
 										"
@@ -125,8 +125,8 @@
 				icon="pi pi-plus"
 				class="p-button-outlined p-button-sm w-full"
 				(click)="onAddStage()"
-				pTooltip="Agregar una nueva fase al ramp-up"
-				tooltipPosition="top"
+				eduTooltip="Agregar una nueva fase al ramp-up"
+				eduTooltipPosition="top"
 			></button>
 		</div>
 		<!-- #endregion -->

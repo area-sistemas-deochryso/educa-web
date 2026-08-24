@@ -33,31 +33,12 @@ import {
 	buildDeleteHorarioMessage,
 	buildToggleHorarioMessage,
 } from '@app/shared/constants';
-import { EduConfirmationService, EduConfirmDialog, EduSelect, EduTag, EduTooltip } from '@edu-ui';
+import { EduConfirmDialog, EduConfirmationService, EduSelect, EduTag, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-schedules',
 	standalone: true,
-	imports: [
-		CommonModule,
-		FormsModule,
-		ButtonModule,
-		EduConfirmDialog,
-		EduSelect,
-		EduTag,
-		EduTooltip,
-		ScheduleDetailDrawerComponent,
-		SchedulesCoursePickerComponent,
-		SchedulesFormDialogComponent,
-		SchedulesImportDialogComponent,
-		SchedulesStatsSkeletonComponent,
-		ScheduleGridLayoutComponent,
-		ScheduleGlobalViewComponent,
-		PageHeaderComponent,
-		PeriodToggleComponent,
-		KpiStatsComponent,
-		DependencyGuidanceComponent,
-	],
+	imports: [CommonModule, FormsModule, ButtonModule, EduConfirmDialog, EduSelect, EduTag, EduTooltip, ScheduleDetailDrawerComponent, SchedulesCoursePickerComponent, SchedulesFormDialogComponent, SchedulesImportDialogComponent, SchedulesStatsSkeletonComponent, ScheduleGridLayoutComponent, ScheduleGlobalViewComponent, PageHeaderComponent, PeriodToggleComponent, KpiStatsComponent, DependencyGuidanceComponent],
 	templateUrl: './horarios.component.html',
 	styleUrl: './horarios.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -113,8 +94,7 @@ export class SchedulesComponent implements OnInit {
 			count: this.vm().profesoresOptions.length || undefined,
 			targetUrl: '/intranet/admin/usuarios',
 			targetLabel: 'Ir a Usuarios',
-		},
-	]);
+		}]);
 
 	readonly statsItems = computed<KpiStatItem[]>(() => {
 		const stats = this.vm().estadisticas;
@@ -140,19 +120,16 @@ export class SchedulesComponent implements OnInit {
 				label: 'Conflictos',
 				value: stats.horariosConConflicto,
 				variant: stats.horariosConConflicto > 0 ? 'error' : undefined,
-			},
-		];
+			}];
 	});
 
 	readonly estadoOptions = [
 		{ label: 'Activos', value: true },
-		{ label: 'Inactivos', value: false },
-	];
+		{ label: 'Inactivos', value: false }];
 
 	readonly completitudOptions: { label: string; value: HorarioCompletitudFiltro }[] = [
 		{ label: 'Sin profesor', value: 'sinProfesor' },
-		{ label: 'Sin estudiantes', value: 'sinEstudiantes' },
-	];
+		{ label: 'Sin estudiantes', value: 'sinEstudiantes' }];
 
 	// #region Lifecycle
 	ngOnInit(): void {

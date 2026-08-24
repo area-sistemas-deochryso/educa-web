@@ -1,5 +1,5 @@
 <section class="table-section">
-	<p-table
+	<edu-table
 		[value]="items()"
 		[dataKey]="'id'"
 		[paginator]="true"
@@ -33,7 +33,7 @@
 					</div>
 				</td>
 				<td>
-					<p-tag
+					<edu-tag
 						[value]="uiMapping.getDomainPauseMotivoLabel(item.motivo)"
 						[severity]="uiMapping.getDomainPauseMotivoSeverity(item.motivo)"
 					/>
@@ -47,7 +47,7 @@
 					}
 				</td>
 				<td>
-					<p-tag
+					<edu-tag
 						[value]="estadoLabel(item.estado)"
 						[severity]="estadoSeverity(item.estado)"
 						styleClass="tag-neutral"
@@ -60,8 +60,8 @@
 								pButton
 								icon="pi pi-unlock"
 								class="p-button-rounded p-button-text p-button-warning"
-								pTooltip="Liberar pausa"
-								tooltipPosition="top"
+								eduTooltip="Liberar pausa"
+								eduTooltipPosition="top"
 								data-info-anchor="admin-email-outbox-domain-liberar-btn"
 								(click)="onRelease(item)"
 								[pt]="{ root: { 'aria-label': 'Liberar pausa' } }"
@@ -87,5 +87,5 @@
 				</td>
 			</tr>
 		</ng-template>
-	</p-table>
+	</edu-table>
 </section>

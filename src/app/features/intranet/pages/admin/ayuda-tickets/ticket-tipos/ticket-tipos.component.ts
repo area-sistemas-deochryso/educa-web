@@ -8,7 +8,6 @@ import { UserPermissionsService } from '@core/services';
 import { TicketTipoAdminDto } from '../models/ticket-admin.models';
 import { TicketTipoCatalogoFacade } from '../services/ticket-tipo-catalogo.facade';
 import { EduButton, EduDialog, EduInputText, EduSortableColumn, EduSpinner, EduTable, EduTag, EduToggle } from '@edu-ui';
-import { TableModule } from 'primeng/table';
 // #endregion
 
 const AYUDA_TICKET_MANAGE = 'AYUDA_TICKET_MANAGE';
@@ -21,17 +20,7 @@ const AYUDA_TICKET_MANAGE = 'AYUDA_TICKET_MANAGE';
 @Component({
 	selector: 'app-ticket-tipos',
 	standalone: true,
-	imports: [TableModule, 
-		CommonModule,
-		FormsModule,
-		EduButton,
-		EduDialog,
-		EduInputText,
-		EduSpinner,
-		EduTable, EduSortableColumn,
-		EduTag,
-		EduToggle,
-	],
+	imports: [EduTable, CommonModule, FormsModule, EduButton, EduDialog, EduInputText, EduSpinner, EduSortableColumn, EduTag, EduToggle],
 	providers: [TicketTipoCatalogoFacade],
 	templateUrl: './ticket-tipos.component.html',
 	styleUrl: './ticket-tipos.component.scss',

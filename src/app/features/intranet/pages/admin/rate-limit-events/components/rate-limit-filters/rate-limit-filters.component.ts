@@ -21,16 +21,7 @@ interface SelectOption<T> {
 @Component({
 	selector: 'app-rate-limit-filters',
 	standalone: true,
-	imports: [
-		CommonModule,
-		FormsModule,
-		ButtonModule,
-		EduDatePicker,
-		EduInputText,
-		EduSelect,
-		EduToggle,
-		EduTooltip,
-	],
+	imports: [CommonModule, FormsModule, ButtonModule, EduDatePicker, EduInputText, EduSelect, EduToggle, EduTooltip],
 	templateUrl: './rate-limit-filters.component.html',
 	styleUrl: './rate-limit-filters.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -49,13 +40,11 @@ export class RateLimitFiltersComponent {
 	// #region Opciones
 	readonly rolOptions = computed<SelectOption<string>[]>(() => [
 		{ label: 'Todos los roles', value: null },
-		...this.rolService.all().map((rol) => ({ label: rol.nombre, value: rol.nombre })),
-	]);
+		...this.rolService.all().map((rol) => ({ label: rol.nombre, value: rol.nombre }))]);
 
 	readonly policyOptions: SelectOption<RateLimitPolicy>[] = [
 		{ label: 'Todas', value: null },
-		...RATE_LIMIT_POLICIES.map((p) => ({ label: p, value: p })),
-	];
+		...RATE_LIMIT_POLICIES.map((p) => ({ label: p, value: p }))];
 	// #endregion
 
 	// #region Computed / helpers

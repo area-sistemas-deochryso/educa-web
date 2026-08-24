@@ -2,7 +2,7 @@
 @if (showCursoSelector()) {
 	<div class="foro-curso-selector">
 		<label class="foro-curso-label">Curso:</label>
-		<p-select
+		<edu-select
 			data-info-anchor="curso-selector"
 			[options]="cursoOptions()"
 			[ngModel]="selectedHorarioId()"
@@ -14,7 +14,7 @@
 	</div>
 } @else if (singleCursoLabel(); as label) {
 	<div class="foro-curso-selector">
-		<p-tag [value]="salonDescripcion() ? label + ' — ' + salonDescripcion() : label" styleClass="tag-neutral" icon="pi pi-book" />
+		<edu-tag [value]="salonDescripcion() ? label + ' — ' + salonDescripcion() : label" styleClass="tag-neutral" icon="pi pi-book" />
 	</div>
 }
 <!-- #endregion -->
@@ -47,7 +47,7 @@
 	<!-- #region Loading -->
 	@if (vm().loading) {
 		<div class="loading-wrapper">
-			<p-progressSpinner strokeWidth="4" [style]="{ width: '40px', height: '40px' }" />
+			<edu-spinner strokeWidth="4" [style]="{ width: '40px', height: '40px' }" />
 		</div>
 	} @else {
 		<!-- #region Posts list -->
@@ -84,7 +84,7 @@
 			<!-- #region Destinatarios selector -->
 			@if (destinatarioOptions().length > 0) {
 				<div class="foro-destinatarios">
-					<p-multiselect
+					<edu-multi-select
 						data-info-anchor="foro-destinatarios"
 						[options]="destinatarioOptions()"
 						[ngModel]="selectedDestinatarios()"
@@ -109,7 +109,7 @@
 			<!-- #region Input -->
 			<div class="foro-input">
 				<input
-					pInputText
+					eduInputText
 					[ngModel]="nuevoMensaje()"
 					(ngModelChange)="nuevoMensaje.set($event)"
 					[placeholder]="isDirectedMessage() ? 'Mensaje dirigido...' : 'Escribe un mensaje...'"

@@ -6,19 +6,12 @@ import { PageHeaderComponent } from '@intranet-shared/components';
 import { SkeletonLoaderComponent } from '@shared/components';
 import { EstudianteRendimientoFacade } from './services/estudiante-rendimiento.facade';
 import { EstudianteRendimientoChartComponent } from './components/estudiante-rendimiento-chart/estudiante-rendimiento-chart.component';
-import { EduCard } from '@edu-ui';
+import { EduCard, EduTemplate } from '@edu-ui';
 
 @Component({
 	selector: 'app-estudiante-rendimiento',
 	standalone: true,
-	imports: [
-		CommonModule,
-		EduCard,
-		ButtonModule,
-		PageHeaderComponent,
-		SkeletonLoaderComponent,
-		EstudianteRendimientoChartComponent,
-	],
+	imports: [CommonModule, EduCard, ButtonModule, PageHeaderComponent, SkeletonLoaderComponent, EstudianteRendimientoChartComponent, EduTemplate],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './estudiante-rendimiento.component.html',
 	styleUrl: './estudiante-rendimiento.component.scss',

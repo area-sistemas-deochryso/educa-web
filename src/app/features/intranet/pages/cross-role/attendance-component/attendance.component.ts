@@ -31,14 +31,7 @@ import { UserPermissionsService } from '@core/services/permissions';
 	selector: 'app-attendance',
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [
-		AttendanceHeaderComponent,
-		AttendanceApoderadoComponent,
-		AttendanceProfesorComponent,
-		AttendanceDirectorComponent,
-		AttendanceEstudianteComponent,
-		ButtonModule,
-	],
+	imports: [AttendanceHeaderComponent, AttendanceApoderadoComponent, AttendanceProfesorComponent, AttendanceDirectorComponent, AttendanceEstudianteComponent, ButtonModule],
 	templateUrl: './attendance.component.html',
 	styleUrl: './attendance.component.scss',
 })

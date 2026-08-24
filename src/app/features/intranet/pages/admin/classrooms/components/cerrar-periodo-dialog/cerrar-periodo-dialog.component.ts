@@ -1,17 +1,15 @@
 import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
-import { MessageModule } from 'primeng/message';
-import { TagModule } from 'primeng/tag';
 
 import { PeriodoAcademicoListDto, SalonesAdminEstadisticas, NivelEducativo } from '../../models';
+import { EduDialog, EduMessage, EduTag } from '@edu-ui';
 
 @Component({
 	selector: 'app-close-period-dialog',
 	standalone: true,
-	imports: [CommonModule, DialogModule, ButtonModule, MessageModule, TagModule],
+	imports: [CommonModule, EduDialog, ButtonModule, EduMessage, EduTag],
 	templateUrl: './cerrar-periodo-dialog.component.html',
 	styleUrl: './cerrar-periodo-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

@@ -4,28 +4,15 @@ import { CommonModule } from '@angular/common';
 
 import { ButtonModule } from 'primeng/button';
 
-import { Tab, TabList, TabPanel, Tabs } from 'primeng/tabs';
-
 import type { CursoOption, CursosPorNivel } from '../../models/curso.interface';
-import { EduBadge, EduDialog, EduSpinner, EduTooltip } from '@edu-ui';
+import { EduBadge, EduDialog, EduSpinner, EduTab, EduTabPanel, EduTabs, EduTemplate, EduTooltip } from '@edu-ui';
 
 // #endregion
 // #region Implementation
 @Component({
 	selector: 'app-schedules-course-picker',
 	standalone: true,
-	imports: [
-		CommonModule,
-		EduBadge,
-		ButtonModule,
-		EduDialog,
-		EduSpinner,
-		Tabs,
-		TabList,
-		Tab,
-		TabPanel,
-		EduTooltip,
-	],
+	imports: [CommonModule, EduBadge, ButtonModule, EduDialog, EduSpinner, EduTabs, EduTab, EduTabPanel, EduTooltip, EduTemplate],
 	templateUrl: './horarios-curso-picker.component.html',
 	styleUrl: './horarios-curso-picker.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

@@ -34,8 +34,7 @@ export class SchedulesWeeklyViewComponent {
     { label: 'Martes', value: 2 },
     { label: 'Miércoles', value: 3 },
     { label: 'Jueves', value: 4 },
-    { label: 'Viernes', value: 5 },
-  ];
+    { label: 'Viernes', value: 5 }];
 
   readonly HORAS = [
     '07:00',
@@ -48,8 +47,7 @@ export class SchedulesWeeklyViewComponent {
     '14:00',
     '15:00',
     '16:00',
-    '17:00',
-  ];
+    '17:00'];
 
   // * Blocks agrupados por día, calculado una sola vez por cambio de input.
   readonly blocksByDay = computed<Map<number, HorarioWeeklyBlock[]>>(() => {

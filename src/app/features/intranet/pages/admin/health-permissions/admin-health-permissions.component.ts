@@ -15,15 +15,7 @@ import { EduSpinner } from '@edu-ui';
 @Component({
 	selector: 'app-admin-health-permissions',
 	standalone: true,
-	imports: [
-		CommonModule,
-		FormsModule,
-		ButtonModule,
-		EduSpinner,
-		PageHeaderComponent,
-		PickerGridComponent,
-		SalonHealthPermissionsTabComponent,
-	],
+	imports: [CommonModule, FormsModule, ButtonModule, EduSpinner, PageHeaderComponent, PickerGridComponent, SalonHealthPermissionsTabComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
 		<app-page-header icon="pi pi-heart" title="Permisos de Salud" subtitle="Administra los permisos de salud registrados por estudiante" />
@@ -131,8 +123,7 @@ import { EduSpinner } from '@edu-ui';
 					}
 				}
 			}
-		`,
-	],
+		`],
 })
 export class AdminHealthPermissionsComponent implements OnInit {
 	readonly facade = inject(AdminHealthPermissionsFacade);

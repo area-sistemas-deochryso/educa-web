@@ -27,14 +27,7 @@ const DOMAIN_REGEX = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-
 @Component({
 	selector: 'app-domain-pauses-add-dialog',
 	standalone: true,
-	imports: [
-		FormsModule,
-		EduDialog,
-		ButtonModule,
-		EduInputText,
-		EduSelect,
-		EduTextarea,
-	],
+	imports: [FormsModule, EduDialog, ButtonModule, EduInputText, EduSelect, EduTextarea],
 	templateUrl: './domain-pauses-add-dialog.component.html',
 	styleUrl: './domain-pauses-add-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

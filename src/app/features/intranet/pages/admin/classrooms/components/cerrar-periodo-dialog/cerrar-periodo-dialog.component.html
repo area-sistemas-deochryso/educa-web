@@ -1,4 +1,4 @@
-<p-dialog
+<edu-dialog
 	header="Cerrar Periodo — {{ nivel() }}"
 	[visible]="visible()"
 	(visibleChange)="onVisibleChange($event)"
@@ -8,7 +8,7 @@
 	[closable]="true"
 >
 	<!-- #region Warning -->
-	<p-message
+	<edu-message
 		severity="warn"
 		text="Esta acción es irreversible. Se crearán los salones del próximo año automáticamente."
 		styleClass="mb-4 w-full"
@@ -22,7 +22,7 @@
 			<div class="info-grid">
 				<div class="info-row">
 					<span class="info-label">Estado actual</span>
-					<p-tag
+					<edu-tag
 						[value]="periodo.estadoCierre === 'CERRADO' ? 'Cerrado' : 'Abierto'"
 						[severity]="periodo.estadoCierre === 'CERRADO' ? 'success' : 'info'"
 					/>
@@ -76,4 +76,4 @@
 		></button>
 	</ng-template>
 	<!-- #endregion -->
-</p-dialog>
+</edu-dialog>

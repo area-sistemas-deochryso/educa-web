@@ -3,20 +3,18 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 
 import { ButtonModule } from 'primeng/button';
-import { TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
 
 import {
 	CorrelationReporteUsuarioDto,
 	REPORTE_ESTADO_SEVERITY_MAP,
 	SECTION_DEFENSIVE_CAP,
 } from '../../models';
+import { EduTable, EduTag, EduTemplate, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-correlation-reports-section',
 	standalone: true,
-	imports: [CommonModule, DatePipe, RouterLink, ButtonModule, TableModule, TagModule, TooltipModule],
+	imports: [CommonModule, DatePipe, RouterLink, ButtonModule, EduTable, EduTag, EduTooltip, EduTemplate],
 	templateUrl: './correlation-reports-section.component.html',
 	styleUrl: './correlation-reports-section.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

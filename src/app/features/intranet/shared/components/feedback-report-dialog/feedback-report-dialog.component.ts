@@ -4,13 +4,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
-import { CheckboxModule } from 'primeng/checkbox';
-import { DialogModule } from 'primeng/dialog';
-import { MessageModule } from 'primeng/message';
-import { SelectModule } from 'primeng/select';
-import { TextareaModule } from 'primeng/textarea';
 
 import { FeedbackReportFacade, REPORTE_TIPO_OPTIONS, ReporteTipo } from '@core/services/feedback';
+import { EduCheckbox, EduDialog, EduMessage, EduSelect, EduTemplate, EduTextarea } from '@edu-ui';
 
 // #endregion
 // #region Implementation
@@ -24,16 +20,7 @@ import { FeedbackReportFacade, REPORTE_TIPO_OPTIONS, ReporteTipo } from '@core/s
 	selector: 'app-feedback-report-dialog',
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [
-		CommonModule,
-		FormsModule,
-		DialogModule,
-		ButtonModule,
-		CheckboxModule,
-		SelectModule,
-		TextareaModule,
-		MessageModule,
-	],
+	imports: [CommonModule, FormsModule, EduDialog, ButtonModule, EduCheckbox, EduSelect, EduTextarea, EduMessage, EduTemplate],
 	templateUrl: './feedback-report-dialog.component.html',
 	styleUrl: './feedback-report-dialog.component.scss',
 })

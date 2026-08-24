@@ -3,14 +3,13 @@ import { forkJoin, finalize } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DestroyRef } from '@angular/core';
 
-import { TabsModule } from 'primeng/tabs';
-
 import { SalonProfesor } from '@data/models';
 import { AttendanceService } from '@intranet-shared/services';
 import { ViewMode } from '@features/intranet/components/attendance/attendance-header/attendance-header.component';
 
 import { AttendanceProfesorPropiaComponent } from './propia/attendance-profesor-propia.component';
 import { AttendanceProfesorEstudiantesComponent } from './estudiantes/attendance-profesor-estudiantes.component';
+import { EduTab, EduTabPanel, EduTabs } from '@edu-ui';
 
 /**
  * Shell del panel de asistencia para el rol Profesor (Plan 21 Chat 4).
@@ -27,7 +26,7 @@ import { AttendanceProfesorEstudiantesComponent } from './estudiantes/attendance
 @Component({
 	selector: 'app-attendance-profesor',
 	standalone: true,
-	imports: [TabsModule, AttendanceProfesorPropiaComponent, AttendanceProfesorEstudiantesComponent],
+	imports: [AttendanceProfesorPropiaComponent, AttendanceProfesorEstudiantesComponent, EduTab, EduTabPanel, EduTabs],
 	templateUrl: './attendance-profesor.component.html',
 	styleUrl: './attendance-profesor.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -62,10 +61,10 @@ export class AttendanceProfesorComponent implements OnInit {
 	readonly salonesReady = computed(() => this.salonesProfesor() !== null);
 
 	// #endregion
-	// #region Tabs
+	// #region EduTabs
 
 	/**
-	 * Tab activo.
+	 * EduTab activo.
 	 * - Default: 'propia' (el profesor abre primero su propia asistencia).
 	 * - Si no tiene salones, permanece en 'propia' (la otra tab está oculta).
 	 */
@@ -135,9 +134,9 @@ export class AttendanceProfesorComponent implements OnInit {
 
 	/**
 	 * Delega el cambio de modo día/mes al tab activo.
-	 * - Tab "Mi asistencia" NO responde al pill (vista mensual pura, igual que
+	 * - EduTab "Mi asistencia" NO responde al pill (vista mensual pura, igual que
 	 *   la vista del estudiante viendo su propia asistencia).
-	 * - Tab "Mis estudiantes" delega al sub-componente.
+	 * - EduTab "Mis estudiantes" delega al sub-componente.
 	 */
 	setViewMode(mode: ViewMode): void {
 		if (this.activeTab() === 'estudiantes') {

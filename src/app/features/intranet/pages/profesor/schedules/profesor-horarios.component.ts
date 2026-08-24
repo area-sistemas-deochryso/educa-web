@@ -139,13 +139,11 @@ export class TeacherSchedulesComponent implements OnInit {
 		{ label: 'Martes', short: 'Mar', value: 2 },
 		{ label: 'Miércoles', short: 'Mié', value: 3 },
 		{ label: 'Jueves', short: 'Jue', value: 4 },
-		{ label: 'Viernes', short: 'Vie', value: 5 },
-	];
+		{ label: 'Viernes', short: 'Vie', value: 5 }];
 
 	readonly HORAS = [
 		'07:00', '08:00', '09:00', '10:00', '11:00',
-		'12:00', '13:00', '14:00', '15:00', '16:00', '17:00',
-	];
+		'12:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
 
 	// #endregion
 	// #region Lifecycle

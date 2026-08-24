@@ -64,40 +64,40 @@
 			}
 
 			<!-- Tabs -->
-			<p-tabs value="general" class="occurrence-tabs">
-				<p-tablist>
-					<p-tab value="general" data-info-anchor="tab-switch">
+			<edu-tabs value="general" class="occurrence-tabs">
+				
+					<edu-tab value="general" data-info-anchor="tab-switch">
 						<i class="pi pi-info-circle"></i>
 						<span>General</span>
-					</p-tab>
-					<p-tab value="trace" data-info-anchor="tab-switch">
+					</edu-tab>
+					<edu-tab value="trace" data-info-anchor="tab-switch">
 						<i class="pi pi-code"></i>
 						<span>Trace</span>
-					</p-tab>
-					<p-tab value="breadcrumbs" data-info-anchor="tab-switch">
+					</edu-tab>
+					<edu-tab value="breadcrumbs" data-info-anchor="tab-switch">
 						<i class="pi pi-history"></i>
 						<span>Breadcrumbs</span>
 						@if (err.breadcrumbs.length > 0) {
 							<span class="tab-count">{{ err.breadcrumbs.length }}</span>
 						}
-					</p-tab>
-					<p-tab value="group" data-info-anchor="tab-switch">
+					</edu-tab>
+					<edu-tab value="group" data-info-anchor="tab-switch">
 						<i class="pi pi-sitemap"></i>
 						<span>Group</span>
-					</p-tab>
-					<p-tab value="reqres" data-info-anchor="tab-switch">
+					</edu-tab>
+					<edu-tab value="reqres" data-info-anchor="tab-switch">
 						<i class="pi pi-replay"></i>
 						<span>Req/Res</span>
-					</p-tab>
-					<p-tab value="environment" data-info-anchor="tab-switch">
+					</edu-tab>
+					<edu-tab value="environment" data-info-anchor="tab-switch">
 						<i class="pi pi-desktop"></i>
 						<span>Entorno</span>
-					</p-tab>
-				</p-tablist>
+					</edu-tab>
+				
 
-				<p-tabpanels>
+				
 					<!-- Tab General: Mensaje + Contexto técnico -->
-					<p-tabpanel value="general">
+					<edu-tabpanel value="general">
 						<div class="detail-section">
 							<h4><i class="pi pi-comment"></i> Mensaje</h4>
 							<pre class="detail-pre">{{ err.mensaje }}</pre>
@@ -141,10 +141,10 @@
 								}
 							</div>
 						</div>
-					</p-tabpanel>
+					</edu-tabpanel>
 
 					<!-- Tab Trace: Layer trace + stack textual + counterpart -->
-					<p-tabpanel value="trace">
+					<edu-tabpanel value="trace">
 						@if (err.trace && err.trace.length > 0) {
 							<div class="detail-section">
 								<h4><i class="pi pi-arrows-v"></i> Trace por capa</h4>
@@ -257,10 +257,10 @@
 								></a>
 							</div>
 						}
-					</p-tabpanel>
+					</edu-tabpanel>
 
 					<!-- Tab Breadcrumbs: Flujo del usuario (FE) o empty (BE) -->
-					<p-tabpanel value="breadcrumbs">
+					<edu-tabpanel value="breadcrumbs">
 						@if (err.breadcrumbs.length > 0) {
 							<div class="detail-section detail-section--flush">
 								<h4>
@@ -313,10 +313,10 @@
 								</p>
 							</div>
 						}
-					</p-tabpanel>
+					</edu-tabpanel>
 
 					<!-- Tab Group: ErrorGroup padre + CorrelationId -->
-					<p-tabpanel value="group">
+					<edu-tabpanel value="group">
 						@if (groupContext(); as grp) {
 						@let gd = groupDerived();
 							<div class="group-card">
@@ -427,10 +427,10 @@
 								></a>
 							</div>
 						}
-					</p-tabpanel>
+					</edu-tabpanel>
 
 					<!-- Tab Req/Res: Datos de reproducción (BE) o empty (FE) -->
-					<p-tabpanel value="reqres">
+					<edu-tabpanel value="reqres">
 						@if (ed?.hasReproduction) {
 							<div class="detail-section detail-section--flush">
 								<h4>
@@ -476,10 +476,10 @@
 								</p>
 							</div>
 						}
-					</p-tabpanel>
+					</edu-tabpanel>
 
 					<!-- Tab Entorno: datos del usuario al momento del error -->
-					<p-tabpanel value="environment">
+					<edu-tabpanel value="environment">
 						@if (clientEnvironment(); as env) {
 							<div class="detail-section">
 								<h4><i class="pi pi-desktop"></i> Entorno del usuario</h4>
@@ -552,9 +552,9 @@
 								</p>
 							</div>
 						}
-					</p-tabpanel>
-				</p-tabpanels>
-			</p-tabs>
+					</edu-tabpanel>
+				
+			</edu-tabs>
 		</div>
 	}
 </edu-drawer>

@@ -10,15 +10,15 @@
 				[text]="true"
 				[rounded]="true"
 				(onClick)="toggleMenu($event)"
-				pTooltip="Descargar reporte"
-				tooltipPosition="top"
+				eduTooltip="Descargar reporte"
+				eduTooltipPosition="top"
 				[pt]="{
 					root: {
 						'aria-label': 'Descargar reporte',
 					},
 				}"
 			/>
-			<p-menu #pdfMenu [model]="menuItems" [popup]="true" appendTo="body" />
+			<edu-menu #pdfMenu [model]="menuItems" [popup]="true" appendTo="body" />
 			<!-- * Date headline -->
 			<h2>Estadísticas del día - {{ estadisticas()!.fecha | date: 'EEEE d MMMM yyyy' }}</h2>
 		</div>

@@ -63,7 +63,7 @@
 <!-- #endregion -->
 
 <!-- #region Tabla de estudiantes -->
-<p-table
+<edu-table
 	[value]="aprobaciones()"
 	[dataKey]="'estudianteId'"
 	[loading]="loading()"
@@ -75,7 +75,7 @@
 		<tr>
 			@if (periodoCerrado()) {
 				<th style="width: 50px" class="text-center">
-					<p-checkbox
+					<edu-checkbox
 						[ngModel]="allSelected()"
 						(ngModelChange)="toggleSelectAll()"
 						[binary]="true"
@@ -96,7 +96,7 @@
 		<tr [class.row-selected]="isSelected(aprobacion.estudianteId)">
 			@if (periodoCerrado()) {
 				<td class="text-center">
-					<p-checkbox
+					<edu-checkbox
 						[ngModel]="isSelected(aprobacion.estudianteId)"
 						(ngModelChange)="toggleStudent(aprobacion.estudianteId)"
 						[binary]="true"
@@ -113,7 +113,7 @@
 				{{ aprobacion.promedioFinal !== null ? aprobacion.promedioFinal : '—' }}
 			</td>
 			<td class="text-center">
-				<p-tag [value]="getEstadoLabel(aprobacion.estado)" [severity]="getEstadoSeverity(aprobacion.estado)" />
+				<edu-tag [value]="getEstadoLabel(aprobacion.estado)" [severity]="getEstadoSeverity(aprobacion.estado)" />
 			</td>
 			@if (periodoCerrado()) {
 				<td class="text-center">
@@ -122,8 +122,8 @@
 							pButton
 							icon="pi pi-check"
 							class="p-button-rounded p-button-text p-button-sm p-button-success"
-							pTooltip="Aprobar"
-							tooltipPosition="top"
+							eduTooltip="Aprobar"
+							eduTooltipPosition="top"
 							[disabled]="aprobacion.estado === 'APROBADO' || loading()"
 							(click)="onAprobarIndividual(aprobacion, 'APROBADO')"
 							[pt]="{ root: { 'aria-label': 'Aprobar estudiante' } }"
@@ -133,8 +133,8 @@
 							pButton
 							icon="pi pi-times"
 							class="p-button-rounded p-button-text p-button-sm p-button-danger"
-							pTooltip="Desaprobar"
-							tooltipPosition="top"
+							eduTooltip="Desaprobar"
+							eduTooltipPosition="top"
 							[disabled]="aprobacion.estado === 'DESAPROBADO' || loading()"
 							(click)="onAprobarIndividual(aprobacion, 'DESAPROBADO')"
 							[pt]="{ root: { 'aria-label': 'Desaprobar estudiante' } }"
@@ -152,5 +152,5 @@
 			</td>
 		</tr>
 	</ng-template>
-</p-table>
+</edu-table>
 <!-- #endregion -->

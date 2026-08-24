@@ -17,7 +17,6 @@ import {
 } from '@features/intranet/pages/estudiante/models';
 import { JustificarInasistenciaDialogComponent } from '@features/intranet/pages/estudiante/components/justificar-inasistencia-dialog/justificar-inasistencia-dialog.component';
 import { EduSelect, EduSortableColumn, EduTable, EduTag, EduTooltip } from '@edu-ui';
-import { TableModule } from 'primeng/table';
 
 const MENSAJE_JUSTIFICACION_GESTIONADA = 'Las justificaciones las gestiona el colegio con tu apoderado';
 
@@ -32,7 +31,7 @@ export type JustificacionCellState =
 @Component({
 	selector: 'app-student-attendance-tab',
 	standalone: true,
-	imports: [TableModule, CommonModule, FormsModule, EduTable, EduSortableColumn, EduTag, EduSelect, ButtonModule, EduTooltip, JustificarInasistenciaDialogComponent, ErrorStateComponent],
+	imports: [EduTable, CommonModule, FormsModule, EduSortableColumn, EduTag, EduSelect, ButtonModule, EduTooltip, JustificarInasistenciaDialogComponent, ErrorStateComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './student-attendance-tab.component.html',
 	styleUrl: './student-attendance-tab.component.scss',

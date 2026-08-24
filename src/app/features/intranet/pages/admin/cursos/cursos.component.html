@@ -33,7 +33,7 @@
 			<i class="pi pi-search"></i>
 			<input
 				type="text"
-				pInputText
+				eduInputText
 				placeholder="Buscar por nombre..."
 				data-info-anchor="admin-cursos-search-input"
 				[ngModel]="vm().searchTerm"
@@ -41,7 +41,7 @@
 			/>
 		</div>
 
-		<p-select
+		<edu-select
 			[options]="estadoOptions"
 			[ngModel]="vm().filterEstado"
 			(ngModelChange)="onFilterEstadoChange($event)"
@@ -51,7 +51,7 @@
 			data-info-anchor="admin-cursos-estado-select"
 		/>
 
-		<p-select
+		<edu-select
 			[options]="nivelOptions"
 			[ngModel]="vm().filterNivel"
 			(ngModelChange)="onFilterNivelChange($event)"
@@ -61,7 +61,7 @@
 			data-info-anchor="admin-cursos-nivel-select"
 		/>
 
-		<p-select
+		<edu-select
 			[options]="completitudOptions"
 			[ngModel]="vm().filterCompletitud"
 			(ngModelChange)="onFilterCompletitudChange($event)"
@@ -99,7 +99,7 @@
 
 	<!-- Table -->
 	<section class="table-section">
-		<p-table
+		<edu-table
 			[value]="vm().cursos"
 			[dataKey]="'id'"
 			[paginator]="true"
@@ -112,11 +112,11 @@
 		>
 			<ng-template #header>
 				<tr>
-					<th style="width: 70px" pSortableColumn="id" data-info-anchor="tabla-orden-columna">ID <p-sortIcon field="id" /></th>
-					<th pSortableColumn="nombre" data-info-anchor="tabla-orden-columna">NOMBRE <p-sortIcon field="nombre" /></th>
+					<th style="width: 70px" eduSortableColumn="id" data-info-anchor="tabla-orden-columna">ID </th>
+					<th eduSortableColumn="nombre" data-info-anchor="tabla-orden-columna">NOMBRE </th>
 					<th style="width: 250px">GRADOS</th>
-					<th style="width: 100px" pSortableColumn="estado" data-info-anchor="tabla-orden-columna">
-						ESTADO <p-sortIcon field="estado" />
+					<th style="width: 100px" eduSortableColumn="estado" data-info-anchor="tabla-orden-columna">
+						ESTADO 
 					</th>
 					<th style="width: 220px">COMPLETITUD</th>
 					<th style="width: 140px">ACCIONES</th>
@@ -144,7 +144,7 @@
 								class="p-button-sm grados-button"
 								data-info-anchor="admin-cursos-ver-grados-btn"
 								(click)="showGrados(curso)"
-								pTooltip="Ver grados asignados"
+								eduTooltip="Ver grados asignados"
 								[pt]="{
 									root: {
 										'aria-label': 'Ver grados',
@@ -156,7 +156,7 @@
 						}
 					</td>
 					<td class="text-left">
-						<p-tag
+						<edu-tag
 							[value]="curso.estado | estadoLabel"
 							[severity]="curso.estado | estadoSeverity"
 						/>
@@ -172,30 +172,30 @@
 									completitud.tieneProfesorAsignado &&
 									completitud.cantidadConflictos === 0
 								) {
-									<p-tag value="Completo" severity="success" />
+									<edu-tag value="Completo" severity="success" />
 								} @else {
 									@if (!completitud.tieneHorario) {
-										<p-tag
+										<edu-tag
 											value="Sin horario"
 											severity="warn"
-											pTooltip="El curso no tiene ningún horario creado en Horarios"
-											tooltipPosition="top"
+											eduTooltip="El curso no tiene ningún horario creado en Horarios"
+											eduTooltipPosition="top"
 										/>
 									}
 									@if (completitud.tieneHorario && !completitud.tieneProfesorAsignado) {
-										<p-tag
+										<edu-tag
 											value="Sin profesor"
 											severity="warn"
-											pTooltip="Ningún horario de este curso tiene profesor asignado"
-											tooltipPosition="top"
+											eduTooltip="Ningún horario de este curso tiene profesor asignado"
+											eduTooltipPosition="top"
 										/>
 									}
 									@if (completitud.cantidadConflictos > 0) {
-										<p-tag
+										<edu-tag
 											[value]="completitud.cantidadConflictos + ' conflicto' + (completitud.cantidadConflictos > 1 ? 's' : '')"
 											severity="danger"
-											pTooltip="Conflictos de horario detectados — revisa Horarios para corregirlos"
-											tooltipPosition="top"
+											eduTooltip="Conflictos de horario detectados — revisa Horarios para corregirlos"
+											eduTooltipPosition="top"
 										/>
 									}
 								}
@@ -209,7 +209,7 @@
 								pButton
 								icon="pi pi-pencil"
 								class="p-button-rounded p-button-text p-button-success"
-								pTooltip="Editar"
+								eduTooltip="Editar"
 								data-info-anchor="admin-cursos-editar-btn"
 								(click)="editCurso(curso)"
 								[pt]="{
@@ -226,7 +226,7 @@
 								class="p-button-rounded p-button-text"
 								[class.p-button-warning]="curso.estado"
 								[class.p-button-info]="!curso.estado"
-								[pTooltip]="curso.estado | estadoToggleLabel"
+								[eduTooltip]="curso.estado | estadoToggleLabel"
 								data-info-anchor="admin-cursos-toggle-estado-btn"
 								(click)="toggleEstado(curso)"
 								[pt]="{
@@ -241,7 +241,7 @@
 								pButton
 								icon="pi pi-trash"
 								class="p-button-rounded p-button-text p-button-danger"
-								pTooltip="Eliminar"
+								eduTooltip="Eliminar"
 								data-info-anchor="admin-cursos-eliminar-btn"
 								(click)="deleteCurso(curso)"
 								[pt]="{
@@ -266,12 +266,12 @@
 					</td>
 				</tr>
 			</ng-template>
-		</p-table>
+		</edu-table>
 	</section>
 </div>
 
 <!-- Edit/Create Dialog -->
-<p-dialog
+<edu-dialog
 	[visible]="vm().dialogVisible"
 	(visibleChange)="onDialogVisibleChange($event)"
 	[header]="vm().isEditing ? 'Editar Curso' : 'Nuevo Curso'"
@@ -289,7 +289,7 @@
 				<input
 					id="nombre"
 					type="text"
-					pInputText
+					eduInputText
 					[ngModel]="vm().formData.nombre"
 					(ngModelChange)="updateFormField('nombre', $event)"
 					placeholder="Ejemplo: Matemática, Comunicación, etc."
@@ -378,7 +378,7 @@
 				<div class="field">
 					<label for="estado">Estado</label>
 					<div class="estado-switch">
-						<p-toggleswitch
+						<edu-toggle
 							id="estado"
 							data-info-anchor="admin-cursos-estado-switch"
 							[ngModel]="vm().formData.estado"
@@ -414,10 +414,10 @@
 			></button>
 		</div>
 	</ng-template>
-</p-dialog>
+</edu-dialog>
 
 <!-- Grados Dialog — data-driven por nivel -->
-<p-dialog
+<edu-dialog
 	[visible]="vm().gradosDialogVisible"
 	(visibleChange)="onGradosDialogVisibleChange($event)"
 	[header]="'Grados de ' + (vm().selectedCursoForGrados?.nombre || '')"
@@ -436,7 +436,7 @@
 				</h3>
 				<div class="grados-grid">
 					@for (grado of nivel.grados; track grado.id) {
-						<p-tag [value]="grado.nombre" styleClass="tag-neutral" />
+						<edu-tag [value]="grado.nombre" styleClass="tag-neutral" />
 					}
 				</div>
 			</div>
@@ -462,8 +462,8 @@
 			></button>
 		</div>
 	</ng-template>
-</p-dialog>
+</edu-dialog>
 
 <!-- ConfirmDialog — siempre en el DOM -->
-<p-confirmDialog (onHide)="onConfirmDialogHide()" />
+<edu-confirm-dialog (onHide)="onConfirmDialogHide()" />
 <!-- #endregion -->

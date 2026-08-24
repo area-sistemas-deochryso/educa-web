@@ -7,7 +7,7 @@
 		</span>
 	</header>
 
-	<p-table
+	<edu-table
 		[value]="data()"
 		[dataKey]="'asistenciaId'"
 		[paginator]="data().length > 5"
@@ -35,7 +35,7 @@
 				</td>
 				<td class="cell-nombre">{{ row.nombreCompleto }}</td>
 				<td class="col-salon">
-					<p-tag [value]="row.salon" styleClass="tag-neutral" />
+					<edu-tag [value]="row.salon" styleClass="tag-neutral" />
 				</td>
 				<td class="col-hora">{{ row.horaEntrada | date: 'HH:mm' }}</td>
 				<td class="col-correo">
@@ -43,13 +43,13 @@
 				</td>
 				<td
 					class="col-hora"
-					[pTooltip]="senderTooltip(row.remitente)"
-					tooltipPosition="top"
+					[eduTooltip]="senderTooltip(row.remitente)"
+					eduTooltipPosition="top"
 				>
 					{{ row.fechaEnvio | date: 'HH:mm' }}
 				</td>
 				<td class="col-estado">
-					<p-tag [value]="row.estado" severity="success" />
+					<edu-tag [value]="row.estado" severity="success" />
 				</td>
 				<td class="col-correlation">
 					<app-correlation-id-pill [id]="row.correlationId" [compact]="true" />
@@ -66,5 +66,5 @@
 				</td>
 			</tr>
 		</ng-template>
-	</p-table>
+	</edu-table>
 </section>

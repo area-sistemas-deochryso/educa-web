@@ -11,21 +11,12 @@ import {
 	ESTADO_ASISTENCIA_ICONS,
 } from '@features/intranet/pages/profesor/models';
 import { findNearestValidDate } from './attendance-registration-panel.helpers';
-import { EduConfirmationService, EduConfirmDialog, EduDatePicker, EduInputText, EduTag, EduTooltip } from '@edu-ui';
+import { EduConfirmDialog, EduConfirmationService, EduDatePicker, EduInputText, EduTag, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-attendance-registration-panel',
 	standalone: true,
-	imports: [
-		CommonModule,
-		FormsModule,
-		ButtonModule,
-		EduDatePicker,
-		EduTag,
-		EduInputText,
-		EduTooltip,
-		EduConfirmDialog,
-	],
+	imports: [CommonModule, FormsModule, ButtonModule, EduDatePicker, EduTag, EduInputText, EduTooltip, EduConfirmDialog],
 	providers: [EduConfirmationService],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './attendance-registration-panel.component.html',

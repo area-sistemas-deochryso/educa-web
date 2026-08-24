@@ -10,14 +10,7 @@ import { AdminRendimientoCursoCardComponent } from './components';
 @Component({
 	selector: 'app-admin-rendimiento',
 	standalone: true,
-	imports: [
-		CommonModule,
-		ButtonModule,
-		PageHeaderComponent,
-		StatsSkeletonComponent,
-		KpiStatsComponent,
-		AdminRendimientoCursoCardComponent,
-	],
+	imports: [CommonModule, ButtonModule, PageHeaderComponent, StatsSkeletonComponent, KpiStatsComponent, AdminRendimientoCursoCardComponent],
 	templateUrl: './admin-rendimiento.component.html',
 	styleUrl: './admin-rendimiento.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -45,8 +38,7 @@ export class AdminRendimientoComponent implements OnInit {
 				icon: 'pi pi-chart-bar',
 				label: 'Promedio institucional',
 				value: this.promedioInstitucionalLabel(),
-			},
-		];
+			}];
 	});
 
 	ngOnInit(): void {

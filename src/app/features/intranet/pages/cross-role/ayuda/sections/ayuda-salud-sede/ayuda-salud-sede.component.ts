@@ -3,10 +3,6 @@ import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } 
 import { FormsModule } from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
-import { MessageModule } from 'primeng/message';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { SelectModule } from 'primeng/select';
-import { TagModule } from 'primeng/tag';
 
 import {
 	SALUD_SEDE_DIMENSIONES,
@@ -16,6 +12,7 @@ import {
 	SaludSedeRating,
 } from './models/salud-sede.models';
 import { AyudaSaludSedeFacade } from './services/ayuda-salud-sede.facade';
+import { EduMessage, EduSelect, EduSpinner, EduTag } from '@edu-ui';
 // #endregion
 
 interface SelectOption<T> {
@@ -48,7 +45,7 @@ const RATING_SEVERITY: Record<SaludSedeRating, 'success' | 'warn' | 'danger'> = 
 @Component({
 	selector: 'app-ayuda-salud-sede',
 	standalone: true,
-	imports: [FormsModule, SelectModule, ButtonModule, ProgressSpinnerModule, MessageModule, TagModule],
+	imports: [FormsModule, EduSelect, ButtonModule, EduSpinner, EduMessage, EduTag],
 	providers: [AyudaSaludSedeFacade],
 	templateUrl: './ayuda-salud-sede.component.html',
 	styleUrl: './ayuda-salud-sede.component.scss',

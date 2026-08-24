@@ -110,8 +110,7 @@ import { EduDialog, EduMultiSelect, EduSelect, EduTextarea } from '@edu-ui';
 				font-size: 0.875rem;
 				color: var(--text-color);
 			}
-		`,
-	],
+		`],
 })
 export class HealthExitDialogComponent implements OnChanges {
 	// #region Inputs/Outputs
