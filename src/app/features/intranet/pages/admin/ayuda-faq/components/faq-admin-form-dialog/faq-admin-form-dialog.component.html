@@ -1,4 +1,4 @@
-<p-dialog
+<edu-dialog
 	[header]="headerLabel()"
 	[visible]="visible()"
 	(visibleChange)="onHide()"
@@ -13,7 +13,7 @@
 			<input
 				id="faq-pregunta"
 				type="text"
-				pInputText
+				eduInputText
 				class="w-full"
 				[ngModel]="pregunta()"
 				(ngModelChange)="pregunta.set($event)"
@@ -26,7 +26,7 @@
 			<label for="faq-respuesta">Respuesta *</label>
 			<textarea
 				id="faq-respuesta"
-				pTextarea
+				eduTextarea
 				class="w-full"
 				[rows]="4"
 				[ngModel]="respuesta()"
@@ -41,7 +41,7 @@
 				<input
 					id="faq-categoria"
 					type="text"
-					pInputText
+					eduInputText
 					class="w-full"
 					[ngModel]="categoria()"
 					(ngModelChange)="categoria.set($event)"
@@ -52,7 +52,7 @@
 
 			<div class="field">
 				<label for="faq-capability">Visible para</label>
-				<p-select
+				<edu-select
 					id="faq-capability"
 					[options]="capabilityOptions()"
 					optionLabel="label"
@@ -87,7 +87,7 @@
 					<input
 						id="faq-wizard-titulo"
 						type="text"
-						pInputText
+						eduInputText
 						class="w-full"
 						[ngModel]="wizardTitulo()"
 						(ngModelChange)="wizardTitulo.set($event)"
@@ -101,7 +101,7 @@
 						<div class="wizard-step-order">{{ $index + 1 }}</div>
 						<div class="wizard-step-fields">
 							<textarea
-								pTextarea
+								eduTextarea
 								class="w-full"
 								[rows]="2"
 								placeholder="Texto del paso"
@@ -111,7 +111,7 @@
 							></textarea>
 							<input
 								type="text"
-								pInputText
+								eduInputText
 								class="w-full"
 								placeholder="URL de imagen (opcional)"
 								[ngModel]="paso.imagenUrl"
@@ -125,7 +125,7 @@
 								type="button"
 								icon="pi pi-arrow-up"
 								class="p-button-text p-button-sm"
-								pTooltip="Subir"
+								eduTooltip="Subir"
 								[disabled]="$index === 0"
 								(click)="movePaso($index, -1)"
 								[pt]="{ root: { 'aria-label': 'Subir paso ' + ($index + 1) } }"
@@ -136,7 +136,7 @@
 								type="button"
 								icon="pi pi-arrow-down"
 								class="p-button-text p-button-sm"
-								pTooltip="Bajar"
+								eduTooltip="Bajar"
 								[disabled]="$index === pasos().length - 1"
 								(click)="movePaso($index, 1)"
 								[pt]="{ root: { 'aria-label': 'Bajar paso ' + ($index + 1) } }"
@@ -147,7 +147,7 @@
 								type="button"
 								icon="pi pi-trash"
 								class="p-button-text p-button-sm p-button-danger"
-								pTooltip="Quitar paso"
+								eduTooltip="Quitar paso"
 								(click)="removePaso($index)"
 								[pt]="{ root: { 'aria-label': 'Quitar paso ' + ($index + 1) } }"
 								data-info-anchor="admin-faq-form-paso-quitar-btn"
@@ -183,4 +183,4 @@
 			data-info-anchor="admin-faq-form-guardar-btn"
 		></button>
 	</ng-template>
-</p-dialog>
+</edu-dialog>

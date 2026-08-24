@@ -1,4 +1,4 @@
-<p-drawer
+<edu-drawer
 	[visible]="vm().visible"
 	(visibleChange)="onVisibleChange($event)"
 	position="right"
@@ -34,15 +34,15 @@
 					</span>
 				</div>
 				<div class="origin-banner-tags">
-					<p-tag [value]="err.origen" [severity]="ed?.origenSeverity ?? 'info'" />
+					<edu-tag [value]="err.origen" [severity]="ed?.origenSeverity ?? 'info'" />
 					@if (err.httpStatus) {
-						<p-tag
+						<edu-tag
 							[value]="'' + err.httpStatus"
 							[severity]="err.httpStatus >= 500 ? 'danger' : 'warn'"
 						/>
 					}
 					@if (err.httpMethod) {
-						<p-tag [value]="err.httpMethod" severity="secondary" />
+						<edu-tag [value]="err.httpMethod" severity="secondary" />
 					}
 				</div>
 			</div>
@@ -216,13 +216,13 @@
 									<div class="detail-row">
 										<span class="detail-label">Origen</span>
 										<span class="detail-value">
-											<p-tag [value]="cp.origen" [severity]="cpd?.origenSeverity ?? 'info'" />
+											<edu-tag [value]="cp.origen" [severity]="cpd?.origenSeverity ?? 'info'" />
 										</span>
 									</div>
 									<div class="detail-row">
 										<span class="detail-label">Severidad</span>
 										<span class="detail-value">
-											<p-tag
+											<edu-tag
 												[value]="cp.severidad"
 												[severity]="cpd?.severidadSeverity ?? 'info'"
 											/>
@@ -322,11 +322,11 @@
 							<div class="group-card">
 								<div class="group-card-header">
 									<div class="group-card-tags">
-										<p-tag
+										<edu-tag
 											[value]="gd?.estadoLabel ?? grp.estado"
 											[severity]="gd?.estadoSeverity ?? 'secondary'"
 										/>
-										<p-tag
+										<edu-tag
 											[value]="grp.severidad"
 											[severity]="gd?.severidadSeverity ?? 'info'"
 										/>
@@ -380,13 +380,13 @@
 														{{ oc.fecha | date: 'dd/MM HH:mm:ss' }}
 													</span>
 													@if (oc.httpStatus) {
-														<p-tag
+														<edu-tag
 															[value]="'' + oc.httpStatus"
 															[severity]="oc.httpStatus >= 500 ? 'danger' : 'warn'"
 														/>
 													}
 													@if (oc.id === vm().errorCompleto?.id) {
-														<p-tag value="Actual" severity="info" />
+														<edu-tag value="Actual" severity="info" />
 													}
 												</div>
 												<span class="group-ocurrencia-msg">{{ oc.mensaje }}</span>
@@ -440,8 +440,8 @@
 										class="copy-btn"
 										(click)="copyForReproduction(err)"
 										aria-label="Copiar para reproducir"
-										pTooltip="Copiar para Postman/curl"
-										tooltipPosition="left"
+										eduTooltip="Copiar para Postman/curl"
+										eduTooltipPosition="left"
 										data-info-anchor="copiar-btn"
 									>
 										<i class="pi pi-copy"></i>
@@ -524,17 +524,17 @@
 											<div class="metrics-snapshot">
 												<span class="metrics-ts">{{ snap.ts | date: 'HH:mm:ss' }}</span>
 												@if (snap.heapUsedMB !== null) {
-													<span class="metrics-item" pTooltip="Heap JS usado">
+													<span class="metrics-item" eduTooltip="Heap JS usado">
 														<i class="pi pi-database"></i> {{ snap.heapUsedMB }} MB
 													</span>
 												}
 												@if (snap.longTaskCount > 0) {
-													<span class="metrics-item" pTooltip="Tareas largas (>50ms)">
+													<span class="metrics-item" eduTooltip="Tareas largas (>50ms)">
 														<i class="pi pi-clock"></i> {{ snap.longTaskCount }} tareas
 													</span>
 												}
 												@if (snap.batteryLevel !== null) {
-													<span class="metrics-item" pTooltip="Nivel de batería">
+													<span class="metrics-item" eduTooltip="Nivel de batería">
 														<i class="pi pi-bolt"></i> {{ snap.batteryLevel }}%
 													</span>
 												}
@@ -557,4 +557,4 @@
 			</p-tabs>
 		</div>
 	}
-</p-drawer>
+</edu-drawer>

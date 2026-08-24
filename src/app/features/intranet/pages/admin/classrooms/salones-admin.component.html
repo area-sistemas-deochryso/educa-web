@@ -5,7 +5,7 @@
 		(valueChange)="onPeriodoChange($event)"
 		data-info-anchor="period-toggle"
 	/>
-	<p-inputNumber
+	<edu-input-number
 		[ngModel]="vm().filtroAnio"
 		(ngModelChange)="onAnioChange($event)"
 		[useGrouping]="false"
@@ -64,16 +64,16 @@
 				<div class="nivel-toolbar">
 					<div class="toolbar-tags">
 						@if (vm().periodoActual; as periodo) {
-							<p-tag
+							<edu-tag
 								[value]="periodo.estadoCierre === 'CERRADO' ? 'Periodo Cerrado' : 'Periodo Abierto'"
 								[severity]="periodo.estadoCierre === 'CERRADO' ? 'success' : 'info'"
 							/>
 						} @else {
-							<p-tag value="Sin periodo" severity="warn" />
+							<edu-tag value="Sin periodo" severity="warn" />
 						}
 
 						@if (vm().configActual; as config) {
-							<p-tag
+							<edu-tag
 								[value]="config.tipoCalificacion === 'NUMERICO' ? 'Numérico' : 'Literal'"
 								styleClass="tag-neutral"
 							/>
@@ -167,4 +167,4 @@
 />
 <!-- #endregion -->
 
-<p-toast />
+<edu-toast />

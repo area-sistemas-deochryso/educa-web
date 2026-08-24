@@ -1,4 +1,4 @@
-<p-dialog
+<edu-dialog
 	[visible]="visible()"
 	(visibleChange)="onVisibleChange($event)"
 	header="Agregar correo a blacklist"
@@ -14,7 +14,7 @@
 				<label for="bl-correo">Correo *</label>
 				<input
 					id="bl-correo"
-					pInputText
+					eduInputText
 					data-info-anchor="admin-email-outbox-blacklist-correo-input"
 					type="email"
 					autocomplete="off"
@@ -30,7 +30,7 @@
 
 			<div class="field full-width">
 				<label for="bl-motivo">Motivo *</label>
-				<p-select
+				<edu-select
 					inputId="bl-motivo"
 					data-info-anchor="admin-email-outbox-blacklist-motivo-select"
 					[options]="motivoOptions"
@@ -53,7 +53,7 @@
 				</label>
 				<textarea
 					id="bl-observacion"
-					pTextarea
+					eduTextarea
 					data-info-anchor="admin-email-outbox-blacklist-observacion-textarea"
 					rows="3"
 					maxlength="500"
@@ -105,4 +105,4 @@
 			></button>
 		</div>
 	</ng-template>
-</p-dialog>
+</edu-dialog>

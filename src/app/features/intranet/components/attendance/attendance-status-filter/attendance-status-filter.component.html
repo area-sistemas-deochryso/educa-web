@@ -3,7 +3,7 @@
 		<i class="pi pi-search"></i>
 		<input
 			type="text"
-			pInputText
+			eduInputText
 			[ngModel]="filterState().searchTerm"
 			(ngModelChange)="onSearchChange($event)"
 			placeholder="Buscar por nombre o DNI..."
@@ -31,8 +31,8 @@
 				[class.active]="isActive(chip.code)"
 				[attr.aria-pressed]="isActive(chip.code)"
 				(click)="onChipClick(chip.code)"
-				[pTooltip]="chip.label"
-				tooltipPosition="top"
+				[eduTooltip]="chip.label"
+				eduTooltipPosition="top"
 			>
 				<span class="chip-code">{{ chip.code === '-' ? '–' : chip.code }}</span>
 				<span class="chip-count">{{ chip.count }}</span>

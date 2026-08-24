@@ -1,4 +1,4 @@
-<p-dialog
+<edu-dialog
 	[header]="headerLabel()"
 	[visible]="visible()"
 	(visibleChange)="onHide()"
@@ -13,7 +13,7 @@
 			<input
 				id="explicacion-ancla"
 				type="text"
-				pInputText
+				eduInputText
 				class="w-full"
 				[ngModel]="ancla()"
 				(ngModelChange)="ancla.set($event)"
@@ -27,7 +27,7 @@
 			<label for="explicacion-texto">Texto *</label>
 			<textarea
 				id="explicacion-texto"
-				pTextarea
+				eduTextarea
 				class="w-full"
 				[rows]="4"
 				[ngModel]="texto()"
@@ -39,7 +39,7 @@
 		<div class="field-row">
 			<div class="field">
 				<label for="explicacion-rol">Rol</label>
-				<p-select
+				<edu-select
 					id="explicacion-rol"
 					[options]="rolOptions()"
 					optionLabel="label"
@@ -55,7 +55,7 @@
 
 			<div class="field">
 				<label for="explicacion-capability">Visible para</label>
-				<p-select
+				<edu-select
 					id="explicacion-capability"
 					[options]="capabilityOptions()"
 					optionLabel="label"
@@ -93,4 +93,4 @@
 			data-info-anchor="admin-explicaciones-form-guardar-btn"
 		></button>
 	</ng-template>
-</p-dialog>
+</edu-dialog>

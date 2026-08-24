@@ -4,10 +4,10 @@ import {
 	computed,
 	input,
 } from '@angular/core';
-import { TagModule } from 'primeng/tag';
 
 import { SkeletonLoaderComponent } from '@shared/components';
 import { DeferFailStatus } from '@features/intranet/pages/admin/email-outbox-shared';
+import { EduTag } from '@edu-ui';
 
 type LevelSeverity = 'success' | 'warn' | 'danger';
 
@@ -19,7 +19,7 @@ type LevelSeverity = 'success' | 'warn' | 'danger';
 @Component({
 	selector: 'app-defer-fail-live-counter-tile',
 	standalone: true,
-	imports: [TagModule, SkeletonLoaderComponent],
+	imports: [EduTag, SkeletonLoaderComponent],
 	templateUrl: './defer-fail-live-counter-tile.component.html',
 	styleUrl: './defer-fail-live-counter-tile.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

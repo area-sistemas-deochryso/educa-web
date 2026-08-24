@@ -1,4 +1,4 @@
-<p-drawer
+<edu-drawer
 	[visible]="visible()"
 	(visibleChange)="onVisibleChange($event)"
 	position="right"
@@ -28,7 +28,7 @@
 					</div>
 					<div class="info-item">
 						<span class="info-label">Tipo</span>
-						<p-tag [value]="row.tipo" styleClass="tag-neutral" />
+						<edu-tag [value]="row.tipo" styleClass="tag-neutral" />
 					</div>
 					@if (row.bcc) {
 						<div class="info-item">
@@ -62,7 +62,7 @@
 				<div class="info-grid">
 					<div class="info-item">
 						<span class="info-label">Estado</span>
-						<p-tag [value]="row.estado" [severity]="estadoSeverity()" />
+						<edu-tag [value]="row.estado" [severity]="estadoSeverity()" />
 					</div>
 					@if (row.tipoFallo) {
 						<div class="info-item">
@@ -225,4 +225,4 @@
 			></button>
 		</div>
 	}
-</p-drawer>
+</edu-drawer>

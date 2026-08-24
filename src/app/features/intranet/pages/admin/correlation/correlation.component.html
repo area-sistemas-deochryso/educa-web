@@ -51,7 +51,7 @@
 			[disabled]="vm().loading || isSnapshotEmpty()"
 			(click)="onExport()"
 			data-info-anchor="admin-correlation-export"
-			pTooltip="Descargar snapshot como JSON"
+			eduTooltip="Descargar snapshot como JSON"
 			[pt]="{ root: { 'aria-label': 'Exportar snapshot como JSON' } }"
 		></button>
 
@@ -66,7 +66,7 @@
 			(click)="onToggleAutoRefresh()"
 			[attr.aria-pressed]="autoRefresh()"
 			data-info-anchor="admin-correlation-autorefresh-toggle"
-			[pTooltip]="
+			[eduTooltip]="
 				autoRefresh()
 					? 'Auto-refresh activo: recarga cada 30s (pausa al cambiar de pestaña)'
 					: 'Activar recarga automática cada 30s'
@@ -87,7 +87,7 @@
 			[disabled]="vm().loading || !vm().correlationId"
 			(click)="onRetry()"
 			data-info-anchor="admin-correlation-refresh"
-			pTooltip="Recargar snapshot"
+			eduTooltip="Recargar snapshot"
 			[pt]="{ root: { 'aria-label': 'Recargar snapshot' } }"
 		></button>
 	</div>

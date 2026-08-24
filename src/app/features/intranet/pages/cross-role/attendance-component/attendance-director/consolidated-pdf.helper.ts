@@ -1,6 +1,7 @@
 import { Observable } from 'rxjs';
-import { MenuItem } from 'primeng/api';
+
 import { AttendanceService } from '@intranet-shared/services';
+import { EduMenuItem } from '@edu-ui';
 
 export type TipoReporte =
 	| 'salon-dia'
@@ -132,7 +133,7 @@ export interface DownloadMenuActions {
 	labelSuffix?: string;
 }
 
-export function buildPdfExcelMenuItems(a: DownloadMenuActions): MenuItem[] {
+export function buildPdfExcelMenuItems(a: DownloadMenuActions): EduMenuItem[] {
 	const suffix = a.labelSuffix ? ` ${a.labelSuffix}` : '';
 	return [
 		{ label: `Ver PDF${suffix}`, icon: 'pi pi-file-pdf', command: a.verPdf },

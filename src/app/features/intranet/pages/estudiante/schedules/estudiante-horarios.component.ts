@@ -2,13 +2,14 @@
 import { Component, ChangeDetectionStrategy, inject, OnInit, computed, signal, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { TooltipModule } from 'primeng/tooltip';
+
 import { PageHeaderComponent } from '@intranet-shared/components';
 import { SkeletonLoaderComponent } from '@shared/components';
 import { StudentSchedulesFacade } from './services/estudiante-horarios.facade';
 import { EstudianteFacade } from '../services/estudiante.facade';
 import { HorarioProfesorDto } from '../models';
 import { cursoColorFor } from '@intranet-shared/config/curso-colors';
+import { EduTooltip } from '@edu-ui';
 
 // #endregion
 // #region Block interface
@@ -161,7 +162,7 @@ function buildCountdownMap(blocks: HorarioBlock[], now: Date): Map<number, Count
 @Component({
 	selector: 'app-student-schedules',
 	standalone: true,
-	imports: [CommonModule, TooltipModule, PageHeaderComponent, SkeletonLoaderComponent],
+	imports: [CommonModule, EduTooltip, PageHeaderComponent, SkeletonLoaderComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './estudiante-horarios.component.html',
 	styleUrl: './estudiante-horarios.component.scss',

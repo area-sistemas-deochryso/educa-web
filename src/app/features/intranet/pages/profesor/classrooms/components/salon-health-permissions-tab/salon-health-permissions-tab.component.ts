@@ -1,9 +1,6 @@
 import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
-import { TooltipModule } from 'primeng/tooltip';
-import { ConfirmationService } from 'primeng/api';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 import {
 	HealthExitPermissionDto,
@@ -16,6 +13,7 @@ import { HealthExitListComponent } from './components/health-exit-list.component
 import { HealthJustificationListComponent } from './components/health-justification-list.component';
 import { HealthExitDialogComponent } from './components/health-exit-dialog.component';
 import { HealthJustificationDialogComponent } from './components/health-justification-dialog.component';
+import { EduConfirmationService, EduConfirmDialog, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-salon-health-permissions-tab',
@@ -23,14 +21,14 @@ import { HealthJustificationDialogComponent } from './components/health-justific
 	imports: [
 		CommonModule,
 		ButtonModule,
-		TooltipModule,
-		ConfirmDialogModule,
+		EduTooltip,
+		EduConfirmDialog,
 		HealthExitListComponent,
 		HealthJustificationListComponent,
 		HealthExitDialogComponent,
 		HealthJustificationDialogComponent,
 	],
-	providers: [ConfirmationService],
+	providers: [EduConfirmationService],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
 		<!-- #region Header + Acciones -->
@@ -43,8 +41,8 @@ import { HealthJustificationDialogComponent } from './components/health-justific
 					class="p-button-outlined p-button-sm"
 					data-info-anchor="profesor-health-abrir-permiso-salida"
 					(click)="openExitDialog.emit()"
-					pTooltip="Emitir permiso de salida por salud (solo hoy)"
-					tooltipPosition="top"
+					eduTooltip="Emitir permiso de salida por salud (solo hoy)"
+					eduTooltipPosition="top"
 				></button>
 				<button
 					pButton
@@ -53,8 +51,8 @@ import { HealthJustificationDialogComponent } from './components/health-justific
 					class="p-button-outlined p-button-sm p-button-secondary"
 					data-info-anchor="profesor-health-abrir-justificacion"
 					(click)="openJustificationDialog.emit()"
-					pTooltip="Justificar faltas con documento médico"
-					tooltipPosition="top"
+					eduTooltip="Justificar faltas con documento médico"
+					eduTooltipPosition="top"
 				></button>
 			</div>
 		</div>
@@ -98,7 +96,7 @@ import { HealthJustificationDialogComponent } from './components/health-justific
 			(save)="saveJustification.emit($event)"
 			(validateDates)="validateDates.emit($event)"
 		/>
-		<p-confirmDialog (onHide)="confirmDialogHide.emit()" />
+		<edu-confirm-dialog (onHide)="confirmDialogHide.emit()" />
 		<!-- #endregion -->
 	`,
 	styles: [

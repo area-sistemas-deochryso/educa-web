@@ -1,4 +1,4 @@
-<p-dialog
+<edu-dialog
 	header="Nuevo Salón"
 	[visible]="visible()"
 	(visibleChange)="onVisibleChange($event)"
@@ -7,7 +7,7 @@
 >
 	<div class="form-field">
 		<label for="nuevoSalonGrado">Grado</label>
-		<p-select
+		<edu-select
 			id="nuevoSalonGrado"
 			[options]="grados()"
 			[ngModel]="gradoId()"
@@ -23,7 +23,7 @@
 
 	<div class="form-field">
 		<label for="nuevoSalonSeccion">Sección</label>
-		<p-select
+		<edu-select
 			id="nuevoSalonSeccion"
 			[options]="secciones()"
 			[ngModel]="seccionId()"
@@ -39,7 +39,7 @@
 
 	<div class="form-field">
 		<label for="nuevoSalonSede">Sede</label>
-		<p-select
+		<edu-select
 			id="nuevoSalonSede"
 			[options]="sedes()"
 			[ngModel]="sedeId()"
@@ -55,7 +55,7 @@
 
 	<div class="form-field">
 		<label for="nuevoSalonAnio">Año</label>
-		<p-inputNumber
+		<edu-input-number
 			id="nuevoSalonAnio"
 			[ngModel]="anio()"
 			(ngModelChange)="anio.set($event)"
@@ -84,4 +84,4 @@
 			data-info-anchor="admin-salon-nuevo-crear-btn"
 		></button>
 	</ng-template>
-</p-dialog>
+</edu-dialog>

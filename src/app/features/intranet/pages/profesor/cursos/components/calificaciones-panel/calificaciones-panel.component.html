@@ -55,9 +55,9 @@
 						<div class="evaluacion-card">
 							<div class="eval-info">
 								<div class="eval-title-row">
-									<p-tag [value]="cal.tipo" styleClass="tag-neutral" />
+									<edu-tag [value]="cal.tipo" styleClass="tag-neutral" />
 									@if (cal.esGrupal) {
-										<p-tag value="Grupal" severity="warn" icon="pi pi-users" />
+										<edu-tag value="Grupal" severity="warn" icon="pi pi-users" />
 									}
 									<span class="eval-title">{{ cal.titulo }}</span>
 									<span class="eval-peso">{{ getPesoPercent(cal.peso) }}</span>
@@ -84,8 +84,8 @@
 									pButton
 									icon="pi pi-check-square"
 									class="p-button-rounded p-button-text p-button-sm"
-									pTooltip="Calificar estudiantes"
-									tooltipPosition="top"
+									eduTooltip="Calificar estudiantes"
+									eduTooltipPosition="top"
 									data-info-anchor="profesor-calificaciones-calificar-estudiantes"
 									(click)="calificarEstudiantes.emit(cal)"
 									[pt]="{ root: { 'aria-label': 'Calificar estudiantes' } }"
@@ -94,8 +94,8 @@
 									pButton
 									[icon]="cal.esGrupal ? 'pi pi-user' : 'pi pi-users'"
 									class="p-button-rounded p-button-text p-button-sm"
-									[pTooltip]="cal.esGrupal ? 'Cambiar a individual' : 'Cambiar a grupal'"
-									tooltipPosition="top"
+									[eduTooltip]="cal.esGrupal ? 'Cambiar a individual' : 'Cambiar a grupal'"
+									eduTooltipPosition="top"
 									data-info-anchor="profesor-calificaciones-cambiar-tipo"
 									(click)="cambiarTipo.emit(cal)"
 									[pt]="{ root: { 'aria-label': cal.esGrupal ? 'Cambiar a individual' : 'Cambiar a grupal' } }"
@@ -104,8 +104,8 @@
 									pButton
 									icon="pi pi-file-edit"
 									class="p-button-rounded p-button-text p-button-sm"
-									pTooltip="Editar evaluación"
-									tooltipPosition="top"
+									eduTooltip="Editar evaluación"
+									eduTooltipPosition="top"
 									data-info-anchor="profesor-calificaciones-editar-evaluacion"
 									(click)="editarEvaluacion.emit(cal)"
 									[pt]="{ root: { 'aria-label': 'Editar evaluación' } }"
@@ -114,8 +114,8 @@
 									pButton
 									icon="pi pi-trash"
 									class="p-button-rounded p-button-text p-button-danger p-button-sm"
-									pTooltip="Eliminar evaluación"
-									tooltipPosition="top"
+									eduTooltip="Eliminar evaluación"
+									eduTooltipPosition="top"
 									data-info-anchor="profesor-calificaciones-eliminar-evaluacion"
 									(click)="eliminarEvaluacion.emit(cal)"
 									[pt]="{ root: { 'aria-label': 'Eliminar evaluación' } }"

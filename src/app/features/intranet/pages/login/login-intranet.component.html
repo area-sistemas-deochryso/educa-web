@@ -22,8 +22,8 @@
 								type="button"
 								class="action-btn action-login"
 								aria-label="Iniciar sesión"
-								pTooltip="Iniciar sesión"
-								tooltipPosition="top"
+								eduTooltip="Iniciar sesión"
+								eduTooltipPosition="top"
 								[disabled]="isLoading()"
 								(click)="quickLogin(session)"
 								appTrackClick="Login: quick-login sesión guardada"
@@ -34,8 +34,8 @@
 								type="button"
 								class="action-btn action-remove"
 								aria-label="Cerrar sesión"
-								pTooltip="Cerrar sesión"
-								tooltipPosition="top"
+								eduTooltip="Cerrar sesión"
+								eduTooltipPosition="top"
 								[disabled]="isLoading()"
 								(click)="removeSession($event, session)"
 							>
@@ -68,7 +68,7 @@
 					<i class="pi pi-id-card"></i>
 					<input
 						type="text"
-						pInputText
+						eduInputText
 						placeholder="DNI"
 						formControlName="dni"
 						autocomplete="username"
@@ -86,12 +86,12 @@
 						[class.pi-lock]="!showPassword()"
 						[class.pi-lock-open]="showPassword()"
 						(click)="togglePasswordVisibility()"
-						pTooltip="Mostrar contraseña"
-						tooltipPosition="top"
+						eduTooltip="Mostrar contraseña"
+						eduTooltipPosition="top"
 					></i>
 					<input
 						[type]="showPassword() ? 'text' : 'password'"
-						pInputText
+						eduInputText
 						placeholder="Contraseña"
 						formControlName="password"
 						autocomplete="current-password"
@@ -104,7 +104,7 @@
 				<!-- * Role selector -->
 				<app-login-role-selector>
 					<i class="pi pi-users"></i>
-					<p-select
+					<edu-select
 						appendTo="body"
 						[options]="roles"
 						formControlName="rol"
@@ -128,7 +128,7 @@
 					}
 					<label class="remember-toggle">
 						<span>Recordar sesión</span>
-						<p-toggleSwitch formControlName="rememberMe" />
+						<edu-toggle formControlName="rememberMe" />
 					</label>
 				</app-login-options>
 

@@ -3,9 +3,7 @@ import { ChangeDetectionStrategy, Component, computed, input, output, signal } f
 import { FormsModule } from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { IconFieldModule } from 'primeng/iconfield';
-import { InputIconModule } from 'primeng/inputicon';
+import { EduIconField, EduInputIcon, EduInputText } from '@edu-ui';
 
 // #endregion
 
@@ -20,7 +18,7 @@ type SelectionMode = 'start' | 'destination';
 @Component({
 	selector: 'app-location-selector',
 	standalone: true,
-	imports: [FormsModule, ButtonModule, InputTextModule, IconFieldModule, InputIconModule],
+	imports: [FormsModule, ButtonModule, EduInputText, EduIconField, EduInputIcon],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
 		<div class="location-selector">
@@ -59,14 +57,14 @@ type SelectionMode = 'start' | 'destination';
 
 			<!-- Buscador -->
 			<div class="search-box">
-				<p-iconfield>
-					<p-inputicon styleClass="pi pi-search" />
-					<input type="text" pInputText
+				<edu-icon-field>
+					<edu-input-icon styleClass="pi pi-search" />
+					<input type="text" eduInputText
 						[ngModel]="searchQuery()"
 						(ngModelChange)="searchQuery.set($event)"
 						[placeholder]="selectionMode() === 'start' ? 'Buscar punto de inicio...' : 'Buscar destino...'"
 					/>
-				</p-iconfield>
+				</edu-icon-field>
 
 				<!-- Resultados -->
 				@if (searchQuery().length > 0) {

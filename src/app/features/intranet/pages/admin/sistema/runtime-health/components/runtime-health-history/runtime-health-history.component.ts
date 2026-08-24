@@ -11,11 +11,10 @@ import {
 	type ElementRef,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { SelectButtonModule } from 'primeng/selectbutton';
+
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { TagModule } from 'primeng/tag';
+
 import { Chart, registerables } from 'chart.js';
 
 import {
@@ -36,13 +35,14 @@ import {
 	computeSummaries,
 	formatAxisTick,
 } from './history-chart.helpers';
+import { EduSelectButton, EduSpinner, EduTag } from '@edu-ui';
 
 Chart.register(...registerables);
 
 @Component({
 	selector: 'app-runtime-health-history',
 	standalone: true,
-	imports: [DatePipe, SelectButtonModule, FormsModule, ButtonModule, ProgressSpinnerModule, TagModule],
+	imports: [DatePipe, EduSelectButton, FormsModule, ButtonModule, EduSpinner, EduTag],
 	templateUrl: './runtime-health-history.component.html',
 	styleUrl: './runtime-health-history.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

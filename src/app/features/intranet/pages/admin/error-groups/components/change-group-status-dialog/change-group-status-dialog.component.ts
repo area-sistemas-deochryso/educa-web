@@ -11,11 +11,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
-import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
-import { TagModule } from 'primeng/tag';
-import { TextareaModule } from 'primeng/textarea';
 
 import {
 	CambiarEstadoErrorGroup,
@@ -25,6 +20,7 @@ import {
 	ErrorGroupEstado,
 	ErrorGroupLista,
 } from '../../models';
+import { EduDialog, EduInputText, EduSelect, EduTag, EduTextarea } from '@edu-ui';
 
 const OBSERVACION_MAX = 1000;
 
@@ -49,11 +45,11 @@ interface EstadoOption {
 		CommonModule,
 		FormsModule,
 		ButtonModule,
-		DialogModule,
-		InputTextModule,
-		SelectModule,
-		TagModule,
-		TextareaModule,
+		EduDialog,
+		EduInputText,
+		EduSelect,
+		EduTag,
+		EduTextarea,
 	],
 	templateUrl: './change-group-status-dialog.component.html',
 	styleUrl: './change-group-status-dialog.component.scss',

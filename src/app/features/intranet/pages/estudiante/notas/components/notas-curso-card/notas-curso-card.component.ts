@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, computed, effect, input, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TagModule } from 'primeng/tag';
+
 import { AccordionModule } from 'primeng/accordion';
 import {
 	EstudianteMisNotasDto,
@@ -15,6 +15,7 @@ import {
 	esPromedioProvisional,
 } from '@intranet-shared/services/calificacion-config';
 import type { ConfiguracionCalificacionListDto } from '@data/models';
+import { EduTag } from '@edu-ui';
 
 interface PeriodoGroup {
 	periodo: PeriodoCalificacionDto;
@@ -25,7 +26,7 @@ interface PeriodoGroup {
 @Component({
 	selector: 'app-notas-curso-card',
 	standalone: true,
-	imports: [CommonModule, TagModule, AccordionModule],
+	imports: [CommonModule, EduTag, AccordionModule],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './notas-curso-card.component.html',
 	styleUrl: './notas-curso-card.component.scss',

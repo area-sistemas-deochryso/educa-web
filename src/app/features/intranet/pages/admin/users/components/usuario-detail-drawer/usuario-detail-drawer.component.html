@@ -1,5 +1,5 @@
 <!-- #region Template -->
-<p-drawer
+<edu-drawer
 	[visible]="visible()"
 	(visibleChange)="onVisibleChange($event)"
 	position="right"
@@ -22,7 +22,7 @@
 
 			<div class="detail-name">{{ usuario()!.apellidos | fullName: usuario()!.nombres }}</div>
 
-			<p-tag
+			<edu-tag
 				[value]="usuario()!.rol"
 				[severity]="uiMapping.getRolSeverity(usuario()!.rol)"
 				styleClass="tag-neutral"
@@ -36,7 +36,7 @@
 				</div>
 				<div class="info-item">
 					<span class="info-label">Estado</span>
-					<p-tag
+					<edu-tag
 						[value]="usuario()!.estado | estadoLabel"
 						[severity]="usuario()!.estado | estadoSeverity"
 						styleClass="tag-neutral"
@@ -115,5 +115,5 @@
 			></button>
 		</div>
 	}
-</p-drawer>
+</edu-drawer>
 <!-- #endregion -->

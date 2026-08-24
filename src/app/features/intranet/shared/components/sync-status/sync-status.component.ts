@@ -9,10 +9,9 @@ import {
 import { DatePipe } from '@angular/common';
 import { WalStatusFacade } from '@core/services';
 import { WalEntry } from '@core/services/wal';
-import { DrawerModule } from 'primeng/drawer';
+
 import { ButtonModule } from 'primeng/button';
-import { TooltipModule } from 'primeng/tooltip';
-import { BadgeModule } from 'primeng/badge';
+import { EduBadge, EduDrawer, EduTooltip } from '@edu-ui';
 
 // #endregion
 // #region Constants
@@ -37,7 +36,7 @@ const RESOURCE_LABELS: Record<string, string> = {
 @Component({
 	selector: 'app-sync-status',
 	standalone: true,
-	imports: [DatePipe, DrawerModule, ButtonModule, TooltipModule, BadgeModule],
+	imports: [DatePipe, EduDrawer, ButtonModule, EduTooltip, EduBadge],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './sync-status.component.html',
 	styleUrl: './sync-status.component.scss',

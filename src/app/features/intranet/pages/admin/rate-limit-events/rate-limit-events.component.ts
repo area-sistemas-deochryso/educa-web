@@ -4,9 +4,8 @@ import { ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { ButtonModule } from 'primeng/button';
-import { MessageService } from 'primeng/api';
+
 import { TableLazyLoadEvent } from 'primeng/table';
-import { ToastModule } from 'primeng/toast';
 
 import { PageHeaderComponent } from '@intranet-shared/components';
 import {
@@ -21,6 +20,7 @@ import { RateLimitTableComponent } from './components/rate-limit-table';
 import { HubContextBannerComponent, readHubContext } from '../monitoreo/shared';
 import { RateLimitEventFiltro, RateLimitEventListaDto } from './models';
 import { RateLimitEventsFacade } from './services';
+import { EduMessageService, EduToast } from '@edu-ui';
 
 @Component({
 	selector: 'app-rate-limit-events',
@@ -28,7 +28,7 @@ import { RateLimitEventsFacade } from './services';
 	imports: [
 		CommonModule,
 		ButtonModule,
-		ToastModule,
+		EduToast,
 		PageHeaderComponent,
 		TableSkeletonComponent,
 		RateLimitStatsComponent,
@@ -37,7 +37,7 @@ import { RateLimitEventsFacade } from './services';
 		RateLimitDetailDrawerComponent,
 		HubContextBannerComponent,
 	],
-	providers: [MessageService],
+	providers: [EduMessageService],
 	templateUrl: './rate-limit-events.component.html',
 	styleUrl: './rate-limit-events.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

@@ -2,9 +2,6 @@ import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } 
 import { FormsModule } from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
-import { SelectModule } from 'primeng/select';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
 
 import { ErrorStateComponent } from '@shared/components';
 import { PageHeaderComponent } from '@intranet-shared/components';
@@ -29,6 +26,7 @@ import {
 	VERTICAL_CONNECTION_TYPE_OPTIONS,
 	VerticalConnectionType,
 } from './models';
+import { EduSelect, EduTag, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-campus-admin',
@@ -36,9 +34,9 @@ import {
 	imports: [
 		FormsModule,
 		ButtonModule,
-		SelectModule,
-		TagModule,
-		TooltipModule,
+		EduSelect,
+		EduTag,
+		EduTooltip,
 		CampusPisosPanelComponent,
 		CampusEditorComponent,
 		CampusPisoDialogComponent,

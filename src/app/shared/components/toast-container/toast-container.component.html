@@ -1,6 +1,6 @@
 <!-- #region Template -->
 <!-- * Central toast host for app-wide notifications. -->
-<p-toast position="top-right" [life]="5000">
+<edu-toast position="top-right" [life]="5000">
 	<ng-template let-message pTemplate="message">
 		<div class="p-toast-message-text">
 			<div class="p-toast-summary">{{ message.summary }}</div>
@@ -17,5 +17,5 @@
 			}
 		</div>
 	</ng-template>
-</p-toast>
+</edu-toast>
 <!-- #endregion -->

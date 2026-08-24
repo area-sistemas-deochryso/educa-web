@@ -4,7 +4,7 @@
 	subtitle="Snapshot en vivo del proceso ASP.NET (ThreadPool, Requests, BD, GC) con clasificación de patrón de saturación."
 />
 
-<p-confirmDialog />
+<edu-confirm-dialog />
 
 @if (vm().error) {
 	<div class="error-banner">
@@ -33,7 +33,7 @@
 			<i class="pi pi-bell tab-icon"></i>
 			Alertas
 			@if (alertsVm().alerts.length > 0) {
-				<p-badge [value]="'' + alertsVm().alerts.length" severity="danger" />
+				<edu-badge [value]="'' + alertsVm().alerts.length" severity="danger" />
 			}
 		</p-tab>
 		<p-tab value="history" data-info-anchor="tab-switch">

@@ -1,6 +1,6 @@
 @if (hasMissing()) {
 	@if (isBannerMode()) {
-		<p-message severity="info" styleClass="dependency-guidance-banner">
+		<edu-message severity="info" styleClass="dependency-guidance-banner">
 			<ng-template #messageContent>
 				<div class="dependency-checklist">
 					<span class="dependency-checklist-title">Para usar esta página necesitás:</span>
@@ -25,10 +25,10 @@
 					}
 				</div>
 			</ng-template>
-		</p-message>
+		</edu-message>
 	} @else {
 		@let single = missingChecks()[0];
-		<p-message severity="warn" styleClass="dependency-guidance-inline">
+		<edu-message severity="warn" styleClass="dependency-guidance-inline">
 			<ng-template #messageContent>
 				<div class="inline-guidance-content">
 					<span>No hay {{ single.label | lowercase }} registrados.</span>
@@ -41,6 +41,6 @@
 					></button>
 				</div>
 			</ng-template>
-		</p-message>
+		</edu-message>
 	}
 }

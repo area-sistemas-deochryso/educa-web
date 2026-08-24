@@ -10,7 +10,7 @@
 			@if (hasMultipleSalones()) {
 				<div class="result-section__selector">
 					<label for="salon-selector" class="selector-label">Sal&oacute;n:</label>
-					<p-select
+					<edu-select
 						inputId="salon-selector"
 						[options]="salonOptions()"
 						[ngModel]="effectiveSalonKey()"
@@ -86,7 +86,7 @@
 					}
 				</div>
 			} @else {
-				<p-table
+				<edu-table
 					[value]="salon.estudiantes"
 					dataKey="dni"
 					[paginator]="true"
@@ -125,7 +125,7 @@
 							<td class="obs-cell">{{ est.observacion ?? '' }}</td>
 						</tr>
 					</ng-template>
-				</p-table>
+				</edu-table>
 			}
 		}
 	</section>
@@ -186,7 +186,7 @@
 				</table>
 			</div>
 		} @else {
-			<p-table
+			<edu-table
 				[value]="profesores()"
 				dataKey="dni"
 				[paginator]="true"
@@ -225,7 +225,7 @@
 						<td class="obs-cell">{{ prof.observacion ?? '' }}</td>
 					</tr>
 				</ng-template>
-			</p-table>
+			</edu-table>
 		}
 	</section>
 }
@@ -285,7 +285,7 @@
 				</table>
 			</div>
 		} @else {
-			<p-table
+			<edu-table
 				[value]="asistentesAdmin()"
 				dataKey="dni"
 				[paginator]="true"
@@ -324,7 +324,7 @@
 						<td class="obs-cell">{{ asist.observacion ?? '' }}</td>
 					</tr>
 				</ng-template>
-			</p-table>
+			</edu-table>
 		}
 	</section>
 }
@@ -382,7 +382,7 @@
 				</table>
 			</div>
 		} @else {
-			<p-table [value]="coordinadores()" dataKey="dni" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[5, 10, 25, 50]" [showCurrentPageReport]="true" currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}" styleClass="p-datatable-sm">
+			<edu-table [value]="coordinadores()" dataKey="dni" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[5, 10, 25, 50]" [showCurrentPageReport]="true" currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}" styleClass="p-datatable-sm">
 				<ng-template #header>
 					<tr>
 						<th style="width: 70px">#</th>
@@ -406,7 +406,7 @@
 						<td class="obs-cell">{{ coord.observacion ?? '' }}</td>
 					</tr>
 				</ng-template>
-			</p-table>
+			</edu-table>
 		}
 	</section>
 }
@@ -464,7 +464,7 @@
 				</table>
 			</div>
 		} @else {
-			<p-table [value]="promotores()" dataKey="dni" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[5, 10, 25, 50]" [showCurrentPageReport]="true" currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}" styleClass="p-datatable-sm">
+			<edu-table [value]="promotores()" dataKey="dni" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[5, 10, 25, 50]" [showCurrentPageReport]="true" currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}" styleClass="p-datatable-sm">
 				<ng-template #header>
 					<tr>
 						<th style="width: 70px">#</th>
@@ -488,7 +488,7 @@
 						<td class="obs-cell">{{ prom.observacion ?? '' }}</td>
 					</tr>
 				</ng-template>
-			</p-table>
+			</edu-table>
 		}
 	</section>
 }

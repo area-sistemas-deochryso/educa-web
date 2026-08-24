@@ -1,4 +1,4 @@
-<p-dialog
+<edu-dialog
 	header="Configurar Periodos"
 	[visible]="visible()"
 	(visibleChange)="onVisibleChange($event)"
@@ -23,8 +23,8 @@
 						pButton
 						icon="pi pi-trash"
 						class="p-button-rounded p-button-text p-button-danger p-button-sm"
-						pTooltip="Eliminar periodo"
-						tooltipPosition="top"
+						eduTooltip="Eliminar periodo"
+						eduTooltipPosition="top"
 						data-info-anchor="profesor-periodos-eliminar"
 						(click)="onEliminar(periodo.id)"
 						[loading]="saving()"
@@ -48,15 +48,15 @@
 			<h5>Agregar periodo</h5>
 			<i
 				class="pi pi-question-circle help-icon"
-				pTooltip="Los periodos agrupan semanas para calcular promedios. Ej: Bimestre 1 = Semanas 1-4"
-				tooltipPosition="top"
+				eduTooltip="Los periodos agrupan semanas para calcular promedios. Ej: Bimestre 1 = Semanas 1-4"
+				eduTooltipPosition="top"
 			></i>
 		</div>
 		<div class="form-grid">
 			<div class="form-field nombre-field">
 				<label for="per-nombre">Nombre</label>
 				<input
-					pInputText
+					eduInputText
 					id="per-nombre"
 					[ngModel]="newPeriodo().nombre"
 					(ngModelChange)="updateNewPeriodo('nombre', $event)"
@@ -66,7 +66,7 @@
 			</div>
 			<div class="form-field semana-field">
 				<label for="per-inicio">Semana inicio</label>
-				<p-inputNumber
+				<edu-input-number
 					id="per-inicio"
 					[ngModel]="newPeriodo().semanaInicio"
 					(ngModelChange)="updateNewPeriodo('semanaInicio', $event)"
@@ -77,7 +77,7 @@
 			</div>
 			<div class="form-field semana-field">
 				<label for="per-fin">Semana fin</label>
-				<p-inputNumber
+				<edu-input-number
 					id="per-fin"
 					[ngModel]="newPeriodo().semanaFin"
 					(ngModelChange)="updateNewPeriodo('semanaFin', $event)"
@@ -99,4 +99,4 @@
 		></button>
 	</div>
 	<!-- #endregion -->
-</p-dialog>
+</edu-dialog>

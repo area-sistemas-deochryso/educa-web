@@ -40,7 +40,7 @@
 		<i class="pi pi-search"></i>
 		<input
 			type="text"
-			pInputText
+			eduInputText
 			data-info-anchor="email-outbox-search-input"
 			placeholder="Buscar por dominio..."
 			[ngModel]="vm().searchTerm"
@@ -49,7 +49,7 @@
 	</div>
 
 	<div class="filter-dropdowns">
-		<p-select
+		<edu-select
 			data-info-anchor="email-outbox-status-filter-select"
 			[options]="estadoOptions"
 			optionLabel="label"
@@ -60,7 +60,7 @@
 			[showClear]="true"
 			appendTo="body"
 		/>
-		<p-select
+		<edu-select
 			data-info-anchor="email-outbox-motivo-filter-select"
 			[options]="motivoOptions"
 			optionLabel="label"
@@ -77,8 +77,8 @@
 		pButton
 		icon="pi pi-filter-slash"
 		class="p-button-text p-button-sm btn-clear"
-		pTooltip="Limpiar filtros"
-		tooltipPosition="top"
+		eduTooltip="Limpiar filtros"
+		eduTooltipPosition="top"
 		data-info-anchor="email-outbox-clear-filters-btn"
 		(click)="onClearFiltros()"
 		[pt]="{ root: { 'aria-label': 'Limpiar filtros' } }"
@@ -88,8 +88,8 @@
 		pButton
 		icon="pi pi-refresh"
 		class="p-button-text p-button-sm"
-		pTooltip="Refrescar"
-		tooltipPosition="top"
+		eduTooltip="Refrescar"
+		eduTooltipPosition="top"
 		data-info-anchor="email-outbox-refresh-btn"
 		(click)="onRefresh()"
 		[pt]="{ root: { 'aria-label': 'Refrescar' } }"
@@ -99,8 +99,8 @@
 		pButton
 		icon="pi pi-download"
 		class="p-button-text p-button-sm"
-		pTooltip="Exportar CSV (página actual)"
-		tooltipPosition="top"
+		eduTooltip="Exportar CSV (página actual)"
+		eduTooltipPosition="top"
 		data-info-anchor="email-outbox-export-csv-btn"
 		(click)="onExportCsv()"
 		[disabled]="vm().items.length === 0"
@@ -140,4 +140,4 @@
 	(cancelAdd)="onDialogCancel()"
 />
 
-<p-confirmDialog />
+<edu-confirm-dialog />

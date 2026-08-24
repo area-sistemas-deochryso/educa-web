@@ -4,7 +4,7 @@
 	[subtitle]="generatedAtLabel() || 'Quiénes marcaron entrada y por qué no llegó su correo'"
 >
 	<div class="header-actions">
-		<p-datepicker
+		<edu-datepicker
 			[ngModel]="selectedDate()"
 			[showIcon]="true"
 			[maxDate]="maxDate()"
@@ -22,7 +22,7 @@
 				pButton
 				icon="pi pi-times"
 				class="p-button-text p-button-sm btn-icon"
-				pTooltip="Volver a hoy"
+				eduTooltip="Volver a hoy"
 				(click)="onClearDate()"
 				[pt]="{ root: { 'aria-label': 'Volver a hoy' } }"
 				data-info-anchor="admin-email-outbox-diagnostico-volver-hoy-btn"
@@ -35,7 +35,7 @@
 			pButton
 			icon="pi pi-refresh"
 			class="p-button-text p-button-sm btn-icon"
-			pTooltip="Refrescar"
+			eduTooltip="Refrescar"
 			[disabled]="loading()"
 			(click)="onRefresh()"
 			[pt]="{ root: { 'aria-label': 'Refrescar' } }"

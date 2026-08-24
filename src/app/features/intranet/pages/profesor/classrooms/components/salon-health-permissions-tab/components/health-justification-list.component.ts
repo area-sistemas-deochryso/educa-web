@@ -1,23 +1,21 @@
 import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TableModule } from 'primeng/table';
+
 import { ButtonModule } from 'primeng/button';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
-import { SkeletonModule } from 'primeng/skeleton';
 
 import { HealthJustificationDto } from '@features/intranet/pages/profesor/models';
+import { EduSkeleton, EduTable, EduTag, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-health-justification-list',
 	standalone: true,
-	imports: [CommonModule, TableModule, ButtonModule, TagModule, TooltipModule, SkeletonModule],
+	imports: [CommonModule, EduTable, ButtonModule, EduTag, EduTooltip, EduSkeleton],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
 		@if (loading()) {
 			<div class="skeleton-container">
 				@for (i of skeletonRows; track $index) {
-					<p-skeleton height="2.5rem" styleClass="mb-2" />
+					<edu-skeleton height="2.5rem" styleClass="mb-2" />
 				}
 			</div>
 		} @else if (justificaciones().length === 0) {
@@ -26,7 +24,7 @@ import { HealthJustificationDto } from '@features/intranet/pages/profesor/models
 				<span>No hay justificaciones médicas registradas</span>
 			</div>
 		} @else {
-			<p-table [value]="justificaciones()" [rows]="5" [paginator]="justificaciones().length > 5" styleClass="p-datatable-sm">
+			<edu-table [value]="justificaciones()" [rows]="5" [paginator]="justificaciones().length > 5" styleClass="p-datatable-sm">
 				<ng-template #header>
 					<tr>
 						<th>Estudiante</th>
@@ -41,8 +39,8 @@ import { HealthJustificationDto } from '@features/intranet/pages/profesor/models
 						<td>{{ j.estudianteNombre }}</td>
 						<td>
 							<span
-								[pTooltip]="formatDias(j)"
-								tooltipPosition="top"
+								[eduTooltip]="formatDias(j)"
+								eduTooltipPosition="top"
 							>{{ j.dias.length }} día{{ j.dias.length > 1 ? 's' : '' }}</span>
 						</td>
 						<td>
@@ -65,14 +63,14 @@ import { HealthJustificationDto } from '@features/intranet/pages/profesor/models
 								class="p-button-rounded p-button-text p-button-danger p-button-sm"
 								data-info-anchor="profesor-health-anular-justificacion"
 								(click)="anular.emit(j.id)"
-								pTooltip="Anular justificación"
-								tooltipPosition="top"
+								eduTooltip="Anular justificación"
+								eduTooltipPosition="top"
 								[pt]="{ root: { 'aria-label': 'Anular justificación' } }"
 							></button>
 						</td>
 					</tr>
 				</ng-template>
-			</p-table>
+			</edu-table>
 		}
 	`,
 	styles: [

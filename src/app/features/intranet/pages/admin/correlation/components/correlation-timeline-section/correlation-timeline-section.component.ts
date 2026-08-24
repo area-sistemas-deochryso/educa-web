@@ -3,8 +3,6 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 
 import { ButtonModule } from 'primeng/button';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
 
 import {
 	CorrelationEmailOutboxDto,
@@ -18,11 +16,12 @@ import {
 	TIMELINE_KIND_LABEL_MAP,
 	type TimelineEvent,
 } from '../../models';
+import { EduTag, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-correlation-timeline-section',
 	standalone: true,
-	imports: [CommonModule, DatePipe, ButtonModule, TagModule, TooltipModule],
+	imports: [CommonModule, DatePipe, ButtonModule, EduTag, EduTooltip],
 	templateUrl: './correlation-timeline-section.component.html',
 	styleUrl: './correlation-timeline-section.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

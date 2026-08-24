@@ -1,6 +1,6 @@
 <!-- #region Curso selector -->
 <div class="tab-header">
-	<p-select
+	<edu-select
 		data-info-anchor="curso-selector"
 		[options]="cursoOptions()"
 		[(ngModel)]="selectedCursoLocal"
@@ -52,7 +52,7 @@
 	<!-- #endregion -->
 
 	<!-- #region Detail table -->
-	<p-table
+	<edu-table
 		[value]="asistenciaData()!.detalle"
 		dataKey="fecha"
 		[paginator]="true"
@@ -62,7 +62,7 @@
 	>
 		<ng-template #header>
 			<tr>
-				<th pSortableColumn="fecha" data-info-anchor="tabla-orden-columna">Fecha <p-sortIcon field="fecha" /></th>
+				<th eduSortableColumn="fecha" data-info-anchor="tabla-orden-columna">Fecha <p-sortIcon field="fecha" /></th>
 				<th style="width: 120px; text-align: center">Estado</th>
 				<th>Justificacion</th>
 			</tr>
@@ -71,7 +71,7 @@
 			<tr>
 				<td>{{ item.fecha | date:'dd/MM/yyyy' }}</td>
 				<td style="text-align: center">
-					<p-tag
+					<edu-tag
 						[value]="getEstadoLabel(item.estado)"
 						[severity]="getEstadoSeverity(item.estado)"
 					/>
@@ -82,14 +82,14 @@
 						@case ('text') { {{ jstate.text }} }
 						@case ('gestionada') { {{ mensajeGestionada }} }
 						@case ('pendiente') {
-							<p-tag value="Pendiente de aprobación" severity="info" />
+							<edu-tag value="Pendiente de aprobación" severity="info" />
 						}
 						@case ('rechazada') {
-							<p-tag
+							<edu-tag
 								value="Rechazada"
 								severity="danger"
-								[pTooltip]="jstate.motivoRechazo ?? 'Sin motivo registrado'"
-								tooltipPosition="top"
+								[eduTooltip]="jstate.motivoRechazo ?? 'Sin motivo registrado'"
+								eduTooltipPosition="top"
 							/>
 							<button
 								pButton
@@ -123,7 +123,7 @@
 				</td>
 			</tr>
 		</ng-template>
-	</p-table>
+	</edu-table>
 	<!-- #endregion -->
 }
 <!-- #endregion -->

@@ -5,10 +5,6 @@ import { FormsModule } from '@angular/forms';
 
 import { TabsModule } from 'primeng/tabs';
 import { ButtonModule } from 'primeng/button';
-import { TagModule } from 'primeng/tag';
-import { InputNumberModule } from 'primeng/inputnumber';
-import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
 
 import { PageHeaderComponent, PeriodToggleComponent, KpiStatsComponent, type KpiStatItem } from '@intranet-shared/components';
 import { ClassroomsAdminFacade } from './services';
@@ -26,6 +22,7 @@ import {
 	CrearSalonDto,
 } from './models';
 import { NuevoSalonDialogComponent } from './components/nuevo-salon-dialog/nuevo-salon-dialog.component';
+import { EduInputNumber, EduMessageService, EduTag, EduToast } from '@edu-ui';
 
 @Component({
 	selector: 'app-classrooms-admin',
@@ -35,9 +32,9 @@ import { NuevoSalonDialogComponent } from './components/nuevo-salon-dialog/nuevo
 		FormsModule,
 		TabsModule,
 		ButtonModule,
-		TagModule,
-		InputNumberModule,
-		ToastModule,
+		EduTag,
+		EduInputNumber,
+		EduToast,
 		PageHeaderComponent,
 		PeriodToggleComponent,
 		KpiStatsComponent,
@@ -47,7 +44,7 @@ import { NuevoSalonDialogComponent } from './components/nuevo-salon-dialog/nuevo
 		ClassroomDetailDialogComponent,
 		NuevoSalonDialogComponent,
 	],
-	providers: [MessageService],
+	providers: [EduMessageService],
 	templateUrl: './salones-admin.component.html',
 	styleUrl: './salones-admin.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

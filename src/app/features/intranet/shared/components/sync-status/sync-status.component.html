@@ -4,21 +4,21 @@
 		type="button"
 		class="sync-indicator"
 		[class]="indicatorClass()"
-		[pTooltip]="tooltipText()"
-		tooltipPosition="left"
+		[eduTooltip]="tooltipText()"
+		eduTooltipPosition="left"
 		(click)="openDrawer()"
 		[attr.aria-label]="tooltipText()"
 	>
 		<i [class]="indicatorIcon()"></i>
 		@if (badgeCount() > 0) {
-			<p-badge [value]="'' + badgeCount()" severity="danger" />
+			<edu-badge [value]="'' + badgeCount()" severity="danger" />
 		}
 	</button>
 }
 <!-- #endregion -->
 
 <!-- #region Drawer -->
-<p-drawer
+<edu-drawer
 	[visible]="drawerVisible()"
 	(visibleChange)="onDrawerVisibleChange($event)"
 	position="right"
@@ -116,5 +116,5 @@
 			</div>
 		}
 	}
-</p-drawer>
+</edu-drawer>
 <!-- #endregion -->

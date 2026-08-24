@@ -9,7 +9,7 @@
 <!-- #region Banner + toast -->
 <app-email-defer-fail-banner />
 @if (deferAlertsEnabled) {
-	<p-toast position="top-right" key="blacklist-alerts" />
+	<edu-toast position="top-right" key="blacklist-alerts" />
 }
 <!-- #endregion -->
 
@@ -52,7 +52,7 @@
 		<i class="pi pi-search"></i>
 		<input
 			type="text"
-			pInputText
+			eduInputText
 			data-info-anchor="email-outbox-search-input"
 			placeholder="Buscar por correo..."
 			[ngModel]="vm().searchTerm"
@@ -61,7 +61,7 @@
 	</div>
 
 	<div class="filter-dropdowns">
-		<p-select
+		<edu-select
 			data-info-anchor="email-outbox-status-filter-select"
 			[options]="estadoOptions"
 			optionLabel="label"
@@ -72,7 +72,7 @@
 			[showClear]="true"
 			appendTo="body"
 		/>
-		<p-select
+		<edu-select
 			data-info-anchor="email-outbox-motivo-filter-select"
 			[options]="motivoOptions"
 			optionLabel="label"
@@ -89,8 +89,8 @@
 		pButton
 		icon="pi pi-filter-slash"
 		class="p-button-text p-button-sm btn-clear"
-		pTooltip="Limpiar filtros"
-		tooltipPosition="top"
+		eduTooltip="Limpiar filtros"
+		eduTooltipPosition="top"
 		data-info-anchor="email-outbox-clear-filters-btn"
 		(click)="onClearFiltros()"
 		[pt]="{ root: { 'aria-label': 'Limpiar filtros' } }"
@@ -100,8 +100,8 @@
 		pButton
 		icon="pi pi-refresh"
 		class="p-button-text p-button-sm"
-		pTooltip="Refrescar"
-		tooltipPosition="top"
+		eduTooltip="Refrescar"
+		eduTooltipPosition="top"
 		data-info-anchor="email-outbox-refresh-btn"
 		(click)="onRefresh()"
 		[pt]="{ root: { 'aria-label': 'Refrescar' } }"
@@ -111,8 +111,8 @@
 		pButton
 		icon="pi pi-download"
 		class="p-button-text p-button-sm"
-		pTooltip="Exportar CSV (página actual)"
-		tooltipPosition="top"
+		eduTooltip="Exportar CSV (página actual)"
+		eduTooltipPosition="top"
 		data-info-anchor="email-outbox-export-csv-btn"
 		[disabled]="vm().items.length === 0"
 		(click)="onExportCsv()"
@@ -175,7 +175,7 @@
 <!-- #endregion -->
 
 <!-- #region Unblock Dialog -->
-<p-dialog
+<edu-dialog
 	header="Desbloquear correo"
 	[visible]="unblockDialogVisible()"
 	(visibleChange)="onUnblockDialogVisibleChange($event)"
@@ -188,7 +188,7 @@
 			Explicá por qué se desbloquea este correo. Mínimo {{ MIN_MOTIVO_LENGTH }} caracteres.
 		</p>
 		<textarea
-			pTextarea
+			eduTextarea
 			data-info-anchor="admin-email-outbox-blacklist-unblock-textarea"
 			[ngModel]="unblockMotivo()"
 			(ngModelChange)="onUnblockMotivoChange($event)"
@@ -221,7 +221,7 @@
 			[pt]="{ root: { 'aria-label': 'Confirmar desbloqueo' } }"
 		></button>
 	</ng-template>
-</p-dialog>
+</edu-dialog>
 <!-- #endregion -->
 
-<p-confirmDialog />
+<edu-confirm-dialog />

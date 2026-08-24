@@ -1,7 +1,7 @@
 <div class="grid-container">
   @if (!loading() && blocks().length > 0 && (compressEmptyHours() || hasCompressibleGaps())) {
     <div class="grid-toolbar">
-      <p-toggleswitch
+      <edu-toggle
         inputId="compress-empty-hours"
         [ngModel]="compressEmptyHours()"
         data-info-anchor="admin-schedules-grid-comprimir-toggle"
@@ -18,7 +18,7 @@
       <div class="grid-header day-header">
         {{ dia.label }}
         @if (!isAdmin() && isDayEmpty(dia.value)) {
-          <span class="day-empty-hint" [pTooltip]="'Sin horarios este día'" tooltipPosition="top">
+          <span class="day-empty-hint" [eduTooltip]="'Sin horarios este día'" eduTooltipPosition="top">
             <i class="pi pi-calendar-times"></i>
           </span>
         }
@@ -34,8 +34,8 @@
           class="collapsed-row"
           data-info-anchor="admin-schedules-grid-expandir-btn"
           (click)="expandRun(row.startIndex)"
-          [pTooltip]="'Mostrar estas horas'"
-          tooltipPosition="top"
+          [eduTooltip]="'Mostrar estas horas'"
+          eduTooltipPosition="top"
         >
           <i class="pi pi-angle-down"></i>
           <span>{{ row.count }} horas sin clases ({{ row.from }}–{{ row.to }})</span>
@@ -69,8 +69,8 @@
               [class.inactive]="!block.horario.estado"
               [class.no-profesor]="hasNoProfesor(block)"
               [class.has-conflict]="hasConflict(block)"
-              [pTooltip]="getBlockTooltip(block)"
-              tooltipPosition="top"
+              [eduTooltip]="getBlockTooltip(block)"
+              eduTooltipPosition="top"
               data-info-anchor="admin-schedules-block"
               (click)="onBlockClick(block); $event.stopPropagation()"
             >

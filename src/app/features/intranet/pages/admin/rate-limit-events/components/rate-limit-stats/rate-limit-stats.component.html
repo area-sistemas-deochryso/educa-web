@@ -18,7 +18,7 @@
 					<tbody>
 						@for (item of stats()!.topRoles; track item.key) {
 							<tr>
-								<td class="breakdown-key" [pTooltip]="item.key">{{ item.key }}</td>
+								<td class="breakdown-key" [eduTooltip]="item.key">{{ item.key }}</td>
 								<td>{{ item.total }}</td>
 								<td>{{ item.rechazados }}</td>
 							</tr>
@@ -45,7 +45,7 @@
 					<tbody>
 						@for (item of stats()!.topEndpoints; track item.key) {
 							<tr>
-								<td class="breakdown-key" [pTooltip]="item.key" tooltipPosition="top">{{ item.key }}</td>
+								<td class="breakdown-key" [eduTooltip]="item.key" eduTooltipPosition="top">{{ item.key }}</td>
 								<td>{{ item.total }}</td>
 								<td>{{ item.rechazados }}</td>
 							</tr>

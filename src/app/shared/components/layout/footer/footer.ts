@@ -2,15 +2,16 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { Tooltip } from 'primeng/tooltip';
+
 import { logger } from '@core/helpers';
+import { EduTooltip } from '@edu-ui';
 
 // #endregion
 // #region Implementation
 @Component({
 	selector: 'app-footer',
 	standalone: true,
-	imports: [RouterLink, FormsModule, Tooltip],
+	imports: [RouterLink, FormsModule, EduTooltip],
 	templateUrl: './footer.html',
 	styleUrl: './footer.scss',
 })

@@ -31,7 +31,7 @@
 	</div>
 }
 
-<p-dialog
+<edu-dialog
 	[visible]="pickerOpen()"
 	(visibleChange)="onDialogVisibleChange($event)"
 	[header]="'Cambiar ' + (activeContext()?.rol ?? '')"
@@ -41,5 +41,5 @@
 	@if (activeContext(); as context) {
 		<app-view-as-picker [rol]="context.rol" (userSelected)="onUserSelected($event)" />
 	}
-</p-dialog>
+</edu-dialog>
 <!-- #endregion -->

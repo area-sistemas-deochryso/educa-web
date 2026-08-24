@@ -1,4 +1,4 @@
-<p-dialog
+<edu-dialog
 	[visible]="visible()"
 	(visibleChange)="onVisibleChange($event)"
 	header="Agregar cuarentena manual"
@@ -14,7 +14,7 @@
 				<label for="qt-destinatario">Destinatario *</label>
 				<input
 					id="qt-destinatario"
-					pInputText
+					eduInputText
 					data-info-anchor="admin-email-outbox-quarantine-destinatario-input"
 					type="email"
 					autocomplete="off"
@@ -30,7 +30,7 @@
 
 			<div class="field full-width">
 				<label for="qt-duration">Duración *</label>
-				<p-select
+				<edu-select
 					inputId="qt-duration"
 					data-info-anchor="admin-email-outbox-quarantine-duration-select"
 					[options]="durationOptions"
@@ -47,7 +47,7 @@
 				<label for="qt-observacion">Observación *</label>
 				<textarea
 					id="qt-observacion"
-					pTextarea
+					eduTextarea
 					data-info-anchor="admin-email-outbox-quarantine-observacion-textarea"
 					rows="3"
 					maxlength="500"
@@ -90,4 +90,4 @@
 			></button>
 		</div>
 	</ng-template>
-</p-dialog>
+</edu-dialog>

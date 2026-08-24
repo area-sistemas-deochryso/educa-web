@@ -11,14 +11,15 @@ import {
 } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
-import { PaginatorModule } from 'primeng/paginator';
+import { EduPaginator } from '@edu-ui';
+
 // #endregion
 
 // #region Implementation
 @Component({
 	selector: 'app-responsive-table',
 	standalone: true,
-	imports: [CommonModule, PaginatorModule],
+	imports: [CommonModule, EduPaginator],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './responsive-table.component.html',
 	styleUrl: './responsive-table.component.scss',

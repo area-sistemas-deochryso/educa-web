@@ -6,14 +6,14 @@
 	</div>
 	<div class="header-badges">
 		@if (vm().hasCredentials) {
-			<p-tag
+			<edu-tag
 				[value]="vm().credentials.length + ' credencial(es)'"
 				styleClass="tag-neutral"
 				icon="pi pi-lock"
 			/>
 		}
 		@if (vm().endpointCount.enabled > 0) {
-			<p-tag
+			<edu-tag
 				[value]="vm().endpointCount.enabled + '/' + vm().endpointCount.total + ' endpoints'"
 				styleClass="tag-neutral"
 				icon="pi pi-link"

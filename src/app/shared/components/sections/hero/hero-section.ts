@@ -1,7 +1,7 @@
 // #region Imports
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Tooltip } from 'primeng/tooltip';
+import { EduTooltip } from '@edu-ui';
 
 // #endregion
 // #region Implementation
@@ -13,7 +13,7 @@ interface ContactForm {
 @Component({
 	selector: 'app-hero-section',
 	standalone: true,
-	imports: [FormsModule, Tooltip],
+	imports: [FormsModule, EduTooltip],
 	templateUrl: './hero-section.html',
 	styleUrl: './hero-section.scss',
 })

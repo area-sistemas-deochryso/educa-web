@@ -3,16 +3,16 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 
 import { ButtonModule } from 'primeng/button';
-import { TooltipModule } from 'primeng/tooltip';
 
 import type { HorarioWeeklyBlock } from '../../models/horario.interface';
+import { EduTooltip } from '@edu-ui';
 
 // #endregion
 // #region Implementation
 @Component({
   selector: 'app-schedules-weekly-view',
   standalone: true,
-  imports: [CommonModule, ButtonModule, TooltipModule],
+  imports: [CommonModule, ButtonModule, EduTooltip],
   templateUrl: './horarios-weekly-view.component.html',
   styleUrl: './horarios-weekly-view.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

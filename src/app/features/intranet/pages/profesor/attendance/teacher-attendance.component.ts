@@ -12,13 +12,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { TabsModule } from 'primeng/tabs';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
+
 import { PageHeaderComponent, PickerGridComponent } from '@intranet-shared/components';
 import { ProfesorFacade } from '../services/profesor.facade';
 import { AttendanceCourseFacade } from '../cursos/services/attendance-course.facade';
 import { AttendanceRegistrationPanelComponent } from '../cursos/components/attendance-registration-panel/attendance-registration-panel.component';
 import { AttendanceSummaryPanelComponent } from '../cursos/components/attendance-summary-panel/attendance-summary-panel.component';
 import { EstadoAsistenciaCurso } from '../models';
+import { EduSpinner } from '@edu-ui';
 
 @Component({
 	selector: 'app-teacher-attendance',
@@ -27,7 +28,7 @@ import { EstadoAsistenciaCurso } from '../models';
 		CommonModule,
 		FormsModule,
 		TabsModule,
-		ProgressSpinnerModule,
+		EduSpinner,
 		AttendanceRegistrationPanelComponent,
 		AttendanceSummaryPanelComponent,
 		PageHeaderComponent,
@@ -104,7 +105,7 @@ import { EstadoAsistenciaCurso } from '../models';
 
 			@if (pageLoading()) {
 				<div class="flex justify-content-center p-5">
-					<p-progressSpinner strokeWidth="4" />
+					<edu-spinner strokeWidth="4" />
 				</div>
 			} @else if (cursoOptions().length === 0) {
 				<div class="empty-page-state">

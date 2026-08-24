@@ -7,8 +7,6 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DestroyRef } from '@angular/core';
-import { MessageService } from 'primeng/api';
-import { ToastModule } from 'primeng/toast';
 
 import { CandidatosBlacklistTileComponent } from '../candidatos-blacklist-tile/candidatos-blacklist-tile.component';
 import { DeferFailLiveCounterTileComponent } from '../defer-fail-live-counter-tile/defer-fail-live-counter-tile.component';
@@ -18,17 +16,18 @@ import { SerieTemporalTileComponent } from '../serie-temporal-tile/serie-tempora
 import { TopDestinatariosTileComponent } from '../top-destinatarios-tile/top-destinatarios-tile.component';
 import { EmailMonitoreoFacade } from '../../services';
 import { EmailHubService, SerieTemporalGranularidad } from '@features/intranet/pages/admin/email-outbox-shared';
+import { EduMessageService, EduToast } from '@edu-ui';
 
 /**
  * Plan 39 Chat C — container del tab "Mapa de envío". Monta los 6 tiles en
- * grid responsivo, conecta el hub SignalR y dispara `MessageService` ante
+ * grid responsivo, conecta el hub SignalR y dispara `EduMessageService` ante
  * `BlacklistEntryCreated` (D5).
  */
 @Component({
 	selector: 'app-mapa-envio-tab',
 	standalone: true,
 	imports: [
-		ToastModule,
+		EduToast,
 		DeferFailLiveCounterTileComponent,
 		SenderStatsTileComponent,
 		TopDestinatariosTileComponent,
@@ -36,7 +35,7 @@ import { EmailHubService, SerieTemporalGranularidad } from '@features/intranet/p
 		DominiosReceptoresTileComponent,
 		CandidatosBlacklistTileComponent,
 	],
-	providers: [MessageService],
+	providers: [EduMessageService],
 	templateUrl: './mapa-envio-tab.component.html',
 	styleUrl: './mapa-envio-tab.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -45,7 +44,7 @@ export class MapaEnvioTabComponent implements OnInit, OnDestroy {
 	private facade = inject(EmailMonitoreoFacade);
 	private hub = inject(EmailHubService);
 	private destroyRef = inject(DestroyRef);
-	private messageService = inject(MessageService);
+	private messageService = inject(EduMessageService);
 
 	readonly vm = this.facade.vm;
 	readonly hubConnected = this.facade.hubConnected;

@@ -1,18 +1,16 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
-
 import { EmailOutboxEstadisticas, EmailOutboxTendencia } from '@data/models';
 import { MiniSparklineComponent } from '@intranet-shared/components';
 
 import { trendSummary } from '../../utils/trend-summary';
+import { EduTag, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-email-outbox-stats',
 	standalone: true,
-	imports: [DecimalPipe, TagModule, TooltipModule, MiniSparklineComponent],
+	imports: [DecimalPipe, EduTag, EduTooltip, MiniSparklineComponent],
 	templateUrl: './email-outbox-stats.component.html',
 	styleUrl: './email-outbox-stats.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

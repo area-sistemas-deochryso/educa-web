@@ -17,8 +17,8 @@ const CALLOUT_ESTIMATED_HEIGHT_PX = 140;
 // #region Implementation
 /**
  * Callout del modo informativo (brief 524, plan xrepo-96 F1+F2): fondo atenuado + resaltado
- * del elemento clickeado + ventana con la explicación. Visualmente distinto de `pTooltip`
- * (aparece al click, no al hover — pre-work confirmó que `pTooltip` está en uso masivo).
+ * del elemento clickeado + ventana con la explicación. Visualmente distinto de `eduTooltip`
+ * (aparece al click, no al hover — pre-work confirmó que `eduTooltip` está en uso masivo).
  *
  * Montado siempre en el DOM (mismo patrón que `app-feedback-report-dialog`); solo se
  * renderiza cuando `InformativeModeService.currentCallout()` tiene contenido.

@@ -9,7 +9,7 @@
 			pButton
 			icon="pi pi-arrow-left"
 			class="p-button-text p-button-sm btn-icon"
-			pTooltip="Volver"
+			eduTooltip="Volver"
 			data-info-anchor="admin-recipient-view-back-btn"
 			(click)="goBack()"
 		></button>
@@ -17,7 +17,7 @@
 			pButton
 			icon="pi pi-refresh"
 			class="p-button-text p-button-sm btn-icon"
-			pTooltip="Actualizar"
+			eduTooltip="Actualizar"
 			[loading]="loading()"
 			data-info-anchor="admin-recipient-view-refresh-btn"
 			(click)="refresh()"
@@ -30,16 +30,16 @@
 @if (summary(); as s) {
 	<section class="status-badges">
 		@if (blacklistActive()) {
-			<p-tag severity="danger" value="Blacklisted" icon="pi pi-ban" />
+			<edu-tag severity="danger" value="Blacklisted" icon="pi pi-ban" />
 		}
 		@if (quarantineActive()) {
-			<p-tag severity="warn" value="En cuarentena" icon="pi pi-clock" />
+			<edu-tag severity="warn" value="En cuarentena" icon="pi pi-clock" />
 		}
 		@if (hasAuditProblem()) {
-			<p-tag severity="warn" [value]="'Auditoría: ' + (s.audit.tipoFallo ?? 'problema detectado')" icon="pi pi-exclamation-triangle" />
+			<edu-tag severity="warn" [value]="'Auditoría: ' + (s.audit.tipoFallo ?? 'problema detectado')" icon="pi pi-exclamation-triangle" />
 		}
 		@if (!blacklistActive() && !quarantineActive() && !hasAuditProblem()) {
-			<p-tag severity="success" value="Sin problemas" icon="pi pi-check" />
+			<edu-tag severity="success" value="Sin problemas" icon="pi pi-check" />
 		}
 	</section>
 }
@@ -190,9 +190,9 @@
 				<span class="detail-label">Estado</span>
 				<span class="detail-value">
 					@if (s.blacklist.activo) {
-						<p-tag severity="danger" value="Activo" />
+						<edu-tag severity="danger" value="Activo" />
 					} @else {
-						<p-tag severity="success" value="No bloqueado" />
+						<edu-tag severity="success" value="No bloqueado" />
 					}
 				</span>
 			</div>
@@ -232,9 +232,9 @@
 				<span class="detail-label">Estado</span>
 				<span class="detail-value">
 					@if (s.quarantine.activo) {
-						<p-tag severity="warn" value="En cuarentena" />
+						<edu-tag severity="warn" value="En cuarentena" />
 					} @else {
-						<p-tag severity="success" value="Sin cuarentena" />
+						<edu-tag severity="success" value="Sin cuarentena" />
 					}
 				</span>
 			</div>
@@ -288,9 +288,9 @@
 				<span class="detail-label">Problemas detectados</span>
 				<span class="detail-value">
 					@if (s.audit.tieneProblema) {
-						<p-tag severity="warn" [value]="s.audit.tipoFallo ?? 'Problema detectado'" />
+						<edu-tag severity="warn" [value]="s.audit.tipoFallo ?? 'Problema detectado'" />
 					} @else {
-						<p-tag severity="success" value="Sin problemas" />
+						<edu-tag severity="success" value="Sin problemas" />
 					}
 				</span>
 			</div>
@@ -307,4 +307,4 @@
 }
 <!-- #endregion -->
 
-<p-confirmDialog />
+<edu-confirm-dialog />

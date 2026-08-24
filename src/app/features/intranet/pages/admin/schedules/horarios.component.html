@@ -16,8 +16,8 @@
 		data-info-anchor="admin-schedules-refresh-btn"
 		(click)="refresh()"
 		[loading]="vm().loading"
-		pTooltip="Actualizar lista de horarios"
-		tooltipPosition="bottom"
+		eduTooltip="Actualizar lista de horarios"
+		eduTooltipPosition="bottom"
 		[pt]="{ root: { 'aria-label': 'Refrescar horarios' } }"
 	></button>
 
@@ -29,8 +29,8 @@
 			class="p-button-outlined"
 			data-info-anchor="admin-schedules-importar-btn"
 			(click)="onOpenImportDialog()"
-			pTooltip="Importar horarios desde Excel"
-			tooltipPosition="bottom"
+			eduTooltip="Importar horarios desde Excel"
+			eduTooltipPosition="bottom"
 			[pt]="{ root: { 'aria-label': 'Importar horarios desde Excel' } }"
 		></button>
 		<button
@@ -40,8 +40,8 @@
 			class="p-button-success"
 			data-info-anchor="admin-schedules-nuevo-btn"
 			(click)="onNew()"
-			pTooltip="Crear un nuevo horario de clase"
-			tooltipPosition="bottom"
+			eduTooltip="Crear un nuevo horario de clase"
+			eduTooltipPosition="bottom"
 			[pt]="{ root: { 'aria-label': 'Crear nuevo horario' } }"
 		></button>
 	}
@@ -76,8 +76,8 @@
 			[class.active]="vm().vistaActual === 'salon'"
 			data-info-anchor="tab-switch"
 			(click)="onCambiarVista('salon')"
-			pTooltip="Ver horarios agrupados por salón"
-			tooltipPosition="top"
+			eduTooltip="Ver horarios agrupados por salón"
+			eduTooltipPosition="top"
 		></button>
 		<button
 			pButton
@@ -87,8 +87,8 @@
 			[class.active]="vm().vistaActual === 'profesor'"
 			data-info-anchor="tab-switch"
 			(click)="onCambiarVista('profesor')"
-			pTooltip="Ver horarios agrupados por profesor"
-			tooltipPosition="top"
+			eduTooltip="Ver horarios agrupados por profesor"
+			eduTooltipPosition="top"
 		></button>
 		<button
 			pButton
@@ -98,13 +98,13 @@
 			[class.active]="vm().vistaActual === 'global'"
 			data-info-anchor="tab-switch"
 			(click)="onCambiarVista('global')"
-			pTooltip="Ver resumen de problemas"
-			tooltipPosition="top"
+			eduTooltip="Ver resumen de problemas"
+			eduTooltipPosition="top"
 		></button>
 	</div>
 
 	<div class="view-filters-inline">
-		<p-select
+		<edu-select
 			[options]="estadoOptions"
 			[ngModel]="vm().filtroEstadoActivo"
 			data-info-anchor="admin-schedules-estado-select"
@@ -116,7 +116,7 @@
 			[showClear]="true"
 			styleClass="estado-filter-select"
 		/>
-		<p-select
+		<edu-select
 			[options]="completitudOptions"
 			[ngModel]="vm().filtroCompletitud"
 			data-info-anchor="admin-schedules-completitud-select"
@@ -127,8 +127,8 @@
 			appendTo="body"
 			[showClear]="true"
 			styleClass="completitud-filter-select"
-			pTooltip="Filtrar horarios sin profesor o sin estudiantes asignados"
-			tooltipPosition="bottom"
+			eduTooltip="Filtrar horarios sin profesor o sin estudiantes asignados"
+			eduTooltipPosition="bottom"
 		/>
 		@if (vm().hasFilters) {
 			<button
@@ -137,8 +137,8 @@
 				class="p-button-text p-button-sm"
 				data-info-anchor="admin-schedules-limpiar-filtros-btn"
 				(click)="onClearFiltros()"
-				pTooltip="Limpiar filtros"
-				tooltipPosition="top"
+				eduTooltip="Limpiar filtros"
+				eduTooltipPosition="top"
 				[pt]="{ root: { 'aria-label': 'Limpiar filtros' } }"
 			></button>
 		}
@@ -213,7 +213,7 @@
 
 <!-- #endregion -->
 <!-- #region ConfirmDialog -->
-<p-confirmDialog />
+<edu-confirm-dialog />
 
 <!-- #endregion -->
 <!-- #region Modal de Seleccion de Cursos por Nivel -->

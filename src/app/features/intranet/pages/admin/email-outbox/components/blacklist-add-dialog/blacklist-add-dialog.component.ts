@@ -8,10 +8,6 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
-import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
-import { TextareaModule } from 'primeng/textarea';
 
 import {
 	BlacklistFormData,
@@ -19,6 +15,7 @@ import {
 	EMAIL_BLACKLIST_MOTIVOS_MANUALES,
 	EmailBlacklistMotivo,
 } from '@data/models';
+import { EduDialog, EduInputText, EduSelect, EduTextarea } from '@edu-ui';
 
 interface MotivoOption {
 	label: string;
@@ -40,7 +37,7 @@ export const BLACKLIST_OBSERVACION_MIN_MANUAL = 20;
 
 /**
  * Plan 38 Chat 5 (D17.8) — dialog "Agregar a blacklist".
- * Solo expone `MANUAL` y `BULK_IMPORT` en el `<p-select>` — los demás motivos
+ * Solo expone `MANUAL` y `BULK_IMPORT` en el `<edu-select>` — los demás motivos
  * los setea el worker automáticamente. Validación inline antes del submit.
  */
 @Component({
@@ -48,11 +45,11 @@ export const BLACKLIST_OBSERVACION_MIN_MANUAL = 20;
 	standalone: true,
 	imports: [
 		FormsModule,
-		DialogModule,
+		EduDialog,
 		ButtonModule,
-		InputTextModule,
-		SelectModule,
-		TextareaModule,
+		EduInputText,
+		EduSelect,
+		EduTextarea,
 	],
 	templateUrl: './blacklist-add-dialog.component.html',
 	styleUrl: './blacklist-add-dialog.component.scss',

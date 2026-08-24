@@ -5,10 +5,9 @@ import { ActivatedRoute } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
 import { type DependencyCheck, DependencyGuidanceComponent } from '@shared/components';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ConfirmationService } from 'primeng/api';
+
 import { FormsModule } from '@angular/forms';
-import { SelectModule } from 'primeng/select';
+
 import { ScheduleDetailDrawerComponent } from './components/horario-detail-drawer/horario-detail-drawer.component';
 import { SchedulesCoursePickerComponent } from './components/horarios-curso-picker/horarios-curso-picker.component';
 import { SchedulesFormDialogComponent } from './components/horarios-form-dialog/horarios-form-dialog.component';
@@ -25,8 +24,7 @@ import { SchedulesCrudFacade, SchedulesDataFacade, SchedulesUiFacade } from './s
 import { SchedulesStatsSkeletonComponent } from './components/horarios-stats-skeleton/horarios-stats-skeleton.component';
 import { ScheduleGridLayoutComponent } from './components/schedule-grid-layout/schedule-grid-layout.component';
 import { ScheduleGlobalViewComponent } from './components/schedule-global-view/schedule-global-view.component';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
+
 import { logger } from '@core/helpers';
 import {
 	UI_CONFIRM_HEADERS,
@@ -35,6 +33,7 @@ import {
 	buildDeleteHorarioMessage,
 	buildToggleHorarioMessage,
 } from '@app/shared/constants';
+import { EduConfirmationService, EduConfirmDialog, EduSelect, EduTag, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-schedules',
@@ -43,10 +42,10 @@ import {
 		CommonModule,
 		FormsModule,
 		ButtonModule,
-		ConfirmDialogModule,
-		SelectModule,
-		TagModule,
-		TooltipModule,
+		EduConfirmDialog,
+		EduSelect,
+		EduTag,
+		EduTooltip,
 		ScheduleDetailDrawerComponent,
 		SchedulesCoursePickerComponent,
 		SchedulesFormDialogComponent,
@@ -62,13 +61,13 @@ import {
 	templateUrl: './horarios.component.html',
 	styleUrl: './horarios.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	providers: [ConfirmationService],
+	providers: [EduConfirmationService],
 })
 export class SchedulesComponent implements OnInit {
 	private dataFacade = inject(SchedulesDataFacade);
 	private crudFacade = inject(SchedulesCrudFacade);
 	private uiFacade = inject(SchedulesUiFacade);
-	private confirmationService = inject(ConfirmationService);
+	private confirmationService = inject(EduConfirmationService);
 	private route = inject(ActivatedRoute);
 
 	readonly vm = this.dataFacade.vm;

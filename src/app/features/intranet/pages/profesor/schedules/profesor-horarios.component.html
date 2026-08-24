@@ -147,8 +147,8 @@
 										class="horario-block"
 										data-info-anchor="profesor-horario-block"
 										[ngStyle]="block.style"
-										[pTooltip]="block.tooltip"
-										tooltipPosition="top"
+										[eduTooltip]="block.tooltip"
+										eduTooltipPosition="top"
 										(click)="onBlockClick($event, block, detailPopover)"
 									>
 										<div class="block-content">
@@ -178,7 +178,7 @@
 				}
 
 				<!-- Popover de detalle de clase (desktop) -->
-				<p-popover #detailPopover appendTo="body" styleClass="class-detail-popover">
+				<edu-popover #detailPopover appendTo="body" styleClass="class-detail-popover">
 					@if (selectedBlock(); as block) {
 						<div class="popover-content">
 							<div class="popover-header">
@@ -220,7 +220,7 @@
 							</div>
 						</div>
 					}
-				</p-popover>
+				</edu-popover>
 			</div>
 		</div>
 	</div>

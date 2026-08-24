@@ -3,7 +3,6 @@ import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signa
 import { RouterLink } from '@angular/router';
 
 import { TabsModule } from 'primeng/tabs';
-import { TooltipModule } from 'primeng/tooltip';
 
 import { PageHeaderComponent } from '@intranet-shared/components/page-header/page-header.component';
 import { UserPermissionsService } from '@core/services';
@@ -25,6 +24,7 @@ import {
 	buildHeadline,
 	buildStats,
 } from './monitoreo-hub.summary';
+import { EduTooltip } from '@edu-ui';
 // #endregion
 
 // #region Types — locales del componente
@@ -71,7 +71,7 @@ interface TriageItem {
 	imports: [
 		RouterLink,
 		TabsModule,
-		TooltipModule,
+		EduTooltip,
 		PageHeaderComponent,
 		EmailDeferFailBannerComponent,
 	],

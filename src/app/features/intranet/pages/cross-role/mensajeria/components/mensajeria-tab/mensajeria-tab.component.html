@@ -2,7 +2,7 @@
 @if (showCursoSelector()) {
 	<div class="mensajeria-curso-selector">
 		<label class="mensajeria-curso-label">Curso:</label>
-		<p-select
+		<edu-select
 			data-info-anchor="curso-selector"
 			[options]="cursoOptions()"
 			[ngModel]="selectedHorarioId()"
@@ -14,7 +14,7 @@
 	</div>
 } @else if (singleCursoLabel(); as label) {
 	<div class="mensajeria-curso-selector">
-		<p-tag [value]="label" styleClass="tag-neutral" icon="pi pi-book" />
+		<edu-tag [value]="label" styleClass="tag-neutral" icon="pi pi-book" />
 	</div>
 }
 <!-- #endregion -->
@@ -56,7 +56,7 @@
 		<!-- List content -->
 		@if (vm().loading) {
 			<div class="loading-wrapper">
-				<p-progressSpinner strokeWidth="4" [style]="{ width: '36px', height: '36px' }" />
+				<edu-spinner strokeWidth="4" [style]="{ width: '36px', height: '36px' }" />
 			</div>
 		} @else if (vm().conversaciones.length === 0) {
 			<div class="empty-state">
@@ -91,7 +91,7 @@
 									conv.ultimoMensajePreview ?? 'Sin mensajes'
 								}}</span>
 								@if (conv.mensajesNoLeidos > 0) {
-									<p-tag
+									<edu-tag
 										[value]="conv.mensajesNoLeidos.toString()"
 										severity="danger"
 										[rounded]="true"
@@ -149,7 +149,7 @@
 			<!-- Messages -->
 			@if (vm().detalleLoading) {
 				<div class="loading-wrapper">
-					<p-progressSpinner strokeWidth="4" [style]="{ width: '36px', height: '36px' }" />
+					<edu-spinner strokeWidth="4" [style]="{ width: '36px', height: '36px' }" />
 				</div>
 			} @else if (vm().detalle; as detalle) {
 				<div class="mensajes-list">
@@ -171,7 +171,7 @@
 				<!-- Input -->
 				<div class="chat-input">
 					<input
-						pInputText
+						eduInputText
 						[ngModel]="nuevoMensaje()"
 						(ngModelChange)="nuevoMensaje.set($event)"
 						placeholder="Escribe un mensaje..."
@@ -198,7 +198,7 @@
 }
 
 <!-- #region New conversation dialog -->
-<p-dialog
+<edu-dialog
 	[visible]="nuevaConversacionVisible()"
 	(visibleChange)="onNuevoDialogVisibleChange($event)"
 	[modal]="true"
@@ -208,7 +208,7 @@
 	<div class="nuevo-form">
 		<div class="nuevo-field">
 			<label class="nuevo-label" for="dest-select">Destinatario</label>
-			<p-select
+			<edu-select
 				data-info-anchor="mensajeria-dialog-destinatario"
 				id="dest-select"
 				[options]="resolvedEstudiantes()"
@@ -224,7 +224,7 @@
 		<div class="nuevo-field">
 			<label class="nuevo-label" for="asunto-input">Asunto</label>
 			<input
-				pInputText
+				eduInputText
 				id="asunto-input"
 				[ngModel]="nuevoAsunto()"
 				(ngModelChange)="nuevoAsunto.set($event)"
@@ -235,7 +235,7 @@
 		<div class="nuevo-field">
 			<label class="nuevo-label" for="contenido-textarea">Mensaje</label>
 			<textarea
-				pInputText
+				eduInputText
 				id="contenido-textarea"
 				[ngModel]="nuevoContenido()"
 				(ngModelChange)="nuevoContenido.set($event)"
@@ -258,5 +258,5 @@
 			[loading]="vm().sending"
 		></button>
 	</ng-template>
-</p-dialog>
+</edu-dialog>
 <!-- #endregion -->

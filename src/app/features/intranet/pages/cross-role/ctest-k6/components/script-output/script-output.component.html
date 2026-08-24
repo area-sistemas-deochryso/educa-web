@@ -8,8 +8,8 @@
 			[icon]="copied() ? 'pi pi-check' : 'pi pi-copy'"
 			[class]="copied() ? 'p-button-success p-button-sm' : 'p-button-outlined p-button-sm'"
 			(click)="onCopy()"
-			pTooltip="Copiar script al portapapeles"
-			tooltipPosition="top"
+			eduTooltip="Copiar script al portapapeles"
+			eduTooltipPosition="top"
 			[pt]="{ root: { 'aria-label': 'Copiar script al portapapeles' } }"
 		></button>
 		<button
@@ -18,8 +18,8 @@
 			icon="pi pi-download"
 			class="p-button-outlined p-button-sm"
 			(click)="onDownload()"
-			pTooltip="Descargar como archivo JavaScript"
-			tooltipPosition="top"
+			eduTooltip="Descargar como archivo JavaScript"
+			eduTooltipPosition="top"
 			[pt]="{ root: { 'aria-label': 'Descargar script como archivo JavaScript' } }"
 		></button>
 	</div>

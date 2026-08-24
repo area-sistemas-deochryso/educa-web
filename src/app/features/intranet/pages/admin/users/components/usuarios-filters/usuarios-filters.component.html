@@ -4,7 +4,7 @@
 		<i class="pi pi-search"></i>
 		<input
 			type="text"
-			pInputText
+			eduInputText
 			placeholder="Buscar por nombre, DNI o correo..."
 			[ngModel]="searchTerm()"
 			(ngModelChange)="onSearchChange($event)"
@@ -13,7 +13,7 @@
 	</div>
 
 	<div class="filter-dropdowns">
-		<p-select
+		<edu-select
 			[options]="options().estadoOptions"
 			[ngModel]="filterEstado()"
 			(ngModelChange)="onFilterEstadoChange($event)"
@@ -23,7 +23,7 @@
 		/>
 
 		@if (showSalonFilter()) {
-			<p-select
+			<edu-select
 				[options]="salonOptions()"
 				[ngModel]="filterSalonId()"
 				(ngModelChange)="onFilterSalonIdChange($event)"
@@ -39,8 +39,8 @@
 			pButton
 			icon="pi pi-filter-slash"
 			class="p-button-text p-button-sm btn-clear"
-			pTooltip="Limpiar filtros"
-			tooltipPosition="top"
+			eduTooltip="Limpiar filtros"
+			eduTooltipPosition="top"
 			(click)="onClearFilters()"
 			data-info-anchor="admin-users-clear-filters-btn"
 			[pt]="{ root: { 'aria-label': 'Limpiar filtros' } }"

@@ -1,4 +1,4 @@
-<p-dialog
+<edu-dialog
 	[visible]="visible()"
 	(visibleChange)="visibleChange.emit($event)"
 	[modal]="true"
@@ -32,7 +32,7 @@
 		</p-stepper>
 
 		<div class="wizard-actions">
-			<p-button
+			<edu-button
 				label="Anterior"
 				icon="pi pi-arrow-left"
 				severity="secondary"
@@ -41,15 +41,15 @@
 				(onClick)="goToStep(activeStep() - 1)"
 			/>
 			@if (!isLastStep()) {
-				<p-button
+				<edu-button
 					label="Siguiente"
 					icon="pi pi-arrow-right"
 					iconPos="right"
 					(onClick)="goToStep(activeStep() + 1)"
 				/>
 			} @else {
-				<p-button label="Listo" icon="pi pi-check" (onClick)="onHide()" />
+				<edu-button label="Listo" icon="pi pi-check" (onClick)="onHide()" />
 			}
 		</div>
 	}
-</p-dialog>
+</edu-dialog>

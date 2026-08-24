@@ -5,9 +5,6 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
 import { ButtonModule } from 'primeng/button';
-import { SelectModule } from 'primeng/select';
-import { SelectButtonModule } from 'primeng/selectbutton';
-import { DatePickerModule } from 'primeng/datepicker';
 
 import { UserPermissionsService } from '@core/services/permissions';
 import { StatsSkeletonComponent } from '@intranet-shared/components';
@@ -22,6 +19,7 @@ import { AttendancePanelChartLineComponent } from './components/attendance-panel
 import { AttendancePanelChartHeatmapComponent } from './components/attendance-panel-chart-heatmap/attendance-panel-chart-heatmap.component';
 import { AttendancePanelFacade } from './services';
 import type { AttendancePanelBreakdownItem } from './models';
+import { EduDatePicker, EduSelect, EduSelectButton } from '@edu-ui';
 // #endregion
 
 /**
@@ -37,9 +35,9 @@ const CAPABILITY_SEDE_CRUZADA = 'ASISTENCIA_ADMIN';
 		CommonModule,
 		FormsModule,
 		ButtonModule,
-		SelectModule,
-		SelectButtonModule,
-		DatePickerModule,
+		EduSelect,
+		EduSelectButton,
+		EduDatePicker,
 		StatsSkeletonComponent,
 		AttendancePanelKpiTileComponent,
 		AttendancePanelBreakdownComponent,

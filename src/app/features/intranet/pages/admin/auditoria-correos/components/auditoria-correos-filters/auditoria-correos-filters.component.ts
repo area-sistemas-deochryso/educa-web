@@ -2,11 +2,9 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
 import { FormsModule } from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
-import { TooltipModule } from 'primeng/tooltip';
 
 import { TipoOrigenAuditoria } from '../../models';
+import { EduInputText, EduSelect, EduTooltip } from '@edu-ui';
 
 interface TipoOption {
 	label: string;
@@ -16,7 +14,7 @@ interface TipoOption {
 @Component({
 	selector: 'app-auditoria-correos-filters',
 	standalone: true,
-	imports: [FormsModule, ButtonModule, InputTextModule, SelectModule, TooltipModule],
+	imports: [FormsModule, ButtonModule, EduInputText, EduSelect, EduTooltip],
 	templateUrl: './auditoria-correos-filters.component.html',
 	styleUrl: './auditoria-correos-filters.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

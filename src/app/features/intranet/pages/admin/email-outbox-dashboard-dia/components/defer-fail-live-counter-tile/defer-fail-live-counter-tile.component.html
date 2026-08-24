@@ -24,7 +24,7 @@
 				<span class="counter__threshold">{{ threshold() }}</span>
 			</div>
 
-			<p-tag [value]="levelLabel()" [severity]="level()" />
+			<edu-tag [value]="levelLabel()" [severity]="level()" />
 
 			<div class="bar" role="progressbar" [attr.aria-valuenow]="percent()" aria-valuemin="0" aria-valuemax="100">
 				<div class="bar__fill" [class]="'bar__fill--' + level()" [style.width.%]="percent()"></div>

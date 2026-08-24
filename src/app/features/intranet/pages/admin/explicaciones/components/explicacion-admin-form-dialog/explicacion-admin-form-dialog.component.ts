@@ -4,11 +4,6 @@ import { ChangeDetectionStrategy, Component, computed, effect, input, output, si
 import { FormsModule } from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
-import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
-import { TextareaModule } from 'primeng/textarea';
-import { TooltipModule } from 'primeng/tooltip';
 
 import { CapabilityCatalogItem } from '@core/services/permissions';
 import { Rol } from '@data/models';
@@ -18,6 +13,7 @@ import {
 	CrearExplicacionRequest,
 	ExplicacionAdminDto,
 } from '../../models/explicacion-admin.models';
+import { EduDialog, EduInputText, EduSelect, EduTextarea, EduTooltip } from '@edu-ui';
 // #endregion
 
 interface SelectOption<T> {
@@ -37,11 +33,11 @@ interface SelectOption<T> {
 		CommonModule,
 		FormsModule,
 		ButtonModule,
-		DialogModule,
-		InputTextModule,
-		SelectModule,
-		TextareaModule,
-		TooltipModule,
+		EduDialog,
+		EduInputText,
+		EduSelect,
+		EduTextarea,
+		EduTooltip,
 	],
 	templateUrl: './explicacion-admin-form-dialog.component.html',
 	styleUrl: './explicacion-admin-form-dialog.component.scss',

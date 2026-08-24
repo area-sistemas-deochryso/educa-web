@@ -2,15 +2,12 @@ import { Component, ChangeDetectionStrategy, inject, input, signal, computed, ef
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { DialogModule } from 'primeng/dialog';
-import { Select } from 'primeng/select';
-import { TagModule } from 'primeng/tag';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
+
 import { CrearConversacionDto } from '@data/models';
 import { getInitial } from '@core/helpers';
 import { SalonMensajeriaFacade } from '../../services/mensajeria.facade';
 import { toSelectOptionsFrom } from '@shared/models';
+import { EduDialog, EduInputText, EduSelect, EduSpinner, EduTag } from '@edu-ui';
 
 // Avatar colors palette (WCAG AA contrast with white text)
 const AVATAR_COLORS = [
@@ -33,11 +30,11 @@ const AVATAR_COLORS = [
 		CommonModule,
 		FormsModule,
 		ButtonModule,
-		InputTextModule,
-		DialogModule,
-		Select,
-		TagModule,
-		ProgressSpinnerModule,
+		EduInputText,
+		EduDialog,
+		EduSelect,
+		EduTag,
+		EduSpinner,
 	],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './mensajeria-tab.component.html',

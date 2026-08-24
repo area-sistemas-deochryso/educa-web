@@ -7,8 +7,8 @@
 		data-info-anchor="profesor-semanas-refresh"
 		(click)="onRefreshContenido()"
 		[disabled]="vm().loading"
-		pTooltip="Refrescar"
-		tooltipPosition="top"
+		eduTooltip="Refrescar"
+		eduTooltipPosition="top"
 		[pt]="{ root: { 'aria-label': 'Refrescar contenido' } }"
 	></button>
 </div>
@@ -150,8 +150,8 @@
 														pButton
 														icon="pi pi-trash"
 														class="p-button-text p-button-danger p-button-sm p-button-rounded"
-														pTooltip="Eliminar"
-														tooltipPosition="top"
+														eduTooltip="Eliminar"
+														eduTooltipPosition="top"
 														data-info-anchor="profesor-semanas-archivo-eliminar"
 														(click)="
 															onDeleteArchivo(
@@ -216,8 +216,8 @@
 														pButton
 														icon="pi pi-users"
 														class="p-button-text p-button-sm p-button-rounded"
-														pTooltip="Ver entregas de estudiantes"
-														tooltipPosition="top"
+														eduTooltip="Ver entregas de estudiantes"
+														eduTooltipPosition="top"
 														data-info-anchor="profesor-semanas-tarea-ver-entregas"
 														(click)="onViewTaskSubmissions(tarea)"
 														[pt]="{
@@ -230,8 +230,8 @@
 														pButton
 														icon="pi pi-pencil"
 														class="p-button-text p-button-sm p-button-rounded"
-														pTooltip="Editar"
-														tooltipPosition="top"
+														eduTooltip="Editar"
+														eduTooltipPosition="top"
 														data-info-anchor="profesor-semanas-tarea-editar"
 														(click)="
 															setActiveSemanaForTarea(semana);
@@ -247,8 +247,8 @@
 														pButton
 														icon="pi pi-trash"
 														class="p-button-text p-button-danger p-button-sm p-button-rounded"
-														pTooltip="Eliminar"
-														tooltipPosition="top"
+														eduTooltip="Eliminar"
+														eduTooltipPosition="top"
 														data-info-anchor="profesor-semanas-tarea-eliminar"
 														(click)="
 															onDeleteTarea(
@@ -306,8 +306,8 @@
 																	pButton
 																	icon="pi pi-trash"
 																	class="p-button-text p-button-danger p-button-sm p-button-rounded"
-																	pTooltip="Eliminar"
-																	tooltipPosition="top"
+																	eduTooltip="Eliminar"
+																	eduTooltipPosition="top"
 																	data-info-anchor="profesor-semanas-archivo-eliminar"
 																	(click)="onDeleteTareaArchivo(semana.id, tarea.id, archivo.id, archivo.nombreArchivo)"
 																	[pt]="{

@@ -1,19 +1,19 @@
 import { Component, ChangeDetectionStrategy, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DialogModule } from 'primeng/dialog';
+
 import { ButtonModule } from 'primeng/button';
-import { TooltipModule } from 'primeng/tooltip';
-import { TagModule } from 'primeng/tag';
+
 import { SemanaEstudianteArchivosDto, CalificacionConNotasDto } from '@features/intranet/pages/profesor/models';
 import { getNotaSeverity } from '@intranet-shared/services/calificacion-config';
 import type { ConfiguracionCalificacionListDto } from '@data/models';
 import { FormatFileSizePipe } from '@intranet-shared/pipes';
 import { SkeletonLoaderComponent } from '@shared/components';
+import { EduDialog, EduTag, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-student-files-dialog',
 	standalone: true,
-	imports: [CommonModule, DialogModule, ButtonModule, TooltipModule, TagModule, SkeletonLoaderComponent, FormatFileSizePipe],
+	imports: [CommonModule, EduDialog, ButtonModule, EduTooltip, EduTag, SkeletonLoaderComponent, FormatFileSizePipe],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './student-files-dialog.component.html',
 	styleUrl: './student-files-dialog.component.scss',

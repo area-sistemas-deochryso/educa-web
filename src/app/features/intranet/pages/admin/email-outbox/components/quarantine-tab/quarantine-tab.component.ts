@@ -9,12 +9,8 @@ import {
 import { DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ConfirmationService } from 'primeng/api';
-import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
+
 import { TableLazyLoadEvent } from 'primeng/table';
-import { TooltipModule } from 'primeng/tooltip';
 
 import { MiniSparklineComponent, TableSkeletonComponent } from '@intranet-shared/components';
 import {
@@ -39,6 +35,7 @@ import { QuarantineTableComponent } from '../quarantine-table/quarantine-table.c
 import { QuarantineAddDialogComponent } from '../quarantine-add-dialog/quarantine-add-dialog.component';
 import { QuarantineDetailDrawerComponent } from '../quarantine-detail-drawer/quarantine-detail-drawer.component';
 import { DomainBlockedAlertBannerComponent } from '../domain-blocked-alert-banner/domain-blocked-alert-banner.component';
+import { EduConfirmationService, EduConfirmDialog, EduInputText, EduSelect, EduTooltip } from '@edu-ui';
 
 interface SelectOption<T> {
 	label: string;
@@ -68,10 +65,10 @@ const MOTIVO_OPTIONS: SelectOption<QuarantineMotivo>[] = EMAIL_QUARANTINE_MOTIVO
 		DecimalPipe,
 		FormsModule,
 		ButtonModule,
-		InputTextModule,
-		SelectModule,
-		TooltipModule,
-		ConfirmDialogModule,
+		EduInputText,
+		EduSelect,
+		EduTooltip,
+		EduConfirmDialog,
 		TableSkeletonComponent,
 		MiniSparklineComponent,
 		QuarantineTableComponent,
@@ -80,7 +77,7 @@ const MOTIVO_OPTIONS: SelectOption<QuarantineMotivo>[] = EMAIL_QUARANTINE_MOTIVO
 		DomainBlockedAlertBannerComponent,
 		HubContextBannerComponent,
 	],
-	providers: [ConfirmationService],
+	providers: [EduConfirmationService],
 	templateUrl: './quarantine-tab.component.html',
 	styleUrl: './quarantine-tab.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -89,7 +86,7 @@ export class QuarantineTabComponent implements OnInit {
 	private readonly dataFacade = inject(EmailQuarantineDataFacade);
 	private readonly crudFacade = inject(EmailQuarantineCrudFacade);
 	private readonly uiFacade = inject(EmailQuarantineUiFacade);
-	private readonly confirmationService = inject(ConfirmationService);
+	private readonly confirmationService = inject(EduConfirmationService);
 	private readonly route = inject(ActivatedRoute);
 
 	readonly vm = this.dataFacade.vm;

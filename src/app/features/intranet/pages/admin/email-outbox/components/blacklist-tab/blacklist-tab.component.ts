@@ -12,15 +12,8 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonModule } from 'primeng/button';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { DialogModule } from 'primeng/dialog';
-import { ConfirmationService, MessageService } from 'primeng/api';
-import { InputTextModule } from 'primeng/inputtext';
-import { TextareaModule } from 'primeng/textarea';
-import { SelectModule } from 'primeng/select';
+
 import { TableLazyLoadEvent } from 'primeng/table';
-import { ToastModule } from 'primeng/toast';
-import { TooltipModule } from 'primeng/tooltip';
 
 import { MiniSparklineComponent, TableSkeletonComponent } from '@intranet-shared/components';
 import { environment } from '@config/environment';
@@ -47,6 +40,7 @@ import { trendSummary, TrendSummary } from '../../utils/trend-summary';
 import { BlacklistTableComponent } from '../blacklist-table/blacklist-table.component';
 import { BlacklistAddDialogComponent } from '../blacklist-add-dialog/blacklist-add-dialog.component';
 import { BlacklistDetailDrawerComponent } from '../blacklist-detail-drawer/blacklist-detail-drawer.component';
+import { EduConfirmationService, EduConfirmDialog, EduDialog, EduInputText, EduMessageService, EduSelect, EduTextarea, EduToast, EduTooltip } from '@edu-ui';
 
 interface SelectOption<T> {
 	label: string;
@@ -79,13 +73,13 @@ const MOTIVO_OPTIONS: SelectOption<EmailBlacklistMotivo>[] = [
 		DecimalPipe,
 		FormsModule,
 		ButtonModule,
-		InputTextModule,
-		TextareaModule,
-		SelectModule,
-		TooltipModule,
-		ToastModule,
-		ConfirmDialogModule,
-		DialogModule,
+		EduInputText,
+		EduTextarea,
+		EduSelect,
+		EduTooltip,
+		EduToast,
+		EduConfirmDialog,
+		EduDialog,
 		TableSkeletonComponent,
 		MiniSparklineComponent,
 		EmailDeferFailBannerComponent,
@@ -94,7 +88,7 @@ const MOTIVO_OPTIONS: SelectOption<EmailBlacklistMotivo>[] = [
 		BlacklistDetailDrawerComponent,
 		HubContextBannerComponent,
 	],
-	providers: [ConfirmationService, MessageService],
+	providers: [EduConfirmationService, EduMessageService],
 	templateUrl: './blacklist-tab.component.html',
 	styleUrl: './blacklist-tab.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -106,9 +100,9 @@ export class BlacklistTabComponent implements OnInit {
 	private readonly uiFacade = inject(BlacklistUiFacade);
 	private readonly route = inject(ActivatedRoute);
 	private readonly destroyRef = inject(DestroyRef);
-	private readonly confirmationService = inject(ConfirmationService);
+	private readonly confirmationService = inject(EduConfirmationService);
 	private readonly hub = inject(EmailHubService);
-	private readonly messageService = inject(MessageService);
+	private readonly messageService = inject(EduMessageService);
 	// #endregion
 
 	// #region Estado

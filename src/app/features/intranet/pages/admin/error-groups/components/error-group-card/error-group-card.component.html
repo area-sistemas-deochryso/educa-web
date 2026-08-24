@@ -1,28 +1,28 @@
 <div class="card-header">
 	<div class="card-header-tags">
-		<p-tag
+		<edu-tag
 			[value]="group().severidad"
 			[severity]="severidadSeverity()"
 			styleClass="severity-tag"
 		/>
 		@if (hasPostResolucion()) {
-			<p-tag
+			<edu-tag
 				value="Reabierto"
 				severity="danger"
 				icon="pi pi-history"
 				styleClass="regresion-tag"
-				[pTooltip]="'Reabierto — ' + group().contadorPostResolucion + ' ocurrencia(s) después de resolver'"
-				tooltipPosition="top"
+				[eduTooltip]="'Reabierto — ' + group().contadorPostResolucion + ' ocurrencia(s) después de resolver'"
+				eduTooltipPosition="top"
 			/>
 		}
 	</div>
-	<span class="counter" pTooltip="Ocurrencias totales" tooltipPosition="top">
+	<span class="counter" eduTooltip="Ocurrencias totales" eduTooltipPosition="top">
 		<i class="pi pi-list"></i>
 		{{ group().contadorTotal }}
 	</span>
 </div>
 
-<div class="card-usuarios" pTooltip="Usuarios únicos afectados" tooltipPosition="top">
+<div class="card-usuarios" eduTooltip="Usuarios únicos afectados" eduTooltipPosition="top">
 	<i class="pi pi-users"></i>
 	{{ group().usuariosUnicos }}
 </div>
@@ -30,8 +30,8 @@
 <div class="card-body">
 	<span
 		class="message"
-		[pTooltip]="group().mensajeRepresentativo"
-		tooltipPosition="top"
+		[eduTooltip]="group().mensajeRepresentativo"
+		eduTooltipPosition="top"
 	>
 		{{ group().mensajeRepresentativo }}
 	</span>
@@ -49,8 +49,8 @@
 			class="card-sparkline__btn"
 			(click)="onSparklineClick($event)"
 			[attr.aria-label]="'Ver ocurrencias 30 días ampliado de ' + group().mensajeRepresentativo"
-			pTooltip="Ver ocurrencias 30 días ampliado"
-			tooltipPosition="top"
+			eduTooltip="Ver ocurrencias 30 días ampliado"
+			eduTooltipPosition="top"
 			data-info-anchor="admin-error-groups-sparkline-btn"
 		>
 			<app-error-occurrence-timeline
@@ -63,7 +63,7 @@
 </div>
 
 <div class="card-footer">
-	<span class="origen" [pTooltip]="group().origen" tooltipPosition="top">
+	<span class="origen" [eduTooltip]="group().origen" eduTooltipPosition="top">
 		<i [class]="origenIcon()"></i>
 	</span>
 	<span class="fecha">{{ group().ultimaFecha | date: 'dd/MM HH:mm' }}</span>

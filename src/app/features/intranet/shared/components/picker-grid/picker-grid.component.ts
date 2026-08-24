@@ -1,7 +1,8 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { InputTextModule } from 'primeng/inputtext';
+import { EduInputText } from '@edu-ui';
+
 // #endregion
 
 // #region Types
@@ -29,7 +30,7 @@ export interface PickerGridOption {
 @Component({
 	selector: 'app-picker-grid',
 	standalone: true,
-	imports: [FormsModule, InputTextModule],
+	imports: [FormsModule, EduInputText],
 	templateUrl: './picker-grid.component.html',
 	styleUrl: './picker-grid.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

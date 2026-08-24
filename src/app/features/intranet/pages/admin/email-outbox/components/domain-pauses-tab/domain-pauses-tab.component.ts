@@ -7,11 +7,6 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ConfirmationService } from 'primeng/api';
-import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
-import { TooltipModule } from 'primeng/tooltip';
 
 import { TableSkeletonComponent } from '@intranet-shared/components';
 import {
@@ -34,6 +29,7 @@ import {
 import { DomainPausesTableComponent } from '../domain-pauses-table/domain-pauses-table.component';
 import { DomainPausesAddDialogComponent } from '../domain-pauses-add-dialog/domain-pauses-add-dialog.component';
 import { DomainBlockedAlertBannerComponent } from '../domain-blocked-alert-banner/domain-blocked-alert-banner.component';
+import { EduConfirmationService, EduConfirmDialog, EduInputText, EduSelect, EduTooltip } from '@edu-ui';
 
 interface SelectOption<T> {
 	label: string;
@@ -61,17 +57,17 @@ const ESTADO_OPTIONS: SelectOption<EmailDomainPauseFiltroEstado>[] = [
 	imports: [
 		FormsModule,
 		ButtonModule,
-		InputTextModule,
-		SelectModule,
-		TooltipModule,
-		ConfirmDialogModule,
+		EduInputText,
+		EduSelect,
+		EduTooltip,
+		EduConfirmDialog,
 		TableSkeletonComponent,
 		DomainPausesTableComponent,
 		DomainPausesAddDialogComponent,
 		DomainBlockedAlertBannerComponent,
 		HubContextBannerComponent,
 	],
-	providers: [ConfirmationService],
+	providers: [EduConfirmationService],
 	templateUrl: './domain-pauses-tab.component.html',
 	styleUrl: './domain-pauses-tab.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -80,7 +76,7 @@ export class DomainPausesTabComponent implements OnInit {
 	private readonly dataFacade = inject(EmailDomainPauseDataFacade);
 	private readonly crudFacade = inject(EmailDomainPauseCrudFacade);
 	private readonly uiFacade = inject(EmailDomainPauseUiFacade);
-	private readonly confirmationService = inject(ConfirmationService);
+	private readonly confirmationService = inject(EduConfirmationService);
 	private readonly route = inject(ActivatedRoute);
 
 	readonly vm = this.dataFacade.vm;

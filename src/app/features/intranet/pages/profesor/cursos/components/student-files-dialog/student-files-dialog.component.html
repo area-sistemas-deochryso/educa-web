@@ -1,4 +1,4 @@
-<p-dialog
+<edu-dialog
 	[visible]="visible()"
 	(visibleChange)="onVisibleChange($event)"
 	[modal]="true"
@@ -29,8 +29,8 @@
 					class="p-button-text p-button-sm"
 					data-info-anchor="profesor-student-files-ir-calificaciones"
 					(click)="onIrACalificaciones()"
-					pTooltip="Navegar al tab de calificaciones"
-					tooltipPosition="top"
+					eduTooltip="Navegar al tab de calificaciones"
+					eduTooltipPosition="top"
 				></button>
 			</div>
 			<!-- #endregion -->
@@ -61,12 +61,12 @@
 									<!-- Notas del estudiante para esta semana -->
 									@let notas = getNotasEstudiante(semana.numeroSemana, estudiante.estudianteId);
 									@for (nota of notas; track nota.titulo) {
-										<p-tag
+										<edu-tag
 											[value]="nota.titulo + ': ' + nota.nota"
 											[severity]="nota.severity"
 											class="nota-tag"
-											[pTooltip]="'Nota: ' + nota.nota + '/20'"
-											tooltipPosition="top"
+											[eduTooltip]="'Nota: ' + nota.nota + '/20'"
+											eduTooltipPosition="top"
 										/>
 									}
 									<span class="student-count">{{ estudiante.archivos.length }} archivo{{ estudiante.archivos.length !== 1 ? 's' : '' }}</span>
@@ -102,4 +102,4 @@
 			}
 		</div>
 	}
-</p-dialog>
+</edu-dialog>

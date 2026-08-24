@@ -1,14 +1,13 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { TooltipModule } from 'primeng/tooltip';
-
 import type { ScheduleEntityItem } from '../../models/horario.interface';
+import { EduTooltip } from '@edu-ui';
 
 @Component({
   selector: 'app-schedule-entity-list',
   standalone: true,
-  imports: [CommonModule, TooltipModule],
+  imports: [CommonModule, EduTooltip],
   templateUrl: './schedule-entity-list.component.html',
   styleUrl: './schedule-entity-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

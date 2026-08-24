@@ -1,20 +1,21 @@
 import { Component, ChangeDetectionStrategy, input, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { SelectModule } from 'primeng/select';
+
 import { EstudianteMisNotasDto } from '@features/intranet/pages/estudiante/models';
 import { NotasCursoCardComponent } from '@features/intranet/pages/estudiante/notas/components/notas-curso-card/notas-curso-card.component';
+import { EduSelect } from '@edu-ui';
 
 @Component({
 	selector: 'app-estudiante-notas-salon-tab',
 	standalone: true,
-	imports: [CommonModule, FormsModule, SelectModule, NotasCursoCardComponent],
+	imports: [CommonModule, FormsModule, EduSelect, NotasCursoCardComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
 		<!-- #region Curso selector -->
 		@if (cursoOptions().length > 1) {
 			<div class="tab-header">
-				<p-select
+				<edu-select
 					data-info-anchor="curso-selector"
 					[options]="cursoOptions()"
 					[ngModel]="selectedCurso()"

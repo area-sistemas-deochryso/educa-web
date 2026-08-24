@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
-import { MessageModule } from 'primeng/message';
+import { EduMessage } from '@edu-ui';
 
 export interface DependencyCheck {
 	label: string;
@@ -14,7 +14,7 @@ export interface DependencyCheck {
 @Component({
 	selector: 'app-dependency-guidance',
 	standalone: true,
-	imports: [CommonModule, ButtonModule, MessageModule],
+	imports: [CommonModule, ButtonModule, EduMessage],
 	templateUrl: './dependency-guidance.component.html',
 	styleUrl: './dependency-guidance.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

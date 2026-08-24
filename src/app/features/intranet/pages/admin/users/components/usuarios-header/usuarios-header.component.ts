@@ -2,13 +2,11 @@ import { ChangeDetectionStrategy, Component, computed, input, output, signal } f
 import { FormsModule } from '@angular/forms';
 import { PageHeaderComponent } from '@intranet-shared/components';
 import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
-import { MenuModule } from 'primeng/menu';
-import { SelectModule } from 'primeng/select';
-import { TooltipModule } from 'primeng/tooltip';
+
 import { periodoActual, esVerano } from '@shared/models';
-import { type MenuItem } from 'primeng/api';
+
 import { RoleTab } from '../../models';
+import { EduDialog, EduMenu, type EduMenuItem, EduSelect, EduTooltip } from '@edu-ui';
 
 const NEW_BUTTON_LABELS: Record<string, string> = {
 	estudiantes: 'Nuevo Estudiante',
@@ -19,7 +17,7 @@ const NEW_BUTTON_LABELS: Record<string, string> = {
 @Component({
 	selector: 'app-users-header',
 	standalone: true,
-	imports: [ButtonModule, PageHeaderComponent, DialogModule, SelectModule, FormsModule, TooltipModule, MenuModule],
+	imports: [ButtonModule, PageHeaderComponent, EduDialog, EduSelect, FormsModule, EduTooltip, EduMenu],
 	templateUrl: './usuarios-header.component.html',
 	styleUrl: './usuarios-header.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -43,8 +41,8 @@ export class UsersHeaderComponent {
 		NEW_BUTTON_LABELS[this.activeTab() ?? ''] ?? 'Nuevo Usuario',
 	);
 
-	readonly overflowMenuItems = computed<MenuItem[]>(() => {
-		const items: MenuItem[] = [
+	readonly overflowMenuItems = computed<EduMenuItem[]>(() => {
+		const items: EduMenuItem[] = [
 			{ label: 'Refrescar', icon: 'pi pi-refresh', command: () => this.refresh.emit() },
 			{ label: 'Exportar', icon: 'pi pi-download', command: () => this.onOpenExportDialog() },
 			{ label: 'Validar Datos', icon: 'pi pi-check-circle', command: () => this.validarDatos.emit() },

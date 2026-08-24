@@ -4,8 +4,7 @@ import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { ErrorHandlerService } from '@core/services/error';
 import type { ErrorNotificationAction } from '@core/services/error';
-import { MessageService } from 'primeng/api';
-import { ToastModule } from 'primeng/toast';
+import { EduMessageService, EduToast } from '@edu-ui';
 
 // #endregion
 // #region Implementation
@@ -13,13 +12,13 @@ import { ToastModule } from 'primeng/toast';
 	selector: 'app-toast-container',
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [CommonModule, ToastModule],
-	providers: [MessageService],
+	imports: [CommonModule, EduToast],
+	providers: [EduMessageService],
 	templateUrl: './toast-container.component.html',
 })
 export class ToastContainerComponent {
 	// * PrimeNG message service + app error handler bridge.
-	private messageService = inject(MessageService);
+	private messageService = inject(EduMessageService);
 	private errorHandler = inject(ErrorHandlerService);
 
 	constructor() {

@@ -1,4 +1,4 @@
-<p-drawer
+<edu-drawer
 	[visible]="visible()"
 	(visibleChange)="onVisibleChange($event)"
 	position="right"
@@ -39,13 +39,13 @@
 					</div>
 					<div class="detail-row">
 						<span class="detail-label">Endpoint</span>
-						<span class="detail-value mono" [pTooltip]="item()!.endpoint">
+						<span class="detail-value mono" [eduTooltip]="item()!.endpoint">
 							{{ item()!.endpoint }}
 						</span>
 					</div>
 					<div class="detail-row">
 						<span class="detail-label">Policy</span>
-						<p-tag [value]="displayPolicy(item()!.policy)" styleClass="tag-neutral" />
+						<edu-tag [value]="displayPolicy(item()!.policy)" styleClass="tag-neutral" />
 					</div>
 				</div>
 			</div>
@@ -126,4 +126,4 @@
 			}
 		</div>
 	}
-</p-drawer>
+</edu-drawer>

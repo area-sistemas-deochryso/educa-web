@@ -8,10 +8,6 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
-import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
-import { TextareaModule } from 'primeng/textarea';
 
 import {
 	CrearEmailQuarantineDto,
@@ -19,6 +15,7 @@ import {
 	QUARANTINE_DURATION_HOURS_OPTIONS,
 	QuarantineDurationHours,
 } from '@data/models';
+import { EduDialog, EduInputText, EduSelect, EduTextarea } from '@edu-ui';
 
 interface DurationOption {
 	label: string;
@@ -37,11 +34,11 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 	standalone: true,
 	imports: [
 		FormsModule,
-		DialogModule,
+		EduDialog,
 		ButtonModule,
-		InputTextModule,
-		SelectModule,
-		TextareaModule,
+		EduInputText,
+		EduSelect,
+		EduTextarea,
 	],
 	templateUrl: './quarantine-add-dialog.component.html',
 	styleUrl: './quarantine-add-dialog.component.scss',

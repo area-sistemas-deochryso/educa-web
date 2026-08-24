@@ -30,8 +30,8 @@
                 class="horario-block"
                 [ngStyle]="blockStyleMap().get(block.horario.id)"
                 [class.inactive]="!block.horario.estado"
-                [pTooltip]="blockTooltipMap().get(block.horario.id)"
-                tooltipPosition="top"
+                [eduTooltip]="blockTooltipMap().get(block.horario.id) ?? ''"
+                eduTooltipPosition="top"
                 data-info-anchor="admin-schedules-block"
                 (click)="onBlockClick(block)"
               >

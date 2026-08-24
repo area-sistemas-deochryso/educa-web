@@ -144,8 +144,8 @@
 									@if (stat.sourceChip) {
 										<span
 											class="summary-source"
-											[pTooltip]="stat.windowTooltip ?? ''"
-											tooltipPosition="top"
+											[eduTooltip]="stat.windowTooltip ?? ''"
+											eduTooltipPosition="top"
 										>{{ stat.sourceChip }}</span>
 									}
 								</span>
@@ -210,9 +210,9 @@
 
 									<p
 										class="tile-description"
-										[pTooltip]="tile.description"
+										[eduTooltip]="tile.description"
 										[title]="tile.description"
-										tooltipPosition="top"
+										eduTooltipPosition="top"
 									>{{ tile.description }}</p>
 								</div>
 

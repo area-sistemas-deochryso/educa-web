@@ -1,12 +1,10 @@
 import { Component, ChangeDetectionStrategy, computed, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
-import { Select } from 'primeng/select';
+
 import { FormsModule } from '@angular/forms';
-import { SkeletonModule } from 'primeng/skeleton';
+
 import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
+
 import { SalonNotasResumenDto, calcularPromedioPonderado, NOTA_MAXIMA } from '@features/intranet/pages/profesor/models';
 import {
 	getNotaSeverity,
@@ -17,6 +15,7 @@ import {
 } from '@intranet-shared/services/calificacion-config';
 import type { ConfiguracionCalificacionListDto } from '@data/models';
 import { ErrorStateComponent } from '@shared/components';
+import { EduInputText, EduSelect, EduSkeleton, EduTable, EduTag } from '@edu-ui';
 
 export interface NotaSaveEvent {
 	calificacionId: number;
@@ -38,13 +37,13 @@ interface EvaluacionRow {
 	standalone: true,
 	imports: [
 		CommonModule,
-		TableModule,
-		TagModule,
-		Select,
+		EduTable,
+		EduTag,
+		EduSelect,
 		FormsModule,
-		SkeletonModule,
+		EduSkeleton,
 		ButtonModule,
-		InputTextModule,
+		EduInputText,
 		ErrorStateComponent,
 	],
 	changeDetection: ChangeDetectionStrategy.OnPush,

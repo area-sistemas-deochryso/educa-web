@@ -1,15 +1,14 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 
 import { ButtonModule } from 'primeng/button';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
 
 import { CampusPisoDto } from '../../models';
+import { EduTag, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-campus-pisos-panel',
 	standalone: true,
-	imports: [ButtonModule, TagModule, TooltipModule],
+	imports: [ButtonModule, EduTag, EduTooltip],
 	templateUrl: './campus-pisos-panel.component.html',
 	styleUrl: './campus-pisos-panel.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

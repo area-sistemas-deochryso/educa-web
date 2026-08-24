@@ -6,7 +6,7 @@
 >
 	<div class="header-actions">
 		<!-- * Date picker con maxDate=hoy y minDate=hoy-90d -->
-		<p-datepicker
+		<edu-datepicker
 			[ngModel]="selectedDate()"
 			[showIcon]="true"
 			[maxDate]="maxDate()"
@@ -24,7 +24,7 @@
 				pButton
 				icon="pi pi-times"
 				class="p-button-text p-button-sm btn-icon"
-				pTooltip="Volver a hoy"
+				eduTooltip="Volver a hoy"
 				(click)="onClearDate()"
 				data-info-anchor="admin-email-outbox-dashboard-fecha-clear"
 				[pt]="{ root: { 'aria-label': 'Volver a hoy' } }"
@@ -37,7 +37,7 @@
 			pButton
 			icon="pi pi-refresh"
 			class="p-button-text p-button-sm btn-icon"
-			pTooltip="Refrescar"
+			eduTooltip="Refrescar"
 			[disabled]="loading()"
 			(click)="onRefresh()"
 			data-info-anchor="admin-email-outbox-dashboard-refresh"

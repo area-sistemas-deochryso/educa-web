@@ -3,18 +3,12 @@ import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@ang
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
-import { InputTextModule } from 'primeng/inputtext';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
-import { ToggleSwitchModule } from 'primeng/toggleswitch';
-
 import { UserPermissionsService } from '@core/services';
 
 import { TicketTipoAdminDto } from '../models/ticket-admin.models';
 import { TicketTipoCatalogoFacade } from '../services/ticket-tipo-catalogo.facade';
+import { EduButton, EduDialog, EduInputText, EduSortableColumn, EduSpinner, EduTable, EduTag, EduToggle } from '@edu-ui';
+import { TableModule } from 'primeng/table';
 // #endregion
 
 const AYUDA_TICKET_MANAGE = 'AYUDA_TICKET_MANAGE';
@@ -27,16 +21,16 @@ const AYUDA_TICKET_MANAGE = 'AYUDA_TICKET_MANAGE';
 @Component({
 	selector: 'app-ticket-tipos',
 	standalone: true,
-	imports: [
+	imports: [TableModule, 
 		CommonModule,
 		FormsModule,
-		ButtonModule,
-		DialogModule,
-		InputTextModule,
-		ProgressSpinnerModule,
-		TableModule,
-		TagModule,
-		ToggleSwitchModule,
+		EduButton,
+		EduDialog,
+		EduInputText,
+		EduSpinner,
+		EduTable, EduSortableColumn,
+		EduTag,
+		EduToggle,
 	],
 	providers: [TicketTipoCatalogoFacade],
 	templateUrl: './ticket-tipos.component.html',

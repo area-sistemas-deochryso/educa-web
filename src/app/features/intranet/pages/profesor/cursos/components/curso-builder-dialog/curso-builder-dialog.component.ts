@@ -2,19 +2,19 @@
 import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DialogModule } from 'primeng/dialog';
+
 import { ButtonModule } from 'primeng/button';
-import { InputNumberModule } from 'primeng/inputnumber';
+import { EduDialog, EduInputNumber } from '@edu-ui';
 
 // #endregion
 // #region Implementation
 @Component({
 	selector: 'app-curso-builder-dialog',
 	standalone: true,
-	imports: [CommonModule, FormsModule, DialogModule, ButtonModule, InputNumberModule],
+	imports: [CommonModule, FormsModule, EduDialog, ButtonModule, EduInputNumber],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
-		<p-dialog
+		<edu-dialog
 			[visible]="visible()"
 			(visibleChange)="onVisibleChange($event)"
 			[modal]="true"
@@ -39,7 +39,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 				<!-- Input -->
 				<div class="flex flex-column gap-2 px-2">
 					<label for="numSemanas" class="font-semibold text-sm">Número de semanas</label>
-					<p-inputNumber
+					<edu-input-number
 						id="numSemanas"
 						[(ngModel)]="numeroSemanas"
 						[min]="1"
@@ -69,7 +69,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 					></button>
 				</div>
 			</ng-template>
-		</p-dialog>
+		</edu-dialog>
 	`,
 })
 export class CursoBuilderDialogComponent {

@@ -1,21 +1,19 @@
 import { Component, ChangeDetectionStrategy, input, output, signal, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DialogModule } from 'primeng/dialog';
-import { SelectModule } from 'primeng/select';
-import { MultiSelectModule } from 'primeng/multiselect';
-import { TextareaModule } from 'primeng/textarea';
+
 import { ButtonModule } from 'primeng/button';
 
 import { StudentForHealthDto, SymptomDto } from '@features/intranet/pages/profesor/models';
+import { EduDialog, EduMultiSelect, EduSelect, EduTextarea } from '@edu-ui';
 
 @Component({
 	selector: 'app-health-exit-dialog',
 	standalone: true,
-	imports: [CommonModule, FormsModule, DialogModule, SelectModule, MultiSelectModule, TextareaModule, ButtonModule],
+	imports: [CommonModule, FormsModule, EduDialog, EduSelect, EduMultiSelect, EduTextarea, ButtonModule],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
-		<p-dialog
+		<edu-dialog
 			header="Permiso de Salida por Salud"
 			[visible]="visible()"
 			(visibleChange)="onVisibleChange($event)"
@@ -25,7 +23,7 @@ import { StudentForHealthDto, SymptomDto } from '@features/intranet/pages/profes
 			<div class="form-grid">
 				<!-- Estudiante -->
 				<label for="exit-student">Estudiante</label>
-				<p-select
+				<edu-select
 					id="exit-student"
 					[options]="studentOptions()"
 					[(ngModel)]="selectedStudent"
@@ -40,7 +38,7 @@ import { StudentForHealthDto, SymptomDto } from '@features/intranet/pages/profes
 
 				<!-- Sintomas -->
 				<label for="exit-symptoms">Síntomas</label>
-				<p-multiselect
+				<edu-multi-select
 					id="exit-symptoms"
 					[options]="symptomOptions()"
 					[(ngModel)]="selectedSymptoms"
@@ -97,7 +95,7 @@ import { StudentForHealthDto, SymptomDto } from '@features/intranet/pages/profes
 					(click)="onSave()"
 				></button>
 			</ng-template>
-		</p-dialog>
+		</edu-dialog>
 	`,
 	styles: [
 		`

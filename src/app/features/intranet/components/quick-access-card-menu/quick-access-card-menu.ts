@@ -1,15 +1,14 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, computed, inject, input, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { Menu, MenuModule } from 'primeng/menu';
-import { MenuItem } from 'primeng/api';
+import { EduMenu, EduMenuItem } from '@edu-ui';
 
 // #endregion
 // #region Implementation
 @Component({
 	selector: 'app-quick-access-card-menu',
 	standalone: true,
-	imports: [MenuModule],
+	imports: [EduMenu],
 	templateUrl: './quick-access-card-menu.html',
 	styleUrl: './quick-access-card-menu.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -17,7 +16,7 @@ import { MenuItem } from 'primeng/api';
 export class QuickAccessCardMenuComponent {
 	private router = inject(Router);
 
-	@ViewChild('coursesMenu') coursesMenu!: Menu;
+	@ViewChild('coursesMenu') coursesMenu!: EduMenu;
 
 	// * Visible label on the card.
 	label = input.required<string>();
@@ -34,7 +33,7 @@ export class QuickAccessCardMenuComponent {
 	// * Course list to populate the menu.
 	courses = input.required<string[]>();
 
-	readonly menuItems = computed<MenuItem[]>(() =>
+	readonly menuItems = computed<EduMenuItem[]>(() =>
 		// * Map courses to menu items.
 		this.courses().map((course) => ({
 			label: course,

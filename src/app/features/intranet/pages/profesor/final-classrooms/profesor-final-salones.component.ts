@@ -4,10 +4,6 @@ import { FormsModule } from '@angular/forms';
 
 import { TabsModule } from 'primeng/tabs';
 import { ButtonModule } from 'primeng/button';
-import { TagModule } from 'primeng/tag';
-import { InputNumberModule } from 'primeng/inputnumber';
-import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
 
 import { PageHeaderComponent } from '@intranet-shared/components';
 // eslint-disable-next-line layer-enforcement/imports-warn -- Razón: pendiente mover SalonesAdminTable y SalonDetailDialog a @intranet-shared (Plan maestro Carril B)
@@ -16,6 +12,7 @@ import { ClassroomsAdminTableComponent } from '@features/intranet/pages/admin/cl
 import { ClassroomDetailDialogComponent } from '@features/intranet/pages/admin/classrooms/components/salon-detail-dialog/salon-detail-dialog.component';
 import { AprobarEstudianteDto, AprobacionMasivaDto, NivelEducativo } from './models';
 import { TeacherFinalClassroomsFacade } from './services/profesor-final-salones.facade';
+import { EduInputNumber, EduMessageService, EduTag, EduToast } from '@edu-ui';
 
 @Component({
 	selector: 'app-teacher-final-classrooms',
@@ -25,14 +22,14 @@ import { TeacherFinalClassroomsFacade } from './services/profesor-final-salones.
 		FormsModule,
 		TabsModule,
 		ButtonModule,
-		TagModule,
-		InputNumberModule,
-		ToastModule,
+		EduTag,
+		EduInputNumber,
+		EduToast,
 		PageHeaderComponent,
 		ClassroomsAdminTableComponent,
 		ClassroomDetailDialogComponent,
 	],
-	providers: [MessageService],
+	providers: [EduMessageService],
 	templateUrl: './profesor-final-salones.component.html',
 	styleUrl: './profesor-final-salones.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

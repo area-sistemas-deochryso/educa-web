@@ -1,6 +1,6 @@
 <!-- #region Header -->
 <app-page-header icon="pi pi-th-large" title="Resumen de Salones" subtitle="Gestión de estudiantes, asistencia y notas de tus salones asignados">
-	<p-inputNumber
+	<edu-input-number
 		[ngModel]="vm().filtroAnio"
 		(ngModelChange)="onAnioChange($event)"
 		data-info-anchor="profesor-final-salones-filtro-anio"
@@ -71,16 +71,16 @@
 					<div class="nivel-toolbar">
 						<div class="flex items-center gap-2">
 							@if (vm().periodoActual; as periodo) {
-								<p-tag
+								<edu-tag
 									[value]="periodo.estadoCierre === 'CERRADO' ? 'Periodo Cerrado' : 'Periodo Abierto'"
 									[severity]="periodo.estadoCierre === 'CERRADO' ? 'success' : 'info'"
 								/>
 							} @else {
-								<p-tag value="Sin periodo" severity="warn" />
+								<edu-tag value="Sin periodo" severity="warn" />
 							}
 
 							@if (vm().configActual; as config) {
-								<p-tag
+								<edu-tag
 									[value]="config.tipoCalificacion === 'NUMERICO' ? 'Numérico' : 'Literal'"
 									styleClass="tag-neutral"
 								/>
@@ -133,4 +133,4 @@
 />
 <!-- #endregion -->
 
-<p-toast />
+<edu-toast />

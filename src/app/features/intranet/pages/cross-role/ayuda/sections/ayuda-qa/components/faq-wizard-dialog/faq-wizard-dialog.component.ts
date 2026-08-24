@@ -1,11 +1,10 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 
-import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
 import { Step, StepList, StepPanel, StepPanels, Stepper } from 'primeng/stepper';
 
 import { FaqWizardDto } from '@features/intranet/pages/cross-role/ayuda/models/faq.models';
+import { EduButton, EduDialog } from '@edu-ui';
 // #endregion
 
 /**
@@ -17,7 +16,7 @@ import { FaqWizardDto } from '@features/intranet/pages/cross-role/ayuda/models/f
 @Component({
 	selector: 'app-faq-wizard-dialog',
 	standalone: true,
-	imports: [ButtonModule, DialogModule, Stepper, StepList, Step, StepPanels, StepPanel],
+	imports: [EduButton, EduDialog, Stepper, StepList, Step, StepPanels, StepPanel],
 	templateUrl: './faq-wizard-dialog.component.html',
 	styleUrl: './faq-wizard-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

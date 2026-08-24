@@ -14,7 +14,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
+
 import { logger, resolveErrorMessage } from '@core/helpers';
 import { VideoconferenciasFacade } from '../../services/videoconferencias.facade';
 import {
@@ -26,6 +26,7 @@ import {
 	countTeachers,
 	normalizeName,
 } from './jitsi-api.types';
+import { EduSpinner } from '@edu-ui';
 
 // #endregion
 
@@ -34,7 +35,7 @@ declare const JitsiMeetExternalAPI: new (domain: string, options: Record<string,
 @Component({
 	selector: 'app-videoconferencia-sala',
 	standalone: true,
-	imports: [CommonModule, ButtonModule, ProgressSpinnerModule],
+	imports: [CommonModule, ButtonModule, EduSpinner],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './videoconferencia-sala.component.html',
 	styleUrl: './videoconferencia-sala.component.scss',

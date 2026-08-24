@@ -1,7 +1,7 @@
 <!-- #region Filters -->
 <div class="notas-filters">
 	@if (cursoOptions().length > 1) {
-		<p-select
+		<edu-select
 			data-info-anchor="curso-selector"
 			[options]="cursoOptions()"
 			[ngModel]="selectedCurso()"
@@ -13,7 +13,7 @@
 			class="curso-select"
 		/>
 	}
-	<p-select
+	<edu-select
 		data-info-anchor="profesor-notas-estudiante-select"
 		[options]="estudianteOptions()"
 		[ngModel]="selectedEstudianteId()"
@@ -33,7 +33,7 @@
 @if (loading()) {
 	<div class="flex flex-column gap-2 p-2">
 		@for (_ of [1, 2, 3, 4, 5]; track $index) {
-			<p-skeleton height="2rem" />
+			<edu-skeleton height="2rem" />
 		}
 	</div>
 } @else if (error()) {
@@ -65,7 +65,7 @@
 			></button>
 		}
 	</div>
-	<p-table [value]="evaluacionRows()" dataKey="calificacionId" styleClass="p-datatable-sm">
+	<edu-table [value]="evaluacionRows()" dataKey="calificacionId" styleClass="p-datatable-sm">
 		<ng-template #header>
 			<tr>
 				<th>Evaluación</th>
@@ -82,7 +82,7 @@
 				<td class="font-semibold">{{ row.titulo }}</td>
 				<td>
 					<div class="tipo-cell">
-						<p-tag [value]="row.tipo" styleClass="tag-neutral" />
+						<edu-tag [value]="row.tipo" styleClass="tag-neutral" />
 						@if (row.esGrupal) {
 							<i class="pi pi-users text-xs" title="Evaluación grupal"></i>
 						}
@@ -93,7 +93,7 @@
 					@if (editingCalificacionId() === row.calificacionId) {
 						<div class="edit-nota-cell">
 							<input
-								pInputText
+								eduInputText
 								type="number"
 								class="edit-nota-input p-inputtext-sm"
 								[(ngModel)]="editNotaValue"
@@ -121,15 +121,15 @@
 							></button>
 						</div>
 					} @else {
-						<p-tag
+						<edu-tag
 							[value]="formatNota(row.nota)"
 							[severity]="getNotaSeverity(row.nota)"
 							[rounded]="true"
 							class="nota-tag-editable"
 							data-info-anchor="profesor-notas-tag-editar"
 							(click)="startEdit(row)"
-							pTooltip="Click para editar"
-							tooltipPosition="top"
+							eduTooltip="Click para editar"
+							eduTooltipPosition="top"
 						/>
 					}
 				</td>
@@ -137,7 +137,7 @@
 					<td class="text-center">
 						@if (row.nota === null) {
 							<input
-								pInputText
+								eduInputText
 								type="number"
 								class="sim-input p-inputtext-sm"
 								data-info-anchor="profesor-notas-simulador-input"
@@ -156,7 +156,7 @@
 				}
 			</tr>
 		</ng-template>
-	</p-table>
+	</edu-table>
 
 	@if (simulatorOpen() && hasSimulation()) {
 		<div class="sim-hint">

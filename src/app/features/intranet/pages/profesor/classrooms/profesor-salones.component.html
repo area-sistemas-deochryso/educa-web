@@ -1,6 +1,6 @@
 @if (vm().loading) {
 	<div class="flex justify-content-center p-5">
-		<p-progressSpinner strokeWidth="4" />
+		<edu-spinner strokeWidth="4" />
 	</div>
 } @else if (vm().salonesConEstudiantes.length === 0) {
 	<div class="flex flex-column align-items-center p-5 text-color-secondary">
@@ -24,10 +24,10 @@
 						<div class="flex align-items-center gap-2">
 							<span class="font-bold text-lg">{{ salon.salonDescripcion }}</span>
 							@if (salon.esTutor) {
-								<p-tag value="Tutor" styleClass="tag-neutral" icon="pi pi-star-fill" />
+								<edu-tag value="Tutor" styleClass="tag-neutral" icon="pi pi-star-fill" />
 							}
 						</div>
-						<p-tag
+						<edu-tag
 							[value]="salon.cantidadEstudiantes | pluralize: 'estudiante'"
 							styleClass="tag-neutral"
 						/>
@@ -35,13 +35,13 @@
 
 					<div class="flex flex-wrap gap-1">
 						@for (curso of salon.cursos; track curso.horarioId) {
-							<p-tag
+							<edu-tag
 								[value]="curso.nombre"
 								styleClass="tag-neutral cursor-pointer"
 								data-info-anchor="profesor-salon-card-curso-tag"
 								(click)="onVerCursoContenido(curso); $event.stopPropagation()"
-								pTooltip="Ver contenido"
-								tooltipPosition="top"
+								eduTooltip="Ver contenido"
+								eduTooltipPosition="top"
 							/>
 						}
 						@if (salon.cursos.length === 0) {

@@ -1,4 +1,4 @@
-<p-dialog
+<edu-dialog
 	[visible]="visible()"
 	(visibleChange)="onVisibleChange($event)"
 	header="Pausar dominio receptor"
@@ -14,7 +14,7 @@
 				<label for="dp-dominio">Dominio *</label>
 				<input
 					id="dp-dominio"
-					pInputText
+					eduInputText
 					data-info-anchor="admin-email-outbox-domain-dominio-input"
 					autocomplete="off"
 					[ngModel]="formData().dominio"
@@ -29,7 +29,7 @@
 
 			<div class="field full-width">
 				<label for="dp-duration">Duración *</label>
-				<p-select
+				<edu-select
 					inputId="dp-duration"
 					data-info-anchor="admin-email-outbox-domain-duration-select"
 					[options]="durationOptions"
@@ -46,7 +46,7 @@
 				<label for="dp-observacion">Observación *</label>
 				<textarea
 					id="dp-observacion"
-					pTextarea
+					eduTextarea
 					data-info-anchor="admin-email-outbox-domain-observacion-textarea"
 					rows="3"
 					maxlength="500"
@@ -89,4 +89,4 @@
 			></button>
 		</div>
 	</ng-template>
-</p-dialog>
+</edu-dialog>

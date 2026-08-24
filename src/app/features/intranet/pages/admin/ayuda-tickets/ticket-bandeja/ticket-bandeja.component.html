@@ -8,7 +8,7 @@
 		<!-- #region Filtro -->
 		<div class="filtro-bar">
 			<label for="filtro-estado" class="font-semibold">Estado</label>
-			<p-select
+			<edu-select
 				id="filtro-estado"
 				[options]="estadoFiltroOptions"
 				[ngModel]="filtroEstado()"
@@ -24,7 +24,7 @@
 
 		@if (loading()) {
 			<div class="loading-state">
-				<p-progressSpinner styleClass="w-3rem h-3rem" strokeWidth="4" />
+				<edu-spinner styleClass="w-3rem h-3rem" strokeWidth="4" />
 			</div>
 		} @else if (error()) {
 			<div class="empty-state">
@@ -38,15 +38,15 @@
 			</div>
 		} @else {
 			<section class="table-section">
-				<p-table [value]="tickets()" dataKey="id" [scrollable]="true" styleClass="p-datatable-sm">
+				<edu-table [value]="tickets()" dataKey="id" [scrollable]="true" styleClass="p-datatable-sm">
 					<ng-template #header>
 						<tr>
-							<th pSortableColumn="tipoNombre" data-info-anchor="tabla-orden-columna">TIPO <p-sortIcon field="tipoNombre" /></th>
+							<th eduSortableColumn="tipoNombre" data-info-anchor="tabla-orden-columna">TIPO <p-sortIcon field="tipoNombre" /></th>
 							<th>DESCRIPCIÓN</th>
 							<th>PROPUESTA</th>
-							<th pSortableColumn="usuarioNombre" data-info-anchor="tabla-orden-columna">USUARIO <p-sortIcon field="usuarioNombre" /></th>
-							<th pSortableColumn="fechaReg" data-info-anchor="tabla-orden-columna">FECHA <p-sortIcon field="fechaReg" /></th>
-							<th pSortableColumn="estado" data-info-anchor="tabla-orden-columna">ESTADO <p-sortIcon field="estado" /></th>
+							<th eduSortableColumn="usuarioNombre" data-info-anchor="tabla-orden-columna">USUARIO <p-sortIcon field="usuarioNombre" /></th>
+							<th eduSortableColumn="fechaReg" data-info-anchor="tabla-orden-columna">FECHA <p-sortIcon field="fechaReg" /></th>
+							<th eduSortableColumn="estado" data-info-anchor="tabla-orden-columna">ESTADO <p-sortIcon field="estado" /></th>
 							<th>CAMBIAR ESTADO</th>
 						</tr>
 					</ng-template>
@@ -58,10 +58,10 @@
 							<td>{{ ticket.usuarioNombre }}</td>
 							<td>{{ ticket.fechaReg | date: 'dd/MM/yyyy HH:mm' }}</td>
 							<td>
-								<p-tag [value]="labelFor(ticket.estado)" [severity]="severityFor(ticket.estado)" />
+								<edu-tag [value]="labelFor(ticket.estado)" [severity]="severityFor(ticket.estado)" />
 							</td>
 							<td>
-								<p-select
+								<edu-select
 									[options]="estadoCambioOptions"
 									[ngModel]="ticket.estado"
 									(ngModelChange)="onEstadoChange(ticket, $event)"
@@ -75,7 +75,7 @@
 							</td>
 						</tr>
 					</ng-template>
-				</p-table>
+				</edu-table>
 			</section>
 		}
 	}

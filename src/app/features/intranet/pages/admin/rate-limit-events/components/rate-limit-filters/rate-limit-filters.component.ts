@@ -3,11 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
-import { DatePickerModule } from 'primeng/datepicker';
-import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
-import { ToggleSwitchModule } from 'primeng/toggleswitch';
-import { TooltipModule } from 'primeng/tooltip';
 
 import { RolService } from '@core/services/roles';
 
@@ -16,6 +11,7 @@ import {
 	RateLimitEventFiltro,
 	RateLimitPolicy,
 } from '../../models';
+import { EduDatePicker, EduInputText, EduSelect, EduToggle, EduTooltip } from '@edu-ui';
 
 interface SelectOption<T> {
 	label: string;
@@ -29,11 +25,11 @@ interface SelectOption<T> {
 		CommonModule,
 		FormsModule,
 		ButtonModule,
-		DatePickerModule,
-		InputTextModule,
-		SelectModule,
-		ToggleSwitchModule,
-		TooltipModule,
+		EduDatePicker,
+		EduInputText,
+		EduSelect,
+		EduToggle,
+		EduTooltip,
 	],
 	templateUrl: './rate-limit-filters.component.html',
 	styleUrl: './rate-limit-filters.component.scss',

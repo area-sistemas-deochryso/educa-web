@@ -2,14 +2,14 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit, OnDestroy, HostListener, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NotificationPriority, KeyboardShortcutsService } from '@core/services';
-import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
+
 import {
 	PriorityInfo,
 	NotificationBellButtonComponent,
 	NotificationsPanelComponent,
 } from './components';
 import { NotificationsPanelContext } from './notifications-panel.context';
+import { EduMessageService, EduToast, EduToastSeverity } from '@edu-ui';
 
 // #endregion
 // #region Implementation
@@ -45,11 +45,11 @@ const PRIORITY_LEGEND: PriorityInfo[] = [
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [
 		CommonModule,
-		ToastModule,
+		EduToast,
 		NotificationBellButtonComponent,
 		NotificationsPanelComponent,
 	],
-	providers: [MessageService, NotificationsPanelContext],
+	providers: [EduMessageService, NotificationsPanelContext],
 	templateUrl: './floating-notification-bell.component.html',
 	styleUrl: './floating-notification-bell.component.scss',
 })
@@ -57,7 +57,7 @@ export class FloatingNotificationBellComponent implements OnInit, OnDestroy {
 	// * Shared context for notifications + shortcut toggles.
 	private context = inject(NotificationsPanelContext);
 	private keyboardService = inject(KeyboardShortcutsService);
-	private messageService = inject(MessageService);
+	private messageService = inject(EduMessageService);
 
 	// * Expose context signals for template bindings.
 	notificationCount = this.context.notificationCount;
@@ -126,7 +126,7 @@ export class FloatingNotificationBellComponent implements OnInit, OnDestroy {
 		// Reproducir sonido
 		this.context.playSound();
 
-		const severityMap: Record<NotificationPriority, string> = {
+		const severityMap: Record<NotificationPriority, EduToastSeverity> = {
 			urgent: 'error',
 			high: 'warn',
 			medium: 'info',

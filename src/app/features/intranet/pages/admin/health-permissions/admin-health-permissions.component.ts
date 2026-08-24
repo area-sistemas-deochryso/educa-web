@@ -2,7 +2,7 @@ import { Component, ChangeDetectionStrategy, inject, OnInit } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
+
 import { PageHeaderComponent, PickerGridComponent } from '@intranet-shared/components';
 
 import { AdminHealthPermissionsFacade } from './services/admin-health-permissions.facade';
@@ -10,6 +10,7 @@ import { AdminHealthPermissionsFacade } from './services/admin-health-permission
 import { CreateHealthExitRequest } from '@features/intranet/pages/profesor/models';
 // eslint-disable-next-line layer-enforcement/imports-error -- Razón: tab compartido entre admin (supervisión) y profesor (gestión); migración a @intranet-shared diferida.
 import { SalonHealthPermissionsTabComponent } from '@features/intranet/pages/profesor/classrooms/components/salon-health-permissions-tab/salon-health-permissions-tab.component';
+import { EduSpinner } from '@edu-ui';
 
 @Component({
 	selector: 'app-admin-health-permissions',
@@ -18,7 +19,7 @@ import { SalonHealthPermissionsTabComponent } from '@features/intranet/pages/pro
 		CommonModule,
 		FormsModule,
 		ButtonModule,
-		ProgressSpinnerModule,
+		EduSpinner,
 		PageHeaderComponent,
 		PickerGridComponent,
 		SalonHealthPermissionsTabComponent,

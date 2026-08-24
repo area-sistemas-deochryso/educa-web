@@ -11,9 +11,8 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { SelectButtonModule } from 'primeng/selectbutton';
-
 import { ErrorGroupsViewMode, StorageService } from '@core/services/storage';
+import { EduSelectButton } from '@edu-ui';
 
 interface ToggleOption {
 	label: string;
@@ -29,7 +28,7 @@ interface ToggleOption {
 	selector: 'app-error-groups-view-toggle',
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [CommonModule, FormsModule, SelectButtonModule],
+	imports: [CommonModule, FormsModule, EduSelectButton],
 	templateUrl: './error-groups-view-toggle.component.html',
 	styleUrl: './error-groups-view-toggle.component.scss',
 })

@@ -28,7 +28,7 @@
 						@switch (event.kind) {
 							@case ('error') {
 								<div class="timeline-event__detail">
-									<p-tag
+									<edu-tag
 										[value]="event.payload.severidad"
 										[severity]="getErrorSeverity(event.payload.severidad)"
 									/>
@@ -38,12 +38,12 @@
 											{{ event.payload.httpStatus }}
 										</span>
 									}
-									<span class="timeline-event__msg" [pTooltip]="event.payload.mensaje" tooltipPosition="top">
+									<span class="timeline-event__msg" [eduTooltip]="event.payload.mensaje" eduTooltipPosition="top">
 										{{ event.payload.mensaje }}
 									</span>
 								</div>
 								<div class="timeline-event__meta">
-									<span class="cell-mono cell-url" [pTooltip]="event.payload.url" tooltipPosition="top">
+									<span class="cell-mono cell-url" [eduTooltip]="event.payload.url" eduTooltipPosition="top">
 										{{ event.payload.url }}
 									</span>
 									@if (event.payload.usuarioDniMasked; as dni) {
@@ -66,7 +66,7 @@
 							}
 							@case ('rate-limit') {
 								<div class="timeline-event__detail">
-									<p-tag
+									<edu-tag
 										[value]="event.payload.fueRechazado ? 'Rechazado' : 'OK'"
 										[severity]="event.payload.fueRechazado ? 'danger' : 'success'"
 									/>
@@ -88,14 +88,14 @@
 							}
 							@case ('reporte') {
 								<div class="timeline-event__detail">
-									<p-tag
+									<edu-tag
 										[value]="event.payload.estado"
 										[severity]="getReporteSeverity(event.payload.estado)"
 									/>
 									<span class="timeline-event__msg">{{ event.payload.tipo }}</span>
 								</div>
 								<div class="timeline-event__meta">
-									<span [pTooltip]="event.payload.descripcionResumen" tooltipPosition="top">
+									<span [eduTooltip]="event.payload.descripcionResumen" eduTooltipPosition="top">
 										{{ event.payload.descripcionResumen }}
 									</span>
 								</div>
@@ -114,11 +114,11 @@
 							}
 							@case ('outbox') {
 								<div class="timeline-event__detail">
-									<p-tag
+									<edu-tag
 										[value]="event.payload.estado"
 										[severity]="getOutboxSeverity(event.payload.estado)"
 									/>
-									<span class="timeline-event__msg" [pTooltip]="event.payload.asunto" tooltipPosition="top">
+									<span class="timeline-event__msg" [eduTooltip]="event.payload.asunto" eduTooltipPosition="top">
 										{{ event.payload.asunto }}
 									</span>
 								</div>

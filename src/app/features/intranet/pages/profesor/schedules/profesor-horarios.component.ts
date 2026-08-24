@@ -2,8 +2,7 @@
 import { Component, ChangeDetectionStrategy, inject, OnInit, computed, signal, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { TooltipModule } from 'primeng/tooltip';
-import { Popover } from 'primeng/popover';
+
 import { ButtonModule } from 'primeng/button';
 import { PageHeaderComponent } from '@intranet-shared/components';
 import { environment } from '@config/environment';
@@ -16,13 +15,14 @@ import {
 	getNextOccurrence,
 	formatDateISO,
 } from './profesor-horarios.helpers';
+import { EduPopover, EduTooltip } from '@edu-ui';
 
 // #endregion
 // #region Component
 @Component({
 	selector: 'app-teacher-schedules',
 	standalone: true,
-	imports: [CommonModule, TooltipModule, Popover, ButtonModule, PageHeaderComponent],
+	imports: [CommonModule, EduTooltip, EduPopover, ButtonModule, PageHeaderComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './profesor-horarios.component.html',
 	styleUrl: './profesor-horarios.component.scss',
@@ -242,11 +242,11 @@ export class TeacherSchedulesComponent implements OnInit {
 	}
 
 	// #endregion
-	// #region Popover de detalle (desktop)
+	// #region EduPopover de detalle (desktop)
 	/** Bloque seleccionado para el popover de detalle. Solo aplica a la vista desktop. */
 	readonly selectedBlock = signal<HorarioBlock | null>(null);
 
-	onBlockClick(event: Event, block: HorarioBlock, popover: Popover): void {
+	onBlockClick(event: Event, block: HorarioBlock, popover: EduPopover): void {
 		this.selectedBlock.set(block);
 		popover.toggle(event);
 	}
@@ -256,7 +256,7 @@ export class TeacherSchedulesComponent implements OnInit {
 		return getNextOccurrence(block, new Date(this._now() + this._serverOffset()));
 	}
 
-	irAAsistencia(popover: Popover): void {
+	irAAsistencia(popover: EduPopover): void {
 		const block = this.selectedBlock();
 		if (!block) return;
 		popover.hide();
@@ -265,7 +265,7 @@ export class TeacherSchedulesComponent implements OnInit {
 		});
 	}
 
-	irAContenido(popover: Popover): void {
+	irAContenido(popover: EduPopover): void {
 		const block = this.selectedBlock();
 		if (!block) return;
 		popover.hide();
@@ -274,7 +274,7 @@ export class TeacherSchedulesComponent implements OnInit {
 		});
 	}
 
-	irACalificaciones(popover: Popover): void {
+	irACalificaciones(popover: EduPopover): void {
 		const block = this.selectedBlock();
 		if (!block) return;
 		popover.hide();

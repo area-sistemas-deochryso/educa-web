@@ -6,12 +6,12 @@
 		</div>
 	} @else {
 		<div class="toolbar">
-			<p-button label="Nuevo tipo" icon="pi pi-plus" (onClick)="openCreateDialog()" data-info-anchor="admin-tickets-tipos-nuevo-btn" />
+			<edu-button label="Nuevo tipo" icon="pi pi-plus" (onClick)="openCreateDialog()" data-info-anchor="admin-tickets-tipos-nuevo-btn" />
 		</div>
 
 		@if (loading()) {
 			<div class="loading-state">
-				<p-progressSpinner styleClass="w-3rem h-3rem" strokeWidth="4" />
+				<edu-spinner styleClass="w-3rem h-3rem" strokeWidth="4" />
 			</div>
 		} @else if (error()) {
 			<div class="empty-state">
@@ -25,11 +25,11 @@
 			</div>
 		} @else {
 			<section class="table-section">
-				<p-table [value]="tipos()" dataKey="id" styleClass="p-datatable-sm">
+				<edu-table [value]="tipos()" dataKey="id" styleClass="p-datatable-sm">
 					<ng-template #header>
 						<tr>
-							<th pSortableColumn="nombre" data-info-anchor="tabla-orden-columna">NOMBRE <p-sortIcon field="nombre" /></th>
-							<th pSortableColumn="estado" data-info-anchor="tabla-orden-columna">ESTADO <p-sortIcon field="estado" /></th>
+							<th eduSortableColumn="nombre" data-info-anchor="tabla-orden-columna">NOMBRE <p-sortIcon field="nombre" /></th>
+							<th eduSortableColumn="estado" data-info-anchor="tabla-orden-columna">ESTADO <p-sortIcon field="estado" /></th>
 							<th style="width: 140px">ACTIVO</th>
 							<th style="width: 100px">EDITAR</th>
 						</tr>
@@ -38,23 +38,23 @@
 						<tr [class.inactivo]="!tipo.estado">
 							<td>{{ tipo.nombre }}</td>
 							<td>
-								<p-tag [value]="tipo.estado ? 'Activo' : 'Inactivo'" [severity]="tipo.estado ? 'success' : 'secondary'" />
+								<edu-tag [value]="tipo.estado ? 'Activo' : 'Inactivo'" [severity]="tipo.estado ? 'success' : 'secondary'" />
 							</td>
 							<td>
-								<p-toggleswitch [ngModel]="tipo.estado" (ngModelChange)="toggleEstado(tipo)" [disabled]="submitting()" data-info-anchor="admin-tickets-tipos-fila-activo-toggle" />
+								<edu-toggle [ngModel]="tipo.estado" (ngModelChange)="toggleEstado(tipo)" [disabled]="submitting()" data-info-anchor="admin-tickets-tipos-fila-activo-toggle" />
 							</td>
 							<td>
-								<p-button icon="pi pi-pencil" [text]="true" (onClick)="openEditDialog(tipo)" data-info-anchor="admin-tickets-tipos-fila-editar-btn" />
+								<edu-button icon="pi pi-pencil" [text]="true" (onClick)="openEditDialog(tipo)" data-info-anchor="admin-tickets-tipos-fila-editar-btn" />
 							</td>
 						</tr>
 					</ng-template>
-				</p-table>
+				</edu-table>
 			</section>
 		}
 	}
 </div>
 
-<p-dialog
+<edu-dialog
 	header="{{ editingTipo() ? 'Editar tipo' : 'Nuevo tipo' }}"
 	[visible]="dialogVisible()"
 	(visibleChange)="onDialogVisibleChange($event)"
@@ -65,7 +65,7 @@
 		<label for="nombre-tipo" class="font-semibold">Nombre</label>
 		<input
 			id="nombre-tipo"
-			pInputText
+			eduInputText
 			type="text"
 			[ngModel]="nombreForm()"
 			(ngModelChange)="onNombreChange($event)"
@@ -76,7 +76,7 @@
 	</div>
 
 	<ng-template #footer>
-		<p-button label="Cancelar" severity="secondary" [text]="true" (onClick)="closeDialog()" data-info-anchor="admin-tickets-tipos-form-cancelar-btn" />
-		<p-button label="Guardar" (onClick)="guardar()" [disabled]="!nombreForm().trim() || submitting()" data-info-anchor="admin-tickets-tipos-form-guardar-btn" />
+		<edu-button label="Cancelar" severity="secondary" [text]="true" (onClick)="closeDialog()" data-info-anchor="admin-tickets-tipos-form-cancelar-btn" />
+		<edu-button label="Guardar" (onClick)="guardar()" [disabled]="!nombreForm().trim() || submitting()" data-info-anchor="admin-tickets-tipos-form-guardar-btn" />
 	</ng-template>
-</p-dialog>
+</edu-dialog>

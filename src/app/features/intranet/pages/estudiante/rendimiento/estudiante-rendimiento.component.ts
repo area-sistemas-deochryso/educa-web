@@ -1,18 +1,19 @@
 import { Component, ChangeDetectionStrategy, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CardModule } from 'primeng/card';
+
 import { ButtonModule } from 'primeng/button';
 import { PageHeaderComponent } from '@intranet-shared/components';
 import { SkeletonLoaderComponent } from '@shared/components';
 import { EstudianteRendimientoFacade } from './services/estudiante-rendimiento.facade';
 import { EstudianteRendimientoChartComponent } from './components/estudiante-rendimiento-chart/estudiante-rendimiento-chart.component';
+import { EduCard } from '@edu-ui';
 
 @Component({
 	selector: 'app-estudiante-rendimiento',
 	standalone: true,
 	imports: [
 		CommonModule,
-		CardModule,
+		EduCard,
 		ButtonModule,
 		PageHeaderComponent,
 		SkeletonLoaderComponent,

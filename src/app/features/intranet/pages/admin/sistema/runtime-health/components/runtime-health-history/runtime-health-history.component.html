@@ -6,7 +6,7 @@
 		</div>
 
 		<div class="history-actions">
-			<p-selectButton
+			<edu-select-button
 				[options]="rangeOptions"
 				[ngModel]="timeRange()"
 				data-info-anchor="admin-runtime-health-history-rango-toggle"
@@ -29,7 +29,7 @@
 
 	@if (loading()) {
 		<div class="history-loading">
-			<p-progressSpinner
+			<edu-spinner
 				[style]="{ width: '2rem', height: '2rem' }"
 				strokeWidth="4"
 			/>
@@ -100,7 +100,7 @@
 						<i class="pi pi-link"></i>
 						<span>Correlación en {{ snap.timestamp | date: 'dd/MM HH:mm:ss' }}</span>
 						@if (snap.saturationPattern) {
-							<p-tag
+							<edu-tag
 								[value]="getPatternLabel(snap.saturationPattern)"
 								[severity]="getPatternSeverity(snap.saturationPattern)"
 							/>

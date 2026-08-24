@@ -27,7 +27,7 @@
 		@for (g of periodoGroups(); track g.periodo.id) {
 			<div class="periodo-chip" [class.empty]="g.promedio === null">
 				<span class="periodo-name">{{ g.periodo.nombre }}</span>
-				<p-tag
+				<edu-tag
 					[value]="formatNota(g.promedio)"
 					[severity]="getNotaSeverity(g.promedio)"
 					[rounded]="true"
@@ -37,7 +37,7 @@
 		@if (curso().periodos.length > 0) {
 			<div class="periodo-chip periodo-general">
 				<span class="periodo-name">General</span>
-				<p-tag
+				<edu-tag
 					[value]="formatNota(promedioGeneral())"
 					[severity]="promedioSeverity()"
 					[rounded]="true"
@@ -65,13 +65,13 @@
 									<div class="eval-info">
 										<span class="eval-titulo">{{ eval.titulo }}</span>
 										<div class="eval-meta">
-											<p-tag [value]="getTipoLabel(eval.tipo)" styleClass="tag-neutral" [rounded]="true" />
+											<edu-tag [value]="getTipoLabel(eval.tipo)" styleClass="tag-neutral" [rounded]="true" />
 											<span class="text-xs text-color-secondary">{{ eval.fechaEvaluacion | date:'dd/MM/yyyy' }}</span>
 											<span class="text-xs text-color-secondary">Peso: {{ (eval.peso * 100).toFixed(0) }}%</span>
 										</div>
 									</div>
 									<div class="eval-nota">
-										<p-tag
+										<edu-tag
 											[value]="formatNota(eval.nota)"
 											[severity]="getNotaSeverity(eval.nota)"
 											[rounded]="true"

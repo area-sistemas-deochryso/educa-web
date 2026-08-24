@@ -2,14 +2,12 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { BadgeModule } from 'primeng/badge';
 import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
+
 import { Tab, TabList, TabPanel, Tabs } from 'primeng/tabs';
-import { TooltipModule } from 'primeng/tooltip';
 
 import type { CursoOption, CursosPorNivel } from '../../models/curso.interface';
+import { EduBadge, EduDialog, EduSpinner, EduTooltip } from '@edu-ui';
 
 // #endregion
 // #region Implementation
@@ -18,15 +16,15 @@ import type { CursoOption, CursosPorNivel } from '../../models/curso.interface';
 	standalone: true,
 	imports: [
 		CommonModule,
-		BadgeModule,
+		EduBadge,
 		ButtonModule,
-		DialogModule,
-		ProgressSpinnerModule,
+		EduDialog,
+		EduSpinner,
 		Tabs,
 		TabList,
 		Tab,
 		TabPanel,
-		TooltipModule,
+		EduTooltip,
 	],
 	templateUrl: './horarios-curso-picker.component.html',
 	styleUrl: './horarios-curso-picker.component.scss',

@@ -5,8 +5,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ConfirmationService } from 'primeng/api';
+
 import {
 	UsersCrudFacade,
 	UsersDataFacade,
@@ -53,6 +52,7 @@ import {
 	findAutoOpenMatch,
 	readAutoOpenQueryParams,
 } from './helpers/auto-open-from-query.helper';
+import { EduConfirmationService, EduConfirmDialog } from '@edu-ui';
 
 // #endregion
 // #region Implementation
@@ -62,7 +62,7 @@ import {
 	imports: [
 		ButtonModule,
 		CommonModule,
-		ConfirmDialogModule,
+		EduConfirmDialog,
 		UsersHeaderComponent,
 		UsersStatsComponent,
 		UsersStatsSkeletonComponent,
@@ -75,7 +75,7 @@ import {
 		UserDetailDrawerComponent,
 		ErrorStateComponent,
 	],
-	providers: [ConfirmationService],
+	providers: [EduConfirmationService],
 	templateUrl: './usuarios.component.html',
 	styleUrl: './usuarios.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -84,7 +84,7 @@ export class UsersComponent implements AfterViewInit {
 	protected dataFacade = inject(UsersDataFacade);
 	private crudFacade = inject(UsersCrudFacade);
 	private uiFacade = inject(UsersUiFacade);
-	private confirmationService = inject(ConfirmationService);
+	private confirmationService = inject(EduConfirmationService);
 	private usuariosApi = inject(UsersService);
 	private excelService = inject(ExcelService);
 	private destroyRef = inject(DestroyRef);

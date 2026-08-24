@@ -4,11 +4,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
-import { ConfirmationService, MessageService } from 'primeng/api';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { InputTextModule } from 'primeng/inputtext';
-import { ToastModule } from 'primeng/toast';
-import { TooltipModule } from 'primeng/tooltip';
 
 import { CapabilityCatalogItem, PermissionsService } from '@core/services/permissions';
 import { RolService } from '@core/services/roles';
@@ -23,6 +18,7 @@ import {
 	ExplicacionAdminDto,
 } from './models/explicacion-admin.models';
 import { ExplicacionAdminFacade } from './services/explicacion-admin.facade';
+import { EduConfirmationService, EduConfirmDialog, EduInputText, EduMessageService, EduToast, EduTooltip } from '@edu-ui';
 // #endregion
 
 /**
@@ -38,15 +34,15 @@ import { ExplicacionAdminFacade } from './services/explicacion-admin.facade';
 	imports: [
 		FormsModule,
 		ButtonModule,
-		InputTextModule,
-		ToastModule,
-		TooltipModule,
-		ConfirmDialogModule,
+		EduInputText,
+		EduToast,
+		EduTooltip,
+		EduConfirmDialog,
 		PageHeaderComponent,
 		ExplicacionAdminTableComponent,
 		ExplicacionAdminFormDialogComponent,
 	],
-	providers: [ExplicacionAdminFacade, ConfirmationService, MessageService],
+	providers: [ExplicacionAdminFacade, EduConfirmationService, EduMessageService],
 	templateUrl: './explicaciones-admin.component.html',
 	styleUrl: './explicaciones-admin.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -56,7 +52,7 @@ export class ExplicacionesAdminComponent implements OnInit {
 	protected readonly facade = inject(ExplicacionAdminFacade);
 	protected readonly rolService = inject(RolService);
 	private readonly permissionsService = inject(PermissionsService);
-	private readonly confirmationService = inject(ConfirmationService);
+	private readonly confirmationService = inject(EduConfirmationService);
 	private readonly destroyRef = inject(DestroyRef);
 	// #endregion
 

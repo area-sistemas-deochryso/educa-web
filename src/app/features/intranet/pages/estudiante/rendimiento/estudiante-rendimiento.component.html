@@ -20,7 +20,7 @@
 	} @else {
 		<div class="rendimiento-cursos">
 			@for (curso of vm().cursos; track curso.cursoContenidoId) {
-				<p-card class="rendimiento-curso-card">
+				<edu-card class="rendimiento-curso-card">
 					<ng-template pTemplate="header">
 						<div class="rendimiento-curso-header">
 							<h3>{{ curso.cursoNombre }}</h3>
@@ -31,7 +31,7 @@
 						[periodos]="curso.periodos"
 						[sinPeriodosConfigurados]="curso.sinPeriodosConfigurados"
 					/>
-				</p-card>
+				</edu-card>
 			}
 		</div>
 	}

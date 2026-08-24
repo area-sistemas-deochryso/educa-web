@@ -23,7 +23,7 @@
 		<div class="throttle-widget__actions">
 			<label class="throttle-widget__autorefresh">
 				<span>Auto-refresh 30s</span>
-				<p-toggleswitch
+				<edu-toggle
 					data-info-anchor="email-outbox-autorefresh-toggle"
 					[ngModel]="autoRefresh()"
 					(ngModelChange)="onAutoRefreshToggle($event)"
@@ -36,8 +36,8 @@
 				class="p-button-outlined p-button-sm"
 				data-info-anchor="email-outbox-refresh-btn"
 				(click)="onRefreshClick()"
-				pTooltip="Refrescar ahora"
-				tooltipPosition="top"
+				eduTooltip="Refrescar ahora"
+				eduTooltipPosition="top"
 				[loading]="loading()"
 				[pt]="{ root: { 'aria-label': 'Refrescar estado del throttle' } }"
 			></button>
@@ -73,7 +73,7 @@
 						</span>
 					}
 				</div>
-				<p-tag
+				<edu-tag
 					[value]="labelFor(status()!.domainCount, status()!.domainLimit)"
 					[severity]="domainSeverity()"
 				/>
@@ -93,7 +93,7 @@
 								<span class="throttle-card__limit">/ {{ sender.limit }}</span>
 							</span>
 						</div>
-						<p-tag
+						<edu-tag
 							[value]="labelFor(sender.count, sender.limit)"
 							[severity]="severityFor(sender.count, sender.limit)"
 						/>

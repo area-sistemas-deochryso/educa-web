@@ -1,12 +1,12 @@
 import { Component, ChangeDetectionStrategy, input, output, signal } from '@angular/core';
 
 import { ButtonModule } from 'primeng/button';
-import { TooltipModule } from 'primeng/tooltip';
+import { EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-script-output',
 	standalone: true,
-	imports: [ButtonModule, TooltipModule],
+	imports: [ButtonModule, EduTooltip],
 	templateUrl: './script-output.component.html',
 	styleUrl: './script-output.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

@@ -8,7 +8,7 @@
 		<!-- #region Filtro -->
 		<div class="filtro-bar">
 			<label for="filtro-estado" class="font-semibold">Estado</label>
-			<p-select
+			<edu-select
 				id="filtro-estado"
 				[options]="estadoFiltroOptions"
 				[ngModel]="filtroEstado()"
@@ -24,7 +24,7 @@
 
 		@if (loading()) {
 			<div class="loading-state">
-				<p-progressSpinner styleClass="w-3rem h-3rem" strokeWidth="4" />
+				<edu-spinner styleClass="w-3rem h-3rem" strokeWidth="4" />
 			</div>
 		} @else if (error()) {
 			<app-error-state message="No se pudo cargar la bandeja." (retry)="onRetry()" />
@@ -35,7 +35,7 @@
 			</div>
 		} @else {
 			<section class="table-section">
-				<p-table [value]="solicitudesFiltradas()" dataKey="id" [scrollable]="true" styleClass="p-datatable-sm">
+				<edu-table [value]="solicitudesFiltradas()" dataKey="id" [scrollable]="true" styleClass="p-datatable-sm">
 					<ng-template #header>
 						<tr>
 							<th>ESTUDIANTE</th>
@@ -70,7 +70,7 @@
 								}
 							</td>
 							<td>
-								<p-tag [value]="labelFor(solicitud.estado)" [severity]="severityFor(solicitud.estado)" />
+								<edu-tag [value]="labelFor(solicitud.estado)" [severity]="severityFor(solicitud.estado)" />
 								@if (solicitud.estado === 'RECHAZADA' && solicitud.motivoRechazo) {
 									<p class="motivo-rechazo">{{ solicitud.motivoRechazo }}</p>
 								}
@@ -102,13 +102,13 @@
 							</td>
 						</tr>
 					</ng-template>
-				</p-table>
+				</edu-table>
 			</section>
 		}
 	}
 </div>
 
-<p-dialog
+<edu-dialog
 	header="Rechazar solicitud"
 	[visible]="rechazarDialogVisible()"
 	(visibleChange)="onRechazarDialogVisibleChange($event)"
@@ -120,7 +120,7 @@
 			<p>Justificación de <strong>{{ solicitud.estudianteNombre }}</strong> — {{ solicitud.fecha | date: 'dd/MM/yyyy' }}</p>
 			<label for="motivo-rechazo">Motivo (obligatorio)</label>
 			<textarea
-				pTextarea
+				eduTextarea
 				id="motivo-rechazo"
 				[ngModel]="motivoRechazo()"
 				(ngModelChange)="motivoRechazo.set($event)"
@@ -144,6 +144,6 @@
 			(click)="onConfirmarRechazo()"
 		></button>
 	</ng-template>
-</p-dialog>
+</edu-dialog>
 
-<p-confirmDialog />
+<edu-confirm-dialog />

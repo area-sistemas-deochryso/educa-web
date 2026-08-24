@@ -1,4 +1,4 @@
-<p-toast />
+<edu-toast />
 
 <app-page-header icon="pi pi-info-circle" title="Gestión del modo informativo" subtitle="Administra las explicaciones que aparecen en el modo informativo">
 	<div class="explicaciones-admin-toolbar">
@@ -6,7 +6,7 @@
 			<i class="pi pi-search"></i>
 			<input
 				type="text"
-				pInputText
+				eduInputText
 				placeholder="Buscar por ancla..."
 				[ngModel]="facade.searchTerm()"
 				(ngModelChange)="onSearchChange($event)"
@@ -18,7 +18,7 @@
 			pButton
 			icon="pi pi-refresh"
 			class="p-button-text p-button-sm"
-			pTooltip="Refrescar"
+			eduTooltip="Refrescar"
 			(click)="facade.load()"
 			[pt]="{ root: { 'aria-label': 'Refrescar listado' } }"
 			data-info-anchor="admin-explicaciones-refresh-btn"
@@ -58,4 +58,4 @@
 	(cancelForm)="onDialogCancel()"
 />
 
-<p-confirmDialog />
+<edu-confirm-dialog />
