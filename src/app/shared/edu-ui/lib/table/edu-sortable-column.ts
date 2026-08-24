@@ -42,7 +42,7 @@ export class EduSortableColumn implements OnDestroy {
 		effect(() => this.renderIcon(this.order()));
 	}
 
-	protected onActivate(event?: KeyboardEvent): void {
+	protected onActivate(event?: Event): void {
 		event?.preventDefault();
 		this.service.toggle(this.eduSortableColumn());
 	}
