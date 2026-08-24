@@ -79,6 +79,17 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 					(blur)="onInputBlur()"
 					(keydown.enter)="onInputEnter($event)"
 				/>
+				@if (showClear() && hasValue() && !disabled()) {
+					<button
+						type="button"
+						class="edu-datepicker__clear"
+						tabindex="-1"
+						aria-label="Limpiar"
+						(click)="onClearClick($event)"
+					>
+						<i class="pi pi-times"></i>
+					</button>
+				}
 				@if (showIcon()) {
 					<i class="edu-datepicker__icon pi pi-calendar"></i>
 				}
@@ -153,6 +164,7 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 export class EduDatePicker implements ControlValueAccessor, OnDestroy {
 	readonly selectionMode = input<EduDatePickerSelectionMode>('single');
 	readonly showIcon = input(false);
+	readonly showClear = input(false);
 	readonly minDate = input<Date>();
 	readonly maxDate = input<Date>();
 	readonly showTime = input(false);
@@ -227,6 +239,7 @@ export class EduDatePicker implements ControlValueAccessor, OnDestroy {
 
 	protected readonly isInputReadonly = computed(() => this.readonlyInput() || this.selectionMode() !== 'single');
 	protected readonly inputValue = computed(() => this.draftText() ?? this.displayLabel());
+	protected readonly hasValue = computed(() => this.selectedDates().length > 0);
 
 	private onChange: (value: Date | Date[] | null) => void = () => {};
 	private onTouched: () => void = () => {};
@@ -272,6 +285,12 @@ export class EduDatePicker implements ControlValueAccessor, OnDestroy {
 			return;
 		}
 		this.toggle(event);
+	}
+
+	protected onClearClick(event: Event): void {
+		event.preventDefault();
+		event.stopPropagation();
+		this.clearValue();
 	}
 
 	protected onTriggerKeydown(event: KeyboardEvent): void {

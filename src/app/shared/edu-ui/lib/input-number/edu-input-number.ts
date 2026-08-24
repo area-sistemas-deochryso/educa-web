@@ -23,7 +23,7 @@ export interface EduInputNumberInputEvent {
 		},
 	],
 	template: `
-		<div class="edu-input-number" [class.edu-input-number--buttons]="showButtons()">
+		<div class="edu-input-number" [class.edu-input-number--buttons]="showButtons()" [style]="style()">
 			<input
 				class="edu-input-text edu-input-number__input"
 				type="text"
@@ -31,6 +31,7 @@ export interface EduInputNumberInputEvent {
 				[value]="text()"
 				[disabled]="disabled()"
 				[placeholder]="placeholder()"
+				[style]="inputStyle()"
 				(input)="handleInput($event)"
 				(blur)="handleBlur($event)"
 				(keydown.ArrowUp)="onArrowStep($event, 1)"
@@ -60,6 +61,8 @@ export class EduInputNumber implements ControlValueAccessor {
 	readonly showButtons = input(false);
 	readonly disabled = input(false);
 	readonly placeholder = input<string>();
+	readonly style = input<Record<string, string> | null>(null);
+	readonly inputStyle = input<Record<string, string> | null>(null);
 
 	/** Emits the raw (pre-clamp) value on every keystroke — mirrors PrimeNG's `(onInput)`, which fires before `(onBlur)` clamps to `min`/`max`. */
 	readonly onInput = output<EduInputNumberInputEvent>();

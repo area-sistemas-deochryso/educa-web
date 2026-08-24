@@ -35,6 +35,14 @@
 	}
 }
 
+.edu-file-upload--basic {
+	gap: 0;
+}
+
+.edu-file-upload__choose--basic {
+	padding: var(--eduui-form-field-padding-y) 0.75rem;
+}
+
 .edu-file-upload__files {
 	display: flex;
 	align-items: center;

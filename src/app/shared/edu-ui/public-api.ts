@@ -1,3 +1,7 @@
+// Vendored from educa-libs (packages/edu-ui/src) — commit 614fbaa (content 290803d),
+// 2026-08-24. Not published to a registry (P79 F6); source-of-truth stays in
+// educa-libs, re-sync manually on changes.
+//
 // F1 — Foundation + trivial components (CSS-only wrappers).
 // Design tokens: import 'dist/edu-ui/tokens.css' in the consuming app (F6).
 
@@ -64,6 +68,7 @@ export { EduAccordionHeader } from './lib/accordion/edu-accordion-header';
 export { EduTabs } from './lib/tabs/edu-tabs';
 export { EduTab } from './lib/tabs/edu-tab';
 export { EduTabPanel } from './lib/tabs/edu-tabpanel';
+export type { EduTabValue } from './lib/tabs/edu-tabs.service';
 
 export { EduStepper } from './lib/stepper/edu-stepper';
 export { EduStepList } from './lib/stepper/edu-step-list';
@@ -87,6 +92,7 @@ export type { EduPaginatorPageEvent } from './lib/paginator/edu-paginator';
 // F3a — Select, MultiSelect, AutoComplete, Popover (overlay anchored to trigger,
 // reuses EduOverlayHandle with a `flexibleConnectedTo` position strategy).
 export { EduSelect } from './lib/select/edu-select';
+export type { EduSelectFilterEvent } from './lib/select/edu-select';
 
 export { EduMultiSelect } from './lib/multi-select/edu-multi-select';
 export type { EduMultiSelectDisplay } from './lib/multi-select/edu-multi-select';
@@ -100,7 +106,7 @@ export { EduPopover } from './lib/popover/edu-popover';
 // <tr> per header/body/footer, which doesn't fit CdkTable's per-column cell model). Sort state
 // via eduSortableColumn + EduTableService; paginator reuses edu-paginator as-is.
 export { EduTable } from './lib/table/edu-table';
-export type { EduTableSortEvent, EduTableSortOrder } from './lib/table/edu-table';
+export type { EduTableSortEvent, EduTableSortOrder, EduTableLazyLoadEvent } from './lib/table/edu-table';
 
 export { EduSortableColumn } from './lib/table/edu-sortable-column';
 

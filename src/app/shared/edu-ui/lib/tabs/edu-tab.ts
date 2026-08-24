@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
-import { EduTabsService } from './edu-tabs.service';
+import { EduTabsService, type EduTabValue } from './edu-tabs.service';
 
 @Component({
 	selector: 'edu-tab',
@@ -21,7 +21,7 @@ import { EduTabsService } from './edu-tabs.service';
 	styleUrl: './edu-tab.scss',
 })
 export class EduTab {
-	readonly value = input.required<string>();
+	readonly value = input.required<EduTabValue>();
 	readonly disabled = input(false);
 
 	private readonly service = inject(EduTabsService);

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
 
 export type EduMessageSeverity = 'info' | 'success' | 'warn' | 'error' | 'secondary' | 'contrast';
 
@@ -7,10 +7,17 @@ export type EduMessageSeverity = 'info' | 'success' | 'warn' | 'error' | 'second
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
-		<div class="edu-message" [attr.data-severity]="severity()" role="alert">
-			{{ text() }}
-			<ng-content></ng-content>
-		</div>
+		@if (visible()) {
+			<div class="edu-message" [attr.data-severity]="severity()" role="alert">
+				{{ text() }}
+				<ng-content></ng-content>
+				@if (closable()) {
+					<button type="button" class="edu-message__close" (click)="close()" aria-label="Cerrar">
+						<i class="pi pi-times"></i>
+					</button>
+				}
+			</div>
+		}
 	`,
 	styles: `
 		.edu-message {
@@ -21,6 +28,24 @@ export type EduMessageSeverity = 'info' | 'success' | 'warn' | 'error' | 'second
 			border: 1px solid transparent;
 			border-radius: var(--eduui-content-border-radius);
 			font-size: 1rem;
+		}
+
+		.edu-message__close {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			margin-left: auto;
+			padding: 0.125rem;
+			border: none;
+			background: transparent;
+			color: inherit;
+			cursor: pointer;
+			border-radius: var(--eduui-content-border-radius);
+			opacity: 0.7;
+		}
+
+		.edu-message__close:hover {
+			opacity: 1;
 		}
 
 		.edu-message[data-severity='info'] { background: color-mix(in srgb, var(--eduui-sky-50), transparent 5%); border-color: var(--eduui-sky-200); color: var(--eduui-sky-600); }
@@ -43,4 +68,14 @@ export type EduMessageSeverity = 'info' | 'success' | 'warn' | 'error' | 'second
 export class EduMessage {
 	readonly text = input<string>();
 	readonly severity = input<EduMessageSeverity>('info');
+	readonly closable = input(false);
+	readonly onClose = output<void>();
+
+	/** Controla la visibilidad interna del mensaje; el cierre por click es la fuente de verdad por default. */
+	protected readonly visible = signal(true);
+
+	protected close(): void {
+		this.visible.set(false);
+		this.onClose.emit();
+	}
 }

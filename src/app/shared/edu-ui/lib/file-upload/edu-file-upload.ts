@@ -9,7 +9,7 @@ export interface EduFileUploadSelectEvent {
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
-		<div class="edu-file-upload">
+		<div class="edu-file-upload" [class.edu-file-upload--basic]="mode() === 'basic'">
 			<input
 				#nativeInput
 				type="file"
@@ -20,19 +20,31 @@ export interface EduFileUploadSelectEvent {
 				[disabled]="disabled()"
 				(change)="onNativeChange($event)"
 			/>
-			<button type="button" class="edu-file-upload__choose" [disabled]="disabled()" (click)="nativeInput.click()">
-				<i class="pi pi-upload"></i>
-				<span>{{ chooseLabel() }}</span>
-			</button>
-			@if (selectedFiles().length > 0) {
-				<div class="edu-file-upload__files">
-					@for (file of selectedFiles(); track file.name + file.size) {
-						<span class="edu-file-upload__file">{{ file.name }}</span>
-					}
-					<button type="button" class="edu-file-upload__clear" (click)="clear()" aria-label="Quitar archivo">
-						<i class="pi pi-times"></i>
-					</button>
-				</div>
+			@if (mode() === 'basic') {
+				<button
+					type="button"
+					class="edu-file-upload__choose edu-file-upload__choose--basic"
+					[disabled]="disabled()"
+					(click)="nativeInput.click()"
+				>
+					<i class="pi pi-upload"></i>
+					<span>{{ chooseLabel() }}</span>
+				</button>
+			} @else {
+				<button type="button" class="edu-file-upload__choose" [disabled]="disabled()" (click)="nativeInput.click()">
+					<i class="pi pi-upload"></i>
+					<span>{{ chooseLabel() }}</span>
+				</button>
+				@if (selectedFiles().length > 0) {
+					<div class="edu-file-upload__files">
+						@for (file of selectedFiles(); track file.name + file.size) {
+							<span class="edu-file-upload__file">{{ file.name }}</span>
+						}
+						<button type="button" class="edu-file-upload__clear" (click)="clear()" aria-label="Quitar archivo">
+							<i class="pi pi-times"></i>
+						</button>
+					</div>
+				}
 			}
 			@if (errorMessage()) {
 				<span class="edu-file-upload__error">{{ errorMessage() }}</span>
@@ -48,6 +60,9 @@ export class EduFileUpload {
 	readonly customUpload = input(false);
 	readonly chooseLabel = input('Elegir archivo');
 	readonly disabled = input(false);
+	/** Accepted for template-binding parity — el componente nunca tuvo botón de confirmación manual, así que ya sube automáticamente al seleccionar cuando `customUpload` está activo; este flag no cambia ese comportamiento. */
+	readonly auto = input(false);
+	readonly mode = input<'advanced' | 'basic'>('advanced');
 
 	readonly onSelect = output<EduFileUploadSelectEvent>();
 	readonly onClear = output<void>();

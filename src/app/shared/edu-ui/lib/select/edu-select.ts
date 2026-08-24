@@ -11,6 +11,7 @@ import {
 	forwardRef,
 	inject,
 	input,
+	output,
 	signal,
 	viewChild,
 } from '@angular/core';
@@ -18,6 +19,11 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { EduOverlayHandle } from '../overlay/edu-overlay-handle';
 import { filterOptionsByLabel, resolveOptionLabel, resolveOptionValue } from './select-option-utils';
 import { SelectListNav } from './select-list-nav';
+
+export interface EduSelectFilterEvent {
+	originalEvent: Event;
+	filter: string;
+}
 
 interface EduSelectGroup {
 	label: string;
@@ -44,9 +50,11 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 		<div
 			class="edu-select"
 			[class.edu-select--disabled]="disabled()"
+			[class.edu-select--loading]="loading()"
 			role="combobox"
 			aria-haspopup="listbox"
 			[attr.aria-expanded]="isOpen()"
+			[attr.aria-busy]="loading()"
 			[attr.tabindex]="disabled() ? -1 : 0"
 			(click)="toggle($event)"
 			(keydown)="onTriggerKeydown($event)"
@@ -54,12 +62,16 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 			<span class="edu-select__label" [class.edu-select__label--placeholder]="!hasValue()">
 				{{ selectedLabel() ?? placeholder() ?? '' }}
 			</span>
-			@if (showClear() && hasValue() && !disabled()) {
+			@if (showClear() && hasValue() && !disabled() && !loading()) {
 				<button type="button" class="edu-select__clear" tabindex="-1" (click)="clear($event)">
 					<i class="pi pi-times"></i>
 				</button>
 			}
-			<i class="edu-select__chevron pi pi-chevron-down"></i>
+			@if (loading()) {
+				<i class="edu-select__spinner pi pi-spinner pi-spin"></i>
+			} @else {
+				<i class="edu-select__chevron pi pi-chevron-down"></i>
+			}
 		</div>
 
 		<ng-template #overlayTemplate>
@@ -127,6 +139,9 @@ export class EduSelect implements ControlValueAccessor, OnDestroy {
 	readonly group = input(false);
 	readonly optionGroupLabel = input<string>();
 	readonly optionGroupChildren = input<string>();
+	readonly loading = input(false);
+
+	readonly onFilter = output<EduSelectFilterEvent>();
 
 	protected readonly value = signal<unknown>(null);
 	protected readonly query = signal('');
@@ -202,7 +217,7 @@ export class EduSelect implements ControlValueAccessor, OnDestroy {
 	}
 
 	protected toggle(event: Event): void {
-		if (this.disabled()) {
+		if (this.disabled() || this.loading()) {
 			return;
 		}
 		if (this.handle.isOpen) {
@@ -220,11 +235,16 @@ export class EduSelect implements ControlValueAccessor, OnDestroy {
 	}
 
 	protected onFilterInput(event: Event): void {
-		this.query.set((event.target as HTMLInputElement).value);
+		const filter = (event.target as HTMLInputElement).value;
+		this.query.set(filter);
 		this.nav.reset();
+		this.onFilter.emit({ originalEvent: event, filter });
 	}
 
 	protected onTriggerKeydown(event: KeyboardEvent): void {
+		if (this.loading()) {
+			return;
+		}
 		if (event.key === 'ArrowDown' || event.key === 'Enter' || event.key === ' ') {
 			event.preventDefault();
 			if (!this.handle.isOpen) {

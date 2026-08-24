@@ -29,9 +29,9 @@ export interface EduAutoCompleteCompleteEvent {
 	query: string;
 }
 
-export interface EduAutoCompleteSelectEvent {
+export interface EduAutoCompleteSelectEvent<T = unknown> {
 	originalEvent: Event;
-	value: unknown;
+	value: T;
 }
 
 const PANEL_POSITIONS: ConnectedPosition[] = [
@@ -110,8 +110,8 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 	`,
 	styleUrl: './edu-autocomplete.scss',
 })
-export class EduAutoComplete implements ControlValueAccessor, OnDestroy {
-	readonly suggestions = input<unknown[]>([]);
+export class EduAutoComplete<T = unknown> implements ControlValueAccessor, OnDestroy {
+	readonly suggestions = input<T[]>([]);
 	readonly optionLabel = input<string>();
 	readonly optionValue = input<string>();
 	readonly placeholder = input<string>();
@@ -130,12 +130,12 @@ export class EduAutoComplete implements ControlValueAccessor, OnDestroy {
 	readonly pt = input<EduPassThrough>();
 
 	readonly completeMethod = output<EduAutoCompleteCompleteEvent>();
-	readonly onSelect = output<EduAutoCompleteSelectEvent>();
+	readonly onSelect = output<EduAutoCompleteSelectEvent<T>>();
 	readonly onShow = output<void>();
 	readonly onHide = output<void>();
 
 	protected readonly query = signal('');
-	private value: unknown = null;
+	private value: T | null = null;
 	private delayTimer: ReturnType<typeof setTimeout> | null = null;
 
 	private readonly itemTemplateRef = contentChild<TemplateRef<unknown>>('item');
@@ -166,9 +166,9 @@ export class EduAutoComplete implements ControlValueAccessor, OnDestroy {
 		if (this.delayTimer) clearTimeout(this.delayTimer);
 	}
 
-	writeValue(value: unknown): void {
+	writeValue(value: T | null): void {
 		this.value = value ?? null;
-		const found = this.suggestions().find((opt) => resolveOptionValue(opt, this.optionValue()) === this.value);
+		const found = this.suggestions().find((opt) => resolveOptionValue(opt, this.optionValue()) === (this.value as unknown));
 		this.query.set(found ? this.resolveLabel(found) : this.value === null ? '' : String(this.value));
 	}
 
@@ -190,7 +190,7 @@ export class EduAutoComplete implements ControlValueAccessor, OnDestroy {
 		this.nav.reset();
 
 		if (!this.forceSelection()) {
-			this.value = raw;
+			this.value = raw as unknown as T;
 			this.onChange(raw);
 		}
 
@@ -262,7 +262,7 @@ export class EduAutoComplete implements ControlValueAccessor, OnDestroy {
 		}
 	}
 
-	protected onOptionMousedown(event: Event, opt: unknown): void {
+	protected onOptionMousedown(event: Event, opt: T): void {
 		event.preventDefault();
 		this.selectOption(opt, event);
 	}
@@ -271,8 +271,8 @@ export class EduAutoComplete implements ControlValueAccessor, OnDestroy {
 		return this.suggestions().some((opt) => this.resolveLabel(opt) === this.query());
 	}
 
-	private selectOption(opt: unknown, originalEvent: Event): void {
-		const optValue = resolveOptionValue(opt, this.optionValue());
+	private selectOption(opt: T, originalEvent: Event): void {
+		const optValue = resolveOptionValue(opt, this.optionValue()) as T;
 		this.value = optValue;
 		this.query.set(this.resolveLabel(opt));
 		this.onChange(optValue);

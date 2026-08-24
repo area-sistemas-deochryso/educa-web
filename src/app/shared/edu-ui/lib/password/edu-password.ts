@@ -38,7 +38,7 @@ function scoreStrength(value: string): EduPasswordStrength {
 		},
 	],
 	template: `
-		<div class="edu-password">
+		<div class="edu-password" [class.edu-password--fluid]="fluid()" [style]="style()">
 			<input
 				class="edu-input-text edu-password__input"
 				[class.edu-password__input--mask]="toggleMask()"
@@ -46,6 +46,7 @@ function scoreStrength(value: string): EduPasswordStrength {
 				[value]="value()"
 				[disabled]="disabled()"
 				[placeholder]="placeholder()"
+				[style]="inputStyle()"
 				(input)="onInput($event)"
 				(focus)="onFocus()"
 				(blur)="onBlur()"
@@ -70,6 +71,9 @@ export class EduPassword implements ControlValueAccessor {
 	readonly feedback = input(false);
 	readonly disabled = input(false);
 	readonly placeholder = input<string>();
+	readonly fluid = input(false);
+	readonly style = input<Record<string, string> | null>(null);
+	readonly inputStyle = input<Record<string, string> | null>(null);
 
 	protected readonly value = signal('');
 	protected readonly masked = signal(true);

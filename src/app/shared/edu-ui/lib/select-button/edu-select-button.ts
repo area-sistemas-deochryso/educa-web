@@ -1,9 +1,11 @@
 import { ChangeDetectionStrategy, Component, forwardRef, input, signal } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { EduPassThrough, EduPtRoot } from '../passthrough/edu-pt-root';
 
 @Component({
 	selector: 'edu-select-button',
 	standalone: true,
+	imports: [EduPtRoot],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	providers: [
 		{
@@ -13,7 +15,12 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 		},
 	],
 	template: `
-		<div class="edu-select-button" role="group" [class.edu-select-button--disabled]="disabled()">
+		<div
+			class="edu-select-button"
+			role="group"
+			[eduPtRoot]="pt()?.root"
+			[class.edu-select-button--disabled]="disabled()"
+		>
 			@for (opt of options(); track $index) {
 				<button
 					type="button"
@@ -35,6 +42,7 @@ export class EduSelectButton implements ControlValueAccessor {
 	readonly optionValue = input<string>();
 	readonly allowEmpty = input(true);
 	readonly disabled = input(false);
+	readonly pt = input<EduPassThrough>();
 
 	protected readonly value = signal<unknown>(null);
 

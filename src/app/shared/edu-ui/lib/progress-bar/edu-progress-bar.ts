@@ -12,8 +12,9 @@ export type EduProgressBarMode = 'determinate' | 'indeterminate';
 				class="edu-progress-bar__value"
 				[class.edu-progress-bar__value--indeterminate]="mode() === 'indeterminate'"
 				[style.width]="mode() === 'determinate' ? valueWidth() : null"
+				[style.background]="color() ?? null"
 			>
-				@if (mode() === 'determinate' && value() > 0) {
+				@if (mode() === 'determinate' && showValue() && value() > 0) {
 					<span class="edu-progress-bar__label">{{ value() }}%</span>
 				}
 			</div>
@@ -24,6 +25,8 @@ export type EduProgressBarMode = 'determinate' | 'indeterminate';
 export class EduProgressBar {
 	readonly value = input(0);
 	readonly mode = input<EduProgressBarMode>('determinate');
+	readonly showValue = input(true);
+	readonly color = input<string>();
 
 	protected readonly valueWidth = computed(() => `${this.value()}%`);
 }

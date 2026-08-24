@@ -15,12 +15,24 @@ export type EduTooltipPosition = 'top' | 'bottom' | 'left' | 'right';
 export class EduTooltip implements OnDestroy {
 	readonly eduTooltip = input<string>('');
 	readonly eduTooltipPosition = input<EduTooltipPosition>('top');
+	/**
+	 * No-op kept for API compatibility with other tooltip implementations.
+	 * This directive already renders its panel by appending directly to
+	 * `document.body` (see `show()`), so it is always "body-level" —
+	 * there is no local `ViewContainerRef`/overlay container to redirect.
+	 */
+	readonly appendTo = input<'body' | string>();
+	readonly tooltipDisabled = input(false);
 
 	private readonly host = inject(ElementRef<HTMLElement>);
 	private readonly renderer = inject(Renderer2);
 	private tooltipEl: HTMLElement | null = null;
 
 	show(): void {
+		if (this.tooltipDisabled()) {
+			return;
+		}
+
 		const text = this.eduTooltip();
 		if (!text || this.tooltipEl) {
 			return;

@@ -17,6 +17,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 			type="button"
 			role="switch"
 			class="edu-toggle"
+			[attr.id]="inputId()"
 			[attr.aria-checked]="checked()"
 			[class.edu-toggle--checked]="checked()"
 			[disabled]="disabled()"
@@ -29,6 +30,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 })
 export class EduToggle implements ControlValueAccessor {
 	readonly disabled = input(false);
+	readonly inputId = input<string>();
 
 	protected readonly checked = signal(false);
 

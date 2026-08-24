@@ -27,6 +27,7 @@ const POPUP_POSITIONS: ConnectedPosition[] = [
 })
 export class EduPopover implements OnDestroy {
 	readonly appendTo = input<'body'>('body');
+	readonly styleClass = input<string>();
 
 	readonly onShow = output<void>();
 	readonly onHide = output<void>();
@@ -70,7 +71,7 @@ export class EduPopover implements OnDestroy {
 			portal,
 			{
 				positionStrategy,
-				panelClass: 'edu-popover-pane',
+				panelClass: ['edu-popover-pane', this.styleClass()].filter(Boolean).join(' '),
 				hasBackdrop: true,
 				backdropClass: 'cdk-overlay-transparent-backdrop',
 				closeOnBackdropClick: true,

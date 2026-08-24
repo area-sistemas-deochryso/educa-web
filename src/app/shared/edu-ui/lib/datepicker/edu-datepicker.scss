@@ -52,6 +52,25 @@
 	color: var(--eduui-text-muted-color);
 }
 
+.edu-datepicker__clear {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: 0 0 auto;
+	width: 1.25rem;
+	height: 1.25rem;
+	padding: 0;
+	background: none;
+	border: none;
+	border-radius: var(--eduui-radius-sm);
+	color: var(--eduui-text-muted-color);
+	cursor: pointer;
+
+	&:hover {
+		color: var(--eduui-text-color);
+	}
+}
+
 .edu-datepicker-panel {
 	display: flex;
 	flex-direction: column;

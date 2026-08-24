@@ -13,6 +13,23 @@ export interface EduTableSortEvent {
 	order: EduTableSortOrder;
 }
 
+export interface EduTableLazyLoadEvent {
+	first: number;
+	rows: number;
+	sortField?: string | null;
+	sortOrder?: EduTableSortOrder;
+}
+
+/** PrimeNG-style numeric sort order, accepted on the `sortOrder` input for migration parity. */
+type EduTableSortOrderInput = EduTableSortOrder | -1 | 0 | 1;
+
+function normalizeSortOrder(value: EduTableSortOrderInput): EduTableSortOrder {
+	if (value === 1) return 'asc';
+	if (value === -1) return 'desc';
+	if (value === 0) return null;
+	return value;
+}
+
 /**
  * Semantic `<table>` (not CdkTable's column-def API — real usage projects a full `<tr>` per
  * header/body/footer, not per-column cells, which CdkTable's model doesn't support without
@@ -70,7 +87,7 @@ export interface EduTableSortEvent {
 				[rowsPerPageOptions]="rowsPerPageOptions()"
 				[showCurrentPageReport]="showCurrentPageReport()"
 				[currentPageReportTemplate]="currentPageReportTemplate()"
-				(onPageChange)="onPageChange.emit($event)"
+				(onPageChange)="handlePageChange($event)"
 			></edu-paginator>
 		}
 	`,
@@ -97,9 +114,11 @@ export class EduTable<T = unknown> {
 	readonly showCurrentPageReport = input(false);
 	readonly currentPageReportTemplate = input('{first} - {last} de {totalRecords}');
 	readonly onPageChange = output<EduPaginatorPageEvent>();
+	readonly onLazyLoad = output<EduTableLazyLoadEvent>();
 
 	readonly sortField = input<string | null>(null);
-	readonly sortOrder = input<EduTableSortOrder>(null);
+	/** Accepts edu-table's own `'asc'|'desc'|null` or PrimeNG's numeric `-1|0|1` (normalized internally). */
+	readonly sortOrder = input<EduTableSortOrderInput>(null);
 	readonly sortChange = output<EduTableSortEvent>();
 
 	private readonly service = inject(EduTableService);
@@ -113,12 +132,32 @@ export class EduTable<T = unknown> {
 	protected readonly bodyTemplate = computed(() => this.bodyRef() ?? this.legacyTemplate('body'));
 	protected readonly footerTemplate = computed(() => this.footerRef() ?? this.legacyTemplate('footer'));
 
+	private readonly normalizedSortOrder = computed(() => normalizeSortOrder(this.sortOrder()));
+
 	constructor() {
 		effect(() => {
 			this.service.sortField.set(this.sortField());
-			this.service.sortOrder.set(this.sortOrder());
+			this.service.sortOrder.set(this.normalizedSortOrder());
 		});
-		this.service.sortChange.subscribe((event) => this.sortChange.emit(event));
+		this.service.sortChange.subscribe((event) => {
+			this.sortChange.emit(event);
+			this.onLazyLoad.emit({
+				first: this.first(),
+				rows: this.rows(),
+				sortField: event.field,
+				sortOrder: event.order,
+			});
+		});
+	}
+
+	protected handlePageChange(event: EduPaginatorPageEvent): void {
+		this.onPageChange.emit(event);
+		this.onLazyLoad.emit({
+			first: event.first,
+			rows: event.rows,
+			sortField: this.sortField(),
+			sortOrder: this.normalizedSortOrder(),
+		});
 	}
 
 	protected trackByFn = (row: T, index: number): unknown => {
