@@ -28,6 +28,8 @@
       "@data": ["./src/app/data"],
       "@data/*": ["./src/app/data/*"],
       "@test": ["./src/test-setup"],
+      "@edu-ui": ["./src/app/shared/edu-ui/public-api"],
+      "@edu-ui/*": ["./src/app/shared/edu-ui/*"],
       "@intranet-shared": ["./src/app/features/intranet/shared"],
       "@intranet-shared/*": ["./src/app/features/intranet/shared/*"]
     }

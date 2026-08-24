@@ -1,0 +1,78 @@
+.edu-file-upload {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.edu-file-upload__choose {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	border: 1px solid var(--eduui-surface-100);
+	border-radius: var(--eduui-form-field-border-radius);
+	padding: var(--eduui-form-field-padding-y) var(--eduui-form-field-padding-x);
+	background: var(--eduui-surface-100);
+	color: var(--eduui-surface-600);
+	font-size: 1rem;
+	font-weight: 500;
+	cursor: pointer;
+	transition: background var(--eduui-form-field-transition-duration);
+
+	&:hover:not(:disabled) {
+		background: var(--eduui-surface-200);
+		border-color: var(--eduui-surface-200);
+	}
+
+	&:disabled {
+		opacity: 0.6;
+		cursor: default;
+	}
+
+	&:focus-visible {
+		outline: var(--eduui-focus-ring-width) var(--eduui-focus-ring-style) var(--eduui-focus-ring-color);
+		outline-offset: var(--eduui-focus-ring-offset);
+	}
+}
+
+.edu-file-upload__files {
+	display: flex;
+	align-items: center;
+	gap: 0.375rem;
+	color: var(--eduui-text-color);
+	font-size: 0.875rem;
+}
+
+.edu-file-upload__file {
+	max-width: 14rem;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.edu-file-upload__clear {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	background: none;
+	border: none;
+	color: var(--eduui-text-muted-color);
+	cursor: pointer;
+}
+
+.edu-file-upload__error {
+	flex-basis: 100%;
+	color: var(--eduui-form-field-invalid-border-color);
+	font-size: 0.75rem;
+}
+
+:host-context(.dark-mode) .edu-file-upload__choose {
+	background: var(--eduui-surface-800);
+	border-color: var(--eduui-surface-800);
+	color: var(--eduui-surface-300);
+
+	&:hover:not(:disabled) {
+		background: var(--eduui-surface-700);
+		border-color: var(--eduui-surface-700);
+	}
+}

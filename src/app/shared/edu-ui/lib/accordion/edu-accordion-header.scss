@@ -1,0 +1,41 @@
+.edu-accordion-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.75rem;
+	width: 100%;
+	padding: 0.75rem 1rem;
+	background: transparent;
+	color: var(--eduui-content-color);
+	border: none;
+	font: inherit;
+	text-align: left;
+	cursor: pointer;
+
+	&:hover {
+		background: var(--eduui-surface-100);
+	}
+
+	&:focus-visible {
+		outline: var(--eduui-focus-ring-width) var(--eduui-focus-ring-style) var(--eduui-focus-ring-color);
+		outline-offset: var(--eduui-focus-ring-offset);
+	}
+}
+
+.edu-accordion-header__icon {
+	flex-shrink: 0;
+	width: 0.5rem;
+	height: 0.5rem;
+	border-right: 2px solid var(--eduui-text-muted-color);
+	border-bottom: 2px solid var(--eduui-text-muted-color);
+	transform: rotate(45deg);
+	transition: transform 0.15s ease;
+
+	&--expanded {
+		transform: rotate(-135deg);
+	}
+}
+
+:host-context(.dark-mode) .edu-accordion-header:hover {
+	background: var(--eduui-surface-800);
+}

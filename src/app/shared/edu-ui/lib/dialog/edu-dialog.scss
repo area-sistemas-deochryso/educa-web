@@ -1,0 +1,72 @@
+.edu-dialog-panel {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	min-width: 20rem;
+	max-width: 90vw;
+	max-height: 90vh;
+	background: var(--eduui-content-background);
+	color: var(--eduui-content-color);
+	border-radius: var(--eduui-content-border-radius);
+	box-shadow: var(--eduui-overlay-modal-shadow);
+	overflow: hidden;
+}
+
+.edu-dialog-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	padding: 1rem 1.5rem;
+	border-bottom: 1px solid var(--eduui-content-border-color);
+
+	&--draggable {
+		cursor: move;
+	}
+
+	&__title {
+		font-size: 1.125rem;
+		font-weight: 600;
+	}
+
+	&__close {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+		width: 2rem;
+		height: 2rem;
+		border: none;
+		border-radius: var(--eduui-radius-md);
+		background: transparent;
+		color: var(--eduui-text-muted-color);
+		cursor: pointer;
+
+		&:hover {
+			background: var(--eduui-surface-100);
+		}
+
+		&:focus-visible {
+			outline: var(--eduui-focus-ring-width) var(--eduui-focus-ring-style) var(--eduui-focus-ring-color);
+			outline-offset: var(--eduui-focus-ring-offset);
+		}
+	}
+}
+
+.edu-dialog-body {
+	padding: 1.5rem;
+	overflow: auto;
+}
+
+.edu-dialog-resize-handle {
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	width: 1rem;
+	height: 1rem;
+	cursor: nwse-resize;
+}
+
+:host-context(.dark-mode) .edu-dialog-header__close:hover {
+	background: var(--eduui-surface-800);
+}

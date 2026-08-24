@@ -1,0 +1,62 @@
+.edu-paginator {
+	display: flex;
+	align-items: center;
+	gap: 0.25rem;
+	flex-wrap: wrap;
+
+	&__report {
+		margin-right: 0.5rem;
+		font-size: 0.875rem;
+		color: var(--eduui-text-muted-color);
+	}
+
+	&__nav,
+	&__page {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 2rem;
+		height: 2rem;
+		border: none;
+		border-radius: var(--eduui-radius-sm);
+		background: transparent;
+		color: var(--eduui-text-color);
+		font-size: 0.875rem;
+		cursor: pointer;
+		transition: background var(--eduui-form-field-transition-duration), color var(--eduui-form-field-transition-duration);
+
+		&:not(:disabled):hover {
+			background: var(--eduui-surface-100);
+		}
+
+		&:disabled {
+			opacity: 0.5;
+			cursor: default;
+		}
+
+		&:focus-visible {
+			outline: var(--eduui-focus-ring-width) var(--eduui-focus-ring-style) var(--eduui-focus-ring-color);
+			outline-offset: var(--eduui-focus-ring-offset);
+		}
+	}
+
+	&__page--active {
+		background: var(--eduui-primary-color);
+		color: var(--eduui-primary-contrast-color);
+
+		&:not(:disabled):hover {
+			background: var(--eduui-primary-hover-color);
+		}
+	}
+
+	&__rows {
+		margin-left: 0.5rem;
+		height: 2rem;
+		border: 1px solid var(--eduui-form-field-border-color);
+		border-radius: var(--eduui-form-field-border-radius);
+		background: var(--eduui-form-field-background);
+		color: var(--eduui-form-field-color);
+		padding: 0 0.5rem;
+		font-size: 0.875rem;
+	}
+}
