@@ -24,7 +24,7 @@ async function login(page: Page): Promise<void> {
 	await page.getByPlaceholder('DNI').fill(ADMIN_DNI!);
 	await page.getByPlaceholder('Contraseña').fill(ADMIN_PASSWORD!);
 
-	await page.locator('app-login-role-selector p-select').click();
+	await page.locator('app-login-role-selector edu-select').click();
 	await page.getByRole('option', { name: 'Administrador' }).click();
 
 	await page.getByRole('button', { name: /Iniciar sesión|Ingresar/i }).click();
@@ -38,13 +38,13 @@ async function crearSalon(page: Page): Promise<void> {
 	await expect(dialog).toBeVisible();
 
 	await dialog.locator('#nuevoSalonGrado').click();
-	await page.locator('.p-select-overlay .p-select-option').first().click();
+	await page.locator('.edu-select-panel .edu-select-panel__option').first().click();
 
 	await dialog.locator('#nuevoSalonSeccion').click();
-	await page.locator('.p-select-overlay .p-select-option').first().click();
+	await page.locator('.edu-select-panel .edu-select-panel__option').first().click();
 
 	await dialog.locator('#nuevoSalonSede').click();
-	await page.locator('.p-select-overlay .p-select-option').first().click();
+	await page.locator('.edu-select-panel .edu-select-panel__option').first().click();
 
 	await dialog.locator('#nuevoSalonAnio input').fill(String(ANIO_TEST));
 
