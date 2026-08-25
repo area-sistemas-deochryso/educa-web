@@ -1,7 +1,5 @@
 import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ButtonModule } from 'primeng/button';
-
 import {
 	HealthExitPermissionDto,
 	HealthJustificationDto,
@@ -13,38 +11,39 @@ import { HealthExitListComponent } from './components/health-exit-list.component
 import { HealthJustificationListComponent } from './components/health-justification-list.component';
 import { HealthExitDialogComponent } from './components/health-exit-dialog.component';
 import { HealthJustificationDialogComponent } from './components/health-justification-dialog.component';
-import { EduConfirmDialog, EduConfirmationService, EduTooltip } from '@edu-ui';
+import { EduButton, EduConfirmDialog, EduConfirmationService, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-salon-health-permissions-tab',
 	standalone: true,
-	imports: [CommonModule, ButtonModule, EduTooltip, EduConfirmDialog, HealthExitListComponent, HealthJustificationListComponent, HealthExitDialogComponent, HealthJustificationDialogComponent],
+	imports: [CommonModule, EduButton, EduTooltip, EduConfirmDialog, HealthExitListComponent, HealthJustificationListComponent, HealthExitDialogComponent, HealthJustificationDialogComponent],
 	providers: [EduConfirmationService],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
 		<!-- #region Header + Acciones -->
 		<div class="health-tab-header">
 			<div class="health-tab-actions">
-				<button
-					pButton
+				<edu-button
 					label="Permiso de Salida"
 					icon="pi pi-sign-out"
-					class="p-button-outlined p-button-sm"
+					[outlined]="true"
+					size="small"
 					data-info-anchor="profesor-health-abrir-permiso-salida"
 					(click)="openExitDialog.emit()"
 					eduTooltip="Emitir permiso de salida por salud (solo hoy)"
 					eduTooltipPosition="top"
-				></button>
-				<button
-					pButton
+				/>
+				<edu-button
 					label="Justificación Médica"
 					icon="pi pi-file-plus"
-					class="p-button-outlined p-button-sm p-button-secondary"
+					[outlined]="true"
+					size="small"
+					severity="secondary"
 					data-info-anchor="profesor-health-abrir-justificacion"
 					(click)="openJustificationDialog.emit()"
 					eduTooltip="Justificar faltas con documento médico"
 					eduTooltipPosition="top"
-				></button>
+				/>
 			</div>
 		</div>
 		<!-- #endregion -->

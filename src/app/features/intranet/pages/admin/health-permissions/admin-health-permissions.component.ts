@@ -1,8 +1,6 @@
 import { Component, ChangeDetectionStrategy, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
-
 import { PageHeaderComponent, PickerGridComponent } from '@intranet-shared/components';
 
 import { AdminHealthPermissionsFacade } from './services/admin-health-permissions.facade';
@@ -10,12 +8,12 @@ import { AdminHealthPermissionsFacade } from './services/admin-health-permission
 import { CreateHealthExitRequest } from '@features/intranet/pages/profesor/models';
 // eslint-disable-next-line layer-enforcement/imports-error -- Razón: tab compartido entre admin (supervisión) y profesor (gestión); migración a @intranet-shared diferida.
 import { SalonHealthPermissionsTabComponent } from '@features/intranet/pages/profesor/classrooms/components/salon-health-permissions-tab/salon-health-permissions-tab.component';
-import { EduSpinner } from '@edu-ui';
+import { EduButton, EduSpinner } from '@edu-ui';
 
 @Component({
 	selector: 'app-admin-health-permissions',
 	standalone: true,
-	imports: [CommonModule, FormsModule, ButtonModule, EduSpinner, PageHeaderComponent, PickerGridComponent, SalonHealthPermissionsTabComponent],
+	imports: [CommonModule, FormsModule, EduButton, EduSpinner, PageHeaderComponent, PickerGridComponent, SalonHealthPermissionsTabComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
 		<app-page-header icon="pi pi-heart" title="Permisos de Salud" subtitle="Administra los permisos de salud registrados por estudiante" />
@@ -47,14 +45,15 @@ import { EduSpinner } from '@edu-ui';
 				<div class="empty-state empty-state--error">
 					<i class="pi pi-exclamation-triangle text-3xl mb-2"></i>
 					<p>No se pudo cargar la información de este salón</p>
-					<button
-						pButton
+					<edu-button
 						label="Reintentar"
 						icon="pi pi-refresh"
-						class="p-button-outlined p-button-sm mt-2"
+						[outlined]="true"
+						size="small"
+						class="mt-2"
 						data-info-anchor="reintentar"
 						(click)="facade.loadResumen(vm().selectedSalonId!)"
-					></button>
+					/>
 				</div>
 			} @else {
 				<app-salon-health-permissions-tab

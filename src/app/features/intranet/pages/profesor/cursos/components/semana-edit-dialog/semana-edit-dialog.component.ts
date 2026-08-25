@@ -2,16 +2,15 @@
 import { Component, ChangeDetectionStrategy, input, output, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
 import { CursoContenidoSemanaDto, ActualizarSemanaRequest } from '@features/intranet/pages/profesor/models';
-import { EduDialog, EduInputText, EduTextarea } from '@edu-ui';
+import { EduButton, EduDialog, EduInputText, EduTextarea } from '@edu-ui';
 
 // #endregion
 // #region Implementation
 @Component({
 	selector: 'app-semana-edit-dialog',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduDialog, ButtonModule, EduInputText, EduTextarea],
+	imports: [CommonModule, FormsModule, EduDialog, EduButton, EduInputText, EduTextarea],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
 		<edu-dialog
@@ -74,15 +73,14 @@ import { EduDialog, EduInputText, EduTextarea } from '@edu-ui';
 
 			<ng-template #footer>
 				<div class="flex justify-content-end gap-2">
-					<button pButton label="Cancelar" class="p-button-text" data-info-anchor="profesor-semana-edit-cancelar" (click)="onCancel()"></button>
-					<button
-						pButton
+					<edu-button label="Cancelar" [text]="true" data-info-anchor="profesor-semana-edit-cancelar" (click)="onCancel()" />
+					<edu-button
 						label="Guardar"
 						icon="pi pi-check"
 						data-info-anchor="profesor-semana-edit-guardar"
 						(click)="onSave()"
 						[loading]="saving()"
-					></button>
+					/>
 				</div>
 			</ng-template>
 		</edu-dialog>

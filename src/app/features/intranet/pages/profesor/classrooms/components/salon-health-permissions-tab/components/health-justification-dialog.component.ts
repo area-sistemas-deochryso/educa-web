@@ -1,16 +1,15 @@
 import { Component, ChangeDetectionStrategy, input, output, signal, computed, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
 import { StudentForHealthDto, DateValidationResult } from '@features/intranet/pages/profesor/models';
-import { EduDatePicker, EduDialog, EduFileUpload, EduSelect, EduTag, EduTextarea } from '@edu-ui';
+import { EduButton, EduDatePicker, EduDialog, EduFileUpload, EduSelect, EduTag, EduTextarea } from '@edu-ui';
 
 @Component({
 	selector: 'app-health-justification-dialog',
 	standalone: true,
 	imports: [
 		CommonModule, FormsModule, EduDialog, EduSelect, EduDatePicker,
-		EduFileUpload, EduTextarea, ButtonModule, EduTag],
+		EduFileUpload, EduTextarea, EduButton, EduTag],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
 		<edu-dialog
@@ -102,22 +101,20 @@ import { EduDatePicker, EduDialog, EduFileUpload, EduSelect, EduTag, EduTextarea
 			</div>
 
 			<ng-template #footer>
-				<button
-					pButton
+				<edu-button
 					label="Cancelar"
-					class="p-button-text"
+					[text]="true"
 					data-info-anchor="profesor-health-justificacion-cancelar"
 					(click)="onVisibleChange(false)"
-				></button>
-				<button
-					pButton
+				/>
+				<edu-button
 					label="Registrar Justificación"
 					icon="pi pi-check"
 					data-info-anchor="profesor-health-justificacion-guardar"
 					[disabled]="!canSave() || saving()"
 					[loading]="saving()"
 					(click)="onSave()"
-				></button>
+				/>
 			</ng-template>
 		</edu-dialog>
 	`,

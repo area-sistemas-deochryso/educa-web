@@ -3,15 +3,14 @@ import { Component, ChangeDetectionStrategy, input, output } from '@angular/core
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { ButtonModule } from 'primeng/button';
-import { EduDialog, EduInputNumber } from '@edu-ui';
+import { EduButton, EduDialog, EduInputNumber } from '@edu-ui';
 
 // #endregion
 // #region Implementation
 @Component({
 	selector: 'app-curso-builder-dialog',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduDialog, ButtonModule, EduInputNumber],
+	imports: [CommonModule, FormsModule, EduDialog, EduButton, EduInputNumber],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
 		<edu-dialog
@@ -57,16 +56,15 @@ import { EduDialog, EduInputNumber } from '@edu-ui';
 
 			<ng-template #footer>
 				<div class="flex justify-content-end gap-2 pt-2">
-					<button pButton label="Cancelar" class="p-button-text" data-info-anchor="profesor-curso-builder-cancelar" (click)="onCancel()"></button>
-					<button
-						pButton
+					<edu-button label="Cancelar" [text]="true" data-info-anchor="profesor-curso-builder-cancelar" (click)="onCancel()" />
+					<edu-button
 						label="Crear contenido"
 						icon="pi pi-check"
 						data-info-anchor="profesor-curso-builder-crear"
 						(click)="onCreate()"
 						[loading]="saving()"
 						[disabled]="!numeroSemanas"
-					></button>
+					/>
 				</div>
 			</ng-template>
 		</edu-dialog>

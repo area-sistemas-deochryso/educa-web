@@ -2,10 +2,9 @@
 import { Component, ChangeDetectionStrategy, input, output, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
 import { toLocalIso } from '@core/helpers';
 import { CursoContenidoTareaDto, CrearTareaRequest, ActualizarTareaRequest } from '@features/intranet/pages/profesor/models';
-import { EduDatePicker, EduDialog, EduInputText, EduTextarea, EduToggle } from '@edu-ui';
+import { EduButton, EduDatePicker, EduDialog, EduInputText, EduTextarea, EduToggle } from '@edu-ui';
 
 // #endregion
 // #region Implementation
@@ -16,7 +15,7 @@ import { EduDatePicker, EduDialog, EduInputText, EduTextarea, EduToggle } from '
 		CommonModule,
 		FormsModule,
 		EduDialog,
-		ButtonModule,
+		EduButton,
 		EduInputText,
 		EduTextarea,
 		EduDatePicker,
@@ -105,16 +104,15 @@ import { EduDatePicker, EduDialog, EduInputText, EduTextarea, EduToggle } from '
 
 			<ng-template #footer>
 				<div class="dialog-footer">
-					<button pButton label="Cancelar" class="p-button-text" data-info-anchor="profesor-tarea-dialog-cancelar" (click)="onCancel()"></button>
-					<button
-						pButton
+					<edu-button label="Cancelar" [text]="true" data-info-anchor="profesor-tarea-dialog-cancelar" (click)="onCancel()" />
+					<edu-button
 						[label]="tarea() ? 'Guardar' : 'Crear'"
 						icon="pi pi-check"
 						data-info-anchor="profesor-tarea-dialog-guardar"
 						(click)="onSave()"
 						[loading]="saving()"
 						[disabled]="!titulo.trim()"
-					></button>
+					/>
 				</div>
 			</ng-template>
 		</edu-dialog>

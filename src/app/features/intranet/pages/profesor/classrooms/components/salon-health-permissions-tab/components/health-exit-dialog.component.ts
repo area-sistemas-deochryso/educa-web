@@ -2,15 +2,13 @@ import { Component, ChangeDetectionStrategy, input, output, signal, OnChanges } 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { ButtonModule } from 'primeng/button';
-
 import { StudentForHealthDto, SymptomDto } from '@features/intranet/pages/profesor/models';
-import { EduDialog, EduMultiSelect, EduSelect, EduTextarea } from '@edu-ui';
+import { EduButton, EduDialog, EduMultiSelect, EduSelect, EduTextarea } from '@edu-ui';
 
 @Component({
 	selector: 'app-health-exit-dialog',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduDialog, EduSelect, EduMultiSelect, EduTextarea, ButtonModule],
+	imports: [CommonModule, FormsModule, EduDialog, EduSelect, EduMultiSelect, EduTextarea, EduButton],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
 		<edu-dialog
@@ -78,22 +76,20 @@ import { EduDialog, EduMultiSelect, EduSelect, EduTextarea } from '@edu-ui';
 			</div>
 
 			<ng-template #footer>
-				<button
-					pButton
+				<edu-button
 					label="Cancelar"
-					class="p-button-text"
+					[text]="true"
 					data-info-anchor="profesor-health-exit-cancelar"
 					(click)="onVisibleChange(false)"
-				></button>
-				<button
-					pButton
+				/>
+				<edu-button
 					label="Emitir Permiso"
 					icon="pi pi-check"
 					data-info-anchor="profesor-health-exit-guardar"
 					[disabled]="!canSave() || saving()"
 					[loading]="saving()"
 					(click)="onSave()"
-				></button>
+				/>
 			</ng-template>
 		</edu-dialog>
 	`,

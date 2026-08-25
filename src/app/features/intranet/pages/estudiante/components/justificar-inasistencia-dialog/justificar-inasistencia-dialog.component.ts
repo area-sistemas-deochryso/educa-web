@@ -1,9 +1,8 @@
 import { Component, ChangeDetectionStrategy, input, output, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
 import { JustificarInasistenciaContext } from '@features/intranet/pages/estudiante/models';
-import { EduDialog, EduFileUpload, EduMessage, EduTextarea } from '@edu-ui';
+import { EduButton, EduDialog, EduFileUpload, EduMessage, EduTextarea } from '@edu-ui';
 
 const MAX_FILE_SIZE = 10485760;
 const ACCEPTED_TYPES = '.pdf,.jpg,.jpeg,.png,.webp';
@@ -11,7 +10,7 @@ const ACCEPTED_TYPES = '.pdf,.jpg,.jpeg,.png,.webp';
 @Component({
 	selector: 'app-justificar-inasistencia-dialog',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduDialog, EduFileUpload, EduTextarea, ButtonModule, EduMessage],
+	imports: [CommonModule, FormsModule, EduDialog, EduFileUpload, EduTextarea, EduButton, EduMessage],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
 		<edu-dialog
@@ -63,22 +62,20 @@ const ACCEPTED_TYPES = '.pdf,.jpg,.jpeg,.png,.webp';
 			}
 
 			<ng-template #footer>
-				<button
-					pButton
+				<edu-button
 					label="Cancelar"
-					class="p-button-text"
+					[text]="true"
 					data-info-anchor="estudiante-justificar-inasistencia-cancelar"
 					(click)="onVisibleChange(false)"
-				></button>
-				<button
-					pButton
+				/>
+				<edu-button
 					label="Enviar solicitud"
 					icon="pi pi-check"
 					data-info-anchor="estudiante-justificar-inasistencia-enviar"
 					[disabled]="!canSave() || saving()"
 					[loading]="saving()"
 					(click)="onSave()"
-				></button>
+				/>
 			</ng-template>
 		</edu-dialog>
 	`,
