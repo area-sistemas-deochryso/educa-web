@@ -2,7 +2,7 @@
 
 > **Plan**: `../../../educa-coord/plans/xrepo-70-angular22-migration.md` (P70)
 > **Worktree**: `EducaWeb/WT/educa-web/p70-angular22-migration`, branch `chat/p70-angular22-migration` (dedicado, sobrevive el cierre de fases individuales — merge semanal desde `main`)
-> **Creado**: 2026-06-24 · **Delegado a educa-web**: 2026-08-21 · **Estado**: 🏃 running.
+> **Creado**: 2026-06-24 · **Delegado a educa-web**: 2026-08-21 · **Cerrado**: 2026-08-25 · **Estado**: ✅ cerrado.
 > **MODO SUGERIDO**: `/investigate`
 > **exclusive**: `true`
 > **touches**: `package.json`, `angular.json`, `src/**`
