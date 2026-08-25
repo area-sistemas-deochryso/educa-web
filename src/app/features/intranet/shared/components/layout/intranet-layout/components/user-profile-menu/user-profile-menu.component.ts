@@ -10,7 +10,6 @@ import {
 	viewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
 import { UserProfileService, NotificationsService } from '@core/services';
 import { FeatureFlagsFacade } from '@core/services/feature-flags';
 import { ThemeService } from '@core/services/theme';
@@ -25,7 +24,6 @@ import { EduAvatar, EduBadge, EduPopover, EduToggle } from '@edu-ui';
 	standalone: true,
 	imports: [
 		EduPopover,
-		ButtonModule,
 		EduAvatar,
 		EduBadge,
 		EduToggle,

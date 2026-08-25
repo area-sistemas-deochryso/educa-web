@@ -10,7 +10,6 @@ import {
 	signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
 import { EduDatePicker, EduTooltip } from '@edu-ui';
 
 export type TemporalNavMode = 'day' | 'month';
@@ -18,7 +17,7 @@ export type TemporalNavMode = 'day' | 'month';
 @Component({
 	selector: 'app-attendance-temporal-nav',
 	standalone: true,
-	imports: [FormsModule, ButtonModule, EduDatePicker, EduTooltip],
+	imports: [FormsModule, EduDatePicker, EduTooltip],
 	templateUrl: './attendance-temporal-nav.component.html',
 	styleUrl: './attendance-temporal-nav.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

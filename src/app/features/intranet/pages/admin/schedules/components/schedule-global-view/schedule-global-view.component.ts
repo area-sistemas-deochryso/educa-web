@@ -1,8 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { ButtonModule } from 'primeng/button';
-
 import type { HorarioResponseDto } from '../../models/horario.interface';
 import { DIAS_SEMANA } from '../../models/horario.interface';
 import { EduTooltip } from '@edu-ui';
@@ -27,7 +25,7 @@ interface ProblemItem {
 @Component({
   selector: 'app-schedule-global-view',
   standalone: true,
-  imports: [CommonModule, ButtonModule, EduTooltip],
+  imports: [CommonModule, EduTooltip],
   templateUrl: './schedule-global-view.component.html',
   styleUrl: './schedule-global-view.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

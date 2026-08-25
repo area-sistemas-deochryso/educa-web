@@ -1,8 +1,6 @@
 import { Component, ChangeDetectionStrategy, input, output, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { ButtonModule } from 'primeng/button';
-
 import { EstudianteAsistencia } from '@intranet-shared/services';
 import {
 	HorarioResponseDto,
@@ -32,7 +30,6 @@ import { EduDialog, EduTab, EduTabPanel, EduTabs } from '@edu-ui';
 		CommonModule,
 		EduDialog,
 		EduTabs, EduTab, EduTabPanel,
-		ButtonModule,
 		ModoAsignacionBadgeComponent,
 		ClassroomApprovalTabComponent,
 		ClassroomAttendanceTabComponent,

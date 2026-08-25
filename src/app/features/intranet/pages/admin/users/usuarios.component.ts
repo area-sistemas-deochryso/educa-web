@@ -3,7 +3,6 @@
 import { AfterViewInit, ChangeDetectionStrategy, Component, DestroyRef, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
 
 import {
@@ -59,7 +58,7 @@ import { EduConfirmDialog, EduConfirmationService, EduTab } from '@edu-ui';
 @Component({
 	selector: 'app-users',
 	standalone: true,
-	imports: [ButtonModule, CommonModule, EduConfirmDialog, UsersHeaderComponent, UsersStatsComponent, UsersStatsSkeletonComponent, UsersFiltersComponent, UsersTableComponent, UsersTableSkeletonComponent, UserFormDialogComponent, UsersImportDialogComponent, UsersValidationDialogComponent, UserDetailDrawerComponent, ErrorStateComponent, EduTab],
+	imports: [CommonModule, EduConfirmDialog, UsersHeaderComponent, UsersStatsComponent, UsersStatsSkeletonComponent, UsersFiltersComponent, UsersTableComponent, UsersTableSkeletonComponent, UserFormDialogComponent, UsersImportDialogComponent, UsersValidationDialogComponent, UserDetailDrawerComponent, ErrorStateComponent, EduTab],
 	providers: [EduConfirmationService],
 	templateUrl: './usuarios.component.html',
 	styleUrl: './usuarios.component.scss',

@@ -3,8 +3,6 @@ import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { ButtonModule } from 'primeng/button';
-
 import { UserPermissionsService } from '@core/services';
 
 import { TicketAdminDto, TicketEstado } from '../models/ticket-admin.models';
@@ -50,7 +48,7 @@ const ESTADO_LABEL: Record<TicketEstado, string> = {
 @Component({
 	selector: 'app-ticket-bandeja',
 	standalone: true,
-	imports: [EduTable, CommonModule, FormsModule, ButtonModule, EduSpinner, EduSelect, EduSortableColumn, EduTag],
+	imports: [EduTable, CommonModule, FormsModule, EduSpinner, EduSelect, EduSortableColumn, EduTag],
 	providers: [TicketBandejaFacade],
 	templateUrl: './ticket-bandeja.component.html',
 	styleUrl: './ticket-bandeja.component.scss',

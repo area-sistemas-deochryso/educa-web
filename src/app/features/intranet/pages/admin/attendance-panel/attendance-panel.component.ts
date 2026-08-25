@@ -4,8 +4,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
-import { ButtonModule } from 'primeng/button';
-
 import { UserPermissionsService } from '@core/services/permissions';
 import { StatsSkeletonComponent } from '@intranet-shared/components';
 import { formatDateLocalIso } from '@core/helpers';
@@ -31,7 +29,7 @@ const CAPABILITY_SEDE_CRUZADA = 'ASISTENCIA_ADMIN';
 @Component({
 	selector: 'app-attendance-panel',
 	standalone: true,
-	imports: [CommonModule, FormsModule, ButtonModule, EduSelect, EduSelectButton, EduDatePicker, StatsSkeletonComponent, AttendancePanelKpiTileComponent, AttendancePanelBreakdownComponent, AttendancePanelChartDiaComponent, AttendancePanelChartLineComponent, AttendancePanelChartHeatmapComponent],
+	imports: [CommonModule, FormsModule, EduSelect, EduSelectButton, EduDatePicker, StatsSkeletonComponent, AttendancePanelKpiTileComponent, AttendancePanelBreakdownComponent, AttendancePanelChartDiaComponent, AttendancePanelChartLineComponent, AttendancePanelChartHeatmapComponent],
 	templateUrl: './attendance-panel.component.html',
 	styleUrl: './attendance-panel.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
