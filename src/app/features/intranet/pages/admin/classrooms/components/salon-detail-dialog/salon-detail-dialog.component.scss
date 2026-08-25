@@ -45,15 +45,4 @@
 	margin: 0 !important;
 	max-height: 100vh !important;
 }
-
-:host ::ng-deep .fullscreen-dialog .p-dialog-content {
-	flex: 1;
-	max-height: none !important;
-}
-// #endregion
-
-// #region Dialog overrides
-:host ::ng-deep .p-dialog {
-	transition: all 0.25s ease;
-}
 // #endregion

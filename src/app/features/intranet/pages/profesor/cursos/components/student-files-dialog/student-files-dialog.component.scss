@@ -1,11 +1,3 @@
-// #region Dialog overrides
-:host ::ng-deep {
-	.p-dialog-content {
-		padding: 0 !important;
-	}
-}
-
-// #endregion
 // #region Loading and empty states
 .loading-state {
 	display: flex;

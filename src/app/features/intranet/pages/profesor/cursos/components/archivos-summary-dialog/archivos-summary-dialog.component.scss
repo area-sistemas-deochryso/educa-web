@@ -1,11 +1,3 @@
-// #region Dialog overrides
-:host ::ng-deep {
-	.p-dialog-content {
-		padding: 0 !important;
-	}
-}
-
-// #endregion
 // #region Body
 .summary-body {
 	padding: 0.5rem 1.5rem 1.5rem;

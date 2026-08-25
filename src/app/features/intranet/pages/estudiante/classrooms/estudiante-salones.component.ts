@@ -30,8 +30,8 @@ import { EduSpinner, EduTag, EduTooltip } from '@edu-ui';
 		}
 		.salon-card {
 			border-radius: 8px;
-			border: 1px solid var(--p-surface-200);
-			border-left: 4px solid var(--p-primary-color);
+			border: 1px solid var(--surface-200);
+			border-left: 4px solid var(--primary-accent);
 			background: var(--surface-card, #fcfdfe);
 			padding: 1rem 1.25rem;
 			cursor: pointer;
@@ -39,8 +39,8 @@ import { EduSpinner, EduTag, EduTooltip } from '@edu-ui';
 		}
 		.salon-card:hover {
 			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-			border-color: var(--p-surface-300);
-			border-left-color: var(--p-primary-color);
+			border-color: var(--surface-300);
+			border-left-color: var(--primary-accent);
 		}
 	`,
 	template: `

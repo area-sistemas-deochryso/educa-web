@@ -1,20 +1,3 @@
 :host {
 	display: block;
-
-	::ng-deep .p-datatable {
-		.p-datatable-header,
-		.p-datatable-thead > tr > th,
-		.p-datatable-tbody > tr,
-		.p-datatable-tbody > tr > td {
-			background: transparent;
-		}
-
-		// design-system.md B4/B7 — encabezados UPPERCASE + flechas donde haya orden.
-		.p-datatable-thead > tr > th {
-			font-weight: 600;
-			font-size: 0.8rem;
-			text-transform: uppercase;
-			letter-spacing: 0.5px;
-		}
-	}
 }

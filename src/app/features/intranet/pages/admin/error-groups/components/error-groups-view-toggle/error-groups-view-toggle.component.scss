@@ -4,15 +4,6 @@
 }
 
 :host ::ng-deep .view-toggle {
-	.p-button {
-		padding: 0.4rem 0.8rem;
-		font-size: 0.85rem;
-
-		i {
-			margin-right: 0.4rem;
-		}
-	}
-
 	.toggle-label {
 		font-weight: 500;
 	}

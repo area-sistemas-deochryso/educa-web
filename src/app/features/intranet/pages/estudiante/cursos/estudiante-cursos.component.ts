@@ -42,8 +42,8 @@ const DAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Vierne
 			min-width: 0;
 			max-width: 100%;
 			border-radius: 8px;
-			border: 1px solid var(--p-surface-200);
-			border-left: 4px solid var(--card-accent, var(--p-primary-color));
+			border: 1px solid var(--surface-200);
+			border-left: 4px solid var(--card-accent, var(--primary-accent));
 			background: var(--surface-card, #fcfdfe);
 			padding: 1rem 1.25rem;
 			cursor: pointer;
@@ -51,8 +51,8 @@ const DAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Vierne
 		}
 		.course-card:hover {
 			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-			border-color: var(--p-surface-300);
-			border-left-color: var(--card-accent, var(--p-primary-color));
+			border-color: var(--surface-300);
+			border-left-color: var(--card-accent, var(--primary-accent));
 		}
 		.course-card-affordance {
 			display: flex;
@@ -62,7 +62,7 @@ const DAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Vierne
 			margin-top: 0.75rem;
 			font-size: 0.75rem;
 			font-weight: 600;
-			color: var(--p-primary-color);
+			color: var(--primary-accent);
 		}
 		.course-card-affordance i {
 			font-size: 0.7rem;
@@ -72,7 +72,7 @@ const DAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Vierne
 			transform: translateX(3px);
 		}
 		.hoy-strip {
-			background: var(--p-surface-50);
+			background: var(--surface-50);
 			border-radius: 8px;
 			padding: 0.5rem 1rem;
 			margin-bottom: 1rem;

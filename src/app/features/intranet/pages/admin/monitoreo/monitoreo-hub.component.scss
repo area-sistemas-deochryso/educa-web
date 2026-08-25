@@ -205,26 +205,7 @@
 }
 // #endregion
 
-// #region Tab triggers — más visuales que el default de PrimeNG
-:host ::ng-deep p-tabs {
-	margin-top: 1rem;
-
-	.p-tablist {
-		gap: 0.25rem;
-	}
-
-	.p-tab {
-		padding: 0.85rem 1.25rem;
-		border-radius: 12px 12px 0 0;
-		transition: background 0.15s ease;
-
-		&[data-p-active='true'] .tab-trigger,
-		&.p-tab-active .tab-trigger {
-			.tab-label { color: var(--text-color); font-weight: 700; }
-		}
-	}
-}
-
+// #region Tab triggers
 .tab-trigger {
 	display: inline-flex;
 	align-items: center;

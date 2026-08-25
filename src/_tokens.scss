@@ -238,6 +238,7 @@
 	   claro necesita ser oscuro, no blanco (semantic.primary.contrastColor
 	   = surface.900 en dark, no #ffffff como en claro). */
 	--primary-color-text: #18181b;
+	--primary-accent: var(--primary-400);
 
 	/* --- Paleta de marca legacy (styles.scss :root, ~13 tokens de color) --- */
 	--intranet-background-color: var(--surface-ground);

@@ -30,26 +30,3 @@
 }
 // #endregion
 
-// #region Headers UPPERCASE
-:host ::ng-deep .p-datatable {
-	.p-datatable-thead > tr > th {
-		font-weight: 600;
-		font-size: 0.8rem;
-		text-transform: uppercase;
-		letter-spacing: 0.5px;
-		color: var(--text-color);
-		border-color: var(--surface-300);
-	}
-
-	.p-datatable-tbody > tr > td {
-		border-color: var(--surface-300);
-		vertical-align: middle;
-	}
-
-	.p-datatable-paginator-bottom,
-	.p-paginator {
-		padding: 0.75rem 1rem;
-		border-top: 1px solid var(--surface-300);
-	}
-}
-// #endregion

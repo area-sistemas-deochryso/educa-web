@@ -34,16 +34,6 @@
 // #endregion
 
 // #region Stepper Wizard
-::ng-deep .p-step-list {
-	overflow-x: auto;
-	-webkit-overflow-scrolling: touch;
-	scrollbar-width: none;
-
-	&::-webkit-scrollbar {
-		display: none;
-	}
-}
-
 .wizard-step-content {
 	padding: 1.25rem 0;
 }

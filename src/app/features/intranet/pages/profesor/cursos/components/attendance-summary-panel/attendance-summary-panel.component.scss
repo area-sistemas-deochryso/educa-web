@@ -22,10 +22,6 @@
 		font-weight: 600;
 		font-size: 0.85rem;
 	}
-
-	:host ::ng-deep .p-calendar {
-		max-width: 180px;
-	}
 }
 
 .global-stats {
@@ -51,39 +47,6 @@
 // #endregion
 
 // #region Table
-:host ::ng-deep {
-	.p-datatable,
-	.p-datatable-table-container {
-		background: transparent;
-	}
-
-	.p-datatable-thead > tr > th {
-		background: transparent;
-		border-color: var(--surface-border);
-	}
-
-	.p-datatable-tbody > tr {
-		background: transparent;
-
-		&.p-datatable-row-even {
-			background: color-mix(in srgb, var(--surface-ground), var(--surface-border) 15%);
-		}
-	}
-
-	.p-datatable-tbody > tr:not(.p-datatable-row-selected):hover {
-		background: var(--surface-hover);
-	}
-
-	.p-datatable-tbody > tr > td {
-		border-color: var(--surface-border);
-	}
-
-	.p-inputtext,
-	.p-select {
-		background: transparent;
-	}
-}
-
 .count-present {
 	color: var(--green-600);
 	font-weight: 600;
@@ -127,10 +90,6 @@
 	.date-range {
 		flex-direction: column;
 		align-items: stretch;
-	}
-
-	.date-field :host ::ng-deep .p-calendar {
-		max-width: 100%;
 	}
 }
 // #endregion

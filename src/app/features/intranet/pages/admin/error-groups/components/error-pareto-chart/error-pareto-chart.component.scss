@@ -4,8 +4,8 @@
 
 .pareto-container {
 	background: transparent;
-	border: 1px solid var(--p-surface-200);
-	border-radius: var(--p-border-radius);
+	border: 1px solid var(--surface-200);
+	border-radius: var(--border-radius);
 	padding: 1rem;
 }
 
@@ -21,20 +21,20 @@
 .pareto-title {
 	font-size: 0.875rem;
 	font-weight: 600;
-	color: var(--p-text-color);
+	color: var(--text-color);
 	margin: 0;
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;
 
 	i {
-		color: var(--p-text-muted-color);
+		color: var(--text-color-secondary);
 	}
 }
 
 .pareto-hint {
 	font-size: 0.75rem;
-	color: var(--p-text-muted-color);
+	color: var(--text-color-secondary);
 }
 
 .pareto-loading,
@@ -44,7 +44,7 @@
 	justify-content: center;
 	gap: 0.5rem;
 	padding: 2rem;
-	color: var(--p-text-muted-color);
+	color: var(--text-color-secondary);
 	font-size: 0.875rem;
 }
 

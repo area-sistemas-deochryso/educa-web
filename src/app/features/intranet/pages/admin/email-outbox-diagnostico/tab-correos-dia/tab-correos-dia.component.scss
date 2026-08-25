@@ -3,34 +3,6 @@
 	background: transparent;
 	margin-top: 1rem;
 
-	.p-tabs,
-	.p-tablist,
-	.p-tablist-tab-list,
-	.p-tabpanels,
-	.p-tabpanel {
-		background: transparent;
-	}
-
-	.p-tablist {
-		border-bottom: 1px solid var(--surface-300);
-		margin-bottom: 0.75rem;
-	}
-
-	.p-tab {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.5rem;
-		font-size: 0.88rem;
-		font-weight: 500;
-		background: transparent;
-		padding: 0.55rem 0.95rem;
-
-		i {
-			font-size: 0.9rem;
-			opacity: 0.85;
-		}
-	}
-
 	.tab-badge--neutral {
 		display: inline-flex !important;
 		align-items: center;
@@ -65,14 +37,6 @@
 		font-weight: 700;
 		font-variant-numeric: tabular-nums;
 		line-height: 1;
-	}
-
-	.p-tabpanels {
-		padding: 0;
-	}
-
-	.p-tabpanel {
-		padding: 0;
 	}
 }
 // #endregion

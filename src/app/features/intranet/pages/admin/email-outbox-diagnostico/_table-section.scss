@@ -29,25 +29,6 @@
 		}
 	}
 
-	:host ::ng-deep .p-datatable {
-		.p-datatable-table-container,
-		.p-datatable-wrapper,
-		&.p-datatable {
-			overflow-x: auto !important;
-			width: 100%;
-		}
-
-		table {
-			table-layout: auto;
-			width: 100%;
-		}
-
-		td {
-			word-break: break-word;
-			overflow-wrap: anywhere;
-		}
-	}
-
 	.col-dni,
 	.cell-dni,
 	.cell-dest code {
@@ -124,20 +105,6 @@
 		width: 2rem;
 		height: 2rem;
 		padding: 0;
-	}
-
-	:host ::ng-deep .p-datatable-tbody > tr {
-		&.row-warning > td {
-			background: color-mix(in srgb, var(--yellow-500) 8%, transparent);
-		}
-
-		&.row-critical > td {
-			background: color-mix(in srgb, var(--red-500) 10%, transparent);
-		}
-
-		&.row-muted > td {
-			opacity: 0.7;
-		}
 	}
 
 	.empty-message {

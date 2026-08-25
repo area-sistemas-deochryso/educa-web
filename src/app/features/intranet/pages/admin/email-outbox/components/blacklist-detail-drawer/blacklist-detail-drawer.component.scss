@@ -136,15 +136,3 @@
 	border-top: 1px solid var(--surface-200);
 	margin-top: 1.5rem;
 }
-
-:host ::ng-deep .p-drawer {
-	.p-drawer-content {
-		padding: 1.5rem;
-		background: var(--surface-ground);
-	}
-	.p-drawer-header {
-		background: var(--surface-ground);
-		color: var(--text-color);
-		border-bottom: 1px solid var(--surface-300);
-	}
-}

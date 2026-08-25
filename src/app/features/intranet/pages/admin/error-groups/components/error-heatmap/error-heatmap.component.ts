@@ -159,6 +159,6 @@ export class ErrorHeatmapComponent {
 
 	getCellColor(intensity: number): string {
 		if (intensity === 0) return 'transparent';
-		return `color-mix(in srgb, var(--p-red-500) ${Math.round(intensity * 100)}%, var(--p-orange-100))`;
+		return `color-mix(in srgb, var(--red-500) ${Math.round(intensity * 100)}%, var(--orange-100))`;
 	}
 }
