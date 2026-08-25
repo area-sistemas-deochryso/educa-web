@@ -35,16 +35,17 @@
 	</div>
 
 	@if (hasActiveFilters()) {
-		<button
-			pButton
+		<edu-button
 			icon="pi pi-filter-slash"
-			class="p-button-text p-button-sm btn-clear"
+			[text]="true"
+			size="small"
+			class="btn-clear"
 			eduTooltip="Limpiar filtros"
 			eduTooltipPosition="top"
 			(click)="onClearFilters()"
 			data-info-anchor="admin-users-clear-filters-btn"
 			[pt]="{ root: { 'aria-label': 'Limpiar filtros' } }"
-		></button>
+		/>
 	}
 </div>
 <!-- #endregion -->

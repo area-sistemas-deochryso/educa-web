@@ -2,7 +2,6 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, effect, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
-import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
 import { type DependencyCheck, DependencyGuidanceComponent } from '@shared/components';
 
@@ -33,12 +32,12 @@ import {
 	buildDeleteHorarioMessage,
 	buildToggleHorarioMessage,
 } from '@app/shared/constants';
-import { EduConfirmDialog, EduConfirmationService, EduSelect, EduTag, EduTooltip } from '@edu-ui';
+import { EduButton, EduConfirmDialog, EduConfirmationService, EduSelect, EduTag, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-schedules',
 	standalone: true,
-	imports: [CommonModule, FormsModule, ButtonModule, EduConfirmDialog, EduSelect, EduTag, EduTooltip, ScheduleDetailDrawerComponent, SchedulesCoursePickerComponent, SchedulesFormDialogComponent, SchedulesImportDialogComponent, SchedulesStatsSkeletonComponent, ScheduleGridLayoutComponent, ScheduleGlobalViewComponent, PageHeaderComponent, PeriodToggleComponent, KpiStatsComponent, DependencyGuidanceComponent],
+	imports: [CommonModule, FormsModule, EduButton, EduConfirmDialog, EduSelect, EduTag, EduTooltip, ScheduleDetailDrawerComponent, SchedulesCoursePickerComponent, SchedulesFormDialogComponent, SchedulesImportDialogComponent, SchedulesStatsSkeletonComponent, ScheduleGridLayoutComponent, ScheduleGlobalViewComponent, PageHeaderComponent, PeriodToggleComponent, KpiStatsComponent, DependencyGuidanceComponent],
 	templateUrl: './horarios.component.html',
 	styleUrl: './horarios.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

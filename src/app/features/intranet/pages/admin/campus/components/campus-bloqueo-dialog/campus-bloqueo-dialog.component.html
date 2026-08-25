@@ -73,21 +73,20 @@
 
 	<!-- #region Footer -->
 	<div class="piso-dialog-footer">
-		<button
-			pButton
+		<edu-button
 			label="Cancelar"
-			class="p-button-text p-button-secondary"
+			[text]="true"
+			severity="secondary"
 			(click)="onCancel()"
 			data-info-anchor="admin-campus-bloqueo-form-cancelar-btn"
-		></button>
-		<button
-			pButton
+		/>
+		<edu-button
 			label="Guardar cambios"
 			icon="pi pi-check"
 			(click)="onSave()"
 			[loading]="saving()"
 			data-info-anchor="admin-campus-bloqueo-form-guardar-btn"
-		></button>
+		/>
 	</div>
 	<!-- #endregion -->
 </edu-dialog>

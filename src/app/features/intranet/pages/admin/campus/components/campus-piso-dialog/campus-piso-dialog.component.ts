@@ -1,15 +1,13 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-import { ButtonModule } from 'primeng/button';
-
 import { PisoFormData } from '../../models';
-import { EduDialog, EduInputNumber, EduInputText } from '@edu-ui';
+import { EduButton, EduDialog, EduInputNumber, EduInputText } from '@edu-ui';
 
 @Component({
 	selector: 'app-campus-piso-dialog',
 	standalone: true,
-	imports: [FormsModule, ButtonModule, EduDialog, EduInputText, EduInputNumber],
+	imports: [FormsModule, EduButton, EduDialog, EduInputText, EduInputNumber],
 	templateUrl: './campus-piso-dialog.component.html',
 	styleUrl: './campus-piso-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

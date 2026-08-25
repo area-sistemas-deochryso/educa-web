@@ -3,39 +3,41 @@
 	<div class="header-actions">
 		<!-- * Migration button (dev only, sits next to "Nuevo") -->
 		@if (showMigration()) {
-			<button
-				pButton
+			<edu-button
 				icon="pi pi-shield"
 				label="Migrar Contraseñas"
-				class="p-button-warning p-button-sm migration-header-btn"
+				size="small"
+				severity="warn"
+				class="migration-header-btn"
 				[class.migration-header-btn--spotlight]="migrationSpotlight()"
 				[loading]="migrationLoading()"
 				(click)="migratePasswords.emit()"
 				data-info-anchor="admin-users-migrate-passwords-btn"
 				[pt]="{ root: { 'aria-label': 'Migrar contraseñas a campo encriptado' } }"
-			></button>
+			/>
 		}
 
 		<!-- * Contextual new button -->
-		<button
-			pButton
+		<edu-button
 			icon="pi pi-user-plus"
 			[label]="newButtonLabel()"
-			class="p-button-success p-button-sm"
+			size="small"
+			severity="success"
 			(click)="onNewUsuario()"
 			data-info-anchor="admin-users-new-btn"
 			[pt]="{ root: { 'aria-label': newButtonLabel() } }"
-		></button>
+		/>
 
 		<!-- * Overflow menu -->
-		<button
-			pButton
+		<edu-button
 			icon="pi pi-ellipsis-v"
-			class="p-button-text p-button-sm btn-icon"
+			[text]="true"
+			size="small"
+			class="btn-icon"
 			(click)="overflowMenu.toggle($event)"
 			data-info-anchor="admin-users-overflow-menu-btn"
 			[pt]="{ root: { 'aria-label': 'Más acciones' } }"
-		></button>
+		/>
 		<edu-menu #overflowMenu [model]="overflowMenuItems()" [popup]="true" appendTo="body" />
 	</div>
 </app-page-header>
@@ -69,50 +71,48 @@
 		<div class="export-field">
 			<label>Periodo</label>
 			<div class="periodo-toggle">
-				<button
-					pButton
+				<edu-button
 					icon="pi pi-calendar"
 					label="Regular"
-					class="p-button-sm"
-					[class.p-button-outlined]="esVerano()"
+					size="small"
+					[outlined]="esVerano()"
 					[class.active]="!esVerano()"
 					(click)="setPeriodo(false)"
 					data-info-anchor="period-toggle"
 					[pt]="{ root: { 'aria-label': 'Periodo regular' } }"
-				></button>
-				<button
-					pButton
+				/>
+				<edu-button
 					icon="pi pi-sun"
 					label="Verano"
-					class="p-button-sm"
-					[class.p-button-outlined]="!esVerano()"
+					size="small"
+					[outlined]="!esVerano()"
 					[class.active]="esVerano()"
 					(click)="setPeriodo(true)"
 					data-info-anchor="period-toggle"
 					[pt]="{ root: { 'aria-label': 'Periodo de verano' } }"
-				></button>
+				/>
 			</div>
 		</div>
 
 		<div class="export-actions">
-			<button
-				pButton
+			<edu-button
 				icon="pi pi-file-excel"
 				label="Credenciales Alumnos"
-				class="p-button-outlined export-btn"
+				[outlined]="true"
+				class="export-btn"
 				(click)="onExportCredenciales('Estudiante')"
 				data-info-anchor="admin-users-export-alumnos-btn"
 				[pt]="{ root: { 'aria-label': 'Exportar credenciales de alumnos' } }"
-			></button>
-			<button
-				pButton
+			/>
+			<edu-button
 				icon="pi pi-file-excel"
 				label="Credenciales Profesores"
-				class="p-button-outlined export-btn"
+				[outlined]="true"
+				class="export-btn"
 				(click)="onExportCredenciales('Profesor')"
 				data-info-anchor="admin-users-export-profesores-btn"
 				[pt]="{ root: { 'aria-label': 'Exportar credenciales de profesores' } }"
-			></button>
+			/>
 		</div>
 	</div>
 </edu-dialog>

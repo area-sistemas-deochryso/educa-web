@@ -2,18 +2,16 @@ import { Component, ChangeDetectionStrategy, inject, input, output, signal, comp
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { ButtonModule } from 'primeng/button';
-
 import { GradosService } from '@features/intranet/pages/admin/cursos/services';
 
 import { CrearSalonDto } from '../../models';
 import { ClassroomsAdminFacade } from '../../services/salones-admin.facade';
-import { EduDialog, EduInputNumber, EduSelect } from '@edu-ui';
+import { EduButton, EduDialog, EduInputNumber, EduSelect } from '@edu-ui';
 
 @Component({
 	selector: 'app-nuevo-salon-dialog',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduDialog, ButtonModule, EduSelect, EduInputNumber],
+	imports: [CommonModule, FormsModule, EduDialog, EduButton, EduSelect, EduInputNumber],
 	templateUrl: './nuevo-salon-dialog.component.html',
 	styleUrl: './nuevo-salon-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

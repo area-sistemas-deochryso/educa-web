@@ -296,14 +296,16 @@
 													/>
 													<label [for]="'tutor-' + salon.salonId" class="tutor-label">Tutor</label>
 												}
-												<button
-													pButton
+												<edu-button
 													icon="pi pi-times"
-													class="p-button-rounded p-button-text p-button-danger p-button-sm"
+													[text]="true"
+													[rounded]="true"
+													size="small"
+													severity="danger"
 													(click)="onRemoverSalon(salon.salonId)"
 													data-info-anchor="admin-users-form-quitar-salon-btn"
 													[pt]="{ root: { 'aria-label': 'Quitar salón ' + salon.salonNombre } }"
-												></button>
+												/>
 											</div>
 										</div>
 									}
@@ -332,16 +334,16 @@
 										data-info-anchor="admin-users-form-seccion-select"
 									/>
 								}
-								<button
-									pButton
+								<edu-button
 									icon="pi pi-plus"
-									class="p-button-outlined p-button-sm"
+									[outlined]="true"
+									size="small"
 									label="Agregar"
 									(click)="onAgregarSalon()"
 									[disabled]="!salonSeleccionado() || salonYaAsignado()"
 									data-info-anchor="admin-users-form-agregar-salon-btn"
 									[pt]="{ root: { 'aria-label': 'Agregar salón' } }"
-								></button>
+								/>
 							</div>
 							@if (salonSeleccionadoModoPreview(); as preview) {
 								<div class="modo-preview">
@@ -370,14 +372,16 @@
 										@for (curso of profesorCursos(); track curso.id) {
 											<div class="curso-row">
 												<span class="curso-nombre">{{ curso.cursoNombre }}</span>
-												<button
-													pButton
+												<edu-button
 													icon="pi pi-times"
-													class="p-button-rounded p-button-text p-button-danger p-button-sm"
+													[text]="true"
+													[rounded]="true"
+													size="small"
+													severity="danger"
 													(click)="onDesasignarCurso(curso.id)"
 												data-info-anchor="admin-users-form-quitar-curso-btn"
 													[pt]="{ root: { 'aria-label': 'Quitar curso ' + curso.cursoNombre } }"
-												></button>
+												/>
 											</div>
 										}
 									</div>
@@ -401,16 +405,16 @@
 											filterPlaceholder="Buscar curso..."
 											data-info-anchor="admin-users-form-cursos-multiselect"
 										/>
-										<button
-											pButton
+										<edu-button
 											icon="pi pi-plus"
-											class="p-button-outlined p-button-sm"
+											[outlined]="true"
+											size="small"
 											label="Asignar"
 											(click)="onAgregarCursos()"
 											[disabled]="_cursosSeleccionados().length === 0"
 											data-info-anchor="admin-users-form-asignar-cursos-btn"
 											[pt]="{ root: { 'aria-label': 'Asignar cursos seleccionados' } }"
-										></button>
+										/>
 									</div>
 								}
 								<small class="text-muted">
@@ -429,25 +433,23 @@
 
 	<ng-template #footer>
 		<div class="dialog-footer">
-			<button
-				pButton
+			<edu-button
 				label="Cancelar"
 				icon="pi pi-times"
-				class="p-button-text"
+				[text]="true"
 				(click)="onCancel()"
 				data-info-anchor="admin-users-form-cancelar-btn"
 				[pt]="{ root: { 'aria-label': 'Cancelar' } }"
-			></button>
-			<button
-				pButton
+			/>
+			<edu-button
 				label="Guardar"
 				icon="pi pi-check"
-				class="p-button-success"
+				severity="success"
 				(click)="onSave()"
 				[disabled]="!isFormValid() || loading()"
 				data-info-anchor="admin-users-form-guardar-btn"
 				[pt]="{ root: { 'aria-label': 'Guardar' } }"
-			></button>
+			/>
 		</div>
 	</ng-template>
 </edu-dialog>

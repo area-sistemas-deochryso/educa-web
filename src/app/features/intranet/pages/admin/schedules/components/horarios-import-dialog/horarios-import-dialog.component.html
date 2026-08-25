@@ -30,15 +30,14 @@
 							class="file-input-hidden"
 							(change)="onSelectFile($event)"
 						/>
-						<button
-							pButton
+						<edu-button
 							type="button"
 							icon="pi pi-file-excel"
 							label="Seleccionar archivo"
-							class="p-button-outlined"
+							[outlined]="true"
 							data-info-anchor="admin-schedules-import-seleccionar-archivo-btn"
 							(click)="fileInput.click()"
-						></button>
+						/>
 						@if (fileName()) {
 							<span class="file-name">
 								<i class="pi pi-check-circle text-green-500"></i>
@@ -79,16 +78,16 @@
 								<edu-tag [value]="invalidCount() + ' con errores'" severity="danger" />
 							}
 						</span>
-						<button
-							pButton
+						<edu-button
 							type="button"
 							icon="pi pi-arrow-left"
 							label="Cambiar archivo"
-							class="p-button-text p-button-sm"
+							[text]="true"
+							size="small"
 							data-info-anchor="admin-schedules-import-cambiar-archivo-btn"
 							(click)="onNuevoArchivo()"
 							[pt]="{ root: { 'aria-label': 'Cambiar archivo' } }"
-						></button>
+						/>
 					</div>
 
 					<edu-table
@@ -197,52 +196,47 @@
 
 			<ng-template pTemplate="footer">
 				@if (step() === 'upload') {
-					<button
-						pButton
+					<edu-button
 						type="button"
 						label="Cancelar"
-						class="p-button-text"
+						[text]="true"
 						data-info-anchor="admin-schedules-import-cancelar-btn"
 						(click)="onClose()"
-					></button>
+					/>
 				}
 				@if (step() === 'preview') {
-					<button
-						pButton
+					<edu-button
 						type="button"
 						label="Cancelar"
-						class="p-button-text"
+						[text]="true"
 						data-info-anchor="admin-schedules-import-cancelar-btn"
 						(click)="onClose()"
-					></button>
-					<button
-						pButton
+					/>
+					<edu-button
 						type="button"
 						icon="pi pi-upload"
 						[label]="'Importar ' + validCount() + ' horarios'"
 						[disabled]="!canImport()"
 						data-info-anchor="admin-schedules-import-confirmar-btn"
 						(click)="onImportar()"
-					></button>
+					/>
 				}
 				@if (step() === 'result') {
 					@if (!loading()) {
-						<button
-							pButton
+						<edu-button
 							type="button"
 							icon="pi pi-refresh"
 							label="Importar otro archivo"
-							class="p-button-outlined"
+							[outlined]="true"
 							data-info-anchor="admin-schedules-import-cambiar-archivo-btn"
 							(click)="onNuevoArchivo()"
-						></button>
-						<button
-							pButton
+						/>
+						<edu-button
 							type="button"
 							label="Cerrar"
 							data-info-anchor="admin-schedules-import-cerrar-btn"
 							(click)="onClose()"
-						></button>
+						/>
 					}
 				}
 			</ng-template>

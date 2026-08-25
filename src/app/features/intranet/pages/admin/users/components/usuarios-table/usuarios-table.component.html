@@ -82,30 +82,33 @@
 					<span class="date-text">{{ usuario.fechaRegistro | date: 'dd/MM/yyyy' }}</span>
 				</td>
 				<td class="text-center actions-cell">
-					<button
-						pButton
+					<edu-button
 						icon="pi pi-eye"
-						class="p-button-sm p-button-text action-icon"
+						[text]="true"
+						size="small"
+						class="action-icon"
 						eduTooltip="Ver detalles"
 						eduTooltipPosition="top"
 						(click)="onView(usuario)"
 						data-info-anchor="admin-users-ver-detalle-btn"
 						[pt]="{ root: { 'aria-label': 'Ver detalles del usuario' } }"
-					></button>
-					<button
-						pButton
+					/>
+					<edu-button
 						icon="pi pi-pencil"
-						class="p-button-sm p-button-text action-icon action-edit"
+						[text]="true"
+						size="small"
+						class="action-icon action-edit"
 						eduTooltip="Editar"
 						eduTooltipPosition="top"
 						(click)="onEdit(usuario)"
 						data-info-anchor="admin-users-edit-btn"
 						[pt]="{ root: { 'aria-label': 'Editar usuario' } }"
-					></button>
-					<button
-						pButton
+					/>
+					<edu-button
 						[icon]="usuario.estado ? 'pi pi-ban' : 'pi pi-check'"
-						class="p-button-sm p-button-text action-icon"
+						[text]="true"
+						size="small"
+						class="action-icon"
 						[class.action-deactivate]="usuario.estado"
 						[class.action-activate]="!usuario.estado"
 						[eduTooltip]="usuario.estado ? 'Desactivar' : 'Activar'"
@@ -113,17 +116,18 @@
 						(click)="onToggleEstado(usuario)"
 						data-info-anchor="admin-users-toggle-estado-btn"
 						[pt]="{ root: { 'aria-label': usuario.estado ? 'Desactivar usuario' : 'Activar usuario' } }"
-					></button>
-					<button
-						pButton
+					/>
+					<edu-button
 						icon="pi pi-copy"
-						class="p-button-sm p-button-text action-icon"
+						[text]="true"
+						size="small"
+						class="action-icon"
 						eduTooltip="Copiar DNI"
 						eduTooltipPosition="top"
 						(click)="onCopyDni(usuario.dni)"
 						data-info-anchor="copiar-btn"
 						[pt]="{ root: { 'aria-label': 'Copiar DNI al portapapeles' } }"
-					></button>
+					/>
 				</td>
 			</tr>
 		</ng-template>

@@ -44,15 +44,14 @@
 					class="file-input-hidden"
 					(change)="onSelectFile($event)"
 				/>
-				<button
-					pButton
+				<edu-button
 					type="button"
 					icon="pi pi-file-excel"
 					label="Seleccionar archivo .xlsx"
-					class="p-button-outlined"
+					[outlined]="true"
 					(click)="fileInput.click()"
 					data-info-anchor="admin-users-import-select-file-btn"
-				></button>
+				/>
 				@if (fileName()) {
 					<span class="file-name">
 						<i class="pi pi-check-circle text-green-500"></i>
@@ -89,16 +88,16 @@
 					<strong>{{ gradoGroups().length }}</strong> grados — Sección:
 					<edu-tag [value]="seccion()" severity="info" styleClass="tag-neutral" />
 				</span>
-				<button
-					pButton
+				<edu-button
 					type="button"
 					icon="pi pi-arrow-left"
 					label="Cambiar archivo"
-					class="p-button-text p-button-sm"
+					[text]="true"
+					size="small"
 					(click)="onNuevoArchivo()"
 					data-info-anchor="admin-users-import-change-file-btn"
 					[pt]="{ root: { 'aria-label': 'Cambiar archivo' } }"
-				></button>
+				/>
 			</div>
 
 			<edu-accordion [multiple]="true">
@@ -221,52 +220,47 @@
 
 	<ng-template pTemplate="footer">
 		@if (step() === 'config') {
-			<button
-				pButton
+			<edu-button
 				type="button"
 				label="Cancelar"
-				class="p-button-text"
+				[text]="true"
 				(click)="onClose()"
 				data-info-anchor="admin-users-import-cancelar-btn"
-			></button>
+			/>
 		}
 		@if (step() === 'preview') {
-			<button
-				pButton
+			<edu-button
 				type="button"
 				label="Cancelar"
-				class="p-button-text"
+				[text]="true"
 				(click)="onClose()"
 				data-info-anchor="admin-users-import-cancelar-btn"
-			></button>
-			<button
-				pButton
+			/>
+			<edu-button
 				type="button"
 				icon="pi pi-upload"
 				[label]="'Importar ' + totalFilas() + ' estudiantes'"
 				[disabled]="!canImport()"
 				(click)="onImportar()"
 				data-info-anchor="admin-users-import-confirm-btn"
-			></button>
+			/>
 		}
 		@if (step() === 'result') {
 			@if (!loading()) {
-				<button
-					pButton
+				<edu-button
 					type="button"
 					icon="pi pi-refresh"
 					label="Importar otro archivo"
-					class="p-button-outlined"
+					[outlined]="true"
 					(click)="onNuevoArchivo()"
 					data-info-anchor="admin-users-import-change-file-btn"
-				></button>
-				<button
-					pButton
+				/>
+				<edu-button
 					type="button"
 					label="Cerrar"
 					(click)="onClose()"
 					data-info-anchor="admin-users-import-cerrar-btn"
-				></button>
+				/>
 			}
 		}
 	</ng-template>

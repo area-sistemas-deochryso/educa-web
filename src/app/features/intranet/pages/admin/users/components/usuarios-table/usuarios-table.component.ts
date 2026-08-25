@@ -1,18 +1,17 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ButtonModule } from 'primeng/button';
 import { UsuarioLista } from '../../services';
 import { RoleTab } from '../../models';
 import { UiMappingService } from '@intranet-shared/services';
 import { FullNamePipe } from '@shared/pipes';
 import { TableLoadingDirective } from '@intranet-shared/directives';
-import { EduDialog, EduTable, EduTag, EduTooltip } from '@edu-ui';
+import { EduButton, EduDialog, EduTable, EduTag, EduTooltip } from '@edu-ui';
 import type { EduTableLazyLoadEvent } from '@edu-ui';
 
 @Component({
 	selector: 'app-users-table',
 	standalone: true,
-	imports: [CommonModule, EduTable, ButtonModule, EduDialog, EduTag, EduTooltip, TableLoadingDirective, FullNamePipe],
+	imports: [CommonModule, EduTable, EduButton, EduDialog, EduTag, EduTooltip, TableLoadingDirective, FullNamePipe],
 	templateUrl: './usuarios-table.component.html',
 	styleUrl: './usuarios-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

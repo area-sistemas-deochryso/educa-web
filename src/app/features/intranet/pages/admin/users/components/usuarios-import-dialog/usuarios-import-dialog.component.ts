@@ -2,7 +2,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
 import { ExcelService } from '@core/services';
 import { safeLookup } from '@app/shared/utils';
 import { ImportarEstudianteItem, ImportarEstudiantesResponse } from '../../services';
@@ -13,7 +12,7 @@ import {
 	parseDni,
 	splitNombreCompleto,
 } from '../../helpers/estudiante-import.config';
-import { EduAccordion, EduAccordionHeader, EduAccordionPanel, EduDialog, EduSelect, EduSpinner, EduTable, EduTag, EduTemplate } from '@edu-ui';
+import { EduAccordion, EduAccordionHeader, EduAccordionPanel, EduButton, EduDialog, EduSelect, EduSpinner, EduTable, EduTag, EduTemplate } from '@edu-ui';
 
 // #endregion
 // #region Component
@@ -28,7 +27,7 @@ interface GradoGroup {
 @Component({
 	selector: 'app-users-import-dialog',
 	standalone: true,
-	imports: [CommonModule, FormsModule, ButtonModule, EduDialog, EduSpinner, EduSelect, EduTable, EduTag, EduAccordion, EduAccordionPanel, EduAccordionHeader, EduTemplate],
+	imports: [CommonModule, FormsModule, EduButton, EduDialog, EduSpinner, EduSelect, EduTable, EduTag, EduAccordion, EduAccordionPanel, EduAccordionHeader, EduTemplate],
 	templateUrl: './usuarios-import-dialog.component.html',
 	styleUrl: './usuarios-import-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

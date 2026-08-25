@@ -96,16 +96,17 @@
 						{{ item.correo || '(vacío)' }}
 					</td>
 					<td>
-						<button
-							pButton
+						<edu-button
 							icon="pi pi-pencil"
-							class="p-button-rounded p-button-text p-button-info"
+							[text]="true"
+							[rounded]="true"
+							severity="info"
 							eduTooltip="Editar"
 							eduTooltipPosition="top"
 							(click)="editUsuario.emit(item)"
 							data-info-anchor="admin-users-validation-edit-btn"
 							[pt]="{ root: { 'aria-label': 'Editar' } }"
-						></button>
+						/>
 					</td>
 				</tr>
 			</ng-template>

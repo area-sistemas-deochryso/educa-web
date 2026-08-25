@@ -38,24 +38,24 @@
 		</div>
 		<div class="flex gap-2">
 			@if (someSelected()) {
-				<button
-					pButton
+				<edu-button
 					label="Aprobar"
 					icon="pi pi-check"
-					class="p-button-sm p-button-success"
+					size="small"
+					severity="success"
 					[loading]="loading()"
 					(click)="onAprobarSeleccionados('APROBADO')"
 					data-info-anchor="admin-salon-aprobacion-bulk-aprobar-btn"
-				></button>
-				<button
-					pButton
+				/>
+				<edu-button
 					label="Desaprobar"
 					icon="pi pi-times"
-					class="p-button-sm p-button-danger"
+					size="small"
+					severity="danger"
 					[loading]="loading()"
 					(click)="onAprobarSeleccionados('DESAPROBADO')"
 					data-info-anchor="admin-salon-aprobacion-bulk-desaprobar-btn"
-				></button>
+				/>
 			}
 		</div>
 	</div>
@@ -118,28 +118,32 @@
 			@if (periodoCerrado()) {
 				<td class="text-center">
 					<div class="flex justify-center gap-1">
-						<button
-							pButton
+						<edu-button
 							icon="pi pi-check"
-							class="p-button-rounded p-button-text p-button-sm p-button-success"
+							[text]="true"
+							[rounded]="true"
+							size="small"
+							severity="success"
 							eduTooltip="Aprobar"
 							eduTooltipPosition="top"
 							[disabled]="aprobacion.estado === 'APROBADO' || loading()"
 							(click)="onAprobarIndividual(aprobacion, 'APROBADO')"
 							[pt]="{ root: { 'aria-label': 'Aprobar estudiante' } }"
 							data-info-anchor="admin-salon-aprobacion-row-aprobar-btn"
-						></button>
-						<button
-							pButton
+						/>
+						<edu-button
 							icon="pi pi-times"
-							class="p-button-rounded p-button-text p-button-sm p-button-danger"
+							[text]="true"
+							[rounded]="true"
+							size="small"
+							severity="danger"
 							eduTooltip="Desaprobar"
 							eduTooltipPosition="top"
 							[disabled]="aprobacion.estado === 'DESAPROBADO' || loading()"
 							(click)="onAprobarIndividual(aprobacion, 'DESAPROBADO')"
 							[pt]="{ root: { 'aria-label': 'Desaprobar estudiante' } }"
 							data-info-anchor="admin-salon-aprobacion-row-desaprobar-btn"
-						></button>
+						/>
 					</div>
 				</td>
 			}

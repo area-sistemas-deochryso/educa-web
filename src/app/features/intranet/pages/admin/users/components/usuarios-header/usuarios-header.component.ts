@@ -1,12 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { PageHeaderComponent } from '@intranet-shared/components';
-import { ButtonModule } from 'primeng/button';
-
 import { periodoActual, esVerano } from '@shared/models';
 
 import { RoleTab } from '../../models';
-import { EduDialog, EduMenu, EduSelect, EduTooltip, type EduMenuItem } from '@edu-ui';
+import { EduButton, EduDialog, EduMenu, EduSelect, EduTooltip, type EduMenuItem } from '@edu-ui';
 
 const NEW_BUTTON_LABELS: Record<string, string> = {
 	estudiantes: 'Nuevo Estudiante',
@@ -17,7 +15,7 @@ const NEW_BUTTON_LABELS: Record<string, string> = {
 @Component({
 	selector: 'app-users-header',
 	standalone: true,
-	imports: [ButtonModule, PageHeaderComponent, EduDialog, EduSelect, FormsModule, EduTooltip, EduMenu],
+	imports: [EduButton, PageHeaderComponent, EduDialog, EduSelect, FormsModule, EduTooltip, EduMenu],
 	templateUrl: './usuarios-header.component.html',
 	styleUrl: './usuarios-header.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

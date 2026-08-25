@@ -68,20 +68,18 @@
 	</div>
 
 	<ng-template #footer>
-		<button
-			pButton
+		<edu-button
 			label="Cancelar"
-			class="p-button-text"
+			[text]="true"
 			(click)="onVisibleChange(false)"
 			data-info-anchor="admin-salon-nuevo-cancel-btn"
-		></button>
-		<button
-			pButton
+		/>
+		<edu-button
 			label="Crear"
 			[loading]="loading()"
 			[disabled]="!isFormValid()"
 			(click)="onSave()"
 			data-info-anchor="admin-salon-nuevo-crear-btn"
-		></button>
+		/>
 	</ng-template>
 </edu-dialog>

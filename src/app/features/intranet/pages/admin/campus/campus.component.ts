@@ -1,8 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-import { ButtonModule } from 'primeng/button';
-
 import { ErrorStateComponent } from '@shared/components';
 import { PageHeaderComponent } from '@intranet-shared/components';
 import { CampusAdminFacade, CampusAdminUiFacade } from './services';
@@ -26,12 +24,12 @@ import {
 	VERTICAL_CONNECTION_TYPE_OPTIONS,
 	VerticalConnectionType,
 } from './models';
-import { EduSelect, EduTag, EduTooltip } from '@edu-ui';
+import { EduButton, EduSelect, EduTag, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-campus-admin',
 	standalone: true,
-	imports: [FormsModule, ButtonModule, EduSelect, EduTag, EduTooltip, CampusPisosPanelComponent, CampusEditorComponent, CampusPisoDialogComponent, CampusNodeDialogComponent, CampusBloqueoDialogComponent, CampusVerticalConnectionDialogComponent, ErrorStateComponent, PageHeaderComponent],
+	imports: [FormsModule, EduButton, EduSelect, EduTag, EduTooltip, CampusPisosPanelComponent, CampusEditorComponent, CampusPisoDialogComponent, CampusNodeDialogComponent, CampusBloqueoDialogComponent, CampusVerticalConnectionDialogComponent, ErrorStateComponent, PageHeaderComponent],
 	templateUrl: './campus.component.html',
 	styleUrl: './campus.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

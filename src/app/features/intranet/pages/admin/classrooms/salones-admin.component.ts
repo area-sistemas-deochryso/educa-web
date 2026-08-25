@@ -3,8 +3,6 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { ButtonModule } from 'primeng/button';
-
 import { PageHeaderComponent, PeriodToggleComponent, KpiStatsComponent, type KpiStatItem } from '@intranet-shared/components';
 import { ClassroomsAdminFacade } from './services';
 import { ClassroomsAdminTableComponent } from './components/salones-admin-table/salones-admin-table.component';
@@ -21,7 +19,7 @@ import {
 	CrearSalonDto,
 } from './models';
 import { NuevoSalonDialogComponent } from './components/nuevo-salon-dialog/nuevo-salon-dialog.component';
-import { EduInputNumber, EduMessageService, EduTab, EduTabPanel, EduTabs, EduTag, EduToast } from '@edu-ui';
+import { EduButton, EduInputNumber, EduMessageService, EduTab, EduTabPanel, EduTabs, EduTag, EduToast } from '@edu-ui';
 @Component({
 	selector: 'app-classrooms-admin',
 	standalone: true,
@@ -29,7 +27,7 @@ import { EduInputNumber, EduMessageService, EduTab, EduTabPanel, EduTabs, EduTag
 		CommonModule,
 		FormsModule,
 		EduTabs, EduTab, EduTabPanel,
-		ButtonModule,
+		EduButton,
 		EduTag,
 		EduInputNumber,
 		EduToast,

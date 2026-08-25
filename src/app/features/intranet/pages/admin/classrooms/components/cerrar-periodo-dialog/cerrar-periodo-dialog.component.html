@@ -57,23 +57,21 @@
 
 	<!-- #region Footer -->
 	<ng-template #footer>
-		<button
-			pButton
+		<edu-button
 			label="Cancelar"
-			class="p-button-text"
+			[text]="true"
 			(click)="onVisibleChange(false)"
 			data-info-anchor="admin-salon-cerrar-periodo-cancel-btn"
-		></button>
-		<button
-			pButton
+		/>
+		<edu-button
 			label="Cerrar Periodo"
 			icon="pi pi-lock"
-			class="p-button-danger"
+			severity="danger"
 			[loading]="loading()"
 			[disabled]="!periodo() || periodo()?.estadoCierre === 'CERRADO'"
 			(click)="onConfirmar()"
 			data-info-anchor="admin-salon-cerrar-periodo-confirm-btn"
-		></button>
+		/>
 	</ng-template>
 	<!-- #endregion -->
 </edu-dialog>

@@ -2,20 +2,19 @@
 import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
 import type { ModoAsignacion } from '@data/models';
 import { ModoAsignacionBadgeComponent } from '@shared/components';
 import type { HorarioDetalleResponseDto, EstudianteHorarioDto } from '../../models/horario.interface';
 import { EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleIconPipe, EstadoToggleLabelPipe } from '@intranet-shared/pipes';
 import type { ProfesorOption } from '../../models/profesor.interface';
-import { EduBadge, EduDrawer, EduSelect, EduTag, EduTemplate, EduTooltip } from '@edu-ui';
+import { EduBadge, EduButton, EduDrawer, EduSelect, EduTag, EduTemplate, EduTooltip } from '@edu-ui';
 
 // #endregion
 // #region Implementation
 @Component({
 	selector: 'app-schedule-detail-drawer',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduBadge, ButtonModule, EduDrawer, EduSelect, EduTag, EduTooltip, ModoAsignacionBadgeComponent, EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleIconPipe, EstadoToggleLabelPipe, EduTemplate],
+	imports: [CommonModule, FormsModule, EduBadge, EduButton, EduDrawer, EduSelect, EduTag, EduTooltip, ModoAsignacionBadgeComponent, EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleIconPipe, EstadoToggleLabelPipe, EduTemplate],
 	templateUrl: './horario-detail-drawer.component.html',
 	styleUrl: './horario-detail-drawer.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

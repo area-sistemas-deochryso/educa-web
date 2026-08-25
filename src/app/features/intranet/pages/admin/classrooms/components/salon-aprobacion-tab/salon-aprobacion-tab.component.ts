@@ -3,8 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 
-import { ButtonModule } from 'primeng/button';
-
 
 
 
@@ -15,7 +13,7 @@ import {
 	SalonAdminListDto,
 	AprobacionEstado,
 } from '../../models';
-import { EduCheckbox, EduTable, EduTag, EduTooltip } from '@edu-ui';
+import { EduButton, EduCheckbox, EduTable, EduTag, EduTooltip } from '@edu-ui';
 
 const PROMEDIO_MIN = 0;
 const PROMEDIO_MAX = 20;
@@ -23,7 +21,7 @@ const PROMEDIO_MAX = 20;
 @Component({
 	selector: 'app-classroom-approval-tab',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduTable, ButtonModule, EduTag, EduCheckbox, EduTooltip],
+	imports: [CommonModule, FormsModule, EduTable, EduButton, EduTag, EduCheckbox, EduTooltip],
 	templateUrl: './salon-aprobacion-tab.component.html',
 	styleUrl: './salon-aprobacion-tab.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

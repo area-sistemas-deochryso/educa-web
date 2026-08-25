@@ -1,8 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
-import { EduDialog, EduInputText, EduSelect, EduTable, EduTag, EduTooltip } from '@edu-ui';
+import { EduButton, EduDialog, EduInputText, EduSelect, EduTable, EduTag, EduTooltip } from '@edu-ui';
 
 // #region Model
 export interface UsuarioValidacionItem {
@@ -23,7 +22,7 @@ export interface ErrorFilterOption {
 @Component({
 	selector: 'app-users-validation-dialog',
 	standalone: true,
-	imports: [CommonModule, FormsModule, ButtonModule, EduDialog, EduInputText, EduSelect, EduTable, EduTag, EduTooltip],
+	imports: [CommonModule, FormsModule, EduButton, EduDialog, EduInputText, EduSelect, EduTable, EduTag, EduTooltip],
 	templateUrl: './usuarios-validation-dialog.component.html',
 	styleUrl: './usuarios-validation-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

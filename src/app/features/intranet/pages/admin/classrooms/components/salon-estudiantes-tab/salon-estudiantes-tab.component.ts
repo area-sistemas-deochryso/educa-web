@@ -2,10 +2,9 @@ import { Component, ChangeDetectionStrategy, inject, input, signal, effect } fro
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { ButtonModule } from 'primeng/button';
 import { EstudianteDisponibleDto, MOTIVOS_RETIRO } from '../../models';
 import { ClassroomStudentsFacade } from './salon-estudiantes-tab.facade';
-import { EduAutoComplete, EduMessage, EduSelect, EduTable, EduTag, EduTooltip } from '@edu-ui';
+import { EduAutoComplete, EduButton, EduMessage, EduSelect, EduTable, EduTag, EduTooltip } from '@edu-ui';
 import type { EduAutoCompleteCompleteEvent } from '@edu-ui';
 
 export interface SalonOption {
@@ -20,7 +19,7 @@ export interface SalonOption {
 		CommonModule,
 		FormsModule,
 		EduTable,
-		ButtonModule,
+		EduButton,
 		EduTag,
 		EduTooltip,
 		EduAutoComplete,

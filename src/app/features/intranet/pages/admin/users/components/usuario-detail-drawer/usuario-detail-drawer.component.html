@@ -87,11 +87,10 @@
 
 		<!-- * Footer actions -->
 		<div class="drawer-footer">
-			<button
-				pButton
+			<edu-button
 				label="Cerrar"
 				icon="pi pi-times"
-				class="p-button-text"
+				[text]="true"
 				(click)="onClose()"
 				data-info-anchor="cerrar-drawer-btn"
 				[pt]="{
@@ -99,12 +98,11 @@
 						'aria-label': 'Cerrar',
 					},
 				}"
-			></button>
-			<button
-				pButton
+			/>
+			<edu-button
 				label="Editar"
 				icon="pi pi-pencil"
-				class="p-button-primary"
+				severity="primary"
 				[pt]="{
 					root: {
 						'aria-label': 'Editar',
@@ -112,7 +110,7 @@
 				}"
 				(click)="onEdit()"
 				data-info-anchor="admin-users-detail-drawer-edit-btn"
-			></button>
+			/>
 		</div>
 	}
 </edu-drawer>

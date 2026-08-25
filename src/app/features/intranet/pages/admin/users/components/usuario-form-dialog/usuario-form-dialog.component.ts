@@ -32,13 +32,12 @@ import { generatePassword } from '@core/helpers';
 import { rolRequiereSalon, rolPermiteEsTutor, canEditPassword } from '@shared/models';
 import { RolService } from '@core/services/roles';
 
-import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
 import { FormFieldErrorComponent } from '@intranet-shared/components';
 import { FormsModule } from '@angular/forms';
 import { UppercaseInputDirective } from '@intranet-shared/directives';
 import { EstadoLabelPipe } from '@intranet-shared/pipes';
-import { EduCheckbox, EduDialog, EduInputText, EduMultiSelect, EduPassword, EduSelect, EduTab, EduTabPanel, EduTabs, EduToggle, EduTooltip } from '@edu-ui';
+import { EduButton, EduCheckbox, EduDialog, EduInputText, EduMultiSelect, EduPassword, EduSelect, EduTab, EduTabPanel, EduTabs, EduToggle, EduTooltip } from '@edu-ui';
 
 export type UsuarioFormData = Partial<CrearUsuarioRequest & ActualizarUsuarioRequest>;
 
@@ -61,7 +60,7 @@ export interface FormValidationErrors {
 		CommonModule,
 		FormsModule,
 		EduDialog,
-		ButtonModule,
+		EduButton,
 		EduInputText,
 		EduMultiSelect,
 		EduSelect,

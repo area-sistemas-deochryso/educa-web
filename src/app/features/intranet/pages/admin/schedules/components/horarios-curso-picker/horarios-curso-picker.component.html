@@ -144,18 +144,16 @@
 	</div>
 
 	<ng-template pTemplate="footer">
-		<button
-			pButton
+		<edu-button
 			label="Cancelar"
 			icon="pi pi-times"
-			class="p-button-text"
+			[text]="true"
 			data-info-anchor="admin-schedules-curso-picker-cancelar-btn"
 			(click)="onCancel()"
 			eduTooltip="Cerrar sin seleccionar curso"
 			eduTooltipPosition="top"
-		></button>
-		<button
-			pButton
+		/>
+		<edu-button
 			label="Confirmar"
 			icon="pi pi-check"
 			[disabled]="!selectedCursoId()"
@@ -163,7 +161,7 @@
 			(click)="onConfirm()"
 			eduTooltip="Confirmar seleccion de curso"
 			eduTooltipPosition="top"
-		></button>
+		/>
 	</ng-template>
 </edu-dialog>
 <!-- #endregion -->

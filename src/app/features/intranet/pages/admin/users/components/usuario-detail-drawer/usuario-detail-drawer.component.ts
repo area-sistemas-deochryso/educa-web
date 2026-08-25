@@ -1,13 +1,11 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, inject, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ButtonModule } from 'primeng/button';
-
 import { UsuarioDetalle } from '../../services';
 import { UiMappingService } from '@intranet-shared/services';
 import { EstadoLabelPipe, EstadoSeverityPipe } from '@intranet-shared/pipes';
 import { FullNamePipe } from '@shared/pipes';
-import { EduDrawer, EduTag, EduTemplate } from '@edu-ui';
+import { EduButton, EduDrawer, EduTag, EduTemplate } from '@edu-ui';
 
 /**
  * Componente presentacional para el drawer de detalles de usuario
@@ -18,7 +16,7 @@ import { EduDrawer, EduTag, EduTemplate } from '@edu-ui';
 @Component({
 	selector: 'app-user-detail-drawer',
 	standalone: true,
-	imports: [CommonModule, EduDrawer, ButtonModule, EduTag, EstadoLabelPipe, EstadoSeverityPipe, FullNamePipe, EduTemplate],
+	imports: [CommonModule, EduDrawer, EduButton, EduTag, EstadoLabelPipe, EstadoSeverityPipe, FullNamePipe, EduTemplate],
 	templateUrl: './usuario-detail-drawer.component.html',
 	styleUrl: './usuario-detail-drawer.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

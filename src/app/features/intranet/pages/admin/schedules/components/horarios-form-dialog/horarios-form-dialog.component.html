@@ -131,24 +131,24 @@
 			<div class="form-field full-width">
 				<label for="curso">Curso *</label>
 				<div class="flex gap-2">
-					<button
-						pButton
+					<edu-button
 						type="button"
 						[label]="cursoSeleccionadoLabel()"
 						icon="pi pi-book"
-						class="p-button-outlined w-full justify-content-start"
+						[outlined]="true"
+						class="w-full justify-content-start"
 						data-info-anchor="curso-selector"
 						(click)="onOpenCursoDialog()"
 						[disabled]="optionsLoading()"
 						eduTooltip="Seleccionar curso organizados por nivel educativo"
 						eduTooltipPosition="top"
-					></button>
+					/>
 					@if (formData().cursoId) {
-						<button
-							pButton
+						<edu-button
 							type="button"
 							icon="pi pi-times"
-							class="p-button-text p-button-danger"
+							[text]="true"
+							severity="danger"
 							data-info-anchor="admin-schedules-form-limpiar-curso-btn"
 							(click)="onClearCurso()"
 							eduTooltip="Limpiar seleccion de curso"
@@ -158,7 +158,7 @@
 									'aria-label': 'Limpiar seleccion',
 								},
 							}"
-						></button>
+						/>
 					}
 				</div>
 				@if (formData().cursoId) {
@@ -172,18 +172,16 @@
 	</div>
 
 	<ng-template pTemplate="footer">
-		<button
-			pButton
+		<edu-button
 			label="Cancelar"
 			icon="pi pi-times"
-			class="p-button-text"
+			[text]="true"
 			data-info-anchor="admin-schedules-form-cancelar-btn"
 			(click)="onCancel()"
 			eduTooltip="Cerrar sin guardar cambios"
 			eduTooltipPosition="top"
-		></button>
-		<button
-			pButton
+		/>
+		<edu-button
 			[label]="isEditing() ? 'Actualizar' : 'Crear'"
 			icon="pi pi-check"
 			data-info-anchor="admin-schedules-form-guardar-btn"
@@ -191,7 +189,7 @@
 			[disabled]="!formValid() || loading()"
 			[eduTooltip]="isEditing() ? 'Guardar cambios del horario' : 'Crear nuevo horario'"
 			eduTooltipPosition="top"
-		></button>
+		/>
 	</ng-template>
 </edu-dialog>
 <!-- #endregion -->

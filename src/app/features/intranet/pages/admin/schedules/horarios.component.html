@@ -8,42 +8,39 @@
 		[value]="vm().esVerano"
 		(valueChange)="onPeriodoChange($event)"
 	/>
-	<button
-		pButton
+	<edu-button
 		label="Refrescar"
 		icon="pi pi-refresh"
-		class="p-button-outlined"
+		[outlined]="true"
 		data-info-anchor="admin-schedules-refresh-btn"
 		(click)="refresh()"
 		[loading]="vm().loading"
 		eduTooltip="Actualizar lista de horarios"
 		eduTooltipPosition="bottom"
 		[pt]="{ root: { 'aria-label': 'Refrescar horarios' } }"
-	></button>
+	/>
 
 	@if (vm().isAdmin) {
-		<button
-			pButton
+		<edu-button
 			label="Importar"
 			icon="pi pi-upload"
-			class="p-button-outlined"
+			[outlined]="true"
 			data-info-anchor="admin-schedules-importar-btn"
 			(click)="onOpenImportDialog()"
 			eduTooltip="Importar horarios desde Excel"
 			eduTooltipPosition="bottom"
 			[pt]="{ root: { 'aria-label': 'Importar horarios desde Excel' } }"
-		></button>
-		<button
-			pButton
+		/>
+		<edu-button
 			label="Nuevo Horario"
 			icon="pi pi-plus"
-			class="p-button-success"
+			severity="success"
 			data-info-anchor="admin-schedules-nuevo-btn"
 			(click)="onNew()"
 			eduTooltip="Crear un nuevo horario de clase"
 			eduTooltipPosition="bottom"
 			[pt]="{ root: { 'aria-label': 'Crear nuevo horario' } }"
-		></button>
+		/>
 	}
 </app-page-header>
 
@@ -68,39 +65,39 @@
 <!-- #region View tabs + estado filter -->
 <div class="view-toolbar">
 	<div class="view-tabs">
-		<button
-			pButton
+		<edu-button
 			label="Por Salón"
 			icon="pi pi-building"
-			class="p-button-text tab-button"
+			[text]="true"
+			class="tab-button"
 			[class.active]="vm().vistaActual === 'salon'"
 			data-info-anchor="tab-switch"
 			(click)="onCambiarVista('salon')"
 			eduTooltip="Ver horarios agrupados por salón"
 			eduTooltipPosition="top"
-		></button>
-		<button
-			pButton
+		/>
+		<edu-button
 			label="Por Profesor"
 			icon="pi pi-user"
-			class="p-button-text tab-button"
+			[text]="true"
+			class="tab-button"
 			[class.active]="vm().vistaActual === 'profesor'"
 			data-info-anchor="tab-switch"
 			(click)="onCambiarVista('profesor')"
 			eduTooltip="Ver horarios agrupados por profesor"
 			eduTooltipPosition="top"
-		></button>
-		<button
-			pButton
+		/>
+		<edu-button
 			label="Vista Global"
 			icon="pi pi-exclamation-triangle"
-			class="p-button-text tab-button"
+			[text]="true"
+			class="tab-button"
 			[class.active]="vm().vistaActual === 'global'"
 			data-info-anchor="tab-switch"
 			(click)="onCambiarVista('global')"
 			eduTooltip="Ver resumen de problemas"
 			eduTooltipPosition="top"
-		></button>
+		/>
 	</div>
 
 	<div class="view-filters-inline">
@@ -131,16 +128,16 @@
 			eduTooltipPosition="bottom"
 		/>
 		@if (vm().hasFilters) {
-			<button
-				pButton
+			<edu-button
 				icon="pi pi-filter-slash"
-				class="p-button-text p-button-sm"
+				[text]="true"
+				size="small"
 				data-info-anchor="admin-schedules-limpiar-filtros-btn"
 				(click)="onClearFiltros()"
 				eduTooltip="Limpiar filtros"
 				eduTooltipPosition="top"
 				[pt]="{ root: { 'aria-label': 'Limpiar filtros' } }"
-			></button>
+			/>
 		}
 	</div>
 </div>

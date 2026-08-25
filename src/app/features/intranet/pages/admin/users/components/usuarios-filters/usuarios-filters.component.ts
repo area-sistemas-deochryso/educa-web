@@ -1,11 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
-
 import { periodoActual, filtrarPorPeriodoAcademico } from '@shared/models';
 import { SalonListDto } from '@features/intranet/pages/admin/schedules/models/salon.interface';
 import { RoleTab } from '../../models';
-import { EduInputText, EduSelect, EduTooltip } from '@edu-ui';
+import { EduButton, EduInputText, EduSelect, EduTooltip } from '@edu-ui';
 
 export interface FilterOptions {
 	estadoOptions: { label: string; value: boolean | null }[];
@@ -14,7 +12,7 @@ export interface FilterOptions {
 @Component({
 	selector: 'app-users-filters',
 	standalone: true,
-	imports: [FormsModule, ButtonModule, EduInputText, EduSelect, EduTooltip],
+	imports: [FormsModule, EduButton, EduInputText, EduSelect, EduTooltip],
 	templateUrl: './usuarios-filters.component.html',
 	styleUrl: './usuarios-filters.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

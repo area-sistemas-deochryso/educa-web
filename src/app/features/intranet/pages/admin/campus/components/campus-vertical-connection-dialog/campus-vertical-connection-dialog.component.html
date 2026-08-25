@@ -141,22 +141,21 @@
 
 	<!-- #region Footer -->
 	<div class="piso-dialog-footer">
-		<button
-			pButton
+		<edu-button
 			label="Cancelar"
-			class="p-button-text p-button-secondary"
+			[text]="true"
+			severity="secondary"
 			(click)="onCancel()"
 			data-info-anchor="admin-campus-vertical-form-cancelar-btn"
-		></button>
-		<button
-			pButton
+		/>
+		<edu-button
 			label="Crear conexion"
 			icon="pi pi-check"
 			(click)="onSave()"
 			[loading]="saving()"
 			[disabled]="!formData().destNodoId"
 			data-info-anchor="admin-campus-vertical-form-guardar-btn"
-		></button>
+		/>
 	</div>
 	<!-- #endregion -->
 </edu-dialog>

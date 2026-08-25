@@ -3,17 +3,16 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { ButtonModule } from 'primeng/button';
 import type { HorarioFormData } from '../../models/horario.interface';
 import type { SalonOption } from '../../models/salon.interface';
-import { EduDialog, EduInputText, EduSelect, EduTooltip } from '@edu-ui';
+import { EduButton, EduDialog, EduInputText, EduSelect, EduTooltip } from '@edu-ui';
 
 // #endregion
 // #region Implementation
 @Component({
 	selector: 'app-schedules-form-dialog',
 	standalone: true,
-	imports: [CommonModule, FormsModule, ButtonModule, EduDialog, EduInputText, EduSelect, EduTooltip],
+	imports: [CommonModule, FormsModule, EduButton, EduDialog, EduInputText, EduSelect, EduTooltip],
 	templateUrl: './horarios-form-dialog.component.html',
 	styleUrl: './horarios-form-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

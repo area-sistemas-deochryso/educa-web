@@ -2,8 +2,6 @@ import { Component, ChangeDetectionStrategy, input, output, signal, computed, On
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { ButtonModule } from 'primeng/button';
-
 import {
 	ConfiguracionCalificacionListDto,
 	CrearConfiguracionCalificacionDto,
@@ -13,7 +11,7 @@ import {
 	TipoCalificacion,
 	TIPOS_CALIFICACION,
 } from '../../models';
-import { EduCheckbox, EduDialog, EduDivider, EduInputNumber, EduInputText, EduSelect } from '@edu-ui';
+import { EduButton, EduCheckbox, EduDialog, EduDivider, EduInputNumber, EduInputText, EduSelect } from '@edu-ui';
 
 interface LiteralRow {
 	letra: string;
@@ -27,7 +25,7 @@ interface LiteralRow {
 @Component({
 	selector: 'app-config-grade-dialog',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduDialog, ButtonModule, EduSelect, EduInputNumber, EduInputText, EduCheckbox, EduDivider],
+	imports: [CommonModule, FormsModule, EduDialog, EduButton, EduSelect, EduInputNumber, EduInputText, EduCheckbox, EduDivider],
 	templateUrl: './config-calificacion-dialog.component.html',
 	styleUrl: './config-calificacion-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
