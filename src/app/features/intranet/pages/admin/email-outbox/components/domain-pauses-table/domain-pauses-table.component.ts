@@ -6,12 +6,11 @@ import {
 	input,
 	output,
 } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
 
 import type { SkeletonColumnDef } from '@intranet-shared/components';
 import { UiMappingService } from '@intranet-shared/services';
 import { EmailDomainPauseListaDto } from '@data/models';
-import { EduTable, EduTag, EduTooltip } from '@edu-ui';
+import { EduButton, EduTable, EduTag, EduTooltip } from '@edu-ui';
 
 /**
  * Plan 37 Chat 3 — tabla client-side de dominios pausados
@@ -20,7 +19,7 @@ import { EduTable, EduTag, EduTooltip } from '@edu-ui';
 @Component({
 	selector: 'app-domain-pauses-table',
 	standalone: true,
-	imports: [EduTable, EduTag, ButtonModule, EduTooltip, DatePipe],
+	imports: [EduTable, EduTag, EduButton, EduTooltip, DatePipe],
 	templateUrl: './domain-pauses-table.component.html',
 	styleUrl: './domain-pauses-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

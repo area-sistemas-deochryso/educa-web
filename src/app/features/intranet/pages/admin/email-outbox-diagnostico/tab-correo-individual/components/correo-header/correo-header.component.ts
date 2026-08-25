@@ -1,13 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
 
 import { ErrorHandlerService } from '@core/services/error';
 import { PageHeaderComponent } from '@intranet-shared/components/page-header';
 
 import { PersonaConCorreoDto, TipoPersona } from '../../models/correo-individual.models';
 import { CampoCorreoLabelPipe } from '../../pipes/campo-correo-label.pipe';
-import { EduAutoComplete, EduTemplate, EduTooltip } from '@edu-ui';
+import { EduAutoComplete, EduButton, EduTemplate, EduTooltip } from '@edu-ui';
 import type { EduAutoCompleteCompleteEvent, EduAutoCompleteSelectEvent } from '@edu-ui';
 
 const TIPO_PERSONA_LABEL: Record<TipoPersona, string> = {
@@ -27,7 +26,7 @@ const TIPO_PERSONA_ICON: Record<TipoPersona, string> = {
 @Component({
 	selector: 'app-correo-header',
 	standalone: true,
-	imports: [FormsModule, EduAutoComplete, ButtonModule, EduTooltip, PageHeaderComponent, CampoCorreoLabelPipe, EduTemplate],
+	imports: [FormsModule, EduAutoComplete, EduButton, EduTooltip, PageHeaderComponent, CampoCorreoLabelPipe, EduTemplate],
 	templateUrl: './correo-header.component.html',
 	styleUrl: './correo-header.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

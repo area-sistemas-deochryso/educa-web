@@ -6,12 +6,11 @@ import {
 	input,
 	output,
 } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
 import { RouterLink } from '@angular/router';
 import type { SkeletonColumnDef } from '@intranet-shared/components';
 import { UiMappingService } from '@intranet-shared/services';
 import { EmailBlacklistEntry } from '@data/models';
-import { EduTable, EduTag, EduTooltip } from '@edu-ui';
+import { EduButton, EduTable, EduTag, EduTooltip } from '@edu-ui';
 import type { EduTableLazyLoadEvent } from '@edu-ui';
 
 /**
@@ -22,7 +21,7 @@ import type { EduTableLazyLoadEvent } from '@edu-ui';
 @Component({
 	selector: 'app-blacklist-table',
 	standalone: true,
-	imports: [EduTable, EduTag, ButtonModule, EduTooltip, DatePipe, RouterLink],
+	imports: [EduTable, EduTag, EduButton, EduTooltip, DatePipe, RouterLink],
 	templateUrl: './blacklist-table.component.html',
 	styleUrl: './blacklist-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

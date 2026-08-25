@@ -239,15 +239,14 @@
 			<!-- Manual retry button -->
 			@if (item.estado === 'FAILED') {
 				<div class="retry-action">
-					<button
-						pButton
+					<edu-button
 						label="Reintentar manualmente"
 						icon="pi pi-replay"
 						severity="warn"
 						[outlined]="true"
 						data-info-anchor="reintentar"
 						(click)="onOpenManualRetry()"
-					></button>
+					/>
 				</div>
 			}
 
@@ -369,19 +368,28 @@
 		</div>
 	}
 	<ng-template #footer>
-		<button pButton label="Cancelar" severity="secondary" [text]="true" data-info-anchor="email-outbox-dialog-cancel-btn" (click)="onCloseManualRetryDialog()"></button>
+		<edu-button
+			label="Cancelar"
+			severity="secondary"
+			[text]="true"
+			data-info-anchor="email-outbox-dialog-cancel-btn"
+			(click)="onCloseManualRetryDialog()"
+		/>
 		@if (!vm().manualRetryResult) {
-			<button
-				pButton
+			<edu-button
 				label="Reintentar"
 				icon="pi pi-replay"
 				severity="warn"
 				data-info-anchor="reintentar"
 				[loading]="vm().manualRetryLoading"
 				(click)="onConfirmManualRetry()"
-			></button>
+			/>
 		} @else {
-			<button pButton label="Cerrar" data-info-anchor="email-outbox-dialog-close-btn" (click)="onCloseManualRetryDialog()"></button>
+			<edu-button
+				label="Cerrar"
+				data-info-anchor="email-outbox-dialog-close-btn"
+				(click)="onCloseManualRetryDialog()"
+			/>
 		}
 	</ng-template>
 </edu-dialog>

@@ -5,13 +5,12 @@ import {
 	input,
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
 
 import { TableSkeletonComponent } from '@intranet-shared/components';
 import type { SkeletonColumnDef } from '@intranet-shared/components';
 
 import { DashboardTopDestinatario } from '@features/intranet/pages/admin/email-outbox-shared';
-import { EduTag, EduTooltip } from '@edu-ui';
+import { EduButton, EduTag, EduTooltip } from '@edu-ui';
 
 const SKELETON_COLUMNS: SkeletonColumnDef[] = [
 	{ width: 'flex', cellType: 'text' },
@@ -30,7 +29,7 @@ const BLACKLIST_ROUTE = '/intranet/admin/monitoreo/correos/blacklist';
 @Component({
 	selector: 'app-top-destinatarios-tile',
 	standalone: true,
-	imports: [ButtonModule, EduTag, EduTooltip, RouterLink, TableSkeletonComponent],
+	imports: [EduButton, EduTag, EduTooltip, RouterLink, TableSkeletonComponent],
 	templateUrl: './top-destinatarios-tile.component.html',
 	styleUrl: './top-destinatarios-tile.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

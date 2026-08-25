@@ -77,49 +77,50 @@
 		/>
 	</div>
 
-	<button
-		pButton
+	<edu-button
 		icon="pi pi-filter-slash"
-		class="p-button-text p-button-sm btn-clear"
+		[text]="true"
+		size="small"
+		class="btn-clear"
 		eduTooltip="Limpiar filtros"
 		eduTooltipPosition="top"
 		data-info-anchor="email-outbox-clear-filters-btn"
 		(click)="onClearFiltros()"
 		[pt]="{ root: { 'aria-label': 'Limpiar filtros' } }"
-	></button>
+	/>
 
-	<button
-		pButton
+	<edu-button
 		icon="pi pi-refresh"
-		class="p-button-text p-button-sm"
+		[text]="true"
+		size="small"
 		eduTooltip="Refrescar"
 		eduTooltipPosition="top"
 		data-info-anchor="email-outbox-refresh-btn"
 		(click)="onRefresh()"
 		[pt]="{ root: { 'aria-label': 'Refrescar' } }"
-	></button>
+	/>
 
-	<button
-		pButton
+	<edu-button
 		icon="pi pi-download"
-		class="p-button-text p-button-sm"
+		[text]="true"
+		size="small"
 		eduTooltip="Exportar CSV (página actual)"
 		eduTooltipPosition="top"
 		data-info-anchor="email-outbox-export-csv-btn"
 		(click)="onExportCsv()"
 		[disabled]="vm().items.length === 0"
 		[pt]="{ root: { 'aria-label': 'Exportar CSV' } }"
-	></button>
+	/>
 
-	<button
-		pButton
+	<edu-button
 		label="Agregar"
 		icon="pi pi-plus"
-		class="p-button-success p-button-sm"
+		size="small"
+		severity="success"
 		data-info-anchor="admin-email-outbox-quarantine-agregar-btn"
 		(click)="onOpenAddDialog()"
 		[pt]="{ root: { 'aria-label': 'Agregar cuarentena manual' } }"
-	></button>
+	/>
 </div>
 
 @if (vm().tableReady) {

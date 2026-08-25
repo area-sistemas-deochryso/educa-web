@@ -56,16 +56,17 @@
 				<td>
 					<div class="actions">
 						@if (item.estado) {
-							<button
-								pButton
+							<edu-button
 								icon="pi pi-unlock"
-								class="p-button-rounded p-button-text p-button-warning"
+								[text]="true"
+								[rounded]="true"
+								severity="warn"
 								eduTooltip="Liberar pausa"
 								eduTooltipPosition="top"
 								data-info-anchor="admin-email-outbox-domain-liberar-btn"
 								(click)="onRelease(item)"
 								[pt]="{ root: { 'aria-label': 'Liberar pausa' } }"
-							></button>
+							/>
 						}
 					</div>
 				</td>

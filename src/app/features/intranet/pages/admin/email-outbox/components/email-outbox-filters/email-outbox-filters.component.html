@@ -117,11 +117,11 @@
 	</div>
 
 	<div class="field field--clear">
-		<button
-			pButton
+		<edu-button
 			type="button"
 			icon="pi pi-filter-slash"
-			class="p-button-text btn-clear"
+			[text]="true"
+			class="btn-clear"
 			eduTooltip="Limpiar filtros"
 			eduTooltipPosition="top"
 			data-info-anchor="email-outbox-clear-filters-btn"
@@ -131,7 +131,7 @@
 					'aria-label': 'Limpiar filtros',
 				},
 			}"
-		></button>
+		/>
 	</div>
 </div>
 <!-- #endregion -->

@@ -6,13 +6,12 @@ import {
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
 
 import { TableSkeletonComponent } from '@intranet-shared/components';
 import type { SkeletonColumnDef } from '@intranet-shared/components';
 
 import { DashboardCandidatoBlacklist } from '@features/intranet/pages/admin/email-outbox-shared';
-import { EduTooltip } from '@edu-ui';
+import { EduButton, EduTooltip } from '@edu-ui';
 
 const SKELETON_COLUMNS: SkeletonColumnDef[] = [
 	{ width: 'flex', cellType: 'text' },
@@ -30,7 +29,7 @@ const BLACKLIST_ROUTE = '/intranet/admin/monitoreo/correos/blacklist';
 @Component({
 	selector: 'app-candidatos-blacklist-tile',
 	standalone: true,
-	imports: [DatePipe, ButtonModule, EduTooltip, RouterLink, TableSkeletonComponent],
+	imports: [DatePipe, EduButton, EduTooltip, RouterLink, TableSkeletonComponent],
 	templateUrl: './candidatos-blacklist-tile.component.html',
 	styleUrl: './candidatos-blacklist-tile.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

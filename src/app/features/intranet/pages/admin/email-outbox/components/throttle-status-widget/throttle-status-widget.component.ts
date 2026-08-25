@@ -6,14 +6,13 @@ import {
 	output,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
 
 import {
 	computeSeverity,
 	ThrottleSeverity,
 	ThrottleStatus,
 } from '../../models/throttle-status.models';
-import { EduTag, EduToggle, EduTooltip } from '@edu-ui';
+import { EduButton, EduTag, EduToggle, EduTooltip } from '@edu-ui';
 
 /**
  * Plan 22 Chat B — widget presentacional del estado throttle saliente SMTP.
@@ -26,7 +25,7 @@ import { EduTag, EduToggle, EduTooltip } from '@edu-ui';
 @Component({
 	selector: 'app-throttle-status-widget',
 	standalone: true,
-	imports: [FormsModule, ButtonModule, EduTag, EduToggle, EduTooltip],
+	imports: [FormsModule, EduButton, EduTag, EduToggle, EduTooltip],
 	templateUrl: './throttle-status-widget.component.html',
 	styleUrl: './throttle-status-widget.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

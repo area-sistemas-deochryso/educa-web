@@ -7,7 +7,6 @@ import {
 	signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
 
 import {
 	CrearEmailDomainPauseDto,
@@ -15,7 +14,7 @@ import {
 	DomainPauseDurationHours,
 	EmailDomainPauseFormData,
 } from '@data/models';
-import { EduDialog, EduInputText, EduSelect, EduTextarea } from '@edu-ui';
+import { EduButton, EduDialog, EduInputText, EduSelect, EduTextarea } from '@edu-ui';
 
 interface DurationOption {
 	label: string;
@@ -27,7 +26,7 @@ const DOMAIN_REGEX = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-
 @Component({
 	selector: 'app-domain-pauses-add-dialog',
 	standalone: true,
-	imports: [FormsModule, EduDialog, ButtonModule, EduInputText, EduSelect, EduTextarea],
+	imports: [FormsModule, EduDialog, EduButton, EduInputText, EduSelect, EduTextarea],
 	templateUrl: './domain-pauses-add-dialog.component.html',
 	styleUrl: './domain-pauses-add-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

@@ -68,10 +68,11 @@
 			</td>
 			<td>
 				<div class="action-buttons">
-					<button
-						pButton
+					<edu-button
 						icon="pi pi-eye"
-						class="p-button-rounded p-button-text p-button-sm"
+						[text]="true"
+						[rounded]="true"
+						size="small"
 						eduTooltip="Ver detalle"
 						eduTooltipPosition="top"
 						data-info-anchor="email-outbox-view-detail-btn"
@@ -81,7 +82,7 @@
 								'aria-label': 'Ver detalle',
 							},
 						}"
-					></button>
+					/>
 					<a
 						[routerLink]="['/intranet/admin/monitoreo/correos/persona', item.destinatario]"
 						class="p-button p-button-rounded p-button-text p-button-sm p-button-info"
@@ -93,10 +94,12 @@
 						<i class="pi pi-history"></i>
 					</a>
 					@if (item.estado === 'FAILED') {
-						<button
-							pButton
+						<edu-button
 							icon="pi pi-refresh"
-							class="p-button-rounded p-button-text p-button-sm p-button-warning"
+							[text]="true"
+							[rounded]="true"
+							size="small"
+							severity="warn"
 							[eduTooltip]="
 								esPermanente(item.tipoFallo)
 									? 'No se puede reintentar: fallo permanente. Corregir el registro origen primero.'
@@ -113,18 +116,20 @@
 										: 'Reintentar envío',
 								},
 							}"
-						></button>
+						/>
 					}
-					<button
-						pButton
+					<edu-button
 						icon="pi pi-file-export"
-						class="p-button-rounded p-button-text p-button-sm p-button-secondary"
+						[text]="true"
+						[rounded]="true"
+						size="small"
+						severity="secondary"
 						eduTooltip="Exportar caso"
 						eduTooltipPosition="top"
 						data-info-anchor="admin-email-outbox-exportar-caso-btn"
 						(click)="exportCaso.emit(item)"
 						[pt]="{ root: { 'aria-label': 'Exportar caso completo' } }"
-					></button>
+					/>
 				</div>
 			</td>
 		</tr>

@@ -6,14 +6,13 @@ import {
 	input,
 	output,
 } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
 
 import { UiMappingService } from '@intranet-shared/services';
 import {
 	EmailQuarantineDetalleDto,
 	EmailQuarantineListaDto,
 } from '@data/models';
-import { EduDrawer, EduTable, EduTag, EduTemplate, EduTooltip } from '@edu-ui';
+import { EduButton, EduDrawer, EduTable, EduTag, EduTemplate, EduTooltip } from '@edu-ui';
 
 /**
  * Plan 37 Chat 3 — drawer detalle de cuarentena (B10).
@@ -22,7 +21,7 @@ import { EduDrawer, EduTable, EduTag, EduTemplate, EduTooltip } from '@edu-ui';
 @Component({
 	selector: 'app-quarantine-detail-drawer',
 	standalone: true,
-	imports: [EduDrawer, ButtonModule, EduTag, EduTable, EduTooltip, DatePipe, EduTemplate],
+	imports: [EduDrawer, EduButton, EduTag, EduTable, EduTooltip, DatePipe, EduTemplate],
 	templateUrl: './quarantine-detail-drawer.component.html',
 	styleUrl: './quarantine-detail-drawer.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

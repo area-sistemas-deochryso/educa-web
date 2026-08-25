@@ -42,18 +42,19 @@
 						<td class="num">{{ d.otros5xx }}</td>
 						<td>
 							@if (!d.yaBlacklisteado) {
-								<button
-									pButton
+								<edu-button
 									label="Bloquear"
 									icon="pi pi-ban"
-									class="p-button-sm p-button-outlined p-button-danger"
+									[outlined]="true"
+									size="small"
+									severity="danger"
 									[routerLink]="[blacklistRoute]"
 									[queryParams]="queryParamsFor(d.destinatario)"
 									data-info-anchor="admin-email-outbox-dashboard-bloquear-destinatario"
 									[pt]="{
 										root: { 'aria-label': 'Bloquear ' + d.destinatario }
 									}"
-								></button>
+								/>
 							}
 						</td>
 					</tr>

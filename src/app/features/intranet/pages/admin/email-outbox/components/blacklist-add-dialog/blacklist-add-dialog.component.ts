@@ -7,7 +7,6 @@ import {
 	signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
 
 import {
 	BlacklistFormData,
@@ -15,7 +14,7 @@ import {
 	EMAIL_BLACKLIST_MOTIVOS_MANUALES,
 	EmailBlacklistMotivo,
 } from '@data/models';
-import { EduDialog, EduInputText, EduSelect, EduTextarea } from '@edu-ui';
+import { EduButton, EduDialog, EduInputText, EduSelect, EduTextarea } from '@edu-ui';
 
 interface MotivoOption {
 	label: string;
@@ -43,7 +42,7 @@ export const BLACKLIST_OBSERVACION_MIN_MANUAL = 20;
 @Component({
 	selector: 'app-blacklist-add-dialog',
 	standalone: true,
-	imports: [FormsModule, EduDialog, ButtonModule, EduInputText, EduSelect, EduTextarea],
+	imports: [FormsModule, EduDialog, EduButton, EduInputText, EduSelect, EduTextarea],
 	templateUrl: './blacklist-add-dialog.component.html',
 	styleUrl: './blacklist-add-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

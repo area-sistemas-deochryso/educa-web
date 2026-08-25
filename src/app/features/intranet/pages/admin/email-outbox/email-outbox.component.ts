@@ -11,8 +11,6 @@ import { DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { ButtonModule } from 'primeng/button';
-
 import { StatsSkeletonComponent, TableSkeletonComponent } from '@intranet-shared/components';
 import { ErrorStateComponent } from '@shared/components';
 import { CorrelationIdPillComponent } from '@intranet-shared/components';
@@ -37,12 +35,12 @@ import { ThrottleStatusWidgetComponent } from './components/throttle-status-widg
 import { DeferFailStatusWidgetComponent } from './components/defer-fail-status-widget/defer-fail-status-widget.component';
 
 import { EmailOutboxLista } from '@data/models';
-import { EduDialog, EduDrawer, EduMessageService, EduSelect, EduTag, EduToast } from '@edu-ui';
+import { EduButton, EduDialog, EduDrawer, EduMessageService, EduSelect, EduTag, EduToast } from '@edu-ui';
 
 @Component({
 	selector: 'app-email-outbox',
 	standalone: true,
-	imports: [DecimalPipe, FormsModule, EduDrawer, EduDialog, EduSelect, ButtonModule, EduTag, EduToast, StatsSkeletonComponent, TableSkeletonComponent, EmailOutboxHeaderComponent, EmailOutboxStatsComponent, EmailOutboxFiltersComponent, EmailOutboxTableComponent, EmailOutboxExportDrawerComponent, EmailOutboxChartComponent, ThrottleStatusWidgetComponent, DeferFailStatusWidgetComponent, EmailDeferFailBannerComponent, CorrelationIdPillComponent, HubContextBannerComponent, ErrorStateComponent],
+	imports: [DecimalPipe, FormsModule, EduDrawer, EduDialog, EduSelect, EduButton, EduTag, EduToast, StatsSkeletonComponent, TableSkeletonComponent, EmailOutboxHeaderComponent, EmailOutboxStatsComponent, EmailOutboxFiltersComponent, EmailOutboxTableComponent, EmailOutboxExportDrawerComponent, EmailOutboxChartComponent, ThrottleStatusWidgetComponent, DeferFailStatusWidgetComponent, EmailDeferFailBannerComponent, CorrelationIdPillComponent, HubContextBannerComponent, ErrorStateComponent],
 	providers: [EduMessageService],
 	templateUrl: './email-outbox.component.html',
 	styleUrl: './email-outbox.component.scss',

@@ -18,28 +18,30 @@
 		/>
 
 		@if (fechaConsulta()) {
-			<button
-				pButton
+			<edu-button
 				icon="pi pi-times"
-				class="p-button-text p-button-sm btn-icon"
+				[text]="true"
+				size="small"
+				class="btn-icon"
 				eduTooltip="Volver a hoy"
 				(click)="onClearDate()"
 				[pt]="{ root: { 'aria-label': 'Volver a hoy' } }"
 				data-info-anchor="admin-email-outbox-diagnostico-volver-hoy-btn"
-			></button>
+			/>
 		}
 
 		<span class="action-divider"></span>
 
-		<button
-			pButton
+		<edu-button
 			icon="pi pi-refresh"
-			class="p-button-text p-button-sm btn-icon"
+			[text]="true"
+			size="small"
+			class="btn-icon"
 			eduTooltip="Refrescar"
 			[disabled]="loading()"
 			(click)="onRefresh()"
 			[pt]="{ root: { 'aria-label': 'Refrescar' } }"
 			data-info-anchor="refrescar-btn"
-		></button>
+		/>
 	</div>
 </app-page-header>

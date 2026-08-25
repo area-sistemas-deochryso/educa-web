@@ -1,10 +1,9 @@
 import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
 
 import { ErrorHandlerService } from '@core/services/error';
 
 import { EmailBouncesAcumulados } from '@features/intranet/pages/admin/email-outbox-shared';
-import { EduTable, EduTag, EduTooltip } from '@edu-ui';
+import { EduButton, EduTable, EduTag, EduTooltip } from '@edu-ui';
 
 const WARNING_THRESHOLD = 2;
 const CRITICAL_THRESHOLD = 3;
@@ -12,7 +11,7 @@ const CRITICAL_THRESHOLD = 3;
 @Component({
 	selector: 'app-dashboard-bouncers-table',
 	standalone: true,
-	imports: [EduTable, EduTag, ButtonModule, EduTooltip],
+	imports: [EduTable, EduTag, EduButton, EduTooltip],
 	templateUrl: './dashboard-bouncers-table.component.html',
 	styleUrl: './dashboard-bouncers-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

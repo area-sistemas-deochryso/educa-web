@@ -1,16 +1,15 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
 
 import { PageHeaderComponent } from '@intranet-shared/components/page-header';
-import { EduDatePicker, EduTooltip } from '@edu-ui';
+import { EduButton, EduDatePicker, EduTooltip } from '@edu-ui';
 
 const MAX_DAYS_BACK = 90;
 
 @Component({
 	selector: 'app-dashboard-header',
 	standalone: true,
-	imports: [FormsModule, ButtonModule, EduDatePicker, EduTooltip, PageHeaderComponent],
+	imports: [FormsModule, EduButton, EduDatePicker, EduTooltip, PageHeaderComponent],
 	templateUrl: './dashboard-header.component.html',
 	styleUrl: './dashboard-header.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

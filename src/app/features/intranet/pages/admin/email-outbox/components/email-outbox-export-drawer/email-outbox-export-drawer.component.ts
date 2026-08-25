@@ -1,14 +1,13 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { ButtonModule } from 'primeng/button';
 
 import { EmailOutboxExportDto } from '../../models/email-outbox-export.models';
-import { EduDrawer, EduTag, EduTooltip } from '@edu-ui';
+import { EduButton, EduDrawer, EduTag, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-email-outbox-export-drawer',
 	standalone: true,
-	imports: [EduDrawer, ButtonModule, EduTag, EduTooltip, DatePipe],
+	imports: [EduDrawer, EduButton, EduTag, EduTooltip, DatePipe],
 	templateUrl: './email-outbox-export-drawer.component.html',
 	styleUrl: './email-outbox-export-drawer.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

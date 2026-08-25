@@ -7,14 +7,14 @@
 				<span class="section-subtitle">Registros del día sin correo SENT asociado</span>
 			</div>
 			@if (!isEmpty()) {
-				<p-button
+				<edu-button
 					label="Exportar Excel"
 					data-info-anchor="exportar-excel-btn"
 					icon="pi pi-file-excel"
 					[text]="true"
 					size="small"
-					(onClick)="exportExcel()"
-					styleClass="btn-export-excel"
+					(click)="exportExcel()"
+					class="btn-export-excel"
 					[pt]="{ root: { 'aria-label': 'Exportar tabla a Excel' } }"
 				/>
 			}
@@ -101,12 +101,12 @@
 					@if (hasSalonData()) {
 						<td class="col-acciones">
 							@if (row.estudianteId !== null) {
-								<p-button
+								<edu-button
 									label="Ver perfil"
 									icon="pi pi-user"
 									[text]="true"
 									size="small"
-									(onClick)="onStudentClick($event, row)"
+									(click)="onStudentClick($event, row)"
 									[pt]="{ root: { 'aria-label': 'Ver perfil de ' + row.alumno } }"
 									data-info-anchor="admin-email-outbox-diagnostico-ver-perfil-btn"
 								/>

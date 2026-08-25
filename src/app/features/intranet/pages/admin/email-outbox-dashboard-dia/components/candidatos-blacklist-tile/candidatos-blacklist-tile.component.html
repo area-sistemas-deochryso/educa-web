@@ -30,18 +30,19 @@
 						<td class="num"><span class="pill pill--warn">{{ c.hits }}</span></td>
 						<td>{{ c.ultimoHit | date: 'short' }}</td>
 						<td>
-							<button
-								pButton
+							<edu-button
 								label="Bloquear"
 								icon="pi pi-ban"
-								class="p-button-sm p-button-outlined p-button-danger"
+								[outlined]="true"
+								size="small"
+								severity="danger"
 								[routerLink]="[blacklistRoute]"
 								[queryParams]="queryParamsFor(c.destinatario)"
 								data-info-anchor="admin-email-outbox-dashboard-bloquear-destinatario"
 								[pt]="{
 									root: { 'aria-label': 'Bloquear ' + c.destinatario }
 								}"
-							></button>
+							/>
 						</td>
 					</tr>
 				}

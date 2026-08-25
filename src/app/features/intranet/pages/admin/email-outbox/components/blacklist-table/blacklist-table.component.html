@@ -62,16 +62,17 @@
 				</td>
 				<td>
 					<div class="actions">
-						<button
-							pButton
+						<edu-button
 							icon="pi pi-eye"
-							class="p-button-rounded p-button-text p-button-secondary"
+							[text]="true"
+							[rounded]="true"
+							severity="secondary"
 							eduTooltip="Ver detalles"
 							eduTooltipPosition="top"
 							data-info-anchor="email-outbox-view-detail-btn"
 							(click)="onViewDetail(item)"
 							[pt]="{ root: { 'aria-label': 'Ver detalles' } }"
-						></button>
+						/>
 						<a
 							[routerLink]="['/intranet/admin/monitoreo/correos/persona', item.correo]"
 							class="p-button p-button-rounded p-button-text p-button-info"
@@ -83,16 +84,17 @@
 							<i class="pi pi-history"></i>
 						</a>
 						@if (item.estado) {
-							<button
-								pButton
+							<edu-button
 								icon="pi pi-lock-open"
-								class="p-button-rounded p-button-text p-button-warning"
+								[text]="true"
+								[rounded]="true"
+								severity="warn"
 								eduTooltip="Desbloquear"
 								eduTooltipPosition="top"
 								data-info-anchor="admin-email-outbox-blacklist-desbloquear-btn"
 								(click)="onUnblock(item)"
 								[pt]="{ root: { 'aria-label': 'Desbloquear correo' } }"
-							></button>
+							/>
 						}
 					</div>
 				</td>

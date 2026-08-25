@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
 import {
 	EMAIL_OUTBOX_ESTADOS,
 	EMAIL_OUTBOX_TIPO_LABELS,
@@ -11,7 +10,7 @@ import {
 
 import { TIPOS_FALLO } from '../../models/tipo-fallo.models';
 import { TipoFalloLabelPipe } from '@features/intranet/pages/admin/email-outbox-shared';
-import { EduDatePicker, EduIconField, EduInputIcon, EduInputText, EduSelect, EduTooltip } from '@edu-ui';
+import { EduButton, EduDatePicker, EduIconField, EduInputIcon, EduInputText, EduSelect, EduTooltip } from '@edu-ui';
 
 interface SelectOption {
 	label: string;
@@ -28,7 +27,7 @@ interface SelectOption {
 		EduDatePicker,
 		EduIconField,
 		EduInputIcon,
-		ButtonModule,
+		EduButton,
 		EduTooltip],
 	templateUrl: './email-outbox-filters.component.html',
 	styleUrl: './email-outbox-filters.component.scss',

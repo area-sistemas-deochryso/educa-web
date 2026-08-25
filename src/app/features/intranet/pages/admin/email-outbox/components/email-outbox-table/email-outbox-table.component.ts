@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
 import {
 	EMAIL_OUTBOX_TIPO_LABELS,
 	EmailOutboxLista,
@@ -13,7 +12,7 @@ import { CorrelationIdPillComponent } from '@intranet-shared/components';
 import { esPermanente } from '../../models/tipo-fallo.models';
 import { TipoFalloLabelPipe } from '@features/intranet/pages/admin/email-outbox-shared';
 import { TipoFalloSeverityPipe } from '../../pipes/tipo-fallo-severity.pipe';
-import { EduTable, EduTag, EduTooltip } from '@edu-ui';
+import { EduButton, EduTable, EduTag, EduTooltip } from '@edu-ui';
 import type { EduTableLazyLoadEvent } from '@edu-ui';
 
 @Component({
@@ -22,7 +21,7 @@ import type { EduTableLazyLoadEvent } from '@edu-ui';
 	imports: [
 		EduTable,
 		EduTag,
-		ButtonModule,
+		EduButton,
 		EduTooltip,
 		DatePipe,
 		RouterLink,

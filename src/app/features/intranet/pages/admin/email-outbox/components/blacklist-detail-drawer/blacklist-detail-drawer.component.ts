@@ -6,11 +6,10 @@ import {
 	input,
 	output,
 } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
 
 import { UiMappingService } from '@intranet-shared/services';
 import { EmailBlacklistEntry } from '@data/models';
-import { EduDrawer, EduTag, EduTooltip } from '@edu-ui';
+import { EduButton, EduDrawer, EduTag, EduTooltip } from '@edu-ui';
 
 /**
  * Plan 38 Chat 5 — drawer detalle (B10 de `design-system.md`).
@@ -19,7 +18,7 @@ import { EduDrawer, EduTag, EduTooltip } from '@edu-ui';
 @Component({
 	selector: 'app-blacklist-detail-drawer',
 	standalone: true,
-	imports: [EduDrawer, ButtonModule, EduTag, EduTooltip, DatePipe],
+	imports: [EduDrawer, EduButton, EduTag, EduTooltip, DatePipe],
 	templateUrl: './blacklist-detail-drawer.component.html',
 	styleUrl: './blacklist-detail-drawer.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

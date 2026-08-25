@@ -7,14 +7,13 @@ import {
 } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
 
 import {
 	DeferFailStatus,
 	DeferFailStatusLevel,
 	isProbableTelemetryFailure,
 } from '@features/intranet/pages/admin/email-outbox-shared';
-import { EduTag, EduToggle, EduTooltip } from '@edu-ui';
+import { EduButton, EduTag, EduToggle, EduTooltip } from '@edu-ui';
 
 type LevelSeverity = 'success' | 'warn' | 'danger';
 
@@ -30,7 +29,7 @@ type LevelSeverity = 'success' | 'warn' | 'danger';
 @Component({
 	selector: 'app-defer-fail-status-widget',
 	standalone: true,
-	imports: [DatePipe, DecimalPipe, FormsModule, ButtonModule, EduTag, EduToggle, EduTooltip],
+	imports: [DatePipe, DecimalPipe, FormsModule, EduButton, EduTag, EduToggle, EduTooltip],
 	templateUrl: './defer-fail-status-widget.component.html',
 	styleUrl: './defer-fail-status-widget.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

@@ -13,15 +13,15 @@
 	} @else if (data(); as d) {
 		<!-- #region Header actions -->
 		<div class="export-actions">
-			<button
-				pButton
+			<edu-button
 				label="Descargar JSON"
 				icon="pi pi-download"
-				class="p-button-sm p-button-outlined"
+				[outlined]="true"
+				size="small"
 				data-info-anchor="admin-email-outbox-export-descargar-json-btn"
 				(click)="downloadJson()"
 				[pt]="{ root: { 'aria-label': 'Descargar caso como archivo JSON' } }"
-			></button>
+			/>
 		</div>
 		<!-- #endregion -->
 

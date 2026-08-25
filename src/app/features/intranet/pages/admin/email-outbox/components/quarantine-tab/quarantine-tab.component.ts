@@ -8,7 +8,6 @@ import {
 } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
 
 import { MiniSparklineComponent, TableSkeletonComponent } from '@intranet-shared/components';
 import {
@@ -33,7 +32,7 @@ import { QuarantineTableComponent } from '../quarantine-table/quarantine-table.c
 import { QuarantineAddDialogComponent } from '../quarantine-add-dialog/quarantine-add-dialog.component';
 import { QuarantineDetailDrawerComponent } from '../quarantine-detail-drawer/quarantine-detail-drawer.component';
 import { DomainBlockedAlertBannerComponent } from '../domain-blocked-alert-banner/domain-blocked-alert-banner.component';
-import { EduConfirmDialog, EduConfirmationService, EduInputText, EduSelect, EduTooltip } from '@edu-ui';
+import { EduButton, EduConfirmationService, EduConfirmDialog, EduInputText, EduSelect, EduTooltip } from '@edu-ui';
 import type { EduTableLazyLoadEvent } from '@edu-ui';
 interface SelectOption<T> {
 	label: string;
@@ -61,7 +60,7 @@ const MOTIVO_OPTIONS: SelectOption<QuarantineMotivo>[] = EMAIL_QUARANTINE_MOTIVO
 	imports: [
 		DecimalPipe,
 		FormsModule,
-		ButtonModule,
+		EduButton,
 		EduInputText,
 		EduSelect,
 		EduTooltip,

@@ -11,7 +11,6 @@ import { DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ButtonModule } from 'primeng/button';
 
 import { MiniSparklineComponent, TableSkeletonComponent } from '@intranet-shared/components';
 import { environment } from '@config/environment';
@@ -38,7 +37,7 @@ import { trendSummary, TrendSummary } from '../../utils/trend-summary';
 import { BlacklistTableComponent } from '../blacklist-table/blacklist-table.component';
 import { BlacklistAddDialogComponent } from '../blacklist-add-dialog/blacklist-add-dialog.component';
 import { BlacklistDetailDrawerComponent } from '../blacklist-detail-drawer/blacklist-detail-drawer.component';
-import { EduConfirmDialog, EduConfirmationService, EduDialog, EduInputText, EduMessageService, EduSelect, EduTextarea, EduToast, EduTooltip } from '@edu-ui';
+import { EduButton, EduConfirmationService, EduConfirmDialog, EduDialog, EduInputText, EduMessageService, EduSelect, EduTextarea, EduToast, EduTooltip } from '@edu-ui';
 import type { EduTableLazyLoadEvent } from '@edu-ui';
 interface SelectOption<T> {
 	label: string;
@@ -68,7 +67,7 @@ const MOTIVO_OPTIONS: SelectOption<EmailBlacklistMotivo>[] = [
 	imports: [
 		DecimalPipe,
 		FormsModule,
-		ButtonModule,
+		EduButton,
 		EduInputText,
 		EduTextarea,
 		EduSelect,

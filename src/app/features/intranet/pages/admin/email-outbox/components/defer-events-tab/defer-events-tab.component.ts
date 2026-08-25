@@ -10,7 +10,6 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
 import { DecimalPipe } from '@angular/common';
 
 import { DeferEventTipo } from '@data/models';
@@ -21,7 +20,7 @@ import { EmailDeferEventDataFacade } from '../../services';
 import { trendSummary, TrendSummary } from '../../utils/trend-summary';
 import { DeferEventItemComponent } from '../defer-event-item/defer-event-item.component';
 import { DomainBlockedAlertBannerComponent } from '../domain-blocked-alert-banner/domain-blocked-alert-banner.component';
-import { EduDatePicker, EduInputText, EduPaginator, EduSelect, EduTooltip } from '@edu-ui';
+import { EduButton, EduDatePicker, EduInputText, EduPaginator, EduSelect, EduTooltip } from '@edu-ui';
 import type { EduPaginatorPageEvent } from '@edu-ui';
 
 const PAGE_SIZE = 25;
@@ -32,7 +31,7 @@ const PAGE_SIZE = 25;
 	imports: [
 		DecimalPipe,
 		FormsModule,
-		ButtonModule,
+		EduButton,
 		EduDatePicker,
 		EduInputText,
 		EduPaginator,

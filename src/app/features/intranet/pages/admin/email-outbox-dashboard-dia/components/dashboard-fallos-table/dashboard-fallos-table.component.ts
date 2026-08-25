@@ -1,16 +1,15 @@
 import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
 
 import { ErrorHandlerService } from '@core/services/error';
 import { EmailOutboxLista } from '@data/models';
 
 import { TipoFalloLabelPipe } from '@features/intranet/pages/admin/email-outbox-shared';
-import { EduTable, EduTag, EduTooltip } from '@edu-ui';
+import { EduButton, EduTable, EduTag, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-dashboard-fallos-table',
 	standalone: true,
-	imports: [EduTable, EduTag, ButtonModule, EduTooltip, TipoFalloLabelPipe],
+	imports: [EduTable, EduTag, EduButton, EduTooltip, TipoFalloLabelPipe],
 	templateUrl: './dashboard-fallos-table.component.html',
 	styleUrl: './dashboard-fallos-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

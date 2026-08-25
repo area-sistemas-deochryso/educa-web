@@ -68,26 +68,24 @@
 
 	<ng-template #footer>
 		<div class="dialog-footer">
-			<button
-				pButton
+			<edu-button
 				label="Cancelar"
 				icon="pi pi-times"
-				class="p-button-text"
+				[text]="true"
 				data-info-anchor="email-outbox-dialog-cancel-btn"
 				(click)="onCancel()"
 				[disabled]="submitting()"
 				[pt]="{ root: { 'aria-label': 'Cancelar' } }"
-			></button>
-			<button
-				pButton
+			/>
+			<edu-button
 				label="Cuarentena"
 				icon="pi pi-shield"
-				class="p-button-success"
+				severity="success"
 				data-info-anchor="admin-email-outbox-quarantine-crear-btn"
 				(click)="onConfirm()"
 				[disabled]="!canSubmit()"
 				[pt]="{ root: { 'aria-label': 'Crear cuarentena manual' } }"
-			></button>
+			/>
 		</div>
 	</ng-template>
 </edu-dialog>

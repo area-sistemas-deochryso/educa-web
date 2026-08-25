@@ -1,12 +1,11 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
 
 import { ExcelService } from '@core/services/excel';
 
 import { AttendanceGapRow } from '@features/intranet/pages/admin/email-outbox-shared';
-import { EduMultiSelect, EduTable, EduTag, EduTooltip } from '@edu-ui';
+import { EduButton, EduMultiSelect, EduTable, EduTag, EduTooltip } from '@edu-ui';
 
 interface SalonOption {
 	id: number;
@@ -16,7 +15,7 @@ interface SalonOption {
 @Component({
 	selector: 'app-attendance-gap-tile',
 	standalone: true,
-	imports: [FormsModule, ButtonModule, EduMultiSelect, EduTable, EduTag, EduTooltip],
+	imports: [FormsModule, EduButton, EduMultiSelect, EduTable, EduTag, EduTooltip],
 	templateUrl: './attendance-gap-tile.component.html',
 	styleUrl: './attendance-gap-tile.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

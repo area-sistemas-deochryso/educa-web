@@ -6,7 +6,6 @@ import {
 	signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
 
 import { TableSkeletonComponent } from '@intranet-shared/components';
 import {
@@ -29,7 +28,7 @@ import {
 import { DomainPausesTableComponent } from '../domain-pauses-table/domain-pauses-table.component';
 import { DomainPausesAddDialogComponent } from '../domain-pauses-add-dialog/domain-pauses-add-dialog.component';
 import { DomainBlockedAlertBannerComponent } from '../domain-blocked-alert-banner/domain-blocked-alert-banner.component';
-import { EduConfirmDialog, EduConfirmationService, EduInputText, EduSelect, EduTooltip } from '@edu-ui';
+import { EduButton, EduConfirmationService, EduConfirmDialog, EduInputText, EduSelect, EduTooltip } from '@edu-ui';
 
 interface SelectOption<T> {
 	label: string;
@@ -53,7 +52,7 @@ const ESTADO_OPTIONS: SelectOption<EmailDomainPauseFiltroEstado>[] = [
 @Component({
 	selector: 'app-domain-pauses-tab',
 	standalone: true,
-	imports: [FormsModule, ButtonModule, EduInputText, EduSelect, EduTooltip, EduConfirmDialog, TableSkeletonComponent, DomainPausesTableComponent, DomainPausesAddDialogComponent, DomainBlockedAlertBannerComponent, HubContextBannerComponent],
+	imports: [FormsModule, EduButton, EduInputText, EduSelect, EduTooltip, EduConfirmDialog, TableSkeletonComponent, DomainPausesTableComponent, DomainPausesAddDialogComponent, DomainBlockedAlertBannerComponent, HubContextBannerComponent],
 	providers: [EduConfirmationService],
 	templateUrl: './domain-pauses-tab.component.html',
 	styleUrl: './domain-pauses-tab.component.scss',
