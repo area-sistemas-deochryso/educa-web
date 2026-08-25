@@ -1,6 +1,7 @@
 import { FocusTrapFactory } from '@angular/cdk/a11y';
 import { Overlay } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
+import { NgTemplateOutlet } from '@angular/common';
 import {
 	ChangeDetectionStrategy,
 	Component,
@@ -8,6 +9,7 @@ import {
 	OnDestroy,
 	TemplateRef,
 	ViewContainerRef,
+	contentChild,
 	effect,
 	inject,
 	input,
@@ -20,7 +22,7 @@ import { EduPassThrough, EduPtRoot } from '../passthrough/edu-pt-root';
 @Component({
 	selector: 'edu-dialog',
 	standalone: true,
-	imports: [EduPtRoot],
+	imports: [EduPtRoot, NgTemplateOutlet],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
 		<ng-template #overlayTemplate>
@@ -35,7 +37,11 @@ import { EduPassThrough, EduPtRoot } from '../passthrough/edu-pt-root';
 			>
 				@if (showHeader()) {
 					<div class="edu-dialog-header" [class.edu-dialog-header--draggable]="draggable()" (mousedown)="onHeaderMouseDown($event)">
-						<span class="edu-dialog-header__title">{{ header() }}</span>
+						@if (headerTemplate(); as tpl) {
+							<ng-container [ngTemplateOutlet]="tpl"></ng-container>
+						} @else {
+							<span class="edu-dialog-header__title">{{ header() }}</span>
+						}
 						@if (closable()) {
 							<button type="button" class="edu-dialog-header__close" (click)="requestClose()" aria-label="Cerrar">✕</button>
 						}
@@ -44,6 +50,11 @@ import { EduPassThrough, EduPtRoot } from '../passthrough/edu-pt-root';
 				<div class="edu-dialog-body" [style]="contentStyle()">
 					<ng-content></ng-content>
 				</div>
+				@if (footerTemplate(); as tpl) {
+					<div class="edu-dialog-footer">
+						<ng-container [ngTemplateOutlet]="tpl"></ng-container>
+					</div>
+				}
 				@if (resizable()) {
 					<div class="edu-dialog-resize-handle" (mousedown)="onResizeMouseDown($event)"></div>
 				}
@@ -66,6 +77,9 @@ export class EduDialog implements OnDestroy {
 	readonly styleClass = input('');
 	readonly contentStyle = input<Record<string, string> | null>(null);
 	readonly pt = input<EduPassThrough>();
+
+	protected readonly headerTemplate = contentChild<TemplateRef<unknown>>('header');
+	protected readonly footerTemplate = contentChild<TemplateRef<unknown>>('footer');
 
 	private readonly overlayTemplateRef = viewChild.required<TemplateRef<unknown>>('overlayTemplate');
 	private readonly viewContainerRef = inject(ViewContainerRef);

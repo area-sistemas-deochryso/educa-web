@@ -61,6 +61,16 @@
 	flex: 1;
 }
 
+.edu-drawer-footer {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 0.5rem;
+	padding: 1rem 1.5rem;
+	border-top: 1px solid var(--eduui-content-border-color);
+	flex-shrink: 0;
+}
+
 :host-context(.dark-mode) .edu-drawer-header__close:hover {
 	background: var(--eduui-surface-800);
 }

@@ -58,6 +58,15 @@
 	overflow: auto;
 }
 
+.edu-dialog-footer {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 0.5rem;
+	padding: 1rem 1.5rem;
+	border-top: 1px solid var(--eduui-content-border-color);
+}
+
 .edu-dialog-resize-handle {
 	position: absolute;
 	right: 0;

@@ -26,6 +26,14 @@
 	background: var(--eduui-content-background);
 }
 
+.edu-table__caption {
+	caption-side: top;
+	padding: 0.75rem 1rem;
+	text-align: left;
+	color: var(--eduui-content-color);
+	background: var(--eduui-content-background);
+}
+
 .edu-table__thead {
 	background: var(--eduui-surface-100);
 

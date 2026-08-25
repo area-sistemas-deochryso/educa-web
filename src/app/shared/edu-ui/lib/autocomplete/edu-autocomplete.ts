@@ -105,6 +105,11 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 						</li>
 					}
 				</ul>
+				@if (footerTemplate(); as tpl) {
+					<div class="edu-autocomplete-panel__footer">
+						<ng-container [ngTemplateOutlet]="tpl"></ng-container>
+					</div>
+				}
 			</div>
 		</ng-template>
 	`,
@@ -140,10 +145,12 @@ export class EduAutoComplete<T = unknown> implements ControlValueAccessor, OnDes
 
 	private readonly itemTemplateRef = contentChild<TemplateRef<unknown>>('item');
 	private readonly emptyTemplateRef = contentChild<TemplateRef<unknown>>('empty');
+	private readonly footerTemplateRef = contentChild<TemplateRef<unknown>>('footer');
 	private readonly legacyTemplates = contentChildren(EduTemplate);
 
 	protected readonly itemTemplate = computed(() => this.itemTemplateRef() ?? this.legacyTemplate('item'));
 	protected readonly emptyTemplate = computed(() => this.emptyTemplateRef() ?? this.legacyTemplate('empty'));
+	protected readonly footerTemplate = computed(() => this.footerTemplateRef() ?? this.legacyTemplate('footer'));
 
 	private readonly overlayTemplateRef = viewChild<TemplateRef<unknown>>('overlayTemplate');
 	private readonly viewContainerRef = inject(ViewContainerRef);

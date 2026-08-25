@@ -53,6 +53,11 @@ function normalizeSortOrder(value: EduTableSortOrderInput): EduTableSortOrder {
 				[class.edu-table--row-hover]="rowHover()"
 				[style]="tableStyle()"
 			>
+				@if (captionTemplate(); as caption) {
+					<caption class="edu-table__caption">
+						<ng-container [ngTemplateOutlet]="caption"></ng-container>
+					</caption>
+				}
 				@if (headerTemplate(); as header) {
 					<thead class="edu-table__thead">
 						<ng-container [ngTemplateOutlet]="header"></ng-container>
@@ -63,6 +68,9 @@ function normalizeSortOrder(value: EduTableSortOrderInput): EduTableSortOrder {
 						@for (row of value(); track trackByFn(row, $index); let index = $index) {
 							<ng-container [ngTemplateOutlet]="body" [ngTemplateOutletContext]="{ $implicit: row, index }"></ng-container>
 						}
+					}
+					@if (value().length === 0 && emptyTemplate(); as empty) {
+						<ng-container [ngTemplateOutlet]="empty"></ng-container>
 					}
 				</tbody>
 				@if (footerTemplate(); as footer) {
@@ -126,11 +134,15 @@ export class EduTable<T = unknown> {
 	private readonly headerRef = contentChild<TemplateRef<unknown>>('header');
 	private readonly bodyRef = contentChild<TemplateRef<unknown>>('body');
 	private readonly footerRef = contentChild<TemplateRef<unknown>>('footer');
+	private readonly emptyRef = contentChild<TemplateRef<unknown>>('emptymessage');
+	private readonly captionRef = contentChild<TemplateRef<unknown>>('caption');
 	private readonly legacyTemplates = contentChildren(EduTemplate);
 
 	protected readonly headerTemplate = computed(() => this.headerRef() ?? this.legacyTemplate('header'));
 	protected readonly bodyTemplate = computed(() => this.bodyRef() ?? this.legacyTemplate('body'));
 	protected readonly footerTemplate = computed(() => this.footerRef() ?? this.legacyTemplate('footer'));
+	protected readonly emptyTemplate = computed(() => this.emptyRef() ?? this.legacyTemplate('emptymessage'));
+	protected readonly captionTemplate = computed(() => this.captionRef() ?? this.legacyTemplate('caption'));
 
 	private readonly normalizedSortOrder = computed(() => normalizeSortOrder(this.sortOrder()));
 

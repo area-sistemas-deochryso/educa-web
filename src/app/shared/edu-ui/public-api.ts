@@ -1,4 +1,4 @@
-// Vendored from educa-libs (packages/edu-ui/src) — commit 1af10d5, F6f, 2026-08-25.
+// Vendored from educa-libs (packages/edu-ui/src) — commit 1c9d3f8, F6g, 2026-08-25.
 // Not published to a registry (P79 F6); source-of-truth stays in educa-libs,
 // re-sync manually on changes.
 //

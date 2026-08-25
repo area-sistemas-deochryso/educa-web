@@ -77,6 +77,12 @@
 	color: var(--eduui-text-muted-color);
 }
 
+.edu-autocomplete-panel__footer {
+	padding: 0.5rem 0.75rem;
+	border-top: 1px solid var(--eduui-content-border-color);
+	flex-shrink: 0;
+}
+
 :host-context(.dark-mode) .edu-autocomplete-panel__option:hover,
 :host-context(.dark-mode) .edu-autocomplete-panel__option--active {
 	background: var(--eduui-surface-800);

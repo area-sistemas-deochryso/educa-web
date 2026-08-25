@@ -1,12 +1,14 @@
 import { FocusTrapFactory } from '@angular/cdk/a11y';
 import { GlobalPositionStrategy, Overlay } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
+import { NgTemplateOutlet } from '@angular/common';
 import {
 	ChangeDetectionStrategy,
 	Component,
 	OnDestroy,
 	TemplateRef,
 	ViewContainerRef,
+	contentChild,
 	effect,
 	inject,
 	input,
@@ -21,7 +23,7 @@ export type EduDrawerPosition = 'left' | 'right' | 'top' | 'bottom';
 @Component({
 	selector: 'edu-drawer',
 	standalone: true,
-	imports: [EduPtRoot],
+	imports: [EduPtRoot, NgTemplateOutlet],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
 		<ng-template #overlayTemplate>
@@ -35,13 +37,22 @@ export type EduDrawerPosition = 'left' | 'right' | 'top' | 'bottom';
 			>
 				@if (showHeader()) {
 					<div class="edu-drawer-header">
-						<span class="edu-drawer-header__title">{{ header() }}</span>
+						@if (headerTemplate(); as tpl) {
+							<ng-container [ngTemplateOutlet]="tpl"></ng-container>
+						} @else {
+							<span class="edu-drawer-header__title">{{ header() }}</span>
+						}
 						<button type="button" class="edu-drawer-header__close" (click)="requestClose()" aria-label="Cerrar">✕</button>
 					</div>
 				}
 				<div class="edu-drawer-body">
 					<ng-content></ng-content>
 				</div>
+				@if (footerTemplate(); as tpl) {
+					<div class="edu-drawer-footer">
+						<ng-container [ngTemplateOutlet]="tpl"></ng-container>
+					</div>
+				}
 			</div>
 		</ng-template>
 	`,
@@ -56,6 +67,9 @@ export class EduDrawer implements OnDestroy {
 	readonly showHeader = input(true);
 	readonly closeOnEscape = input(true);
 	readonly pt = input<EduPassThrough>();
+
+	protected readonly headerTemplate = contentChild<TemplateRef<unknown>>('header');
+	protected readonly footerTemplate = contentChild<TemplateRef<unknown>>('footer');
 
 	private readonly overlayTemplateRef = viewChild.required<TemplateRef<unknown>>('overlayTemplate');
 	private readonly viewContainerRef = inject(ViewContainerRef);
