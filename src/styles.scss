@@ -126,81 +126,83 @@
 }
 
 /*---------------------------------------
-  PRIMENG TOKEN COMPATIBILITY SHIM
-  El theme Aura (PrimeNG v18+, ver app.config.ts)
-  expone TODOS sus tokens con prefijo --p- (--p-blue-500,
-  --p-surface-0, --p-text-color, etc.). El código del
-  proyecto usa la convención legacy sin prefijo
-  (--blue-500, --surface-300, --text-color), que nunca
-  fue definida — resolvía vacío en ~229 archivos .scss
-  (brief 467, hallazgo 0). Este bloque reenvía cada
-  nombre legacy a su equivalente real --p-*.
-
-  Los 5 tokens semánticos surface-card/ground/hover/
-  overlay/border no tienen equivalente 1:1 en v18 (el
-  concepto fue renombrado); el mapeo de abajo es best-
-  effort, verificado en vivo contra el theme activo.
+  BRAND/SEMANTIC COLOR PALETTE (ex-PRIMENG TOKEN SHIM)
+  Hasta P79 F6 (brief 588), estos tokens reenviaban a los --p-* que
+  PrimeNG's Aura theme inyectaba en runtime vía providePrimeNG() (brief
+  467, hallazgo 0 — el código legacy usaba --blue-500/--surface-300/
+  --text-color sin que nada los definiera). Con PrimeNG removido del
+  proyecto (F6, package.json), se hardcodean acá los valores reales que
+  Aura resolvía — extraídos del preset fuente (@primeng/themes/aura,
+  primitive.{blue,green,orange,purple,red,yellow,emerald}, primitive.
+  borderRadius.md) antes de desinstalarlo. Los primitivos NO varían entre
+  claro/oscuro (confirmado: viven fuera de semantic.colorScheme, paleta
+  plana). Lo que SÍ variaba por modo (superficie neutra, texto, hover,
+  overlay) tiene su contraparte en `_tokens.scss` (`:root.dark-mode`) —
+  ver el comentario de ese bloque para el detalle completo.
 -----------------------------------------*/
 :root {
-	--border-radius: var(--p-border-radius-md);
+	--border-radius: 6px;
 
-	--blue-50: var(--p-blue-50);
-	--blue-100: var(--p-blue-100);
-	--blue-400: var(--p-blue-400);
-	--blue-500: var(--p-blue-500);
-	--blue-600: var(--p-blue-600);
-	--blue-700: var(--p-blue-700);
-	--blue-800: var(--p-blue-800);
-	--blue-900: var(--p-blue-900);
+	--blue-50: #eff6ff;
+	--blue-100: #dbeafe;
+	--blue-400: #60a5fa;
+	--blue-500: #3b82f6;
+	--blue-600: #2563eb;
+	--blue-700: #1d4ed8;
+	--blue-800: #1e40af;
+	--blue-900: #1e3a8a;
 
-	--green-50: var(--p-green-50);
-	--green-100: var(--p-green-100);
-	--green-200: var(--p-green-200);
-	--green-400: var(--p-green-400);
-	--green-500: var(--p-green-500);
-	--green-600: var(--p-green-600);
-	--green-700: var(--p-green-700);
+	--green-50: #f0fdf4;
+	--green-100: #dcfce7;
+	--green-200: #bbf7d0;
+	--green-400: #4ade80;
+	--green-500: #22c55e;
+	--green-600: #16a34a;
+	--green-700: #15803d;
 
-	--orange-50: var(--p-orange-50);
-	--orange-100: var(--p-orange-100);
-	--orange-200: var(--p-orange-200);
-	--orange-500: var(--p-orange-500);
-	--orange-600: var(--p-orange-600);
-	--orange-700: var(--p-orange-700);
-	--orange-800: var(--p-orange-800);
-	--orange-950: var(--p-orange-950);
+	--orange-50: #fff7ed;
+	--orange-100: #ffedd5;
+	--orange-200: #fed7aa;
+	--orange-500: #f97316;
+	--orange-600: #ea580c;
+	--orange-700: #c2410c;
+	--orange-800: #9a3412;
+	--orange-950: #431407;
 
-	--purple-500: var(--p-purple-500);
-	--purple-700: var(--p-purple-700);
+	--purple-500: #a855f7;
+	--purple-700: #7e22ce;
 
-	--red-50: var(--p-red-50);
-	--red-100: var(--p-red-100);
-	--red-200: var(--p-red-200);
-	--red-300: var(--p-red-300);
-	--red-400: var(--p-red-400);
-	--red-500: var(--p-red-500);
-	--red-600: var(--p-red-600);
-	--red-700: var(--p-red-700);
+	--red-50: #fef2f2;
+	--red-100: #fee2e2;
+	--red-200: #fecaca;
+	--red-300: #fca5a5;
+	--red-400: #f87171;
+	--red-500: #ef4444;
+	--red-600: #dc2626;
+	--red-700: #b91c1c;
 
-	--yellow-50: var(--p-yellow-50);
-	--yellow-400: var(--p-yellow-400);
-	--yellow-500: var(--p-yellow-500);
-	--yellow-600: var(--p-yellow-600);
-	--yellow-700: var(--p-yellow-700);
-	--yellow-800: var(--p-yellow-800);
-	--yellow-950: var(--p-yellow-950);
+	--yellow-50: #fefce8;
+	--yellow-400: #facc15;
+	--yellow-500: #eab308;
+	--yellow-600: #ca8a04;
+	--yellow-700: #a16207;
+	--yellow-800: #854d0e;
+	--yellow-950: #422006;
 
-	--primary-50: var(--p-primary-50);
-	--primary-100: var(--p-primary-100);
-	--primary-200: var(--p-primary-200);
-	--primary-300: var(--p-primary-300);
-	--primary-400: var(--p-primary-400);
-	--primary-500: var(--p-primary-500);
-	--primary-600: var(--p-primary-600);
-	--primary-700: var(--p-primary-700);
-	--primary-color-text: var(--p-primary-contrast-color);
+	/* emerald — era el "primary" default del preset Aura (sin override
+	   explícito en app.config.ts). --primary-color/--intranet-primary-color
+	   son variables DISTINTAS, no relacionadas (ver :root más arriba). */
+	--primary-50: #ecfdf5;
+	--primary-100: #d1fae5;
+	--primary-200: #a7f3d0;
+	--primary-300: #6ee7b7;
+	--primary-400: #34d399;
+	--primary-500: #10b981;
+	--primary-600: #059669;
+	--primary-700: #047857;
+	--primary-color-text: #ffffff;
 
-	--surface-0: var(--p-surface-0);
+	--surface-0: #ffffff;
 	/* --surface-50/100 neutros (familia --intranet-background-color #eeeeee),
 	   no la escala azulada de PrimeNG — mismo criterio que --surface-card/
 	   --surface-ground más abajo. Se usan crudos en ~76 archivos (hover
@@ -210,14 +212,19 @@
 	   se quedó en #f5f5f5, mismo componente visual con 2 tonos distintos). */
 	--surface-50: var(--surface-card);
 	--surface-100: #e3e3e3;
-	--surface-200: var(--p-surface-200);
-	--surface-300: var(--p-surface-300);
-	--surface-400: var(--p-surface-400);
-	--surface-500: var(--p-surface-500);
-	--surface-900: var(--p-surface-900);
+	/* 200/300/400/500/900 = escala `slate` de Aura (modo claro); ver
+	   `_tokens.scss` para la contraparte `zinc` de modo oscuro. */
+	--surface-200: #e2e8f0;
+	--surface-300: #cbd5e1;
+	--surface-400: #94a3b8;
+	--surface-500: #64748b;
+	--surface-900: #0f172a;
 
-	--text-color: var(--p-text-color);
-	--text-color-secondary: var(--p-text-muted-color);
+	/* text-color/-secondary = slate.700/slate.500 (modo claro). Ver
+	   `_tokens.scss` (`:root.dark-mode`) para la contraparte oscura —
+	   incluye un override deliberado sobre el crudo de Aura (brief 523). */
+	--text-color: #334155;
+	--text-color-secondary: #64748b;
 
 	/* Sin equivalente 1:1 — mapeo semántico best-effort */
 	/* --surface-card / --surface-ground usan gris neutro propio (familia
@@ -226,61 +233,15 @@
 	   demasiado clara para uso prolongado (feedback directo del usuario).
 	   --surface-card más claro que --surface-ground a propósito: una tarjeta
 	   elevada debe ser más clara que su fondo, no al revés — ~20 componentes
-	   usan ambas variables juntas para esa jerarquía.
-	   --p-dialog-background (usado por .p-dialog) usa su propio tono
-	   --surface-dialog, definido más abajo junto al resto de overrides de
-	   PrimeNG — ver ese bloque. */
+	   usan ambas variables juntas para esa jerarquía. */
 	--surface-card: #f0f0f0;
 	--surface-ground: #eeeeee;
-	--surface-hover: var(--p-content-hover-background);
-	--surface-overlay: var(--p-overlay-modal-background);
-	--surface-border: var(--p-content-border-color);
-
-}
-
-/*---------------------------------------
-  PRIMENG COMPONENT TOKENS — blanco puro fuera de la escala neutra
-  --p-content-background / --p-overlay-popover-background /
-  --p-overlay-select-background / --p-overlay-modal-background derivan de
-  --p-surface-0 (#ffffff literal, ver preset Aura) y alimentan accordion,
-  tabs, popovers (p-popover, menús), overlays de p-select/p-multiselect/
-  p-autocomplete y .p-dialog (vía --p-dialog-background →
-  --p-overlay-modal-background). Los diálogos usan un tono propio
-  (--surface-dialog) un poco más claro que las tarjetas normales — se
-  mantienen "elevados" sin ser blanco puro (decisión 2026-07-20, antes
-  se dejaban en blanco puro a propósito; se revirtió por pedido explícito).
-
-  PrimeNG inyecta sus propios <style> con estos tokens en :root DESPUÉS de
-  este stylesheet (orden de carga, no de especificidad) — un :root plano
-  acá pierde el empate de cascada. Se usa html:root para forzar mayor
-  especificidad y ganar sin importar el orden de inyección.
------------------------------------------*/
-html:root {
-	--surface-dialog: #f7f7f7;
-	--p-content-background: var(--surface-card);
-	--p-overlay-popover-background: var(--surface-card);
-	--p-overlay-select-background: var(--surface-card);
-	--p-overlay-modal-background: var(--surface-dialog);
-
-	/* p-togglebutton (filtros tipo "Estudiantes/Profesores/...") — fondo
-	   inactivo en --p-surface-100 (azulado) y pill activo en --p-surface-0
-	   (blanco puro), ninguno pasa por --p-content-background. */
-	--p-togglebutton-background: var(--surface-100);
-	--p-togglebutton-checked-background: var(--surface-100);
-	--p-togglebutton-hover-background: var(--surface-100);
-	--p-togglebutton-border-color: var(--surface-100);
-	--p-togglebutton-checked-border-color: var(--surface-100);
-	--p-togglebutton-content-checked-background: var(--surface-card);
-}
-
-/*---------------------------------------
-  P-DIALOG — clip de esquinas redondeadas
-  El panel tiene border-radius pero overflow: visible;
-  header/content/footer (border-radius: 0) sobresalen del
-  contorno redondeado en las esquinas superiores/inferiores.
------------------------------------------*/
-.p-dialog {
-	overflow: hidden;
+	/* content.hoverBackground / content.borderColor (modo claro) = slate.100/
+	   slate.200. overlay.modal.background (modo claro) = surface.0 (blanco
+	   puro) — ver `_tokens.scss` para la contraparte oscura de las 3. */
+	--surface-hover: #f1f5f9;
+	--surface-overlay: #ffffff;
+	--surface-border: #e2e8f0;
 }
 
 /*---------------------------------------

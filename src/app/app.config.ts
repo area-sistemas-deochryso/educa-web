@@ -25,12 +25,10 @@ import {
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { provideHttpClient, withFetch, withInterceptors, withXsrfConfiguration } from '@angular/common/http';
 
-import Aura from '@primeng/themes/aura';
 import { DEBUG_CONFIG } from './core/helpers/debug/debug.type';
 import { GlobalErrorHandler } from '@core/services/error';
 import localeEs from '@angular/common/locales/es-PE';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-import { providePrimeNG } from 'primeng/config';
 import { provideRouter } from '@angular/router';
 import { registerLocaleData } from '@angular/common';
 import { AdaptivePreloadingStrategy } from '@core/services/preloading/adaptive-preloading.strategy';
@@ -69,18 +67,6 @@ export const appConfig: ApplicationConfig = {
 			}),
 		),
 		provideAnimationsAsync(),
-		providePrimeNG({
-			theme: {
-				preset: Aura,
-				options: {
-					// Brief 523: real dark mode toggle. ThemeService (core/services/theme)
-					// applies/removes `.dark-mode` on `document.documentElement` — do NOT
-					// revert to `false`/default `'system'` without also removing the
-					// service and toggle UI (see brief 522 for what happens otherwise).
-					darkModeSelector: '.dark-mode',
-				},
-			},
-		}),
 		{ provide: ErrorHandler, useClass: GlobalErrorHandler },
 		{ provide: LOCALE_ID, useValue: 'es-PE' },
 		provideClientHydration(withEventReplay()),

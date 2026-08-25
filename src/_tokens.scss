@@ -178,12 +178,16 @@
 // detalle de qué sí se pudo verificar en vivo. Fondo de referencia usado en
 // los cálculos: #18181b (el mismo --surface-ground definido abajo).
 //
+// P79 F6 (brief 588, 2026-08-25): con PrimeNG removido, --text-color,
+// --text-color-secondary, --surface-hover, --surface-border, --surface-200/
+// 300/400/500/900 y --surface-overlay YA NO son alias de --p-* recalculados
+// por Aura — el override de modo oscuro de cada uno ahora vive ACÁ (antes
+// era gratis vía la inyección de Aura bajo `.dark-mode`; ver styles.scss
+// para la contraparte de modo claro de cada uno, escala `slate`). Estos usan
+// la escala `zinc` de Aura (confirmado en el preset fuente antes de
+// desinstalar el paquete), no un valor inventado.
+//
 // Lo que NO está en este bloque a propósito:
-// - --text-color, --text-color-secondary, --surface-hover, --surface-border,
-//   --surface-0/200/300/400/500/900: alias reales de tokens --p-* que Aura
-//   recalcula solo bajo el selector activo (confirmado leyendo
-//   node_modules/@primeuix/themes/dist/aura/base — colorScheme.dark usa la
-//   escala `zinc` en vez de `slate` para toda la familia surface).
 // - Primitivos de color del shim de styles.scss (--red-500, --blue-600,
 //   etc.): paleta fija, no varía entre esquemas (confirmado en el mismo
 //   archivo — viven fuera de `colorScheme`, es una paleta plana).
@@ -215,7 +219,25 @@
 	--surface-ground: #232326;
 	--surface-card: #2c2c30;
 	--surface-100: #37373c;
-	--surface-dialog: #37373c;
+
+	/* --- Escala `zinc` de Aura (modo oscuro) — reemplaza lo que antes
+	   recalculaba solo la inyección de PrimeNG (ver comentario de arriba). */
+	--surface-200: #e4e4e7;
+	--surface-300: #d4d4d8;
+	--surface-400: #a1a1aa;
+	--surface-500: #71717a;
+	--surface-900: #18181b;
+	--surface-hover: #27272a;
+	--surface-border: #3f3f46;
+	--surface-overlay: #18181b;
+	--text-color-secondary: #a1a1aa;
+
+	/* --- Acento primario (emerald) en modo oscuro — Aura usa un tono más
+	   claro (primary.400) que en modo claro (primary.500) para mantener
+	   contraste sobre fondo oscuro; el texto que va SOBRE ese fondo más
+	   claro necesita ser oscuro, no blanco (semantic.primary.contrastColor
+	   = surface.900 en dark, no #ffffff como en claro). */
+	--primary-color-text: #18181b;
 
 	/* --- Paleta de marca legacy (styles.scss :root, ~13 tokens de color) --- */
 	--intranet-background-color: var(--surface-ground);
@@ -243,15 +265,15 @@
 	   azul en dark, no tres distintas (uniformidad pedida por el usuario). */
 	--primary-text-color: #6f9dc2;
 
-	/* --- Texto base de PrimeNG (Aura) — el preset usa blanco puro (#ffffff)
-	   para --p-text-color en dark, que técnicamente contrasta de sobra pero
+	/* --- Texto base (modo oscuro) — Aura resolvía blanco puro (#ffffff)
+	   para este token en dark, que técnicamente contrasta de sobra pero
 	   cansa la vista en sesiones largas (pedido explícito del usuario: "ni
 	   tan brillante que canse"). Off-white, ~14.8:1 contra el fondo — sigue
-	   sobrando contraste para AA, pero sin el brillo de blanco puro. Se
-	   pisa --p-text-color (no --text-color, que es solo un alias) para que
-	   el ajuste alcance también a los componentes nativos de PrimeNG que
-	   leen --p-text-color directo, no solo los que pasan por nuestro shim. */
-	--p-text-color: #e4e4e7;
+	   sobrando contraste para AA, pero sin el brillo de blanco puro. Hasta
+	   F6 (588) esto pisaba --p-text-color (el token real que Aura inyectaba)
+	   en vez de --text-color (el alias); con PrimeNG removido, --text-color
+	   ES el token real ahora, así que el override va directo acá. */
+	--text-color: #e4e4e7;
 
 	/* --- Acento interactivo (indigo) — #4338ca da ~2.25:1 calculado contra
 	   el fondo oscuro, muy por debajo de AA (se usa como color/border-color
@@ -298,18 +320,17 @@
 	--tint-danger-text: var(--red-300);
 	--tint-warning-bg: color-mix(in srgb, var(--yellow-500) 24%, transparent);
 	--tint-warning-border: color-mix(in srgb, var(--yellow-500) 45%, transparent);
-	/* yellow-300 NO está en el shim (solo hasta yellow-50/400+) -- primitivo
-	   --p-yellow-300 directo con fallback hex (ver comentario del brief 523
-	   en el fix template). */
-	--tint-warning-text: var(--p-yellow-300, #fde047);
+	/* yellow-300/green-300/blue-300 no están en el shim de styles.scss (solo
+	   hasta yellow-50/400+) -- hex literal de Aura (era `var(--p-yellow-300,
+	   #fde047)` con fallback antes de F6; el fallback YA era el valor real,
+	   así que se simplifica al literal directo). */
+	--tint-warning-text: #fde047;
 	--tint-success-bg: color-mix(in srgb, var(--green-500) 22%, transparent);
 	--tint-success-border: color-mix(in srgb, var(--green-500) 40%, transparent);
-	/* green-300 tampoco está en el shim -- mismo caso que yellow-300 arriba. */
-	--tint-success-text: var(--p-green-300, #86efac);
+	--tint-success-text: #86efac;
 	--tint-info-bg: color-mix(in srgb, var(--blue-500) 20%, transparent);
 	--tint-info-border: color-mix(in srgb, var(--blue-500) 40%, transparent);
-	/* blue-300 tampoco está en el shim -- mismo caso que yellow-300/green-300. */
-	--tint-info-text: var(--p-blue-300, #93c5fd);
+	--tint-info-text: #93c5fd;
 
 	/* --tint-primary-bg/-border ya heredan el % subido de arriba (son la
 	   misma variable, color-mix recalcula solo). --tint-primary-text SÍ
