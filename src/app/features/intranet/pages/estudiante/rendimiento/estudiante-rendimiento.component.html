@@ -28,12 +28,10 @@
 		<div class="rendimiento-cursos">
 			@for (curso of vm().cursos; track curso.cursoContenidoId) {
 				<edu-card class="rendimiento-curso-card">
-					<ng-template pTemplate="header">
-						<div class="rendimiento-curso-header">
-							<h3>{{ curso.cursoNombre }}</h3>
-							<span class="text-color-secondary text-sm">{{ curso.anio }}</span>
-						</div>
-					</ng-template>
+					<div class="rendimiento-curso-header">
+						<h3>{{ curso.cursoNombre }}</h3>
+						<span class="text-color-secondary text-sm">{{ curso.anio }}</span>
+					</div>
 					<app-estudiante-rendimiento-chart
 						[periodos]="curso.periodos"
 						[sinPeriodosConfigurados]="curso.sinPeriodosConfigurados"

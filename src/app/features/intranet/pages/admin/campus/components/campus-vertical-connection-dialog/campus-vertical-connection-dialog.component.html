@@ -78,10 +78,10 @@
 						placeholder="Selecciona un nodo"
 						data-info-anchor="admin-campus-vertical-form-dest-nodo-select"
 					>
-						<ng-template let-node pTemplate="item">
+						<ng-template #item let-node>
 							<span>{{ node.etiqueta || node.tipo }} ({{ node.x | number: '1.0-0' }}, {{ node.y | number: '1.0-0' }})</span>
 						</ng-template>
-						<ng-template let-node pTemplate="selectedItem">
+						<ng-template #selectedItem let-node>
 							<span>{{ node.etiqueta || node.tipo }}</span>
 						</ng-template>
 					</edu-select>

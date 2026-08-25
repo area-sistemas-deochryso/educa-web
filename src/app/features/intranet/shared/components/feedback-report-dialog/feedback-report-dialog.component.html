@@ -67,7 +67,7 @@
 					(ngModelChange)="onTipoChange($event)"
 					[disabled]="vm().submitting"
 				>
-					<ng-template let-option pTemplate="item">
+					<ng-template #item let-option>
 						<div class="tipo-option">
 							<i [class]="option.icon"></i>
 							<span>{{ option.label }}</span>

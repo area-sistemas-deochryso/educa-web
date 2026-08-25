@@ -16,7 +16,7 @@ import { FormsModule } from '@angular/forms';
 import { PermissionsService, UsuarioBusqueda } from '@core/services/permissions';
 import { ViewAsContext, ViewAsFiltroOption, ViewAsFiltrosService, ViewAsRol } from '@core/services/view-as';
 import { PickerGridComponent } from '../picker-grid';
-import { EduAutoComplete } from '@edu-ui';
+import { EduAutoComplete, EduTemplate } from '@edu-ui';
 import type { EduAutoCompleteCompleteEvent } from '@edu-ui';
 // #endregion
 
@@ -43,7 +43,7 @@ import type { EduAutoCompleteCompleteEvent } from '@edu-ui';
 @Component({
 	selector: 'app-view-as-picker',
 	standalone: true,
-	imports: [FormsModule, EduAutoComplete, PickerGridComponent],
+	imports: [FormsModule, EduAutoComplete, EduTemplate, PickerGridComponent],
 	templateUrl: './view-as-picker.component.html',
 	styleUrl: './view-as-picker.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

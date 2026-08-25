@@ -14,7 +14,7 @@ import {
 	getStatusClass,
 } from '@features/intranet/pages/cross-role/attendance-component/config/attendance.constants';
 import { AttendanceTemporalNavComponent } from '../attendance-temporal-nav/attendance-temporal-nav.component';
-import { EduSelect, EduTable, EduTooltip } from '@edu-ui';
+import { EduSelect, EduTable, EduTemplate, EduTooltip } from '@edu-ui';
 
 // #endregion
 // #region Implementation
@@ -28,7 +28,7 @@ export interface HijoOption {
 @Component({
 	selector: 'app-attendance-table',
 	standalone: true,
-	imports: [DatePipe, FormsModule, EduTable, EduSelect, EduTooltip, AttendanceTemporalNavComponent],
+	imports: [DatePipe, FormsModule, EduTable, EduSelect, EduTooltip, EduTemplate, AttendanceTemporalNavComponent],
 	templateUrl: './attendance-table.component.html',
 	styleUrl: './attendance-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

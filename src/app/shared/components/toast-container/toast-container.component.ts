@@ -4,7 +4,7 @@ import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { ErrorHandlerService } from '@core/services/error';
 import type { ErrorNotificationAction } from '@core/services/error';
-import { EduButton, EduMessageService, EduToast } from '@edu-ui';
+import { EduButton, EduMessageService, EduTemplate, EduToast } from '@edu-ui';
 
 // #endregion
 // #region Implementation
@@ -12,7 +12,7 @@ import { EduButton, EduMessageService, EduToast } from '@edu-ui';
 	selector: 'app-toast-container',
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [CommonModule, EduToast, EduButton],
+	imports: [CommonModule, EduToast, EduButton, EduTemplate],
 	providers: [EduMessageService],
 	templateUrl: './toast-container.component.html',
 })

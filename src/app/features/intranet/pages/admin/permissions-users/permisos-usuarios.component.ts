@@ -7,7 +7,7 @@ import { PageHeaderComponent } from '@intranet-shared/components';
 import type { UsuarioBusqueda } from '@core/services';
 
 import { PermissionsUsersDataFacade } from './services';
-import { EduAutoComplete, EduButton, EduDialog, EduInputText, EduSelect, EduTag, EduTooltip } from '@edu-ui';
+import { EduAutoComplete, EduButton, EduDialog, EduInputText, EduSelect, EduTag, EduTemplate, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-permissions-users',
@@ -22,6 +22,7 @@ import { EduAutoComplete, EduButton, EduDialog, EduInputText, EduSelect, EduTag,
 		EduSelect,
 		EduInputText,
 		EduAutoComplete,
+		EduTemplate,
 		RouterLink,
 		PageHeaderComponent],
 	templateUrl: './permisos-usuarios.component.html',

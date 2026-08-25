@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 
 import { EstudianteDisponibleDto, MOTIVOS_RETIRO } from '../../models';
 import { ClassroomStudentsFacade } from './salon-estudiantes-tab.facade';
-import { EduAutoComplete, EduButton, EduMessage, EduSelect, EduTable, EduTag, EduTooltip } from '@edu-ui';
+import { EduAutoComplete, EduButton, EduMessage, EduSelect, EduTable, EduTag, EduTemplate, EduTooltip } from '@edu-ui';
 import type { EduAutoCompleteCompleteEvent } from '@edu-ui';
 
 export interface SalonOption {
@@ -22,6 +22,7 @@ export interface SalonOption {
 		EduButton,
 		EduTag,
 		EduTooltip,
+		EduTemplate,
 		EduAutoComplete,
 		EduSelect,
 		EduMessage],

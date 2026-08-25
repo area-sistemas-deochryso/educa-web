@@ -1,18 +1,16 @@
 <edu-card class="curso-card" [class.curso-card--outlier]="hasOutlier()">
-	<ng-template pTemplate="header">
-		<div class="curso-card__header">
-			<div>
-				<h3>{{ curso().cursoNombre }}</h3>
-				<span class="text-color-secondary text-sm">{{ curso().salonDescripcion }}</span>
-			</div>
-			@if (hasOutlier()) {
-				<span class="curso-card__badge" title="Este curso se desvió de su línea base">
-					<i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
-					Desvío detectado
-				</span>
-			}
+	<div class="curso-card__header">
+		<div>
+			<h3>{{ curso().cursoNombre }}</h3>
+			<span class="text-color-secondary text-sm">{{ curso().salonDescripcion }}</span>
 		</div>
-	</ng-template>
+		@if (hasOutlier()) {
+			<span class="curso-card__badge" title="Este curso se desvió de su línea base">
+				<i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+				Desvío detectado
+			</span>
+		}
+	</div>
 	<div class="chart-canvas-wrap">
 		<canvas #rendimientoChart [class.chart-canvas--hidden]="curso().periodos.length === 0"></canvas>
 		@if (curso().periodos.length === 0) {
