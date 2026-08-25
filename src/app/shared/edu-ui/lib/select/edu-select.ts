@@ -17,6 +17,7 @@ import {
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { EduOverlayHandle } from '../overlay/edu-overlay-handle';
+import { EduPassThrough, EduPtRoot } from '../passthrough/edu-pt-root';
 import { filterOptionsByLabel, resolveOptionLabel, resolveOptionValue } from './select-option-utils';
 import { SelectListNav } from './select-list-nav';
 
@@ -38,6 +39,7 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 @Component({
 	selector: 'edu-select',
 	standalone: true,
+	imports: [EduPtRoot],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	providers: [
 		{
@@ -49,6 +51,7 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 	template: `
 		<div
 			class="edu-select"
+			[eduPtRoot]="pt()?.root"
 			[class.edu-select--disabled]="disabled()"
 			[class.edu-select--loading]="loading()"
 			role="combobox"
@@ -140,6 +143,7 @@ export class EduSelect implements ControlValueAccessor, OnDestroy {
 	readonly optionGroupLabel = input<string>();
 	readonly optionGroupChildren = input<string>();
 	readonly loading = input(false);
+	readonly pt = input<EduPassThrough>();
 
 	readonly onFilter = output<EduSelectFilterEvent>();
 

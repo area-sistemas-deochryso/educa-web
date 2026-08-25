@@ -11,7 +11,7 @@ export type EduButtonSeverity =
 	| 'help'
 	| 'contrast';
 
-export type EduButtonSize = 'small' | 'large';
+export type EduButtonSize = 'xs' | 'small' | 'large';
 export type EduButtonIconPos = 'left' | 'right';
 export type EduButtonType = 'button' | 'submit';
 
@@ -31,6 +31,7 @@ export type EduButtonType = 'button' | 'submit';
 			[class.edu-button--text]="text()"
 			[class.edu-button--outlined]="outlined()"
 			[class.edu-button--rounded]="rounded()"
+			[class.edu-button--xs]="size() === 'xs'"
 			[class.edu-button--sm]="size() === 'small'"
 			[class.edu-button--lg]="size() === 'large'"
 			[class.edu-button--icon-only]="(!!icon() || loading()) && !label()"

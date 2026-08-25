@@ -2,6 +2,10 @@ import { Directive, ElementRef, OnDestroy, Renderer2, inject, input } from '@ang
 
 export type EduTooltipPosition = 'top' | 'bottom' | 'left' | 'right';
 
+export interface EduTooltipOptions {
+	showDelay?: number;
+}
+
 @Directive({
 	selector: '[eduTooltip]',
 	standalone: true,
@@ -23,10 +27,12 @@ export class EduTooltip implements OnDestroy {
 	 */
 	readonly appendTo = input<'body' | string>();
 	readonly tooltipDisabled = input(false);
+	readonly tooltipOptions = input<EduTooltipOptions>();
 
 	private readonly host = inject(ElementRef<HTMLElement>);
 	private readonly renderer = inject(Renderer2);
 	private tooltipEl: HTMLElement | null = null;
+	private showTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
 	show(): void {
 		if (this.tooltipDisabled()) {
@@ -34,19 +40,27 @@ export class EduTooltip implements OnDestroy {
 		}
 
 		const text = this.eduTooltip();
-		if (!text || this.tooltipEl) {
+		if (!text || this.tooltipEl || this.showTimeoutId) {
 			return;
 		}
 
-		const el = this.renderer.createElement('div') as HTMLElement;
-		this.renderer.addClass(el, 'edu-tooltip');
-		this.renderer.setProperty(el, 'textContent', text);
-		this.renderer.appendChild(document.body, el);
-		this.tooltipEl = el;
-		this.position();
+		const showDelay = this.tooltipOptions()?.showDelay;
+		if (showDelay) {
+			this.showTimeoutId = setTimeout(() => {
+				this.showTimeoutId = null;
+				this.render(text);
+			}, showDelay);
+			return;
+		}
+
+		this.render(text);
 	}
 
 	hide(): void {
+		if (this.showTimeoutId) {
+			clearTimeout(this.showTimeoutId);
+			this.showTimeoutId = null;
+		}
 		if (this.tooltipEl) {
 			this.renderer.removeChild(document.body, this.tooltipEl);
 			this.tooltipEl = null;
@@ -55,6 +69,15 @@ export class EduTooltip implements OnDestroy {
 
 	ngOnDestroy(): void {
 		this.hide();
+	}
+
+	private render(text: string): void {
+		const el = this.renderer.createElement('div') as HTMLElement;
+		this.renderer.addClass(el, 'edu-tooltip');
+		this.renderer.setProperty(el, 'textContent', text);
+		this.renderer.appendChild(document.body, el);
+		this.tooltipEl = el;
+		this.position();
 	}
 
 	private position(): void {

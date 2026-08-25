@@ -21,6 +21,11 @@
 		outline-offset: var(--eduui-focus-ring-offset);
 	}
 
+	&--xs {
+		padding: var(--eduui-form-field-padding-y-xs) var(--eduui-form-field-padding-x-xs);
+		font-size: var(--eduui-form-field-font-size-xs);
+	}
+
 	&--sm {
 		padding: var(--eduui-form-field-padding-y-sm) var(--eduui-form-field-padding-x-sm);
 		font-size: var(--eduui-form-field-font-size-sm);
