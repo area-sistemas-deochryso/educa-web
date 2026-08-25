@@ -1,6 +1,7 @@
 import { FocusTrapFactory } from '@angular/cdk/a11y';
 import { ConnectedPosition, Overlay } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
+import { NgTemplateOutlet } from '@angular/common';
 import {
 	ChangeDetectionStrategy,
 	Component,
@@ -8,6 +9,7 @@ import {
 	TemplateRef,
 	ViewContainerRef,
 	computed,
+	contentChild,
 	forwardRef,
 	inject,
 	input,
@@ -39,7 +41,7 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 @Component({
 	selector: 'edu-select',
 	standalone: true,
-	imports: [EduPtRoot],
+	imports: [EduPtRoot, NgTemplateOutlet],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	providers: [
 		{
@@ -62,9 +64,19 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 			(click)="toggle($event)"
 			(keydown)="onTriggerKeydown($event)"
 		>
-			<span class="edu-select__label" [class.edu-select__label--placeholder]="!hasValue()">
-				{{ selectedLabel() ?? placeholder() ?? '' }}
-			</span>
+			@if (selectedItemTemplate(); as tpl) {
+				@if (hasValue()) {
+					<span class="edu-select__label">
+						<ng-container [ngTemplateOutlet]="tpl" [ngTemplateOutletContext]="{ $implicit: selectedOption() }"></ng-container>
+					</span>
+				} @else {
+					<span class="edu-select__label edu-select__label--placeholder">{{ placeholder() ?? '' }}</span>
+				}
+			} @else {
+				<span class="edu-select__label" [class.edu-select__label--placeholder]="!hasValue()">
+					{{ selectedLabel() ?? placeholder() ?? '' }}
+				</span>
+			}
 			@if (showClear() && hasValue() && !disabled() && !loading()) {
 				<button type="button" class="edu-select__clear" tabindex="-1" (click)="clear($event)">
 					<i class="pi pi-times"></i>
@@ -103,7 +115,11 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 									[attr.aria-selected]="isSelected(opt)"
 									(click)="selectOption(opt)"
 								>
-									{{ resolveLabel(opt) }}
+									@if (itemTemplate(); as tpl) {
+										<ng-container [ngTemplateOutlet]="tpl" [ngTemplateOutletContext]="{ $implicit: opt }"></ng-container>
+									} @else {
+										{{ resolveLabel(opt) }}
+									}
 								</li>
 							}
 						}
@@ -117,7 +133,11 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 								[attr.aria-selected]="isSelected(opt)"
 								(click)="selectOption(opt)"
 							>
-								{{ resolveLabel(opt) }}
+								@if (itemTemplate(); as tpl) {
+									<ng-container [ngTemplateOutlet]="tpl" [ngTemplateOutletContext]="{ $implicit: opt }"></ng-container>
+								} @else {
+									{{ resolveLabel(opt) }}
+								}
 							</li>
 						}
 					}
@@ -145,6 +165,9 @@ export class EduSelect implements ControlValueAccessor, OnDestroy {
 	readonly loading = input(false);
 	readonly pt = input<EduPassThrough>();
 
+	protected readonly selectedItemTemplate = contentChild<TemplateRef<unknown>>('selectedItem');
+	protected readonly itemTemplate = contentChild<TemplateRef<unknown>>('item');
+
 	readonly onFilter = output<EduSelectFilterEvent>();
 
 	protected readonly value = signal<unknown>(null);
@@ -161,8 +184,10 @@ export class EduSelect implements ControlValueAccessor, OnDestroy {
 
 	protected readonly hasValue = computed(() => this.value() !== null && this.value() !== undefined);
 
+	protected readonly selectedOption = computed(() => this.findSelectedOption());
+
 	protected readonly selectedLabel = computed(() => {
-		const found = this.findSelectedOption();
+		const found = this.selectedOption();
 		return found ? this.resolveLabel(found) : null;
 	});
 
