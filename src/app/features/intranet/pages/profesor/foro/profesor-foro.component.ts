@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
+
 import { PageHeaderComponent, PickerGridComponent } from '@intranet-shared/components';
 import { ProfesorFacade } from '../services/profesor.facade';
 import { SalonMensajeriaFacade } from '@features/intranet/pages/cross-role/mensajeria/services/mensajeria.facade';
@@ -17,6 +17,7 @@ import { SalonForoTabComponent } from '@features/intranet/pages/cross-role/mensa
 import { GruposFacade } from '../classrooms/services/grupos.facade';
 import { ProfesorSalonConEstudiantes } from '../models';
 import { toSelectOptionsFrom } from '@shared/models';
+import { EduSpinner } from '@edu-ui';
 
 @Component({
 	selector: 'app-profesor-foro',
@@ -24,7 +25,7 @@ import { toSelectOptionsFrom } from '@shared/models';
 	imports: [
 		CommonModule,
 		FormsModule,
-		ProgressSpinnerModule,
+		EduSpinner,
 		PageHeaderComponent,
 		PickerGridComponent,
 		SalonForoTabComponent,
@@ -51,7 +52,7 @@ import { toSelectOptionsFrom } from '@shared/models';
 
 			@if (loading()) {
 				<div class="flex justify-content-center p-5">
-					<p-progressSpinner strokeWidth="4" />
+					<edu-spinner strokeWidth="4" />
 				</div>
 			} @else if (salonOptions().length === 0) {
 				<div class="flex flex-column align-items-center p-5 text-color-secondary">

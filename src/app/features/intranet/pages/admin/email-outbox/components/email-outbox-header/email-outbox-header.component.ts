@@ -1,34 +1,34 @@
 import { ChangeDetectionStrategy, Component, output } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
+import { EduButton } from '@edu-ui';
 
 import { PageHeaderComponent } from '@intranet-shared/components/page-header/page-header.component';
 
 @Component({
 	selector: 'app-email-outbox-header',
 	standalone: true,
-	imports: [PageHeaderComponent, ButtonModule],
+	imports: [PageHeaderComponent, EduButton],
 	template: `
 		<app-page-header
 			icon="pi pi-envelope"
 			title="Bandeja de Correos"
 			subtitle="Auditoría y trazabilidad de correos enviados"
 		>
-			<button
-				pButton
+			<edu-button
 				icon="pi pi-refresh"
 				label="Refrescar"
-				class="p-button-outlined p-button-sm"
+				[outlined]="true"
+				size="small"
 				data-info-anchor="email-outbox-refresh-btn"
 				(click)="refresh.emit()"
-			></button>
-			<button
-				pButton
+			/>
+			<edu-button
 				icon="pi pi-file-excel"
 				label="Exportar"
-				class="p-button-success p-button-sm"
+				severity="success"
+				size="small"
 				data-info-anchor="admin-email-outbox-exportar-excel-btn"
 				(click)="exportExcel.emit()"
-			></button>
+			/>
 		</app-page-header>
 	`,
 	changeDetection: ChangeDetectionStrategy.OnPush,

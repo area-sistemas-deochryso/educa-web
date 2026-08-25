@@ -34,7 +34,7 @@
 				<i class="pi pi-search"></i>
 				<input
 					type="text"
-					pInputText
+					eduInputText
 					[ngModel]="monthSearchTerm()"
 					(ngModelChange)="monthSearchTerm.set($event)"
 					(focus)="onMonthSearchFocus()"
@@ -69,7 +69,7 @@
 			</div>
 
 			<div class="filters-right">
-				<p-selectButton
+				<edu-select-button
 					[options]="view.monthSubModeOptions"
 					[ngModel]="view.monthSubMode()"
 					(ngModelChange)="view.setMonthSubMode($event)"
@@ -79,7 +79,7 @@
 					styleClass="pdf-mode-toggle"
 				/>
 				@if (view.monthSubMode() === 'periodo') {
-					<p-select
+					<edu-select
 						[options]="view.mesOptionsInicio()"
 						[ngModel]="view.periodoInicio()"
 						(ngModelChange)="view.setPeriodoInicio($event)"
@@ -89,7 +89,7 @@
 						styleClass="periodo-select"
 					/>
 					<span class="periodo-separator">–</span>
-					<p-select
+					<edu-select
 						[options]="view.mesOptionsFin()"
 						[ngModel]="view.periodoFin()"
 						(ngModelChange)="view.setPeriodoFin($event)"
@@ -102,19 +102,19 @@
 				} @else {
 					<span class="pdf-label">{{ view.pdfFecha() | date: 'MMMM yyyy' }}</span>
 				}
-				<p-button
+				<edu-button
 					icon="pi pi-file-pdf"
 					[loading]="view.pdf.downloadingPdf()"
 					[disabled]="view.monthSubMode() === 'periodo' && !view.isPeriodoValid()"
 					severity="danger"
 					[text]="true"
 					[rounded]="true"
-					(onClick)="togglePdfMenu($event)"
-					pTooltip="Opciones de PDF"
-					tooltipPosition="top"
+					(click)="togglePdfMenu($event)"
+					eduTooltip="Opciones de PDF"
+					eduTooltipPosition="top"
 					[pt]="{ root: { 'aria-label': 'Opciones de PDF' } }"
 				/>
-				<p-menu #pdfMenu [model]="pdfMenuItems()" [popup]="true" appendTo="body" />
+				<edu-menu #pdfMenu [model]="pdfMenuItems()" [popup]="true" appendTo="body" />
 			</div>
 		</div>
 	}

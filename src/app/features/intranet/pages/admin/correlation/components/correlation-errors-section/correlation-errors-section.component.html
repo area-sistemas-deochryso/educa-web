@@ -8,13 +8,10 @@
 		<a
 			[routerLink]="['/intranet/admin/monitoreo/incidencias/errores']"
 			[queryParams]="{ correlationId: correlationId() }"
-			pButton
-			type="button"
-			label="Abrir en error-logs"
-			icon="pi pi-external-link"
-			class="p-button-text p-button-sm"
+			class="edu-button-link edu-button-link--text edu-button-link--sm"
+			data-severity="primary"
 			data-info-anchor="admin-correlation-open-external"
-		></a>
+		><span>Abrir en error-logs</span><i class="edu-button-link__icon pi pi-external-link"></i></a>
 	</header>
 
 	@if (count() === 0) {
@@ -23,7 +20,7 @@
 			<p>Sin errores registrados con este correlation id.</p>
 		</div>
 	} @else {
-		<p-table [value]="items()" [dataKey]="'id'" class="p-datatable-sm" [scrollable]="true" scrollHeight="flex">
+		<edu-table [value]="items()" [dataKey]="'id'" class="p-datatable-sm" [scrollable]="true" scrollHeight="flex">
 			<ng-template #header>
 				<tr>
 					<th style="width: 90px">Severidad</th>
@@ -39,17 +36,17 @@
 			<ng-template #body let-row>
 				<tr>
 					<td>
-						<p-tag [value]="row.severidad" [severity]="getSeveridadSeverity(row.severidad)" />
+						<edu-tag [value]="row.severidad" [severity]="getSeveridadSeverity(row.severidad)" />
 					</td>
 					<td>
 						@if (row.httpStatus !== null) {
-							<p-tag [value]="'' + row.httpStatus" [severity]="getStatusSeverity(row.httpStatus)" />
+							<edu-tag [value]="'' + row.httpStatus" [severity]="getStatusSeverity(row.httpStatus)" />
 						} @else {
 							<span class="muted">—</span>
 						}
 					</td>
 					<td>
-						<span class="cell-message" [pTooltip]="row.mensaje" tooltipPosition="top">
+						<span class="cell-message" [eduTooltip]="row.mensaje" eduTooltipPosition="top">
 							{{ row.mensaje }}
 						</span>
 					</td>
@@ -57,7 +54,7 @@
 						<span class="cell-mono">{{ row.httpMethod ?? '—' }}</span>
 					</td>
 					<td>
-						<span class="cell-mono cell-url" [pTooltip]="row.url" tooltipPosition="top">
+						<span class="cell-mono cell-url" [eduTooltip]="row.url" eduTooltipPosition="top">
 							{{ row.url }}
 						</span>
 					</td>
@@ -75,17 +72,17 @@
 					</td>
 					<td>{{ row.fecha | date: 'dd/MM/yyyy HH:mm:ss' }}</td>
 					<td>
-						<button
-							pButton
+						<edu-button
 							type="button"
 							label="Ver grupo"
 							icon="pi pi-sitemap"
-							class="p-button-text p-button-sm"
+							[text]="true"
+							size="small"
 							[disabled]="!canGoToGroup(row)"
 							(click)="onGoToGroup(row)"
 							data-info-anchor="admin-correlation-row-action"
 							[pt]="{ root: { 'aria-label': 'Ver grupo de errores' } }"
-						></button>
+						/>
 					</td>
 				</tr>
 			</ng-template>
@@ -94,7 +91,7 @@
 					<td colspan="8" class="text-center p-4">No hay errores asociados a esta correlación.</td>
 				</tr>
 			</ng-template>
-		</p-table>
+		</edu-table>
 
 		@if (cappedRows()) {
 			<p class="correlation-section__cap">

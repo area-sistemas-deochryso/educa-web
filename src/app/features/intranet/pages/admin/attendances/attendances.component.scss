@@ -164,47 +164,12 @@
 	gap: 0.25rem;
 }
 
-// Agregar salida: naranja oscuro (complementario del verde de entrada) con contraste AA sobre fondo claro.
-// Motivo: p-button-text p-button-success renderiza verde pálido casi invisible sobre --surface-ground.
-:host ::ng-deep .btn-agregar-salida.p-button-text {
-	color: var(--orange-700, #c2410c);
-
-	&:enabled:hover {
-		background: color-mix(in srgb, var(--orange-500, #f97316) 15%, transparent);
-		color: var(--orange-800, #9a3412);
-	}
-}
-
 .text-center {
 	text-align: center;
 	padding: 2rem !important;
 	color: var(--text-color-secondary);
 }
 
-::ng-deep .p-datatable {
-	background: transparent;
-
-	.p-datatable-table {
-		background: transparent;
-	}
-
-	.p-datatable-thead > tr > th {
-		background: transparent;
-	}
-
-	.p-datatable-tbody > tr {
-		background: transparent;
-
-		> td {
-			background: transparent;
-		}
-	}
-
-	.p-datatable-paginator-bottom,
-	.p-paginator {
-		background: transparent;
-	}
-}
 // #endregion
 
 // #region Dialog form
@@ -284,48 +249,6 @@
 			gap: 0.5rem;
 			align-items: center;
 		}
-	}
-}
-// #endregion
-
-// #region Tabs
-:host ::ng-deep {
-	.p-tabs {
-		.p-tablist {
-			background: transparent;
-		}
-
-		.p-tabpanel {
-			padding: 1.5rem 0 0;
-		}
-	}
-}
-// #endregion
-
-// #region Overrides PrimeNG
-:host ::ng-deep {
-	.p-inputtext,
-	.p-select {
-		background: transparent;
-		color: var(--text-color);
-		border-color: var(--surface-300);
-
-		&::placeholder {
-			color: var(--text-color-secondary);
-		}
-
-		&:enabled:focus {
-			border-color: var(--text-color);
-			box-shadow: 0 0 0 1px var(--text-color);
-		}
-	}
-
-	.p-select-label {
-		color: var(--text-color);
-	}
-
-	.p-select-dropdown {
-		color: var(--text-color);
 	}
 }
 // #endregion

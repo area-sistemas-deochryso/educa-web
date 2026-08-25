@@ -10,24 +10,16 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TableModule } from 'primeng/table';
-import { SkeletonModule } from 'primeng/skeleton';
-import { ButtonModule } from 'primeng/button';
-import { Menu, MenuModule } from 'primeng/menu';
-import { TooltipModule } from 'primeng/tooltip';
-import { DialogModule } from 'primeng/dialog';
-import { Textarea } from 'primeng/textarea';
-import { Select } from 'primeng/select';
-import { MenuItem } from 'primeng/api';
 import { EstudianteAsistencia, EstadisticasAsistenciaDia } from '@data/models';
 import { ResponsiveTableComponent, TableSkeletonComponent } from '@intranet-shared/components';
 import type { SkeletonColumnDef } from '@intranet-shared/components';
 import { FormatTimePipe } from '@intranet-shared/pipes';
 import { getStatusClass } from '@features/intranet/pages/cross-role/attendance-component/config/attendance.constants';
 import { AttendanceStatus } from '@features/intranet/pages/cross-role/attendance-component/models/attendance.types';
-import { InputTextModule } from 'primeng/inputtext';
 import { AttendanceTemporalNavComponent } from '../attendance-temporal-nav/attendance-temporal-nav.component';
 import { EmptyStateComponent } from '../empty-state/empty-state.component';
+import { EduButton, EduDialog, EduInputText, EduMenu, EduSelect, EduTable, EduTextarea, EduTooltip } from '@edu-ui';
+import type { EduMenuItem } from '@edu-ui';
 
 export interface EstudianteAsistenciaDia {
 	estudianteId: number;
@@ -53,21 +45,19 @@ export interface JustificacionEvent {
 	imports: [
 		CommonModule,
 		FormsModule,
-		TableModule,
-		SkeletonModule,
+		EduTable,
 		TableSkeletonComponent,
 		ResponsiveTableComponent,
-		ButtonModule,
-		MenuModule,
-		TooltipModule,
-		DialogModule,
-		Textarea,
-		Select,
+		EduButton,
+		EduMenu,
+		EduTooltip,
+		EduDialog,
+		EduTextarea,
+		EduSelect,
 		FormatTimePipe,
-		InputTextModule,
+		EduInputText,
 		AttendanceTemporalNavComponent,
-		EmptyStateComponent,
-	],
+		EmptyStateComponent],
 	templateUrl: './attendance-day-list.component.html',
 	styleUrl: './attendance-day-list.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -80,7 +70,7 @@ export class AttendanceDayListComponent {
 	readonly loading = input<boolean>(false);
 	readonly showPdfButton = input<boolean>(false);
 	readonly downloadingPdf = input<boolean>(false);
-	readonly pdfMenuItems = input<MenuItem[]>([]);
+	readonly pdfMenuItems = input<EduMenuItem[]>([]);
 	readonly allowJustify = input<boolean>(false);
 	readonly savingJustificacion = input<boolean>(false);
 	readonly tipoReporteOptions = input<{ label: string; items: { label: string; value: string }[] }[]>([]);
@@ -94,7 +84,7 @@ export class AttendanceDayListComponent {
 	readonly tipoReporteChange = output<string>();
 
 	// * ViewChild
-	@ViewChild('pdfMenu') pdfMenu!: Menu;
+	@ViewChild('pdfMenu') pdfMenu!: EduMenu;
 
 	// * Constants
 	readonly today = new Date();
@@ -104,8 +94,7 @@ export class AttendanceDayListComponent {
 		{ width: 'flex', cellType: 'text-subtitle' },
 		{ width: '100px', cellType: 'text' },
 		{ width: '100px', cellType: 'text' },
-		{ width: '80px', cellType: 'badge' },
-	];
+		{ width: '80px', cellType: 'badge' }];
 	private readonly PREFIJO_JUSTIFICACION = 'Justificado: ';
 
 	// * Local state for the datepicker model (signal for OnPush reactivity)

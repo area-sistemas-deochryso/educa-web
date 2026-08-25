@@ -2,22 +2,22 @@
 <div class="filters-bar">
 	<div class="field field--search">
 		<label class="label-uppercase" for="filter-buscar">Buscar</label>
-		<p-iconfield>
-			<p-inputicon styleClass="pi pi-search" />
+		<edu-icon-field>
+			<edu-input-icon styleClass="pi pi-search" />
 			<input
 				id="filter-buscar"
-				pInputText
+				eduInputText
 				type="text"
 				data-info-anchor="email-outbox-search-input"
 				placeholder="Destinatario o asunto..."
 				(input)="searchChange.emit($any($event.target).value)"
 			/>
-		</p-iconfield>
+		</edu-icon-field>
 	</div>
 
 	<div class="field">
 		<label class="label-uppercase" for="filter-tipo">Tipo de correo</label>
-		<p-select
+		<edu-select
 			inputId="filter-tipo"
 			data-info-anchor="admin-email-outbox-tipo-filter-select"
 			[options]="tipoOptions"
@@ -32,7 +32,7 @@
 
 	<div class="field">
 		<label class="label-uppercase" for="filter-estado">Estado del envío</label>
-		<p-select
+		<edu-select
 			inputId="filter-estado"
 			data-info-anchor="email-outbox-status-filter-select"
 			[options]="estadoOptions"
@@ -47,7 +47,7 @@
 
 	<div class="field">
 		<label class="label-uppercase" for="filter-tipo-fallo">Tipo de fallo</label>
-		<p-select
+		<edu-select
 			inputId="filter-tipo-fallo"
 			data-info-anchor="admin-email-outbox-tipo-fallo-filter-select"
 			[options]="tipoFalloOptions"
@@ -62,7 +62,7 @@
 
 	<div class="field">
 		<label class="label-uppercase" for="filter-smtp-code">Código SMTP</label>
-		<p-select
+		<edu-select
 			inputId="filter-smtp-code"
 			data-info-anchor="admin-email-outbox-smtp-code-filter-select"
 			[options]="smtpCodeOptions"
@@ -77,28 +77,28 @@
 
 	<div class="field">
 		<label class="label-uppercase">Desde</label>
-		<p-datepicker
+		<edu-datepicker
 			placeholder="dd/mm/yyyy"
 			dateFormat="yy-mm-dd"
 			[showIcon]="true"
 			appendTo="body"
 			data-info-anchor="admin-email-outbox-filtro-desde-datepicker"
-			(onSelect)="onDesdeChange($event)"
-			(onClear)="onDesdeChange(null)"
+			[ngModel]="desde()"
+			(ngModelChange)="onDesdeChange($event)"
 			[showClear]="true"
 		/>
 	</div>
 
 	<div class="field">
 		<label class="label-uppercase">Hasta</label>
-		<p-datepicker
+		<edu-datepicker
 			placeholder="dd/mm/yyyy"
 			dateFormat="yy-mm-dd"
 			[showIcon]="true"
 			appendTo="body"
 			data-info-anchor="admin-email-outbox-filtro-hasta-datepicker"
-			(onSelect)="onHastaChange($event)"
-			(onClear)="onHastaChange(null)"
+			[ngModel]="hasta()"
+			(ngModelChange)="onHastaChange($event)"
 			[showClear]="true"
 		/>
 	</div>
@@ -107,7 +107,7 @@
 		<label class="label-uppercase" for="filter-correlation">Correlation ID</label>
 		<input
 			id="filter-correlation"
-			pInputText
+			eduInputText
 			type="text"
 			data-info-anchor="admin-email-outbox-correlation-input"
 			placeholder="ID de correlación"
@@ -117,13 +117,13 @@
 	</div>
 
 	<div class="field field--clear">
-		<button
-			pButton
+		<edu-button
 			type="button"
 			icon="pi pi-filter-slash"
-			class="p-button-text btn-clear"
-			pTooltip="Limpiar filtros"
-			tooltipPosition="top"
+			[text]="true"
+			class="btn-clear"
+			eduTooltip="Limpiar filtros"
+			eduTooltipPosition="top"
 			data-info-anchor="email-outbox-clear-filters-btn"
 			(click)="onClearFilters()"
 			[pt]="{
@@ -131,7 +131,7 @@
 					'aria-label': 'Limpiar filtros',
 				},
 			}"
-		></button>
+		/>
 	</div>
 </div>
 <!-- #endregion -->

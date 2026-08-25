@@ -397,20 +397,6 @@
 	display: block;
 	margin-top: 1rem;
 
-	::ng-deep .p-tab {
-		display: flex;
-		align-items: center;
-		gap: 0.4rem;
-
-		i {
-			font-size: 0.85rem;
-		}
-	}
-
-	::ng-deep .p-tabpanels {
-		padding-top: 1rem;
-	}
-
 	.tab-count {
 		display: inline-flex;
 		align-items: center;
@@ -762,7 +748,7 @@
 	align-items: center;
 	gap: 0.5rem;
 	padding: 1rem;
-	color: var(--p-text-muted-color);
+	color: var(--text-color-secondary);
 	font-size: 0.85rem;
 }
 
@@ -774,14 +760,14 @@
 
 .group-ocurrencia-item {
 	padding: 0.5rem 0.75rem;
-	border-radius: var(--p-border-radius);
-	border: 1px solid var(--p-surface-200);
+	border-radius: var(--border-radius);
+	border: 1px solid var(--surface-200);
 	background: var(--surface-card, #fcfdfe);
 	transition: background 0.15s;
 
 	&--current {
-		border-color: var(--p-primary-color);
-		background: color-mix(in srgb, var(--p-primary-color) 5%, var(--p-surface-0));
+		border-color: var(--primary-accent);
+		background: color-mix(in srgb, var(--primary-accent) 5%, var(--surface-0));
 	}
 
 	.group-ocurrencia-header {
@@ -794,14 +780,14 @@
 	.group-ocurrencia-date {
 		font-size: 0.75rem;
 		font-weight: 500;
-		color: var(--p-text-muted-color);
+		color: var(--text-color-secondary);
 		font-family: monospace;
 	}
 
 	.group-ocurrencia-msg {
 		display: block;
 		font-size: 0.8rem;
-		color: var(--p-text-color);
+		color: var(--text-color);
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
@@ -810,7 +796,7 @@
 	.group-ocurrencia-user {
 		display: block;
 		font-size: 0.7rem;
-		color: var(--p-text-muted-color);
+		color: var(--text-color-secondary);
 		margin-top: 0.125rem;
 	}
 }
@@ -819,6 +805,6 @@
 	padding: 0.5rem;
 	text-align: center;
 	font-size: 0.75rem;
-	color: var(--p-text-muted-color);
+	color: var(--text-color-secondary);
 }
 // #endregion

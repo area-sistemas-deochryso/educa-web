@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { ButtonModule } from 'primeng/button';
+import { EduButton } from '@edu-ui';
 
 import {
 	CdkDrag,
@@ -60,13 +60,7 @@ const PAGE_SIZE_INCREMENT = 20;
 	selector: 'app-error-groups-kanban-board',
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [
-		CommonModule,
-		ButtonModule,
-		CdkDropList,
-		CdkDrag,
-		ErrorGroupCardComponent,
-	],
+	imports: [CommonModule, EduButton, CdkDropList, CdkDrag, ErrorGroupCardComponent],
 	templateUrl: './error-groups-kanban-board.component.html',
 	styleUrl: './error-groups-kanban-board.component.scss',
 })

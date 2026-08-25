@@ -1,12 +1,8 @@
 import { Component, ChangeDetectionStrategy, input, output, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DialogModule } from 'primeng/dialog';
-import { FileUploadModule } from 'primeng/fileupload';
-import { TextareaModule } from 'primeng/textarea';
-import { ButtonModule } from 'primeng/button';
-import { MessageModule } from 'primeng/message';
 import { JustificarInasistenciaContext } from '@features/intranet/pages/estudiante/models';
+import { EduButton, EduDialog, EduFileUpload, EduMessage, EduTextarea } from '@edu-ui';
 
 const MAX_FILE_SIZE = 10485760;
 const ACCEPTED_TYPES = '.pdf,.jpg,.jpeg,.png,.webp';
@@ -14,10 +10,10 @@ const ACCEPTED_TYPES = '.pdf,.jpg,.jpeg,.png,.webp';
 @Component({
 	selector: 'app-justificar-inasistencia-dialog',
 	standalone: true,
-	imports: [CommonModule, FormsModule, DialogModule, FileUploadModule, TextareaModule, ButtonModule, MessageModule],
+	imports: [CommonModule, FormsModule, EduDialog, EduFileUpload, EduTextarea, EduButton, EduMessage],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
-		<p-dialog
+		<edu-dialog
 			header="Justificar inasistencia"
 			[visible]="visible()"
 			(visibleChange)="onVisibleChange($event)"
@@ -29,11 +25,11 @@ const ACCEPTED_TYPES = '.pdf,.jpg,.jpeg,.png,.webp';
 					<p class="fecha-info">Falta del <strong>{{ ctx.fecha | date: 'dd/MM/yyyy' }}</strong></p>
 
 					@if (ctx.motivoRechazoAnterior) {
-						<p-message severity="warn" [text]="'Solicitud anterior rechazada: ' + ctx.motivoRechazoAnterior" styleClass="w-full" />
+						<edu-message severity="warn" [text]="'Solicitud anterior rechazada: ' + ctx.motivoRechazoAnterior" styleClass="w-full" />
 					}
 
 					<label>Documento de respaldo (PDF o imagen)</label>
-					<p-fileUpload
+					<edu-file-upload
 						mode="basic"
 						[auto]="false"
 						data-info-anchor="estudiante-justificar-inasistencia-adjuntar"
@@ -54,7 +50,7 @@ const ACCEPTED_TYPES = '.pdf,.jpg,.jpeg,.png,.webp';
 
 					<label for="just-comentario">Comentario (opcional)</label>
 					<textarea
-						pTextarea
+						eduTextarea
 						id="just-comentario"
 						[(ngModel)]="comentario"
 						placeholder="Comentario adicional..."
@@ -66,24 +62,22 @@ const ACCEPTED_TYPES = '.pdf,.jpg,.jpeg,.png,.webp';
 			}
 
 			<ng-template #footer>
-				<button
-					pButton
+				<edu-button
 					label="Cancelar"
-					class="p-button-text"
+					[text]="true"
 					data-info-anchor="estudiante-justificar-inasistencia-cancelar"
 					(click)="onVisibleChange(false)"
-				></button>
-				<button
-					pButton
+				/>
+				<edu-button
 					label="Enviar solicitud"
 					icon="pi pi-check"
 					data-info-anchor="estudiante-justificar-inasistencia-enviar"
 					[disabled]="!canSave() || saving()"
 					[loading]="saving()"
 					(click)="onSave()"
-				></button>
+				/>
 			</ng-template>
-		</p-dialog>
+		</edu-dialog>
 	`,
 	styles: [
 		`
@@ -110,8 +104,7 @@ const ACCEPTED_TYPES = '.pdf,.jpg,.jpeg,.png,.webp';
 				font-size: 0.85rem;
 				color: var(--text-color-secondary);
 			}
-		`,
-	],
+		`],
 })
 export class JustificarInasistenciaDialogComponent {
 	// #region Inputs/Outputs

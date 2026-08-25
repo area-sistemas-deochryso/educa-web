@@ -1,4 +1,4 @@
-<p-dialog
+<edu-dialog
 	[visible]="visible()"
 	(visibleChange)="onVisibleChange($event)"
 	[modal]="true"
@@ -24,12 +24,11 @@
 	</div>
 
 	<ng-template #footer>
-		<button
-			pButton
+		<edu-button
 			label="Volver al inicio"
 			icon="pi pi-home"
-			class="p-button-outlined"
+			[outlined]="true"
 			(click)="goHome()"
-		></button>
+		/>
 	</ng-template>
-</p-dialog>
+</edu-dialog>

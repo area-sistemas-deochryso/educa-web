@@ -4,9 +4,6 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { ButtonModule } from 'primeng/button';
-import { TooltipModule } from 'primeng/tooltip';
-
 import { logger } from '@core/helpers';
 import { StorageService, type CorrelationViewMode } from '@core/services';
 
@@ -19,6 +16,7 @@ import { CorrelationRateLimitSectionComponent } from './components/correlation-r
 import { CorrelationReportsSectionComponent } from './components/correlation-reports-section';
 import { CorrelationEmailsSectionComponent } from './components/correlation-emails-section';
 import { CorrelationTimelineSectionComponent } from './components/correlation-timeline-section';
+import { EduButton, EduTooltip } from '@edu-ui';
 // #endregion
 
 /**
@@ -37,19 +35,7 @@ import { CorrelationTimelineSectionComponent } from './components/correlation-ti
 @Component({
 	selector: 'app-correlation',
 	standalone: true,
-	imports: [
-		CommonModule,
-		DatePipe,
-		ButtonModule,
-		TooltipModule,
-		PageHeaderComponent,
-		CorrelationTimelineSectionComponent,
-		CorrelationErrorsSectionComponent,
-		CorrelationRateLimitSectionComponent,
-		CorrelationReportsSectionComponent,
-		CorrelationEmailsSectionComponent,
-		CorrelationIdPillComponent,
-	],
+	imports: [CommonModule, DatePipe, EduButton, EduTooltip, PageHeaderComponent, CorrelationTimelineSectionComponent, CorrelationErrorsSectionComponent, CorrelationRateLimitSectionComponent, CorrelationReportsSectionComponent, CorrelationEmailsSectionComponent, CorrelationIdPillComponent],
 	templateUrl: './correlation.component.html',
 	styleUrl: './correlation.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

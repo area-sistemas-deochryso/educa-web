@@ -1,16 +1,15 @@
 import { ChangeDetectionStrategy, Component, model } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-import { SelectButtonModule } from 'primeng/selectbutton';
-
 import { esVerano, periodoActual } from '@shared/models';
+import { EduSelectButton } from '@edu-ui';
 
 @Component({
 	selector: 'app-period-toggle',
 	standalone: true,
-	imports: [FormsModule, SelectButtonModule],
+	imports: [FormsModule, EduSelectButton],
 	template: `
-		<p-selectButton
+		<edu-select-button
 			data-info-anchor="period-toggle"
 			[options]="options"
 			[ngModel]="value()"

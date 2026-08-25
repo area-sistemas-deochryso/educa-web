@@ -1,14 +1,13 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { AutoCompleteCompleteEvent, AutoCompleteModule, AutoCompleteSelectEvent } from 'primeng/autocomplete';
-import { ButtonModule } from 'primeng/button';
-import { TooltipModule } from 'primeng/tooltip';
 
 import { ErrorHandlerService } from '@core/services/error';
 import { PageHeaderComponent } from '@intranet-shared/components/page-header';
 
 import { PersonaConCorreoDto, TipoPersona } from '../../models/correo-individual.models';
 import { CampoCorreoLabelPipe } from '../../pipes/campo-correo-label.pipe';
+import { EduAutoComplete, EduButton, EduTemplate, EduTooltip } from '@edu-ui';
+import type { EduAutoCompleteCompleteEvent, EduAutoCompleteSelectEvent } from '@edu-ui';
 
 const TIPO_PERSONA_LABEL: Record<TipoPersona, string> = {
 	E: 'Estudiante',
@@ -27,14 +26,7 @@ const TIPO_PERSONA_ICON: Record<TipoPersona, string> = {
 @Component({
 	selector: 'app-correo-header',
 	standalone: true,
-	imports: [
-		FormsModule,
-		AutoCompleteModule,
-		ButtonModule,
-		TooltipModule,
-		PageHeaderComponent,
-		CampoCorreoLabelPipe,
-	],
+	imports: [FormsModule, EduAutoComplete, EduButton, EduTooltip, PageHeaderComponent, CampoCorreoLabelPipe, EduTemplate],
 	templateUrl: './correo-header.component.html',
 	styleUrl: './correo-header.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -88,7 +80,7 @@ export class CorreoHeaderComponent {
 	// #region Handlers — typeahead
 	// * El input del p-autoComplete acepta string libre o PersonaConCorreoDto al seleccionar.
 	// * Mantenemos en el ngModel un string siempre — al seleccionar emitimos via (onSelect).
-	onComplete(event: AutoCompleteCompleteEvent): void {
+	onComplete(event: EduAutoCompleteCompleteEvent): void {
 		this.typeaheadQuery.emit(event.query ?? '');
 	}
 
@@ -100,7 +92,7 @@ export class CorreoHeaderComponent {
 		}
 	}
 
-	onSelect(event: AutoCompleteSelectEvent): void {
+	onSelect(event: EduAutoCompleteSelectEvent): void {
 		const persona = event.value as PersonaConCorreoDto;
 		this.seleccionarPersona.emit(persona);
 	}

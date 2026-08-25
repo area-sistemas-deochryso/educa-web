@@ -6,7 +6,7 @@
 			<i class="pi pi-search"></i>
 			<input
 				type="text"
-				pInputText
+				eduInputText
 				[ngModel]="monthSearchTerm()"
 				(ngModelChange)="monthSearchTerm.set($event)"
 				(focus)="onMonthSearchFocus()"
@@ -41,25 +41,25 @@
 		</div>
 
 		@if (selectedProfesor()) {
-			<p-button
+			<edu-button
 				icon="pi pi-pencil"
 				severity="info"
 				[text]="true"
 				[rounded]="true"
-				(onClick)="onEditarEnAdminMes()"
-				pTooltip="Editar asistencia del profesor en admin"
-				tooltipPosition="top"
+				(click)="onEditarEnAdminMes()"
+				eduTooltip="Editar asistencia del profesor en admin"
+				eduTooltipPosition="top"
 				[pt]="{ root: { 'aria-label': 'Editar asistencia del profesor en admin' } }"
 			/>
 		}
-		<p-button
+		<edu-button
 			icon="pi pi-chart-bar"
 			severity="secondary"
 			[text]="true"
 			[rounded]="true"
-			(onClick)="navigateToReportes()"
-			pTooltip="Reportes de asistencia"
-			tooltipPosition="top"
+			(click)="navigateToReportes()"
+			eduTooltip="Reportes de asistencia"
+			eduTooltipPosition="top"
 			[pt]="{ root: { 'aria-label': 'Reportes de asistencia' } }"
 		/>
 	</div>
@@ -117,24 +117,24 @@
 		(editAdmin)="onEditarEnAdminDia($event)"
 	>
 		<ng-container actionsSlot>
-			<p-button
+			<edu-button
 				icon="pi pi-pencil"
 				severity="info"
 				[text]="true"
 				[rounded]="true"
-				(onClick)="navigateToGestion()"
-				pTooltip="Gestión de asistencia"
-				tooltipPosition="top"
+				(click)="navigateToGestion()"
+				eduTooltip="Gestión de asistencia"
+				eduTooltipPosition="top"
 				[pt]="{ root: { 'aria-label': 'Gestión de asistencia' } }"
 			/>
-			<p-button
+			<edu-button
 				icon="pi pi-chart-bar"
 				severity="secondary"
 				[text]="true"
 				[rounded]="true"
-				(onClick)="navigateToReportes()"
-				pTooltip="Reportes de asistencia"
-				tooltipPosition="top"
+				(click)="navigateToReportes()"
+				eduTooltip="Reportes de asistencia"
+				eduTooltipPosition="top"
 				[pt]="{ root: { 'aria-label': 'Reportes de asistencia' } }"
 			/>
 		</ng-container>

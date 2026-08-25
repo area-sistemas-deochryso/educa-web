@@ -1,9 +1,9 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DialogModule } from 'primeng/dialog';
 import { logger } from '@core/helpers';
 import { getGradeClass as getGradeClassFn } from '@intranet-shared/services/calificacion-config';
+import { EduDialog } from '@edu-ui';
 
 // #endregion
 // #region Implementation
@@ -29,7 +29,7 @@ export interface Submission {
 
 @Component({
 	selector: 'app-submissions-modal',
-	imports: [CommonModule, DialogModule],
+	imports: [CommonModule, EduDialog],
 	templateUrl: './submissions-modal.component.html',
 	styleUrl: './submissions-modal.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -58,8 +58,7 @@ export class SubmissionsModalComponent {
 			grade: null,
 			feedback: null,
 			isRead: false,
-		},
-	];
+		}];
 	// #endregion
 
 	/**

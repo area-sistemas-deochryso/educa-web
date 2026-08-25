@@ -12,25 +12,25 @@
 	title="Telemetría de Rate Limiting"
 	subtitle="Observabilidad de respuestas 429 y consumo de tokens por policy"
 >
-	<button
-		pButton
+	<edu-button
 		type="button"
 		icon="pi pi-file-export"
 		label="Exportar CSV"
-		class="p-button-outlined p-button-sm"
+		[outlined]="true"
+		size="small"
 		data-info-anchor="admin-rate-limit-export-csv-btn"
 		(click)="onExportCsv()"
 		[pt]="{ root: { 'aria-label': 'Exportar eventos a CSV' } }"
-	></button>
-	<button
-		pButton
+	/>
+	<edu-button
 		icon="pi pi-refresh"
-		class="p-button-text p-button-sm"
+		[text]="true"
+		size="small"
 		data-info-anchor="admin-rate-limit-refresh-btn"
 		(click)="onRefresh()"
 		[loading]="vm().loading || vm().loadingStats"
 		[pt]="{ root: { 'aria-label': 'Refrescar' } }"
-	></button>
+	/>
 </app-page-header>
 <!-- #endregion -->
 
@@ -85,5 +85,5 @@
 <!-- #endregion -->
 
 <!-- #region Toast (para copy-to-clipboard) -->
-<p-toast />
+<edu-toast />
 <!-- #endregion -->

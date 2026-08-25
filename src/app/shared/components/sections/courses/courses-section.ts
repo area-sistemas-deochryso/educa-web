@@ -1,6 +1,6 @@
 // #region Imports
 import { Component } from '@angular/core';
-import { Tooltip } from 'primeng/tooltip';
+import { EduTooltip } from '@edu-ui';
 
 // #endregion
 // #region Implementation
@@ -16,7 +16,7 @@ interface Course {
 @Component({
 	selector: 'app-courses-section',
 	standalone: true,
-	imports: [Tooltip],
+	imports: [EduTooltip],
 	templateUrl: './courses-section.html',
 	styleUrl: './courses-section.scss',
 })

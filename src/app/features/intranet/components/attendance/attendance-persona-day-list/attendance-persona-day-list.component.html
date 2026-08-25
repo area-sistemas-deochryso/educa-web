@@ -4,7 +4,7 @@
 		<i class="pi pi-search"></i>
 		<input
 			type="text"
-			pInputText
+			eduInputText
 			[ngModel]="searchTerm()"
 			(ngModelChange)="searchTerm.set($event)"
 			placeholder="Buscar por nombre o DNI..."
@@ -29,7 +29,7 @@
 	<div class="filters-right">
 		@if (showPdfButton()) {
 			@if (tipoReporteOptions().length > 0) {
-				<p-select
+				<edu-select
 					[options]="tipoReporteOptions()"
 					[ngModel]="tipoReporte()"
 					(ngModelChange)="tipoReporteChange.emit($event)"
@@ -42,15 +42,15 @@
 					class="tipo-reporte-selector"
 				/>
 			}
-			<p-button
+			<edu-button
 				icon="pi pi-file-pdf"
 				[loading]="downloadingPdf()"
 				severity="danger"
 				[text]="true"
 				[rounded]="true"
-				(onClick)="togglePdfMenu($event)"
-				pTooltip="Opciones de PDF"
-				tooltipPosition="top"
+				(click)="togglePdfMenu($event)"
+				eduTooltip="Opciones de PDF"
+				eduTooltipPosition="top"
 				class="pdf-button"
 				[pt]="{
 					root: {
@@ -58,7 +58,7 @@
 					},
 				}"
 			/>
-			<p-menu #pdfMenu [model]="pdfMenuItems()" [popup]="true" appendTo="body" />
+			<edu-menu #pdfMenu [model]="pdfMenuItems()" [popup]="true" appendTo="body" />
 		}
 		@if (!hideTemporalNav()) {
 			<app-attendance-temporal-nav
@@ -100,7 +100,7 @@
 	>
 		<!-- #region Desktop: tabla estándar -->
 		<ng-template #desktopView>
-			<p-table [value]="filteredPersonas()" class="p-datatable-sm asistencia-table">
+			<edu-table [value]="filteredPersonas()" class="p-datatable-sm asistencia-table">
 				<ng-template #header>
 					<tr>
 						<th style="width: 50px">#</th>
@@ -116,15 +116,14 @@
 				<ng-template #body let-persona let-i="rowIndex">
 					<tr
 						[class.row-clickable]="allowJustify() && persona.puedeJustificar"
-						[pTooltip]="
+						[eduTooltip]="
 							allowJustify() && persona.puedeJustificar
 								? persona.esJustificado
 									? 'Clic para editar/quitar justificación'
 									: 'Clic para justificar'
 								: ''
 						"
-						tooltipPosition="top"
-						[appendTo]="'body'"
+						eduTooltipPosition="top"
 						[tooltipOptions]="{ showDelay: 300 }"
 						(click)="onPersonaClick(persona)"
 					>
@@ -136,8 +135,8 @@
 								@if (persona.observacion) {
 									<span
 										class="observacion"
-										pTooltip="{{ persona.observacion }}"
-										tooltipPosition="top"
+										eduTooltip="{{ persona.observacion }}"
+										eduTooltipPosition="top"
 									>
 										<i class="pi pi-info-circle"></i>
 										{{ persona.observacion | slice: 0 : 30
@@ -169,25 +168,26 @@
 						</td>
 						@if (showEditAdminAction()) {
 							<td class="text-center">
-								<button
-									pButton
+								<edu-button
 									type="button"
 									icon="pi pi-pencil"
-									class="p-button-rounded p-button-text p-button-info"
-									pTooltip="Editar asistencia del profesor"
-									tooltipPosition="top"
+									[text]="true"
+									[rounded]="true"
+									severity="info"
+									eduTooltip="Editar asistencia del profesor"
+									eduTooltipPosition="top"
 									(click)="onEditAdminClick($event, persona)"
 									[pt]="{
 										root: {
 											'aria-label': 'Editar asistencia del profesor',
 										},
 									}"
-								></button>
+								/>
 							</td>
 						}
 					</tr>
 				</ng-template>
-			</p-table>
+			</edu-table>
 		</ng-template>
 		<!-- #endregion -->
 
@@ -232,19 +232,20 @@
 
 				@if (showEditAdminAction()) {
 					<div class="rt-card__field mobile-card-actions">
-						<button
-							pButton
+						<edu-button
 							type="button"
 							icon="pi pi-pencil"
 							label="Editar en admin"
-							class="p-button-outlined p-button-info p-button-sm"
+							[outlined]="true"
+							size="small"
+							severity="info"
 							(click)="onEditAdminClick($event, persona)"
 							[pt]="{
 								root: {
 									'aria-label': 'Editar asistencia del profesor en admin',
 								},
 							}"
-						></button>
+						/>
 					</div>
 				}
 			</div>
@@ -255,7 +256,7 @@
 <!-- #endregion -->
 
 <!-- #region Diálogo de Justificación -->
-<p-dialog
+<edu-dialog
 	[visible]="dialogVisible()"
 	(visibleChange)="onDialogVisibleChange($event)"
 	[modal]="true"
@@ -286,7 +287,7 @@
 					>Motivo de la justificación <span class="required">*</span></label
 				>
 				<textarea
-					pTextarea
+					eduTextarea
 					id="observacion"
 					rows="4"
 					[ngModel]="observacionText()"
@@ -298,30 +299,30 @@
 
 			<div class="dialog-footer">
 				@if (persona.esJustificado) {
-					<p-button
+					<edu-button
 						label="Quitar justificación"
 						severity="danger"
 						[text]="true"
 						icon="pi pi-trash"
 						[loading]="savingJustificacion()"
-						(onClick)="quitarJustificacion()"
+						(click)="quitarJustificacion()"
 					/>
 				}
-				<p-button
+				<edu-button
 					label="Cancelar"
 					severity="secondary"
 					[text]="true"
-					(onClick)="closeDialog()"
+					(click)="closeDialog()"
 				/>
-				<p-button
+				<edu-button
 					label="Guardar"
 					icon="pi pi-check"
 					[loading]="savingJustificacion()"
 					[disabled]="!observacionText().trim()"
-					(onClick)="guardarJustificacion()"
+					(click)="guardarJustificacion()"
 				/>
 			</div>
 		</div>
 	}
-</p-dialog>
+</edu-dialog>
 <!-- #endregion -->

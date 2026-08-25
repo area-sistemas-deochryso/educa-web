@@ -1,9 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
-
 import { EmailDashboardResumen } from '@features/intranet/pages/admin/email-outbox-shared';
+import { EduTag, EduTooltip } from '@edu-ui';
 
 // * Threshold del techo cPanel defer/fail (5 fails+defers por hora por dominio, política hosting).
 // * El contador del DTO es del día completo — aquí el semáforo se aplica al acumulado diario como
@@ -93,7 +91,7 @@ const BREAKDOWN_CARDS: StatCardDef[] = [
 @Component({
 	selector: 'app-dashboard-resumen',
 	standalone: true,
-	imports: [TagModule, TooltipModule],
+	imports: [EduTag, EduTooltip],
 	templateUrl: './dashboard-resumen.component.html',
 	styleUrl: './dashboard-resumen.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

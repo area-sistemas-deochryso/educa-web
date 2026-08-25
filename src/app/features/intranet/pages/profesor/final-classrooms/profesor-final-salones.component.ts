@@ -2,12 +2,6 @@ import { Component, ChangeDetectionStrategy, inject, OnInit } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { TabsModule } from 'primeng/tabs';
-import { ButtonModule } from 'primeng/button';
-import { TagModule } from 'primeng/tag';
-import { InputNumberModule } from 'primeng/inputnumber';
-import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
 
 import { PageHeaderComponent } from '@intranet-shared/components';
 // eslint-disable-next-line layer-enforcement/imports-warn -- Razón: pendiente mover SalonesAdminTable y SalonDetailDialog a @intranet-shared (Plan maestro Carril B)
@@ -16,23 +10,22 @@ import { ClassroomsAdminTableComponent } from '@features/intranet/pages/admin/cl
 import { ClassroomDetailDialogComponent } from '@features/intranet/pages/admin/classrooms/components/salon-detail-dialog/salon-detail-dialog.component';
 import { AprobarEstudianteDto, AprobacionMasivaDto, NivelEducativo } from './models';
 import { TeacherFinalClassroomsFacade } from './services/profesor-final-salones.facade';
-
+import { EduButton, EduInputNumber, EduMessageService, EduTab, EduTabPanel, EduTabs, EduTag, EduToast } from '@edu-ui';
 @Component({
 	selector: 'app-teacher-final-classrooms',
 	standalone: true,
 	imports: [
 		CommonModule,
 		FormsModule,
-		TabsModule,
-		ButtonModule,
-		TagModule,
-		InputNumberModule,
-		ToastModule,
+		EduTabs, EduTab, EduTabPanel,
+		EduButton,
+		EduTag,
+		EduInputNumber,
+		EduToast,
 		PageHeaderComponent,
 		ClassroomsAdminTableComponent,
-		ClassroomDetailDialogComponent,
-	],
-	providers: [MessageService],
+		ClassroomDetailDialogComponent],
+	providers: [EduMessageService],
 	templateUrl: './profesor-final-salones.component.html',
 	styleUrl: './profesor-final-salones.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -59,7 +52,7 @@ export class TeacherFinalClassroomsComponent implements OnInit {
 	}
 	// #endregion
 
-	// #region Event handlers — Tabs
+	// #region Event handlers — EduTabs
 	onTabChange(index: number): void {
 		const niveles = this.vm().nivelesDisponibles;
 		const nivel = niveles[index];

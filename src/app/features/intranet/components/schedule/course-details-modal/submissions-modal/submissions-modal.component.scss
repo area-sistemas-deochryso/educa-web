@@ -1,19 +1,4 @@
 // #region Styles
-:host ::ng-deep {
-	.submissions-modal.p-dialog {
-		border-radius: 10px;
-		overflow: hidden;
-		background-color: var(--intranet-white-color);
-		max-width: 520px;
-		width: 90vw;
-
-		.p-dialog-content {
-			padding: 0;
-			background: transparent;
-		}
-	}
-}
-
 .modal-content {
 	padding: 1.5rem;
 	background-color: var(--intranet-white-color);

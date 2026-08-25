@@ -1,0 +1,41 @@
+:host {
+	display: block;
+}
+
+.edu-tab {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.625rem 1rem;
+	margin-bottom: -1px;
+	background: transparent;
+	color: var(--eduui-text-muted-color);
+	border: none;
+	border-bottom: 2px solid transparent;
+	font: inherit;
+	font-weight: 500;
+	cursor: pointer;
+
+	&:hover:not(:disabled) {
+		color: var(--eduui-content-color);
+	}
+
+	&:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+
+	&:focus-visible {
+		outline: var(--eduui-focus-ring-width) var(--eduui-focus-ring-style) var(--eduui-focus-ring-color);
+		outline-offset: var(--eduui-focus-ring-offset);
+	}
+}
+
+.edu-tab--active {
+	color: var(--eduui-primary-color);
+	border-bottom-color: var(--eduui-primary-color);
+}
+
+:host-context(.dark-mode) .edu-tab:hover:not(:disabled) {
+	color: var(--eduui-content-color);
+}

@@ -2,7 +2,7 @@
 <div class="registro-header">
 	<div class="date-picker">
 		<label for="asist-fecha">Fecha</label>
-		<p-datepicker
+		<edu-datepicker
 			[(ngModel)]="selectedDate"
 			(ngModelChange)="onDateSelect()"
 			[showIcon]="true"
@@ -10,10 +10,9 @@
 			inputId="asist-fecha"
 			appendTo="body"
 		/>
-		<button
-			pButton
+		<edu-button
 			icon="pi pi-search"
-			class="p-button-outlined"
+			[outlined]="true"
 			data-info-anchor="profesor-asistencia-buscar-fecha"
 			(click)="onDateSelect()"
 			[pt]="{
@@ -21,17 +20,17 @@
 					'aria-label': 'Buscar asistencia',
 				},
 			}"
-		></button>
+		/>
 	</div>
 
 	@if (hasEstudiantes()) {
 		<div class="stats-row">
-			<p-tag [value]="'Total: ' + stats().total" severity="secondary" />
-			<p-tag [value]="'Presentes: ' + stats().presentes" severity="success" />
-			<p-tag [value]="'Tardes: ' + stats().tardes" severity="warn" />
-			<p-tag [value]="'Faltas: ' + stats().faltas" severity="danger" />
+			<edu-tag [value]="'Total: ' + stats().total" severity="secondary" />
+			<edu-tag [value]="'Presentes: ' + stats().presentes" severity="success" />
+			<edu-tag [value]="'Tardes: ' + stats().tardes" severity="warn" />
+			<edu-tag [value]="'Faltas: ' + stats().faltas" severity="danger" />
 			@if (esListaSinGuardar()) {
-				<p-tag value="Sin guardar" severity="warn" icon="pi pi-info-circle" />
+				<edu-tag value="Sin guardar" severity="warn" icon="pi pi-info-circle" />
 			}
 		</div>
 	}
@@ -48,30 +47,30 @@
 				El guardado está bloqueado hasta confirmar que es una excepción válida (ej. clase de recuperación).
 			}
 		</span>
-		<button
-			pButton
+		<edu-button
 			type="button"
 			label="Ir a fecha válida"
 			icon="pi pi-calendar"
-			class="p-button-text p-button-sm"
+			[text]="true"
+			size="small"
 			data-info-anchor="profesor-asistencia-ir-fecha-valida"
 			(click)="irAFechaValida()"
-		></button>
+		/>
 		@if (!confirmadoFechaAtipica()) {
-			<button
-				pButton
+			<edu-button
 				type="button"
 				label="Confirmar excepción"
 				icon="pi pi-check"
-				class="p-button-text p-button-sm"
+				[text]="true"
+				size="small"
 				(click)="confirmarFechaAtipica()"
-			></button>
+			/>
 		}
 	</div>
 }
 <!-- #endregion -->
 
-<p-confirmDialog />
+<edu-confirm-dialog />
 
 <!-- #region Loading -->
 @if (loading()) {
@@ -96,23 +95,22 @@
 				</div>
 
 				@if (est.estado === 'J') {
-					<p-tag
+					<edu-tag
 						[value]="labels['J']"
 						[severity]="getEstadoSeverity('J')"
-						[pTooltip]="est.justificacion ?? undefined"
-						tooltipPosition="top"
+						[eduTooltip]="est.justificacion ?? ''"
+						eduTooltipPosition="top"
 					/>
 				} @else {
 					<div class="estado-buttons">
 						@for (estado of estados; track estado) {
-							<button
-								pButton
+							<edu-button
 								[class]="'estado-btn estado-btn--' + estado"
 								[class.active]="est.estado === estado"
 								data-info-anchor="profesor-asistencia-estado-btn"
 								(click)="onEstadoChange(est.estudianteId, estado)"
-								[pTooltip]="labels[estado]"
-								tooltipPosition="top"
+								[eduTooltip]="labels[estado]"
+								eduTooltipPosition="top"
 								[pt]="{
 									root: {
 										'aria-label': labels[estado],
@@ -121,14 +119,14 @@
 							>
 								<i [class]="icons[estado]"></i>
 								<span class="estado-letter">{{ estado }}</span>
-							</button>
+							</edu-button>
 						}
 					</div>
 
 					@if (est.estado === 'T' || est.estado === 'F') {
 						<div class="justificacion-row">
 							<input
-								pInputText
+								eduInputText
 								type="text"
 								placeholder="Justificación (opcional)"
 								[value]="est.justificacion ?? ''"
@@ -143,17 +141,16 @@
 	</div>
 
 	<div class="actions-footer">
-		<button
-			pButton
+		<edu-button
 			label="Guardar Asistencia"
 			icon="pi pi-save"
 			data-info-anchor="profesor-asistencia-guardar"
 			(click)="onSave()"
 			[loading]="saving()"
 			[disabled]="saving() || !puedeGuardar()"
-			[pTooltip]="!puedeGuardar() ? 'Confirmá que la fecha es una excepción válida para poder guardar' : undefined"
-			tooltipPosition="top"
-		></button>
+			[eduTooltip]="!puedeGuardar() ? 'Confirmá que la fecha es una excepción válida para poder guardar' : ''"
+			eduTooltipPosition="top"
+		/>
 	</div>
 }
 <!-- #endregion -->

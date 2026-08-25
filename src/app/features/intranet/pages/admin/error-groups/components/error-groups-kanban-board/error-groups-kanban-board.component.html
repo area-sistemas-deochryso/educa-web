@@ -46,16 +46,16 @@
 
 			@if (col.hasMore) {
 				<div class="kanban-column__footer">
-					<button
-						pButton
+					<edu-button
 						type="button"
 						label="Cargar más"
 						icon="pi pi-arrow-down"
-						class="p-button-text p-button-sm"
+						[text]="true"
+						size="small"
 						(click)="onLoadMore(col.estado)"
 						[pt]="{ root: { 'aria-label': 'Cargar más en columna ' + col.label } }"
 						data-info-anchor="admin-error-groups-cargar-mas-btn"
-					></button>
+					/>
 				</div>
 			}
 		</div>

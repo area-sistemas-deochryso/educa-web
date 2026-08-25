@@ -1,5 +1,5 @@
 <!-- #region Dialog principal de contenido -->
-<p-dialog
+<edu-dialog
 	[visible]="vm().contentDialogVisible"
 	(visibleChange)="onVisibleChange($event)"
 	(onShow)="onDialogShow()"
@@ -25,22 +25,22 @@
 	</ng-template>
 	@if (vm().contenido; as contenido) {
 		<div class="modal-body">
-			<p-tabs [value]="activeTab()" (valueChange)="onTabChange($any($event))">
+			<edu-tabs [value]="activeTab()" (valueChange)="onTabChange($any($event))">
 				<div class="tabs-header-row">
-					<p-tablist>
-						<p-tab value="0" data-info-anchor="profesor-curso-dialog-tab">
+					
+						<edu-tab value="0" data-info-anchor="profesor-curso-dialog-tab">
 							<i class="pi pi-book tab-icon"></i>
 							Contenido
-						</p-tab>
-						<p-tab value="1" data-info-anchor="profesor-curso-dialog-tab">
+						</edu-tab>
+						<edu-tab value="1" data-info-anchor="profesor-curso-dialog-tab">
 							<i class="pi pi-chart-bar tab-icon"></i>
 							Calificaciones
-						</p-tab>
-						<p-tab value="2" data-info-anchor="profesor-curso-dialog-tab">
+						</edu-tab>
+						<edu-tab value="2" data-info-anchor="profesor-curso-dialog-tab">
 							<i class="pi pi-info-circle tab-icon"></i>
 							Información
-						</p-tab>
-					</p-tablist>
+						</edu-tab>
+					
 					<div class="tabs-header-links">
 						<button type="button" class="ver-asistencia-link" data-info-anchor="profesor-curso-dialog-ver-salon" (click)="onVerSalon()">
 							<i class="pi pi-building"></i>
@@ -55,30 +55,31 @@
 					</div>
 				</div>
 
-				<p-tabpanels>
+				
 					<!-- #region Tab Contenido -->
-					<p-tabpanel value="0">
+					<edu-tabpanel value="0">
 						<div class="tab-panel-body">
 							<app-semanas-accordion />
 						</div>
-					</p-tabpanel>
+					</edu-tabpanel>
 					<!-- #endregion -->
 
 					<!-- #region Tab Calificaciones -->
-					<p-tabpanel value="1">
+					<edu-tabpanel value="1">
 						<div class="tab-panel-body">
 							<div style="display: flex; justify-content: flex-end; margin-bottom: 0.5rem">
-								<button
-									pButton
+								<edu-button
 									icon="pi pi-refresh"
-									class="p-button-rounded p-button-text p-button-sm"
+									[text]="true"
+									[rounded]="true"
+									size="small"
 									data-info-anchor="profesor-curso-dialog-refresh-calificaciones"
 									(click)="onRefreshCalificaciones()"
 									[disabled]="calVm().loading"
-									pTooltip="Refrescar"
-									tooltipPosition="top"
+									eduTooltip="Refrescar"
+									eduTooltipPosition="top"
 									[pt]="{ root: { 'aria-label': 'Refrescar calificaciones' } }"
-								></button>
+								/>
 							</div>
 							<app-calificaciones-panel
 								[calificacionesPorSemana]="calVm().calificacionesPorSemana"
@@ -95,11 +96,11 @@
 								(configurarPeriodos)="onConfigurarPeriodos()"
 							/>
 						</div>
-					</p-tabpanel>
+					</edu-tabpanel>
 					<!-- #endregion -->
 
 					<!-- #region Tab Información -->
-					<p-tabpanel value="2">
+					<edu-tabpanel value="2">
 						<div class="tab-panel-body">
 							<div class="info-grid">
 								<div class="info-card">
@@ -183,14 +184,14 @@
 								Eliminar todo el contenido
 							</button>
 						</div>
-					</p-tabpanel>
+					</edu-tabpanel>
 					<!-- #endregion -->
 
-					</p-tabpanels>
-			</p-tabs>
+					
+			</edu-tabs>
 		</div>
 	}
-</p-dialog>
+</edu-dialog>
 
 <!-- #region Sub-dialogs -->
 <app-semana-edit-dialog
@@ -274,5 +275,5 @@
 	(eliminarPeriodo)="onEliminarPeriodo($event)"
 />
 
-<p-confirmDialog />
+<edu-confirm-dialog />
 <!-- #endregion -->

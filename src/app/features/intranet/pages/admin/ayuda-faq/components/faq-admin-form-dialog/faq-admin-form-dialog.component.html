@@ -1,4 +1,4 @@
-<p-dialog
+<edu-dialog
 	[header]="headerLabel()"
 	[visible]="visible()"
 	(visibleChange)="onHide()"
@@ -13,7 +13,7 @@
 			<input
 				id="faq-pregunta"
 				type="text"
-				pInputText
+				eduInputText
 				class="w-full"
 				[ngModel]="pregunta()"
 				(ngModelChange)="pregunta.set($event)"
@@ -26,7 +26,7 @@
 			<label for="faq-respuesta">Respuesta *</label>
 			<textarea
 				id="faq-respuesta"
-				pTextarea
+				eduTextarea
 				class="w-full"
 				[rows]="4"
 				[ngModel]="respuesta()"
@@ -41,7 +41,7 @@
 				<input
 					id="faq-categoria"
 					type="text"
-					pInputText
+					eduInputText
 					class="w-full"
 					[ngModel]="categoria()"
 					(ngModelChange)="categoria.set($event)"
@@ -52,7 +52,7 @@
 
 			<div class="field">
 				<label for="faq-capability">Visible para</label>
-				<p-select
+				<edu-select
 					id="faq-capability"
 					[options]="capabilityOptions()"
 					optionLabel="label"
@@ -70,15 +70,15 @@
 		<div class="wizard-editor">
 			<div class="wizard-editor-header">
 				<h4>Wizard (opcional)</h4>
-				<button
-					pButton
+				<edu-button
 					type="button"
 					label="Agregar paso"
 					icon="pi pi-plus"
-					class="p-button-text p-button-sm"
+					[text]="true"
+					size="small"
 					(click)="addPaso()"
 					data-info-anchor="admin-faq-form-agregar-paso-btn"
-				></button>
+				/>
 			</div>
 
 			@if (pasos().length > 0) {
@@ -87,7 +87,7 @@
 					<input
 						id="faq-wizard-titulo"
 						type="text"
-						pInputText
+						eduInputText
 						class="w-full"
 						[ngModel]="wizardTitulo()"
 						(ngModelChange)="wizardTitulo.set($event)"
@@ -101,7 +101,7 @@
 						<div class="wizard-step-order">{{ $index + 1 }}</div>
 						<div class="wizard-step-fields">
 							<textarea
-								pTextarea
+								eduTextarea
 								class="w-full"
 								[rows]="2"
 								placeholder="Texto del paso"
@@ -111,7 +111,7 @@
 							></textarea>
 							<input
 								type="text"
-								pInputText
+								eduInputText
 								class="w-full"
 								placeholder="URL de imagen (opcional)"
 								[ngModel]="paso.imagenUrl"
@@ -120,38 +120,39 @@
 							/>
 						</div>
 						<div class="wizard-step-actions">
-							<button
-								pButton
+							<edu-button
 								type="button"
 								icon="pi pi-arrow-up"
-								class="p-button-text p-button-sm"
-								pTooltip="Subir"
+								[text]="true"
+								size="small"
+								eduTooltip="Subir"
 								[disabled]="$index === 0"
 								(click)="movePaso($index, -1)"
 								[pt]="{ root: { 'aria-label': 'Subir paso ' + ($index + 1) } }"
 								data-info-anchor="admin-faq-form-paso-subir-btn"
-							></button>
-							<button
-								pButton
+							/>
+							<edu-button
 								type="button"
 								icon="pi pi-arrow-down"
-								class="p-button-text p-button-sm"
-								pTooltip="Bajar"
+								[text]="true"
+								size="small"
+								eduTooltip="Bajar"
 								[disabled]="$index === pasos().length - 1"
 								(click)="movePaso($index, 1)"
 								[pt]="{ root: { 'aria-label': 'Bajar paso ' + ($index + 1) } }"
 								data-info-anchor="admin-faq-form-paso-bajar-btn"
-							></button>
-							<button
-								pButton
+							/>
+							<edu-button
 								type="button"
 								icon="pi pi-trash"
-								class="p-button-text p-button-sm p-button-danger"
-								pTooltip="Quitar paso"
+								[text]="true"
+								size="small"
+								severity="danger"
+								eduTooltip="Quitar paso"
 								(click)="removePaso($index)"
 								[pt]="{ root: { 'aria-label': 'Quitar paso ' + ($index + 1) } }"
 								data-info-anchor="admin-faq-form-paso-quitar-btn"
-							></button>
+							/>
 						</div>
 					</div>
 				}
@@ -161,18 +162,16 @@
 		</div>
 	</div>
 
-	<ng-template pTemplate="footer">
-		<button
-			pButton
+	<ng-template #footer>
+		<edu-button
 			type="button"
 			label="Cancelar"
-			class="p-button-text"
+			[text]="true"
 			(click)="onCancel()"
 			[pt]="{ root: { 'aria-label': 'Cancelar' } }"
 			data-info-anchor="admin-faq-form-cancelar-btn"
-		></button>
-		<button
-			pButton
+		/>
+		<edu-button
 			type="button"
 			label="Guardar"
 			icon="pi pi-check"
@@ -181,6 +180,6 @@
 			(click)="onSave()"
 			[pt]="{ root: { 'aria-label': 'Guardar FAQ' } }"
 			data-info-anchor="admin-faq-form-guardar-btn"
-		></button>
+		/>
 	</ng-template>
-</p-dialog>
+</edu-dialog>

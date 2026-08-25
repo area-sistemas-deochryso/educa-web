@@ -1,4 +1,4 @@
-<p-dialog
+<edu-dialog
 	[visible]="visible()"
 	(visibleChange)="onVisibleChange($event)"
 	[modal]="true"
@@ -23,7 +23,7 @@
 			<div class="field">
 				<label for="motivo">Motivo <span class="required">*</span></label>
 				<textarea
-					pTextarea
+					eduTextarea
 					id="motivo"
 					rows="4"
 					[ngModel]="motivoText()"
@@ -34,21 +34,21 @@
 			</div>
 
 			<div class="dialog-footer">
-				<p-button
+				<edu-button
 					label="Cancelar"
 					severity="secondary"
 					[text]="true"
 					[disabled]="saving()"
-					(onClick)="close()"
+					(click)="close()"
 				/>
-				<p-button
+				<edu-button
 					label="Habilitar e ingresar"
 					icon="pi pi-video"
 					[loading]="saving()"
 					[disabled]="!motivoText().trim()"
-					(onClick)="confirmarClick()"
+					(click)="confirmarClick()"
 				/>
 			</div>
 		</div>
 	}
-</p-dialog>
+</edu-dialog>

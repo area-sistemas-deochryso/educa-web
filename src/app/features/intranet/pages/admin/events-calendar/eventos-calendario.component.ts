@@ -2,28 +2,13 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ConfirmationService } from 'primeng/api';
-
-import { TableModule } from 'primeng/table';
-import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
-import { InputTextModule } from 'primeng/inputtext';
-import { TextareaModule } from 'primeng/textarea';
-import { Select } from 'primeng/select';
-import { TagModule } from 'primeng/tag';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { TooltipModule } from 'primeng/tooltip';
-import { ToggleSwitchModule } from 'primeng/toggleswitch';
-import { DatePickerModule } from 'primeng/datepicker';
-import { IconFieldModule } from 'primeng/iconfield';
-import { InputIconModule } from 'primeng/inputicon';
-
 import { PageHeaderComponent, KpiStatsComponent, type KpiStatItem } from '@intranet-shared/components';
 import { EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleLabelPipe } from '@intranet-shared/pipes';
 import { UiMappingService } from '@intranet-shared/services';
 import { EventsCalendarFacade, EventsCalendarStore } from './services';
 import type { EventoFormData } from './services';
 import { EventoCalendarioLista } from '@data/models';
+import { EduButton, EduConfirmDialog, EduConfirmationService, EduDatePicker, EduDialog, EduIconField, EduInputIcon, EduInputText, EduSelect, EduTable, EduTag, EduTextarea, EduToggle, EduTooltip } from '@edu-ui';
 
 // #endregion
 // #region Implementation
@@ -34,26 +19,25 @@ import { EventoCalendarioLista } from '@data/models';
 	imports: [
 		CommonModule,
 		FormsModule,
-		TableModule,
-		ButtonModule,
-		DialogModule,
-		InputTextModule,
-		TextareaModule,
-		Select,
-		TagModule,
-		ConfirmDialogModule,
-		TooltipModule,
-		ToggleSwitchModule,
-		DatePickerModule,
-		IconFieldModule,
-		InputIconModule,
+		EduTable,
+		EduButton,
+		EduDialog,
+		EduInputText,
+		EduTextarea,
+		EduSelect,
+		EduTag,
+		EduConfirmDialog,
+		EduTooltip,
+		EduToggle,
+		EduDatePicker,
+		EduIconField,
+		EduInputIcon,
 		PageHeaderComponent,
 		KpiStatsComponent,
 		EstadoLabelPipe,
 		EstadoSeverityPipe,
-		EstadoToggleLabelPipe,
-	],
-	providers: [ConfirmationService],
+		EstadoToggleLabelPipe],
+	providers: [EduConfirmationService],
 	templateUrl: './eventos-calendario.component.html',
 	styleUrl: './eventos-calendario.component.scss',
 })
@@ -61,7 +45,7 @@ export class EventsCalendarComponent implements OnInit {
 	// #region Dependencias
 	private facade = inject(EventsCalendarFacade);
 	private store = inject(EventsCalendarStore);
-	private confirmationService = inject(ConfirmationService);
+	private confirmationService = inject(EduConfirmationService);
 	readonly uiMapping = inject(UiMappingService);
 	// #endregion
 
@@ -91,8 +75,7 @@ export class EventsCalendarComponent implements OnInit {
 			icon: 'pi pi-clock',
 			label: 'Próximos 30 días',
 			value: this.vm().estadisticas.proximosMes,
-		},
-	]);
+		}]);
 	// #endregion
 
 	// #region Opciones de filtros
@@ -102,14 +85,12 @@ export class EventsCalendarComponent implements OnInit {
 		{ label: 'Cultural', value: 'cultural' },
 		{ label: 'Deportivo', value: 'sports' },
 		{ label: 'Reunión', value: 'meeting' },
-		{ label: 'Otro', value: 'other' },
-	];
+		{ label: 'Otro', value: 'other' }];
 
 	readonly estadoOptions = [
 		{ label: 'Todos', value: null },
 		{ label: 'Activos', value: true },
-		{ label: 'Inactivos', value: false },
-	];
+		{ label: 'Inactivos', value: false }];
 
 	readonly iconoOptions = [
 		{ label: 'Calendario', value: 'pi-calendar' },
@@ -123,8 +104,7 @@ export class EventsCalendarComponent implements OnInit {
 		{ label: 'Sol', value: 'pi-sun' },
 		{ label: 'Archivo', value: 'pi-file-edit' },
 		{ label: 'Graduación', value: 'pi-graduation-cap' },
-		{ label: 'Advertencia', value: 'pi-exclamation-triangle' },
-	];
+		{ label: 'Advertencia', value: 'pi-exclamation-triangle' }];
 	// #endregion
 
 	// #region Lifecycle

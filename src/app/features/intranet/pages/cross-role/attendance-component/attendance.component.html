@@ -11,18 +11,18 @@
 
 	@if (canViewAdminPanel()) {
 		<div class="admin-panel-link">
-			<button
-				pButton
+			<edu-button
 				icon="pi pi-th-large"
 				label="Ver Panel Administrativo de Asistencias"
-				class="p-button-outlined p-button-sm"
+				[outlined]="true"
+				size="small"
 				(click)="irAPanelAdmin()"
 				[pt]="{
 					root: {
 						'aria-label': 'Ir al Panel Administrativo de Asistencias',
 					},
 				}"
-			></button>
+			/>
 		</div>
 	}
 

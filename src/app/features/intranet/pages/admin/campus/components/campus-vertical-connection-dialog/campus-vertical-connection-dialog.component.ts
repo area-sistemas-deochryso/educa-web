@@ -2,18 +2,13 @@ import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
-import { InputNumberModule } from 'primeng/inputnumber';
-import { SelectModule } from 'primeng/select';
-import { ToggleSwitchModule } from 'primeng/toggleswitch';
-
 import { CampusNodoDto, CampusPisoDto, VerticalConnectionFormData, VerticalConnectionType } from '../../models';
+import { EduButton, EduDialog, EduInputNumber, EduSelect, EduToggle } from '@edu-ui';
 
 @Component({
 	selector: 'app-campus-vertical-connection-dialog',
 	standalone: true,
-	imports: [DecimalPipe, FormsModule, ButtonModule, DialogModule, InputNumberModule, SelectModule, ToggleSwitchModule],
+	imports: [DecimalPipe, FormsModule, EduButton, EduDialog, EduInputNumber, EduSelect, EduToggle],
 	templateUrl: './campus-vertical-connection-dialog.component.html',
 	styleUrl: './campus-vertical-connection-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

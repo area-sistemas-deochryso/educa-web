@@ -4,8 +4,8 @@
 
 .heatmap-container {
 	background: transparent;
-	border: 1px solid var(--p-surface-200);
-	border-radius: var(--p-border-radius);
+	border: 1px solid var(--surface-200);
+	border-radius: var(--border-radius);
 	padding: 1rem;
 }
 
@@ -21,14 +21,14 @@
 .heatmap-title {
 	font-size: 0.875rem;
 	font-weight: 600;
-	color: var(--p-text-color);
+	color: var(--text-color);
 	margin: 0;
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;
 
 	i {
-		color: var(--p-text-muted-color);
+		color: var(--text-color-secondary);
 	}
 }
 
@@ -38,26 +38,11 @@
 	gap: 0.75rem;
 	flex-wrap: wrap;
 
-	:host ::ng-deep {
-		.p-selectbutton .p-button {
-			padding: 0.25rem 0.75rem;
-			font-size: 0.75rem;
-		}
-
-		.p-datepicker {
-			width: 9rem;
-
-			input {
-				padding: 0.25rem 0.5rem;
-				font-size: 0.75rem;
-			}
-		}
-	}
 }
 
 .heatmap-range-label {
 	font-size: 0.75rem;
-	color: var(--p-text-muted-color);
+	color: var(--text-color-secondary);
 	white-space: nowrap;
 }
 
@@ -72,10 +57,6 @@
 	width: 1.75rem;
 	height: 1.75rem;
 	flex-shrink: 0;
-
-	:host ::ng-deep & .p-button-icon {
-		font-size: 0.75rem;
-	}
 }
 
 .heatmap-loading {
@@ -84,7 +65,7 @@
 	justify-content: center;
 	gap: 0.5rem;
 	padding: 2rem;
-	color: var(--p-text-muted-color);
+	color: var(--text-color-secondary);
 	font-size: 0.875rem;
 }
 
@@ -104,7 +85,7 @@
 	&--header {
 		.heatmap-hour-label {
 			font-size: 0.625rem;
-			color: var(--p-text-muted-color);
+			color: var(--text-color-secondary);
 			text-align: center;
 		}
 	}
@@ -115,7 +96,7 @@
 	min-width: 2rem;
 	font-size: 0.75rem;
 	font-weight: 500;
-	color: var(--p-text-muted-color);
+	color: var(--text-color-secondary);
 	text-align: right;
 	padding-right: 0.25rem;
 }
@@ -132,10 +113,10 @@
 	border-radius: 2px;
 	cursor: default;
 	transition: outline 0.15s;
-	border: 1px solid var(--p-surface-200);
+	border: 1px solid var(--surface-200);
 
 	&:hover {
-		outline: 2px solid var(--p-primary-color);
+		outline: 2px solid var(--primary-accent);
 		outline-offset: 1px;
 	}
 }
@@ -152,7 +133,7 @@
 
 .heatmap-legend-label {
 	font-size: 0.6875rem;
-	color: var(--p-text-muted-color);
+	color: var(--text-color-secondary);
 }
 
 .heatmap-legend-cell {
@@ -161,7 +142,7 @@
 	border-radius: 2px;
 
 	&--empty {
-		border: 1px solid var(--p-surface-200);
+		border: 1px solid var(--surface-200);
 	}
 }
 // #endregion

@@ -1,15 +1,8 @@
 import { Component, ChangeDetectionStrategy, input, computed } from '@angular/core';
 import { UpperCasePipe } from '@angular/common';
 
-import { TooltipModule } from 'primeng/tooltip';
-import { Tabs } from 'primeng/tabs';
-import { TabList } from 'primeng/tabs';
-import { Tab } from 'primeng/tabs';
-import { TabPanels } from 'primeng/tabs';
-import { TabPanel } from 'primeng/tabs';
-
 import { K6Endpoint, K6Stage } from '../../models';
-
+import { EduTab, EduTabPanel, EduTabs, EduTooltip } from '@edu-ui';
 // #region Interfaces
 interface TestPhase {
 	durationSec: number;
@@ -31,7 +24,7 @@ export interface TestProfile {
 @Component({
 	selector: 'app-load-profile',
 	standalone: true,
-	imports: [UpperCasePipe, TooltipModule, Tabs, TabList, Tab, TabPanels, TabPanel],
+	imports: [UpperCasePipe, EduTooltip, EduTabs, EduTab, EduTabPanel],
 	templateUrl: './load-profile.component.html',
 	styleUrl: './load-profile.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -162,8 +155,7 @@ export class LoadProfileComponent {
 					widthPercent: 100,
 					vus: p.peakVus,
 					label: p.totalDuration,
-				},
-			];
+				}];
 		}
 
 		return p.phases.map((phase) => ({

@@ -1,4 +1,4 @@
-<p-drawer
+<edu-drawer
 	[visible]="visible()"
 	(visibleChange)="onVisibleChange($event)"
 	header="Simulador de Notas"
@@ -11,7 +11,7 @@
 		<span class="text-sm text-color-secondary">{{ curso().cursoNombre }}</span>
 		<div class="sim-promedio">
 			<span class="text-sm">Promedio simulado:</span>
-			<p-tag
+			<edu-tag
 				[value]="formatNota(promedioSimulado())"
 				[severity]="getNotaSeverity(promedioSimulado())"
 				[rounded]="true"
@@ -19,14 +19,14 @@
 			/>
 		</div>
 		<div class="sim-actions">
-			<button
-				pButton
+			<edu-button
 				label="Restaurar"
 				icon="pi pi-undo"
-				class="p-button-outlined p-button-sm"
+				[outlined]="true"
+				size="small"
 				data-info-anchor="estudiante-notas-simulador-restaurar"
 				(click)="resetSimulacion.emit()"
-			></button>
+			/>
 		</div>
 	</div>
 	<!-- #endregion -->
@@ -38,7 +38,7 @@
 				<div class="sim-info">
 					<span class="sim-titulo">{{ getEvalTitulo(sim.calificacionId) }}</span>
 					<div class="sim-meta">
-						<p-tag [value]="getEvalTipo(sim.calificacionId)" styleClass="tag-neutral" [rounded]="true" />
+						<edu-tag [value]="getEvalTipo(sim.calificacionId)" styleClass="tag-neutral" [rounded]="true" />
 						<span class="text-xs text-color-secondary">Peso: {{ (sim.peso * 100).toFixed(0) }}%</span>
 					</div>
 				</div>
@@ -46,7 +46,7 @@
 					<span class="text-xs text-color-secondary mb-1">
 						Original: {{ formatNota(sim.notaOriginal) }}
 					</span>
-					<p-inputNumber
+					<edu-input-number
 						data-info-anchor="estudiante-notas-simulador-input"
 						[ngModel]="sim.notaSimulada"
 						(ngModelChange)="notaChange.emit({ calificacionId: sim.calificacionId, nota: $event })"
@@ -83,4 +83,4 @@
 		</span>
 	</div>
 	<!-- #endregion -->
-</p-drawer>
+</edu-drawer>

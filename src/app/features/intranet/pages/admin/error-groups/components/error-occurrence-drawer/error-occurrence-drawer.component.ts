@@ -15,12 +15,6 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { ButtonModule } from 'primeng/button';
-import { DrawerModule } from 'primeng/drawer';
-import { TabsModule } from 'primeng/tabs';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
-
 import { logger } from '@core/helpers';
 import { CorrelationIdPillComponent } from '@intranet-shared/components';
 
@@ -46,6 +40,7 @@ import {
 	TRACE_CAPA_LABEL_MAP,
 	parseSourceLocation,
 } from '../../models';
+import { EduDrawer, EduTab, EduTabPanel, EduTabs, EduTag, EduTooltip } from '@edu-ui';
 
 // #endregion
 /**
@@ -65,17 +60,7 @@ import {
 	selector: 'app-error-occurrence-drawer',
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [
-		CommonModule,
-		DatePipe,
-		RouterLink,
-		ButtonModule,
-		DrawerModule,
-		TabsModule,
-		TagModule,
-		TooltipModule,
-		CorrelationIdPillComponent,
-	],
+	imports: [CommonModule, DatePipe, RouterLink, EduDrawer, EduTag, EduTooltip, CorrelationIdPillComponent, EduTab, EduTabPanel, EduTabs],
 	templateUrl: './error-occurrence-drawer.component.html',
 	styleUrl: './error-occurrence-drawer.component.scss',
 })

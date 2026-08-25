@@ -3,8 +3,8 @@
 		type="button"
 		class="nav-btn"
 		(click)="onPrevious()"
-		pTooltip="Anterior"
-		tooltipPosition="top"
+		eduTooltip="Anterior"
+		eduTooltipPosition="top"
 		aria-label="Ir al anterior"
 	>
 		<i class="pi pi-chevron-left"></i>
@@ -15,14 +15,14 @@
 			type="button"
 			class="nav-label"
 			(click)="togglePicker($event)"
-			pTooltip="Abrir selector"
-			tooltipPosition="top"
+			eduTooltip="Abrir selector"
+			eduTooltipPosition="top"
 		>
 			{{ label() }}
 		</button>
 		@if (pickerVisible()) {
 			<div class="datepicker-dropdown" (click)="$event.stopPropagation()">
-				<p-datepicker
+				<edu-datepicker
 					[ngModel]="currentDate()"
 					[maxDate]="maxDate()"
 					(ngModelChange)="onDateSelect($event)"
@@ -38,8 +38,8 @@
 		[class.disabled]="!canGoNext()"
 		[disabled]="!canGoNext()"
 		(click)="onNext()"
-		pTooltip="Siguiente"
-		tooltipPosition="top"
+		eduTooltip="Siguiente"
+		eduTooltipPosition="top"
 		aria-label="Ir al siguiente"
 	>
 		<i class="pi pi-chevron-right"></i>

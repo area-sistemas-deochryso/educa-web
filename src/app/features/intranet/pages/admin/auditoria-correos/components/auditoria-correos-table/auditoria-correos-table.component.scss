@@ -7,31 +7,6 @@
 	overflow: hidden;
 }
 
-:host ::ng-deep {
-	.p-datatable {
-		.p-datatable-thead > tr > th {
-			font-weight: 600;
-			font-size: 0.8rem;
-			text-transform: uppercase;
-			letter-spacing: 0.5px;
-			color: var(--text-color);
-			border-color: var(--surface-300);
-		}
-
-		.p-datatable-tbody > tr {
-			> td {
-				vertical-align: middle;
-				color: var(--text-color);
-				border-color: var(--surface-300);
-			}
-
-			&:hover > td {
-				background: var(--surface-100);
-			}
-		}
-	}
-}
-
 .dni-mono,
 .correo-mono {
 	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;

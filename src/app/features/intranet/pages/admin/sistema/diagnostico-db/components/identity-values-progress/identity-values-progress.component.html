@@ -4,14 +4,14 @@
 			<i class="pi pi-hashtag"></i>
 			<h3>Valores de identidad</h3>
 		</div>
-		<button
-			pButton
+		<edu-button
 			icon="pi pi-refresh"
-			class="p-button-text p-button-sm"
+			[text]="true"
+			size="small"
 			[loading]="loading()"
 			data-info-anchor="admin-diagnostico-db-refresh-btn"
 			(click)="onRefresh()"
-		></button>
+		/>
 	</header>
 
 	@if (error()) {
@@ -35,7 +35,7 @@
 					<div class="identity-card__header">
 						<span class="identity-card__name"><code>{{ col.tableName }}</code>.{{ col.columnName }}</span>
 					</div>
-					<p-progressBar [value]="col.percentConsumed" [showValue]="true" />
+					<edu-progress-bar [value]="col.percentConsumed" [showValue]="true" />
 					<div class="identity-card__meta">
 						<span>Actual: {{ formatValue(col.currentValue) }}</span>
 						<span>Máx: {{ formatValue(col.maxValue) }}</span>

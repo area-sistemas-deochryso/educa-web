@@ -20,17 +20,16 @@ import {
 } from '@intranet-shared/components/login';
 import { CommonModule } from '@angular/common';
 import { FormErrorComponent } from '@intranet-shared/components/form-error';
-import { InputTextModule } from 'primeng/inputtext';
+
 import { Router } from '@angular/router';
-import { Select } from 'primeng/select';
-import { ToggleSwitch } from 'primeng/toggleswitch';
-import { Tooltip } from 'primeng/tooltip';
+
 import { UppercaseInputDirective } from '@intranet-shared/directives';
 import { InitialsPipe } from '@intranet-shared/pipes';
 import { TrackClickDirective, TrackSubmitDirective } from '@shared/directives';
 import { logger } from '@core/helpers';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { UI_LOGIN_MESSAGES } from '@app/shared/constants';
+import { EduInputText, EduSelect, EduToggle, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-login-intranet',
@@ -38,10 +37,10 @@ import { UI_LOGIN_MESSAGES } from '@app/shared/constants';
 	imports: [
 		CommonModule,
 		ReactiveFormsModule,
-		InputTextModule,
-		ToggleSwitch,
-		Tooltip,
-		Select,
+		EduInputText,
+		EduToggle,
+		EduTooltip,
+		EduSelect,
 		FormErrorComponent,
 		LoginHeaderComponent,
 		LoginErrorMessageComponent,

@@ -1,13 +1,13 @@
 // #region Imports
 import { Component } from '@angular/core';
-import { Tooltip } from 'primeng/tooltip';
+import { EduTooltip } from '@edu-ui';
 
 // #endregion
 // #region Implementation
 @Component({
 	selector: 'app-about-section',
 	standalone: true,
-	imports: [Tooltip],
+	imports: [EduTooltip],
 	templateUrl: './about-section.html',
 	styleUrl: './about-section.scss',
 })

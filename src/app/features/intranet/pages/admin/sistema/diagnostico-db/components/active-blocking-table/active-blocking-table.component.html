@@ -4,14 +4,14 @@
 			<i class="pi pi-lock"></i>
 			<h3>Bloqueos activos</h3>
 		</div>
-		<button
-			pButton
+		<edu-button
 			icon="pi pi-refresh"
-			class="p-button-text p-button-sm"
+			[text]="true"
+			size="small"
 			[loading]="loading()"
 			data-info-anchor="admin-diagnostico-db-refresh-btn"
 			(click)="onRefresh()"
-		></button>
+		/>
 	</header>
 
 	@if (error()) {
@@ -29,14 +29,14 @@
 	}
 
 	@if (sessions().length > 0) {
-		<p-table [value]="sessions()" [dataKey]="'sessionId'" [tableStyle]="{ 'min-width': '45rem' }" [sortField]="'waitTimeMs'" [sortOrder]="-1">
+		<edu-table [value]="sessions()" [dataKey]="'sessionId'" [tableStyle]="{ 'min-width': '45rem' }" [sortField]="'waitTimeMs'" [sortOrder]="-1">
 			<ng-template #header>
 				<tr>
-					<th pSortableColumn="sessionId" style="width: 7rem" data-info-anchor="tabla-orden-columna">Session <p-sortIcon field="sessionId" /></th>
-					<th pSortableColumn="blockingSessionId" style="width: 8rem" data-info-anchor="tabla-orden-columna">Bloqueado por <p-sortIcon field="blockingSessionId" /></th>
-					<th pSortableColumn="waitType" style="width: 10rem" data-info-anchor="tabla-orden-columna">Tipo de espera <p-sortIcon field="waitType" /></th>
-					<th pSortableColumn="waitTimeMs" style="width: 8rem" data-info-anchor="tabla-orden-columna">Tiempo de espera <p-sortIcon field="waitTimeMs" /></th>
-					<th pSortableColumn="sqlText" data-info-anchor="tabla-orden-columna">SQL <p-sortIcon field="sqlText" /></th>
+					<th eduSortableColumn="sessionId" style="width: 7rem" data-info-anchor="tabla-orden-columna">Session</th>
+					<th eduSortableColumn="blockingSessionId" style="width: 8rem" data-info-anchor="tabla-orden-columna">Bloqueado por</th>
+					<th eduSortableColumn="waitType" style="width: 10rem" data-info-anchor="tabla-orden-columna">Tipo de espera</th>
+					<th eduSortableColumn="waitTimeMs" style="width: 8rem" data-info-anchor="tabla-orden-columna">Tiempo de espera</th>
+					<th eduSortableColumn="sqlText" data-info-anchor="tabla-orden-columna">SQL</th>
 				</tr>
 			</ng-template>
 			<ng-template #body let-row>
@@ -46,10 +46,10 @@
 					<td>{{ row.waitType }}</td>
 					<td>{{ row.waitTimeMs | number }} ms</td>
 					<td class="sql-cell">
-						<code class="sql-text" [pTooltip]="row.sqlText" tooltipPosition="top">{{ row.sqlText }}</code>
+						<code class="sql-text" [eduTooltip]="row.sqlText" eduTooltipPosition="top">{{ row.sqlText }}</code>
 					</td>
 				</tr>
 			</ng-template>
-		</p-table>
+		</edu-table>
 	}
 </section>

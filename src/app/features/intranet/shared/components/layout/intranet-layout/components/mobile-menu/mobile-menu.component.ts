@@ -16,10 +16,11 @@ import { FormsModule } from '@angular/forms';
 import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, startWith } from 'rxjs/operators';
-import { TagModule } from 'primeng/tag';
+
 import { ModuloId } from '@shared/constants';
 import { QuickAccessFavoritesService } from '@intranet-shared/services';
 import { UserProfileMenuComponent } from '../user-profile-menu';
+import { EduTag } from '@edu-ui';
 // #endregion
 
 // #region Types
@@ -69,7 +70,7 @@ interface MobileTreeGroup {
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	encapsulation: ViewEncapsulation.None,
-	imports: [FormsModule, RouterLink, TagModule, UserProfileMenuComponent],
+	imports: [FormsModule, RouterLink, EduTag, UserProfileMenuComponent],
 	templateUrl: './mobile-menu.component.html',
 	styleUrl: './mobile-menu.component.scss',
 })

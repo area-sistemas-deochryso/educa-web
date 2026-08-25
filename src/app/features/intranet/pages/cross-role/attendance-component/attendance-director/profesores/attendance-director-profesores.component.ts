@@ -44,13 +44,9 @@ import { AsistenciaProfesorApiService } from '@intranet-shared/services';
 import { downloadBlob, formatDateLocalIso, viewBlobInNewTab } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
 
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { MenuItem } from 'primeng/api';
-import { Menu, MenuModule } from 'primeng/menu';
-import { TooltipModule } from 'primeng/tooltip';
-
 import { buildPdfExcelMenuItems } from '../consolidated-pdf.helper';
+import { EduButton, EduInputText, EduMenu, EduTooltip } from '@edu-ui';
+import type { EduMenuItem } from '@edu-ui';
 
 /**
  * Vista "Profesores" del panel admin (Plan 21 Chat 7). Sin grado/sección — lista todos
@@ -60,25 +56,13 @@ import { buildPdfExcelMenuItems } from '../consolidated-pdf.helper';
 @Component({
 	selector: 'app-attendance-director-profesores',
 	standalone: true,
-	imports: [
-		AttendanceLegendStatsComponent,
-		AttendancePersonaDayListComponent,
-		AttendanceHeatmapComponent,
-		AttendanceTemporalNavComponent,
-		AttendanceTableSkeletonComponent,
-		EmptyStateComponent,
-		ButtonModule,
-		FormsModule,
-		InputTextModule,
-		MenuModule,
-		TooltipModule,
-	],
+	imports: [AttendanceLegendStatsComponent, AttendancePersonaDayListComponent, AttendanceHeatmapComponent, AttendanceTemporalNavComponent, AttendanceTableSkeletonComponent, EmptyStateComponent, EduButton, FormsModule, EduInputText, EduMenu, EduTooltip],
 	templateUrl: './attendance-director-profesores.component.html',
 	styleUrl: './attendance-director-profesores.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AttendanceDirectorProfesoresComponent implements OnInit {
-	@ViewChild('pdfMenu') pdfMenu!: Menu;
+	@ViewChild('pdfMenu') pdfMenu!: EduMenu;
 
 	private api = inject(AsistenciaProfesorApiService);
 	private dataService = inject(AttendanceDataService);
@@ -196,7 +180,7 @@ export class AttendanceDirectorProfesoresComponent implements OnInit {
 	// #endregion
 
 	// #region PDF/Excel
-	readonly pdfMenuItems = computed<MenuItem[]>(() => {
+	readonly pdfMenuItems = computed<EduMenuItem[]>(() => {
 		if (this.viewMode() === VIEW_MODE.Mes) {
 			const profesor = this.selectedProfesor();
 			if (!profesor) return [];

@@ -4,7 +4,7 @@
 		<span class="view-as-picker__main-label">{{ placeholder() }}</span>
 		<div class="view-as-picker__main-input">
 			<i class="pi pi-search" aria-hidden="true"></i>
-			<p-autoComplete
+			<edu-autocomplete
 				[suggestions]="suggestions()"
 				[ngModel]="selectedUsuario()"
 				(completeMethod)="onSearch($event)"
@@ -34,7 +34,7 @@
 						{{ searching() ? 'Buscando...' : 'Sin resultados' }}
 					</div>
 				</ng-template>
-			</p-autoComplete>
+			</edu-autocomplete>
 		</div>
 	</div>
 

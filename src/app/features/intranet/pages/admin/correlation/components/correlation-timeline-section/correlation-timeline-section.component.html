@@ -28,7 +28,7 @@
 						@switch (event.kind) {
 							@case ('error') {
 								<div class="timeline-event__detail">
-									<p-tag
+									<edu-tag
 										[value]="event.payload.severidad"
 										[severity]="getErrorSeverity(event.payload.severidad)"
 									/>
@@ -38,12 +38,12 @@
 											{{ event.payload.httpStatus }}
 										</span>
 									}
-									<span class="timeline-event__msg" [pTooltip]="event.payload.mensaje" tooltipPosition="top">
+									<span class="timeline-event__msg" [eduTooltip]="event.payload.mensaje" eduTooltipPosition="top">
 										{{ event.payload.mensaje }}
 									</span>
 								</div>
 								<div class="timeline-event__meta">
-									<span class="cell-mono cell-url" [pTooltip]="event.payload.url" tooltipPosition="top">
+									<span class="cell-mono cell-url" [eduTooltip]="event.payload.url" eduTooltipPosition="top">
 										{{ event.payload.url }}
 									</span>
 									@if (event.payload.usuarioDniMasked; as dni) {
@@ -51,22 +51,22 @@
 									}
 								</div>
 								<div class="timeline-event__actions">
-									<button
-										pButton
+									<edu-button
 										type="button"
 										label="Ver grupo"
 										icon="pi pi-sitemap"
-										class="p-button-text p-button-sm"
+										[text]="true"
+										size="small"
 										[disabled]="!canGoToGroup(event.payload)"
 										(click)="onGoToGroup(event.payload)"
 										data-info-anchor="admin-correlation-row-action"
 										[pt]="{ root: { 'aria-label': 'Ver grupo de errores' } }"
-									></button>
+									/>
 								</div>
 							}
 							@case ('rate-limit') {
 								<div class="timeline-event__detail">
-									<p-tag
+									<edu-tag
 										[value]="event.payload.fueRechazado ? 'Rechazado' : 'OK'"
 										[severity]="event.payload.fueRechazado ? 'danger' : 'success'"
 									/>
@@ -88,37 +88,37 @@
 							}
 							@case ('reporte') {
 								<div class="timeline-event__detail">
-									<p-tag
+									<edu-tag
 										[value]="event.payload.estado"
 										[severity]="getReporteSeverity(event.payload.estado)"
 									/>
 									<span class="timeline-event__msg">{{ event.payload.tipo }}</span>
 								</div>
 								<div class="timeline-event__meta">
-									<span [pTooltip]="event.payload.descripcionResumen" tooltipPosition="top">
+									<span [eduTooltip]="event.payload.descripcionResumen" eduTooltipPosition="top">
 										{{ event.payload.descripcionResumen }}
 									</span>
 								</div>
 								<div class="timeline-event__actions">
-									<button
-										pButton
+									<edu-button
 										type="button"
 										label="Ver reporte"
 										icon="pi pi-external-link"
-										class="p-button-text p-button-sm"
+										[text]="true"
+										size="small"
 										(click)="onGoToReport(event.payload)"
 										data-info-anchor="admin-correlation-row-action"
 										[pt]="{ root: { 'aria-label': 'Ver detalle del reporte' } }"
-									></button>
+									/>
 								</div>
 							}
 							@case ('outbox') {
 								<div class="timeline-event__detail">
-									<p-tag
+									<edu-tag
 										[value]="event.payload.estado"
 										[severity]="getOutboxSeverity(event.payload.estado)"
 									/>
-									<span class="timeline-event__msg" [pTooltip]="event.payload.asunto" tooltipPosition="top">
+									<span class="timeline-event__msg" [eduTooltip]="event.payload.asunto" eduTooltipPosition="top">
 										{{ event.payload.asunto }}
 									</span>
 								</div>
@@ -129,16 +129,16 @@
 									}
 								</div>
 								<div class="timeline-event__actions">
-									<button
-										pButton
+									<edu-button
 										type="button"
 										label="Ver en bandeja"
 										icon="pi pi-envelope"
-										class="p-button-text p-button-sm"
+										[text]="true"
+										size="small"
 										(click)="onGoToOutbox(event.payload)"
 										data-info-anchor="admin-correlation-row-action"
 										[pt]="{ root: { 'aria-label': 'Ver correos del destinatario en bandeja' } }"
-									></button>
+									/>
 								</div>
 							}
 						}

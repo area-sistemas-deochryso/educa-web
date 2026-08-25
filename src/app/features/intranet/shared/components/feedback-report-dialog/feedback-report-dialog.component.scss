@@ -144,34 +144,3 @@
 }
 // #endregion
 
-// #region Overrides PrimeNG
-:host ::ng-deep {
-	.feedback-report-dialog .p-dialog-content {
-		padding: 1.25rem 1.5rem;
-	}
-
-	.feedback-report-dialog .p-dialog-footer {
-		padding: 1rem 1.5rem;
-		display: flex;
-		justify-content: flex-end;
-		gap: 0.5rem;
-	}
-
-	.p-inputtext,
-	.p-select,
-	textarea.p-textarea {
-		background: transparent;
-		color: var(--text-color);
-		border-color: var(--surface-300);
-
-		&::placeholder {
-			color: var(--text-color-secondary);
-		}
-
-		&:enabled:focus {
-			border-color: var(--accent-interactive-light);
-			box-shadow: 0 0 0 1px var(--accent-interactive-light);
-		}
-	}
-}
-// #endregion

@@ -1,5 +1,5 @@
 <!-- #region Modal de Seleccion de Cursos por Nivel -->
-<p-dialog
+<edu-dialog
 	[visible]="visible()"
 	(visibleChange)="onVisibleChange($event)"
 	[modal]="true"
@@ -9,7 +9,7 @@
 	styleClass="curso-selection-dialog"
 	[style]="{ width: '90vw', 'max-width': '800px' }"
 >
-	<ng-template pTemplate="header">
+	<ng-template #header>
 		<div class="flex align-items-center gap-2">
 			<i class="pi pi-book text-primary" style="font-size: 1.5rem"></i>
 			<span class="text-xl font-semibold">Seleccionar Curso por Nivel Educativo</span>
@@ -19,30 +19,30 @@
 	<div class="curso-selection-content">
 		@if (loading()) {
 			<div class="flex justify-content-center align-items-center p-5">
-				<p-progressSpinner />
+				<edu-spinner />
 			</div>
 		} @else {
-			<p-tabs value="inicial">
-				<p-tablist>
-					<p-tab value="inicial" data-info-anchor="tab-switch">
+			<edu-tabs value="inicial">
+				
+					<edu-tab value="inicial" data-info-anchor="tab-switch">
 						<i class="pi pi-sun"></i>
 						<span>Inicial</span>
-						<p-badge [value]="cursosPorNivel().inicial.length.toString()" />
-					</p-tab>
-					<p-tab value="primaria" data-info-anchor="tab-switch">
+						<edu-badge [value]="cursosPorNivel().inicial.length.toString()" />
+					</edu-tab>
+					<edu-tab value="primaria" data-info-anchor="tab-switch">
 						<i class="pi pi-pencil"></i>
 						<span>Primaria</span>
-						<p-badge [value]="cursosPorNivel().primaria.length.toString()" />
-					</p-tab>
-					<p-tab value="secundaria" data-info-anchor="tab-switch">
+						<edu-badge [value]="cursosPorNivel().primaria.length.toString()" />
+					</edu-tab>
+					<edu-tab value="secundaria" data-info-anchor="tab-switch">
 						<i class="pi pi-graduation-cap"></i>
 						<span>Secundaria</span>
-						<p-badge [value]="cursosPorNivel().secundaria.length.toString()" />
-					</p-tab>
-				</p-tablist>
+						<edu-badge [value]="cursosPorNivel().secundaria.length.toString()" />
+					</edu-tab>
+				
 
 				<!-- Panel: Inicial -->
-				<p-tabpanel value="inicial">
+				<edu-tabpanel value="inicial">
 					@if (cursosPorNivel().inicial.length === 0) {
 						<div class="text-center p-4 text-color-secondary">
 							<i class="pi pi-info-circle" style="font-size: 2rem"></i>
@@ -72,10 +72,10 @@
 							}
 						</div>
 					}
-				</p-tabpanel>
+				</edu-tabpanel>
 
 				<!-- Panel: Primaria -->
-				<p-tabpanel value="primaria">
+				<edu-tabpanel value="primaria">
 					@if (cursosPorNivel().primaria.length === 0) {
 						<div class="text-center p-4 text-color-secondary">
 							<i class="pi pi-info-circle" style="font-size: 2rem"></i>
@@ -105,10 +105,10 @@
 							}
 						</div>
 					}
-				</p-tabpanel>
+				</edu-tabpanel>
 
 				<!-- Panel: Secundaria -->
-				<p-tabpanel value="secundaria">
+				<edu-tabpanel value="secundaria">
 					@if (cursosPorNivel().secundaria.length === 0) {
 						<div class="text-center p-4 text-color-secondary">
 							<i class="pi pi-info-circle" style="font-size: 2rem"></i>
@@ -138,32 +138,30 @@
 							}
 						</div>
 					}
-				</p-tabpanel>
-			</p-tabs>
+				</edu-tabpanel>
+			</edu-tabs>
 		}
 	</div>
 
-	<ng-template pTemplate="footer">
-		<button
-			pButton
+	<ng-template #footer>
+		<edu-button
 			label="Cancelar"
 			icon="pi pi-times"
-			class="p-button-text"
+			[text]="true"
 			data-info-anchor="admin-schedules-curso-picker-cancelar-btn"
 			(click)="onCancel()"
-			pTooltip="Cerrar sin seleccionar curso"
-			tooltipPosition="top"
-		></button>
-		<button
-			pButton
+			eduTooltip="Cerrar sin seleccionar curso"
+			eduTooltipPosition="top"
+		/>
+		<edu-button
 			label="Confirmar"
 			icon="pi pi-check"
 			[disabled]="!selectedCursoId()"
 			data-info-anchor="admin-schedules-curso-picker-confirmar-btn"
 			(click)="onConfirm()"
-			pTooltip="Confirmar seleccion de curso"
-			tooltipPosition="top"
-		></button>
+			eduTooltip="Confirmar seleccion de curso"
+			eduTooltipPosition="top"
+		/>
 	</ng-template>
-</p-dialog>
+</edu-dialog>
 <!-- #endregion -->

@@ -3,13 +3,12 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { Tab, TabList, Tabs } from 'primeng/tabs';
-
 import { PageHeaderComponent } from '@intranet-shared/components';
 import { UserPermissionsService } from '@core/services';
 
 import { TicketBandejaComponent } from '../ticket-bandeja/ticket-bandeja.component';
 import { TicketTiposComponent } from '../ticket-tipos/ticket-tipos.component';
+import { EduTab, EduTabs } from '@edu-ui';
 // #endregion
 
 const AYUDA_TICKET_MANAGE = 'AYUDA_TICKET_MANAGE';
@@ -31,7 +30,7 @@ type TicketAdminTab = 'bandeja' | 'tipos';
 @Component({
 	selector: 'app-ticket-admin',
 	standalone: true,
-	imports: [Tabs, TabList, Tab, PageHeaderComponent, TicketBandejaComponent, TicketTiposComponent],
+	imports: [EduTabs, EduTab, PageHeaderComponent, TicketBandejaComponent, TicketTiposComponent],
 	templateUrl: './ticket-admin.component.html',
 	styleUrl: './ticket-admin.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

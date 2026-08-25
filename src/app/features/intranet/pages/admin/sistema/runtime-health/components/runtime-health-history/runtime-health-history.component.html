@@ -6,7 +6,7 @@
 		</div>
 
 		<div class="history-actions">
-			<p-selectButton
+			<edu-select-button
 				[options]="rangeOptions"
 				[ngModel]="timeRange()"
 				data-info-anchor="admin-runtime-health-history-rango-toggle"
@@ -15,21 +15,21 @@
 				optionValue="value"
 				size="small"
 			/>
-			<button
-				pButton
+			<edu-button
 				icon="pi pi-refresh"
-				class="p-button-text p-button-sm"
+				[text]="true"
+				size="small"
 				[loading]="loading()"
 				data-info-anchor="admin-runtime-health-history-refresh-btn"
 				(click)="onRefresh()"
 				[pt]="{ root: { 'aria-label': 'Refrescar historial' } }"
-			></button>
+			/>
 		</div>
 	</header>
 
 	@if (loading()) {
 		<div class="history-loading">
-			<p-progressSpinner
+			<edu-spinner
 				[style]="{ width: '2rem', height: '2rem' }"
 				strokeWidth="4"
 			/>
@@ -100,20 +100,21 @@
 						<i class="pi pi-link"></i>
 						<span>Correlación en {{ snap.timestamp | date: 'dd/MM HH:mm:ss' }}</span>
 						@if (snap.saturationPattern) {
-							<p-tag
+							<edu-tag
 								[value]="getPatternLabel(snap.saturationPattern)"
 								[severity]="getPatternSeverity(snap.saturationPattern)"
 							/>
 						}
 					</div>
-					<button
-						pButton
+					<edu-button
 						icon="pi pi-times"
-						class="p-button-text p-button-sm p-button-secondary"
+						[text]="true"
+						size="small"
+						severity="secondary"
 						data-info-anchor="admin-runtime-health-history-cerrar-correlacion-btn"
 						(click)="dismissCorrelation()"
 						[pt]="{ root: { 'aria-label': 'Cerrar correlación' } }"
-					></button>
+					/>
 				</header>
 
 				@if (snap.reason) {

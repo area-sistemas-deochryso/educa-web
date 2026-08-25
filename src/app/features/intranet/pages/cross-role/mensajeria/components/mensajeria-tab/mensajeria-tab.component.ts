@@ -1,16 +1,12 @@
 import { Component, ChangeDetectionStrategy, inject, input, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { DialogModule } from 'primeng/dialog';
-import { Select } from 'primeng/select';
-import { TagModule } from 'primeng/tag';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
+
 import { CrearConversacionDto } from '@data/models';
 import { getInitial } from '@core/helpers';
 import { SalonMensajeriaFacade } from '../../services/mensajeria.facade';
 import { toSelectOptionsFrom } from '@shared/models';
+import { EduButton, EduDialog, EduInputText, EduSelect, EduSpinner, EduTag } from '@edu-ui';
 
 // Avatar colors palette (WCAG AA contrast with white text)
 const AVATAR_COLORS = [
@@ -23,22 +19,12 @@ const AVATAR_COLORS = [
 	'#db2777',
 	'#2563eb',
 	'#ca8a04',
-	'#0d9488',
-];
+	'#0d9488'];
 
 @Component({
 	selector: 'app-salon-mensajeria-tab',
 	standalone: true,
-	imports: [
-		CommonModule,
-		FormsModule,
-		ButtonModule,
-		InputTextModule,
-		DialogModule,
-		Select,
-		TagModule,
-		ProgressSpinnerModule,
-	],
+	imports: [CommonModule, FormsModule, EduButton, EduInputText, EduDialog, EduSelect, EduTag, EduSpinner],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './mensajeria-tab.component.html',
 	styleUrl: './mensajeria-tab.component.scss',

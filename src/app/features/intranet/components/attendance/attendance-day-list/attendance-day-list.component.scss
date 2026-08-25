@@ -180,57 +180,6 @@ $color-pendiente: var(--attendance-pendiente);
 	color: var(--intranet-soft-text-color);
 }
 
-// #region Table styles
-:host ::ng-deep {
-	.asistencia-table {
-		&.p-datatable {
-			background: transparent;
-
-			.p-datatable-thead > tr > th {
-				background: transparent;
-				font-weight: 600;
-				font-size: 0.8rem;
-				text-transform: uppercase;
-				letter-spacing: 0.5px;
-				color: var(--intranet-soft-text-color);
-				padding: 0.75rem 1rem;
-				border-bottom: 1px solid var(--intranet-alternative-text-color);
-				border-right: 1px solid var(--intranet-alternative-text-color);
-
-				&:last-child {
-					border-right: none;
-				}
-			}
-
-			.p-datatable-tbody > tr {
-				background: transparent;
-				transition: background-color 0.15s ease;
-
-				&:hover {
-					background: rgba(0, 0, 0, 0.02) !important;
-				}
-
-				> td {
-					background: transparent;
-					padding: 0.75rem 1rem;
-					border-bottom: 1px solid var(--intranet-alternative-text-color);
-					border-right: 1px solid var(--intranet-alternative-text-color);
-					color: var(--intranet-soft-text-color);
-
-					&:last-child {
-						border-right: none;
-					}
-				}
-
-				&:last-child > td {
-					border-bottom: none;
-				}
-			}
-		}
-	}
-}
-// #endregion
-
 // #region Responsive
 @media (max-width: 768px) {
 	.filters-bar {
@@ -356,38 +305,12 @@ $color-pendiente: var(--attendance-pendiente);
 
 // #region Diálogo de justificación
 :host ::ng-deep {
-	.p-dialog-mask {
-		display: flex !important;
-		align-items: center !important;
-		justify-content: center !important;
-	}
-
 	.justificacion-dialog {
 		position: static !important;
 		top: auto !important;
 		left: auto !important;
 		transform: none !important;
 		margin: 0 !important;
-
-		.p-dialog-header {
-			padding: 1rem 1.25rem;
-			border-bottom: 1px solid var(--intranet-alternative-text-color);
-
-			.p-dialog-title {
-				font-size: 1.1rem;
-				font-weight: 600;
-				color: var(--intranet-default-text-color);
-			}
-		}
-
-		.p-dialog-content {
-			padding: 1.25rem;
-		}
-
-		.p-dialog-footer {
-			padding: 0.75rem 1.25rem;
-			border-top: 1px solid var(--intranet-alternative-text-color);
-		}
 	}
 }
 
@@ -463,42 +386,6 @@ $color-pendiente: var(--attendance-pendiente);
 		justify-content: flex-end;
 		gap: 0.5rem;
 		padding-top: 0.5rem;
-	}
-}
-// #endregion
-
-// #region PDF menu
-:host ::ng-deep .p-menu {
-	background: var(--intranet-background-color) !important;
-	border: 1px solid var(--intranet-border-color) !important;
-	box-shadow: var(--shadow-2) !important;
-
-	a:hover {
-		color: initial !important;
-	}
-
-	.p-menuitem-icon,
-	.p-menuitem-text,
-	.p-menu-item-icon,
-	a {
-		color: var(--intranet-accent-color-blue) !important;
-	}
-	.p-menuitem-link {
-		color: var(--intranet-default-text-color) !important;
-		padding: 0.75rem 1rem !important;
-		transition: all 0.3s ease !important;
-
-		.p-menuitem-icon {
-			color: var(--intranet-default-text-color) !important;
-		}
-
-		.p-menuitem-text {
-			color: var(--intranet-default-text-color) !important;
-		}
-
-		&:focus {
-			box-shadow: none !important;
-		}
 	}
 }
 // #endregion

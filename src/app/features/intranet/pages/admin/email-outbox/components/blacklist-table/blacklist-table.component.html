@@ -1,5 +1,5 @@
 <section class="table-section">
-	<p-table
+	<edu-table
 		[value]="items()"
 		[dataKey]="'id'"
 		[lazy]="true"
@@ -40,7 +40,7 @@
 					</div>
 				</td>
 				<td>
-					<p-tag
+					<edu-tag
 						[value]="uiMapping.getBlacklistMotivoLabel(item.motivo)"
 						[severity]="uiMapping.getBlacklistMotivoSeverity(item.motivo)"
 					/>
@@ -54,7 +54,7 @@
 					}
 				</td>
 				<td>
-					<p-tag
+					<edu-tag
 						[value]="estadoLabel(item.estado)"
 						[severity]="estadoSeverity(item.estado)"
 						styleClass="tag-neutral"
@@ -62,37 +62,40 @@
 				</td>
 				<td>
 					<div class="actions">
-						<button
-							pButton
+						<edu-button
 							icon="pi pi-eye"
-							class="p-button-rounded p-button-text p-button-secondary"
-							pTooltip="Ver detalles"
-							tooltipPosition="top"
+							[text]="true"
+							[rounded]="true"
+							severity="secondary"
+							eduTooltip="Ver detalles"
+							eduTooltipPosition="top"
 							data-info-anchor="email-outbox-view-detail-btn"
 							(click)="onViewDetail(item)"
 							[pt]="{ root: { 'aria-label': 'Ver detalles' } }"
-						></button>
+						/>
 						<a
 							[routerLink]="['/intranet/admin/monitoreo/correos/persona', item.correo]"
-							class="p-button p-button-rounded p-button-text p-button-info"
+							class="edu-button-link edu-button-link--rounded edu-button-link--text edu-button-link--icon-only"
+							data-severity="info"
 							data-info-anchor="email-outbox-view-history-link"
-							pTooltip="Ver historial"
-							tooltipPosition="top"
+							eduTooltip="Ver historial"
+							eduTooltipPosition="top"
 							[attr.aria-label]="'Ver historial de ' + item.correo"
 						>
 							<i class="pi pi-history"></i>
 						</a>
 						@if (item.estado) {
-							<button
-								pButton
+							<edu-button
 								icon="pi pi-lock-open"
-								class="p-button-rounded p-button-text p-button-warning"
-								pTooltip="Desbloquear"
-								tooltipPosition="top"
+								[text]="true"
+								[rounded]="true"
+								severity="warn"
+								eduTooltip="Desbloquear"
+								eduTooltipPosition="top"
 								data-info-anchor="admin-email-outbox-blacklist-desbloquear-btn"
 								(click)="onUnblock(item)"
 								[pt]="{ root: { 'aria-label': 'Desbloquear correo' } }"
-							></button>
+							/>
 						}
 					</div>
 				</td>
@@ -115,5 +118,5 @@
 				</td>
 			</tr>
 		</ng-template>
-	</p-table>
+	</edu-table>
 </section>

@@ -1,4 +1,4 @@
-<p-dialog
+<edu-dialog
 	[visible]="visible()"
 	(visibleChange)="onVisibleChange($event)"
 	[modal]="true"
@@ -25,7 +25,7 @@
 			<div class="field">
 				<label for="observacion">Motivo de la justificación <span class="required">*</span></label>
 				<textarea
-					pTextarea
+					eduTextarea
 					id="observacion"
 					rows="4"
 					[ngModel]="observacionText()"
@@ -37,29 +37,29 @@
 
 			<div class="dialog-footer">
 				@if (ctx.isJustified) {
-					<p-button
+					<edu-button
 						label="Quitar justificación"
 						severity="danger"
 						[text]="true"
 						icon="pi pi-trash"
 						[loading]="saving()"
-						(onClick)="quitar()"
+						(click)="quitar()"
 					/>
 				}
-				<p-button
+				<edu-button
 					label="Cancelar"
 					severity="secondary"
 					[text]="true"
-					(onClick)="close()"
+					(click)="close()"
 				/>
-				<p-button
+				<edu-button
 					label="Guardar"
 					icon="pi pi-check"
 					[loading]="saving()"
 					[disabled]="!observacionText().trim()"
-					(onClick)="guardar()"
+					(click)="guardar()"
 				/>
 			</div>
 		</div>
 	}
-</p-dialog>
+</edu-dialog>

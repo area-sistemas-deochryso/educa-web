@@ -2,17 +2,18 @@
 <div class="sala-header" [class.fullscreen-header]="isFullscreen()">
 	<div class="sala-header-left">
 		@if (!isFullscreen()) {
-			<button
-				pButton
+			<edu-button
 				icon="pi pi-arrow-left"
-				class="p-button-text p-button-rounded p-button-sm"
+				[text]="true"
+				[rounded]="true"
+				size="small"
 				(click)="onVolver()"
 				[pt]="{
 					root: {
 						'aria-label': 'Volver a la lista de cursos',
 					},
 				}"
-			></button>
+			/>
 		}
 		<div class="sala-title">
 			<div class="sala-icon">
@@ -52,10 +53,11 @@
 					<span>{{ staffCount() }} {{ staffCount() === 1 ? 'moderador' : 'moderadores' }}</span>
 				</div>
 			}
-			<button
-				pButton
+			<edu-button
 				icon="pi pi-refresh"
-				class="p-button-text p-button-rounded p-button-xs"
+				[text]="true"
+				[rounded]="true"
+				size="xs"
 				[loading]="syncingParticipants()"
 				(click)="onRefreshParticipants()"
 				[pt]="{
@@ -63,40 +65,43 @@
 						'aria-label': 'Actualizar participantes',
 					},
 				}"
-			></button>
+			/>
 		</div>
 	}
 	<!-- #endregion -->
 
 	<!-- #region Acciones -->
 	<div class="sala-header-actions">
-		<button
-			pButton
+		<edu-button
 			[icon]="isFullscreen() ? 'pi pi-window-minimize' : 'pi pi-window-maximize'"
-			class="p-button-text p-button-rounded p-button-sm"
+			[text]="true"
+			[rounded]="true"
+			size="small"
 			(click)="onToggleFullscreen()"
 			[pt]="{
 				root: {
 					'aria-label': isFullscreen() ? 'Salir de pantalla completa' : 'Pantalla completa',
 				},
 			}"
-		></button>
+		/>
 		@if (isFullscreen()) {
-			<button
-				pButton
+			<edu-button
 				label="Salir de sala"
 				icon="pi pi-sign-out"
-				class="p-button-outlined p-button-danger p-button-sm"
+				[outlined]="true"
+				severity="danger"
+				size="small"
 				(click)="onVolver()"
-			></button>
+			/>
 		} @else {
-			<button
-				pButton
+			<edu-button
 				label="Salir"
 				icon="pi pi-sign-out"
-				class="p-button-outlined p-button-danger p-button-sm"
+				[outlined]="true"
+				severity="danger"
+				size="small"
 				(click)="onVolver()"
-			></button>
+			/>
 		}
 	</div>
 	<!-- #endregion -->
@@ -143,13 +148,12 @@
 		<div class="error-state">
 			<i class="pi pi-exclamation-triangle" style="font-size: 3rem; color: var(--orange-500)"></i>
 			<p class="text-color-secondary fw-semibold" style="font-size: 1.0625rem">{{ errorMsg() }}</p>
-			<button
-				pButton
+			<edu-button
 				label="Volver a cursos"
 				icon="pi pi-arrow-left"
-				class="p-button-outlined"
+				[outlined]="true"
 				(click)="onVolver()"
-			></button>
+			/>
 		</div>
 	}
 

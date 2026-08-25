@@ -27,7 +27,7 @@
 		@for (g of periodoGroups(); track g.periodo.id) {
 			<div class="periodo-chip" [class.empty]="g.promedio === null">
 				<span class="periodo-name">{{ g.periodo.nombre }}</span>
-				<p-tag
+				<edu-tag
 					[value]="formatNota(g.promedio)"
 					[severity]="getNotaSeverity(g.promedio)"
 					[rounded]="true"
@@ -37,7 +37,7 @@
 		@if (curso().periodos.length > 0) {
 			<div class="periodo-chip periodo-general">
 				<span class="periodo-name">General</span>
-				<p-tag
+				<edu-tag
 					[value]="formatNota(promedioGeneral())"
 					[severity]="promedioSeverity()"
 					[rounded]="true"
@@ -48,16 +48,16 @@
 	<!-- #endregion -->
 
 	<!-- #region Evaluaciones accordion -->
-	<p-accordion [multiple]="true" [value]="openPanels()" (valueChange)="openPanels.set($any($event))">
+	<edu-accordion [multiple]="true" [value]="openPanelsStr()" (valueChange)="onOpenPanelsChangeStr($any($event))">
 		@for (g of periodoGroups(); track g.periodo.id) {
-			<p-accordionpanel [value]="g.periodo.id">
-				<p-accordionheader data-info-anchor="estudiante-notas-periodo-accordion">
+			<edu-accordion-panel [value]="g.periodo.id.toString()">
+				<edu-accordion-header data-info-anchor="estudiante-notas-periodo-accordion">
 					<div class="accordion-header-content">
 						<span class="accordion-periodo-name">{{ g.periodo.nombre }}</span>
 						<span class="accordion-eval-count">{{ g.evaluaciones.length }} evaluación{{ g.evaluaciones.length !== 1 ? 'es' : '' }}</span>
 					</div>
-				</p-accordionheader>
-				<p-accordioncontent>
+				</edu-accordion-header>
+				
 					@if (g.evaluaciones.length > 0) {
 						<div class="evaluaciones-list">
 							@for (eval of g.evaluaciones; track eval.id) {
@@ -65,13 +65,13 @@
 									<div class="eval-info">
 										<span class="eval-titulo">{{ eval.titulo }}</span>
 										<div class="eval-meta">
-											<p-tag [value]="getTipoLabel(eval.tipo)" styleClass="tag-neutral" [rounded]="true" />
+											<edu-tag [value]="getTipoLabel(eval.tipo)" styleClass="tag-neutral" [rounded]="true" />
 											<span class="text-xs text-color-secondary">{{ eval.fechaEvaluacion | date:'dd/MM/yyyy' }}</span>
 											<span class="text-xs text-color-secondary">Peso: {{ (eval.peso * 100).toFixed(0) }}%</span>
 										</div>
 									</div>
 									<div class="eval-nota">
-										<p-tag
+										<edu-tag
 											[value]="formatNota(eval.nota)"
 											[severity]="getNotaSeverity(eval.nota)"
 											[rounded]="true"
@@ -87,9 +87,9 @@
 							Sin notas aún
 						</div>
 					}
-				</p-accordioncontent>
-			</p-accordionpanel>
+				
+			</edu-accordion-panel>
 		}
-	</p-accordion>
+	</edu-accordion>
 	<!-- #endregion -->
 </div>

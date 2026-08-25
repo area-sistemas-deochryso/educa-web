@@ -1,13 +1,12 @@
 import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
 
 import {
 	DiagnosticoRazon,
 	EntradaSinCorreoEnviado,
 } from '../../models/correos-dia.models';
 import { RazonLabelPipe } from '../../pipes/razon-label.pipe';
+import { EduTable, EduTag } from '@edu-ui';
 
 type Severity = 'secondary' | 'warn' | 'danger';
 
@@ -22,7 +21,7 @@ const RAZON_SEVERITY: Record<DiagnosticoRazon, Severity> = {
 @Component({
 	selector: 'app-entradas-sin-correo-table',
 	standalone: true,
-	imports: [TableModule, TagModule, DatePipe, RazonLabelPipe],
+	imports: [EduTable, EduTag, DatePipe, RazonLabelPipe],
 	templateUrl: './entradas-sin-correo-table.component.html',
 	styleUrl: './entradas-sin-correo-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

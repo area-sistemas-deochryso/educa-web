@@ -1,0 +1,44 @@
+/*
+ * Posición del ícono (izquierda/derecha) resuelta por orden de DOM
+ * (:first-child / :last-child), no por un input `iconPosition` — verificado
+ * contra `node_modules/primeng/fesm2022/primeng-iconfield.mjs` (v21.1.0):
+ * el input `iconPosition` existe en el componente real pero las clases que
+ * genera (`p-iconfield-left`/`-right`) no aparecen en ningún selector de
+ * `@primeuix/styles/iconfield` — es API muerta en la versión actual. El
+ * posicionamiento real ocurre 100% vía `:first-child`/`:last-child` sobre
+ * `.p-inputicon`, igual que acá. Ninguno de los 6 usos reales en educa-web
+ * setea `iconPosition`.
+ *
+ * `::ng-deep` porque `edu-input-icon`/`eduInputText` llegan como contenido
+ * proyectado (encapsulación del consumidor, no la de este componente) —
+ * mismo mecanismo que `edu-table.scss`/`edu-avatar.scss`.
+ */
+.edu-icon-field {
+	position: relative;
+	display: block;
+
+	::ng-deep .edu-input-icon {
+		position: absolute;
+		top: 50%;
+		margin-top: calc(-1 * var(--eduui-icon-size) / 2);
+		color: var(--eduui-form-field-icon-color);
+		line-height: 1;
+		z-index: 1;
+	}
+
+	::ng-deep .edu-input-icon:first-child {
+		inset-inline-start: var(--eduui-form-field-padding-x);
+	}
+
+	::ng-deep .edu-input-icon:last-child {
+		inset-inline-end: var(--eduui-form-field-padding-x);
+	}
+
+	::ng-deep .edu-input-text:not(:first-child) {
+		padding-inline-start: calc((var(--eduui-form-field-padding-x) * 2) + var(--eduui-icon-size));
+	}
+
+	::ng-deep .edu-input-text:not(:last-child) {
+		padding-inline-end: calc((var(--eduui-form-field-padding-x) * 2) + var(--eduui-icon-size));
+	}
+}

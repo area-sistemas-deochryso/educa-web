@@ -30,8 +30,8 @@
                 class="horario-block"
                 [ngStyle]="blockStyleMap().get(block.horario.id)"
                 [class.inactive]="!block.horario.estado"
-                [pTooltip]="blockTooltipMap().get(block.horario.id)"
-                tooltipPosition="top"
+                [eduTooltip]="blockTooltipMap().get(block.horario.id) ?? ''"
+                eduTooltipPosition="top"
                 data-info-anchor="admin-schedules-block"
                 (click)="onBlockClick(block)"
               >
@@ -72,24 +72,28 @@
 
                   <!-- * Acciones (aparecen al hover) -->
                   <div class="block-actions">
-                    <button
-                      pButton
+                    <edu-button
                       icon="pi pi-eye"
-                      class="p-button-rounded p-button-text p-button-sm action-btn"
+                      [text]="true"
+                      [rounded]="true"
+                      size="small"
+                      class="action-btn"
                       data-info-anchor="admin-schedules-block-ver-detalle-btn"
                       (click)="onViewDetailClick($event, block)"
                       [pt]="{ root: { 'aria-label': 'Ver detalles' } }"
-                    ></button>
+                    />
 
                     @if (isAdmin()) {
-                      <button
-                        pButton
+                      <edu-button
                         icon="pi pi-pencil"
-                        class="p-button-rounded p-button-text p-button-sm action-btn"
+                        [text]="true"
+                        [rounded]="true"
+                        size="small"
+                        class="action-btn"
                         data-info-anchor="admin-schedules-block-editar-btn"
                         (click)="onEditClick($event, block)"
                         [pt]="{ root: { 'aria-label': 'Editar' } }"
-                      ></button>
+                      />
                     }
                   </div>
                 </div>

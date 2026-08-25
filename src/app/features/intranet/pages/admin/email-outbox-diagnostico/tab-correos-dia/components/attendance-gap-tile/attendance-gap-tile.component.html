@@ -7,14 +7,14 @@
 				<span class="section-subtitle">Registros del día sin correo SENT asociado</span>
 			</div>
 			@if (!isEmpty()) {
-				<p-button
+				<edu-button
 					label="Exportar Excel"
 					data-info-anchor="exportar-excel-btn"
 					icon="pi pi-file-excel"
 					[text]="true"
 					size="small"
-					(onClick)="exportExcel()"
-					styleClass="btn-export-excel"
+					(click)="exportExcel()"
+					class="btn-export-excel"
 					[pt]="{ root: { 'aria-label': 'Exportar tabla a Excel' } }"
 				/>
 			}
@@ -22,7 +22,7 @@
 
 		@if (!isEmpty() && hasSalonData()) {
 			<div class="salon-filter">
-				<p-multiselect
+				<edu-multi-select
 					[options]="salonOptions()"
 					[(ngModel)]="selectedSalonIds"
 					optionLabel="nombre"
@@ -51,7 +51,7 @@
 			<span>Cobertura completa</span>
 		</div>
 	} @else {
-		<p-table
+		<edu-table
 			[value]="filteredData()"
 			class="p-datatable-sm"
 			styleClass="p-datatable-gridlines"
@@ -79,21 +79,21 @@
 				<tr
 					class="row-clickable"
 					(click)="onRowClick(row)"
-					pTooltip="Ver en bandeja de correos"
-					tooltipPosition="left"
+					eduTooltip="Ver en bandeja de correos"
+					eduTooltipPosition="left"
 					data-info-anchor="admin-email-outbox-diagnostico-asistencia-fila"
 				>
 					<td>{{ row.alumno }}</td>
 					<td>{{ row.grado }}</td>
 					@if (hasSalonData()) {
 						<td class="col-salon">
-							<p-tag [value]="row.salonNombre ?? '—'" styleClass="tag-neutral" />
+							<edu-tag [value]="row.salonNombre ?? '—'" styleClass="tag-neutral" />
 						</td>
 					}
 					<td class="col-tipo">{{ row.tipo }}</td>
 					<td class="col-hora">{{ row.horaRegistro }}</td>
 					<td class="col-estado">
-						<p-tag
+						<edu-tag
 							[value]="getEstadoLabel(row)"
 							[severity]="getEstadoSeverity(row)"
 						/>
@@ -101,12 +101,12 @@
 					@if (hasSalonData()) {
 						<td class="col-acciones">
 							@if (row.estudianteId !== null) {
-								<p-button
+								<edu-button
 									label="Ver perfil"
 									icon="pi pi-user"
 									[text]="true"
 									size="small"
-									(onClick)="onStudentClick($event, row)"
+									(click)="onStudentClick($event, row)"
 									[pt]="{ root: { 'aria-label': 'Ver perfil de ' + row.alumno } }"
 									data-info-anchor="admin-email-outbox-diagnostico-ver-perfil-btn"
 								/>
@@ -125,7 +125,7 @@
 					</td>
 				</tr>
 			</ng-template>
-		</p-table>
+		</edu-table>
 	}
 </section>
 <!-- #endregion -->

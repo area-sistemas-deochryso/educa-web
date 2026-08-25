@@ -1,13 +1,10 @@
 import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
-import { TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
 
 import { CorrelationIdPillComponent } from '@intranet-shared/components';
 
 import { EmailDiagnosticoHistoriaItem } from '../../models/correo-individual.models';
+import { EduButton, EduTable, EduTag, EduTooltip } from '@edu-ui';
 
 type Severity = 'secondary' | 'success' | 'danger' | 'warn' | 'info';
 
@@ -22,7 +19,7 @@ const ESTADO_SEVERITY: Record<string, Severity> = {
 @Component({
 	selector: 'app-correo-historia-table',
 	standalone: true,
-	imports: [TableModule, TagModule, ButtonModule, TooltipModule, DatePipe, CorrelationIdPillComponent],
+	imports: [EduTable, EduTag, EduButton, EduTooltip, DatePipe, CorrelationIdPillComponent],
 	templateUrl: './correo-historia-table.component.html',
 	styleUrl: './correo-historia-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

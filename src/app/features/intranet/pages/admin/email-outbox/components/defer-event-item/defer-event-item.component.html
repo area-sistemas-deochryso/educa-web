@@ -1,6 +1,6 @@
 <div class="event-item">
 	<div class="event-item__header">
-		<p-tag
+		<edu-tag
 			[value]="uiMapping.getDeferEventTipoLabel(event().tipo)"
 			[severity]="uiMapping.getDeferEventTipoSeverity(event().tipo)"
 		/>
@@ -37,7 +37,7 @@
 		@if (event().diagnosticCode) {
 			<div class="event-item__row">
 				<span class="event-item__label">Diagnóstico</span>
-				<code [pTooltip]="event().diagnosticCode!" tooltipPosition="top">
+				<code [eduTooltip]="event().diagnosticCode!" eduTooltipPosition="top">
 					{{ truncate(event().diagnosticCode) }}
 				</code>
 			</div>

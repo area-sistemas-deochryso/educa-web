@@ -17,8 +17,7 @@
 			color: var(--text-color);
 		}
 
-		input,
-		:host ::ng-deep .p-inputtext {
+		input {
 			width: 100%;
 		}
 
@@ -188,63 +187,6 @@
 	display: flex;
 	justify-content: flex-end;
 	gap: 0.5rem;
-
-	.p-button-success {
-		color: var(--white-color);
-	}
-}
-// #endregion
-
-// #region PrimeNG overrides
-:host ::ng-deep {
-	.edit-usuario-dialog {
-		.p-dialog-header {
-			background: var(--surface-ground);
-			color: var(--text-color);
-			border-bottom: 1px solid var(--surface-300);
-		}
-
-		.p-dialog-content {
-			padding: 0 1.5rem 1rem;
-			background: var(--surface-ground);
-		}
-
-		.p-dialog-footer {
-			background: var(--surface-ground);
-			border-top: 1px solid var(--surface-300);
-		}
-	}
-
-	.p-tabs {
-		.p-tablist {
-			border-bottom: 1px solid var(--surface-300);
-		}
-
-		.p-tab {
-			gap: 0.5rem;
-		}
-
-		.p-tabpanel {
-			padding: 0;
-		}
-	}
-
-	.p-password {
-		width: 100%;
-
-		.p-password-input {
-			width: 100%;
-			background: transparent;
-			color: var(--text-color);
-			border-color: var(--surface-300);
-		}
-	}
-
-	.p-inputswitch.p-inputswitch-checked {
-		.p-inputswitch-slider {
-			background: var(--primary-color);
-		}
-	}
 }
 // #endregion
 

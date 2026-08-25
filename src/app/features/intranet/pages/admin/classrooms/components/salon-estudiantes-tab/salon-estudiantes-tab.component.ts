@@ -2,16 +2,10 @@ import { Component, ChangeDetectionStrategy, inject, input, signal, effect } fro
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { TableModule } from 'primeng/table';
-import { ButtonModule } from 'primeng/button';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
-import { AutoCompleteModule, AutoCompleteCompleteEvent } from 'primeng/autocomplete';
-import { SelectModule } from 'primeng/select';
-import { MessageModule } from 'primeng/message';
-
 import { EstudianteDisponibleDto, MOTIVOS_RETIRO } from '../../models';
 import { ClassroomStudentsFacade } from './salon-estudiantes-tab.facade';
+import { EduAutoComplete, EduButton, EduMessage, EduSelect, EduTable, EduTag, EduTemplate, EduTooltip } from '@edu-ui';
+import type { EduAutoCompleteCompleteEvent } from '@edu-ui';
 
 export interface SalonOption {
 	id: number;
@@ -24,14 +18,14 @@ export interface SalonOption {
 	imports: [
 		CommonModule,
 		FormsModule,
-		TableModule,
-		ButtonModule,
-		TagModule,
-		TooltipModule,
-		AutoCompleteModule,
-		SelectModule,
-		MessageModule,
-	],
+		EduTable,
+		EduButton,
+		EduTag,
+		EduTooltip,
+		EduTemplate,
+		EduAutoComplete,
+		EduSelect,
+		EduMessage],
 	templateUrl: './salon-estudiantes-tab.component.html',
 	styleUrl: './salon-estudiantes-tab.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -70,7 +64,7 @@ export class ClassroomStudentsTabComponent {
 	}
 
 	// #region Agregar
-	onSearchDisponibles(event: AutoCompleteCompleteEvent): void {
+	onSearchDisponibles(event: EduAutoCompleteCompleteEvent): void {
 		this.facade.buscarSinSalon(event.query);
 	}
 

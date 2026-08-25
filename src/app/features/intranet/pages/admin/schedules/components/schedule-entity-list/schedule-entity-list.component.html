@@ -26,14 +26,14 @@
             <i
               [class]="getStatusIcon(entity)"
               [ngClass]="getStatusClass(entity)"
-              [pTooltip]="getStatusTooltip(entity)"
-              tooltipPosition="right"
+              [eduTooltip]="getStatusTooltip(entity)"
+              eduTooltipPosition="right"
             ></i>
           </div>
           <div class="entity-info">
-            <span class="entity-name" [pTooltip]="entity.label" [title]="entity.label" tooltipPosition="top">{{ entity.label }}</span>
+            <span class="entity-name" [eduTooltip]="entity.label" [title]="entity.label" eduTooltipPosition="top">{{ entity.label }}</span>
             @if (entity.subtitle) {
-              <span class="entity-subtitle" [pTooltip]="entity.subtitle" [title]="entity.subtitle" tooltipPosition="top">{{ entity.subtitle }}</span>
+              <span class="entity-subtitle" [eduTooltip]="entity.subtitle" [title]="entity.subtitle" eduTooltipPosition="top">{{ entity.subtitle }}</span>
             }
           </div>
           <div class="entity-badge">

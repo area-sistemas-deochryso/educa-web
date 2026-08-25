@@ -121,13 +121,3 @@
 }
 
 // #endregion
-
-// #region Paginator override
-:host ::ng-deep .rt-mobile {
-	.p-paginator {
-		margin-top: 1rem;
-		justify-content: center;
-		padding: 0.5rem;
-	}
-}
-// #endregion

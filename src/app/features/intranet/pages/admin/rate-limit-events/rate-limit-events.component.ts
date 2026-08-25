@@ -3,11 +3,6 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { ButtonModule } from 'primeng/button';
-import { MessageService } from 'primeng/api';
-import { TableLazyLoadEvent } from 'primeng/table';
-import { ToastModule } from 'primeng/toast';
-
 import { PageHeaderComponent } from '@intranet-shared/components';
 import {
 	SkeletonColumnDef,
@@ -21,23 +16,23 @@ import { RateLimitTableComponent } from './components/rate-limit-table';
 import { HubContextBannerComponent, readHubContext } from '../monitoreo/shared';
 import { RateLimitEventFiltro, RateLimitEventListaDto } from './models';
 import { RateLimitEventsFacade } from './services';
-
+import { EduButton, EduMessageService, EduToast } from '@edu-ui';
+import type { EduTableLazyLoadEvent } from '@edu-ui';
 @Component({
 	selector: 'app-rate-limit-events',
 	standalone: true,
 	imports: [
 		CommonModule,
-		ButtonModule,
-		ToastModule,
+		EduButton,
+		EduToast,
 		PageHeaderComponent,
 		TableSkeletonComponent,
 		RateLimitStatsComponent,
 		RateLimitFiltersComponent,
 		RateLimitTableComponent,
 		RateLimitDetailDrawerComponent,
-		HubContextBannerComponent,
-	],
-	providers: [MessageService],
+		HubContextBannerComponent],
+	providers: [EduMessageService],
 	templateUrl: './rate-limit-events.component.html',
 	styleUrl: './rate-limit-events.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -67,8 +62,7 @@ export class RateLimitEventsComponent implements OnInit {
 		{ width: '90px', cellType: 'badge' },
 		{ width: '100px', cellType: 'text' },
 		{ width: '140px', cellType: 'text' },
-		{ width: '60px', cellType: 'actions' },
-	];
+		{ width: '60px', cellType: 'actions' }];
 	// #endregion
 
 	// #region Lifecycle
@@ -102,7 +96,7 @@ export class RateLimitEventsComponent implements OnInit {
 		this.facade.updateFilter(partial);
 	}
 
-	onLazyLoad(event: TableLazyLoadEvent): void {
+	onLazyLoad(event: EduTableLazyLoadEvent): void {
 		const rows = event.rows ?? this.vm().pageSize;
 		const first = event.first ?? 0;
 		const page = Math.floor(first / rows) + 1;

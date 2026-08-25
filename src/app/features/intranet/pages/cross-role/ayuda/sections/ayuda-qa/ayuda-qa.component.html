@@ -2,14 +2,14 @@
 <div class="qa-filters">
 	<input
 		type="text"
-		pInputText
+		eduInputText
 		class="qa-filters__search"
 		placeholder="Buscar en preguntas frecuentes..."
 		[ngModel]="searchTerm()"
 		(ngModelChange)="onSearchChange($event)"
 	/>
 
-	<p-select
+	<edu-select
 		[options]="categoriaOptions()"
 		optionLabel="label"
 		optionValue="value"
@@ -24,7 +24,7 @@
 <!-- #region Contenido -->
 @if (loading()) {
 	<div class="qa-loading">
-		<p-progressSpinner styleClass="w-3rem h-3rem" strokeWidth="4" />
+		<edu-spinner styleClass="w-3rem h-3rem" strokeWidth="4" />
 	</div>
 } @else if (error()) {
 	<p class="qa-error">No se pudieron cargar las preguntas frecuentes. Intenta de nuevo más tarde.</p>

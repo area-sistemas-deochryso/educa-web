@@ -1,0 +1,267 @@
+/*
+ * EduUI design tokens — extracted from PrimeNG Aura preset (default, unmodified —
+ * verified against educa-web's app.config.ts, no definePreset override).
+ * Primitives + semantic layer only; no PrimeNG/CDK dependency at runtime.
+ *
+ * Naming: --eduui-* prefix (not --p-*) so these coexist without collision with
+ * PrimeNG's own tokens and the app's legacy --blue-500-style shim during F1-F6.
+ *
+ * Dark mode: same convention as educa-web (ThemeService toggles `.dark-mode`
+ * on <html>), NOT prefers-color-scheme — keep in sync with that convention.
+ */
+
+:root {
+	/* --- Primitive color scales (Tailwind-derived, Aura base/index.mjs) --- */
+	--eduui-emerald-50: #ecfdf5;
+	--eduui-emerald-100: #d1fae5;
+	--eduui-emerald-200: #a7f3d0;
+	--eduui-emerald-300: #6ee7b7;
+	--eduui-emerald-400: #34d399;
+	--eduui-emerald-500: #10b981;
+	--eduui-emerald-600: #059669;
+	--eduui-emerald-700: #047857;
+	--eduui-emerald-800: #065f46;
+	--eduui-emerald-900: #064e3b;
+	--eduui-emerald-950: #022c22;
+
+	--eduui-green-50: #f0fdf4;
+	--eduui-green-100: #dcfce7;
+	--eduui-green-200: #bbf7d0;
+	--eduui-green-300: #86efac;
+	--eduui-green-400: #4ade80;
+	--eduui-green-500: #22c55e;
+	--eduui-green-600: #16a34a;
+	--eduui-green-700: #15803d;
+	--eduui-green-950: #052e16;
+
+	--eduui-red-50: #fef2f2;
+	--eduui-red-100: #fee2e2;
+	--eduui-red-200: #fecaca;
+	--eduui-red-300: #fca5a5;
+	--eduui-red-400: #f87171;
+	--eduui-red-500: #ef4444;
+	--eduui-red-600: #dc2626;
+	--eduui-red-700: #b91c1c;
+	--eduui-red-950: #450a0a;
+
+	--eduui-orange-50: #fff7ed;
+	--eduui-orange-100: #ffedd5;
+	--eduui-orange-200: #fed7aa;
+	--eduui-orange-300: #fdba74;
+	--eduui-orange-400: #fb923c;
+	--eduui-orange-500: #f97316;
+	--eduui-orange-600: #ea580c;
+	--eduui-orange-700: #c2410c;
+	--eduui-orange-950: #431407;
+
+	--eduui-yellow-50: #fefce8;
+	--eduui-yellow-100: #fef9c3;
+	--eduui-yellow-200: #fef08a;
+	--eduui-yellow-400: #facc15;
+	--eduui-yellow-500: #eab308;
+	--eduui-yellow-600: #ca8a04;
+	--eduui-yellow-700: #a16207;
+
+	--eduui-sky-50: #f0f9ff;
+	--eduui-sky-100: #e0f2fe;
+	--eduui-sky-200: #bae6fd;
+	--eduui-sky-300: #7dd3fc;
+	--eduui-sky-400: #38bdf8;
+	--eduui-sky-500: #0ea5e9;
+	--eduui-sky-600: #0284c7;
+	--eduui-sky-700: #0369a1;
+	--eduui-sky-950: #082f49;
+
+	--eduui-purple-50: #faf5ff;
+	--eduui-purple-100: #f3e8ff;
+	--eduui-purple-200: #e9d5ff;
+	--eduui-purple-300: #d8b4fe;
+	--eduui-purple-400: #c084fc;
+	--eduui-purple-500: #a855f7;
+	--eduui-purple-600: #9333ea;
+	--eduui-purple-700: #7e22ce;
+	--eduui-purple-950: #3b0764;
+
+	--eduui-blue-400: #60a5fa;
+	--eduui-blue-500: #3b82f6;
+
+	/* Surface = slate in light, zinc in dark (Aura colorScheme.light/dark.surface) */
+	--eduui-surface-0: #ffffff;
+	--eduui-surface-50: #f8fafc;
+	--eduui-surface-100: #f1f5f9;
+	--eduui-surface-200: #e2e8f0;
+	--eduui-surface-300: #cbd5e1;
+	--eduui-surface-400: #94a3b8;
+	--eduui-surface-500: #64748b;
+	--eduui-surface-600: #475569;
+	--eduui-surface-700: #334155;
+	--eduui-surface-800: #1e293b;
+	--eduui-surface-900: #0f172a;
+	--eduui-surface-950: #020617;
+
+	/* --- Primitive scale: border radius (Aura base) --- */
+	--eduui-radius-none: 0;
+	--eduui-radius-xs: 2px;
+	--eduui-radius-sm: 4px;
+	--eduui-radius-md: 6px;
+	--eduui-radius-lg: 8px;
+	--eduui-radius-xl: 12px;
+
+	/* --- Primitive: icon size (Aura base, semantic.iconSize) --- */
+	--eduui-icon-size: 1rem;
+
+	/* --- Semantic: primary (default Aura preset = emerald, unmodified) --- */
+	--eduui-primary-50: var(--eduui-emerald-50);
+	--eduui-primary-100: var(--eduui-emerald-100);
+	--eduui-primary-200: var(--eduui-emerald-200);
+	--eduui-primary-300: var(--eduui-emerald-300);
+	--eduui-primary-400: var(--eduui-emerald-400);
+	--eduui-primary-500: var(--eduui-emerald-500);
+	--eduui-primary-600: var(--eduui-emerald-600);
+	--eduui-primary-700: var(--eduui-emerald-700);
+	--eduui-primary-color: var(--eduui-primary-500);
+	--eduui-primary-hover-color: var(--eduui-primary-600);
+	--eduui-primary-active-color: var(--eduui-primary-700);
+	--eduui-primary-contrast-color: #ffffff;
+
+	/* --- Semantic: text / content / form-field / focus-ring / overlay --- */
+	--eduui-text-color: var(--eduui-surface-700);
+	--eduui-text-muted-color: var(--eduui-surface-500);
+
+	--eduui-content-background: var(--eduui-surface-0);
+	--eduui-content-border-color: var(--eduui-surface-200);
+	--eduui-content-border-radius: var(--eduui-radius-md);
+	--eduui-content-color: var(--eduui-text-color);
+
+	--eduui-form-field-background: var(--eduui-surface-0);
+	--eduui-form-field-disabled-background: var(--eduui-surface-200);
+	--eduui-form-field-border-color: var(--eduui-surface-300);
+	--eduui-form-field-hover-border-color: var(--eduui-surface-400);
+	--eduui-form-field-focus-border-color: var(--eduui-primary-color);
+	--eduui-form-field-invalid-border-color: var(--eduui-red-400);
+	--eduui-form-field-color: var(--eduui-surface-700);
+	--eduui-form-field-disabled-color: var(--eduui-surface-500);
+	--eduui-form-field-placeholder-color: var(--eduui-surface-500);
+	--eduui-form-field-icon-color: var(--eduui-surface-400);
+	--eduui-form-field-padding-x: 0.75rem;
+	--eduui-form-field-padding-y: 0.5rem;
+	--eduui-form-field-padding-x-xs: 0.5rem;
+	--eduui-form-field-padding-y-xs: 0.25rem;
+	--eduui-form-field-padding-x-sm: 0.625rem;
+	--eduui-form-field-padding-y-sm: 0.375rem;
+	--eduui-form-field-padding-x-lg: 0.875rem;
+	--eduui-form-field-padding-y-lg: 0.625rem;
+	--eduui-form-field-font-size-xs: 0.75rem;
+	--eduui-form-field-font-size-sm: 0.875rem;
+	--eduui-form-field-font-size-lg: 1.125rem;
+	--eduui-form-field-border-radius: var(--eduui-radius-md);
+	--eduui-form-field-transition-duration: 0.2s;
+
+	--eduui-focus-ring-width: 1px;
+	--eduui-focus-ring-style: solid;
+	--eduui-focus-ring-color: var(--eduui-primary-color);
+	--eduui-focus-ring-offset: 2px;
+
+	--eduui-overlay-select-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+	--eduui-overlay-popover-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+	--eduui-overlay-modal-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+	--eduui-overlay-navigation-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+}
+
+:root.dark-mode {
+	--eduui-primary-color: var(--eduui-primary-400);
+	--eduui-primary-hover-color: var(--eduui-primary-300);
+	--eduui-primary-active-color: var(--eduui-primary-200);
+	--eduui-primary-contrast-color: var(--eduui-surface-900);
+
+	/* Surface scale flips to zinc in dark (Aura colorScheme.dark.surface) */
+	--eduui-surface-50: #fafafa;
+	--eduui-surface-100: #f4f4f5;
+	--eduui-surface-200: #e4e4e7;
+	--eduui-surface-300: #d4d4d8;
+	--eduui-surface-400: #a1a1aa;
+	--eduui-surface-500: #71717a;
+	--eduui-surface-600: #52525b;
+	--eduui-surface-700: #3f3f46;
+	--eduui-surface-800: #27272a;
+	--eduui-surface-900: #18181b;
+	--eduui-surface-950: #09090b;
+
+	--eduui-text-color: var(--eduui-surface-0);
+	--eduui-text-muted-color: var(--eduui-surface-400);
+
+	--eduui-content-background: var(--eduui-surface-900);
+	--eduui-content-border-color: var(--eduui-surface-700);
+
+	--eduui-form-field-background: var(--eduui-surface-950);
+	--eduui-form-field-disabled-background: var(--eduui-surface-700);
+	--eduui-form-field-border-color: var(--eduui-surface-600);
+	--eduui-form-field-hover-border-color: var(--eduui-surface-500);
+	--eduui-form-field-invalid-border-color: var(--eduui-red-300);
+	--eduui-form-field-color: var(--eduui-surface-0);
+	--eduui-form-field-disabled-color: var(--eduui-surface-400);
+	--eduui-form-field-placeholder-color: var(--eduui-surface-400);
+}
+
+/*
+ * Global rules for directives that render outside a component template
+ * (eduTooltip appends to document.body; eduInputText/eduTextarea style a
+ * native element with no template of their own) — these can't rely on
+ * Angular's per-component style encapsulation, so they live here instead.
+ */
+
+/* --- eduInputText / eduTextarea (styling-only directives) --- */
+.edu-input-text,
+.edu-textarea {
+	width: 100%;
+	box-sizing: border-box;
+	background: var(--eduui-form-field-background);
+	border: 1px solid var(--eduui-form-field-border-color);
+	border-radius: var(--eduui-form-field-border-radius);
+	padding: var(--eduui-form-field-padding-y) var(--eduui-form-field-padding-x);
+	color: var(--eduui-form-field-color);
+	font-size: 1rem;
+	transition: border-color var(--eduui-form-field-transition-duration), background var(--eduui-form-field-transition-duration);
+}
+.edu-input-text::placeholder,
+.edu-textarea::placeholder {
+	color: var(--eduui-form-field-placeholder-color);
+}
+.edu-input-text:hover:not(:disabled),
+.edu-textarea:hover:not(:disabled) {
+	border-color: var(--eduui-form-field-hover-border-color);
+}
+.edu-input-text:focus,
+.edu-textarea:focus {
+	outline: none;
+	border-color: var(--eduui-form-field-focus-border-color);
+}
+.edu-input-text:disabled,
+.edu-textarea:disabled {
+	background: var(--eduui-form-field-disabled-background);
+	color: var(--eduui-form-field-disabled-color);
+	cursor: default;
+}
+.edu-input-text.ng-invalid.ng-touched,
+.edu-textarea.ng-invalid.ng-touched {
+	border-color: var(--eduui-form-field-invalid-border-color);
+}
+.edu-textarea {
+	resize: vertical;
+	font-family: inherit;
+}
+
+/* --- eduTooltip bubble (appended to document.body via Renderer2) --- */
+.edu-tooltip {
+	position: fixed;
+	z-index: 1100;
+	max-width: 12.5rem;
+	padding: 0.5rem 0.75rem;
+	border-radius: var(--eduui-content-border-radius);
+	background: var(--eduui-surface-700);
+	color: var(--eduui-surface-0);
+	font-size: 0.875rem;
+	line-height: 1.4;
+	box-shadow: var(--eduui-overlay-popover-shadow);
+	pointer-events: none;
+}

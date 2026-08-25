@@ -1,4 +1,4 @@
-<p-dialog
+<edu-dialog
 	[visible]="visible()"
 	(visibleChange)="onVisibleChange($event)"
 	[modal]="true"
@@ -23,20 +23,20 @@
 	</ng-template>
 
 	@if (salon(); as s) {
-		<p-tabs value="0" (valueChange)="onTabChange($any($event))">
-			<p-tablist>
-				<p-tab value="0" data-info-anchor="admin-salon-detail-tab-aprobacion"><i class="pi pi-check-square tab-icon"></i>Aprobación</p-tab>
-				<p-tab value="1" data-info-anchor="admin-salon-detail-tab-asistencias"><i class="pi pi-calendar tab-icon"></i>Asistencias</p-tab>
-				<p-tab value="2" data-info-anchor="admin-salon-detail-tab-notas"><i class="pi pi-chart-bar tab-icon"></i>Notas</p-tab>
-				<p-tab value="3" data-info-anchor="admin-salon-detail-tab-estudiantes"><i class="pi pi-users tab-icon"></i>Estudiantes</p-tab>
+		<edu-tabs value="0" (valueChange)="onTabChange($any($event))">
+			
+				<edu-tab value="0" data-info-anchor="admin-salon-detail-tab-aprobacion"><i class="pi pi-check-square tab-icon"></i>Aprobación</edu-tab>
+				<edu-tab value="1" data-info-anchor="admin-salon-detail-tab-asistencias"><i class="pi pi-calendar tab-icon"></i>Asistencias</edu-tab>
+				<edu-tab value="2" data-info-anchor="admin-salon-detail-tab-notas"><i class="pi pi-chart-bar tab-icon"></i>Notas</edu-tab>
+				<edu-tab value="3" data-info-anchor="admin-salon-detail-tab-estudiantes"><i class="pi pi-users tab-icon"></i>Estudiantes</edu-tab>
 				@if (showRendimiento()) {
-					<p-tab value="4" data-info-anchor="admin-salon-detail-tab-rendimiento"><i class="pi pi-chart-line tab-icon"></i>Rendimiento</p-tab>
+					<edu-tab value="4" data-info-anchor="admin-salon-detail-tab-rendimiento"><i class="pi pi-chart-line tab-icon"></i>Rendimiento</edu-tab>
 				}
-			</p-tablist>
+			
 
-			<p-tabpanels>
+			
 				<!-- #region Tab Aprobación -->
-				<p-tabpanel value="0">
+				<edu-tabpanel value="0">
 					<app-classroom-approval-tab
 						[salon]="salon()"
 						[aprobaciones]="aprobaciones()"
@@ -46,11 +46,11 @@
 						(aprobar)="onAprobar($event)"
 						(aprobarMasivo)="onAprobarMasivo($event)"
 					/>
-				</p-tabpanel>
+				</edu-tabpanel>
 				<!-- #endregion -->
 
 				<!-- #region Tab Asistencias -->
-				<p-tabpanel value="1">
+				<edu-tabpanel value="1">
 					<app-classroom-attendance-tab
 						[asistenciaData]="asistenciaData()"
 						[loading]="asistenciaLoading()"
@@ -58,11 +58,11 @@
 						[seccion]="s.seccion"
 						(mesChange)="onMesChange($event)"
 					/>
-				</p-tabpanel>
+				</edu-tabpanel>
 				<!-- #endregion -->
 
 				<!-- #region Tab Notas -->
-				<p-tabpanel value="2">
+				<edu-tabpanel value="2">
 					<app-classroom-grades-tab
 						[notasData]="notasData()"
 						[loading]="notasLoading()"
@@ -70,18 +70,18 @@
 						[horariosLoading]="horariosLoading()"
 						(cursoChange)="onCursoChange($event)"
 					/>
-				</p-tabpanel>
+				</edu-tabpanel>
 				<!-- #endregion -->
 
 				<!-- #region Tab Estudiantes -->
-				<p-tabpanel value="3">
+				<edu-tabpanel value="3">
 					<app-classroom-students-tab [salonId]="s.id" [salonesDisponibles]="salonesDisponibles()" />
-				</p-tabpanel>
+				</edu-tabpanel>
 				<!-- #endregion -->
 
 				<!-- #region Tab Rendimiento (brief 493, profesor-only) -->
 				@if (showRendimiento()) {
-					<p-tabpanel value="4">
+					<edu-tabpanel value="4">
 						<app-classroom-rendimiento-tab
 							[rendimiento]="rendimientoData()"
 							[loading]="rendimientoLoading()"
@@ -90,10 +90,10 @@
 							[horariosLoading]="horariosLoading()"
 							(cursoChange)="onRendimientoCursoChange($event)"
 						/>
-					</p-tabpanel>
+					</edu-tabpanel>
 				}
 				<!-- #endregion -->
-			</p-tabpanels>
-		</p-tabs>
+			
+		</edu-tabs>
 	}
-</p-dialog>
+</edu-dialog>

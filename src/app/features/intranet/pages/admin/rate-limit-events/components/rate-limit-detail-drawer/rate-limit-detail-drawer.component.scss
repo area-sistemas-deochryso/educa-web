@@ -139,14 +139,3 @@
 	gap: 0.5rem;
 	flex-wrap: wrap;
 }
-
-:host ::ng-deep .p-drawer {
-	.p-drawer-content {
-		padding: 1.5rem;
-		background: var(--surface-ground);
-	}
-	.p-drawer-header {
-		background: var(--surface-ground);
-		border-bottom: 1px solid var(--surface-300);
-	}
-}

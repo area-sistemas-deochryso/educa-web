@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
-import { Tab, TabList, TabPanel, Tabs } from 'primeng/tabs';
 
 import { PageHeaderComponent } from '@intranet-shared/components/page-header';
 
@@ -13,26 +12,12 @@ import { TableSizesTableComponent } from './components/table-sizes-table/table-s
 import { TopQueriesTableComponent } from './components/top-queries-table/top-queries-table.component';
 import { UnusedIndexesTableComponent } from './components/unused-indexes-table/unused-indexes-table.component';
 import { DiagnosticoDbFacade } from './services/diagnostico-db.facade';
+import { EduTab, EduTabPanel, EduTabs } from '@edu-ui';
 
 @Component({
 	selector: 'app-diagnostico-db-page',
 	standalone: true,
-	imports: [
-		Tabs,
-		TabList,
-		Tab,
-		TabPanel,
-		PageHeaderComponent,
-		ResourceStatsChartComponent,
-		TopQueriesTableComponent,
-		ActiveBlockingTableComponent,
-		StorageGaugesComponent,
-		TableSizesTableComponent,
-		MissingIndexesTableComponent,
-		IndexFragmentationTableComponent,
-		UnusedIndexesTableComponent,
-		IdentityValuesProgressComponent,
-	],
+	imports: [EduTabs, EduTab, EduTabPanel, PageHeaderComponent, ResourceStatsChartComponent, TopQueriesTableComponent, ActiveBlockingTableComponent, StorageGaugesComponent, TableSizesTableComponent, MissingIndexesTableComponent, IndexFragmentationTableComponent, UnusedIndexesTableComponent, IdentityValuesProgressComponent],
 	templateUrl: './diagnostico-db.component.html',
 	styleUrl: './diagnostico-db.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

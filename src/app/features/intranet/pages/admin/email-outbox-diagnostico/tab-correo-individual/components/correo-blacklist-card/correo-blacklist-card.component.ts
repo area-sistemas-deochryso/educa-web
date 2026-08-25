@@ -1,16 +1,16 @@
 import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { TagModule } from 'primeng/tag';
 
 import {
 	BlacklistEstado,
 	EmailDiagnosticoBlacklist,
 } from '../../models/correo-individual.models';
+import { EduTag } from '@edu-ui';
 
 @Component({
 	selector: 'app-correo-blacklist-card',
 	standalone: true,
-	imports: [DatePipe, TagModule],
+	imports: [DatePipe, EduTag],
 	templateUrl: './correo-blacklist-card.component.html',
 	styleUrl: './correo-blacklist-card.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

@@ -4,14 +4,14 @@
 			<i class="pi pi-eye-slash"></i>
 			<h3>Índices sin uso</h3>
 		</div>
-		<button
-			pButton
+		<edu-button
 			icon="pi pi-refresh"
-			class="p-button-text p-button-sm"
+			[text]="true"
+			size="small"
 			[loading]="loading()"
 			data-info-anchor="admin-diagnostico-db-refresh-btn"
 			(click)="onRefresh()"
-		></button>
+		/>
 	</header>
 
 	@if (error()) {
@@ -29,12 +29,12 @@
 	}
 
 	@if (indexes().length > 0) {
-		<p-table [value]="indexes()" [tableStyle]="{ 'min-width': '40rem' }" [sortField]="'totalWrites'" [sortOrder]="-1">
+		<edu-table [value]="indexes()" [tableStyle]="{ 'min-width': '40rem' }" [sortField]="'totalWrites'" [sortOrder]="-1">
 			<ng-template #header>
 				<tr>
-					<th pSortableColumn="tableName" data-info-anchor="tabla-orden-columna">Tabla <p-sortIcon field="tableName" /></th>
-					<th pSortableColumn="indexName" data-info-anchor="tabla-orden-columna">Índice <p-sortIcon field="indexName" /></th>
-					<th pSortableColumn="totalWrites" style="width: 10rem" data-info-anchor="tabla-orden-columna">Escrituras <p-sortIcon field="totalWrites" /></th>
+					<th eduSortableColumn="tableName" data-info-anchor="tabla-orden-columna">Tabla</th>
+					<th eduSortableColumn="indexName" data-info-anchor="tabla-orden-columna">Índice</th>
+					<th eduSortableColumn="totalWrites" style="width: 10rem" data-info-anchor="tabla-orden-columna">Escrituras</th>
 					<th style="width: 8rem">Lecturas</th>
 				</tr>
 			</ng-template>
@@ -46,6 +46,6 @@
 					<td>{{ row.totalReads | number }}</td>
 				</tr>
 			</ng-template>
-		</p-table>
+		</edu-table>
 	}
 </section>

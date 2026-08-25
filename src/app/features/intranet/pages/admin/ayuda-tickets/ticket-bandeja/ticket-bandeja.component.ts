@@ -3,16 +3,11 @@ import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { ButtonModule } from 'primeng/button';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { SelectModule } from 'primeng/select';
-import { TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
-
 import { UserPermissionsService } from '@core/services';
 
 import { TicketAdminDto, TicketEstado } from '../models/ticket-admin.models';
 import { TicketBandejaFacade } from '../services/ticket-bandeja.facade';
+import { EduSelect, EduSortableColumn, EduSpinner, EduTable, EduTag } from '@edu-ui';
 // #endregion
 
 const AYUDA_TICKET_MANAGE = 'AYUDA_TICKET_MANAGE';
@@ -26,14 +21,12 @@ const ESTADO_FILTRO_OPTIONS: EstadoOption[] = [
 	{ label: 'Todos', value: null },
 	{ label: 'Pendiente', value: 'PENDIENTE' },
 	{ label: 'En revisión', value: 'EN_REVISION' },
-	{ label: 'Resuelto', value: 'RESUELTO' },
-];
+	{ label: 'Resuelto', value: 'RESUELTO' }];
 
 const ESTADO_CAMBIO_OPTIONS: { label: string; value: TicketEstado }[] = [
 	{ label: 'Pendiente', value: 'PENDIENTE' },
 	{ label: 'En revisión', value: 'EN_REVISION' },
-	{ label: 'Resuelto', value: 'RESUELTO' },
-];
+	{ label: 'Resuelto', value: 'RESUELTO' }];
 
 const ESTADO_SEVERITY: Record<TicketEstado, 'warn' | 'info' | 'success'> = {
 	PENDIENTE: 'warn',
@@ -55,15 +48,7 @@ const ESTADO_LABEL: Record<TicketEstado, string> = {
 @Component({
 	selector: 'app-ticket-bandeja',
 	standalone: true,
-	imports: [
-		CommonModule,
-		FormsModule,
-		ButtonModule,
-		ProgressSpinnerModule,
-		SelectModule,
-		TableModule,
-		TagModule,
-	],
+	imports: [EduTable, CommonModule, FormsModule, EduSpinner, EduSelect, EduSortableColumn, EduTag],
 	providers: [TicketBandejaFacade],
 	templateUrl: './ticket-bandeja.component.html',
 	styleUrl: './ticket-bandeja.component.scss',

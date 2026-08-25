@@ -7,10 +7,6 @@ import {
 	output,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
-import { TagModule } from 'primeng/tag';
-import { ToggleSwitchModule } from 'primeng/toggleswitch';
-import { TooltipModule } from 'primeng/tooltip';
 
 import {
 	ALERT_RECOMMENDATIONS,
@@ -22,19 +18,12 @@ import {
 	ThresholdConfig,
 	isProbableTelemetryFailure,
 } from '../../models/runtime-health.models';
+import { EduButton, EduTag, EduToggle, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-runtime-health-widget',
 	standalone: true,
-	imports: [
-		DatePipe,
-		DecimalPipe,
-		FormsModule,
-		ButtonModule,
-		TagModule,
-		ToggleSwitchModule,
-		TooltipModule,
-	],
+	imports: [DatePipe, DecimalPipe, FormsModule, EduButton, EduTag, EduToggle, EduTooltip],
 	templateUrl: './runtime-health-widget.component.html',
 	styleUrl: './runtime-health-widget.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

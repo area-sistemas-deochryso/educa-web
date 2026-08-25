@@ -1,17 +1,15 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
-import { DatePickerModule } from 'primeng/datepicker';
-import { TooltipModule } from 'primeng/tooltip';
 
 import { PageHeaderComponent } from '@intranet-shared/components/page-header';
+import { EduButton, EduDatePicker, EduTooltip } from '@edu-ui';
 
 const MAX_DAYS_BACK = 90;
 
 @Component({
 	selector: 'app-correos-dia-header',
 	standalone: true,
-	imports: [FormsModule, ButtonModule, DatePickerModule, TooltipModule, PageHeaderComponent],
+	imports: [FormsModule, EduButton, EduDatePicker, EduTooltip, PageHeaderComponent],
 	templateUrl: './correos-dia-header.component.html',
 	styleUrl: './correos-dia-header.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

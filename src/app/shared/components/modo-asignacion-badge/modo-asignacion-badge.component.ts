@@ -1,14 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
-
 import type { ModoAsignacion } from '@data/models';
 import {
 	getModoAsignacionLabel,
 	getModoAsignacionSeverity,
 	getModoAsignacionTooltip,
 } from './modo-asignacion.glossary';
+import { EduTag, EduTooltip } from '@edu-ui';
 
 // #region Implementation
 /**
@@ -21,10 +19,10 @@ import {
 @Component({
 	selector: 'app-modo-asignacion-badge',
 	standalone: true,
-	imports: [TagModule, TooltipModule],
+	imports: [EduTag, EduTooltip],
 	template: `
 		@if (label(); as label) {
-			<p-tag [value]="label" styleClass="tag-neutral" [pTooltip]="tooltip()" tooltipPosition="top" />
+			<edu-tag [value]="label" styleClass="tag-neutral" [eduTooltip]="tooltip()" eduTooltipPosition="top" />
 		}
 	`,
 	changeDetection: ChangeDetectionStrategy.OnPush,

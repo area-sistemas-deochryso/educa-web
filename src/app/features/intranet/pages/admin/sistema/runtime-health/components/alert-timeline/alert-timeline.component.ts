@@ -7,12 +7,7 @@ import {
 	output,
 	signal,
 } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
-import { CheckboxModule } from 'primeng/checkbox';
-import { SelectButtonModule } from 'primeng/selectbutton';
 import { FormsModule } from '@angular/forms';
-import { TagModule } from 'primeng/tag';
-import { SelectModule } from 'primeng/select';
 
 import {
 	ALERT_RECOMMENDATIONS,
@@ -21,6 +16,7 @@ import {
 	RECOMMENDATION_TAB_TARGETS,
 	RuntimeHealthAlert,
 } from '../../models/runtime-health.models';
+import { EduButton, EduCheckbox, EduSelect, EduSelectButton, EduTag } from '@edu-ui';
 
 type SeverityFilter = 'all' | 'warn' | 'critical';
 
@@ -41,16 +37,7 @@ const PAGE_SIZE = 15;
 @Component({
 	selector: 'app-alert-timeline',
 	standalone: true,
-	imports: [
-		DatePipe,
-		DecimalPipe,
-		FormsModule,
-		ButtonModule,
-		CheckboxModule,
-		SelectModule,
-		SelectButtonModule,
-		TagModule,
-	],
+	imports: [DatePipe, DecimalPipe, FormsModule, EduButton, EduCheckbox, EduSelect, EduSelectButton, EduTag],
 	templateUrl: './alert-timeline.component.html',
 	styleUrl: './alert-timeline.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -71,15 +58,13 @@ export class AlertTimelineComponent {
 	readonly filterOptions: { label: string; value: SeverityFilter }[] = [
 		{ label: 'Todos', value: 'all' },
 		{ label: 'Warning', value: 'warn' },
-		{ label: 'Critical', value: 'critical' },
-	];
+		{ label: 'Critical', value: 'critical' }];
 
 	readonly metricOptions = computed(() => {
 		const keys = new Set(this.alerts().map(a => a.metricKey));
 		return [
 			{ label: 'Todas las métricas', value: null },
-			...[...keys].map(k => ({ label: METRIC_LABELS[k] ?? k, value: k })),
-		];
+			...[...keys].map(k => ({ label: METRIC_LABELS[k] ?? k, value: k }))];
 	});
 
 	private readonly filteredAlerts = computed(() => {

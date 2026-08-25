@@ -25,11 +25,11 @@
 	gap: 0.5rem;
 
 	&.satisfied i {
-		color: var(--p-green-500);
+		color: var(--green-500);
 	}
 
 	&.missing i {
-		color: var(--p-red-500);
+		color: var(--red-500);
 	}
 }
 

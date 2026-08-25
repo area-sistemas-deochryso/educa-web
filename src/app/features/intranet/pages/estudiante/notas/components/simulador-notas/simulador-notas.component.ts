@@ -1,10 +1,7 @@
 import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DrawerModule } from 'primeng/drawer';
-import { InputNumberModule } from 'primeng/inputnumber';
-import { ButtonModule } from 'primeng/button';
-import { TagModule } from 'primeng/tag';
+
 import {
 	EstudianteMisNotasDto,
 	NOTA_MINIMA,
@@ -13,11 +10,12 @@ import {
 import { NotaSimulada } from '../../services/estudiante-notas.models';
 import { getNotaSeverity, formatNotaConConfig } from '@intranet-shared/services/calificacion-config';
 import type { ConfiguracionCalificacionListDto } from '@data/models';
+import { EduButton, EduDrawer, EduInputNumber, EduTag } from '@edu-ui';
 
 @Component({
 	selector: 'app-simulador-notas',
 	standalone: true,
-	imports: [CommonModule, FormsModule, DrawerModule, InputNumberModule, ButtonModule, TagModule],
+	imports: [CommonModule, FormsModule, EduDrawer, EduInputNumber, EduButton, EduTag],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './simulador-notas.component.html',
 	styleUrl: './simulador-notas.component.scss',

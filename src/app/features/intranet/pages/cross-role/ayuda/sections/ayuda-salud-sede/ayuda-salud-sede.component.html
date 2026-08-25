@@ -5,7 +5,7 @@
 
 	@if (loadingEstado()) {
 		<div class="salud-sede-estado__loading">
-			<p-progressSpinner styleClass="w-3rem h-3rem" strokeWidth="4" />
+			<edu-spinner styleClass="w-3rem h-3rem" strokeWidth="4" />
 		</div>
 	} @else if (errorEstado()) {
 		<p class="salud-sede-estado__error">No se pudo cargar el estado de la sede. Intenta de nuevo más tarde.</p>
@@ -16,7 +16,7 @@
 			@for (item of estadoPorDimension(); track item.dimension) {
 				<li class="salud-sede-estado__item">
 					<span class="salud-sede-estado__dimension">{{ dimensionLabels[item.dimension] }}</span>
-					<p-tag [value]="ratingLabels[item.rating]" [severity]="ratingSeverity(item.rating)" />
+					<edu-tag [value]="ratingLabels[item.rating]" [severity]="ratingSeverity(item.rating)" />
 				</li>
 			}
 		</ul>
@@ -30,7 +30,7 @@
 	<h4>Reportar salud de sede</h4>
 
 	<div class="salud-sede-form__fields">
-		<p-select
+		<edu-select
 			[options]="dimensionOptions"
 			optionLabel="label"
 			optionValue="value"
@@ -40,7 +40,7 @@
 			appendTo="body"
 		/>
 
-		<p-select
+		<edu-select
 			[options]="ratingOptions"
 			optionLabel="label"
 			optionValue="value"
@@ -50,14 +50,19 @@
 			appendTo="body"
 		/>
 
-		<p-button label="Reportar" [disabled]="!canSubmit()" [loading]="submitting()" (onClick)="onSubmit()" />
+		<edu-button
+			label="Reportar"
+			[disabled]="!canSubmit()"
+			[loading]="submitting()"
+			(click)="onSubmit()"
+		/>
 	</div>
 
 	@if (submitSuccess()) {
-		<p-message severity="success" text="Reporte enviado correctamente." />
+		<edu-message severity="success" text="Reporte enviado correctamente." />
 	}
 	@if (submitError()) {
-		<p-message severity="error" text="No se pudo enviar el reporte. Intenta de nuevo." />
+		<edu-message severity="error" text="No se pudo enviar el reporte. Intenta de nuevo." />
 	}
 </section>
 <!-- #endregion -->

@@ -29,9 +29,9 @@
 	font-weight: 700;
 	line-height: 1;
 
-	&.severity-success { color: var(--p-green-500); }
-	&.severity-warn { color: var(--p-yellow-500); }
-	&.severity-danger { color: var(--p-red-500); }
+	&.severity-success { color: var(--green-500); }
+	&.severity-warn { color: var(--yellow-500); }
+	&.severity-danger { color: var(--red-500); }
 	&.severity-secondary { color: var(--text-color-secondary); }
 }
 

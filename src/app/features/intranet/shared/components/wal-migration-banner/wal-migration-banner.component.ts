@@ -1,7 +1,7 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, inject, signal, computed } from '@angular/core';
 import { WalStatusFacade } from '@core/services';
-import { ButtonModule } from 'primeng/button';
+import { EduButton } from '@edu-ui';
 // #endregion
 
 /**
@@ -12,7 +12,7 @@ import { ButtonModule } from 'primeng/button';
 @Component({
 	selector: 'app-wal-migration-banner',
 	standalone: true,
-	imports: [ButtonModule],
+	imports: [EduButton],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './wal-migration-banner.component.html',
 	styleUrl: './wal-migration-banner.component.scss',

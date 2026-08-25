@@ -1,4 +1,4 @@
-<p-dialog
+<edu-dialog
 	[visible]="visible()"
 	(visibleChange)="onVisibleChange($event)"
 	header="Pausar dominio receptor"
@@ -14,7 +14,7 @@
 				<label for="dp-dominio">Dominio *</label>
 				<input
 					id="dp-dominio"
-					pInputText
+					eduInputText
 					data-info-anchor="admin-email-outbox-domain-dominio-input"
 					autocomplete="off"
 					[ngModel]="formData().dominio"
@@ -29,7 +29,7 @@
 
 			<div class="field full-width">
 				<label for="dp-duration">Duración *</label>
-				<p-select
+				<edu-select
 					inputId="dp-duration"
 					data-info-anchor="admin-email-outbox-domain-duration-select"
 					[options]="durationOptions"
@@ -46,7 +46,7 @@
 				<label for="dp-observacion">Observación *</label>
 				<textarea
 					id="dp-observacion"
-					pTextarea
+					eduTextarea
 					data-info-anchor="admin-email-outbox-domain-observacion-textarea"
 					rows="3"
 					maxlength="500"
@@ -67,26 +67,24 @@
 
 	<ng-template #footer>
 		<div class="dialog-footer">
-			<button
-				pButton
+			<edu-button
 				label="Cancelar"
 				icon="pi pi-times"
-				class="p-button-text"
+				[text]="true"
 				data-info-anchor="email-outbox-dialog-cancel-btn"
 				(click)="onCancel()"
 				[disabled]="submitting()"
 				[pt]="{ root: { 'aria-label': 'Cancelar' } }"
-			></button>
-			<button
-				pButton
+			/>
+			<edu-button
 				label="Pausar"
 				icon="pi pi-pause"
-				class="p-button-success"
+				severity="success"
 				data-info-anchor="admin-email-outbox-domain-pausar-btn"
 				(click)="onConfirm()"
 				[disabled]="!canSubmit()"
 				[pt]="{ root: { 'aria-label': 'Pausar dominio' } }"
-			></button>
+			/>
 		</div>
 	</ng-template>
-</p-dialog>
+</edu-dialog>

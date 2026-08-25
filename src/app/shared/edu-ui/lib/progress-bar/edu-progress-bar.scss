@@ -1,0 +1,33 @@
+.edu-progress-bar {
+	position: relative;
+	overflow: hidden;
+	width: 100%;
+	height: 1.25rem;
+	border-radius: var(--eduui-content-border-radius);
+	background: var(--eduui-content-border-color);
+
+	&__value {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		height: 100%;
+		background: var(--eduui-primary-color);
+		transition: width 1s ease-in-out;
+
+		&--indeterminate {
+			width: 40%;
+			animation: edu-progress-bar-indeterminate 2.1s ease-in-out infinite;
+		}
+	}
+
+	&__label {
+		color: var(--eduui-primary-contrast-color);
+		font-size: 0.75rem;
+		font-weight: 600;
+	}
+}
+
+@keyframes edu-progress-bar-indeterminate {
+	0% { margin-left: -40%; }
+	60%, 100% { margin-left: 100%; }
+}

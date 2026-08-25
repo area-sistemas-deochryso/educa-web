@@ -1,15 +1,11 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
-import { MultiSelectModule } from 'primeng/multiselect';
-import { TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
 
 import { ExcelService } from '@core/services/excel';
 
 import { AttendanceGapRow } from '@features/intranet/pages/admin/email-outbox-shared';
+import { EduButton, EduMultiSelect, EduTable, EduTag, EduTooltip } from '@edu-ui';
 
 interface SalonOption {
 	id: number;
@@ -19,7 +15,7 @@ interface SalonOption {
 @Component({
 	selector: 'app-attendance-gap-tile',
 	standalone: true,
-	imports: [FormsModule, ButtonModule, MultiSelectModule, TableModule, TagModule, TooltipModule],
+	imports: [FormsModule, EduButton, EduMultiSelect, EduTable, EduTag, EduTooltip],
 	templateUrl: './attendance-gap-tile.component.html',
 	styleUrl: './attendance-gap-tile.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -94,8 +90,7 @@ export class AttendanceGapTileComponent {
 				{ header: 'Salón', key: 'salonNombre', width: 15 },
 				{ header: 'Tipo', key: 'tipo', width: 12 },
 				{ header: 'Hora registro', key: 'horaRegistro', width: 14 },
-				{ header: 'Estado correo', key: 'estadoLabel', width: 14 },
-			],
+				{ header: 'Estado correo', key: 'estadoLabel', width: 14 }],
 			data: rows.map((r) => ({
 				alumno: r.alumno,
 				grado: r.grado,

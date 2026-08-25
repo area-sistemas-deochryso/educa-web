@@ -1,4 +1,4 @@
-<p-toast />
+<edu-toast />
 
 <div class="ticket-layout">
 	<!-- #region Formulario de creación -->
@@ -8,7 +8,7 @@
 
 		<div class="ticket-form__field">
 			<label for="ticket-tipo">Tipo de problema</label>
-			<p-select
+			<edu-select
 				inputId="ticket-tipo"
 				[options]="tipoOptions()"
 				optionLabel="label"
@@ -25,7 +25,7 @@
 			<label for="ticket-descripcion">Descripción</label>
 			<textarea
 				id="ticket-descripcion"
-				pTextarea
+				eduTextarea
 				rows="5"
 				class="ticket-form__textarea"
 				[ngModel]="descripcion()"
@@ -42,7 +42,7 @@
 			<label for="ticket-propuesta">Propuesta de mejora (opcional)</label>
 			<textarea
 				id="ticket-propuesta"
-				pTextarea
+				eduTextarea
 				rows="3"
 				class="ticket-form__textarea"
 				[ngModel]="propuesta()"
@@ -52,12 +52,12 @@
 			></textarea>
 		</div>
 
-		<p-button
+		<edu-button
 			label="Enviar ticket"
 			icon="pi pi-send"
 			[disabled]="!canSubmit()"
 			[loading]="submitting()"
-			(onClick)="onSubmit()"
+			(click)="onSubmit()"
 		/>
 	</section>
 	<!-- #endregion -->
@@ -96,7 +96,7 @@
 
 	@if (loading()) {
 		<div class="ticket-history__loading">
-			<p-progressSpinner styleClass="w-3rem h-3rem" strokeWidth="4" />
+			<edu-spinner styleClass="w-3rem h-3rem" strokeWidth="4" />
 		</div>
 	} @else if (error()) {
 		<app-error-state
@@ -106,7 +106,7 @@
 	} @else if (tickets().length === 0) {
 		<p class="ticket-history__empty">Todavía no generaste ningún ticket.</p>
 	} @else {
-		<p-table [value]="tickets()" styleClass="ticket-history__table">
+		<edu-table [value]="tickets()" styleClass="ticket-history__table">
 			<ng-template pTemplate="header">
 				<tr>
 					<th>Tipo</th>
@@ -120,12 +120,12 @@
 					<td>{{ ticket.tipoNombre }}</td>
 					<td class="ticket-history__descripcion">{{ ticket.descripcion }}</td>
 					<td>
-						<p-tag [value]="estadoLabel(ticket.estado)" [severity]="estadoTagSeverity(ticket.estado)" />
+						<edu-tag [value]="estadoLabel(ticket.estado)" [severity]="estadoTagSeverity(ticket.estado)" />
 					</td>
 					<td>{{ ticket.fechaReg | date: 'dd/MM/yyyy HH:mm' }}</td>
 				</tr>
 			</ng-template>
-		</p-table>
+		</edu-table>
 	}
 </section>
 <!-- #endregion -->

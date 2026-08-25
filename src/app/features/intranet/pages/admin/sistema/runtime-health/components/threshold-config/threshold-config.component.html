@@ -6,40 +6,40 @@
 		</div>
 		<div class="section-actions">
 			@if (editableRows().length === 0) {
-				<button
-					pButton
+				<edu-button
 					icon="pi pi-pencil"
 					label="Editar"
-					class="p-button-outlined p-button-sm"
+					[outlined]="true"
+					size="small"
 					[loading]="loading()"
 					data-info-anchor="admin-runtime-health-thresholds-editar-btn"
 					(click)="onLoadClick()"
-				></button>
+				/>
 			} @else {
-				<button
-					pButton
+				<edu-button
 					icon="pi pi-check"
 					label="Guardar"
-					class="p-button-sm p-button-success"
+					size="small"
+					severity="success"
 					[loading]="saving()"
 					[disabled]="!dirty()"
 					data-info-anchor="admin-runtime-health-thresholds-guardar-btn"
 					(click)="onSave()"
-				></button>
-				<button
-					pButton
+				/>
+				<edu-button
 					icon="pi pi-times"
 					label="Cancelar"
-					class="p-button-sm p-button-text"
+					[text]="true"
+					size="small"
 					data-info-anchor="admin-runtime-health-thresholds-cancelar-btn"
 					(click)="onCancel()"
-				></button>
+				/>
 			}
 		</div>
 	</header>
 
 	@if (editableRows().length > 0) {
-		<p-table [value]="editableRows()" [dataKey]="'metricKey'" [tableStyle]="{ 'min-width': '40rem' }">
+		<edu-table [value]="editableRows()" [dataKey]="'metricKey'" [tableStyle]="{ 'min-width': '40rem' }">
 			<ng-template #header>
 				<tr>
 					<th>Métrica</th>
@@ -52,7 +52,7 @@
 				<tr>
 					<td>{{ getMetricLabel(row.metricKey) }}</td>
 					<td>
-						<p-inputNumber
+						<edu-input-number
 							[(ngModel)]="editableRows()[i].warnValue"
 							[minFractionDigits]="0"
 							[maxFractionDigits]="1"
@@ -63,7 +63,7 @@
 						/>
 					</td>
 					<td>
-						<p-inputNumber
+						<edu-input-number
 							[(ngModel)]="editableRows()[i].criticalValue"
 							[minFractionDigits]="0"
 							[maxFractionDigits]="1"
@@ -74,7 +74,7 @@
 						/>
 					</td>
 					<td>
-						<p-select
+						<edu-select
 							[(ngModel)]="editableRows()[i].direction"
 							[options]="directionOptions"
 							optionLabel="label"
@@ -86,9 +86,9 @@
 					</td>
 				</tr>
 			</ng-template>
-		</p-table>
+		</edu-table>
 	} @else if (hasData()) {
-		<p-table [value]="thresholds()" [dataKey]="'metricKey'" [tableStyle]="{ 'min-width': '40rem' }">
+		<edu-table [value]="thresholds()" [dataKey]="'metricKey'" [tableStyle]="{ 'min-width': '40rem' }">
 			<ng-template #header>
 				<tr>
 					<th>Métrica</th>
@@ -101,15 +101,15 @@
 				<tr>
 					<td>{{ getMetricLabel(row.metricKey) }}</td>
 					<td>
-						<p-tag [value]="'' + row.warnValue" severity="warn" />
+						<edu-tag [value]="'' + row.warnValue" severity="warn" />
 					</td>
 					<td>
-						<p-tag [value]="'' + row.criticalValue" severity="danger" />
+						<edu-tag [value]="'' + row.criticalValue" severity="danger" />
 					</td>
 					<td>{{ row.direction === 'Above' ? 'Por encima' : 'Por debajo' }}</td>
 				</tr>
 			</ng-template>
-		</p-table>
+		</edu-table>
 	} @else {
 		<div class="empty-state">
 			<i class="pi pi-info-circle"></i>

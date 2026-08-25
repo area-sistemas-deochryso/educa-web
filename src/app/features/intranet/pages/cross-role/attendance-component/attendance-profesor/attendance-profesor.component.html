@@ -1,32 +1,32 @@
 <!-- #region Template -->
-<p-tabs [value]="activeTab()" (valueChange)="onTabChange($any($event))">
-	<p-tablist>
-		<p-tab value="propia">
+<edu-tabs [value]="activeTab()" (valueChange)="onTabChange($any($event))">
+	
+		<edu-tab value="propia">
 			<i class="pi pi-user tab-icon"></i>
 			Mi asistencia
-		</p-tab>
+		</edu-tab>
 		@if (hasSalones()) {
-			<p-tab value="estudiantes">
+			<edu-tab value="estudiantes">
 				<i class="pi pi-users tab-icon"></i>
 				Mis estudiantes
-			</p-tab>
+			</edu-tab>
 		}
-	</p-tablist>
+	
 
-	<p-tabpanels>
+	
 		<!-- #region Tab Mi asistencia -->
-		<p-tabpanel value="propia">
+		<edu-tabpanel value="propia">
 			<app-attendance-profesor-propia />
-		</p-tabpanel>
+		</edu-tabpanel>
 		<!-- #endregion -->
 
 		<!-- #region Tab Mis estudiantes (solo si tiene salones) -->
 		@if (hasSalones()) {
-			<p-tabpanel value="estudiantes">
+			<edu-tabpanel value="estudiantes">
 				<app-attendance-profesor-estudiantes />
-			</p-tabpanel>
+			</edu-tabpanel>
 		}
 		<!-- #endregion -->
-	</p-tabpanels>
-</p-tabs>
+	
+</edu-tabs>
 <!-- #endregion -->

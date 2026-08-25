@@ -4,14 +4,14 @@
 			<i class="pi pi-table"></i>
 			<h3>Tamaño de tablas</h3>
 		</div>
-		<button
-			pButton
+		<edu-button
 			icon="pi pi-refresh"
-			class="p-button-text p-button-sm"
+			[text]="true"
+			size="small"
 			[loading]="loading()"
 			data-info-anchor="admin-diagnostico-db-refresh-btn"
 			(click)="onRefresh()"
-		></button>
+		/>
 	</header>
 
 	@if (error()) {
@@ -29,12 +29,12 @@
 	}
 
 	@if (tables().length > 0) {
-		<p-table [value]="tables()" [dataKey]="'tableName'" [tableStyle]="{ 'min-width': '30rem' }" [sortField]="'reservedMb'" [sortOrder]="-1">
+		<edu-table [value]="tables()" [dataKey]="'tableName'" [tableStyle]="{ 'min-width': '30rem' }" [sortField]="'reservedMb'" [sortOrder]="-1">
 			<ng-template #header>
 				<tr>
-					<th pSortableColumn="tableName" data-info-anchor="tabla-orden-columna">Tabla <p-sortIcon field="tableName" /></th>
-					<th pSortableColumn="rowCount" style="width: 10rem" data-info-anchor="tabla-orden-columna">Filas <p-sortIcon field="rowCount" /></th>
-					<th pSortableColumn="reservedMb" style="width: 10rem" data-info-anchor="tabla-orden-columna">Tamaño (MB) <p-sortIcon field="reservedMb" /></th>
+					<th eduSortableColumn="tableName" data-info-anchor="tabla-orden-columna">Tabla</th>
+					<th eduSortableColumn="rowCount" style="width: 10rem" data-info-anchor="tabla-orden-columna">Filas</th>
+					<th eduSortableColumn="reservedMb" style="width: 10rem" data-info-anchor="tabla-orden-columna">Tamaño (MB)</th>
 				</tr>
 			</ng-template>
 			<ng-template #body let-row>
@@ -44,6 +44,6 @@
 					<td>{{ row.reservedMb | number: '1.1-1' }} MB</td>
 				</tr>
 			</ng-template>
-		</p-table>
+		</edu-table>
 	}
 </section>

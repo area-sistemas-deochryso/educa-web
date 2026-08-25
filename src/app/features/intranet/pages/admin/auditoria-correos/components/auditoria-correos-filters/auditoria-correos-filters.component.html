@@ -3,7 +3,7 @@
 		<i class="pi pi-search"></i>
 		<input
 			type="text"
-			pInputText
+			eduInputText
 			placeholder="Buscar por nombre, DNI o correo..."
 			[ngModel]="searchTerm()"
 			(ngModelChange)="onSearchChange($event)"
@@ -12,7 +12,7 @@
 	</div>
 
 	<div class="filter-dropdowns">
-		<p-select
+		<edu-select
 			[options]="tipoOptions"
 			[ngModel]="filterTipo()"
 			(ngModelChange)="onTipoChange($event)"
@@ -22,15 +22,16 @@
 		/>
 	</div>
 
-	<button
-		pButton
+	<edu-button
 		icon="pi pi-filter-slash"
-		class="p-button-text p-button-sm btn-clear"
-		pTooltip="Limpiar filtros"
-		tooltipPosition="top"
+		[text]="true"
+		size="small"
+		class="btn-clear"
+		eduTooltip="Limpiar filtros"
+		eduTooltipPosition="top"
 		[disabled]="!hasActiveFilters()"
 		(click)="onClear()"
 		[pt]="{ root: { 'aria-label': 'Limpiar filtros' } }"
 		data-info-anchor="admin-auditoria-correos-limpiar-filtros-btn"
-	></button>
+	/>
 </div>

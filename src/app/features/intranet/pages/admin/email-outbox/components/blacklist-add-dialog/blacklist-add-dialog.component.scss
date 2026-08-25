@@ -39,20 +39,3 @@
 	justify-content: flex-end;
 	gap: 0.5rem;
 }
-
-:host ::ng-deep .blacklist-add-dialog {
-	.p-dialog-header,
-	.p-dialog-content,
-	.p-dialog-footer {
-		background: var(--surface-ground);
-		color: var(--text-color);
-	}
-
-	.p-dialog-header {
-		border-bottom: 1px solid var(--surface-300);
-	}
-
-	.p-dialog-footer {
-		border-top: 1px solid var(--surface-300);
-	}
-}

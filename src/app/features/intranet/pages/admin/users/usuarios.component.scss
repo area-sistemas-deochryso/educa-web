@@ -100,63 +100,6 @@
 }
 // #endregion
 
-// #region GLOBAL NG-DEEP OVERRIDES
-:host ::ng-deep {
-	.p-inputtext,
-	.p-select {
-		background: transparent;
-		color: var(--text-color);
-		border-color: var(--surface-300);
-
-		&::placeholder {
-			color: var(--text-color-secondary);
-		}
-
-		&:enabled:focus {
-			border-color: var(--text-color);
-			box-shadow: 0 0 0 1px var(--text-color);
-		}
-	}
-
-	.p-select-label {
-		color: var(--text-color);
-	}
-
-	.p-select-dropdown {
-		color: var(--text-color);
-	}
-
-	.p-tag {
-		font-weight: 600;
-		background: var(--surface-100) !important;
-		color: var(--text-color) !important;
-	}
-
-	.p-button-success,
-	.p-button-success:hover {
-		color: black;
-	}
-
-	.p-button-text {
-		color: var(--text-color);
-
-		&:hover {
-			background: var(--surface-100);
-		}
-	}
-
-	.p-button-outlined {
-		color: var(--text-color);
-		border-color: var(--surface-300);
-
-		&:hover {
-			background: var(--surface-100);
-		}
-	}
-}
-
-// #endregion
-
 // #endregion (validation action removed — moved to overflow menu)
 
 // #endregion (legacy dev migration panel removed)

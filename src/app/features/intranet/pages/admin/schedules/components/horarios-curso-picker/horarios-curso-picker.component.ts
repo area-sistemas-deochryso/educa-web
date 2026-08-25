@@ -2,32 +2,15 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { BadgeModule } from 'primeng/badge';
-import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { Tab, TabList, TabPanel, Tabs } from 'primeng/tabs';
-import { TooltipModule } from 'primeng/tooltip';
-
 import type { CursoOption, CursosPorNivel } from '../../models/curso.interface';
+import { EduBadge, EduButton, EduDialog, EduSpinner, EduTab, EduTabPanel, EduTabs, EduTooltip } from '@edu-ui';
 
 // #endregion
 // #region Implementation
 @Component({
 	selector: 'app-schedules-course-picker',
 	standalone: true,
-	imports: [
-		CommonModule,
-		BadgeModule,
-		ButtonModule,
-		DialogModule,
-		ProgressSpinnerModule,
-		Tabs,
-		TabList,
-		Tab,
-		TabPanel,
-		TooltipModule,
-	],
+	imports: [CommonModule, EduBadge, EduButton, EduDialog, EduSpinner, EduTabs, EduTab, EduTabPanel, EduTooltip],
 	templateUrl: './horarios-curso-picker.component.html',
 	styleUrl: './horarios-curso-picker.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

@@ -27,7 +27,7 @@
 		</div>
 
 		@if (paginator() && totalRecords() > rows()) {
-			<p-paginator
+			<edu-paginator
 				[rows]="rows()"
 				[totalRecords]="totalRecords()"
 				[rowsPerPageOptions]="rowsPerPageOptions()"

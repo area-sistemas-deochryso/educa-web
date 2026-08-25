@@ -17,8 +17,8 @@
 			<div
 				class="bar-wrapper"
 				[style.width.%]="bar.widthPercent"
-				[pTooltip]="bar.vus + ' VUs durante ' + bar.label"
-				tooltipPosition="top"
+				[eduTooltip]="bar.vus + ' VUs durante ' + bar.label"
+				eduTooltipPosition="top"
 			>
 				<div class="bar" [style.height.%]="bar.heightPercent" [style.--bar-delay]="$index * 0.6 + 's'">
 					<div class="bar-shimmer"></div>
@@ -47,21 +47,21 @@
 
 <!-- #region Stats -->
 <div class="profile-stats">
-	<div class="stat" pTooltip="Duración total del test" tooltipPosition="top">
+	<div class="stat" eduTooltip="Duración total del test" eduTooltipPosition="top">
 		<i class="pi pi-clock"></i>
 		<div class="stat-content">
 			<span class="stat-value">{{ profile().totalDuration }}</span>
 			<span class="stat-label">Duración</span>
 		</div>
 	</div>
-	<div class="stat" pTooltip="Máximo de usuarios virtuales simultáneos" tooltipPosition="top">
+	<div class="stat" eduTooltip="Máximo de usuarios virtuales simultáneos" eduTooltipPosition="top">
 		<i class="pi pi-users"></i>
 		<div class="stat-content">
 			<span class="stat-value">{{ profile().peakVus }}</span>
 			<span class="stat-label">Pico VUs</span>
 		</div>
 	</div>
-	<div class="stat" pTooltip="Endpoints habilitados que se testearán" tooltipPosition="top">
+	<div class="stat" eduTooltip="Endpoints habilitados que se testearán" eduTooltipPosition="top">
 		<i class="pi pi-link"></i>
 		<div class="stat-content">
 			<span class="stat-value">{{ profile().endpointsCount }}</span>
@@ -70,8 +70,8 @@
 	</div>
 	<div
 		class="stat"
-		pTooltip="Estimación de requests totales (cada VU ejecuta ~1 iteración cada ~2s con N endpoints)"
-		tooltipPosition="top"
+		eduTooltip="Estimación de requests totales (cada VU ejecuta ~1 iteración cada ~2s con N endpoints)"
+		eduTooltipPosition="top"
 	>
 		<i class="pi pi-send"></i>
 		<div class="stat-content">
@@ -102,8 +102,8 @@
 						class="phase-segment"
 						[style.width.%]="seg.widthPercent"
 						[style.--intensity]="seg.intensity"
-						[pTooltip]="seg.label + ' VUs en ' + seg.duration"
-						tooltipPosition="top"
+						[eduTooltip]="seg.label + ' VUs en ' + seg.duration"
+						eduTooltipPosition="top"
 					>
 						<div class="segment-fill"></div>
 						<span class="segment-label">{{ seg.targetVus }}</span>
@@ -115,17 +115,17 @@
 
 		@if (usePhaseTabs()) {
 			<!-- Tabs por fase: cada tab muestra su propio flujo -->
-			<p-tabs [value]="0">
-				<p-tablist>
+			<edu-tabs [value]="0">
+				
 					@for (stage of stages(); track $index; let si = $index) {
-						<p-tab [value]="si">
+						<edu-tab [value]="si">
 							Fase {{ si + 1 }}: {{ stage.target }} VUs ({{ stage.duration }})
-						</p-tab>
+						</edu-tab>
 					}
-				</p-tablist>
-				<p-tabpanels>
+				
+				
 					@for (stage of stages(); track $index; let si = $index) {
-						<p-tabpanel [value]="si">
+						<edu-tabpanel [value]="si">
 							<div
 								class="simulation-flow phase-flow"
 								[style.--cycle-duration]="phaseCycleDurations()[si] + 's'"
@@ -223,10 +223,10 @@
 									</div>
 								}
 							</div>
-						</p-tabpanel>
+						</edu-tabpanel>
 					}
-				</p-tabpanels>
-			</p-tabs>
+				
+			</edu-tabs>
 		} @else {
 			<!-- Vista sin tabs: flujo único (como antes) -->
 			<div class="simulation-flow">

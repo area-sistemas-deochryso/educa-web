@@ -31,13 +31,6 @@
 
 	// #region PrimeNG overrides — permite scroll horizontal + wrap
 	:host ::ng-deep .fallos-table {
-		.p-datatable-table-container,
-		.p-datatable-wrapper,
-		.p-datatable {
-			overflow-x: auto !important;
-			width: 100%;
-		}
-
 		table {
 			table-layout: fixed;
 			width: 100%;
@@ -50,11 +43,6 @@
 			word-break: break-word;
 			overflow-wrap: anywhere;
 			white-space: normal;
-		}
-
-		// * Tag del tipoFallo — forzar nowrap para que no se parta
-		.p-tag {
-			white-space: nowrap;
 		}
 	}
 	// #endregion

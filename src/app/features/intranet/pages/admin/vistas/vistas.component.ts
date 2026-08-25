@@ -2,19 +2,10 @@ import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@ang
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
-import { TableModule } from 'primeng/table';
-import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
-import { TooltipModule } from 'primeng/tooltip';
-import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
-import { TagModule } from 'primeng/tag';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ConfirmationService } from 'primeng/api';
-
 import type { CapabilityCatalogItem } from '@core/services';
 
 import { VistasFacade } from './services';
+import { EduButton, EduConfirmDialog, EduConfirmationService, EduDialog, EduInputText, EduSelect, EduTable, EduTag, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-vistas',
@@ -22,16 +13,15 @@ import { VistasFacade } from './services';
 	imports: [
 		CommonModule,
 		FormsModule,
-		TableModule,
-		ButtonModule,
-		DialogModule,
-		TooltipModule,
-		InputTextModule,
-		SelectModule,
-		TagModule,
-		ConfirmDialogModule,
-	],
-	providers: [ConfirmationService],
+		EduTable,
+		EduButton,
+		EduDialog,
+		EduTooltip,
+		EduInputText,
+		EduSelect,
+		EduTag,
+		EduConfirmDialog],
+	providers: [EduConfirmationService],
 	templateUrl: './vistas.component.html',
 	styleUrl: './vistas.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -39,7 +29,7 @@ import { VistasFacade } from './services';
 export class VistasComponent implements OnInit {
 	// #region Dependencias
 	private facade = inject(VistasFacade);
-	private confirmationService = inject(ConfirmationService);
+	private confirmationService = inject(EduConfirmationService);
 	// #endregion
 
 	// #region Estado

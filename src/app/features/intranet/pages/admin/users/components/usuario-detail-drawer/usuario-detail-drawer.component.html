@@ -1,12 +1,12 @@
 <!-- #region Template -->
-<p-drawer
+<edu-drawer
 	[visible]="visible()"
 	(visibleChange)="onVisibleChange($event)"
 	position="right"
 	[style]="{ width: '450px' }"
 	[modal]="true"
 >
-	<ng-template pTemplate="header">
+	<ng-template #header>
 		<!-- * Drawer header -->
 		<div class="drawer-header">
 			<span>Detalles del Usuario</span>
@@ -22,7 +22,7 @@
 
 			<div class="detail-name">{{ usuario()!.apellidos | fullName: usuario()!.nombres }}</div>
 
-			<p-tag
+			<edu-tag
 				[value]="usuario()!.rol"
 				[severity]="uiMapping.getRolSeverity(usuario()!.rol)"
 				styleClass="tag-neutral"
@@ -36,7 +36,7 @@
 				</div>
 				<div class="info-item">
 					<span class="info-label">Estado</span>
-					<p-tag
+					<edu-tag
 						[value]="usuario()!.estado | estadoLabel"
 						[severity]="usuario()!.estado | estadoSeverity"
 						styleClass="tag-neutral"
@@ -87,11 +87,10 @@
 
 		<!-- * Footer actions -->
 		<div class="drawer-footer">
-			<button
-				pButton
+			<edu-button
 				label="Cerrar"
 				icon="pi pi-times"
-				class="p-button-text"
+				[text]="true"
 				(click)="onClose()"
 				data-info-anchor="cerrar-drawer-btn"
 				[pt]="{
@@ -99,12 +98,11 @@
 						'aria-label': 'Cerrar',
 					},
 				}"
-			></button>
-			<button
-				pButton
+			/>
+			<edu-button
 				label="Editar"
 				icon="pi pi-pencil"
-				class="p-button-primary"
+				severity="primary"
 				[pt]="{
 					root: {
 						'aria-label': 'Editar',
@@ -112,8 +110,8 @@
 				}"
 				(click)="onEdit()"
 				data-info-anchor="admin-users-detail-drawer-edit-btn"
-			></button>
+			/>
 		</div>
 	}
-</p-drawer>
+</edu-drawer>
 <!-- #endregion -->

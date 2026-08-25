@@ -1,9 +1,7 @@
 import { Component, ChangeDetectionStrategy, inject, effect, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
+
 import { PageHeaderComponent, PeriodToggleComponent } from '@intranet-shared/components';
 import { PluralizePipe } from '@intranet-shared/pipes';
 import { SalonCursoInfo, VistaPromedio, ActualizarGrupoDto, ProfesorSalonConEstudiantes } from '../models';
@@ -14,15 +12,16 @@ import { CreateHealthExitRequest } from '../models';
 import { SalonMensajeriaFacade } from '@features/intranet/pages/cross-role/mensajeria/services/mensajeria.facade';
 import { SalonEstudiantesDialogComponent } from './components/salon-estudiantes-dialog/salon-estudiantes-dialog.component';
 import { NotaSaveEvent } from './components/salon-notas-estudiante-tab/salon-notas-estudiante-tab.component';
+import { EduSpinner, EduTag, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-teacher-classrooms',
 	standalone: true,
 	imports: [
 		CommonModule,
-		TagModule,
-		TooltipModule,
-		ProgressSpinnerModule,
+		EduTag,
+		EduTooltip,
+		EduSpinner,
 		PageHeaderComponent,
 		PeriodToggleComponent,
 		PluralizePipe,

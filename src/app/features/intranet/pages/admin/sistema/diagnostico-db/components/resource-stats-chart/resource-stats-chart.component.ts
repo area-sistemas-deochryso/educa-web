@@ -8,7 +8,7 @@ import {
 	output,
 	viewChild,
 } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
+import { EduButton } from '@edu-ui';
 import { Chart, registerables } from 'chart.js';
 
 import { ResourceStatsSnapshotDto } from '../../models/diagnostico-db.models';
@@ -44,7 +44,7 @@ const CHART_WINDOW_MS = 60 * 60 * 1000;
 @Component({
 	selector: 'app-resource-stats-chart',
 	standalone: true,
-	imports: [ButtonModule],
+	imports: [EduButton],
 	templateUrl: './resource-stats-chart.component.html',
 	styleUrl: './resource-stats-chart.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -100,8 +100,7 @@ export class ResourceStatsChartComponent implements AfterViewInit {
 					buildDataset('CPU %', toPoints((d) => d.cpuPercent), CHART_COLORS.blue),
 					buildDataset('Data IO %', toPoints((d) => d.dataIoPercent), CHART_COLORS.orange),
 					buildDataset('Log Write %', toPoints((d) => d.logWritePercent), CHART_COLORS.red),
-					buildDataset('Memoria %', toPoints((d) => d.memoryUsagePercent), CHART_COLORS.green),
-				],
+					buildDataset('Memoria %', toPoints((d) => d.memoryUsagePercent), CHART_COLORS.green)],
 			},
 			options: {
 				responsive: true,
@@ -144,8 +143,7 @@ export class ResourceStatsChartComponent implements AfterViewInit {
 			toPoints((d) => d.cpuPercent),
 			toPoints((d) => d.dataIoPercent),
 			toPoints((d) => d.logWritePercent),
-			toPoints((d) => d.memoryUsagePercent),
-		];
+			toPoints((d) => d.memoryUsagePercent)];
 		values.forEach((v, i) => {
 			if (this.chart!.data.datasets[i]) this.chart!.data.datasets[i].data = v;
 		});

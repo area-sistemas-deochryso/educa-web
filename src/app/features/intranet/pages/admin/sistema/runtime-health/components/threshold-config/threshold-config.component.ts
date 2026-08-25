@@ -7,29 +7,23 @@ import {
 	signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
-import { InputNumberModule } from 'primeng/inputnumber';
-import { SelectModule } from 'primeng/select';
-import { TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
-
 import {
 	METRIC_LABELS,
 	ThresholdConfig,
 	ThresholdDirection,
 } from '../../models/runtime-health.models';
+import { EduButton, EduInputNumber, EduSelect, EduTable, EduTag } from '@edu-ui';
 
 @Component({
 	selector: 'app-threshold-config',
 	standalone: true,
 	imports: [
 		FormsModule,
-		ButtonModule,
-		InputNumberModule,
-		SelectModule,
-		TableModule,
-		TagModule,
-	],
+		EduButton,
+		EduInputNumber,
+		EduSelect,
+		EduTable,
+		EduTag],
 	templateUrl: './threshold-config.component.html',
 	styleUrl: './threshold-config.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -46,8 +40,7 @@ export class ThresholdConfigComponent {
 
 	readonly directionOptions: { label: string; value: ThresholdDirection }[] = [
 		{ label: 'Por encima', value: 'Above' },
-		{ label: 'Por debajo', value: 'Below' },
-	];
+		{ label: 'Por debajo', value: 'Below' }];
 
 	readonly hasData = computed(() => this.thresholds().length > 0);
 

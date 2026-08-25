@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, computed, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
+
 import { EstudianteFacade } from '../services/estudiante.facade';
 import { SalonMensajeriaFacade } from '@features/intranet/pages/cross-role/mensajeria/services/mensajeria.facade';
 import { SalonMensajeriaTabComponent } from '@features/intranet/pages/cross-role/mensajeria/components/mensajeria-tab/mensajeria-tab.component';
@@ -9,11 +9,12 @@ import { signal, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { logger, withRetry } from '@core/helpers';
 import { PageHeaderComponent } from '@intranet-shared/components';
+import { EduSpinner } from '@edu-ui';
 
 @Component({
 	selector: 'app-estudiante-mensajeria',
 	standalone: true,
-	imports: [CommonModule, ProgressSpinnerModule, PageHeaderComponent, SalonMensajeriaTabComponent],
+	imports: [CommonModule, EduSpinner, PageHeaderComponent, SalonMensajeriaTabComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	styles: `
 		:host {
@@ -49,7 +50,7 @@ import { PageHeaderComponent } from '@intranet-shared/components';
 
 			@if (loading()) {
 				<div class="flex justify-content-center p-5">
-					<p-progressSpinner strokeWidth="4" />
+					<edu-spinner strokeWidth="4" />
 				</div>
 			} @else if (cursoOptions().length === 0) {
 				<div class="flex flex-column align-items-center p-5 text-color-secondary">

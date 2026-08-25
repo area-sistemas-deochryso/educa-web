@@ -2,21 +2,18 @@ import { Component, ChangeDetectionStrategy, input, output, computed, signal } f
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { TableModule } from 'primeng/table';
-import { SelectModule } from 'primeng/select';
-import { TagModule } from 'primeng/tag';
-
 import { EstudianteAsistencia, AttendanceStatus } from '@intranet-shared/services';
 import {
 	ATTENDANCE_STATUS_CONFIGS,
 	getSalonStatusClass,
 	getStatusLabel,
 } from '@features/intranet/pages/cross-role/attendance-component/config/attendance.constants';
+import { EduSelect, EduTable, EduTag } from '@edu-ui';
 
 @Component({
 	selector: 'app-classroom-attendance-tab',
 	standalone: true,
-	imports: [CommonModule, FormsModule, TableModule, SelectModule, TagModule],
+	imports: [CommonModule, FormsModule, EduTable, EduSelect, EduTag],
 	templateUrl: './salon-attendance-tab.component.html',
 	styleUrl: './salon-attendance-tab.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -47,8 +44,7 @@ export class ClassroomAttendanceTabComponent {
 		{ label: 'Septiembre', value: 9 },
 		{ label: 'Octubre', value: 10 },
 		{ label: 'Noviembre', value: 11 },
-		{ label: 'Diciembre', value: 12 },
-	];
+		{ label: 'Diciembre', value: 12 }];
 	// #endregion
 
 	// #region Computed

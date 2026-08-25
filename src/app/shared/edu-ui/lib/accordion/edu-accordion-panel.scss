@@ -1,0 +1,12 @@
+.edu-accordion-panel {
+	background: var(--eduui-content-background);
+	color: var(--eduui-content-color);
+	border: 1px solid var(--eduui-content-border-color);
+	border-radius: var(--eduui-content-border-radius);
+	overflow: hidden;
+}
+
+.edu-accordion-panel__content {
+	padding: 0.75rem 1rem 1rem;
+	border-top: 1px solid var(--eduui-content-border-color);
+}

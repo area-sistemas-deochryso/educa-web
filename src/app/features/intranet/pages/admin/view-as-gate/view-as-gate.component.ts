@@ -2,7 +2,7 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
-import { ButtonModule } from 'primeng/button';
+import { EduButton } from '@edu-ui';
 
 import { PageHeaderComponent } from '@intranet-shared/components/page-header';
 import { ViewAsPickerComponent } from '@intranet-shared/components/view-as-picker';
@@ -26,7 +26,7 @@ import { ViewAsContext, ViewAsContextService, ViewAsRol } from '@core/services/v
 @Component({
 	selector: 'app-view-as-gate',
 	standalone: true,
-	imports: [RouterLink, ButtonModule, PageHeaderComponent, ViewAsPickerComponent],
+	imports: [RouterLink, EduButton, PageHeaderComponent, ViewAsPickerComponent],
 	templateUrl: './view-as-gate.component.html',
 	styleUrl: './view-as-gate.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

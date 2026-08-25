@@ -1,18 +1,13 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
-import { InputTextModule } from 'primeng/inputtext';
-import { InputNumberModule } from 'primeng/inputnumber';
-import { SelectModule } from 'primeng/select';
-
 import { EditorNodeType, NodeFormData } from '../../models';
+import { EduButton, EduDialog, EduInputNumber, EduInputText, EduSelect } from '@edu-ui';
 
 @Component({
 	selector: 'app-campus-node-dialog',
 	standalone: true,
-	imports: [FormsModule, ButtonModule, DialogModule, InputTextModule, InputNumberModule, SelectModule],
+	imports: [FormsModule, EduButton, EduDialog, EduInputText, EduInputNumber, EduSelect],
 	templateUrl: './campus-node-dialog.component.html',
 	styleUrl: './campus-node-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

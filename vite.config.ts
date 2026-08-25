@@ -18,6 +18,7 @@ export default defineConfig({
 			'@data': resolve(__dirname, 'src/app/data'),
 			'@intranet-shared': resolve(__dirname, 'src/app/features/intranet/shared'),
 			'@test': resolve(__dirname, 'src/test-setup'),
+			'@edu-ui': resolve(__dirname, 'src/app/shared/edu-ui/public-api'),
 		},
 	},
 	test: {
@@ -28,7 +29,7 @@ export default defineConfig({
 		setupFiles: ['src/test-setup.ts'],
 		server: {
 			deps: {
-				inline: [/@angular/, /@primeng/, /primeng/],
+				inline: [/@angular/],
 			},
 		},
 	},

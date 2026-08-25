@@ -1,5 +1,5 @@
 <!-- #region Template -->
-<p-drawer
+<edu-drawer
 	[visible]="visible()"
 	(visibleChange)="onVisibleChange($event)"
 	position="right"
@@ -7,7 +7,7 @@
 	[closeOnEscape]="true"
 	[style]="{ width: '600px' }"
 >
-	<ng-template pTemplate="header">
+	<ng-template #header>
 		<!-- * Drawer header -->
 		<div class="drawer-header">
 			<div class="header-icon">
@@ -30,59 +30,60 @@
 		<div class="detail-content">
 			<!-- * Estado y acciones rápidas -->
 			<div class="status-section">
-				<p-tag
+				<edu-tag
 					[value]="detalle()!.estado | estadoLabel"
 					[severity]="detalle()!.estado | estadoSeverity"
 				/>
 
 				@if (isAdmin()) {
 					<div class="quick-actions">
-						<button
-							pButton
+						<edu-button
 							icon="pi pi-pencil"
-							class="p-button-rounded p-button-text p-button-info"
+							[text]="true"
+							[rounded]="true"
+							severity="info"
 							data-info-anchor="admin-schedules-detail-editar-btn"
 							(click)="onEdit()"
-							pTooltip="Editar horario"
-							tooltipPosition="top"
+							eduTooltip="Editar horario"
+							eduTooltipPosition="top"
 							[pt]="{
 								root: {
 									'aria-label': 'Editar horario',
 								},
 							}"
-						></button>
+						/>
 
-						<button
-							pButton
+						<edu-button
 							[icon]="detalle()!.estado | estadoToggleIcon"
-							class="p-button-rounded p-button-text"
-							[class.p-button-warning]="detalle()!.estado"
-							[class.p-button-success]="!detalle()!.estado"
+							[text]="true"
+							[rounded]="true"
+							[severity]="detalle()!.estado ? 'warn' : 'success'"
 							data-info-anchor="admin-schedules-detail-toggle-estado-btn"
 							(click)="onToggleEstado()"
-							[pTooltip]="detalle()!.estado | estadoToggleLabel"
-							tooltipPosition="top"
+							[eduTooltip]="detalle()!.estado | estadoToggleLabel"
+							eduTooltipPosition="top"
 							[pt]="{
 								root: {
 									'aria-label': detalle()!.estado | estadoToggleLabel,
 								},
 							}"
-						></button>
+						/>
 
-						<button
-							pButton
+						<edu-button
 							icon="pi pi-trash"
-							class="p-button-rounded p-button-text p-button-danger"
+							[text]="true"
+							[rounded]="true"
+							severity="danger"
 							data-info-anchor="admin-schedules-detail-eliminar-btn"
 							(click)="onDelete()"
-							pTooltip="Eliminar horario"
-							tooltipPosition="top"
+							eduTooltip="Eliminar horario"
+							eduTooltipPosition="top"
 							[pt]="{
 								root: {
 									'aria-label': 'Eliminar',
 								},
 							}"
-						></button>
+						/>
 					</div>
 				}
 			</div>
@@ -156,38 +157,42 @@
 						Profesor Asignado
 					</h3>
 					@if (modoAsignacion() === 'TutorPleno') {
-						<p-tag value="Tutor" styleClass="tag-neutral" class="modo-tag" />
+						<edu-tag value="Tutor" styleClass="tag-neutral" class="modo-tag" />
 					}
 					@if (isAdmin() && detalle()!.profesorId) {
 						<div class="section-actions">
-							<button
-								pButton
+							<edu-button
 								icon="pi pi-pencil"
-								class="p-button-rounded p-button-text p-button-sm p-button-info"
+								[text]="true"
+								[rounded]="true"
+								size="small"
+								severity="info"
 								data-info-anchor="admin-schedules-detail-toggle-profesor-edit-btn"
 								(click)="onToggleProfesorEdit()"
-								[pTooltip]="showProfesorEdit() ? 'Cancelar cambio' : 'Cambiar profesor'"
-								tooltipPosition="top"
+								[eduTooltip]="showProfesorEdit() ? 'Cancelar cambio' : 'Cambiar profesor'"
+								eduTooltipPosition="top"
 								[pt]="{
 									root: {
 										'aria-label': showProfesorEdit() ? 'Cancelar cambio' : 'Cambiar profesor',
 									},
 								}"
-							></button>
-							<button
-								pButton
+							/>
+							<edu-button
 								icon="pi pi-user-minus"
-								class="p-button-rounded p-button-text p-button-sm p-button-danger"
+								[text]="true"
+								[rounded]="true"
+								size="small"
+								severity="danger"
 								data-info-anchor="admin-schedules-detail-desasignar-profesor-btn"
 								(click)="onDesasignarProfesor()"
-								pTooltip="Quitar profesor"
-								tooltipPosition="top"
+								eduTooltip="Quitar profesor"
+								eduTooltipPosition="top"
 								[pt]="{
 									root: {
 										'aria-label': 'Quitar profesor',
 									},
 								}"
-							></button>
+							/>
 						</div>
 					}
 				</div>
@@ -208,7 +213,7 @@
 					<!-- Dropdown para cambiar profesor (admin only) -->
 					@if (isAdmin() && showProfesorEdit()) {
 						<div class="assign-professor-form mt-3">
-							<p-select
+							<edu-select
 								[options]="profesoresOptions()"
 								[(ngModel)]="selectedProfesorId"
 								data-info-anchor="admin-schedules-detail-profesor-select"
@@ -222,17 +227,17 @@
 								class="w-full"
 							/>
 
-							<button
-								pButton
+							<edu-button
 								label="Cambiar Profesor"
 								icon="pi pi-refresh"
-								class="p-button-sm w-full"
+								size="small"
+								class="w-full"
 								[disabled]="!selectedProfesorId"
 								data-info-anchor="admin-schedules-detail-asignar-profesor-btn"
 								(click)="onAsignarProfesor()"
-								pTooltip="Asignar el nuevo profesor seleccionado"
-								tooltipPosition="top"
-							></button>
+								eduTooltip="Asignar el nuevo profesor seleccionado"
+								eduTooltipPosition="top"
+							/>
 						</div>
 					}
 				} @else {
@@ -242,7 +247,7 @@
 
 						@if (isAdmin()) {
 							<div class="assign-professor-form">
-								<p-select
+								<edu-select
 									[options]="profesoresOptions()"
 									[(ngModel)]="selectedProfesorId"
 									data-info-anchor="admin-schedules-detail-profesor-select"
@@ -256,17 +261,17 @@
 									class="w-full"
 								/>
 
-								<button
-									pButton
+								<edu-button
 									label="Asignar Profesor"
 									icon="pi pi-user-plus"
-									class="p-button-sm w-full"
+									size="small"
+									class="w-full"
 									[disabled]="!selectedProfesorId"
 									data-info-anchor="admin-schedules-detail-asignar-profesor-btn"
 									(click)="onAsignarProfesor()"
-									pTooltip="Asignar el profesor seleccionado a este horario"
-									tooltipPosition="top"
-								></button>
+									eduTooltip="Asignar el profesor seleccionado a este horario"
+									eduTooltipPosition="top"
+								/>
 							</div>
 						}
 					</div>
@@ -279,23 +284,23 @@
 					<h3 class="section-title">
 						<i class="pi pi-users"></i>
 						Estudiantes Asignados
-						<p-badge [value]="detalle()!.estudiantes.length.toString()" />
+						<edu-badge [value]="detalle()!.estudiantes.length.toString()" />
 					</h3>
 					@if (isAdmin()) {
 						<div class="section-actions">
-							<button
-								pButton
+							<edu-button
 								icon="pi pi-user-plus"
 								label="Asignar Todos"
-								class="p-button-text p-button-sm"
+								[text]="true"
+								size="small"
 								data-info-anchor="admin-schedules-detail-asignar-todos-btn"
 								(click)="onAsignarTodosEstudiantes()"
 								[disabled]="detalle()!.estudiantesDisponiblesSalon === 0"
-								[pTooltip]="detalle()!.estudiantesDisponiblesSalon === 0
+								[eduTooltip]="detalle()!.estudiantesDisponiblesSalon === 0
 									? 'No hay estudiantes matriculados en este salón'
 									: 'Asignar todos los estudiantes del salón'"
-								tooltipPosition="top"
-							></button>
+								eduTooltipPosition="top"
+							/>
 						</div>
 					}
 				</div>
@@ -312,20 +317,23 @@
 									<small>DNI: {{ estudiante.dni }}</small>
 								</div>
 								@if (isAdmin()) {
-									<button
-										pButton
+									<edu-button
 										icon="pi pi-times"
-										class="p-button-rounded p-button-text p-button-danger p-button-sm student-remove-btn"
+										[text]="true"
+										[rounded]="true"
+										size="small"
+										severity="danger"
+										class="student-remove-btn"
 										data-info-anchor="admin-schedules-detail-desasignar-estudiante-btn"
 										(click)="onDesasignarEstudiante(estudiante.id)"
-										pTooltip="Quitar estudiante"
-										tooltipPosition="left"
+										eduTooltip="Quitar estudiante"
+										eduTooltipPosition="left"
 										[pt]="{
 											root: {
 												'aria-label': 'Quitar estudiante',
 											},
 										}"
-									></button>
+									/>
 								}
 							</div>
 						}
@@ -374,17 +382,16 @@
 		</div>
 	}
 
-	<ng-template pTemplate="footer">
-		<button
-			pButton
+	<ng-template #footer>
+		<edu-button
 			label="Cerrar"
 			icon="pi pi-times"
-			class="p-button-text"
+			[text]="true"
 			data-info-anchor="cerrar-drawer-btn"
 			(click)="onClose()"
-			pTooltip="Cerrar panel de detalles"
-			tooltipPosition="top"
-		></button>
+			eduTooltip="Cerrar panel de detalles"
+			eduTooltipPosition="top"
+		/>
 	</ng-template>
-</p-drawer>
+</edu-drawer>
 <!-- #endregion -->

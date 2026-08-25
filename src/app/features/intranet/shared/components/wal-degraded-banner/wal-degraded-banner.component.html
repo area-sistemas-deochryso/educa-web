@@ -32,14 +32,15 @@
 		</div>
 		<div class="wal-degraded-banner__actions">
 			@if (vm().bannerMessage === 'circuit-open') {
-				<button
-					pButton
+				<edu-button
 					label="Reintentar ahora"
 					icon="pi pi-refresh"
-					class="p-button-warning p-button-sm p-button-outlined"
+					[outlined]="true"
+					size="small"
+					severity="warn"
 					[loading]="retrying()"
 					(click)="onForceRetry()"
-				></button>
+				/>
 			}
 		</div>
 	</div>

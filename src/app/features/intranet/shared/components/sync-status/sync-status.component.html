@@ -4,21 +4,21 @@
 		type="button"
 		class="sync-indicator"
 		[class]="indicatorClass()"
-		[pTooltip]="tooltipText()"
-		tooltipPosition="left"
+		[eduTooltip]="tooltipText()"
+		eduTooltipPosition="left"
 		(click)="openDrawer()"
 		[attr.aria-label]="tooltipText()"
 	>
 		<i [class]="indicatorIcon()"></i>
 		@if (badgeCount() > 0) {
-			<p-badge [value]="'' + badgeCount()" severity="danger" />
+			<edu-badge [value]="'' + badgeCount()" severity="danger" />
 		}
 	</button>
 }
 <!-- #endregion -->
 
 <!-- #region Drawer -->
-<p-drawer
+<edu-drawer
 	[visible]="drawerVisible()"
 	(visibleChange)="onDrawerVisibleChange($event)"
 	position="right"
@@ -38,20 +38,21 @@
 				{{ vm().failedCount }} operacion(es) fallida(s)
 			</span>
 			<div class="batch-buttons">
-				<button
-					pButton
+				<edu-button
 					icon="pi pi-refresh"
 					label="Reintentar todo"
-					class="p-button-sm p-button-outlined"
+					[outlined]="true"
+					size="small"
 					(click)="retryAll()"
-				></button>
-				<button
-					pButton
+				/>
+				<edu-button
 					icon="pi pi-trash"
 					label="Descartar todo"
-					class="p-button-sm p-button-outlined p-button-danger"
+					[outlined]="true"
+					size="small"
+					severity="danger"
 					(click)="discardAll()"
-				></button>
+				/>
 			</div>
 		</div>
 	}
@@ -73,28 +74,31 @@
 						}
 					</div>
 					<div class="entry-actions">
-						<button
-							pButton
+						<edu-button
 							icon="pi pi-refresh"
-							class="p-button-sm p-button-rounded p-button-text"
+							[text]="true"
+							[rounded]="true"
+							size="small"
 							(click)="retryEntry(entry.id)"
 							[pt]="{
 								root: {
 									'aria-label': 'Reintentar',
 								},
 							}"
-						></button>
-						<button
-							pButton
+						/>
+						<edu-button
 							icon="pi pi-times"
-							class="p-button-sm p-button-rounded p-button-text p-button-danger"
+							[text]="true"
+							[rounded]="true"
+							size="small"
+							severity="danger"
 							(click)="discardEntry(entry.id)"
 							[pt]="{
 								root: {
 									'aria-label': 'Descartar',
 								},
 							}"
-						></button>
+						/>
 					</div>
 				</div>
 			}
@@ -116,5 +120,5 @@
 			</div>
 		}
 	}
-</p-drawer>
+</edu-drawer>
 <!-- #endregion -->

@@ -1,20 +1,16 @@
 import { Component, ChangeDetectionStrategy, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
-import { AccordionModule } from 'primeng/accordion';
-import { TooltipModule } from 'primeng/tooltip';
-import { ConfirmationService } from 'primeng/api';
 import { CursoContenidoDataFacade } from '../../services/curso-contenido-data.facade';
 import { CursoContenidoCrudFacade } from '../../services/curso-contenido-crud.facade';
 import { CursoContenidoUiFacade } from '../../services/curso-contenido-ui.facade';
 import { CursoContenidoSemanaDto, CursoContenidoTareaDto } from '@features/intranet/pages/profesor/models';
 import { FormatFileSizePipe } from '@intranet-shared/pipes';
-
+import { EduAccordion, EduAccordionHeader, EduAccordionPanel, EduButton, EduConfirmationService, EduTooltip } from '@edu-ui';
 @Component({
 	selector: 'app-semanas-accordion',
 	standalone: true,
-	imports: [CommonModule, FormsModule, ButtonModule, AccordionModule, TooltipModule, FormatFileSizePipe],
+	imports: [CommonModule, FormsModule, EduButton, EduAccordion, EduAccordionHeader, EduAccordionPanel, EduTooltip, FormatFileSizePipe],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './semanas-accordion.component.html',
 	styleUrl: './semanas-accordion.component.scss',
@@ -24,7 +20,7 @@ export class SemanasAccordionComponent {
 	private readonly dataFacade = inject(CursoContenidoDataFacade);
 	private readonly crudFacade = inject(CursoContenidoCrudFacade);
 	private readonly uiFacade = inject(CursoContenidoUiFacade);
-	private readonly confirmationService = inject(ConfirmationService);
+	private readonly confirmationService = inject(EduConfirmationService);
 	// #endregion
 
 	// #region Estado del facade
@@ -34,6 +30,16 @@ export class SemanasAccordionComponent {
 	// #region Estado local
 	readonly searchQuery = signal('');
 	readonly openPanels = signal<number[]>([]);
+	// #endregion
+
+	// #region Accordion value bridge
+	// edu-accordion's [value] is string-based (no numeric convention) — semana ids are
+	// numeric, so this bridges the two at the template boundary only.
+	readonly openPanelsStr = computed(() => this.openPanels().map((v) => v.toString()));
+
+	onOpenPanelsChangeStr(values: string[]): void {
+		this.openPanels.set(values.map((v) => Number(v)));
+	}
 	// #endregion
 
 	// #region Computed

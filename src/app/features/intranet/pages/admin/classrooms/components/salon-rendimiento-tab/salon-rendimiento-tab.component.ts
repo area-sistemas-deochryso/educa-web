@@ -2,12 +2,8 @@ import { Component, ChangeDetectionStrategy, input, output, computed, signal } f
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { TableModule } from 'primeng/table';
-import { SelectModule } from 'primeng/select';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
-
 import { HorarioResponseDto, ReporteRendimientoEstudiantesDto, RendimientoEstudianteDto } from '@data/models';
+import { EduSelect, EduTable, EduTag, EduTooltip } from '@edu-ui';
 
 /** Nota mínima de deterioro para marcar a un estudiante "en riesgo" en su período más reciente */
 const UMBRAL_RIESGO = 0;
@@ -15,7 +11,7 @@ const UMBRAL_RIESGO = 0;
 @Component({
 	selector: 'app-classroom-rendimiento-tab',
 	standalone: true,
-	imports: [CommonModule, FormsModule, TableModule, SelectModule, TagModule, TooltipModule],
+	imports: [CommonModule, FormsModule, EduTable, EduSelect, EduTag, EduTooltip],
 	templateUrl: './salon-rendimiento-tab.component.html',
 	styleUrl: './salon-rendimiento-tab.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

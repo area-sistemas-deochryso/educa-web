@@ -1,23 +1,19 @@
 import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TableModule } from 'primeng/table';
-import { ButtonModule } from 'primeng/button';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
-import { SkeletonModule } from 'primeng/skeleton';
 
 import { HealthExitPermissionDto } from '@features/intranet/pages/profesor/models';
+import { EduButton, EduSkeleton, EduTable, EduTag, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-health-exit-list',
 	standalone: true,
-	imports: [CommonModule, TableModule, ButtonModule, TagModule, TooltipModule, SkeletonModule],
+	imports: [CommonModule, EduTable, EduButton, EduTag, EduTooltip, EduSkeleton],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
 		@if (loading()) {
 			<div class="skeleton-container">
 				@for (i of skeletonRows; track $index) {
-					<p-skeleton height="2.5rem" styleClass="mb-2" />
+					<edu-skeleton height="2.5rem" styleClass="mb-2" />
 				}
 			</div>
 		} @else if (permisos().length === 0) {
@@ -26,7 +22,7 @@ import { HealthExitPermissionDto } from '@features/intranet/pages/profesor/model
 				<span>No hay permisos de salida registrados</span>
 			</div>
 		} @else {
-			<p-table [value]="permisos()" [rows]="5" [paginator]="permisos().length > 5" styleClass="p-datatable-sm">
+			<edu-table [value]="permisos()" [rows]="5" [paginator]="permisos().length > 5" styleClass="p-datatable-sm">
 				<ng-template #header>
 					<tr>
 						<th>Estudiante</th>
@@ -43,25 +39,27 @@ import { HealthExitPermissionDto } from '@features/intranet/pages/profesor/model
 						<td>{{ p.horaSalida }}</td>
 						<td>
 							<span
-								[pTooltip]="p.sintomaDetalle || ''"
-								tooltipPosition="top"
+								[eduTooltip]="p.sintomaDetalle || ''"
+								eduTooltipPosition="top"
 							>{{ p.sintomasDisplay }}</span>
 						</td>
 						<td>
-							<button
-								pButton
+							<edu-button
 								icon="pi pi-times"
-								class="p-button-rounded p-button-text p-button-danger p-button-sm"
+								[rounded]="true"
+								[text]="true"
+								severity="danger"
+								size="small"
 								data-info-anchor="profesor-health-anular-permiso"
 								(click)="anular.emit(p.id)"
-								pTooltip="Anular permiso"
-								tooltipPosition="top"
+								eduTooltip="Anular permiso"
+								eduTooltipPosition="top"
 								[pt]="{ root: { 'aria-label': 'Anular permiso' } }"
-							></button>
+							/>
 						</td>
 					</tr>
 				</ng-template>
-			</p-table>
+			</edu-table>
 		}
 	`,
 	styles: [
@@ -90,8 +88,7 @@ import { HealthExitPermissionDto } from '@features/intranet/pages/profesor/model
 				.p-datatable-tbody > tr > td { background: transparent; }
 				.p-paginator { background: transparent; }
 			}
-		`,
-	],
+		`],
 })
 export class HealthExitListComponent {
 	readonly permisos = input<HealthExitPermissionDto[]>([]);

@@ -1,12 +1,13 @@
 import { Component, ChangeDetectionStrategy, input, output, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DialogModule } from 'primeng/dialog';
+
 import { CursoContenidoSemanaDto } from '@features/intranet/pages/profesor/models';
+import { EduDialog } from '@edu-ui';
 
 @Component({
 	selector: 'app-tareas-summary-dialog',
 	standalone: true,
-	imports: [CommonModule, DialogModule],
+	imports: [CommonModule, EduDialog],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './tareas-summary-dialog.component.html',
 	styleUrl: './tareas-summary-dialog.component.scss',

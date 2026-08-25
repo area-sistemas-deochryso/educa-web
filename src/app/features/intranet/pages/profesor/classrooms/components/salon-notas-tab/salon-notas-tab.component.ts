@@ -1,14 +1,10 @@
 import { Component, ChangeDetectionStrategy, computed, input, output } from '@angular/core';
 import { CommonModule, SlicePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
-import { Select } from 'primeng/select';
+
 import { FormsModule } from '@angular/forms';
-import { SelectButtonModule } from 'primeng/selectbutton';
-import { SkeletonModule } from 'primeng/skeleton';
-import { ButtonModule } from 'primeng/button';
-import { TooltipModule } from 'primeng/tooltip';
+
+
 import {
 	SalonNotasResumenDto,
 	CalificacionDto,
@@ -24,6 +20,7 @@ import {
 } from '@intranet-shared/services/calificacion-config';
 import type { ConfiguracionCalificacionListDto } from '@data/models';
 import { ErrorStateComponent } from '@shared/components';
+import { EduButton, EduSelect, EduSelectButton, EduSkeleton, EduTable, EduTag, EduTooltip } from '@edu-ui';
 
 interface PeriodoColumnsGroup {
 	periodo: PeriodoCalificacionDto;
@@ -40,20 +37,7 @@ interface SemanaColumnsGroup {
 @Component({
 	selector: 'app-classroom-grades-tab',
 	standalone: true,
-	imports: [
-		CommonModule,
-		SlicePipe,
-		RouterLink,
-		TableModule,
-		TagModule,
-		Select,
-		FormsModule,
-		SelectButtonModule,
-		SkeletonModule,
-		ButtonModule,
-		TooltipModule,
-		ErrorStateComponent,
-	],
+	imports: [CommonModule, SlicePipe, RouterLink, EduTable, EduTag, EduSelect, FormsModule, EduSelectButton, EduSkeleton, EduButton, EduTooltip, ErrorStateComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './salon-notas-tab.component.html',
 	styleUrl: './salon-notas-tab.component.scss',
@@ -80,8 +64,7 @@ export class ClassroomGradesTabComponent {
 	readonly vistaOptions = [
 		{ label: 'Semana', value: 'semana' },
 		{ label: 'Periodo', value: 'periodo' },
-		{ label: 'Año', value: 'anual' },
-	];
+		{ label: 'Año', value: 'anual' }];
 	// #endregion
 
 	// #region Computed

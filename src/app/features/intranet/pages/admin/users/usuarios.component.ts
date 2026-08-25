@@ -3,10 +3,8 @@
 import { AfterViewInit, ChangeDetectionStrategy, Component, DestroyRef, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ConfirmationService } from 'primeng/api';
+
 import {
 	UsersCrudFacade,
 	UsersDataFacade,
@@ -53,29 +51,15 @@ import {
 	findAutoOpenMatch,
 	readAutoOpenQueryParams,
 } from './helpers/auto-open-from-query.helper';
+import { EduConfirmDialog, EduConfirmationService, EduTab } from '@edu-ui';
 
 // #endregion
 // #region Implementation
 @Component({
 	selector: 'app-users',
 	standalone: true,
-	imports: [
-		ButtonModule,
-		CommonModule,
-		ConfirmDialogModule,
-		UsersHeaderComponent,
-		UsersStatsComponent,
-		UsersStatsSkeletonComponent,
-		UsersFiltersComponent,
-		UsersTableComponent,
-		UsersTableSkeletonComponent,
-		UserFormDialogComponent,
-		UsersImportDialogComponent,
-		UsersValidationDialogComponent,
-		UserDetailDrawerComponent,
-		ErrorStateComponent,
-	],
-	providers: [ConfirmationService],
+	imports: [CommonModule, EduConfirmDialog, UsersHeaderComponent, UsersStatsComponent, UsersStatsSkeletonComponent, UsersFiltersComponent, UsersTableComponent, UsersTableSkeletonComponent, UserFormDialogComponent, UsersImportDialogComponent, UsersValidationDialogComponent, UserDetailDrawerComponent, ErrorStateComponent, EduTab],
+	providers: [EduConfirmationService],
 	templateUrl: './usuarios.component.html',
 	styleUrl: './usuarios.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -84,7 +68,7 @@ export class UsersComponent implements AfterViewInit {
 	protected dataFacade = inject(UsersDataFacade);
 	private crudFacade = inject(UsersCrudFacade);
 	private uiFacade = inject(UsersUiFacade);
-	private confirmationService = inject(ConfirmationService);
+	private confirmationService = inject(EduConfirmationService);
 	private usuariosApi = inject(UsersService);
 	private excelService = inject(ExcelService);
 	private destroyRef = inject(DestroyRef);
@@ -112,8 +96,7 @@ export class UsersComponent implements AfterViewInit {
 	readonly filterOptions: FilterOptions = {
 		estadoOptions: withAllOption([
 			{ label: 'Activos', value: true },
-			{ label: 'Inactivos', value: false },
-		]),
+			{ label: 'Inactivos', value: false }]),
 	};
 
 	readonly formData = computed<UsuarioFormData>(() => this.vm().formData as UsuarioFormData);
@@ -160,7 +143,7 @@ export class UsersComponent implements AfterViewInit {
 		this.fixConfirmDialogAria('Confirmación');
 	}
 
-	// #region Tab + Data & Filter handlers
+	// #region EduTab + Data & Filter handlers
 	onTabChange(tab: RoleTab): void {
 		this.dataFacade.setActiveTab(tab);
 		this.router.navigate([], {
@@ -313,8 +296,7 @@ export class UsersComponent implements AfterViewInit {
 				{ header: 'DNI', key: 'dni', width: 15 },
 				{ header: 'Contraseña', key: 'contrasena', width: 20 },
 				{ header: 'Grado', key: 'grado', width: 20 },
-				{ header: 'Sección', key: 'seccion', width: 12 },
-			],
+				{ header: 'Sección', key: 'seccion', width: 12 }],
 			data: credenciales.map((c) => ({
 				nombreCompleto: c.nombreCompleto,
 				dni: c.dni,

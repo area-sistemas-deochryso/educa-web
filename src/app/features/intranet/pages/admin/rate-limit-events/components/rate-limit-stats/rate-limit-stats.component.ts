@@ -1,15 +1,15 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TooltipModule } from 'primeng/tooltip';
 
 import { KpiStatsComponent, type KpiStatItem } from '@intranet-shared/components';
 
 import { RateLimitStats } from '../../models';
+import { EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-rate-limit-stats',
 	standalone: true,
-	imports: [CommonModule, TooltipModule, KpiStatsComponent],
+	imports: [CommonModule, EduTooltip, KpiStatsComponent],
 	templateUrl: './rate-limit-stats.component.html',
 	styleUrl: './rate-limit-stats.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

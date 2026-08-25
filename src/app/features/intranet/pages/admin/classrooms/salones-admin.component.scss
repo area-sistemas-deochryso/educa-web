@@ -5,27 +5,6 @@
 }
 // #endregion
 
-// #region PrimeNG overrides
-:host ::ng-deep {
-	.p-tabs,
-	.p-tablist,
-	.p-tabpanels,
-	.p-paginator {
-		background: transparent;
-	}
-
-	.p-datatable-scrollable > .p-datatable-table-container > .p-datatable-scrollable-table > .p-datatable-thead,
-	.p-datatable-scrollable > .p-datatable-table > .p-datatable-thead {
-		background: transparent;
-	}
-
-	.p-inputnumber,
-	.p-inputnumber .p-inputnumber-input {
-		max-width: 100px;
-	}
-}
-// #endregion
-
 // #region Stats
 .stats-row {
 	display: flex;

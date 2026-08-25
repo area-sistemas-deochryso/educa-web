@@ -1,9 +1,5 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
-import { BadgeModule } from 'primeng/badge';
-import { ConfirmationService } from 'primeng/api';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { Tab, TabList, TabPanel, Tabs } from 'primeng/tabs';
 
 import { PageHeaderComponent } from '@intranet-shared/components/page-header';
 
@@ -14,33 +10,20 @@ import { SlowRequestsTableComponent } from './components/slow-requests-table/slo
 import { ThresholdConfigComponent } from './components/threshold-config/threshold-config.component';
 import { HistoryTimeRange, ThresholdConfig } from './models/runtime-health.models';
 import { RuntimeHealthFacade } from './services/runtime-health.facade';
+import { EduBadge, EduConfirmDialog, EduConfirmationService, EduTab, EduTabPanel, EduTabs } from '@edu-ui';
 
 @Component({
 	selector: 'app-runtime-health-page',
 	standalone: true,
-	imports: [
-		DecimalPipe,
-		BadgeModule,
-		ConfirmDialogModule,
-		Tabs,
-		TabList,
-		Tab,
-		TabPanel,
-		PageHeaderComponent,
-		RuntimeHealthWidgetComponent,
-		RuntimeHealthHistoryComponent,
-		AlertTimelineComponent,
-		SlowRequestsTableComponent,
-		ThresholdConfigComponent,
-	],
+	imports: [DecimalPipe, EduBadge, EduConfirmDialog, EduTabs, EduTab, EduTabPanel, PageHeaderComponent, RuntimeHealthWidgetComponent, RuntimeHealthHistoryComponent, AlertTimelineComponent, SlowRequestsTableComponent, ThresholdConfigComponent],
 	templateUrl: './runtime-health.component.html',
 	styleUrl: './runtime-health.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	providers: [ConfirmationService],
+	providers: [EduConfirmationService],
 })
 export class RuntimeHealthPageComponent implements OnInit {
 	private readonly facade = inject(RuntimeHealthFacade);
-	private readonly confirmationService = inject(ConfirmationService);
+	private readonly confirmationService = inject(EduConfirmationService);
 
 	readonly vm = this.facade.vm;
 	readonly historyVm = this.facade.historyVm;

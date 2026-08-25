@@ -1,11 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { TableLazyLoadEvent, TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
-import { ButtonModule } from 'primeng/button';
-import { TooltipModule } from 'primeng/tooltip';
-
 import {
 	EMAIL_OUTBOX_TIPO_LABELS,
 	EmailOutboxLista,
@@ -17,21 +12,23 @@ import { CorrelationIdPillComponent } from '@intranet-shared/components';
 import { esPermanente } from '../../models/tipo-fallo.models';
 import { TipoFalloLabelPipe } from '@features/intranet/pages/admin/email-outbox-shared';
 import { TipoFalloSeverityPipe } from '../../pipes/tipo-fallo-severity.pipe';
+import { EduButton, EduTable, EduTag, EduTemplate, EduTooltip } from '@edu-ui';
+import type { EduTableLazyLoadEvent } from '@edu-ui';
 
 @Component({
 	selector: 'app-email-outbox-table',
 	standalone: true,
 	imports: [
-		TableModule,
-		TagModule,
-		ButtonModule,
-		TooltipModule,
+		EduTable,
+		EduTag,
+		EduButton,
+		EduTooltip,
+		EduTemplate,
 		DatePipe,
 		RouterLink,
 		TipoFalloLabelPipe,
 		TipoFalloSeverityPipe,
-		CorrelationIdPillComponent,
-	],
+		CorrelationIdPillComponent],
 	templateUrl: './email-outbox-table.component.html',
 	styleUrl: './email-outbox-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -58,7 +55,7 @@ export class EmailOutboxTableComponent {
 	// #endregion
 
 	// #region Handlers
-	onLazyLoad(event: TableLazyLoadEvent): void {
+	onLazyLoad(event: EduTableLazyLoadEvent): void {
 		const first = event.first ?? 0;
 		const rows = event.rows ?? this.pageSize();
 		const nextPage = Math.floor(first / rows) + 1;
@@ -76,8 +73,7 @@ export class EmailOutboxTableComponent {
 		{ width: '80px', cellType: 'text' },
 		{ width: '130px', cellType: 'text' },
 		{ width: '110px', cellType: 'badge' },
-		{ width: '100px', cellType: 'actions' },
-	];
+		{ width: '100px', cellType: 'actions' }];
 	// #endregion
 
 	// #region Helpers

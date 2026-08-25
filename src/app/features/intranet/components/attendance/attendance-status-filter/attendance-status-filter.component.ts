@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, input, model } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { TooltipModule } from 'primeng/tooltip';
-import { InputTextModule } from 'primeng/inputtext';
+
 import { EstadisticasAsistenciaDia } from '@data/models';
 import { AttendanceStatus } from '@features/intranet/pages/cross-role/attendance-component/models/attendance.types';
 import { getStatusClass } from '@features/intranet/pages/cross-role/attendance-component/config/attendance.constants';
+import { EduInputText, EduTooltip } from '@edu-ui';
 
 export interface StatusFilterState {
 	searchTerm: string;
@@ -20,7 +20,7 @@ interface StatusChip {
 @Component({
 	selector: 'app-attendance-status-filter',
 	standalone: true,
-	imports: [FormsModule, TooltipModule, InputTextModule],
+	imports: [FormsModule, EduTooltip, EduInputText],
 	templateUrl: './attendance-status-filter.component.html',
 	styleUrl: './attendance-status-filter.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

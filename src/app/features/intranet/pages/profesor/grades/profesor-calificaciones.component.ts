@@ -10,8 +10,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ConfirmationService } from 'primeng/api';
+
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { logger, withRetry } from '@core/helpers';
 import { PageHeaderComponent, PickerGridComponent } from '@intranet-shared/components';
@@ -30,6 +29,7 @@ import {
 	CambiarTipoCalificacionDto,
 	CursoContenidoDetalleDto,
 } from '../models';
+import { EduConfirmationService, EduConfirmDialog } from '@edu-ui';
 
 @Component({
 	selector: 'app-teacher-grades',
@@ -37,7 +37,7 @@ import {
 	imports: [
 		CommonModule,
 		FormsModule,
-		ConfirmDialogModule,
+		EduConfirmDialog,
 		PageHeaderComponent,
 		PickerGridComponent,
 		SkeletonLoaderComponent,
@@ -46,7 +46,7 @@ import {
 		EvaluacionFormDialogComponent,
 		PeriodosConfigDialogComponent,
 	],
-	providers: [ConfirmationService],
+	providers: [EduConfirmationService],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './profesor-calificaciones.component.html',
 	styleUrl: './profesor-calificaciones.component.scss',
@@ -55,7 +55,7 @@ export class TeacherGradesComponent implements OnInit, OnDestroy {
 	// #region Dependencias
 	private readonly facade = inject(ProfesorFacade);
 	readonly calFacade = inject(CalificacionesFacade);
-	private readonly confirmationService = inject(ConfirmationService);
+	private readonly confirmationService = inject(EduConfirmationService);
 	private readonly destroyRef = inject(DestroyRef);
 	// #endregion
 

@@ -32,23 +32,12 @@ import { generatePassword } from '@core/helpers';
 import { rolRequiereSalon, rolPermiteEsTutor, canEditPassword } from '@shared/models';
 import { RolService } from '@core/services/roles';
 
-import { ButtonModule } from 'primeng/button';
-import { Checkbox } from 'primeng/checkbox';
 import { CommonModule } from '@angular/common';
-import { DatePickerModule } from 'primeng/datepicker';
-import { DialogModule } from 'primeng/dialog';
 import { FormFieldErrorComponent } from '@intranet-shared/components';
 import { FormsModule } from '@angular/forms';
-import { InputTextModule } from 'primeng/inputtext';
-import { MultiSelectModule } from 'primeng/multiselect';
-import { PasswordModule } from 'primeng/password';
-import { SelectModule } from 'primeng/select';
-import { Tab, TabList, TabPanel, Tabs } from 'primeng/tabs';
-import { TableModule } from 'primeng/table';
-import { TooltipModule } from 'primeng/tooltip';
-import { ToggleSwitch } from 'primeng/toggleswitch';
 import { UppercaseInputDirective } from '@intranet-shared/directives';
 import { EstadoLabelPipe } from '@intranet-shared/pipes';
+import { EduButton, EduCheckbox, EduDialog, EduInputText, EduMultiSelect, EduPassword, EduSelect, EduTab, EduTabPanel, EduTabs, EduToggle, EduTooltip } from '@edu-ui';
 
 export type UsuarioFormData = Partial<CrearUsuarioRequest & ActualizarUsuarioRequest>;
 
@@ -70,23 +59,20 @@ export interface FormValidationErrors {
 	imports: [
 		CommonModule,
 		FormsModule,
-		DialogModule,
-		ButtonModule,
-		InputTextModule,
-		MultiSelectModule,
-		SelectModule,
-		Tabs, TabList, Tab, TabPanel,
+		EduDialog,
+		EduButton,
+		EduInputText,
+		EduMultiSelect,
+		EduSelect,
+		EduTabs, EduTab, EduTabPanel,
 		ModoAsignacionBadgeComponent,
-		TooltipModule,
-		ToggleSwitch,
-		PasswordModule,
-		DatePickerModule,
+		EduTooltip,
+		EduToggle,
+		EduPassword,
 		FormFieldErrorComponent,
-		TableModule,
 		UppercaseInputDirective,
-		Checkbox,
-		EstadoLabelPipe,
-	],
+		EduCheckbox,
+		EstadoLabelPipe],
 	templateUrl: './usuario-form-dialog.component.html',
 	styleUrl: './usuario-form-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

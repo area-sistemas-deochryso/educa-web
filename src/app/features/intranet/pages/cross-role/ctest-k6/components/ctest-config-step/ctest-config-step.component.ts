@@ -1,27 +1,15 @@
 import { Component, ChangeDetectionStrategy, inject, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { InputNumberModule } from 'primeng/inputnumber';
-import { SelectModule } from 'primeng/select';
-import { TooltipModule } from 'primeng/tooltip';
-
 import { CTestK6Facade } from '../../services/ctest-k6.facade';
 import { TEST_TYPE_OPTIONS, BASE_URL_OPTIONS } from '../../models';
 import { TestType } from '../../models';
+import { EduButton, EduInputNumber, EduInputText, EduSelect, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-ctest-config-step',
 	standalone: true,
-	imports: [
-		FormsModule,
-		ButtonModule,
-		InputTextModule,
-		InputNumberModule,
-		SelectModule,
-		TooltipModule,
-	],
+	imports: [FormsModule, EduButton, EduInputText, EduInputNumber, EduSelect, EduTooltip],
 	templateUrl: './ctest-config-step.component.html',
 	styleUrl: './ctest-config-step.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

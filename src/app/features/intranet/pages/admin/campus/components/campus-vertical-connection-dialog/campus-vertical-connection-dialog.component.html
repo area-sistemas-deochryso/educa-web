@@ -1,4 +1,4 @@
-<p-dialog
+<edu-dialog
 	[visible]="visible()"
 	(visibleChange)="onVisibleChange($event)"
 	[modal]="true"
@@ -25,7 +25,7 @@
 				<i class="pi pi-th-large"></i>
 				Tipo de conexion
 			</label>
-			<p-select
+			<edu-select
 				id="verticalTipo"
 				[options]="typeOptions()"
 				[ngModel]="formData().tipo"
@@ -42,7 +42,7 @@
 				<i class="pi pi-building"></i>
 				Piso destino
 			</label>
-			<p-select
+			<edu-select
 				id="verticalDestPiso"
 				[options]="otherPisos()"
 				[ngModel]="formData().destPisoId"
@@ -67,7 +67,7 @@
 						Cargando nodos...
 					</div>
 				} @else {
-					<p-select
+					<edu-select
 						id="verticalDestNodo"
 						[options]="destPisoNodos()"
 						[ngModel]="formData().destNodoId"
@@ -78,13 +78,13 @@
 						placeholder="Selecciona un nodo"
 						data-info-anchor="admin-campus-vertical-form-dest-nodo-select"
 					>
-						<ng-template let-node pTemplate="item">
+						<ng-template #item let-node>
 							<span>{{ node.etiqueta || node.tipo }} ({{ node.x | number: '1.0-0' }}, {{ node.y | number: '1.0-0' }})</span>
 						</ng-template>
-						<ng-template let-node pTemplate="selectedItem">
+						<ng-template #selectedItem let-node>
 							<span>{{ node.etiqueta || node.tipo }}</span>
 						</ng-template>
-					</p-select>
+					</edu-select>
 				}
 			</div>
 		}
@@ -95,7 +95,7 @@
 					<i class="pi pi-arrow-up"></i>
 					Peso subida
 				</label>
-				<p-inputNumber
+				<edu-input-number
 					id="verticalPesoSubida"
 					[ngModel]="formData().pesoSubida"
 					(ngModelChange)="onPesoSubidaChange($event)"
@@ -111,7 +111,7 @@
 					<i class="pi pi-arrow-down"></i>
 					Peso bajada
 				</label>
-				<p-inputNumber
+				<edu-input-number
 					id="verticalPesoBajada"
 					[ngModel]="formData().pesoBajada"
 					(ngModelChange)="onPesoBajadaChange($event)"
@@ -129,7 +129,7 @@
 				<i class="pi pi-sort-alt"></i>
 				Bidireccional
 			</label>
-			<p-toggleSwitch
+			<edu-toggle
 				id="verticalBidireccional"
 				[ngModel]="formData().bidireccional"
 				(ngModelChange)="onBidireccionalChange($event)"
@@ -141,22 +141,21 @@
 
 	<!-- #region Footer -->
 	<div class="piso-dialog-footer">
-		<button
-			pButton
+		<edu-button
 			label="Cancelar"
-			class="p-button-text p-button-secondary"
+			[text]="true"
+			severity="secondary"
 			(click)="onCancel()"
 			data-info-anchor="admin-campus-vertical-form-cancelar-btn"
-		></button>
-		<button
-			pButton
+		/>
+		<edu-button
 			label="Crear conexion"
 			icon="pi pi-check"
 			(click)="onSave()"
 			[loading]="saving()"
 			[disabled]="!formData().destNodoId"
 			data-info-anchor="admin-campus-vertical-form-guardar-btn"
-		></button>
+		/>
 	</div>
 	<!-- #endregion -->
-</p-dialog>
+</edu-dialog>

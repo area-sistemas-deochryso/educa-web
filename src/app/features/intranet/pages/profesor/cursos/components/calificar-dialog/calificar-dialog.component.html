@@ -1,4 +1,4 @@
-<p-dialog
+<edu-dialog
 	[header]="dialogTitle()"
 	[visible]="visible()"
 	(visibleChange)="onVisibleChange($event)"
@@ -9,9 +9,9 @@
 	<!-- #region Header metadata -->
 	@if (calificacion(); as cal) {
 		<div class="calificar-metadata">
-			<p-tag [value]="cal.tipo" styleClass="tag-neutral" />
+			<edu-tag [value]="cal.tipo" styleClass="tag-neutral" />
 			@if (cal.esGrupal) {
-				<p-tag value="Grupal" severity="warn" icon="pi pi-users" />
+				<edu-tag value="Grupal" severity="warn" icon="pi pi-users" />
 			}
 			<span class="metadata-item">
 				<i class="pi pi-percentage"></i>
@@ -34,7 +34,7 @@
 		<span class="p-input-icon-left w-full">
 			<i class="pi pi-search"></i>
 			<input
-				pInputText
+				eduInputText
 				[ngModel]="searchQuery()"
 				(ngModelChange)="searchQuery.set($event)"
 				[placeholder]="isGrupal() ? 'Buscar grupo o miembro...' : 'Buscar por nombre...'"
@@ -66,19 +66,19 @@
 					Prom: {{ stats().promedio.toFixed(1) }}
 				</span>
 			}
-			<p-tag
+			<edu-tag
 				[value]="stats().aprobados + ' aprobados'"
 				severity="success"
 				[rounded]="true"
 			/>
-			<p-tag
+			<edu-tag
 				[value]="stats().desaprobados + ' desaprobados'"
 				severity="danger"
 				[rounded]="true"
 			/>
 		}
 		@if (stats().sinCalificar > 0) {
-			<p-tag
+			<edu-tag
 				[value]="stats().sinCalificar + ' sin nota'"
 				severity="secondary"
 				[rounded]="true"
@@ -90,7 +90,7 @@
 	<!-- #region Individual mode table -->
 	@if (!isGrupal()) {
 		@if (filteredRows().length > 0) {
-			<p-table
+			<edu-table
 				[value]="filteredRows()"
 					dataKey="estudianteId"
 				[scrollable]="true"
@@ -113,7 +113,7 @@
 							@if (row.esEditable) {
 								<div class="nota-cell">
 									@if (isLiteral()) {
-										<p-select
+										<edu-select
 											data-info-anchor="profesor-calificar-nota-select"
 											[ngModel]="getLiteralForNota(row.nota)"
 											(ngModelChange)="updateNotaLiteral(row.estudianteId, $event)"
@@ -123,7 +123,7 @@
 											[style]="{ width: '90px' }"
 										/>
 									} @else {
-										<p-inputNumber
+										<edu-input-number
 											[ngModel]="row.nota"
 											(ngModelChange)="updateNota(row.estudianteId, $event)"
 											[min]="NOTA_MINIMA"
@@ -136,7 +136,7 @@
 										/>
 									}
 									@if (row.nota !== null && row.nota !== undefined) {
-										<p-tag
+										<edu-tag
 											[value]="row.nota.toFixed(1)"
 											[severity]="getNotaSeverity(row.nota)"
 											styleClass="nota-severity-tag"
@@ -145,14 +145,14 @@
 								</div>
 							} @else {
 								<div class="nota-cell">
-									<p-tag
+									<edu-tag
 										[value]="row.nota !== null ? row.nota.toFixed(1) : '-'"
 										[severity]="getNotaSeverity(row.nota)"
 									/>
 									<i
 										class="pi pi-lock text-xs text-color-secondary"
-										pTooltip="No editable (+2 meses)"
-										tooltipPosition="top"
+										eduTooltip="No editable (+2 meses)"
+										eduTooltipPosition="top"
 									></i>
 								</div>
 							}
@@ -160,7 +160,7 @@
 						<td>
 							@if (row.esEditable) {
 								<input
-									pInputText
+									eduInputText
 									[ngModel]="row.observacion"
 									(ngModelChange)="updateObservacion(row.estudianteId, $event)"
 									placeholder="Opcional"
@@ -172,7 +172,7 @@
 						</td>
 					</tr>
 				</ng-template>
-			</p-table>
+			</edu-table>
 		} @else {
 			<div class="empty-state">
 				<i class="pi pi-search text-4xl text-color-secondary"></i>
@@ -201,7 +201,7 @@
 							</div>
 							<div class="grupo-nota-input">
 								@if (isLiteral()) {
-									<p-select
+									<edu-select
 										[ngModel]="getLiteralForNota(grupo.nota)"
 										data-info-anchor="profesor-calificar-nota-select"
 										(ngModelChange)="updateGrupoNotaLiteral(grupo.grupoId, $event)"
@@ -211,7 +211,7 @@
 										[style]="{ width: '90px' }"
 									/>
 								} @else {
-									<p-inputNumber
+									<edu-input-number
 										[ngModel]="grupo.nota"
 										(ngModelChange)="updateGrupoNota(grupo.grupoId, $event)"
 										[min]="NOTA_MINIMA"
@@ -225,7 +225,7 @@
 									/>
 								}
 								@if (grupo.nota !== null && grupo.nota !== undefined) {
-									<p-tag
+									<edu-tag
 										[value]="grupo.nota.toFixed(1)"
 										[severity]="getNotaSeverity(grupo.nota)"
 										styleClass="nota-severity-tag"
@@ -237,7 +237,7 @@
 						<!-- Observacion -->
 						<div class="grupo-observacion">
 							<input
-								pInputText
+								eduInputText
 								[ngModel]="grupo.observacion"
 								(ngModelChange)="updateGrupoObservacion(grupo.grupoId, $event)"
 								placeholder="Observación (opcional)"
@@ -256,7 +256,7 @@
 									<div class="miembro-actions">
 										@if (miembro.esOverride) {
 											@if (isLiteral()) {
-												<p-select
+												<edu-select
 													data-info-anchor="profesor-calificar-nota-select"
 													[ngModel]="getLiteralForNota(miembro.overrideNota)"
 													(ngModelChange)="updateMiembroOverrideLiteral(grupo.grupoId, miembro.estudianteId, $event)"
@@ -266,7 +266,7 @@
 													[style]="{ width: '80px', fontSize: '0.85rem' }"
 												/>
 											} @else {
-												<p-inputNumber
+												<edu-input-number
 													[ngModel]="miembro.overrideNota"
 													(ngModelChange)="updateMiembroOverride(grupo.grupoId, miembro.estudianteId, $event)"
 													[min]="NOTA_MINIMA"
@@ -279,23 +279,25 @@
 												/>
 											}
 											@if (miembro.overrideNota !== null) {
-												<p-tag
+												<edu-tag
 													[value]="miembro.overrideNota!.toFixed(1)"
 													[severity]="getNotaSeverity(miembro.overrideNota)"
 													styleClass="nota-severity-tag"
 												/>
 											}
 										} @else if (miembro.notaActual !== null) {
-											<p-tag
+											<edu-tag
 												[value]="miembro.notaActual!.toFixed(1)"
 												[severity]="getNotaSeverity(miembro.notaActual)"
 												styleClass="nota-severity-tag"
 											/>
 										}
-										<button
-											pButton
+										<edu-button
 											[icon]="miembro.esOverride ? 'pi pi-times' : 'pi pi-pencil'"
-											[class]="miembro.esOverride ? 'p-button-rounded p-button-text p-button-sm p-button-danger' : 'p-button-rounded p-button-text p-button-sm'"
+											[rounded]="true"
+											[text]="true"
+											size="small"
+											[severity]="miembro.esOverride ? 'danger' : 'primary'"
 											data-info-anchor="profesor-calificar-toggle-override"
 											(click)="toggleMiembroOverride(grupo.grupoId, miembro.estudianteId)"
 											[pt]="{
@@ -303,9 +305,9 @@
 													'aria-label': miembro.esOverride ? 'Quitar nota individual' : 'Nota individual',
 												},
 											}"
-											[pTooltip]="miembro.esOverride ? 'Quitar nota individual' : 'Asignar nota individual'"
-											tooltipPosition="top"
-										></button>
+											[eduTooltip]="miembro.esOverride ? 'Quitar nota individual' : 'Asignar nota individual'"
+											eduTooltipPosition="top"
+										/>
 									</div>
 								</div>
 							}
@@ -324,22 +326,20 @@
 
 	<ng-template #footer>
 		<div class="dialog-footer">
-			<button
-				pButton
+			<edu-button
 				label="Cancelar"
-				class="p-button-text"
+				[text]="true"
 				data-info-anchor="profesor-calificar-cancelar"
 				(click)="onVisibleChange(false)"
-			></button>
-			<button
-				pButton
+			/>
+			<edu-button
 				[label]="isGrupal() ? 'Guardar Notas Grupales' : 'Guardar Notas'"
 				icon="pi pi-check"
 				data-info-anchor="profesor-calificar-guardar"
 				[loading]="saving()"
 				[disabled]="!hasChanges()"
 				(click)="onSave()"
-			></button>
+			/>
 		</div>
 	</ng-template>
-</p-dialog>
+</edu-dialog>

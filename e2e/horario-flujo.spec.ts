@@ -33,8 +33,8 @@ async function login(page: Page): Promise<void> {
 	await page.getByPlaceholder('DNI').fill(ADMIN_DNI!);
 	await page.getByPlaceholder('Contraseña').fill(ADMIN_PASSWORD!);
 
-	// PrimeNG p-select role selector — click to open, then choose the "Administrador" option.
-	await page.locator('app-login-role-selector p-select').click();
+	// edu-select role selector — click to open, then choose the "Administrador" option.
+	await page.locator('app-login-role-selector edu-select').click();
 	await page.getByRole('option', { name: 'Administrador' }).click();
 
 	await page.getByRole('button', { name: /Iniciar sesión|Ingresar/i }).click();
@@ -84,9 +84,9 @@ test.describe('Curso -> Horario -> Salon (happy path)', () => {
 		await horaFin.press('Home');
 		await horaFin.pressSequentially('0500PM', { delay: 150 });
 
-		// Salon: open the filterable p-select and take the first available option.
+		// Salon: open the filterable edu-select and take the first available option.
 		await dialog.locator('#salon').click();
-		const salonOption = page.locator('.p-select-overlay .p-select-option').first();
+		const salonOption = page.locator('.edu-select-panel .edu-select-panel__option').first();
 		await expect(salonOption).toBeVisible();
 		const salonLabel = (await salonOption.locator('.font-semibold').textContent())?.trim();
 		await salonOption.click();
@@ -126,7 +126,7 @@ test.describe('Curso -> Horario -> Salon (happy path)', () => {
 		await page.locator('a[href="/intranet/admin/salones"]').first().click();
 		await expect(page).toHaveURL(/\/intranet\/admin\/salones/);
 		// The salones table splits grado/sección/sede into separate cells — salonLabel's
-		// " - Sede X" formatting (from the horario dialog's p-select) has no literal match
+		// " - Sede X" formatting (from the horario dialog's edu-select) has no literal match
 		// in the row's concatenated text, so match on the grado+sección prefix only.
 		const salonRowText = salonLabel!.split(' - ')[0];
 		const salonRow = page.getByRole('row', { name: new RegExp(salonRowText) }).first();

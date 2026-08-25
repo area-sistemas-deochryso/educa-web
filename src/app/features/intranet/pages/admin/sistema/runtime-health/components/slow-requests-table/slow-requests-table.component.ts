@@ -5,16 +5,13 @@ import {
 	input,
 	output,
 } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
-import { TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
-
 import { SlowRequestEntry } from '../../models/runtime-health.models';
+import { EduButton, EduTable, EduTag } from '@edu-ui';
 
 @Component({
 	selector: 'app-slow-requests-table',
 	standalone: true,
-	imports: [DecimalPipe, ButtonModule, TableModule, TagModule],
+	imports: [DecimalPipe, EduButton, EduTable, EduTag],
 	templateUrl: './slow-requests-table.component.html',
 	styleUrl: './slow-requests-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

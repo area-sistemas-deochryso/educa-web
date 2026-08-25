@@ -7,21 +7,6 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { ButtonModule } from 'primeng/button';
-import { CheckboxModule } from 'primeng/checkbox';
-import { ConfirmationService } from 'primeng/api';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { DialogModule } from 'primeng/dialog';
-import { IconFieldModule } from 'primeng/iconfield';
-import { InputIconModule } from 'primeng/inputicon';
-import { InputNumberModule } from 'primeng/inputnumber';
-import { InputTextModule } from 'primeng/inputtext';
-import { PaginatorModule, PaginatorState } from 'primeng/paginator';
-import { SelectModule } from 'primeng/select';
-import { TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
-
 import { ErrorGroupsViewMode, StorageService } from '@core/services/storage';
 import { PageHeaderComponent, KpiStatsComponent, type KpiStatItem } from '@intranet-shared/components';
 import { TableSkeletonComponent } from '@intranet-shared/components/table-skeleton';
@@ -64,6 +49,8 @@ import {
 	ErrorGroupsStore,
 	ErrorGroupsUiFacade,
 } from './services';
+import { EduButton, EduCheckbox, EduConfirmDialog, EduConfirmationService, EduDialog, EduIconField, EduInputIcon, EduInputNumber, EduInputText, EduPaginator, EduSelect, EduTable, EduTag, EduTooltip } from '@edu-ui';
+import type { EduPaginatorPageEvent } from '@edu-ui';
 
 /**
  * Umbral de la vista condicional por defecto (brief 471, P68 F9). Con ≤40
@@ -76,40 +63,11 @@ const VIEW_MODE_VOLUME_THRESHOLD = 40;
 @Component({
 	selector: 'app-error-groups',
 	standalone: true,
-	imports: [
-		CommonModule,
-		DatePipe,
-		FormsModule,
-		ButtonModule,
-		CheckboxModule,
-		ConfirmDialogModule,
-		DialogModule,
-		IconFieldModule,
-		InputIconModule,
-		InputNumberModule,
-		InputTextModule,
-		PaginatorModule,
-		SelectModule,
-		TableModule,
-		TagModule,
-		TooltipModule,
-		ErrorOccurrenceTimelineComponent,
-		PageHeaderComponent,
-		KpiStatsComponent,
-		TableSkeletonComponent,
-		ErrorGroupDetailDrawerComponent,
-		ErrorOccurrenceDrawerComponent,
-		ChangeGroupStatusDialogComponent,
-		ErrorGroupsKanbanBoardComponent,
-		ErrorGroupsViewToggleComponent,
-		ErrorHeatmapComponent,
-		ErrorParetoChartComponent,
-		HubContextBannerComponent,
-	],
+	imports: [CommonModule, DatePipe, FormsModule, EduButton, EduCheckbox, EduConfirmDialog, EduDialog, EduIconField, EduInputIcon, EduInputNumber, EduInputText, EduPaginator, EduSelect, EduTable, EduTag, EduTooltip, ErrorOccurrenceTimelineComponent, PageHeaderComponent, KpiStatsComponent, TableSkeletonComponent, ErrorGroupDetailDrawerComponent, ErrorOccurrenceDrawerComponent, ChangeGroupStatusDialogComponent, ErrorGroupsKanbanBoardComponent, ErrorGroupsViewToggleComponent, ErrorHeatmapComponent, ErrorParetoChartComponent, HubContextBannerComponent],
 	templateUrl: './error-groups.component.html',
 	styleUrl: './error-groups.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	providers: [ConfirmationService],
+	providers: [EduConfirmationService],
 })
 export class ErrorGroupsComponent implements OnInit {
 	protected readonly store = inject(ErrorGroupsStore);
@@ -119,7 +77,7 @@ export class ErrorGroupsComponent implements OnInit {
 	private readonly route = inject(ActivatedRoute);
 	private readonly router = inject(Router);
 	private readonly destroyRef = inject(DestroyRef);
-	private readonly confirmationService = inject(ConfirmationService);
+	private readonly confirmationService = inject(EduConfirmationService);
 	private readonly storage = inject(StorageService);
 
 	readonly items = this.store.visibleItems;
@@ -130,8 +88,7 @@ export class ErrorGroupsComponent implements OnInit {
 			{ icon: 'pi pi-list', label: 'Total grupos (página)', value: s.total, sublabel: 'grupos visibles' },
 			{ icon: 'pi pi-times-circle', label: 'Critical', value: s.critical, sublabel: 'bugs urgentes', variant: 'critical' },
 			{ icon: 'pi pi-exclamation-triangle', label: 'Error', value: s.error, sublabel: 'errores estándar', variant: 'error' },
-			{ icon: 'pi pi-info-circle', label: 'Warning', value: s.warning, sublabel: 'avisos', variant: 'warning' },
-		];
+			{ icon: 'pi pi-info-circle', label: 'Warning', value: s.warning, sublabel: 'avisos', variant: 'warning' }];
 	});
 	readonly loading = this.store.loading;
 	readonly error = this.store.error;
@@ -419,7 +376,7 @@ export class ErrorGroupsComponent implements OnInit {
 		this.syncUrl();
 	}
 
-	onPageChange(event: PaginatorState): void {
+	onPageChange(event: EduPaginatorPageEvent): void {
 		const currentPageSize = this.pageSize();
 		const newPageSize = event.rows ?? currentPageSize;
 		const newPage = (event.page ?? 0) + 1;
@@ -553,7 +510,7 @@ export class ErrorGroupsComponent implements OnInit {
 	}
 	// #endregion
 
-	onEventPageChange(event: PaginatorState): void {
+	onEventPageChange(event: EduPaginatorPageEvent): void {
 		const currentPageSize = this.eventPageSize();
 		const newPageSize = event.rows ?? currentPageSize;
 		const newPage = (event.page ?? 0) + 1;

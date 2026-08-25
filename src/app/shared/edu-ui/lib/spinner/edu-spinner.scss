@@ -1,0 +1,43 @@
+.edu-spinner {
+	width: 2rem;
+	height: 2rem;
+	animation: edu-spinner-rotate 2s linear infinite;
+
+	&__circle {
+		stroke-dasharray: 1, 200;
+		stroke-dashoffset: 0;
+		stroke: var(--eduui-red-500);
+		animation:
+			edu-spinner-dash 1.5s ease-in-out infinite,
+			edu-spinner-color 6s ease-in-out infinite;
+	}
+}
+
+:host-context(.dark-mode) .edu-spinner__circle {
+	stroke: var(--eduui-red-400);
+	animation-name: edu-spinner-dash, edu-spinner-color-dark;
+}
+
+@keyframes edu-spinner-rotate {
+	100% { transform: rotate(360deg); }
+}
+
+@keyframes edu-spinner-dash {
+	0% { stroke-dasharray: 1, 200; stroke-dashoffset: 0; }
+	50% { stroke-dasharray: 89, 200; stroke-dashoffset: -35px; }
+	100% { stroke-dasharray: 89, 200; stroke-dashoffset: -124px; }
+}
+
+@keyframes edu-spinner-color {
+	100%, 0% { stroke: var(--eduui-red-500); }
+	40% { stroke: var(--eduui-blue-500); }
+	66% { stroke: var(--eduui-green-500); }
+	80%, 90% { stroke: var(--eduui-yellow-500); }
+}
+
+@keyframes edu-spinner-color-dark {
+	100%, 0% { stroke: var(--eduui-red-400); }
+	40% { stroke: var(--eduui-blue-400); }
+	66% { stroke: var(--eduui-green-400); }
+	80%, 90% { stroke: var(--eduui-yellow-400); }
+}

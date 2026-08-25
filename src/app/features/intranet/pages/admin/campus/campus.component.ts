@@ -1,11 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-import { ButtonModule } from 'primeng/button';
-import { SelectModule } from 'primeng/select';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
-
 import { ErrorStateComponent } from '@shared/components';
 import { PageHeaderComponent } from '@intranet-shared/components';
 import { CampusAdminFacade, CampusAdminUiFacade } from './services';
@@ -29,25 +24,12 @@ import {
 	VERTICAL_CONNECTION_TYPE_OPTIONS,
 	VerticalConnectionType,
 } from './models';
+import { EduButton, EduSelect, EduTag, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-campus-admin',
 	standalone: true,
-	imports: [
-		FormsModule,
-		ButtonModule,
-		SelectModule,
-		TagModule,
-		TooltipModule,
-		CampusPisosPanelComponent,
-		CampusEditorComponent,
-		CampusPisoDialogComponent,
-		CampusNodeDialogComponent,
-		CampusBloqueoDialogComponent,
-		CampusVerticalConnectionDialogComponent,
-		ErrorStateComponent,
-		PageHeaderComponent,
-	],
+	imports: [FormsModule, EduButton, EduSelect, EduTag, EduTooltip, CampusPisosPanelComponent, CampusEditorComponent, CampusPisoDialogComponent, CampusNodeDialogComponent, CampusBloqueoDialogComponent, CampusVerticalConnectionDialogComponent, ErrorStateComponent, PageHeaderComponent],
 	templateUrl: './campus.component.html',
 	styleUrl: './campus.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -105,8 +87,7 @@ export class CampusComponent implements OnInit {
 		{ tool: 'addEdge', icon: 'pi pi-arrows-h', label: 'Conectar nodos' },
 		{ tool: 'addBlock', icon: 'pi pi-ban', label: 'Agregar bloqueo' },
 		{ tool: 'addVertical', icon: 'pi pi-arrows-v', label: 'Conexión vertical' },
-		{ tool: 'delete', icon: 'pi pi-trash', label: 'Eliminar' },
-	];
+		{ tool: 'delete', icon: 'pi pi-trash', label: 'Eliminar' }];
 
 	/** Pisos disponibles como destino (excluye el piso actual) */
 	readonly otherPisos = computed(() => {

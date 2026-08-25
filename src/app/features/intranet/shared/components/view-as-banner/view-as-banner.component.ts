@@ -4,11 +4,10 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs';
 
-import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
 
 import { ViewAsContext, ViewAsContextService } from '@core/services/view-as';
 import { ViewAsPickerComponent } from '../view-as-picker';
+import { EduButton, EduDialog } from '@edu-ui';
 // #endregion
 
 // #region Implementation
@@ -25,7 +24,7 @@ import { ViewAsPickerComponent } from '../view-as-picker';
 @Component({
 	selector: 'app-view-as-banner',
 	standalone: true,
-	imports: [ButtonModule, DialogModule, ViewAsPickerComponent],
+	imports: [EduButton, EduDialog, ViewAsPickerComponent],
 	templateUrl: './view-as-banner.component.html',
 	styleUrl: './view-as-banner.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

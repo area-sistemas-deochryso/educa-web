@@ -147,8 +147,8 @@
 										class="horario-block"
 										data-info-anchor="profesor-horario-block"
 										[ngStyle]="block.style"
-										[pTooltip]="block.tooltip"
-										tooltipPosition="top"
+										[eduTooltip]="block.tooltip"
+										eduTooltipPosition="top"
 										(click)="onBlockClick($event, block, detailPopover)"
 									>
 										<div class="block-content">
@@ -178,7 +178,7 @@
 				}
 
 				<!-- Popover de detalle de clase (desktop) -->
-				<p-popover #detailPopover appendTo="body" styleClass="class-detail-popover">
+				<edu-popover #detailPopover appendTo="body" styleClass="class-detail-popover">
 					@if (selectedBlock(); as block) {
 						<div class="popover-content">
 							<div class="popover-header">
@@ -190,37 +190,36 @@
 								<span><i class="pi pi-users"></i> {{ block.cantidadEstudiantes }} estudiantes</span>
 							</div>
 							<div class="popover-actions">
-								<button
-									pButton
+								<edu-button
 									type="button"
 									icon="pi pi-check-square"
 									label="Asistencia"
-									class="p-button-sm"
+									size="small"
 									data-info-anchor="profesor-horario-popover-asistencia"
 									(click)="irAAsistencia(detailPopover)"
-								></button>
-								<button
-									pButton
+								/>
+								<edu-button
 									type="button"
 									icon="pi pi-book"
 									label="Contenido"
-									class="p-button-sm p-button-outlined"
+									[outlined]="true"
+									size="small"
 									data-info-anchor="profesor-horario-popover-contenido"
 									(click)="irAContenido(detailPopover)"
-								></button>
-								<button
-									pButton
+								/>
+								<edu-button
 									type="button"
 									icon="pi pi-chart-bar"
 									label="Calificaciones"
-									class="p-button-sm p-button-outlined"
+									[outlined]="true"
+									size="small"
 									data-info-anchor="profesor-horario-popover-calificaciones"
 									(click)="irACalificaciones(detailPopover)"
-								></button>
+								/>
 							</div>
 						</div>
 					}
-				</p-popover>
+				</edu-popover>
 			</div>
 		</div>
 	</div>

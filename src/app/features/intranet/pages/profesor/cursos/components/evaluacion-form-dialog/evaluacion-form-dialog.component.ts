@@ -1,16 +1,8 @@
 import { Component, ChangeDetectionStrategy, inject, input, output, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DialogModule } from 'primeng/dialog';
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { InputNumberModule, InputNumberInputEvent } from 'primeng/inputnumber';
-import { Select } from 'primeng/select';
-import { DatePickerModule } from 'primeng/datepicker';
-import { TooltipModule } from 'primeng/tooltip';
 import { toLocalIso } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
-import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import {
 	CalificacionDto,
 	CrearCalificacionDto,
@@ -20,6 +12,8 @@ import {
 	PESO_MINIMO,
 	PESO_MAXIMO,
 } from '@features/intranet/pages/profesor/models';
+import { EduButton, EduDatePicker, EduDialog, EduInputNumber, EduInputText, EduSelect, EduToggle, EduTooltip } from '@edu-ui';
+import type { EduInputNumberInputEvent } from '@edu-ui';
 
 interface FormData {
 	titulo: string;
@@ -34,18 +28,7 @@ interface FormData {
 @Component({
 	selector: 'app-evaluacion-form-dialog',
 	standalone: true,
-	imports: [
-		CommonModule,
-		FormsModule,
-		DialogModule,
-		ButtonModule,
-		InputTextModule,
-		InputNumberModule,
-		Select,
-		DatePickerModule,
-		TooltipModule,
-		ToggleSwitchModule,
-	],
+	imports: [CommonModule, FormsModule, EduDialog, EduButton, EduInputText, EduInputNumber, EduSelect, EduDatePicker, EduTooltip, EduToggle],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './evaluacion-form-dialog.component.html',
 	styleUrl: './evaluacion-form-dialog.component.scss',
@@ -161,7 +144,7 @@ export class EvaluacionFormDialogComponent {
 		this.formData.update((f) => ({ ...f, [field]: value }));
 	}
 
-	onPesoInput(event: InputNumberInputEvent): void {
+	onPesoInput(event: EduInputNumberInputEvent): void {
 		this.lastRawPeso = typeof event.value === 'number' ? event.value : null;
 	}
 

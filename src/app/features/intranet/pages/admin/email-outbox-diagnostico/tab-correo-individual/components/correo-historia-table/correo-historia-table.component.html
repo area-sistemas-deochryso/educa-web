@@ -7,7 +7,7 @@
 		</span>
 	</header>
 
-	<p-table
+	<edu-table
 		[value]="data()"
 		[dataKey]="'id'"
 		[paginator]="data().length > 10"
@@ -33,24 +33,25 @@
 			<tr [class.row-muted]="row.estado === 'SENT'">
 				<td class="col-expand">
 					@if (hasDetalle(row)) {
-						<button
-							pButton
+						<edu-button
 							[icon]="isExpanded(row.id) ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
-							class="p-button-text p-button-sm btn-icon"
-							[pTooltip]="isExpanded(row.id) ? 'Ocultar detalles' : 'Ver detalles'"
+							[text]="true"
+							size="small"
+							class="btn-icon"
+							[eduTooltip]="isExpanded(row.id) ? 'Ocultar detalles' : 'Ver detalles'"
 							(click)="toggleExpand(row.id)"
 							[pt]="{ root: { 'aria-label': 'Expandir detalles' } }"
 							data-info-anchor="admin-email-outbox-diagnostico-historia-expandir-btn"
-						></button>
+						/>
 					}
 				</td>
 				<td class="cell-fecha col-fecha">{{ row.fecha | date: 'yyyy-MM-dd HH:mm' }}</td>
 				<td class="col-motivo">
-					<p-tag [value]="row.tipo" styleClass="tag-neutral" />
+					<edu-tag [value]="row.tipo" styleClass="tag-neutral" />
 				</td>
 				<td class="cell-nombre">{{ row.asunto }}</td>
 				<td class="col-tipofallo">
-					<p-tag [value]="row.estado" [severity]="estadoSeverity(row.estado)" />
+					<edu-tag [value]="row.estado" [severity]="estadoSeverity(row.estado)" />
 				</td>
 				<td class="col-tipofallo">
 					@if (row.tipoFallo) {
@@ -64,16 +65,17 @@
 					<app-correlation-id-pill [id]="row.correlationId" [compact]="true" />
 				</td>
 				<td class="col-actions">
-					<button
-						pButton
+					<edu-button
 						icon="pi pi-eye"
-						class="p-button-rounded p-button-text p-button-sm"
-						pTooltip="Ver detalle completo"
-						tooltipPosition="top"
+						[text]="true"
+						[rounded]="true"
+						size="small"
+						eduTooltip="Ver detalle completo"
+						eduTooltipPosition="top"
 						(click)="onViewDetail(row)"
 						[pt]="{ root: { 'aria-label': 'Ver detalle completo' } }"
 						data-info-anchor="email-row-ver-detalle-btn"
-					></button>
+					/>
 				</td>
 			</tr>
 
@@ -121,5 +123,5 @@
 				</td>
 			</tr>
 		</ng-template>
-	</p-table>
+	</edu-table>
 </section>

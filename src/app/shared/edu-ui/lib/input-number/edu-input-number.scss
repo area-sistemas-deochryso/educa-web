@@ -1,0 +1,56 @@
+.edu-input-number {
+	position: relative;
+	display: inline-flex;
+	width: 100%;
+
+	&__input {
+		width: 100%;
+	}
+
+	&--buttons &__input {
+		padding-right: 2rem;
+	}
+
+	&__buttons {
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		display: flex;
+		flex-direction: column;
+		width: 1.75rem;
+		border-left: 1px solid var(--eduui-form-field-border-color);
+	}
+
+	&__button {
+		flex: 1;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		border: none;
+		background: transparent;
+		color: var(--eduui-text-muted-color);
+		font-size: 0.75rem;
+		line-height: 1;
+		cursor: pointer;
+
+		&:not(:disabled):hover {
+			background: var(--eduui-surface-100);
+			color: var(--eduui-text-color);
+		}
+
+		&:disabled {
+			cursor: default;
+			opacity: 0.6;
+		}
+
+		&:first-child {
+			border-top-right-radius: var(--eduui-form-field-border-radius);
+		}
+
+		&:last-child {
+			border-bottom-right-radius: var(--eduui-form-field-border-radius);
+			border-top: 1px solid var(--eduui-form-field-border-color);
+		}
+	}
+}

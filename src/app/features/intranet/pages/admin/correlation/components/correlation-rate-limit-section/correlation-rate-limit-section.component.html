@@ -8,13 +8,10 @@
 		<a
 			[routerLink]="['/intranet/admin/rate-limit-events']"
 			[queryParams]="{ correlationId: correlationId() }"
-			pButton
-			type="button"
-			label="Abrir en rate-limit"
-			icon="pi pi-external-link"
-			class="p-button-text p-button-sm"
+			class="edu-button-link edu-button-link--text edu-button-link--sm"
+			data-severity="primary"
 			data-info-anchor="admin-correlation-open-external"
-		></a>
+		><span>Abrir en rate-limit</span><i class="edu-button-link__icon pi pi-external-link"></i></a>
 	</header>
 
 	@if (count() === 0) {
@@ -23,7 +20,7 @@
 			<p>Sin rebotes de rate limit con este correlation id.</p>
 		</div>
 	} @else {
-		<p-table [value]="items()" [dataKey]="'id'" class="p-datatable-sm" [scrollable]="true" scrollHeight="flex">
+		<edu-table [value]="items()" [dataKey]="'id'" class="p-datatable-sm" [scrollable]="true" scrollHeight="flex">
 			<ng-template #header>
 				<tr>
 					<th style="width: 80px">Método</th>
@@ -39,16 +36,16 @@
 				<tr>
 					<td><span class="cell-mono">{{ row.httpMethod }}</span></td>
 					<td>
-						<span class="cell-mono cell-url" [pTooltip]="row.endpoint" tooltipPosition="top">
+						<span class="cell-mono cell-url" [eduTooltip]="row.endpoint" eduTooltipPosition="top">
 							{{ row.endpoint }}
 						</span>
 					</td>
-					<td><p-tag [value]="displayPolicy(row.policy)" styleClass="tag-neutral" /></td>
+					<td><edu-tag [value]="displayPolicy(row.policy)" styleClass="tag-neutral" /></td>
 					<td>
 						@if (row.fueRechazado) {
-							<p-tag value="Sí" severity="danger" />
+							<edu-tag value="Sí" severity="danger" />
 						} @else {
-							<p-tag value="No" styleClass="tag-neutral" />
+							<edu-tag value="No" styleClass="tag-neutral" />
 						}
 					</td>
 					<td>
@@ -78,7 +75,7 @@
 					<td colspan="7" class="text-center p-4">No hay eventos de rate-limit asociados a esta correlación.</td>
 				</tr>
 			</ng-template>
-		</p-table>
+		</edu-table>
 
 		@if (cappedRows()) {
 			<p class="correlation-section__cap">

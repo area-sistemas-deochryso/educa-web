@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, OnInit, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TooltipModule } from 'primeng/tooltip';
-import { SkeletonModule } from 'primeng/skeleton';
+
 import { firstValueFrom } from 'rxjs';
 import { EstadisticasMultiRolDia, TipoPersona } from '@data/models';
 import { DirectorAttendanceApiService } from '@intranet-shared/services';
 import { logger } from '@core/helpers';
+import { EduSkeleton, EduTooltip } from '@edu-ui';
 
 const ROL_CONFIG: Record<TipoPersona, { label: string; icon: string }> = {
 	E: { label: 'Estudiantes', icon: 'pi pi-graduation-cap' },
@@ -30,7 +30,7 @@ export interface RoleChip {
 @Component({
 	selector: 'app-attendance-dashboard',
 	standalone: true,
-	imports: [CommonModule, TooltipModule, SkeletonModule],
+	imports: [CommonModule, EduTooltip, EduSkeleton],
 	templateUrl: './attendance-dashboard.component.html',
 	styleUrl: './attendance-dashboard.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

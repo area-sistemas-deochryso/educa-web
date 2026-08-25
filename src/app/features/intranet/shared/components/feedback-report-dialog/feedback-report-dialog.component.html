@@ -1,5 +1,5 @@
 <!-- #region Template -->
-<p-dialog
+<edu-dialog
 	[visible]="vm().dialogVisible"
 	(visibleChange)="onDialogVisibleChange($event)"
 	[modal]="true"
@@ -39,7 +39,7 @@
 							Si lo marcas, tu reporte se enlazará con ese error automáticamente.
 						</p>
 						<label class="recent-error-check">
-							<p-checkbox
+							<edu-checkbox
 								[binary]="true"
 								[ngModel]="vm().linkToRecentError"
 								(ngModelChange)="onLinkToRecentErrorChange($event)"
@@ -54,7 +54,7 @@
 			<!-- Tipo de problema -->
 			<div class="field">
 				<label for="feedback-tipo">Tipo de problema</label>
-				<p-select
+				<edu-select
 					inputId="feedback-tipo"
 					[options]="tipoOptions"
 					optionLabel="label"
@@ -67,13 +67,13 @@
 					(ngModelChange)="onTipoChange($event)"
 					[disabled]="vm().submitting"
 				>
-					<ng-template let-option pTemplate="item">
+					<ng-template #item let-option>
 						<div class="tipo-option">
 							<i [class]="option.icon"></i>
 							<span>{{ option.label }}</span>
 						</div>
 					</ng-template>
-				</p-select>
+				</edu-select>
 				@if (showValidation() && vm().tipoError) {
 					<small class="error-msg">{{ vm().tipoError }}</small>
 				}
@@ -83,7 +83,7 @@
 			<div class="field">
 				<label for="feedback-desc">Descripción del problema</label>
 				<textarea
-					pTextarea
+					eduTextarea
 					id="feedback-desc"
 					rows="5"
 					[ngModel]="vm().formData.descripcion"
@@ -109,7 +109,7 @@
 					Propuesta de mejora <span class="optional">(opcional)</span>
 				</label>
 				<textarea
-					pTextarea
+					eduTextarea
 					id="feedback-propuesta"
 					rows="3"
 					[ngModel]="vm().formData.propuesta"
@@ -121,31 +121,29 @@
 			</div>
 
 			@if (vm().error) {
-				<p-message severity="error" [text]="vm().error ?? ''" styleClass="w-full" />
+				<edu-message severity="error" [text]="vm().error ?? ''" styleClass="w-full" />
 			}
 		</div>
 		<!-- #endregion -->
 
 		<!-- #region Footer -->
-		<ng-template pTemplate="footer">
-			<button
-				pButton
+		<ng-template #footer>
+			<edu-button
 				type="button"
 				label="Cancelar"
-				class="p-button-text"
+				[text]="true"
 				(click)="onCancel()"
 				[disabled]="vm().submitting"
-			></button>
-			<button
-				pButton
+			/>
+			<edu-button
 				type="button"
 				label="Enviar reporte"
 				icon="pi pi-send"
 				(click)="onSubmit()"
 				[loading]="vm().submitting"
-			></button>
+			/>
 		</ng-template>
 		<!-- #endregion -->
 	}
-</p-dialog>
+</edu-dialog>
 <!-- #endregion -->

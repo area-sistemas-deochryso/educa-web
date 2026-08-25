@@ -1,4 +1,4 @@
-<p-dialog
+<edu-dialog
 	[visible]="visible()"
 	(visibleChange)="onVisibleChange($event)"
 	[modal]="true"
@@ -42,16 +42,16 @@
 
 			<!-- #region Actions bar -->
 			<div class="actions-bar">
-				<button
-					pButton
+				<edu-button
 					label="Ir a Calificaciones"
 					icon="pi pi-chart-bar"
-					class="p-button-text p-button-sm"
+					[text]="true"
+					size="small"
 					data-info-anchor="profesor-submissions-ir-calificaciones"
 					(click)="onIrACalificaciones()"
-					pTooltip="Calificar esta tarea en el tab de calificaciones"
-					tooltipPosition="top"
-				></button>
+					eduTooltip="Calificar esta tarea en el tab de calificaciones"
+					eduTooltipPosition="top"
+				/>
 			</div>
 			<!-- #endregion -->
 
@@ -71,7 +71,7 @@
 								</div>
 								<span class="student-name">{{ estudiante.estudianteNombre }}</span>
 								@let status = getSubmissionStatus(estudiante);
-								<p-tag
+								<edu-tag
 									[value]="status.label"
 									[severity]="status.severity"
 									[icon]="status.icon"
@@ -110,4 +110,4 @@
 			<!-- #endregion -->
 		</div>
 	}
-</p-dialog>
+</edu-dialog>

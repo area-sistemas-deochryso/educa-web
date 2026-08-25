@@ -1,0 +1,35 @@
+.edu-menu {
+	display: flex;
+	flex-direction: column;
+	min-width: 12rem;
+	margin: 0;
+	padding: 0.375rem;
+	list-style: none;
+	background: var(--eduui-content-background);
+	color: var(--eduui-content-color);
+	border: 1px solid var(--eduui-content-border-color);
+	border-radius: var(--eduui-content-border-radius);
+	box-shadow: var(--eduui-overlay-navigation-shadow);
+}
+
+.edu-menu__item {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.5rem 0.75rem;
+	border-radius: var(--eduui-radius-sm);
+	cursor: pointer;
+
+	&:hover {
+		background: var(--eduui-surface-100);
+	}
+}
+
+.edu-menu__icon {
+	font-size: 1rem;
+	color: var(--eduui-text-muted-color);
+}
+
+:host-context(.dark-mode) .edu-menu__item:hover {
+	background: var(--eduui-surface-800);
+}

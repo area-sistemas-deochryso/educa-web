@@ -1,6 +1,6 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, Output, EventEmitter } from '@angular/core';
-import { Tooltip } from 'primeng/tooltip';
+import { EduTooltip } from '@edu-ui';
 
 // #endregion
 // #region Implementation
@@ -8,7 +8,7 @@ import { Tooltip } from 'primeng/tooltip';
 	selector: 'app-logout-button',
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [Tooltip],
+	imports: [EduTooltip],
 	templateUrl: './logout-button.component.html',
 	styleUrl: './logout-button.component.scss',
 })

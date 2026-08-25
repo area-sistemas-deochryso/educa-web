@@ -1,4 +1,4 @@
-<p-table
+<edu-table
 	[value]="items()"
 	[dataKey]="'id'"
 	[lazy]="true"
@@ -22,8 +22,8 @@
 			<th class="label-uppercase col-policy">Policy</th>
 			<th
 				class="label-uppercase col-consumo"
-				pTooltip="Intentos consumidos / umbral del policy en su ventana"
-				tooltipPosition="top"
+				eduTooltip="Intentos consumidos / umbral del policy en su ventana"
+				eduTooltipPosition="top"
 			>
 				Intentos / Umbral
 			</th>
@@ -43,12 +43,12 @@
 				<span class="method-badge">{{ item.httpMethod }}</span>
 			</td>
 			<td class="col-endpoint">
-				<span class="endpoint-text" [pTooltip]="item.endpoint" tooltipPosition="top">
+				<span class="endpoint-text" [eduTooltip]="item.endpoint" eduTooltipPosition="top">
 					{{ item.endpoint }}
 				</span>
 			</td>
 			<td class="col-policy">
-				<p-tag [value]="displayPolicy(item.policy)" styleClass="tag-neutral" />
+				<edu-tag [value]="displayPolicy(item.policy)" styleClass="tag-neutral" />
 			</td>
 			<td class="col-consumo">
 				@if (item.tokensConsumidos !== null || item.limiteEfectivo !== null) {
@@ -68,7 +68,7 @@
 			</td>
 			<td class="col-rol">
 				@if (item.usuarioRol) {
-					<p-tag [value]="item.usuarioRol" styleClass="tag-neutral" />
+					<edu-tag [value]="item.usuarioRol" styleClass="tag-neutral" />
 				} @else {
 					<span class="muted">—</span>
 				}
@@ -78,9 +78,9 @@
 			</td>
 			<td class="col-rechazado">
 				@if (item.fueRechazado) {
-					<p-tag value="SI" severity="danger" />
+					<edu-tag value="SI" severity="danger" />
 				} @else {
-					<p-tag value="NO" styleClass="tag-neutral" />
+					<edu-tag value="NO" styleClass="tag-neutral" />
 				}
 			</td>
 			<td class="col-ip">
@@ -90,16 +90,17 @@
 				<app-correlation-id-pill [id]="item.correlationId" [compact]="true" />
 			</td>
 			<td class="col-actions">
-				<button
-					pButton
+				<edu-button
 					icon="pi pi-eye"
-					class="p-button-rounded p-button-text p-button-sm"
+					[text]="true"
+					[rounded]="true"
+					size="small"
 					data-info-anchor="admin-rate-limit-ver-detalle-btn"
 					(click)="onRowSelect(item)"
-					pTooltip="Ver detalle"
-					tooltipPosition="top"
+					eduTooltip="Ver detalle"
+					eduTooltipPosition="top"
 					[pt]="{ root: { 'aria-label': 'Ver detalle del evento' } }"
-				></button>
+				/>
 			</td>
 		</tr>
 	</ng-template>
@@ -113,4 +114,4 @@
 			</td>
 		</tr>
 	</ng-template>
-</p-table>
+</edu-table>

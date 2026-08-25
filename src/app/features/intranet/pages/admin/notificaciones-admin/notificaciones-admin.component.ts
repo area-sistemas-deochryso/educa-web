@@ -2,28 +2,13 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ConfirmationService } from 'primeng/api';
-
-import { TableModule } from 'primeng/table';
-import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
-import { InputTextModule } from 'primeng/inputtext';
-import { TextareaModule } from 'primeng/textarea';
-import { Select } from 'primeng/select';
-import { TagModule } from 'primeng/tag';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { TooltipModule } from 'primeng/tooltip';
-import { ToggleSwitchModule } from 'primeng/toggleswitch';
-import { DatePickerModule } from 'primeng/datepicker';
-import { IconFieldModule } from 'primeng/iconfield';
-import { InputIconModule } from 'primeng/inputicon';
-
 import { PageHeaderComponent, KpiStatsComponent, type KpiStatItem } from '@intranet-shared/components';
 import { EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleLabelPipe } from '@intranet-shared/pipes';
 import { UiMappingService } from '@intranet-shared/services';
 import { NotificacionesAdminFacade, NotificacionesAdminStore } from './services';
 import type { NotificacionFormData } from './services';
 import { NotificacionLista } from '@data/models';
+import { EduButton, EduConfirmDialog, EduConfirmationService, EduDatePicker, EduDialog, EduIconField, EduInputIcon, EduInputText, EduSelect, EduTable, EduTag, EduTextarea, EduToggle, EduTooltip } from '@edu-ui';
 
 // #endregion
 // #region Implementation
@@ -34,26 +19,25 @@ import { NotificacionLista } from '@data/models';
 	imports: [
 		CommonModule,
 		FormsModule,
-		TableModule,
-		ButtonModule,
-		DialogModule,
-		InputTextModule,
-		TextareaModule,
-		Select,
-		TagModule,
-		ConfirmDialogModule,
-		TooltipModule,
-		ToggleSwitchModule,
-		DatePickerModule,
-		IconFieldModule,
-		InputIconModule,
+		EduTable,
+		EduButton,
+		EduDialog,
+		EduInputText,
+		EduTextarea,
+		EduSelect,
+		EduTag,
+		EduConfirmDialog,
+		EduTooltip,
+		EduToggle,
+		EduDatePicker,
+		EduIconField,
+		EduInputIcon,
 		PageHeaderComponent,
 		KpiStatsComponent,
 		EstadoLabelPipe,
 		EstadoSeverityPipe,
-		EstadoToggleLabelPipe,
-	],
-	providers: [ConfirmationService],
+		EstadoToggleLabelPipe],
+	providers: [EduConfirmationService],
 	templateUrl: './notificaciones-admin.component.html',
 	styleUrl: './notificaciones-admin.component.scss',
 })
@@ -61,7 +45,7 @@ export class NotificacionesAdminComponent implements OnInit {
 	// #region Dependencias
 	private facade = inject(NotificacionesAdminFacade);
 	private store = inject(NotificacionesAdminStore);
-	private confirmationService = inject(ConfirmationService);
+	private confirmationService = inject(EduConfirmationService);
 	readonly uiMapping = inject(UiMappingService);
 	// #endregion
 
@@ -91,8 +75,7 @@ export class NotificacionesAdminComponent implements OnInit {
 			icon: 'pi pi-calendar-clock',
 			label: 'Vigentes hoy',
 			value: this.vm().estadisticas.vigentesHoy,
-		},
-	]);
+		}]);
 	// #endregion
 
 	// #region Opciones de filtros
@@ -102,21 +85,18 @@ export class NotificacionesAdminComponent implements OnInit {
 		{ label: 'Pago', value: 'pago' },
 		{ label: 'Académico', value: 'academico' },
 		{ label: 'Festividad', value: 'festividad' },
-		{ label: 'Evento', value: 'evento' },
-	];
+		{ label: 'Evento', value: 'evento' }];
 
 	readonly prioridadOptions = [
 		{ label: 'Baja', value: 'low' },
 		{ label: 'Media', value: 'medium' },
 		{ label: 'Alta', value: 'high' },
-		{ label: 'Urgente', value: 'urgent' },
-	];
+		{ label: 'Urgente', value: 'urgent' }];
 
 	readonly estadoOptions = [
 		{ label: 'Todos', value: null },
 		{ label: 'Activos', value: true },
-		{ label: 'Inactivos', value: false },
-	];
+		{ label: 'Inactivos', value: false }];
 
 	readonly iconoOptions = [
 		{ label: 'Campana', value: 'pi-bell' },
@@ -135,8 +115,7 @@ export class NotificacionesAdminComponent implements OnInit {
 		{ label: 'Advertencia', value: 'pi-exclamation-triangle' },
 		{ label: 'Info', value: 'pi-exclamation-circle' },
 		{ label: 'Archivo', value: 'pi-file-edit' },
-		{ label: 'Refrescar', value: 'pi-refresh' },
-	];
+		{ label: 'Refrescar', value: 'pi-refresh' }];
 
 	readonly destinatarioRolOptions = [
 		{ label: 'Todos', value: null },
@@ -145,8 +124,7 @@ export class NotificacionesAdminComponent implements OnInit {
 		{ label: 'Apoderado', value: 'Apoderado' },
 		{ label: 'Director', value: 'Director' },
 		{ label: 'Asistente Administrativo', value: 'Asistente Administrativo' },
-		{ label: 'Promotor', value: 'Promotor' },
-	];
+		{ label: 'Promotor', value: 'Promotor' }];
 
 	readonly destinatarioGradoOptions = [
 		{ label: 'Todos', value: null },
@@ -163,8 +141,7 @@ export class NotificacionesAdminComponent implements OnInit {
 		{ label: '2° Secundaria', value: '2° Secundaria' },
 		{ label: '3° Secundaria', value: '3° Secundaria' },
 		{ label: '4° Secundaria', value: '4° Secundaria' },
-		{ label: '5° Secundaria', value: '5° Secundaria' },
-	];
+		{ label: '5° Secundaria', value: '5° Secundaria' }];
 
 	readonly destinatarioSeccionOptions = [
 		{ label: 'Todos', value: null },
@@ -172,8 +149,7 @@ export class NotificacionesAdminComponent implements OnInit {
 		{ label: 'B', value: 'B' },
 		{ label: 'C', value: 'C' },
 		{ label: 'D', value: 'D' },
-		{ label: 'V (Vacacional)', value: 'V' },
-	];
+		{ label: 'V (Vacacional)', value: 'V' }];
 	// #endregion
 
 	// #region Lifecycle

@@ -1,15 +1,16 @@
 import { Component, ChangeDetectionStrategy, computed, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
+
 import { PageHeaderComponent } from '@intranet-shared/components';
 import { ProfesorFacade } from '../services/profesor.facade';
 import { SalonMensajeriaFacade } from '@features/intranet/pages/cross-role/mensajeria/services/mensajeria.facade';
 import { SalonMensajeriaTabComponent } from '@features/intranet/pages/cross-role/mensajeria/components/mensajeria-tab/mensajeria-tab.component';
+import { EduSpinner } from '@edu-ui';
 
 @Component({
 	selector: 'app-profesor-mensajeria',
 	standalone: true,
-	imports: [CommonModule, ProgressSpinnerModule, PageHeaderComponent, SalonMensajeriaTabComponent],
+	imports: [CommonModule, EduSpinner, PageHeaderComponent, SalonMensajeriaTabComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	styles: `
 		:host {
@@ -45,7 +46,7 @@ import { SalonMensajeriaTabComponent } from '@features/intranet/pages/cross-role
 
 			@if (loading()) {
 				<div class="flex justify-content-center p-5">
-					<p-progressSpinner strokeWidth="4" />
+					<edu-spinner strokeWidth="4" />
 				</div>
 			} @else if (cursoOptions().length === 0) {
 				<div class="flex flex-column align-items-center p-5 text-color-secondary">

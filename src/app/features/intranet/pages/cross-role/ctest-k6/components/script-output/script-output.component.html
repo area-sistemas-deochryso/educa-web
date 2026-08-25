@@ -2,26 +2,27 @@
 <div class="output-header">
 	<h3><i class="pi pi-code"></i> Script Generado</h3>
 	<div class="output-actions">
-		<button
-			pButton
+		<edu-button
 			[label]="copied() ? 'Copiado!' : 'Copiar'"
 			[icon]="copied() ? 'pi pi-check' : 'pi pi-copy'"
-			[class]="copied() ? 'p-button-success p-button-sm' : 'p-button-outlined p-button-sm'"
+			size="small"
+			[severity]="copied() ? 'success' : 'primary'"
+			[outlined]="!(copied())"
 			(click)="onCopy()"
-			pTooltip="Copiar script al portapapeles"
-			tooltipPosition="top"
+			eduTooltip="Copiar script al portapapeles"
+			eduTooltipPosition="top"
 			[pt]="{ root: { 'aria-label': 'Copiar script al portapapeles' } }"
-		></button>
-		<button
-			pButton
+		/>
+		<edu-button
 			label="Descargar .js"
 			icon="pi pi-download"
-			class="p-button-outlined p-button-sm"
+			[outlined]="true"
+			size="small"
 			(click)="onDownload()"
-			pTooltip="Descargar como archivo JavaScript"
-			tooltipPosition="top"
+			eduTooltip="Descargar como archivo JavaScript"
+			eduTooltipPosition="top"
 			[pt]="{ root: { 'aria-label': 'Descargar script como archivo JavaScript' } }"
-		></button>
+		/>
 	</div>
 </div>
 <!-- #endregion -->

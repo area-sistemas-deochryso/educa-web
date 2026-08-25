@@ -1,0 +1,239 @@
+.edu-datepicker {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	width: 100%;
+	box-sizing: border-box;
+	background: var(--eduui-form-field-background);
+	border: 1px solid var(--eduui-form-field-border-color);
+	border-radius: var(--eduui-form-field-border-radius);
+	padding: var(--eduui-form-field-padding-y) var(--eduui-form-field-padding-x);
+	transition: border-color var(--eduui-form-field-transition-duration);
+
+	&:hover:not(.edu-datepicker--disabled) {
+		border-color: var(--eduui-form-field-hover-border-color);
+	}
+
+	&:focus-within {
+		border-color: var(--eduui-form-field-focus-border-color);
+	}
+}
+
+.edu-datepicker--disabled {
+	background: var(--eduui-form-field-disabled-background);
+	cursor: default;
+}
+
+.edu-datepicker__input {
+	flex: 1 1 auto;
+	min-width: 0;
+	border: none;
+	outline: none;
+	background: transparent;
+	color: var(--eduui-form-field-color);
+	font-size: 1rem;
+	font-family: inherit;
+
+	&::placeholder {
+		color: var(--eduui-form-field-placeholder-color);
+	}
+
+	&:disabled {
+		color: var(--eduui-form-field-disabled-color);
+	}
+
+	&:read-only {
+		cursor: pointer;
+	}
+}
+
+.edu-datepicker__icon {
+	flex: 0 0 auto;
+	color: var(--eduui-text-muted-color);
+}
+
+.edu-datepicker__clear {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: 0 0 auto;
+	width: 1.25rem;
+	height: 1.25rem;
+	padding: 0;
+	background: none;
+	border: none;
+	border-radius: var(--eduui-radius-sm);
+	color: var(--eduui-text-muted-color);
+	cursor: pointer;
+
+	&:hover {
+		color: var(--eduui-text-color);
+	}
+}
+
+.edu-datepicker-panel {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	width: 17.5rem;
+	padding: 0.75rem;
+	background: var(--eduui-content-background);
+	color: var(--eduui-content-color);
+	border: 1px solid var(--eduui-content-border-color);
+	border-radius: var(--eduui-content-border-radius);
+	box-shadow: var(--eduui-overlay-popover-shadow);
+}
+
+.edu-datepicker-panel--inline {
+	box-shadow: none;
+}
+
+.edu-datepicker-panel__header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.edu-datepicker-panel__title {
+	font-weight: 600;
+	text-transform: capitalize;
+}
+
+.edu-datepicker-panel__nav {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 1.75rem;
+	height: 1.75rem;
+	background: none;
+	border: none;
+	border-radius: var(--eduui-radius-sm);
+	color: var(--eduui-text-color);
+	cursor: pointer;
+
+	&:hover {
+		background: var(--eduui-surface-100);
+	}
+}
+
+.edu-datepicker-panel__weekdays,
+.edu-datepicker-panel__days {
+	display: grid;
+	grid-template-columns: repeat(7, 1fr);
+	gap: 0.125rem;
+}
+
+.edu-datepicker-panel__weekdays {
+	text-align: center;
+	font-size: 0.75rem;
+	font-weight: 600;
+	color: var(--eduui-text-muted-color);
+	padding-bottom: 0.25rem;
+}
+
+.edu-datepicker-panel__day {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	aspect-ratio: 1;
+	background: none;
+	border: none;
+	border-radius: var(--eduui-radius-sm);
+	color: var(--eduui-text-color);
+	font-size: 0.875rem;
+	cursor: pointer;
+
+	&:hover:not(:disabled) {
+		background: var(--eduui-surface-100);
+	}
+
+	&:disabled {
+		color: var(--eduui-surface-300);
+		cursor: default;
+	}
+}
+
+.edu-datepicker-panel__day--other-month {
+	color: var(--eduui-text-muted-color);
+}
+
+.edu-datepicker-panel__day--today {
+	font-weight: 700;
+}
+
+.edu-datepicker-panel__day--in-range {
+	background: var(--eduui-primary-50);
+	border-radius: 0;
+}
+
+.edu-datepicker-panel__day--selected {
+	background: var(--eduui-primary-color);
+	color: var(--eduui-primary-contrast-color);
+
+	&:hover:not(:disabled) {
+		background: var(--eduui-primary-hover-color);
+	}
+}
+
+.edu-datepicker-panel__time {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.375rem;
+	padding-top: 0.5rem;
+	border-top: 1px solid var(--eduui-content-border-color);
+}
+
+.edu-datepicker-panel__time-input {
+	width: 3rem;
+	text-align: center;
+	background: var(--eduui-form-field-background);
+	border: 1px solid var(--eduui-form-field-border-color);
+	border-radius: var(--eduui-radius-sm);
+	color: var(--eduui-form-field-color);
+	padding: 0.25rem;
+}
+
+.edu-datepicker-panel__meridiem {
+	background: var(--eduui-surface-100);
+	border: 1px solid var(--eduui-form-field-border-color);
+	border-radius: var(--eduui-radius-sm);
+	color: var(--eduui-form-field-color);
+	padding: 0.25rem 0.5rem;
+	cursor: pointer;
+}
+
+.edu-datepicker-panel__buttonbar {
+	display: flex;
+	justify-content: space-between;
+	gap: 0.5rem;
+	padding-top: 0.5rem;
+	border-top: 1px solid var(--eduui-content-border-color);
+}
+
+.edu-datepicker-panel__buttonbar-btn {
+	background: none;
+	border: none;
+	color: var(--eduui-primary-color);
+	font-size: 0.875rem;
+	font-weight: 600;
+	cursor: pointer;
+	padding: 0.25rem 0.5rem;
+
+	&:hover {
+		text-decoration: underline;
+	}
+}
+
+:host-context(.dark-mode) .edu-datepicker-panel__meridiem {
+	background: var(--eduui-surface-800);
+}
+
+:host-context(.dark-mode) .edu-datepicker-panel__nav:hover,
+:host-context(.dark-mode) .edu-datepicker-panel__day:hover:not(:disabled) {
+	background: var(--eduui-surface-800);
+}
+
+:host-context(.dark-mode) .edu-datepicker-panel__day--in-range {
+	background: var(--eduui-primary-900, var(--eduui-surface-800));
+}

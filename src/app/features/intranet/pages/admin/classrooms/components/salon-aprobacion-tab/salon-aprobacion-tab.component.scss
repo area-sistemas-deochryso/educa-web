@@ -81,9 +81,3 @@
 }
 // #endregion
 
-// #region Table overrides
-:host ::ng-deep .p-datatable {
-	--p-datatable-header-cell-background: transparent;
-	--p-datatable-row-background: transparent;
-}
-// #endregion

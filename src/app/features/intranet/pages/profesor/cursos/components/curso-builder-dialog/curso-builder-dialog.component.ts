@@ -2,19 +2,18 @@
 import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DialogModule } from 'primeng/dialog';
-import { ButtonModule } from 'primeng/button';
-import { InputNumberModule } from 'primeng/inputnumber';
+
+import { EduButton, EduDialog, EduInputNumber } from '@edu-ui';
 
 // #endregion
 // #region Implementation
 @Component({
 	selector: 'app-curso-builder-dialog',
 	standalone: true,
-	imports: [CommonModule, FormsModule, DialogModule, ButtonModule, InputNumberModule],
+	imports: [CommonModule, FormsModule, EduDialog, EduButton, EduInputNumber],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
-		<p-dialog
+		<edu-dialog
 			[visible]="visible()"
 			(visibleChange)="onVisibleChange($event)"
 			[modal]="true"
@@ -39,7 +38,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 				<!-- Input -->
 				<div class="flex flex-column gap-2 px-2">
 					<label for="numSemanas" class="font-semibold text-sm">Número de semanas</label>
-					<p-inputNumber
+					<edu-input-number
 						id="numSemanas"
 						[(ngModel)]="numeroSemanas"
 						[min]="1"
@@ -57,19 +56,18 @@ import { InputNumberModule } from 'primeng/inputnumber';
 
 			<ng-template #footer>
 				<div class="flex justify-content-end gap-2 pt-2">
-					<button pButton label="Cancelar" class="p-button-text" data-info-anchor="profesor-curso-builder-cancelar" (click)="onCancel()"></button>
-					<button
-						pButton
+					<edu-button label="Cancelar" [text]="true" data-info-anchor="profesor-curso-builder-cancelar" (click)="onCancel()" />
+					<edu-button
 						label="Crear contenido"
 						icon="pi pi-check"
 						data-info-anchor="profesor-curso-builder-crear"
 						(click)="onCreate()"
 						[loading]="saving()"
 						[disabled]="!numeroSemanas"
-					></button>
+					/>
 				</div>
 			</ng-template>
-		</p-dialog>
+		</edu-dialog>
 	`,
 })
 export class CursoBuilderDialogComponent {
