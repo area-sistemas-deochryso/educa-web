@@ -38,17 +38,17 @@
 				severity="secondary"
 				[outlined]="true"
 				[disabled]="activeStep() === 0"
-				(onClick)="goToStep(activeStep() - 1)"
+				(click)="goToStep(activeStep() - 1)"
 			/>
 			@if (!isLastStep()) {
 				<edu-button
 					label="Siguiente"
 					icon="pi pi-arrow-right"
 					iconPos="right"
-					(onClick)="goToStep(activeStep() + 1)"
+					(click)="goToStep(activeStep() + 1)"
 				/>
 			} @else {
-				<edu-button label="Listo" icon="pi pi-check" (onClick)="onHide()" />
+				<edu-button label="Listo" icon="pi pi-check" (click)="onHide()" />
 			}
 		</div>
 	}

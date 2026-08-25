@@ -6,7 +6,7 @@
 		</div>
 	} @else {
 		<div class="toolbar">
-			<edu-button label="Nuevo tipo" icon="pi pi-plus" (onClick)="openCreateDialog()" data-info-anchor="admin-tickets-tipos-nuevo-btn" />
+			<edu-button label="Nuevo tipo" icon="pi pi-plus" (click)="openCreateDialog()" data-info-anchor="admin-tickets-tipos-nuevo-btn" />
 		</div>
 
 		@if (loading()) {
@@ -44,7 +44,7 @@
 								<edu-toggle [ngModel]="tipo.estado" (ngModelChange)="toggleEstado(tipo)" [disabled]="submitting()" data-info-anchor="admin-tickets-tipos-fila-activo-toggle" />
 							</td>
 							<td>
-								<edu-button icon="pi pi-pencil" [text]="true" (onClick)="openEditDialog(tipo)" data-info-anchor="admin-tickets-tipos-fila-editar-btn" />
+								<edu-button icon="pi pi-pencil" [text]="true" (click)="openEditDialog(tipo)" data-info-anchor="admin-tickets-tipos-fila-editar-btn" />
 							</td>
 						</tr>
 					</ng-template>
@@ -76,7 +76,7 @@
 	</div>
 
 	<ng-template #footer>
-		<edu-button label="Cancelar" severity="secondary" [text]="true" (onClick)="closeDialog()" data-info-anchor="admin-tickets-tipos-form-cancelar-btn" />
-		<edu-button label="Guardar" (onClick)="guardar()" [disabled]="!nombreForm().trim() || submitting()" data-info-anchor="admin-tickets-tipos-form-guardar-btn" />
+		<edu-button label="Cancelar" severity="secondary" [text]="true" (click)="closeDialog()" data-info-anchor="admin-tickets-tipos-form-cancelar-btn" />
+		<edu-button label="Guardar" (click)="guardar()" [disabled]="!nombreForm().trim() || submitting()" data-info-anchor="admin-tickets-tipos-form-guardar-btn" />
 	</ng-template>
 </edu-dialog>
