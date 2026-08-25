@@ -7,7 +7,7 @@
 	[closeOnEscape]="true"
 	[style]="{ width: '600px' }"
 >
-	<ng-template pTemplate="header">
+	<ng-template #header>
 		<!-- * Drawer header -->
 		<div class="drawer-header">
 			<div class="header-icon">
@@ -382,7 +382,7 @@
 		</div>
 	}
 
-	<ng-template pTemplate="footer">
+	<ng-template #footer>
 		<edu-button
 			label="Cerrar"
 			icon="pi pi-times"

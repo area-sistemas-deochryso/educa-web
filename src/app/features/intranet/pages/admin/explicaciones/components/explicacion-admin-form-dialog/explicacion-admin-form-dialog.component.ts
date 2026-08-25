@@ -11,7 +11,7 @@ import {
 	CrearExplicacionRequest,
 	ExplicacionAdminDto,
 } from '../../models/explicacion-admin.models';
-import { EduButton, EduDialog, EduInputText, EduSelect, EduTemplate, EduTextarea, EduTooltip } from '@edu-ui';
+import { EduButton, EduDialog, EduInputText, EduSelect, EduTextarea, EduTooltip } from '@edu-ui';
 // #endregion
 
 interface SelectOption<T> {
@@ -27,7 +27,7 @@ interface SelectOption<T> {
 @Component({
 	selector: 'app-explicacion-admin-form-dialog',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduButton, EduDialog, EduInputText, EduSelect, EduTextarea, EduTooltip, EduTemplate],
+	imports: [CommonModule, FormsModule, EduButton, EduDialog, EduInputText, EduSelect, EduTextarea, EduTooltip],
 	templateUrl: './explicacion-admin-form-dialog.component.html',
 	styleUrl: './explicacion-admin-form-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

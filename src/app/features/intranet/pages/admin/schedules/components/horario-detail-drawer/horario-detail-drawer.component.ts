@@ -7,14 +7,14 @@ import { ModoAsignacionBadgeComponent } from '@shared/components';
 import type { HorarioDetalleResponseDto, EstudianteHorarioDto } from '../../models/horario.interface';
 import { EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleIconPipe, EstadoToggleLabelPipe } from '@intranet-shared/pipes';
 import type { ProfesorOption } from '../../models/profesor.interface';
-import { EduBadge, EduButton, EduDrawer, EduSelect, EduTag, EduTemplate, EduTooltip } from '@edu-ui';
+import { EduBadge, EduButton, EduDrawer, EduSelect, EduTag, EduTooltip } from '@edu-ui';
 
 // #endregion
 // #region Implementation
 @Component({
 	selector: 'app-schedule-detail-drawer',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduBadge, EduButton, EduDrawer, EduSelect, EduTag, EduTooltip, ModoAsignacionBadgeComponent, EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleIconPipe, EstadoToggleLabelPipe, EduTemplate],
+	imports: [CommonModule, FormsModule, EduBadge, EduButton, EduDrawer, EduSelect, EduTag, EduTooltip, ModoAsignacionBadgeComponent, EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleIconPipe, EstadoToggleLabelPipe],
 	templateUrl: './horario-detail-drawer.component.html',
 	styleUrl: './horario-detail-drawer.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

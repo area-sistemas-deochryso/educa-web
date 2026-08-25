@@ -7,12 +7,12 @@ import { PageHeaderComponent, KpiStatsComponent, type KpiStatItem } from '@intra
 import { PermissionsRolesFacade } from './services';
 import type { RolCapabilityMatrixRow } from '@core/services';
 import { VistasComponent } from '../vistas';
-import { EduButton, EduCheckbox, EduDialog, EduDrawer, EduInputText, EduTab, EduTabPanel, EduTable, EduTabs, EduTag, EduTemplate, EduTooltip } from '@edu-ui';
+import { EduButton, EduCheckbox, EduDialog, EduDrawer, EduInputText, EduTab, EduTabPanel, EduTable, EduTabs, EduTag, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-permissions-roles',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduTable, EduButton, EduDialog, EduTooltip, EduTag, EduInputText, EduCheckbox, EduDrawer, EduTabs, EduTab, EduTabPanel, PageHeaderComponent, KpiStatsComponent, VistasComponent, EduTemplate],
+	imports: [CommonModule, FormsModule, EduTable, EduButton, EduDialog, EduTooltip, EduTag, EduInputText, EduCheckbox, EduDrawer, EduTabs, EduTab, EduTabPanel, PageHeaderComponent, KpiStatsComponent, VistasComponent],
 	templateUrl: './permisos-roles.component.html',
 	styleUrl: './permisos-roles.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

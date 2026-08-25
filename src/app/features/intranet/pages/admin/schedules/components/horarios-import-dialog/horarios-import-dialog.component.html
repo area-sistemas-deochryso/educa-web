@@ -8,7 +8,7 @@
 			[style]="{ width: '700px', maxWidth: '95vw' }"
 			styleClass="import-dialog"
 		>
-			<ng-template pTemplate="header">
+			<ng-template #header>
 				<span class="dialog-title">
 					<i class="pi pi-upload"></i>
 					Importar Horarios
@@ -194,7 +194,7 @@
 			}
 			<!-- #endregion -->
 
-			<ng-template pTemplate="footer">
+			<ng-template #footer>
 				@if (step() === 'upload') {
 					<edu-button
 						type="button"

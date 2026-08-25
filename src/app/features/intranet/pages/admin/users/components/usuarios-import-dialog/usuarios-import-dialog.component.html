@@ -8,7 +8,7 @@
 	[style]="{ width: '860px', maxWidth: '95vw' }"
 	styleClass="import-dialog"
 >
-	<ng-template pTemplate="header">
+	<ng-template #header>
 		<span class="dialog-title">
 			<i class="pi pi-upload"></i>
 			Importación masiva de estudiantes
@@ -218,7 +218,7 @@
 	}
 	<!-- #endregion -->
 
-	<ng-template pTemplate="footer">
+	<ng-template #footer>
 		@if (step() === 'config') {
 			<edu-button
 				type="button"

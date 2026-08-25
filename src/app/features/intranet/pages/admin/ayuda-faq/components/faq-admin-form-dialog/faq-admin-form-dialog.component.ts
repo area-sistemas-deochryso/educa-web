@@ -11,7 +11,7 @@ import {
 	FaqAdminDto,
 	WizardPasoInput,
 } from '../../models/faq-admin.models';
-import { EduButton, EduDialog, EduInputText, EduSelect, EduTemplate, EduTextarea, EduTooltip } from '@edu-ui';
+import { EduButton, EduDialog, EduInputText, EduSelect, EduTextarea, EduTooltip } from '@edu-ui';
 // #endregion
 
 interface CapabilityOption {
@@ -28,7 +28,7 @@ interface CapabilityOption {
 @Component({
 	selector: 'app-faq-admin-form-dialog',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduButton, EduDialog, EduInputText, EduSelect, EduTextarea, EduTooltip, EduTemplate],
+	imports: [CommonModule, FormsModule, EduButton, EduDialog, EduInputText, EduSelect, EduTextarea, EduTooltip],
 	templateUrl: './faq-admin-form-dialog.component.html',
 	styleUrl: './faq-admin-form-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

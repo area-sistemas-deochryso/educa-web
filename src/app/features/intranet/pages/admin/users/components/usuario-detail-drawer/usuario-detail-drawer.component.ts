@@ -5,7 +5,7 @@ import { UsuarioDetalle } from '../../services';
 import { UiMappingService } from '@intranet-shared/services';
 import { EstadoLabelPipe, EstadoSeverityPipe } from '@intranet-shared/pipes';
 import { FullNamePipe } from '@shared/pipes';
-import { EduButton, EduDrawer, EduTag, EduTemplate } from '@edu-ui';
+import { EduButton, EduDrawer, EduTag } from '@edu-ui';
 
 /**
  * Componente presentacional para el drawer de detalles de usuario
@@ -16,7 +16,7 @@ import { EduButton, EduDrawer, EduTag, EduTemplate } from '@edu-ui';
 @Component({
 	selector: 'app-user-detail-drawer',
 	standalone: true,
-	imports: [CommonModule, EduDrawer, EduButton, EduTag, EstadoLabelPipe, EstadoSeverityPipe, FullNamePipe, EduTemplate],
+	imports: [CommonModule, EduDrawer, EduButton, EduTag, EstadoLabelPipe, EstadoSeverityPipe, FullNamePipe],
 	templateUrl: './usuario-detail-drawer.component.html',
 	styleUrl: './usuario-detail-drawer.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

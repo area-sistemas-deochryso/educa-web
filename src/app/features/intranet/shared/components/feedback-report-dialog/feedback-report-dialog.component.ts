@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 
 
 import { FeedbackReportFacade, REPORTE_TIPO_OPTIONS, ReporteTipo } from '@core/services/feedback';
-import { EduButton, EduCheckbox, EduDialog, EduMessage, EduSelect, EduTemplate, EduTextarea } from '@edu-ui';
+import { EduButton, EduCheckbox, EduDialog, EduMessage, EduSelect, EduTextarea } from '@edu-ui';
 
 // #endregion
 // #region Implementation
@@ -19,7 +19,7 @@ import { EduButton, EduCheckbox, EduDialog, EduMessage, EduSelect, EduTemplate, 
 	selector: 'app-feedback-report-dialog',
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [CommonModule, FormsModule, EduDialog, EduButton, EduCheckbox, EduSelect, EduTextarea, EduMessage, EduTemplate],
+	imports: [CommonModule, FormsModule, EduDialog, EduButton, EduCheckbox, EduSelect, EduTextarea, EduMessage],
 	templateUrl: './feedback-report-dialog.component.html',
 	styleUrl: './feedback-report-dialog.component.scss',
 })
