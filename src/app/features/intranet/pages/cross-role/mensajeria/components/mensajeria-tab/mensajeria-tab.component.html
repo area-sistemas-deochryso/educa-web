@@ -33,23 +33,24 @@
 		<div class="sidebar-header">
 			<span class="sidebar-title">Mensajes</span>
 			<div style="display: flex; gap: 0.25rem">
-				<button
-					pButton
+				<edu-button
 					icon="pi pi-refresh"
-					class="p-button-rounded p-button-text p-button-sm"
+					[text]="true"
+					[rounded]="true"
+					size="small"
 					data-info-anchor="mensajeria-refresh-lista"
 					(click)="onRefreshLista()"
 					[disabled]="vm().loading"
 					[pt]="{ root: { 'aria-label': 'Refrescar' } }"
-				></button>
-				<button
-					pButton
+				/>
+				<edu-button
 					icon="pi pi-plus"
-					class="p-button-rounded p-button-sm"
+					[rounded]="true"
+					size="small"
 					data-info-anchor="mensajeria-nuevo"
 					(click)="onNuevoMensaje()"
 					[pt]="{ root: { 'aria-label': 'Nuevo mensaje' } }"
-				></button>
+				/>
 			</div>
 		</div>
 
@@ -119,14 +120,16 @@
 		} @else {
 			<!-- Chat header -->
 			<div class="chat-header">
-				<button
-					pButton
+				<edu-button
 					icon="pi pi-arrow-left"
-					class="p-button-rounded p-button-text p-button-sm back-btn"
+					[text]="true"
+					[rounded]="true"
+					size="small"
+					class="back-btn"
 					data-info-anchor="mensajeria-volver"
 					(click)="onBack()"
 					[pt]="{ root: { 'aria-label': 'Volver a lista' } }"
-				></button>
+				/>
 				<div class="chat-header-info">
 					<div class="chat-header-name">{{ vm().detalle?.asunto }}</div>
 					@if (vm().detalle; as detalle) {
@@ -135,15 +138,16 @@
 						</div>
 					}
 				</div>
-				<button
-					pButton
+				<edu-button
 					icon="pi pi-refresh"
-					class="p-button-rounded p-button-text p-button-sm"
+					[text]="true"
+					[rounded]="true"
+					size="small"
 					data-info-anchor="mensajeria-refresh-detalle"
 					(click)="onRefreshDetalle()"
 					[disabled]="vm().detalleLoading"
 					[pt]="{ root: { 'aria-label': 'Refrescar' } }"
-				></button>
+				/>
 			</div>
 
 			<!-- Messages -->
@@ -179,16 +183,15 @@
 						(keydown.enter)="onEnviar()"
 						[disabled]="vm().sending"
 					/>
-					<button
-						pButton
+					<edu-button
 						icon="pi pi-send"
-						class="p-button-rounded"
+						[rounded]="true"
 						data-info-anchor="mensajeria-enviar"
 						(click)="onEnviar()"
 						[disabled]="!nuevoMensaje().trim() || vm().sending"
 						[loading]="vm().sending"
 						[pt]="{ root: { 'aria-label': 'Enviar mensaje' } }"
-					></button>
+					/>
 				</div>
 			}
 		}
@@ -247,16 +250,20 @@
 	</div>
 
 	<ng-template #footer>
-		<button pButton label="Cancelar" class="p-button-text" data-info-anchor="mensajeria-dialog-cancelar" (click)="onCancelarNuevo()"></button>
-		<button
-			pButton
+		<edu-button
+			label="Cancelar"
+			[text]="true"
+			data-info-anchor="mensajeria-dialog-cancelar"
+			(click)="onCancelarNuevo()"
+		/>
+		<edu-button
 			label="Enviar"
 			icon="pi pi-send"
 			data-info-anchor="mensajeria-dialog-enviar"
 			(click)="onCrearConversacion()"
 			[disabled]="!canCreate() || vm().sending"
 			[loading]="vm().sending"
-		></button>
+		/>
 	</ng-template>
 </edu-dialog>
 <!-- #endregion -->

@@ -59,17 +59,18 @@
 					<edu-tabpanel value="0">
 						<div class="tab-panel-body">
 							<div style="display: flex; justify-content: flex-end; margin-bottom: 0.5rem">
-								<button
-									pButton
+								<edu-button
 									icon="pi pi-refresh"
-									class="p-button-rounded p-button-text p-button-sm"
+									[text]="true"
+									[rounded]="true"
+									size="small"
 									data-info-anchor="estudiante-curso-dialog-refresh-contenido"
 									(click)="onRefreshContenido()"
 									[disabled]="vm().contentLoading"
 									eduTooltip="Refrescar"
 									eduTooltipPosition="top"
 									[pt]="{ root: { 'aria-label': 'Refrescar contenido' } }"
-								></button>
+								/>
 							</div>
 							<!-- Search bar -->
 							<div class="search-box">
@@ -231,10 +232,12 @@
 																				}
 																			</div>
 																			<div class="row-actions">
-																				<button
-																					pButton
+																				<edu-button
 																					icon="pi pi-trash"
-																					class="p-button-text p-button-danger p-button-sm p-button-rounded"
+																					[text]="true"
+																					[rounded]="true"
+																					size="small"
+																					severity="danger"
 																					eduTooltip="Eliminar"
 																					eduTooltipPosition="top"
 																					data-info-anchor="estudiante-curso-dialog-mi-archivo-eliminar"
@@ -244,7 +247,7 @@
 																							'aria-label': 'Eliminar archivo',
 																						},
 																					}"
-																				></button>
+																				/>
 																			</div>
 																		</div>
 																	}
@@ -362,10 +365,12 @@
 																								}
 																							</div>
 																							<div class="row-actions">
-																								<button
-																									pButton
+																								<edu-button
 																									icon="pi pi-trash"
-																									class="p-button-text p-button-danger p-button-sm p-button-rounded"
+																									[text]="true"
+																									[rounded]="true"
+																									size="small"
+																									severity="danger"
 																									eduTooltip="Eliminar"
 																									eduTooltipPosition="top"
 																									data-info-anchor="estudiante-curso-dialog-mi-entrega-eliminar"
@@ -375,7 +380,7 @@
 																											'aria-label': 'Eliminar archivo de tarea',
 																										},
 																									}"
-																								></button>
+																								/>
 																							</div>
 																						</div>
 																					}
@@ -402,17 +407,18 @@
 					<edu-tabpanel value="1">
 						<div class="tab-panel-body">
 							<div style="display: flex; justify-content: flex-end; margin-bottom: 0.5rem">
-								<button
-									pButton
+								<edu-button
 									icon="pi pi-refresh"
-									class="p-button-rounded p-button-text p-button-sm"
+									[text]="true"
+									[rounded]="true"
+									size="small"
 									data-info-anchor="estudiante-curso-dialog-refresh-notas"
 									(click)="onRefreshNotas()"
 									[disabled]="vm().misNotasLoading"
 									eduTooltip="Refrescar"
 									eduTooltipPosition="top"
 									[pt]="{ root: { 'aria-label': 'Refrescar calificaciones' } }"
-								></button>
+								/>
 							</div>
 							@if (vm().misNotasLoading) {
 								<div class="empty-state">

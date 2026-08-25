@@ -22,7 +22,6 @@ import { SelectorContext } from '@features/intranet/services/attendance/attendan
 import { AttendancePdfService } from '@features/intranet/services/attendance/attendance-pdf.service';
 import { AttendanceStatsService } from '@features/intranet/services/attendance/attendance-stats.service';
 import { VIEW_MODE, ViewMode } from '@features/intranet/components/attendance/attendance-header/attendance-header.component';
-import { ButtonModule } from 'primeng/button';
 import { EmptyStateComponent } from '@features/intranet/components/attendance/empty-state/empty-state.component';
 import { FormsModule } from '@angular/forms';
 import { GradoSeccionSelectorComponent } from '@features/intranet/components/attendance/grado-seccion-selector/grado-seccion-selector.component';
@@ -37,7 +36,7 @@ import {
 	getTodosSalonesExcelObservable,
 	getConsolidadoFileName,
 } from '../consolidated-pdf.helper';
-import { EduInputText, EduMenu, EduTooltip } from '@edu-ui';
+import { EduButton, EduInputText, EduMenu, EduTooltip } from '@edu-ui';
 import type { EduMenuItem } from '@edu-ui';
 
 /**
@@ -50,7 +49,7 @@ import type { EduMenuItem } from '@edu-ui';
 @Component({
 	selector: 'app-attendance-director-estudiantes',
 	standalone: true,
-	imports: [AttendanceHeatmapComponent, AttendanceTemporalNavComponent, AttendanceTableSkeletonComponent, GradoSeccionSelectorComponent, AttendanceDayListComponent, EmptyStateComponent, AttendanceLegendStatsComponent, AttendanceScopeBannerComponent, JustificationDialogComponent, ButtonModule, EduTooltip, EduMenu, EduInputText, FormsModule],
+	imports: [AttendanceHeatmapComponent, AttendanceTemporalNavComponent, AttendanceTableSkeletonComponent, GradoSeccionSelectorComponent, AttendanceDayListComponent, EmptyStateComponent, AttendanceLegendStatsComponent, AttendanceScopeBannerComponent, JustificationDialogComponent, EduButton, EduTooltip, EduMenu, EduInputText, FormsModule],
 	providers: [AttendanceViewController, AttendancePdfService, AttendanceStatsService],
 	templateUrl: './attendance-director-estudiantes.component.html',
 	styleUrl: './attendance-director-estudiantes.component.scss',

@@ -3,8 +3,6 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-import { ButtonModule } from 'primeng/button';
-
 import {
 	TICKET_DESCRIPCION_MAX,
 	TICKET_DESCRIPCION_MIN,
@@ -13,7 +11,7 @@ import {
 } from '../../models/ticket.models';
 import { ErrorStateComponent } from '@shared/components';
 import { AyudaTicketFacade } from './services/ayuda-ticket.facade';
-import { EduMessageService, EduSelect, EduSpinner, EduTable, EduTag, EduTemplate, EduTextarea, EduToast } from '@edu-ui';
+import { EduButton, EduMessageService, EduSelect, EduSpinner, EduTable, EduTag, EduTemplate, EduTextarea, EduToast } from '@edu-ui';
 
 interface TipoOption {
 	label: string;
@@ -42,7 +40,7 @@ const ESTADO_SEVERITY: Record<TicketEstado, 'warn' | 'info' | 'success'> = {
 @Component({
 	selector: 'app-ayuda-ticket',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduSelect, EduTextarea, ButtonModule, EduSpinner, EduTable, EduTag, EduToast, ErrorStateComponent, EduTemplate],
+	imports: [CommonModule, FormsModule, EduSelect, EduTextarea, EduButton, EduSpinner, EduTable, EduTag, EduToast, ErrorStateComponent, EduTemplate],
 	providers: [AyudaTicketFacade, EduMessageService],
 	templateUrl: './ayuda-ticket.component.html',
 	styleUrl: './ayuda-ticket.component.scss',

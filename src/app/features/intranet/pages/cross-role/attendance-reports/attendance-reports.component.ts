@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
 import { TableSkeletonComponent } from '@intranet-shared/components/table-skeleton/table-skeleton.component';
 import { StatsSkeletonComponent } from '@intranet-shared/components/stats-skeleton/stats-skeleton.component';
 import { ErrorStateComponent } from '@shared/components';
@@ -10,6 +9,7 @@ import { ReportsFiltersComponent } from './components/reports-filters/reports-fi
 import { ReportsSummaryComponent } from './components/reports-summary/reports-summary.component';
 import { ReportsResultComponent } from './components/reports-result/reports-result.component';
 import { AttendanceReportsFacade } from './services';
+import { EduButton } from '@edu-ui';
 import {
 	salonToOption,
 	TIPOS_PERSONA,
@@ -22,7 +22,7 @@ import {
 @Component({
 	selector: 'app-attendance-reports',
 	standalone: true,
-	imports: [ButtonModule, ReportsFiltersComponent, ReportsSummaryComponent, ReportsResultComponent, TableSkeletonComponent, StatsSkeletonComponent, ErrorStateComponent],
+	imports: [EduButton, ReportsFiltersComponent, ReportsSummaryComponent, ReportsResultComponent, TableSkeletonComponent, StatsSkeletonComponent, ErrorStateComponent],
 	templateUrl: './attendance-reports.component.html',
 	styleUrl: './attendance-reports.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

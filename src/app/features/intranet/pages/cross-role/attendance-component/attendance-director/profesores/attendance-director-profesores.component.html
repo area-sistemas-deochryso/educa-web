@@ -41,23 +41,23 @@
 		</div>
 
 		@if (selectedProfesor()) {
-			<p-button
+			<edu-button
 				icon="pi pi-pencil"
 				severity="info"
 				[text]="true"
 				[rounded]="true"
-				(onClick)="onEditarEnAdminMes()"
+				(click)="onEditarEnAdminMes()"
 				eduTooltip="Editar asistencia del profesor en admin"
 				eduTooltipPosition="top"
 				[pt]="{ root: { 'aria-label': 'Editar asistencia del profesor en admin' } }"
 			/>
 		}
-		<p-button
+		<edu-button
 			icon="pi pi-chart-bar"
 			severity="secondary"
 			[text]="true"
 			[rounded]="true"
-			(onClick)="navigateToReportes()"
+			(click)="navigateToReportes()"
 			eduTooltip="Reportes de asistencia"
 			eduTooltipPosition="top"
 			[pt]="{ root: { 'aria-label': 'Reportes de asistencia' } }"
@@ -117,22 +117,22 @@
 		(editAdmin)="onEditarEnAdminDia($event)"
 	>
 		<ng-container actionsSlot>
-			<p-button
+			<edu-button
 				icon="pi pi-pencil"
 				severity="info"
 				[text]="true"
 				[rounded]="true"
-				(onClick)="navigateToGestion()"
+				(click)="navigateToGestion()"
 				eduTooltip="Gestión de asistencia"
 				eduTooltipPosition="top"
 				[pt]="{ root: { 'aria-label': 'Gestión de asistencia' } }"
 			/>
-			<p-button
+			<edu-button
 				icon="pi pi-chart-bar"
 				severity="secondary"
 				[text]="true"
 				[rounded]="true"
-				(onClick)="navigateToReportes()"
+				(click)="navigateToReportes()"
 				eduTooltip="Reportes de asistencia"
 				eduTooltipPosition="top"
 				[pt]="{ root: { 'aria-label': 'Reportes de asistencia' } }"

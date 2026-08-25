@@ -94,15 +94,14 @@
 
 	<!-- Acción -->
 	<div class="filter-action">
-		<button
-			pButton
+		<edu-button
 			label="Visualizar tabla"
 			icon="pi pi-table"
-			class="p-button-success"
+			severity="success"
 			(click)="generar.emit()"
 			[loading]="loading()"
 			[disabled]="disableGenerar()"
-		></button>
+		/>
 	</div>
 </div>
 <!-- #endregion -->

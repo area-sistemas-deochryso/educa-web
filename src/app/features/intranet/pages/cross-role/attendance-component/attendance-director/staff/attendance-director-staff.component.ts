@@ -41,10 +41,9 @@ import {
 import { AsistenciaStaffApiService } from '@intranet-shared/services';
 import { formatDateLocalIso } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
-import { ButtonModule } from 'primeng/button';
 
 import { MonthSearchState } from '../month-search-state';
-import { EduInputText, EduTooltip } from '@edu-ui';
+import { EduButton, EduInputText, EduTooltip } from '@edu-ui';
 
 const TIPO_LABELS: Record<string, string> = {
 	C: 'Coordinador',
@@ -56,7 +55,7 @@ const TIPO_LABELS: Record<string, string> = {
 @Component({
 	selector: 'app-attendance-director-staff',
 	standalone: true,
-	imports: [AttendanceLegendStatsComponent, AttendancePersonaDayListComponent, AttendanceHeatmapComponent, AttendanceTemporalNavComponent, AttendanceTableSkeletonComponent, EmptyStateComponent, ButtonModule, FormsModule, EduInputText, EduTooltip],
+	imports: [AttendanceLegendStatsComponent, AttendancePersonaDayListComponent, AttendanceHeatmapComponent, AttendanceTemporalNavComponent, AttendanceTableSkeletonComponent, EmptyStateComponent, EduButton, FormsModule, EduInputText, EduTooltip],
 	templateUrl: './attendance-director-staff.component.html',
 	styleUrl: './attendance-director-staff.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

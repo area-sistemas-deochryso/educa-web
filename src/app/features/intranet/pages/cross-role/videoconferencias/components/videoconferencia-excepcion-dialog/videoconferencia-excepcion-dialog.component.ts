@@ -1,8 +1,7 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, input, model, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
-import { EduDialog, EduTextarea } from '@edu-ui';
+import { EduButton, EduDialog, EduTextarea } from '@edu-ui';
 
 // #endregion
 
@@ -13,7 +12,7 @@ export interface ExcepcionContext {
 @Component({
 	selector: 'app-videoconferencia-excepcion-dialog',
 	standalone: true,
-	imports: [FormsModule, EduDialog, ButtonModule, EduTextarea],
+	imports: [FormsModule, EduDialog, EduButton, EduTextarea],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './videoconferencia-excepcion-dialog.component.html',
 	styleUrl: './videoconferencia-excepcion-dialog.component.scss',

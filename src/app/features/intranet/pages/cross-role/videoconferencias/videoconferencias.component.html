@@ -27,13 +27,13 @@
 					<i class="pi pi-exclamation-triangle" style="font-size: 1.75rem; color: var(--orange-500)"></i>
 				</div>
 				<p class="text-color-secondary fw-semibold mb-1">{{ vm().error }}</p>
-				<button
-					pButton
+				<edu-button
 					label="Reintentar"
 					icon="pi pi-refresh"
-					class="p-button-outlined mt-3"
+					[outlined]="true"
+					class="mt-3"
 					(click)="onRetry()"
-				></button>
+				/>
 			</div>
 			<!-- #endregion -->
 		} @else if (vm().isEmpty) {
@@ -97,31 +97,29 @@
 							}
 
 							@if (estadoDe(item) === 'disponible') {
-								<button
-									pButton
+								<edu-button
 									label="Unirse a Sala"
 									icon="pi pi-video"
 									class="w-100"
 									(click)="onUnirse(item)"
-								></button>
+								/>
 							} @else if (isModerator()) {
-								<button
-									pButton
+								<edu-button
 									label="Habilitar fuera de horario"
 									icon="pi pi-unlock"
-									class="w-100 p-button-outlined"
+									[outlined]="true"
+									class="w-100"
 									(click)="onSolicitarExcepcion(item)"
-								></button>
+								/>
 							} @else {
-								<button
-									pButton
+								<edu-button
 									[label]="estadoLabel(item)"
 									icon="pi pi-video"
 									class="w-100"
 									[disabled]="true"
 									eduTooltip="El estado se actualiza automáticamente — vuelve a intentar cuando esté disponible"
 									eduTooltipPosition="top"
-								></button>
+								/>
 							}
 						</div>
 					</div>

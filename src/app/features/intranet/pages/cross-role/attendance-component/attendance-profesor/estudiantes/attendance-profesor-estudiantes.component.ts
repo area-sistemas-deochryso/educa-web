@@ -20,7 +20,6 @@ import {
 	VIEW_MODE,
 	ViewMode,
 } from '@features/intranet/components/attendance/attendance-header/attendance-header.component';
-import { ButtonModule } from 'primeng/button';
 import { DatePipe } from '@angular/common';
 import { EmptyStateComponent } from '@features/intranet/components/attendance/empty-state/empty-state.component';
 import { FormsModule } from '@angular/forms';
@@ -31,7 +30,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { buildPdfExcelMenuItems } from '../../attendance-director/consolidated-pdf.helper';
 import { MonthSearchState } from '../../attendance-director/month-search-state';
 import { AttendanceSalonesSummaryComponent } from './components/attendance-salones-summary/attendance-salones-summary.component';
-import { EduInputText, EduMenu, EduSelect, EduSelectButton, EduTooltip } from '@edu-ui';
+import { EduButton, EduInputText, EduMenu, EduSelect, EduSelectButton, EduTooltip } from '@edu-ui';
 import type { EduMenuItem } from '@edu-ui';
 
 /**
@@ -45,7 +44,7 @@ import type { EduMenuItem } from '@edu-ui';
 @Component({
 	selector: 'app-attendance-profesor-estudiantes',
 	standalone: true,
-	imports: [AttendanceHeatmapComponent, AttendanceTableSkeletonComponent, AttendanceScopeStudentNoticeComponent, SalonSelectorComponent, AttendanceDayListComponent, EmptyStateComponent, AttendanceLegendComponent, JustificationDialogComponent, ButtonModule, EduTooltip, EduMenu, EduInputText, DatePipe, FormsModule, EduSelect, EduSelectButton, AttendanceSalonesSummaryComponent],
+	imports: [AttendanceHeatmapComponent, AttendanceTableSkeletonComponent, AttendanceScopeStudentNoticeComponent, SalonSelectorComponent, AttendanceDayListComponent, EmptyStateComponent, AttendanceLegendComponent, JustificationDialogComponent, EduButton, EduTooltip, EduMenu, EduInputText, DatePipe, FormsModule, EduSelect, EduSelectButton, AttendanceSalonesSummaryComponent],
 	providers: [AttendanceViewController, AttendancePdfService, AttendanceStatsService],
 	templateUrl: './attendance-profesor-estudiantes.component.html',
 	styleUrl: './attendance-profesor-estudiantes.component.scss',

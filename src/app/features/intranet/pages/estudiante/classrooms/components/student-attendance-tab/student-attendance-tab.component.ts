@@ -2,8 +2,6 @@ import { Component, ChangeDetectionStrategy, input, output, computed, OnInit, ef
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { ButtonModule } from 'primeng/button';
-
 import { NivelEducativo } from '@core/helpers';
 import { ErrorStateComponent } from '@shared/components';
 import {
@@ -16,7 +14,7 @@ import {
 	JustificarInasistenciaContext,
 } from '@features/intranet/pages/estudiante/models';
 import { JustificarInasistenciaDialogComponent } from '@features/intranet/pages/estudiante/components/justificar-inasistencia-dialog/justificar-inasistencia-dialog.component';
-import { EduSelect, EduSortableColumn, EduTable, EduTag, EduTooltip } from '@edu-ui';
+import { EduButton, EduSelect, EduSortableColumn, EduTable, EduTag, EduTooltip } from '@edu-ui';
 
 const MENSAJE_JUSTIFICACION_GESTIONADA = 'Las justificaciones las gestiona el colegio con tu apoderado';
 
@@ -31,7 +29,7 @@ export type JustificacionCellState =
 @Component({
 	selector: 'app-student-attendance-tab',
 	standalone: true,
-	imports: [EduTable, CommonModule, FormsModule, EduSortableColumn, EduTag, EduSelect, ButtonModule, EduTooltip, JustificarInasistenciaDialogComponent, ErrorStateComponent],
+	imports: [EduTable, CommonModule, FormsModule, EduSortableColumn, EduTag, EduSelect, EduButton, EduTooltip, JustificarInasistenciaDialogComponent, ErrorStateComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './student-attendance-tab.component.html',
 	styleUrl: './student-attendance-tab.component.scss',

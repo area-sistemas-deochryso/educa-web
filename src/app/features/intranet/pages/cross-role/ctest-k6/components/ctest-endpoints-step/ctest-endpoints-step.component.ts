@@ -2,10 +2,9 @@ import { Component, ChangeDetectionStrategy, inject, output } from '@angular/cor
 import { FormsModule } from '@angular/forms';
 
 import { CdkDropList, CdkDrag, CdkDragHandle, CdkDragDrop } from '@intranet-shared/directives/drag-drop';
-import { ButtonModule } from 'primeng/button';
 import { CTestK6Facade } from '../../services/ctest-k6.facade';
 import { HTTP_METHOD_OPTIONS, HttpMethod, K6Endpoint } from '../../models';
-import { EduCheckbox, EduInputText, EduSelect, EduTextarea, EduTooltip } from '@edu-ui';
+import { EduButton, EduCheckbox, EduInputText, EduSelect, EduTextarea, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-ctest-endpoints-step',
@@ -15,7 +14,7 @@ import { EduCheckbox, EduInputText, EduSelect, EduTextarea, EduTooltip } from '@
 		CdkDropList,
 		CdkDrag,
 		CdkDragHandle,
-		ButtonModule,
+		EduButton,
 		EduInputText,
 		EduSelect,
 		EduCheckbox,

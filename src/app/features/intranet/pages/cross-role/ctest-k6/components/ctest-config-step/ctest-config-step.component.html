@@ -131,35 +131,31 @@
 	<!-- #endregion -->
 
 	<!-- #region Credentials Button -->
-	<button
-		pButton
+	<edu-button
 		[label]="
 			vm().hasCredentials
 				? 'Credenciales (' + vm().credentials.length + ')'
 				: 'Configurar Credenciales'
 		"
 		icon="pi pi-lock"
-		[class]="
-			vm().hasCredentials
-				? 'p-button-success w-full'
-				: 'p-button-outlined w-full'
-		"
+		class="w-full"
+		[severity]="vm().hasCredentials ? 'success' : 'primary'"
+		[outlined]="!(vm().hasCredentials)"
 		(click)="onOpenCredentials()"
 		eduTooltip="Tokens de autenticación reales para simular usuarios con diferentes roles"
 		eduTooltipPosition="top"
-	></button>
+	/>
 	<!-- #endregion -->
 
 	<!-- #region Footer -->
 	<div class="step-footer">
 		<div class="step-spacer"></div>
-		<button
-			pButton
+		<edu-button
 			label="Siguiente"
 			icon="pi pi-arrow-right"
 			iconPos="right"
 			(click)="onGoNext()"
-		></button>
+		/>
 	</div>
 	<!-- #endregion -->
 </div>

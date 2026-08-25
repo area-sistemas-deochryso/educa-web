@@ -4,22 +4,21 @@
 
 	@if (vm().hasData) {
 		<div class="export-buttons">
-			<button
-				pButton
+			<edu-button
 				icon="pi pi-file-pdf"
 				label="PDF"
-				class="p-button-outlined p-button-danger"
+				[outlined]="true"
+				severity="danger"
 				(click)="onExportPdf()"
 				[loading]="vm().exportingPdf"
-			></button>
-			<button
-				pButton
+			/>
+			<edu-button
 				icon="pi pi-file-excel"
 				label="Excel"
-				class="p-button-success"
+				severity="success"
 				(click)="onExportExcel()"
 				[loading]="vm().exportingExcel"
-			></button>
+			/>
 		</div>
 	}
 </div>

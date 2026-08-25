@@ -1,18 +1,17 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
 import {
 	ESTADO_OPTIONS,
 	RANGO_OPTIONS,
 	TIPO_PERSONA_OPTIONS,
 } from '../../config/attendance-reports.config';
 import type { EstadoFiltro, RangoTipo, SalonOption, TipoPersonaReporte } from '../../models';
-import { EduDatePicker, EduMultiSelect, EduSelect, EduSelectButton } from '@edu-ui';
+import { EduButton, EduDatePicker, EduMultiSelect, EduSelect, EduSelectButton } from '@edu-ui';
 
 @Component({
 	selector: 'app-reports-filters',
 	standalone: true,
-	imports: [FormsModule, EduSelect, EduSelectButton, EduMultiSelect, EduDatePicker, ButtonModule],
+	imports: [FormsModule, EduSelect, EduSelectButton, EduMultiSelect, EduDatePicker, EduButton],
 	templateUrl: './reports-filters.component.html',
 	styleUrl: './reports-filters.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

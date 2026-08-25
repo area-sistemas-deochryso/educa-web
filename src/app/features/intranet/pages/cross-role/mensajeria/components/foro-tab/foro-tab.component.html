@@ -32,15 +32,16 @@
 			<i class="pi pi-megaphone"></i>
 			<span>{{ readOnly() ? 'Publicaciones del profesor' : 'Mensajes visibles para todos los estudiantes del curso' }}</span>
 		</div>
-		<button
-			pButton
+		<edu-button
 			icon="pi pi-refresh"
-			class="p-button-rounded p-button-text p-button-sm"
+			[text]="true"
+			[rounded]="true"
+			size="small"
 			data-info-anchor="foro-refresh"
 			(click)="onRefresh()"
 			[disabled]="vm().loading"
 			[pt]="{ root: { 'aria-label': 'Refrescar mensajes' } }"
-		></button>
+		/>
 	</div>
 	<!-- #endregion -->
 
@@ -117,16 +118,15 @@
 					(keydown.enter)="onEnviar()"
 					[disabled]="vm().sending"
 				/>
-				<button
-					pButton
+				<edu-button
 					[icon]="isDirectedMessage() ? 'pi pi-envelope' : 'pi pi-send'"
-					class="p-button-rounded"
+					[rounded]="true"
 					data-info-anchor="foro-enviar"
 					(click)="onEnviar()"
 					[disabled]="!nuevoMensaje().trim() || vm().sending"
 					[loading]="vm().sending"
 					[pt]="{ root: { 'aria-label': isDirectedMessage() ? 'Enviar mensaje dirigido' : 'Enviar mensaje' } }"
-				></button>
+				/>
 			</div>
 			<!-- #endregion -->
 		}

@@ -92,25 +92,25 @@
 											[eduTooltip]="jstate.motivoRechazo ?? 'Sin motivo registrado'"
 											eduTooltipPosition="top"
 										/>
-										<button
-											pButton
+										<edu-button
 											type="button"
 											label="Reintentar"
-											class="p-button-text p-button-sm"
+											[text]="true"
+											size="small"
 											data-info-anchor="estudiante-justificar-reintentar-standalone"
 											(click)="onAbrirJustificar(item)"
-										></button>
+										/>
 									}
 									@case ('justificar') {
-										<button
-											pButton
+										<edu-button
 											type="button"
 											label="Justificar"
 											icon="pi pi-upload"
-											class="p-button-text p-button-sm"
+											[text]="true"
+											size="small"
 											data-info-anchor="estudiante-justificar-inasistencia-standalone"
 											(click)="onAbrirJustificar(item)"
-										></button>
+										/>
 									}
 									@default { — }
 								}

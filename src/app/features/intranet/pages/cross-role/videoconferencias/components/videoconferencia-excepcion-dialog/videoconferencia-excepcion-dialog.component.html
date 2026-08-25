@@ -34,19 +34,19 @@
 			</div>
 
 			<div class="dialog-footer">
-				<p-button
+				<edu-button
 					label="Cancelar"
 					severity="secondary"
 					[text]="true"
 					[disabled]="saving()"
-					(onClick)="close()"
+					(click)="close()"
 				/>
-				<p-button
+				<edu-button
 					label="Habilitar e ingresar"
 					icon="pi pi-video"
 					[loading]="saving()"
 					[disabled]="!motivoText().trim()"
-					(onClick)="confirmarClick()"
+					(click)="confirmarClick()"
 				/>
 			</div>
 		</div>

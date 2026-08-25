@@ -77,25 +77,26 @@
 							</td>
 							<td>
 								@if (solicitud.estado === 'PENDIENTE') {
-									<button
-										pButton
+									<edu-button
 										label="Aprobar"
 										icon="pi pi-check"
-										class="p-button-success p-button-sm"
+										size="small"
+										severity="success"
 										[disabled]="resolvingId() === solicitud.id"
 										[loading]="resolvingId() === solicitud.id"
 										(click)="onAprobar(solicitud)"
 										data-info-anchor="justificacion-bandeja-aprobar-btn"
-									></button>
-									<button
-										pButton
+									/>
+									<edu-button
 										label="Rechazar"
 										icon="pi pi-times"
-										class="p-button-danger p-button-outlined p-button-sm"
+										[outlined]="true"
+										size="small"
+										severity="danger"
 										[disabled]="resolvingId() === solicitud.id"
 										(click)="onAbrirRechazo(solicitud)"
 										data-info-anchor="justificacion-bandeja-rechazar-btn"
-									></button>
+									/>
 								} @else {
 									—
 								}
@@ -133,16 +134,19 @@
 	}
 
 	<ng-template #footer>
-		<button pButton label="Cancelar" class="p-button-text" (click)="onCancelarRechazo()"></button>
-		<button
-			pButton
+		<edu-button
+			label="Cancelar"
+			[text]="true"
+			(click)="onCancelarRechazo()"
+		/>
+		<edu-button
 			label="Rechazar"
 			icon="pi pi-times"
-			class="p-button-danger"
+			severity="danger"
 			[disabled]="!motivoRechazo().trim()"
 			[loading]="resolvingId() === solicitudSeleccionada()?.id"
 			(click)="onConfirmarRechazo()"
-		></button>
+		/>
 	</ng-template>
 </edu-dialog>
 

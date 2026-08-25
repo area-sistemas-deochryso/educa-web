@@ -1,7 +1,5 @@
 import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
 
-import { ButtonModule } from 'primeng/button';
-
 import { CTestK6Facade } from './services/ctest-k6.facade';
 import { CredentialsDialogComponent } from './components/credentials-dialog/credentials-dialog.component';
 import { ScriptOutputComponent } from './components/script-output/script-output.component';
@@ -9,12 +7,12 @@ import { LoadProfileComponent } from './components/load-profile/load-profile.com
 import { CTestConfigStepComponent } from './components/ctest-config-step/ctest-config-step.component';
 import { CTestStagesStepComponent } from './components/ctest-stages-step/ctest-stages-step.component';
 import { CTestEndpointsStepComponent } from './components/ctest-endpoints-step/ctest-endpoints-step.component';
-import { EduStep, EduStepList, EduStepPanel, EduStepPanels, EduStepper, EduTag } from '@edu-ui';
+import { EduButton, EduStep, EduStepList, EduStepPanel, EduStepPanels, EduStepper, EduTag } from '@edu-ui';
 @Component({
 	selector: 'app-ctest-k6',
 	standalone: true,
 	imports: [
-		ButtonModule,
+		EduButton,
 		EduTag,
 		EduStepper,
 		EduStepList,

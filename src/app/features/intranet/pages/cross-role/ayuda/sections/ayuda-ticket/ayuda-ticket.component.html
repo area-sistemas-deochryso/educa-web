@@ -52,12 +52,12 @@
 			></textarea>
 		</div>
 
-		<p-button
+		<edu-button
 			label="Enviar ticket"
 			icon="pi pi-send"
 			[disabled]="!canSubmit()"
 			[loading]="submitting()"
-			(onClick)="onSubmit()"
+			(click)="onSubmit()"
 		/>
 	</section>
 	<!-- #endregion -->

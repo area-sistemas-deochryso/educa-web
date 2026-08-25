@@ -44,10 +44,8 @@ import { AsistenciaProfesorApiService } from '@intranet-shared/services';
 import { downloadBlob, formatDateLocalIso, viewBlobInNewTab } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
 
-import { ButtonModule } from 'primeng/button';
-
 import { buildPdfExcelMenuItems } from '../consolidated-pdf.helper';
-import { EduInputText, EduMenu, EduTooltip } from '@edu-ui';
+import { EduButton, EduInputText, EduMenu, EduTooltip } from '@edu-ui';
 import type { EduMenuItem } from '@edu-ui';
 
 /**
@@ -58,7 +56,7 @@ import type { EduMenuItem } from '@edu-ui';
 @Component({
 	selector: 'app-attendance-director-profesores',
 	standalone: true,
-	imports: [AttendanceLegendStatsComponent, AttendancePersonaDayListComponent, AttendanceHeatmapComponent, AttendanceTemporalNavComponent, AttendanceTableSkeletonComponent, EmptyStateComponent, ButtonModule, FormsModule, EduInputText, EduMenu, EduTooltip],
+	imports: [AttendanceLegendStatsComponent, AttendancePersonaDayListComponent, AttendanceHeatmapComponent, AttendanceTemporalNavComponent, AttendanceTableSkeletonComponent, EmptyStateComponent, EduButton, FormsModule, EduInputText, EduMenu, EduTooltip],
 	templateUrl: './attendance-director-profesores.component.html',
 	styleUrl: './attendance-director-profesores.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

@@ -85,22 +85,20 @@
 
 					<!-- Footer -->
 					<div class="step-footer">
-						<button
-							pButton
+						<edu-button
 							label="Anterior"
 							icon="pi pi-arrow-left"
-							class="p-button-outlined"
+							[outlined]="true"
 							(click)="goToStep(2)"
-						></button>
+						/>
 						<div class="step-spacer"></div>
-						<button
-							pButton
+						<edu-button
 							label="Generar Script"
 							icon="pi pi-bolt"
 							class="generate-btn"
 							severity="success"
 							(click)="onGenerateScript()"
-						></button>
+						/>
 					</div>
 				</div>
 			</ng-template>
@@ -145,20 +143,18 @@
 
 						<!-- Footer -->
 						<div class="step-footer">
-							<button
-								pButton
+							<edu-button
 								label="Volver a Vista Previa"
 								icon="pi pi-arrow-left"
-								class="p-button-outlined"
+								[outlined]="true"
 								(click)="goToStep(3)"
-							></button>
+							/>
 							<div class="step-spacer"></div>
-							<button
-								pButton
+							<edu-button
 								label="Descargar Script"
 								icon="pi pi-download"
 								(click)="onDownloadScript()"
-							></button>
+							/>
 						</div>
 					</div>
 				</ng-template>

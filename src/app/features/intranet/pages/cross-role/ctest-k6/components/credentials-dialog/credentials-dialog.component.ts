@@ -1,10 +1,8 @@
 import { Component, ChangeDetectionStrategy, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-
-import { ButtonModule } from 'primeng/button';
 import { K6Credential, K6RoleDistribution } from '../../models';
 import { LOGIN_ROLE_OPTIONS } from '../../models';
-import { EduDialog, EduDivider, EduInputNumber, EduInputText, EduPassword, EduSelect, EduTag, EduTextarea, EduTooltip } from '@edu-ui';
+import { EduButton, EduDialog, EduDivider, EduInputNumber, EduInputText, EduPassword, EduSelect, EduTag, EduTextarea, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-credentials-dialog',
@@ -12,7 +10,7 @@ import { EduDialog, EduDivider, EduInputNumber, EduInputText, EduPassword, EduSe
 	imports: [
 		FormsModule,
 		EduDialog,
-		ButtonModule,
+		EduButton,
 		EduInputText,
 		EduPassword,
 		EduSelect,

@@ -2,7 +2,6 @@ import { Component, ChangeDetectionStrategy, inject, signal, computed } from '@a
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
 import { FormatFileSizePipe } from '@intranet-shared/pipes';
 import { EstudianteCursosFacade } from '@features/intranet/pages/estudiante/services/estudiante-cursos.facade';
 import { EstudianteArchivoDto, EstudianteTareaArchivoDto } from '@features/intranet/pages/estudiante/models';
@@ -11,7 +10,7 @@ import { ArchivosSummaryDialogComponent } from '@features/intranet/pages/profeso
 // eslint-disable-next-line layer-enforcement/imports-error -- Razón: ver import anterior — mismo dialog cross-role.
 import { TareasSummaryDialogComponent } from '@features/intranet/pages/profesor/cursos/components/tareas-summary-dialog/tareas-summary-dialog.component';
 import { NotasCursoCardComponent } from '@features/intranet/pages/estudiante/notas/components/notas-curso-card/notas-curso-card.component';
-import { EduAccordion, EduAccordionHeader, EduAccordionPanel, EduConfirmDialog, EduConfirmationService, EduDialog, EduTab, EduTabPanel, EduTabs, EduTooltip } from '@edu-ui';
+import { EduAccordion, EduAccordionHeader, EduAccordionPanel, EduButton, EduConfirmDialog, EduConfirmationService, EduDialog, EduTab, EduTabPanel, EduTabs, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-curso-content-readonly-dialog',
@@ -21,7 +20,7 @@ import { EduAccordion, EduAccordionHeader, EduAccordionPanel, EduConfirmDialog, 
 		FormsModule,
 		EduDialog,
 		EduAccordion, EduAccordionHeader, EduAccordionPanel,
-		ButtonModule,
+		EduButton,
 		EduTooltip,
 		EduConfirmDialog,
 		EduTabs, EduTab, EduTabPanel,

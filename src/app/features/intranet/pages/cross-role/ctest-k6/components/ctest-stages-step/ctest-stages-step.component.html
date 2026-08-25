@@ -53,11 +53,12 @@
 								eduTooltipPosition="top"
 							/>
 						</div>
-						<button
-							pButton
+						<edu-button
 							icon="pi pi-link"
-							class="p-button-rounded p-button-text p-button-sm"
-							[class.p-button-info]="stage.endpointIndices.length > 0"
+							[text]="true"
+							[rounded]="true"
+							size="small"
+							[severity]="stage.endpointIndices.length > 0 ? 'info' : 'primary'"
 							(click)="onToggleStageEndpoints(i)"
 							eduTooltip="Asignar endpoints a esta fase"
 							eduTooltipPosition="top"
@@ -66,14 +67,16 @@
 									'aria-label': 'Configurar endpoints de fase',
 								},
 							}"
-						></button>
-						<button
-							pButton
+						/>
+						<edu-button
 							icon="pi pi-trash"
-							class="p-button-rounded p-button-text p-button-danger p-button-sm"
+							[text]="true"
+							[rounded]="true"
+							size="small"
+							severity="danger"
 							(click)="onRemoveStage(i)"
 							[pt]="{ root: { 'aria-label': 'Eliminar stage' } }"
-						></button>
+						/>
 					</div>
 
 					<!-- Panel de asignación de endpoints por fase -->
@@ -119,15 +122,16 @@
 				</div>
 			}
 
-			<button
-				pButton
+			<edu-button
 				label="Agregar Stage"
 				icon="pi pi-plus"
-				class="p-button-outlined p-button-sm w-full"
+				[outlined]="true"
+				size="small"
+				class="w-full"
 				(click)="onAddStage()"
 				eduTooltip="Agregar una nueva fase al ramp-up"
 				eduTooltipPosition="top"
-			></button>
+			/>
 		</div>
 		<!-- #endregion -->
 
@@ -156,21 +160,19 @@
 
 	<!-- #region Footer -->
 	<div class="step-footer">
-		<button
-			pButton
+		<edu-button
 			label="Anterior"
 			icon="pi pi-arrow-left"
-			class="p-button-outlined"
+			[outlined]="true"
 			(click)="onGoPrev()"
-		></button>
+		/>
 		<div class="step-spacer"></div>
-		<button
-			pButton
+		<edu-button
 			label="Siguiente"
 			icon="pi pi-arrow-right"
 			iconPos="right"
 			(click)="onGoNext()"
-		></button>
+		/>
 	</div>
 	<!-- #endregion -->
 </div>

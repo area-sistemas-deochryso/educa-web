@@ -50,7 +50,12 @@
 			appendTo="body"
 		/>
 
-		<p-button label="Reportar" [disabled]="!canSubmit()" [loading]="submitting()" (onClick)="onSubmit()" />
+		<edu-button
+			label="Reportar"
+			[disabled]="!canSubmit()"
+			[loading]="submitting()"
+			(click)="onSubmit()"
+		/>
 	</div>
 
 	@if (submitSuccess()) {

@@ -19,14 +19,14 @@
 			/>
 		</div>
 		<div class="sim-actions">
-			<button
-				pButton
+			<edu-button
 				label="Restaurar"
 				icon="pi pi-undo"
-				class="p-button-outlined p-button-sm"
+				[outlined]="true"
+				size="small"
 				data-info-anchor="estudiante-notas-simulador-restaurar"
 				(click)="resetSimulacion.emit()"
-			></button>
+			/>
 		</div>
 	</div>
 	<!-- #endregion -->

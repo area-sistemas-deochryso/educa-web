@@ -3,14 +3,12 @@ import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { ButtonModule } from 'primeng/button';
-
 import { UserPermissionsService } from '@core/services';
 import { ErrorStateComponent } from '@shared/components';
 import { SolicitudJustificacionAsistenciaDto, EstadoSolicitudJustificacion } from '@features/intranet/pages/estudiante/models';
 
 import { JustificacionAsistenciaBandejaFacade } from './justificacion-asistencia-bandeja.facade';
-import { EduConfirmDialog, EduConfirmationService, EduDialog, EduSelect, EduSpinner, EduTable, EduTag, EduTextarea } from '@edu-ui';
+import { EduButton, EduConfirmDialog, EduConfirmationService, EduDialog, EduSelect, EduSpinner, EduTable, EduTag, EduTextarea } from '@edu-ui';
 // #endregion
 
 const JUSTIFICACION_ASISTENCIA_APROBAR = 'JUSTIFICACION_ASISTENCIA_APROBAR';
@@ -49,7 +47,7 @@ const ESTADO_LABEL: Record<EstadoSolicitudJustificacion, string> = {
 @Component({
 	selector: 'app-justificacion-asistencia-bandeja',
 	standalone: true,
-	imports: [CommonModule, FormsModule, ButtonModule, EduConfirmDialog, EduDialog, EduSpinner, EduSelect, EduTable, EduTag, EduTextarea, ErrorStateComponent],
+	imports: [CommonModule, FormsModule, EduButton, EduConfirmDialog, EduDialog, EduSpinner, EduSelect, EduTable, EduTag, EduTextarea, ErrorStateComponent],
 	providers: [JustificacionAsistenciaBandejaFacade, EduConfirmationService],
 	templateUrl: './justificacion-asistencia-bandeja.component.html',
 	styleUrl: './justificacion-asistencia-bandeja.component.scss',

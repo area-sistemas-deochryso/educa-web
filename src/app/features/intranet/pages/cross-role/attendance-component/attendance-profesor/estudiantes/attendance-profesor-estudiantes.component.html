@@ -102,14 +102,14 @@
 				} @else {
 					<span class="pdf-label">{{ view.pdfFecha() | date: 'MMMM yyyy' }}</span>
 				}
-				<p-button
+				<edu-button
 					icon="pi pi-file-pdf"
 					[loading]="view.pdf.downloadingPdf()"
 					[disabled]="view.monthSubMode() === 'periodo' && !view.isPeriodoValid()"
 					severity="danger"
 					[text]="true"
 					[rounded]="true"
-					(onClick)="togglePdfMenu($event)"
+					(click)="togglePdfMenu($event)"
 					eduTooltip="Opciones de PDF"
 					eduTooltipPosition="top"
 					[pt]="{ root: { 'aria-label': 'Opciones de PDF' } }"
