@@ -2,8 +2,6 @@ import { ChangeDetectionStrategy, Component, computed, inject, input } from '@an
 import { CommonModule, DatePipe } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 
-import { ButtonModule } from 'primeng/button';
-
 import {
 	CorrelationEmailOutboxDto,
 	OUTBOX_ESTADO_SEVERITY_MAP,
@@ -14,7 +12,7 @@ import { EduButton, EduTable, EduTag, EduTemplate, EduTooltip } from '@edu-ui';
 @Component({
 	selector: 'app-correlation-emails-section',
 	standalone: true,
-	imports: [CommonModule, DatePipe, RouterLink, ButtonModule, EduButton, EduTable, EduTag, EduTooltip, EduTemplate],
+	imports: [CommonModule, DatePipe, RouterLink, EduButton, EduTable, EduTag, EduTooltip, EduTemplate],
 	templateUrl: './correlation-emails-section.component.html',
 	styleUrl: './correlation-emails-section.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

@@ -8,13 +8,10 @@
 		<a
 			[routerLink]="['/intranet/admin/rate-limit-events']"
 			[queryParams]="{ correlationId: correlationId() }"
-			pButton
-			type="button"
-			label="Abrir en rate-limit"
-			icon="pi pi-external-link"
-			class="p-button-text p-button-sm"
+			class="edu-button-link edu-button-link--text edu-button-link--sm"
+			data-severity="primary"
 			data-info-anchor="admin-correlation-open-external"
-		></a>
+		><span>Abrir en rate-limit</span><i class="edu-button-link__icon pi pi-external-link"></i></a>
 	</header>
 
 	@if (count() === 0) {

@@ -248,13 +248,10 @@
 								<a
 									[routerLink]="['/intranet/admin/monitoreo/incidencias/errores']"
 									[queryParams]="{ errorId: cp.id }"
-									pButton
-									type="button"
-									label="Ver ocurrencia contraparte"
-									icon="pi pi-external-link"
-									class="p-button-text p-button-sm counterpart-link"
+									class="edu-button-link edu-button-link--text edu-button-link--sm counterpart-link"
+									data-severity="primary"
 									data-info-anchor="admin-error-groups-ver-contraparte-link"
-								></a>
+								><span>Ver ocurrencia contraparte</span><i class="edu-button-link__icon pi pi-external-link"></i></a>
 							</div>
 						}
 					</edu-tabpanel>
@@ -418,13 +415,10 @@
 								<app-correlation-id-pill [id]="err.correlationId" />
 								<a
 									[routerLink]="['/intranet/admin/correlation', err.correlationId]"
-									pButton
-									type="button"
-									label="Ver eventos correlacionados"
-									icon="pi pi-share-alt"
-									class="p-button-text p-button-sm correlation-link"
+									class="edu-button-link edu-button-link--text edu-button-link--sm correlation-link"
+									data-severity="primary"
 									data-info-anchor="admin-error-groups-ver-correlacionados-link"
-								></a>
+								><span>Ver eventos correlacionados</span><i class="edu-button-link__icon pi pi-share-alt"></i></a>
 							</div>
 						}
 					</edu-tabpanel>

@@ -2,8 +2,6 @@ import { ChangeDetectionStrategy, Component, computed, inject, input } from '@an
 import { CommonModule, DatePipe } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 
-import { ButtonModule } from 'primeng/button';
-
 import {
 	CorrelationErrorLogDto,
 	SECTION_DEFENSIVE_CAP,
@@ -14,7 +12,7 @@ import { EduButton, EduTable, EduTag, EduTemplate, EduTooltip } from '@edu-ui';
 @Component({
 	selector: 'app-correlation-errors-section',
 	standalone: true,
-	imports: [CommonModule, DatePipe, RouterLink, ButtonModule, EduButton, EduTable, EduTag, EduTooltip, EduTemplate],
+	imports: [CommonModule, DatePipe, RouterLink, EduButton, EduTable, EduTag, EduTooltip, EduTemplate],
 	templateUrl: './correlation-errors-section.component.html',
 	styleUrl: './correlation-errors-section.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

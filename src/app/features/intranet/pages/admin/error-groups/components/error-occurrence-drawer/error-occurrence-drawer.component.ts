@@ -15,8 +15,6 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { ButtonModule } from 'primeng/button';
-
 import { logger } from '@core/helpers';
 import { CorrelationIdPillComponent } from '@intranet-shared/components';
 
@@ -62,7 +60,7 @@ import { EduDrawer, EduTab, EduTabPanel, EduTabs, EduTag, EduTooltip } from '@ed
 	selector: 'app-error-occurrence-drawer',
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [CommonModule, DatePipe, RouterLink, ButtonModule, EduDrawer, EduTag, EduTooltip, CorrelationIdPillComponent, EduTab, EduTabPanel, EduTabs],
+	imports: [CommonModule, DatePipe, RouterLink, EduDrawer, EduTag, EduTooltip, CorrelationIdPillComponent, EduTab, EduTabPanel, EduTabs],
 	templateUrl: './error-occurrence-drawer.component.html',
 	styleUrl: './error-occurrence-drawer.component.scss',
 })

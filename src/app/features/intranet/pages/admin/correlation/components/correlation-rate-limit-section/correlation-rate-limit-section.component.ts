@@ -2,15 +2,13 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
-import { ButtonModule } from 'primeng/button';
-
 import { CorrelationRateLimitEventDto, SECTION_DEFENSIVE_CAP } from '../../models';
 import { EduTable, EduTag, EduTemplate, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-correlation-rate-limit-section',
 	standalone: true,
-	imports: [CommonModule, DatePipe, RouterLink, ButtonModule, EduTable, EduTag, EduTooltip, EduTemplate],
+	imports: [CommonModule, DatePipe, RouterLink, EduTable, EduTag, EduTooltip, EduTemplate],
 	templateUrl: './correlation-rate-limit-section.component.html',
 	styleUrl: './correlation-rate-limit-section.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
