@@ -2,14 +2,13 @@ import { Component, ChangeDetectionStrategy, inject, input, output, signal, comp
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CdkDropList, CdkDrag, CdkDragHandle, CdkDragDrop } from '@intranet-shared/directives/drag-drop';
-import { ButtonModule } from 'primeng/button';
 import { ErrorHandlerService } from '@core/services';
 import {
 	GrupoContenidoDto,
 	GrupoEstudianteDto,
 	EstudianteSinGrupoDto,
 } from '@features/intranet/pages/profesor/models';
-import { EduCheckbox, EduConfirmDialog, EduConfirmationService, EduDialog, EduInputText, EduSelect, EduSkeleton, EduTag, EduTooltip } from '@edu-ui';
+import { EduButton, EduCheckbox, EduConfirmDialog, EduConfirmationService, EduDialog, EduInputText, EduSelect, EduSkeleton, EduTag, EduTooltip } from '@edu-ui';
 
 interface DragData {
 	estudianteId: number;
@@ -23,7 +22,7 @@ interface DropListData {
 @Component({
 	selector: 'app-salon-grupos-tab',
 	standalone: true,
-	imports: [CommonModule, FormsModule, CdkDropList, CdkDrag, CdkDragHandle, ButtonModule, EduInputText, EduSelect, EduTag, EduTooltip, EduDialog, EduConfirmDialog, EduSkeleton, EduCheckbox],
+	imports: [CommonModule, FormsModule, CdkDropList, CdkDrag, CdkDragHandle, EduButton, EduInputText, EduSelect, EduTag, EduTooltip, EduDialog, EduConfirmDialog, EduSkeleton, EduCheckbox],
 	providers: [EduConfirmationService],
 	templateUrl: './salon-grupos-tab.component.html',
 	styleUrl: './salon-grupos-tab.component.scss',

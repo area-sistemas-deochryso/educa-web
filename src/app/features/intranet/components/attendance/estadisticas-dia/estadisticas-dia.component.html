@@ -3,13 +3,13 @@
 	<div class="estadisticas-container">
 		<div class="header-row">
 			<!-- * Descarga PDF/Excel -->
-			<p-button
+			<edu-button
 				icon="pi pi-download"
 				[loading]="downloadingPdf()"
 				severity="secondary"
 				[text]="true"
 				[rounded]="true"
-				(onClick)="toggleMenu($event)"
+				(click)="toggleMenu($event)"
 				eduTooltip="Descargar reporte"
 				eduTooltipPosition="top"
 				[pt]="{

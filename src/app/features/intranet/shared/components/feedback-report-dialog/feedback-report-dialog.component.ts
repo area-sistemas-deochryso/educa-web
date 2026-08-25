@@ -3,10 +3,9 @@ import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@ang
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { ButtonModule } from 'primeng/button';
 
 import { FeedbackReportFacade, REPORTE_TIPO_OPTIONS, ReporteTipo } from '@core/services/feedback';
-import { EduCheckbox, EduDialog, EduMessage, EduSelect, EduTemplate, EduTextarea } from '@edu-ui';
+import { EduButton, EduCheckbox, EduDialog, EduMessage, EduSelect, EduTemplate, EduTextarea } from '@edu-ui';
 
 // #endregion
 // #region Implementation
@@ -20,7 +19,7 @@ import { EduCheckbox, EduDialog, EduMessage, EduSelect, EduTemplate, EduTextarea
 	selector: 'app-feedback-report-dialog',
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [CommonModule, FormsModule, EduDialog, ButtonModule, EduCheckbox, EduSelect, EduTextarea, EduMessage, EduTemplate],
+	imports: [CommonModule, FormsModule, EduDialog, EduButton, EduCheckbox, EduSelect, EduTextarea, EduMessage, EduTemplate],
 	templateUrl: './feedback-report-dialog.component.html',
 	styleUrl: './feedback-report-dialog.component.scss',
 })

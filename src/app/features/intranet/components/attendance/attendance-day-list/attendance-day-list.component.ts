@@ -10,7 +10,6 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
 // Exception (588 retry, F6c): eduTooltip has no `tooltipOptions` input (confirmed missing,
 // not a false positive) -- kept on PrimeNG for this one row-hover tooltip only.
 import { TooltipModule } from 'primeng/tooltip';
@@ -22,7 +21,7 @@ import { getStatusClass } from '@features/intranet/pages/cross-role/attendance-c
 import { AttendanceStatus } from '@features/intranet/pages/cross-role/attendance-component/models/attendance.types';
 import { AttendanceTemporalNavComponent } from '../attendance-temporal-nav/attendance-temporal-nav.component';
 import { EmptyStateComponent } from '../empty-state/empty-state.component';
-import { EduDialog, EduInputText, EduMenu, EduSelect, EduTable, EduTextarea, EduTooltip } from '@edu-ui';
+import { EduButton, EduDialog, EduInputText, EduMenu, EduSelect, EduTable, EduTextarea, EduTooltip } from '@edu-ui';
 import type { EduMenuItem } from '@edu-ui';
 
 export interface EstudianteAsistenciaDia {
@@ -52,7 +51,7 @@ export interface JustificacionEvent {
 		EduTable,
 		TableSkeletonComponent,
 		ResponsiveTableComponent,
-		ButtonModule,
+		EduButton,
 		TooltipModule,
 		EduMenu,
 		EduTooltip,

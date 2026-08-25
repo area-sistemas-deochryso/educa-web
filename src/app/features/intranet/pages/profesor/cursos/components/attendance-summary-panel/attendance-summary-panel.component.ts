@@ -1,16 +1,15 @@
 import { Component, ChangeDetectionStrategy, input, output, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
 
 import { AsistenciaCursoResumenDto } from '@features/intranet/pages/profesor/models';
 import { ErrorStateComponent } from '@shared/components';
-import { EduDatePicker, EduTable, EduTag } from '@edu-ui';
+import { EduButton, EduDatePicker, EduTable, EduTag } from '@edu-ui';
 
 @Component({
 	selector: 'app-attendance-summary-panel',
 	standalone: true,
-	imports: [CommonModule, FormsModule, ButtonModule, EduDatePicker, EduTable, EduTag, ErrorStateComponent],
+	imports: [CommonModule, FormsModule, EduButton, EduDatePicker, EduTable, EduTag, ErrorStateComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './attendance-summary-panel.component.html',
 	styleUrl: './attendance-summary-panel.component.scss',

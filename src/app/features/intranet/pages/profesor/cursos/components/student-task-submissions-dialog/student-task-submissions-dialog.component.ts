@@ -1,15 +1,14 @@
 import { Component, ChangeDetectionStrategy, input, output, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ButtonModule } from 'primeng/button';
 import { EstudianteTareaArchivosGroupDto, CursoContenidoTareaDto } from '@features/intranet/pages/profesor/models';
 import { FormatFileSizePipe } from '@intranet-shared/pipes';
 import { SkeletonLoaderComponent } from '@shared/components';
-import { EduDialog, EduTag, EduTooltip } from '@edu-ui';
+import { EduButton, EduDialog, EduTag, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-student-task-submissions-dialog',
 	standalone: true,
-	imports: [CommonModule, EduDialog, ButtonModule, EduTooltip, EduTag, SkeletonLoaderComponent, FormatFileSizePipe],
+	imports: [CommonModule, EduDialog, EduButton, EduTooltip, EduTag, SkeletonLoaderComponent, FormatFileSizePipe],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './student-task-submissions-dialog.component.html',
 	styleUrl: './student-task-submissions-dialog.component.scss',

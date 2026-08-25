@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 
 import { FormsModule } from '@angular/forms';
 
-import { ButtonModule } from 'primeng/button';
 
 import { SalonNotasResumenDto, calcularPromedioPonderado, NOTA_MAXIMA } from '@features/intranet/pages/profesor/models';
 import {
@@ -15,7 +14,7 @@ import {
 } from '@intranet-shared/services/calificacion-config';
 import type { ConfiguracionCalificacionListDto } from '@data/models';
 import { ErrorStateComponent } from '@shared/components';
-import { EduInputText, EduSelect, EduSkeleton, EduTable, EduTag, EduTooltip } from '@edu-ui';
+import { EduButton, EduInputText, EduSelect, EduSkeleton, EduTable, EduTag, EduTooltip } from '@edu-ui';
 
 export interface NotaSaveEvent {
 	calificacionId: number;
@@ -35,7 +34,7 @@ interface EvaluacionRow {
 @Component({
 	selector: 'app-salon-notas-estudiante-tab',
 	standalone: true,
-	imports: [CommonModule, EduTable, EduTag, EduSelect, FormsModule, EduSkeleton, ButtonModule, EduInputText, ErrorStateComponent, EduTooltip],
+	imports: [CommonModule, EduTable, EduTag, EduSelect, FormsModule, EduSkeleton, EduButton, EduInputText, ErrorStateComponent, EduTooltip],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './salon-notas-estudiante-tab.component.html',
 	styleUrl: './salon-notas-estudiante-tab.component.scss',

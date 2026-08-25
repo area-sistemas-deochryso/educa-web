@@ -1,7 +1,6 @@
 import { Component, ChangeDetectionStrategy, inject, input, output, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
 import { toLocalIso } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
 import {
@@ -13,7 +12,7 @@ import {
 	PESO_MINIMO,
 	PESO_MAXIMO,
 } from '@features/intranet/pages/profesor/models';
-import { EduDatePicker, EduDialog, EduInputNumber, EduInputText, EduSelect, EduToggle, EduTooltip } from '@edu-ui';
+import { EduButton, EduDatePicker, EduDialog, EduInputNumber, EduInputText, EduSelect, EduToggle, EduTooltip } from '@edu-ui';
 import type { EduInputNumberInputEvent } from '@edu-ui';
 
 interface FormData {
@@ -29,7 +28,7 @@ interface FormData {
 @Component({
 	selector: 'app-evaluacion-form-dialog',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduDialog, ButtonModule, EduInputText, EduInputNumber, EduSelect, EduDatePicker, EduTooltip, EduToggle],
+	imports: [CommonModule, FormsModule, EduDialog, EduButton, EduInputText, EduInputNumber, EduSelect, EduDatePicker, EduTooltip, EduToggle],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './evaluacion-form-dialog.component.html',
 	styleUrl: './evaluacion-form-dialog.component.scss',

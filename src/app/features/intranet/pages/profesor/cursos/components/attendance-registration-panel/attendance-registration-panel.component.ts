@@ -1,7 +1,6 @@
 import { Component, ChangeDetectionStrategy, input, output, computed, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
 
 import {
 	AsistenciaCursoEstudianteDto,
@@ -11,12 +10,12 @@ import {
 	ESTADO_ASISTENCIA_ICONS,
 } from '@features/intranet/pages/profesor/models';
 import { findNearestValidDate } from './attendance-registration-panel.helpers';
-import { EduConfirmDialog, EduConfirmationService, EduDatePicker, EduInputText, EduTag, EduTooltip } from '@edu-ui';
+import { EduButton, EduConfirmDialog, EduConfirmationService, EduDatePicker, EduInputText, EduTag, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-attendance-registration-panel',
 	standalone: true,
-	imports: [CommonModule, FormsModule, ButtonModule, EduDatePicker, EduTag, EduInputText, EduTooltip, EduConfirmDialog],
+	imports: [CommonModule, FormsModule, EduButton, EduDatePicker, EduTag, EduInputText, EduTooltip, EduConfirmDialog],
 	providers: [EduConfirmationService],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './attendance-registration-panel.component.html',

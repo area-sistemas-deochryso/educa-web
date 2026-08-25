@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, model, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
-import { EduDialog, EduTextarea } from '@edu-ui';
+import { EduButton, EduDialog, EduTextarea } from '@edu-ui';
 
 export interface JustificationContext {
 	personId: number;
@@ -22,7 +21,7 @@ export interface JustificationResult {
 @Component({
 	selector: 'app-justification-dialog',
 	standalone: true,
-	imports: [FormsModule, EduDialog, ButtonModule, EduTextarea],
+	imports: [FormsModule, EduDialog, EduButton, EduTextarea],
 	templateUrl: './justification-dialog.component.html',
 	styleUrl: './justification-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

@@ -4,7 +4,6 @@ import { RouterLink } from '@angular/router';
 
 import { FormsModule } from '@angular/forms';
 
-import { ButtonModule } from 'primeng/button';
 
 import {
 	SalonNotasResumenDto,
@@ -21,7 +20,7 @@ import {
 } from '@intranet-shared/services/calificacion-config';
 import type { ConfiguracionCalificacionListDto } from '@data/models';
 import { ErrorStateComponent } from '@shared/components';
-import { EduSelect, EduSelectButton, EduSkeleton, EduTable, EduTag, EduTooltip } from '@edu-ui';
+import { EduButton, EduSelect, EduSelectButton, EduSkeleton, EduTable, EduTag, EduTooltip } from '@edu-ui';
 
 interface PeriodoColumnsGroup {
 	periodo: PeriodoCalificacionDto;
@@ -38,7 +37,7 @@ interface SemanaColumnsGroup {
 @Component({
 	selector: 'app-classroom-grades-tab',
 	standalone: true,
-	imports: [CommonModule, SlicePipe, RouterLink, EduTable, EduTag, EduSelect, FormsModule, EduSelectButton, EduSkeleton, ButtonModule, EduTooltip, ErrorStateComponent],
+	imports: [CommonModule, SlicePipe, RouterLink, EduTable, EduTag, EduSelect, FormsModule, EduSelectButton, EduSkeleton, EduButton, EduTooltip, ErrorStateComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './salon-notas-tab.component.html',
 	styleUrl: './salon-notas-tab.component.scss',

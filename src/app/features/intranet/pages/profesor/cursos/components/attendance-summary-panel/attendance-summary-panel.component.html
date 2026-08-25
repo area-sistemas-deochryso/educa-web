@@ -21,15 +21,14 @@
 				appendTo="body"
 			/>
 		</div>
-		<button
-			pButton
+		<edu-button
 			label="Buscar"
 			icon="pi pi-search"
 			data-info-anchor="profesor-asistencia-resumen-buscar"
 			(click)="onBuscar()"
 			[loading]="loading()"
-			class="p-button-outlined"
-		></button>
+			[outlined]="true"
+		/>
 	</div>
 
 	@if (globalStats(); as stats) {

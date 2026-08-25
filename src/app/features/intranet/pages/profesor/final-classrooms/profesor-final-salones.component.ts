@@ -2,7 +2,6 @@ import { Component, ChangeDetectionStrategy, inject, OnInit } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { ButtonModule } from 'primeng/button';
 
 import { PageHeaderComponent } from '@intranet-shared/components';
 // eslint-disable-next-line layer-enforcement/imports-warn -- Razón: pendiente mover SalonesAdminTable y SalonDetailDialog a @intranet-shared (Plan maestro Carril B)
@@ -11,7 +10,7 @@ import { ClassroomsAdminTableComponent } from '@features/intranet/pages/admin/cl
 import { ClassroomDetailDialogComponent } from '@features/intranet/pages/admin/classrooms/components/salon-detail-dialog/salon-detail-dialog.component';
 import { AprobarEstudianteDto, AprobacionMasivaDto, NivelEducativo } from './models';
 import { TeacherFinalClassroomsFacade } from './services/profesor-final-salones.facade';
-import { EduInputNumber, EduMessageService, EduTab, EduTabPanel, EduTabs, EduTag, EduToast } from '@edu-ui';
+import { EduButton, EduInputNumber, EduMessageService, EduTab, EduTabPanel, EduTabs, EduTag, EduToast } from '@edu-ui';
 @Component({
 	selector: 'app-teacher-final-classrooms',
 	standalone: true,
@@ -19,7 +18,7 @@ import { EduInputNumber, EduMessageService, EduTab, EduTabPanel, EduTabs, EduTag
 		CommonModule,
 		FormsModule,
 		EduTabs, EduTab, EduTabPanel,
-		ButtonModule,
+		EduButton,
 		EduTag,
 		EduInputNumber,
 		EduToast,

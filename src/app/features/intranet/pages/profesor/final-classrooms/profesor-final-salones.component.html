@@ -9,10 +9,9 @@
 		[max]="2030"
 		[style]="{ width: '100px' }"
 	/>
-	<button
-		pButton
+	<edu-button
 		icon="pi pi-refresh"
-		class="p-button-outlined"
+		[outlined]="true"
 		data-info-anchor="profesor-final-salones-refresh"
 		(click)="onRefresh()"
 		[pt]="{
@@ -20,7 +19,7 @@
 				'aria-label': 'Refrescar',
 			},
 		}"
-	></button>
+	/>
 </app-page-header>
 <!-- #endregion -->
 

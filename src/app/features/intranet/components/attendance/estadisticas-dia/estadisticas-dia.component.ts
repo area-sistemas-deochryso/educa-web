@@ -2,9 +2,8 @@
 import { ChangeDetectionStrategy, Component, ViewChild, input, output } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
 
-import { ButtonModule } from 'primeng/button';
 import { EstadisticasDia } from '@data/models';
-import { EduMenu, EduTooltip } from '@edu-ui';
+import { EduButton, EduMenu, EduTooltip } from '@edu-ui';
 import type { EduMenuItem } from '@edu-ui';
 
 /**
@@ -16,7 +15,7 @@ import type { EduMenuItem } from '@edu-ui';
 @Component({
 	selector: 'app-estadisticas-dia',
 	standalone: true,
-	imports: [DatePipe, DecimalPipe, ButtonModule, EduTooltip, EduMenu],
+	imports: [DatePipe, DecimalPipe, EduButton, EduTooltip, EduMenu],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './estadisticas-dia.component.html',
 	styleUrls: ['./estadisticas-dia.component.scss'],

@@ -292,10 +292,12 @@
 												styleClass="nota-severity-tag"
 											/>
 										}
-										<button
-											pButton
+										<edu-button
 											[icon]="miembro.esOverride ? 'pi pi-times' : 'pi pi-pencil'"
-											[class]="miembro.esOverride ? 'p-button-rounded p-button-text p-button-sm p-button-danger' : 'p-button-rounded p-button-text p-button-sm'"
+											[rounded]="true"
+											[text]="true"
+											size="small"
+											[severity]="miembro.esOverride ? 'danger' : 'primary'"
 											data-info-anchor="profesor-calificar-toggle-override"
 											(click)="toggleMiembroOverride(grupo.grupoId, miembro.estudianteId)"
 											[pt]="{
@@ -305,7 +307,7 @@
 											}"
 											[eduTooltip]="miembro.esOverride ? 'Quitar nota individual' : 'Asignar nota individual'"
 											eduTooltipPosition="top"
-										></button>
+										/>
 									</div>
 								</div>
 							}
@@ -324,22 +326,20 @@
 
 	<ng-template #footer>
 		<div class="dialog-footer">
-			<button
-				pButton
+			<edu-button
 				label="Cancelar"
-				class="p-button-text"
+				[text]="true"
 				data-info-anchor="profesor-calificar-cancelar"
 				(click)="onVisibleChange(false)"
-			></button>
-			<button
-				pButton
+			/>
+			<edu-button
 				[label]="isGrupal() ? 'Guardar Notas Grupales' : 'Guardar Notas'"
 				icon="pi pi-check"
 				data-info-anchor="profesor-calificar-guardar"
 				[loading]="saving()"
 				[disabled]="!hasChanges()"
 				(click)="onSave()"
-			></button>
+			/>
 		</div>
 	</ng-template>
 </edu-dialog>

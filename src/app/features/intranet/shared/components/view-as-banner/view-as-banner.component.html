@@ -10,22 +10,22 @@
 				</span>
 			</div>
 			<div class="view-as-banner__actions">
-				<button
-					pButton
+				<edu-button
 					type="button"
 					label="Cambiar"
 					icon="pi pi-sync"
-					class="p-button-sm p-button-outlined"
+					[outlined]="true"
+					size="small"
 					(click)="openPicker()"
-				></button>
-				<button
-					pButton
+				/>
+				<edu-button
 					type="button"
 					label="Salir"
 					icon="pi pi-sign-out"
-					class="p-button-sm p-button-text"
+					[text]="true"
+					size="small"
 					(click)="exit()"
-				></button>
+				/>
 			</div>
 		</div>
 	</div>

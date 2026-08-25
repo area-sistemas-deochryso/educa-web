@@ -3,7 +3,6 @@ import { Component, ChangeDetectionStrategy, inject, OnInit, computed, signal, D
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 
-import { ButtonModule } from 'primeng/button';
 import { PageHeaderComponent } from '@intranet-shared/components';
 import { environment } from '@config/environment';
 import { ProfesorFacade } from '../services/profesor.facade';
@@ -15,14 +14,14 @@ import {
 	getNextOccurrence,
 	formatDateISO,
 } from './profesor-horarios.helpers';
-import { EduPopover, EduTooltip } from '@edu-ui';
+import { EduButton, EduPopover, EduTooltip } from '@edu-ui';
 
 // #endregion
 // #region Component
 @Component({
 	selector: 'app-teacher-schedules',
 	standalone: true,
-	imports: [CommonModule, EduTooltip, EduPopover, ButtonModule, PageHeaderComponent],
+	imports: [CommonModule, EduTooltip, EduPopover, EduButton, PageHeaderComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './profesor-horarios.component.html',
 	styleUrl: './profesor-horarios.component.scss',

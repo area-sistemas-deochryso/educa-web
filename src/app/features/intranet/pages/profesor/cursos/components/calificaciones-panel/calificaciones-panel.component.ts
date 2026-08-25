@@ -1,6 +1,5 @@
 import { Component, ChangeDetectionStrategy, input, output, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ButtonModule } from 'primeng/button';
 
 import {
 	CalificacionConNotasDto,
@@ -12,12 +11,12 @@ import { formatNotaConConfig } from '@intranet-shared/services/calificacion-conf
 import type { ConfiguracionCalificacionListDto } from '@data/models';
 import { SkeletonLoaderComponent } from '@shared/components';
 import { PluralizePipe } from '@intranet-shared/pipes';
-import { EduTag, EduTooltip } from '@edu-ui';
+import { EduButton, EduTag, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-calificaciones-panel',
 	standalone: true,
-	imports: [CommonModule, ButtonModule, EduTooltip, EduTag, SkeletonLoaderComponent, PluralizePipe],
+	imports: [CommonModule, EduButton, EduTooltip, EduTag, SkeletonLoaderComponent, PluralizePipe],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './calificaciones-panel.component.html',
 	styleUrl: './calificaciones-panel.component.scss',

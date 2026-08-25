@@ -10,10 +10,9 @@
 			inputId="asist-fecha"
 			appendTo="body"
 		/>
-		<button
-			pButton
+		<edu-button
 			icon="pi pi-search"
-			class="p-button-outlined"
+			[outlined]="true"
 			data-info-anchor="profesor-asistencia-buscar-fecha"
 			(click)="onDateSelect()"
 			[pt]="{
@@ -21,7 +20,7 @@
 					'aria-label': 'Buscar asistencia',
 				},
 			}"
-		></button>
+		/>
 	</div>
 
 	@if (hasEstudiantes()) {
@@ -48,24 +47,24 @@
 				El guardado está bloqueado hasta confirmar que es una excepción válida (ej. clase de recuperación).
 			}
 		</span>
-		<button
-			pButton
+		<edu-button
 			type="button"
 			label="Ir a fecha válida"
 			icon="pi pi-calendar"
-			class="p-button-text p-button-sm"
+			[text]="true"
+			size="small"
 			data-info-anchor="profesor-asistencia-ir-fecha-valida"
 			(click)="irAFechaValida()"
-		></button>
+		/>
 		@if (!confirmadoFechaAtipica()) {
-			<button
-				pButton
+			<edu-button
 				type="button"
 				label="Confirmar excepción"
 				icon="pi pi-check"
-				class="p-button-text p-button-sm"
+				[text]="true"
+				size="small"
 				(click)="confirmarFechaAtipica()"
-			></button>
+			/>
 		}
 	</div>
 }
@@ -105,8 +104,7 @@
 				} @else {
 					<div class="estado-buttons">
 						@for (estado of estados; track estado) {
-							<button
-								pButton
+							<edu-button
 								[class]="'estado-btn estado-btn--' + estado"
 								[class.active]="est.estado === estado"
 								data-info-anchor="profesor-asistencia-estado-btn"
@@ -121,7 +119,7 @@
 							>
 								<i [class]="icons[estado]"></i>
 								<span class="estado-letter">{{ estado }}</span>
-							</button>
+							</edu-button>
 						}
 					</div>
 
@@ -143,8 +141,7 @@
 	</div>
 
 	<div class="actions-footer">
-		<button
-			pButton
+		<edu-button
 			label="Guardar Asistencia"
 			icon="pi pi-save"
 			data-info-anchor="profesor-asistencia-guardar"
@@ -153,7 +150,7 @@
 			[disabled]="saving() || !puedeGuardar()"
 			[eduTooltip]="!puedeGuardar() ? 'Confirmá que la fecha es una excepción válida para poder guardar' : ''"
 			eduTooltipPosition="top"
-		></button>
+		/>
 	</div>
 }
 <!-- #endregion -->

@@ -55,14 +55,15 @@
 	<div class="section-header">
 		<span class="section-title">Evaluaciones</span>
 		@if (pendingCount() > 0) {
-			<button
-				pButton
+			<edu-button
 				[label]="simulatorOpen() ? 'Cerrar simulador' : 'Simular notas'"
 				[icon]="simulatorOpen() ? 'pi pi-times' : 'pi pi-calculator'"
-				[class]="simulatorOpen() ? 'p-button-outlined p-button-secondary p-button-sm' : 'p-button-outlined p-button-sm'"
+				[outlined]="true"
+				size="small"
+				[severity]="simulatorOpen() ? 'secondary' : 'primary'"
 				data-info-anchor="profesor-notas-simular"
 				(click)="toggleSimulator()"
-			></button>
+			/>
 		}
 	</div>
 	<edu-table [value]="evaluacionRows()" dataKey="calificacionId" styleClass="p-datatable-sm">
@@ -103,22 +104,26 @@
 								(keydown)="onEditKeydown($event)"
 								[attr.aria-label]="'Editar nota de ' + row.titulo"
 							/>
-							<button
-								pButton
+							<edu-button
 								icon="pi pi-check"
-								class="p-button-rounded p-button-text p-button-success p-button-sm"
+								[text]="true"
+								[rounded]="true"
+								size="small"
+								severity="success"
 								data-info-anchor="profesor-notas-guardar-edicion"
 								(click)="saveEdit()"
 								[pt]="{ root: { 'aria-label': 'Guardar nota' } }"
-							></button>
-							<button
-								pButton
+							/>
+							<edu-button
 								icon="pi pi-times"
-								class="p-button-rounded p-button-text p-button-secondary p-button-sm"
+								[text]="true"
+								[rounded]="true"
+								size="small"
+								severity="secondary"
 								data-info-anchor="profesor-notas-cancelar-edicion"
 								(click)="cancelEdit()"
 								[pt]="{ root: { 'aria-label': 'Cancelar edición' } }"
-							></button>
+							/>
 						</div>
 					} @else {
 						<edu-tag
@@ -160,14 +165,15 @@
 
 	@if (simulatorOpen() && hasSimulation()) {
 		<div class="sim-hint">
-			<button
-				pButton
+			<edu-button
 				label="Limpiar"
 				icon="pi pi-eraser"
-				class="p-button-text p-button-sm p-button-secondary"
+				[text]="true"
+				size="small"
+				severity="secondary"
 				data-info-anchor="profesor-notas-simulador-limpiar"
 				(click)="clearSimulation()"
-			></button>
+			/>
 		</div>
 	}
 	<!-- #endregion -->

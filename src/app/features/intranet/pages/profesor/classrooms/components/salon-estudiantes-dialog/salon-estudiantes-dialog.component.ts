@@ -1,6 +1,5 @@
 import { Component, ChangeDetectionStrategy, input, output, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ButtonModule } from 'primeng/button';
 import { environment } from '@config/environment';
 import { ProfesorSalonConEstudiantes } from '@features/intranet/pages/profesor/models';
 import { ClassroomGradesTabComponent } from '../salon-notas-tab/salon-notas-tab.component';
@@ -20,7 +19,7 @@ import {
 	DateValidationResult,
 } from '@features/intranet/pages/profesor/models';
 import { NotaSaveEvent } from '../salon-notas-estudiante-tab/salon-notas-estudiante-tab.component';
-import { EduDialog, EduTab, EduTabPanel, EduTabs, EduTag, EduTooltip } from '@edu-ui';
+import { EduButton, EduDialog, EduTab, EduTabPanel, EduTabs, EduTag, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-salon-estudiantes-dialog',
@@ -30,7 +29,7 @@ import { EduDialog, EduTab, EduTabPanel, EduTabs, EduTag, EduTooltip } from '@ed
 		EduDialog,
 		EduTabs, EduTab, EduTabPanel,
 		EduTag,
-		ButtonModule,
+		EduButton,
 		EduTooltip,
 		ClassroomGradesTabComponent,
 		SalonNotasEstudianteTabComponent,

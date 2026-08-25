@@ -14,13 +14,13 @@
 						<div class="dependency-item missing">
 							<i class="pi pi-times-circle"></i>
 							<span>{{ check.label }}</span>
-							<button
-								pButton
+							<edu-button
 								[label]="check.targetLabel"
 								icon="pi pi-external-link"
-								class="p-button-sm p-button-text"
+								[text]="true"
+								size="small"
 								(click)="openInNewTab(check.targetUrl)"
-							></button>
+							/>
 						</div>
 					}
 				</div>
@@ -32,13 +32,13 @@
 			<ng-template #messageContent>
 				<div class="inline-guidance-content">
 					<span>No hay {{ single.label | lowercase }} registrados.</span>
-					<button
-						pButton
+					<edu-button
 						[label]="single.targetLabel"
 						icon="pi pi-external-link"
-						class="p-button-sm p-button-text"
+						[text]="true"
+						size="small"
 						(click)="openInNewTab(single.targetUrl)"
-					></button>
+					/>
 				</div>
 			</ng-template>
 		</edu-message>

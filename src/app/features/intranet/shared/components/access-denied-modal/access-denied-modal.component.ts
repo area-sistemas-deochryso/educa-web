@@ -1,14 +1,13 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { ButtonModule } from 'primeng/button';
 import { AccessDeniedService } from '@core/services';
-import { EduDialog } from '@edu-ui';
+import { EduButton, EduDialog } from '@edu-ui';
 
 @Component({
 	selector: 'app-access-denied-modal',
 	standalone: true,
-	imports: [EduDialog, ButtonModule],
+	imports: [EduDialog, EduButton],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './access-denied-modal.component.html',
 	styleUrl: './access-denied-modal.component.scss',

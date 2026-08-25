@@ -22,16 +22,16 @@
 		optionValue="value"
 	/>
 	@if (hasData()) {
-		<button
-			pButton
+		<edu-button
 			icon="pi pi-file-pdf"
-			class="p-button-outlined p-button-sm"
+			[outlined]="true"
+			size="small"
 			data-info-anchor="profesor-notas-salon-descargar-boletas"
 			(click)="descargarBoletas.emit()"
 			eduTooltip="Descargar boletas de notas del salón"
 			eduTooltipPosition="top"
 			[pt]="{ root: { 'aria-label': 'Descargar boletas PDF' } }"
-		></button>
+		/>
 	}
 	<a
 		pButton

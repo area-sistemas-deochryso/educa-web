@@ -42,13 +42,13 @@
 					class="tipo-reporte-selector"
 				/>
 			}
-			<p-button
+			<edu-button
 				icon="pi pi-file-pdf"
 				[loading]="downloadingPdf()"
 				severity="danger"
 				[text]="true"
 				[rounded]="true"
-				(onClick)="togglePdfMenu($event)"
+				(click)="togglePdfMenu($event)"
 				eduTooltip="Opciones de PDF"
 				eduTooltipPosition="top"
 				class="pdf-button"
@@ -169,11 +169,12 @@
 						</td>
 						@if (showEditAdminAction()) {
 							<td class="text-center">
-								<button
-									pButton
+								<edu-button
 									type="button"
 									icon="pi pi-pencil"
-									class="p-button-rounded p-button-text p-button-info"
+									[text]="true"
+									[rounded]="true"
+									severity="info"
 									eduTooltip="Editar asistencia del profesor"
 									eduTooltipPosition="top"
 									(click)="onEditAdminClick($event, persona)"
@@ -182,7 +183,7 @@
 											'aria-label': 'Editar asistencia del profesor',
 										},
 									}"
-								></button>
+								/>
 							</td>
 						}
 					</tr>
@@ -232,19 +233,20 @@
 
 				@if (showEditAdminAction()) {
 					<div class="rt-card__field mobile-card-actions">
-						<button
-							pButton
+						<edu-button
 							type="button"
 							icon="pi pi-pencil"
 							label="Editar en admin"
-							class="p-button-outlined p-button-info p-button-sm"
+							[outlined]="true"
+							size="small"
+							severity="info"
 							(click)="onEditAdminClick($event, persona)"
 							[pt]="{
 								root: {
 									'aria-label': 'Editar asistencia del profesor en admin',
 								},
 							}"
-						></button>
+						/>
 					</div>
 				}
 			</div>
@@ -298,27 +300,27 @@
 
 			<div class="dialog-footer">
 				@if (persona.esJustificado) {
-					<p-button
+					<edu-button
 						label="Quitar justificación"
 						severity="danger"
 						[text]="true"
 						icon="pi pi-trash"
 						[loading]="savingJustificacion()"
-						(onClick)="quitarJustificacion()"
+						(click)="quitarJustificacion()"
 					/>
 				}
-				<p-button
+				<edu-button
 					label="Cancelar"
 					severity="secondary"
 					[text]="true"
-					(onClick)="closeDialog()"
+					(click)="closeDialog()"
 				/>
-				<p-button
+				<edu-button
 					label="Guardar"
 					icon="pi pi-check"
 					[loading]="savingJustificacion()"
 					[disabled]="!observacionText().trim()"
-					(onClick)="guardarJustificacion()"
+					(click)="guardarJustificacion()"
 				/>
 			</div>
 		</div>

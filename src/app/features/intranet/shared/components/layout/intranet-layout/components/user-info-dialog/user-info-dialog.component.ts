@@ -12,18 +12,17 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
 import { AuthService } from '@core/services';
 import { UserProfileService } from '@core/services';
 import { extractErrorMessage } from '@core/helpers';
-import { EduAvatar, EduDialog, EduInputText, EduMessageService, EduTab, EduTabPanel, EduTabs, EduTag } from '@edu-ui';
+import { EduAvatar, EduButton, EduDialog, EduInputText, EduMessageService, EduTab, EduTabPanel, EduTabs, EduTag } from '@edu-ui';
 
 // #endregion
 // #region Implementation
 @Component({
 	selector: 'app-user-info-dialog',
 	standalone: true,
-	imports: [EduDialog, ButtonModule, EduAvatar, EduTag, EduInputText, FormsModule, EduTab, EduTabPanel, EduTabs],
+	imports: [EduDialog, EduButton, EduAvatar, EduTag, EduInputText, FormsModule, EduTab, EduTabPanel, EduTabs],
 	templateUrl: './user-info-dialog.component.html',
 	styleUrl: './user-info-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

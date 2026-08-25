@@ -1,17 +1,16 @@
 import { Component, ChangeDetectionStrategy, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
 import { CursoContenidoDataFacade } from '../../services/curso-contenido-data.facade';
 import { CursoContenidoCrudFacade } from '../../services/curso-contenido-crud.facade';
 import { CursoContenidoUiFacade } from '../../services/curso-contenido-ui.facade';
 import { CursoContenidoSemanaDto, CursoContenidoTareaDto } from '@features/intranet/pages/profesor/models';
 import { FormatFileSizePipe } from '@intranet-shared/pipes';
-import { EduAccordion, EduAccordionHeader, EduAccordionPanel, EduConfirmationService, EduTooltip } from '@edu-ui';
+import { EduAccordion, EduAccordionHeader, EduAccordionPanel, EduButton, EduConfirmationService, EduTooltip } from '@edu-ui';
 @Component({
 	selector: 'app-semanas-accordion',
 	standalone: true,
-	imports: [CommonModule, FormsModule, ButtonModule, EduAccordion, EduAccordionHeader, EduAccordionPanel, EduTooltip, FormatFileSizePipe],
+	imports: [CommonModule, FormsModule, EduButton, EduAccordion, EduAccordionHeader, EduAccordionPanel, EduTooltip, FormatFileSizePipe],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './semanas-accordion.component.html',
 	styleUrl: './semanas-accordion.component.scss',

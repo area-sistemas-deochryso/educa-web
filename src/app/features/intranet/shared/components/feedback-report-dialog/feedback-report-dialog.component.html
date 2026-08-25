@@ -128,22 +128,20 @@
 
 		<!-- #region Footer -->
 		<ng-template pTemplate="footer">
-			<button
-				pButton
+			<edu-button
 				type="button"
 				label="Cancelar"
-				class="p-button-text"
+				[text]="true"
 				(click)="onCancel()"
 				[disabled]="vm().submitting"
-			></button>
-			<button
-				pButton
+			/>
+			<edu-button
 				type="button"
 				label="Enviar reporte"
 				icon="pi pi-send"
 				(click)="onSubmit()"
 				[loading]="vm().submitting"
-			></button>
+			/>
 		</ng-template>
 		<!-- #endregion -->
 	}

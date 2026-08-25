@@ -8,14 +8,15 @@
 			</span>
 		</div>
 		<div class="migration-banner__actions">
-			<button
-				pButton
+			<edu-button
 				label="Descartar entradas"
 				icon="pi pi-trash"
-				class="p-button-warning p-button-sm p-button-outlined"
+				[outlined]="true"
+				size="small"
+				severity="warn"
 				[loading]="discarding()"
 				(click)="discardEntries()"
-			></button>
+			/>
 			<button
 				type="button"
 				class="migration-banner__dismiss"

@@ -133,22 +133,20 @@
 
 	<ng-template #footer>
 		<div class="dialog-footer">
-			<button
-				pButton
+			<edu-button
 				label="Cancelar"
-				class="p-button-text"
+				[text]="true"
 				data-info-anchor="profesor-evaluacion-cancelar"
 				(click)="onVisibleChange(false)"
-			></button>
-			<button
-				pButton
+			/>
+			<edu-button
 				[label]="isEditing() ? 'Guardar' : 'Crear'"
 				icon="pi pi-check"
 				data-info-anchor="profesor-evaluacion-guardar"
 				[loading]="saving()"
 				[disabled]="!isFormValid() || saving()"
 				(click)="onSave()"
-			></button>
+			/>
 		</div>
 	</ng-template>
 </edu-dialog>

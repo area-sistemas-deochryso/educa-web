@@ -77,17 +77,18 @@
 				aria-label="Máximo de estudiantes por grupo"
 			/>
 			@if (maxInputDirty()) {
-				<button
-					pButton
+				<edu-button
 					icon="pi pi-check"
-					class="p-button-sm p-button-success p-button-rounded"
+					[rounded]="true"
+					size="small"
+					severity="success"
 					data-info-anchor="profesor-grupos-guardar-max"
 					(click)="onSaveMax()"
 					[disabled]="saving()"
 					eduTooltip="Guardar límite"
 					eduTooltipPosition="top"
 					[pt]="{ root: { 'aria-label': 'Guardar máximo' } }"
-				></button>
+				/>
 			}
 		</div>
 		<div class="flex align-items-center gap-2">
@@ -121,23 +122,27 @@
 									(keydown.enter)="onSaveEditing(grupo.id)"
 									(keydown.escape)="onCancelEditing()"
 								/>
-								<button
-									pButton
+								<edu-button
 									icon="pi pi-check"
-									class="p-button-rounded p-button-text p-button-success p-button-sm"
+									[text]="true"
+									[rounded]="true"
+									size="small"
+									severity="success"
 									data-info-anchor="profesor-grupos-guardar-nombre"
 									(click)="onSaveEditing(grupo.id)"
 									[disabled]="saving()"
 									[pt]="{ root: { 'aria-label': 'Guardar nombre' } }"
-								></button>
-								<button
-									pButton
+								/>
+								<edu-button
 									icon="pi pi-times"
-									class="p-button-rounded p-button-text p-button-secondary p-button-sm"
+									[text]="true"
+									[rounded]="true"
+									size="small"
+									severity="secondary"
 									data-info-anchor="profesor-grupos-cancelar-nombre"
 									(click)="onCancelEditing()"
 									[pt]="{ root: { 'aria-label': 'Cancelar edición' } }"
-								></button>
+								/>
 							</div>
 						} @else {
 							<div class="grupo-title">
@@ -150,39 +155,43 @@
 								/>
 							</div>
 							<div class="grupo-actions">
-								<button
-									pButton
+								<edu-button
 									icon="pi pi-user-plus"
-									class="p-button-rounded p-button-text p-button-sm"
+									[text]="true"
+									[rounded]="true"
+									size="small"
 									data-info-anchor="profesor-grupos-asignar-estudiantes"
 									(click)="onOpenAsignar(grupo.id)"
 									[disabled]="saving() || estudiantesSinGrupo().length === 0"
 									eduTooltip="Asignar estudiantes"
 									eduTooltipPosition="top"
 									[pt]="{ root: { 'aria-label': 'Asignar estudiantes al grupo' } }"
-								></button>
-								<button
-									pButton
+								/>
+								<edu-button
 									icon="pi pi-pencil"
-									class="p-button-rounded p-button-text p-button-sm"
+									[text]="true"
+									[rounded]="true"
+									size="small"
 									data-info-anchor="profesor-grupos-editar-nombre"
 									(click)="onStartEditing(grupo)"
 									[disabled]="saving()"
 									eduTooltip="Renombrar"
 									eduTooltipPosition="top"
 									[pt]="{ root: { 'aria-label': 'Renombrar grupo' } }"
-								></button>
-								<button
-									pButton
+								/>
+								<edu-button
 									icon="pi pi-trash"
-									class="p-button-rounded p-button-text p-button-danger p-button-sm"
+									[text]="true"
+									[rounded]="true"
+									size="small"
+									severity="danger"
 									data-info-anchor="profesor-grupos-eliminar-grupo"
 									(click)="onEliminarGrupo(grupo)"
 									[disabled]="saving()"
 									eduTooltip="Eliminar grupo"
 									eduTooltipPosition="top"
 									[pt]="{ root: { 'aria-label': 'Eliminar grupo' } }"
-								></button>
+								/>
 							</div>
 						}
 					</div>
@@ -215,15 +224,17 @@
 										<span class="miembro-dni">{{ est.estudianteDni }}</span>
 										<span class="miembro-nombre">{{ est.estudianteNombre }}</span>
 									</div>
-									<button
-										pButton
+									<edu-button
 										icon="pi pi-times"
-										class="p-button-rounded p-button-text p-button-danger p-button-sm"
+										[text]="true"
+										[rounded]="true"
+										size="small"
+										severity="danger"
 										data-info-anchor="profesor-grupos-remover-estudiante"
 										(click)="onRemoverEstudiante(grupo.id, est)"
 										[disabled]="saving()"
 										[pt]="{ root: { 'aria-label': 'Remover ' + est.estudianteNombre } }"
-									></button>
+									/>
 								</div>
 							}
 						}
@@ -245,15 +256,14 @@
 			(keydown.enter)="onCrearGrupo()"
 			[disabled]="saving()"
 		/>
-		<button
-			pButton
+		<edu-button
 			label="Crear"
 			icon="pi pi-plus"
-			class="p-button-sm"
+			size="small"
 			data-info-anchor="profesor-grupos-crear-grupo"
 			(click)="onCrearGrupo()"
 			[disabled]="saving() || !nuevoGrupoNombre.trim()"
-		></button>
+		/>
 	</div>
 	<!-- #endregion -->
 
@@ -338,23 +348,22 @@
 				}
 			</div>
 			<div class="flex justify-content-end gap-2 mt-3 pt-2 border-top-1 surface-border">
-				<button
-					pButton
+				<edu-button
 					label="Cancelar"
-					class="p-button-text p-button-sm"
+					[text]="true"
+					size="small"
 					data-info-anchor="profesor-grupos-asignar-dialog-cancelar"
 					(click)="onCloseAsignar()"
-				></button>
-				<button
-					pButton
+				/>
+				<edu-button
 					[label]="'Asignar (' + selectedEstudianteIds().length + ')'"
 					icon="pi pi-check"
 					data-info-anchor="profesor-grupos-asignar-dialog-confirmar"
-					class="p-button-sm"
+					size="small"
 					(click)="onAsignarEstudiantes()"
 					[disabled]="selectedEstudianteIds().length === 0 || saving()"
 					[loading]="saving()"
-				></button>
+				/>
 			</div>
 		}
 	}

@@ -19,17 +19,19 @@
 							Semana {{ periodo.semanaInicio }} - {{ periodo.semanaFin }}
 						</span>
 					</div>
-					<button
-						pButton
+					<edu-button
 						icon="pi pi-trash"
-						class="p-button-rounded p-button-text p-button-danger p-button-sm"
+						[text]="true"
+						[rounded]="true"
+						size="small"
+						severity="danger"
 						eduTooltip="Eliminar periodo"
 						eduTooltipPosition="top"
 						data-info-anchor="profesor-periodos-eliminar"
 						(click)="onEliminar(periodo.id)"
 						[loading]="saving()"
 						[pt]="{ root: { 'aria-label': 'Eliminar periodo' } }"
-					></button>
+					/>
 				</div>
 			}
 		</div>
@@ -87,16 +89,17 @@
 				/>
 			</div>
 		</div>
-		<button
-			pButton
+		<edu-button
 			label="Agregar periodo"
 			icon="pi pi-plus"
-			class="p-button-sm p-button-success add-periodo-btn"
+			size="small"
+			severity="success"
+			class="add-periodo-btn"
 			data-info-anchor="profesor-periodos-agregar"
 			[loading]="saving()"
 			[disabled]="!isFormValid()"
 			(click)="onCrear()"
-		></button>
+		/>
 	</div>
 	<!-- #endregion -->
 </edu-dialog>

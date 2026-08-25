@@ -1,7 +1,6 @@
 import { Component, ChangeDetectionStrategy, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
 import { CursoContenidoDataFacade } from '../../services/curso-contenido-data.facade';
 import { CursoContenidoCrudFacade } from '../../services/curso-contenido-crud.facade';
 import { CursoContenidoUiFacade } from '../../services/curso-contenido-ui.facade';
@@ -27,7 +26,7 @@ import { EvaluacionFormDialogComponent } from '../evaluacion-form-dialog/evaluac
 import { CalificarDialogComponent } from '../calificar-dialog/calificar-dialog.component';
 import { PeriodosConfigDialogComponent } from '../periodos-config-dialog/periodos-config-dialog.component';
 import { SemanasAccordionComponent } from '../semanas-accordion/semanas-accordion.component';
-import { EduConfirmDialog, EduConfirmationService, EduDialog, EduTab, EduTabPanel, EduTabs, EduTooltip } from '@edu-ui';
+import { EduButton, EduConfirmDialog, EduConfirmationService, EduDialog, EduTab, EduTabPanel, EduTabs, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-curso-content-dialog',
@@ -35,7 +34,7 @@ import { EduConfirmDialog, EduConfirmationService, EduDialog, EduTab, EduTabPane
 	imports: [
 		CommonModule,
 		EduDialog,
-		ButtonModule,
+		EduButton,
 		EduTooltip,
 		EduTabs, EduTab, EduTabPanel,
 		EduConfirmDialog,

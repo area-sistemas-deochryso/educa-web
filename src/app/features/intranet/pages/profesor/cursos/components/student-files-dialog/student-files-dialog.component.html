@@ -22,16 +22,16 @@
 		<div class="summary-body">
 			<!-- #region Actions bar -->
 			<div class="actions-bar">
-				<button
-					pButton
+				<edu-button
 					label="Ir a Calificaciones"
 					icon="pi pi-chart-bar"
-					class="p-button-text p-button-sm"
+					[text]="true"
+					size="small"
 					data-info-anchor="profesor-student-files-ir-calificaciones"
 					(click)="onIrACalificaciones()"
 					eduTooltip="Navegar al tab de calificaciones"
 					eduTooltipPosition="top"
-				></button>
+				/>
 			</div>
 			<!-- #endregion -->
 
