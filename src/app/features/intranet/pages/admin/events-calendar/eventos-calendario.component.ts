@@ -2,14 +2,13 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
 import { PageHeaderComponent, KpiStatsComponent, type KpiStatItem } from '@intranet-shared/components';
 import { EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleLabelPipe } from '@intranet-shared/pipes';
 import { UiMappingService } from '@intranet-shared/services';
 import { EventsCalendarFacade, EventsCalendarStore } from './services';
 import type { EventoFormData } from './services';
 import { EventoCalendarioLista } from '@data/models';
-import { EduConfirmDialog, EduConfirmationService, EduDatePicker, EduDialog, EduIconField, EduInputIcon, EduInputText, EduSelect, EduTable, EduTag, EduTextarea, EduToggle, EduTooltip } from '@edu-ui';
+import { EduButton, EduConfirmDialog, EduConfirmationService, EduDatePicker, EduDialog, EduIconField, EduInputIcon, EduInputText, EduSelect, EduTable, EduTag, EduTextarea, EduToggle, EduTooltip } from '@edu-ui';
 
 // #endregion
 // #region Implementation
@@ -21,7 +20,7 @@ import { EduConfirmDialog, EduConfirmationService, EduDatePicker, EduDialog, Edu
 		CommonModule,
 		FormsModule,
 		EduTable,
-		ButtonModule,
+		EduButton,
 		EduDialog,
 		EduInputText,
 		EduTextarea,

@@ -45,25 +45,26 @@
 
 		@if (isFailed()) {
 			<div class="sync-banner__actions">
-				<button
-					pButton
+				<edu-button
 					type="button"
 					label="Reintentar"
 					icon="pi pi-refresh"
-					class="p-button-outlined p-button-danger p-button-sm"
+					[outlined]="true"
+					size="small"
+					severity="danger"
 					(click)="onRetry()"
 					[pt]="{ root: { 'aria-label': 'Reintentar sincronización' } }"
 					data-info-anchor="reintentar"
-				></button>
-				<button
-					pButton
+				/>
+				<edu-button
 					type="button"
 					icon="pi pi-times"
-					class="p-button-text p-button-sm"
+					[text]="true"
+					size="small"
 					(click)="onDismiss()"
 					[pt]="{ root: { 'aria-label': 'Cerrar banner' } }"
 					data-info-anchor="admin-asistencia-sync-banner-dismiss-btn"
-				></button>
+				/>
 			</div>
 		}
 	</div>

@@ -5,23 +5,25 @@
 	subtitle="Vista unificada del destinatario"
 >
 	<div class="header-actions">
-		<button
-			pButton
+		<edu-button
 			icon="pi pi-arrow-left"
-			class="p-button-text p-button-sm btn-icon"
+			[text]="true"
+			size="small"
+			class="btn-icon"
 			eduTooltip="Volver"
 			data-info-anchor="admin-recipient-view-back-btn"
 			(click)="goBack()"
-		></button>
-		<button
-			pButton
+		/>
+		<edu-button
 			icon="pi pi-refresh"
-			class="p-button-text p-button-sm btn-icon"
+			[text]="true"
+			size="small"
+			class="btn-icon"
 			eduTooltip="Actualizar"
 			[loading]="loading()"
 			data-info-anchor="admin-recipient-view-refresh-btn"
 			(click)="refresh()"
-		></button>
+		/>
 	</div>
 </app-page-header>
 <!-- #endregion -->
@@ -59,7 +61,7 @@
 	<div class="error-container">
 		<i class="pi pi-exclamation-circle" style="font-size: 2rem; color: var(--red-500)"></i>
 		<p>No se pudo cargar la información del destinatario.</p>
-		<button pButton label="Reintentar" icon="pi pi-refresh" class="p-button-outlined p-button-sm" data-info-anchor="reintentar" (click)="refresh()"></button>
+		<edu-button label="Reintentar" icon="pi pi-refresh" [outlined]="true" size="small" data-info-anchor="reintentar" (click)="refresh()"/>
 	</div>
 }
 <!-- #endregion -->
@@ -176,15 +178,16 @@
 			<div class="profile-section-header">
 				<i class="pi pi-shield mr-2"></i>
 				<h3>Blacklist</h3>
-				<button
-					pButton
+				<edu-button
 					[label]="blacklistActive() ? 'Desbloquear' : 'Bloquear'"
 					[icon]="blacklistActive() ? 'pi pi-lock-open' : 'pi pi-ban'"
-					[class]="blacklistActive() ? 'p-button-outlined p-button-sm' : 'p-button-danger p-button-sm'"
+					[outlined]="blacklistActive()"
+					size="small"
+					[severity]="blacklistActive() ? 'primary' : 'danger'"
 					[loading]="actionInFlight()"
 					data-info-anchor="admin-recipient-view-toggle-blacklist-btn"
 					(click)="toggleBlacklist()"
-				></button>
+				/>
 			</div>
 			<div class="detail-row">
 				<span class="detail-label">Estado</span>
@@ -217,15 +220,15 @@
 				<i class="pi pi-clock mr-2"></i>
 				<h3>Cuarentena</h3>
 				@if (quarantineActive()) {
-					<button
-						pButton
+					<edu-button
 						label="Liberar"
 						icon="pi pi-unlock"
-						class="p-button-outlined p-button-sm"
+						[outlined]="true"
+						size="small"
 						[loading]="actionInFlight()"
 						data-info-anchor="admin-email-outbox-quarantine-liberar-btn"
 						(click)="releaseQuarantine()"
-					></button>
+					/>
 				}
 			</div>
 			<div class="detail-row">

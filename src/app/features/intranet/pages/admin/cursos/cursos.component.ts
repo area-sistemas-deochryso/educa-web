@@ -2,8 +2,6 @@ import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } 
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
-import { ButtonModule } from 'primeng/button';
-
 import { UiMappingService } from '@intranet-shared/services';
 import { PageHeaderComponent, KpiStatsComponent, type KpiStatItem } from '@intranet-shared/components';
 import { EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleIconPipe, EstadoToggleLabelPipe } from '@intranet-shared/pipes';
@@ -11,12 +9,12 @@ import { buildDeleteCursoMessage } from '@app/shared/constants';
 
 import { CursosFacade } from './services';
 import type { Curso } from './models';
-import { EduConfirmDialog, EduConfirmationService, EduDialog, EduInputText, EduSelect, EduSortableColumn, EduTable, EduTag, EduToggle, EduTooltip } from '@edu-ui';
+import { EduButton, EduConfirmDialog, EduConfirmationService, EduDialog, EduInputText, EduSelect, EduSortableColumn, EduTable, EduTag, EduToggle, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-cursos',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduTable, ButtonModule, EduDialog, EduTooltip, EduTag, EduInputText, EduSelect, EduToggle, EduConfirmDialog, PageHeaderComponent, KpiStatsComponent, EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleIconPipe, EstadoToggleLabelPipe, EduSortableColumn],
+	imports: [CommonModule, FormsModule, EduTable, EduButton, EduDialog, EduTooltip, EduTag, EduInputText, EduSelect, EduToggle, EduConfirmDialog, PageHeaderComponent, KpiStatsComponent, EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleIconPipe, EstadoToggleLabelPipe, EduSortableColumn],
 	providers: [EduConfirmationService],
 	templateUrl: './cursos.component.html',
 	styleUrl: './cursos.component.scss',

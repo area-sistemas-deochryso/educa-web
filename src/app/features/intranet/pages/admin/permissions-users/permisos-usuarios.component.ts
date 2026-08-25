@@ -3,12 +3,11 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
-import { ButtonModule } from 'primeng/button';
 import { PageHeaderComponent } from '@intranet-shared/components';
 import type { UsuarioBusqueda } from '@core/services';
 
 import { PermissionsUsersDataFacade } from './services';
-import { EduAutoComplete, EduDialog, EduInputText, EduSelect, EduTag, EduTooltip } from '@edu-ui';
+import { EduAutoComplete, EduButton, EduDialog, EduInputText, EduSelect, EduTag, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-permissions-users',
@@ -16,7 +15,7 @@ import { EduAutoComplete, EduDialog, EduInputText, EduSelect, EduTag, EduTooltip
 	imports: [
 		CommonModule,
 		FormsModule,
-		ButtonModule,
+		EduButton,
 		EduDialog,
 		EduTooltip,
 		EduTag,

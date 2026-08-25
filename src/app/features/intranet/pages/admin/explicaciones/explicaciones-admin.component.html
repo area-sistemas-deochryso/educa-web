@@ -14,25 +14,25 @@
 			/>
 		</div>
 
-		<button
-			pButton
+		<edu-button
 			icon="pi pi-refresh"
-			class="p-button-text p-button-sm"
+			[text]="true"
+			size="small"
 			eduTooltip="Refrescar"
 			(click)="facade.load()"
 			[pt]="{ root: { 'aria-label': 'Refrescar listado' } }"
 			data-info-anchor="admin-explicaciones-refresh-btn"
-		></button>
+		/>
 
-		<button
-			pButton
+		<edu-button
 			label="Nueva explicación"
 			icon="pi pi-plus"
-			class="p-button-success p-button-sm"
+			size="small"
+			severity="success"
 			(click)="onOpenCreate()"
 			[pt]="{ root: { 'aria-label': 'Crear nueva explicación' } }"
 			data-info-anchor="admin-explicaciones-nueva-btn"
-		></button>
+		/>
 	</div>
 </app-page-header>
 

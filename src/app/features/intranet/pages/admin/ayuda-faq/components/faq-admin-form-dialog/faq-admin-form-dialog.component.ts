@@ -3,8 +3,6 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-import { ButtonModule } from 'primeng/button';
-
 import { CapabilityCatalogItem } from '@core/services/permissions';
 
 import {
@@ -13,7 +11,7 @@ import {
 	FaqAdminDto,
 	WizardPasoInput,
 } from '../../models/faq-admin.models';
-import { EduDialog, EduInputText, EduSelect, EduTemplate, EduTextarea, EduTooltip } from '@edu-ui';
+import { EduButton, EduDialog, EduInputText, EduSelect, EduTemplate, EduTextarea, EduTooltip } from '@edu-ui';
 // #endregion
 
 interface CapabilityOption {
@@ -30,7 +28,7 @@ interface CapabilityOption {
 @Component({
 	selector: 'app-faq-admin-form-dialog',
 	standalone: true,
-	imports: [CommonModule, FormsModule, ButtonModule, EduDialog, EduInputText, EduSelect, EduTextarea, EduTooltip, EduTemplate],
+	imports: [CommonModule, FormsModule, EduButton, EduDialog, EduInputText, EduSelect, EduTextarea, EduTooltip, EduTemplate],
 	templateUrl: './faq-admin-form-dialog.component.html',
 	styleUrl: './faq-admin-form-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

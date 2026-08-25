@@ -3,8 +3,6 @@ import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal 
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 
-import { ButtonModule } from 'primeng/button';
-
 import { CapabilityCatalogItem, PermissionsService } from '@core/services/permissions';
 import { RolService } from '@core/services/roles';
 import { logger } from '@core/helpers';
@@ -18,7 +16,7 @@ import {
 	ExplicacionAdminDto,
 } from './models/explicacion-admin.models';
 import { ExplicacionAdminFacade } from './services/explicacion-admin.facade';
-import { EduConfirmDialog, EduConfirmationService, EduInputText, EduMessageService, EduToast, EduTooltip } from '@edu-ui';
+import { EduButton, EduConfirmDialog, EduConfirmationService, EduInputText, EduMessageService, EduToast, EduTooltip } from '@edu-ui';
 // #endregion
 
 /**
@@ -31,7 +29,7 @@ import { EduConfirmDialog, EduConfirmationService, EduInputText, EduMessageServi
 @Component({
 	selector: 'app-explicaciones-admin',
 	standalone: true,
-	imports: [FormsModule, ButtonModule, EduInputText, EduToast, EduTooltip, EduConfirmDialog, PageHeaderComponent, ExplicacionAdminTableComponent, ExplicacionAdminFormDialogComponent],
+	imports: [FormsModule, EduButton, EduInputText, EduToast, EduTooltip, EduConfirmDialog, PageHeaderComponent, ExplicacionAdminTableComponent, ExplicacionAdminFormDialogComponent],
 	providers: [ExplicacionAdminFacade, EduConfirmationService, EduMessageService],
 	templateUrl: './explicaciones-admin.component.html',
 	styleUrl: './explicaciones-admin.component.scss',

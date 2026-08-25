@@ -14,26 +14,26 @@
 		title="Reportes de Usuarios"
 		subtitle="Problemas y propuestas enviadas manualmente desde la intranet."
 	>
-		<button
-			pButton
+		<edu-button
 			type="button"
 			icon="pi pi-file-export"
 			label="Exportar CSV"
-			class="p-button-outlined p-button-sm"
+			[outlined]="true"
+			size="small"
 			(click)="onExportCsv()"
 			[pt]="{ root: { 'aria-label': 'Exportar reportes a CSV' } }"
 			data-info-anchor="admin-feedback-reports-export-btn"
-		></button>
-		<button
-			pButton
+		/>
+		<edu-button
 			type="button"
 			icon="pi pi-refresh"
 			label="Refrescar"
-			class="p-button-outlined p-button-sm"
+			[outlined]="true"
+			size="small"
 			(click)="onRefresh()"
 			[pt]="{ root: { 'aria-label': 'Refrescar listado' } }"
 			data-info-anchor="admin-feedback-reports-refresh-btn"
-		></button>
+		/>
 	</app-page-header>
 	<!-- #endregion -->
 
@@ -157,16 +157,17 @@
 				data-info-anchor="admin-feedback-reports-hasta-picker"
 			></edu-datepicker>
 		</div>
-		<button
-			pButton
+		<edu-button
 			type="button"
 			icon="pi pi-filter-slash"
-			class="p-button-text p-button-sm btn-clear"
+			[text]="true"
+			size="small"
+			class="btn-clear"
 			eduTooltip="Limpiar filtros"
 			(click)="onClearFilters()"
 			[pt]="{ root: { 'aria-label': 'Limpiar filtros' } }"
 			data-info-anchor="admin-feedback-reports-limpiar-filtros-btn"
-		></button>
+		/>
 	</div>
 	<!-- #endregion -->
 
@@ -223,15 +224,15 @@
 						></edu-tag>
 					</td>
 					<td>
-						<button
-							pButton
+						<edu-button
 							type="button"
 							icon="pi pi-eye"
-							class="p-button-rounded p-button-text"
+							[text]="true"
+							[rounded]="true"
 							(click)="onRowClick(item); $event.stopPropagation()"
 							[pt]="{ root: { 'aria-label': 'Ver detalle del reporte' } }"
 							data-info-anchor="admin-feedback-reports-ver-detalle-btn"
-						></button>
+						/>
 					</td>
 				</tr>
 			</ng-template>
@@ -345,8 +346,7 @@
 						data-info-anchor="admin-feedback-reports-observacion-textarea"
 					></textarea>
 				</div>
-				<button
-					pButton
+				<edu-button
 					type="button"
 					label="Guardar cambio"
 					icon="pi pi-check"
@@ -354,7 +354,7 @@
 					[loading]="vm().estadoUpdating"
 					[disabled]="!nuevoEstado() || nuevoEstado() === d.estado"
 					data-info-anchor="admin-feedback-reports-guardar-cambio-btn"
-				></button>
+				/>
 			</section>
 
 			<!-- #region Eliminar reporte -->
@@ -370,15 +370,15 @@
 						</p>
 					</div>
 				</div>
-				<button
-					pButton
+				<edu-button
 					type="button"
 					icon="pi pi-trash"
 					label="Eliminar reporte #{{ d.id }}"
-					class="p-button-danger p-button-outlined"
+					[outlined]="true"
+					severity="danger"
 					(click)="onDeleteReport()"
 					data-info-anchor="admin-feedback-reports-eliminar-btn"
-				></button>
+				/>
 			</section>
 			<!-- #endregion -->
 		</div>

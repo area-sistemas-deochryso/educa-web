@@ -25,26 +25,27 @@
 				<edu-tag [severity]="explicacion.estado ? 'success' : 'danger'" [value]="explicacion.estado ? 'Activa' : 'Inactiva'" />
 			</td>
 			<td>
-				<button
-					pButton
+				<edu-button
 					icon="pi pi-pencil"
-					class="p-button-text p-button-sm"
+					[text]="true"
+					size="small"
 					eduTooltip="Editar"
 					eduTooltipPosition="top"
 					(click)="edit.emit(explicacion)"
 					[pt]="{ root: { 'aria-label': 'Editar ' + explicacion.ancla } }"
 					data-info-anchor="admin-explicaciones-fila-editar-btn"
-				></button>
-				<button
-					pButton
+				/>
+				<edu-button
 					icon="pi pi-trash"
-					class="p-button-text p-button-sm p-button-danger"
+					[text]="true"
+					size="small"
+					severity="danger"
 					eduTooltip="Eliminar"
 					eduTooltipPosition="top"
 					(click)="remove.emit(explicacion)"
 					[pt]="{ root: { 'aria-label': 'Eliminar ' + explicacion.ancla } }"
 					data-info-anchor="admin-explicaciones-fila-eliminar-btn"
-				></button>
+				/>
 			</td>
 		</tr>
 	</ng-template>

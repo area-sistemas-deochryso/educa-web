@@ -34,11 +34,11 @@
 		<span class="subtitle">Registro y corrección formal de asistencia diaria</span>
 	</div>
 	<div class="header-actions">
-		<button
-			pButton
+		<edu-button
 			icon="pi pi-th-large"
 			label="Ver resumen en Panel"
-			class="p-button-outlined p-button-secondary"
+			[outlined]="true"
+			severity="secondary"
 			(click)="irAPanel()"
 			[pt]="{
 				root: {
@@ -46,13 +46,13 @@
 				},
 			}"
 			data-info-anchor="admin-asistencia-ver-panel-btn"
-		></button>
+		/>
 		@if (vm().selectedCount > 0) {
-			<button
-				pButton
+			<edu-button
 				icon="pi pi-envelope"
 				[label]="'Enviar correos (' + vm().selectedCount + ')'"
-				class="p-button-outlined p-button-help"
+				[outlined]="true"
+				severity="help"
 				[loading]="vm().enviandoCorreos"
 				(click)="crudFacade.enviarCorreos()"
 				[pt]="{
@@ -63,13 +63,12 @@
 				eduTooltip="Envía el correo de asistencia al apoderado de cada estudiante seleccionado"
 				eduTooltipPosition="bottom"
 				data-info-anchor="admin-asistencia-enviar-correos-btn"
-			></button>
+			/>
 		}
-		<button
-			pButton
+		<edu-button
 			icon="pi pi-sync"
 			label="Sincronizar asistencias del día"
-			class="p-button-outlined"
+			[outlined]="true"
 			[loading]="vm().syncing"
 			[disabled]="syncActive()"
 			(click)="onSincronizar()"
@@ -85,12 +84,11 @@
 			"
 			eduTooltipPosition="bottom"
 			data-info-anchor="admin-asistencia-sincronizar-btn"
-		></button>
-		<button
-			pButton
+		/>
+		<edu-button
 			icon="pi pi-history"
 			label="Sincronizar rango"
-			class="p-button-outlined"
+			[outlined]="true"
 			[disabled]="syncActive()"
 			(click)="onSincronizarRango()"
 			[pt]="{
@@ -101,33 +99,32 @@
 			eduTooltip="Sincronizar un rango de fechas con filtro opcional de personas"
 			eduTooltipPosition="bottom"
 			data-info-anchor="admin-asistencia-sincronizar-rango-btn"
-		></button>
-		<button
-			pButton
+		/>
+		<edu-button
 			icon="pi pi-bug"
 			label="Debug Paginación"
-			class="p-button-outlined p-button-danger"
+			[outlined]="true"
+			severity="danger"
 			(click)="onDebugPagination()"
 			eduTooltip="DEBUG: llama páginas 1-3 de CrossChex y guarda raw JSON en SQL"
 			eduTooltipPosition="bottom"
 			data-info-anchor="admin-asistencia-debug-paginacion-btn"
-		></button>
-		<button
-			pButton
+		/>
+		<edu-button
 			icon="pi pi-lock"
 			label="Cerrar mes"
-			class="p-button-outlined p-button-warning"
+			[outlined]="true"
+			severity="warn"
 			(click)="onAbrirCierre()"
 			data-info-anchor="admin-asistencia-cerrar-mes-btn"
-		></button>
-		<button
-			pButton
+		/>
+		<edu-button
 			icon="pi pi-plus"
 			label="Nueva asistencia"
-			class="p-button-success"
+			severity="success"
 			(click)="onNuevo('entrada')"
 			data-info-anchor="admin-asistencia-nueva-btn"
-		></button>
+		/>
 	</div>
 </div>
 <!-- #endregion -->
@@ -154,10 +151,10 @@
 	@if (!isFilterDefault()) {
 		<span class="filter-active-badge">
 			Filtro activo: {{ filtroLabel() }}
-			<button
-				pButton
+			<edu-button
 				label="Cambiar"
-				class="p-button-text p-button-sm"
+				[text]="true"
+				size="small"
 				(click)="onResetTipoPersonaFilter()"
 				[pt]="{
 					root: {
@@ -165,7 +162,7 @@
 					},
 				}"
 				data-info-anchor="admin-asistencia-reset-filtro-btn"
-			></button>
+			/>
 		</span>
 	}
 </div>
@@ -280,10 +277,11 @@
 				<td>
 					<div class="action-buttons">
 						@if (item.estado === 'Incompleta' && !item.horaSalida) {
-							<button
-								pButton
+							<edu-button
 								icon="pi pi-sign-out"
-								class="p-button-rounded p-button-text btn-agregar-salida"
+								[text]="true"
+								[rounded]="true"
+								class="btn-agregar-salida"
 								eduTooltip="Agregar salida"
 								eduTooltipPosition="top"
 								(click)="onAgregarSalida(item)"
@@ -293,12 +291,12 @@
 									},
 								}"
 								data-info-anchor="admin-asistencia-fila-agregar-salida-btn"
-							></button>
+							/>
 						}
-						<button
-							pButton
+						<edu-button
 							icon="pi pi-pencil"
-							class="p-button-rounded p-button-text"
+							[text]="true"
+							[rounded]="true"
 							eduTooltip="Editar horas"
 							eduTooltipPosition="top"
 							(click)="onEditar(item)"
@@ -308,11 +306,12 @@
 								},
 							}"
 							data-info-anchor="admin-asistencia-fila-editar-btn"
-						></button>
-						<button
-							pButton
+						/>
+						<edu-button
 							icon="pi pi-trash"
-							class="p-button-rounded p-button-text p-button-danger"
+							[text]="true"
+							[rounded]="true"
+							severity="danger"
 							eduTooltip="Eliminar"
 							eduTooltipPosition="top"
 							(click)="onEliminar(item)"
@@ -322,7 +321,7 @@
 								},
 							}"
 							data-info-anchor="admin-asistencia-fila-eliminar-btn"
-						></button>
+						/>
 					</div>
 				</td>
 			</tr>
@@ -419,25 +418,26 @@
 								placeholder="HH:mm"
 								data-info-anchor="admin-asistencia-form-hora-entrada-picker"
 							/>
-							<button
-								pButton
+							<edu-button
 								icon="pi pi-times"
-								class="p-button-danger p-button-text p-button-sm"
+								[text]="true"
+								size="small"
+								severity="danger"
 								(click)="store.updateFormData({ horaEntrada: null })"
 								[pt]="{ root: { 'aria-label': 'Quitar hora de entrada' } }"
 								eduTooltip="Quitar entrada"
 								eduTooltipPosition="top"
 								data-info-anchor="admin-asistencia-form-quitar-entrada-btn"
-							></button>
+							/>
 						} @else {
-							<button
-								pButton
+							<edu-button
 								icon="pi pi-plus"
 								label="Agregar hora de entrada"
-								class="p-button-outlined p-button-sm"
+								[outlined]="true"
+								size="small"
 								(click)="setHoraEntradaNow()"
 								data-info-anchor="admin-asistencia-form-agregar-entrada-btn"
-							></button>
+							/>
 						}
 					</div>
 				} @else {
@@ -474,25 +474,26 @@
 								placeholder="HH:mm"
 								data-info-anchor="admin-asistencia-form-hora-salida-picker"
 							/>
-							<button
-								pButton
+							<edu-button
 								icon="pi pi-times"
-								class="p-button-danger p-button-text p-button-sm"
+								[text]="true"
+								size="small"
+								severity="danger"
 								(click)="store.updateFormData({ horaSalida: null })"
 								[pt]="{ root: { 'aria-label': 'Quitar hora de salida' } }"
 								eduTooltip="Quitar salida"
 								eduTooltipPosition="top"
 								data-info-anchor="admin-asistencia-form-quitar-salida-btn"
-							></button>
+							/>
 						} @else {
-							<button
-								pButton
+							<edu-button
 								icon="pi pi-plus"
 								label="Agregar hora de salida"
-								class="p-button-outlined p-button-sm"
+								[outlined]="true"
+								size="small"
 								(click)="setHoraSalidaNow()"
 								data-info-anchor="admin-asistencia-form-agregar-salida-btn"
-							></button>
+							/>
 						}
 					} @else {
 						<edu-datepicker
@@ -526,21 +527,19 @@
 	</div>
 
 	<ng-template #footer>
-		<button
-			pButton
+		<edu-button
 			label="Cancelar"
-			class="p-button-text"
+			[text]="true"
 			(click)="uiFacade.closeDialog()"
 			data-info-anchor="admin-asistencia-form-cancelar-btn"
-		></button>
-		<button
-			pButton
+		/>
+		<edu-button
 			[label]="vm().isEditing ? 'Actualizar' : 'Registrar'"
 			icon="pi pi-check"
 			[disabled]="!vm().isFormValid"
 			(click)="onSave()"
 			data-info-anchor="admin-asistencia-form-guardar-btn"
-		></button>
+		/>
 	</ng-template>
 </edu-dialog>
 <!-- #endregion -->
@@ -578,16 +577,15 @@
 				placeholder="Observación (opcional)"
 				data-info-anchor="admin-asistencia-cierre-observacion-input"
 			/>
-			<button
-				pButton
+			<edu-button
 				icon="pi pi-lock"
 				label="Cerrar"
-				class="p-button-warning"
+				severity="warn"
 				[loading]="cierreSaving()"
 				[disabled]="cierreSaving()"
 				(click)="onCrearCierre()"
 				data-info-anchor="admin-asistencia-cierre-confirmar-btn"
-			></button>
+			/>
 		</div>
 	</div>
 
@@ -611,16 +609,16 @@
 							style="width: 200px"
 							data-info-anchor="admin-asistencia-cierre-revertir-motivo-input"
 						/>
-						<button
-							pButton
+						<edu-button
 							icon="pi pi-undo"
 							label="Revertir"
-							class="p-button-outlined p-button-danger"
+							[outlined]="true"
+							severity="danger"
 							[loading]="revertSaving()"
 							[disabled]="revertirObservacion().length < 10 || revertSaving()"
 							(click)="onRevertirCierre(cierre.cierreId, cierre.rowVersion)"
 							data-info-anchor="admin-asistencia-cierre-revertir-btn"
-						></button>
+						/>
 					</div>
 				</div>
 			}
@@ -639,18 +637,19 @@
 	<!-- Tab: Reportes -->
 	<edu-tabpanel value="reportes">
 		<div class="reportes-panel-link">
-			<button
-				pButton
+			<edu-button
 				icon="pi pi-th-large"
 				label="Ver resumen en Panel"
-				class="p-button-outlined p-button-secondary p-button-sm"
+				[outlined]="true"
+				size="small"
+				severity="secondary"
 				(click)="irAPanel()"
 				[pt]="{
 					root: {
 						'aria-label': 'Ver resumen en el tab Panel',
 					},
 				}"
-			></button>
+			/>
 		</div>
 		<app-attendance-reports />
 	</edu-tabpanel>

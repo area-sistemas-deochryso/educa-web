@@ -45,16 +45,17 @@
 				</td>
 				<td class="col-actions">
 					<div class="actions">
-						<button
-							pButton
+						<edu-button
 							icon="pi pi-external-link"
-							class="p-button-rounded p-button-text p-button-info"
+							[text]="true"
+							[rounded]="true"
+							severity="info"
 							eduTooltip="Ir a Usuarios (copia el nombre al portapapeles)"
 							eduTooltipPosition="top"
 							(click)="onNavegar(item)"
 							[pt]="{ root: { 'aria-label': 'Ir al registro en Usuarios' } }"
 							data-info-anchor="admin-auditoria-correos-ir-usuario-btn"
-						></button>
+						/>
 						@if (item.correoActual) {
 							<a
 								[routerLink]="['/intranet/admin/monitoreo/correos/persona', item.correoActual]"

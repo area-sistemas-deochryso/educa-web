@@ -2,11 +2,10 @@ import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@ang
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
-import { ButtonModule } from 'primeng/button';
 import type { CapabilityCatalogItem } from '@core/services';
 
 import { VistasFacade } from './services';
-import { EduConfirmDialog, EduConfirmationService, EduDialog, EduInputText, EduSelect, EduTable, EduTag, EduTooltip } from '@edu-ui';
+import { EduButton, EduConfirmDialog, EduConfirmationService, EduDialog, EduInputText, EduSelect, EduTable, EduTag, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-vistas',
@@ -15,7 +14,7 @@ import { EduConfirmDialog, EduConfirmationService, EduDialog, EduInputText, EduS
 		CommonModule,
 		FormsModule,
 		EduTable,
-		ButtonModule,
+		EduButton,
 		EduDialog,
 		EduTooltip,
 		EduInputText,

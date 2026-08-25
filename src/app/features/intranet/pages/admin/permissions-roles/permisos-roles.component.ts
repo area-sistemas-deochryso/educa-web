@@ -2,19 +2,17 @@ import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } 
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
-import { ButtonModule } from 'primeng/button';
-
 import { PageHeaderComponent, KpiStatsComponent, type KpiStatItem } from '@intranet-shared/components';
 
 import { PermissionsRolesFacade } from './services';
 import type { RolCapabilityMatrixRow } from '@core/services';
 import { VistasComponent } from '../vistas';
-import { EduCheckbox, EduDialog, EduDrawer, EduInputText, EduTab, EduTabPanel, EduTable, EduTabs, EduTag, EduTemplate, EduTooltip } from '@edu-ui';
+import { EduButton, EduCheckbox, EduDialog, EduDrawer, EduInputText, EduTab, EduTabPanel, EduTable, EduTabs, EduTag, EduTemplate, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-permissions-roles',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduTable, ButtonModule, EduDialog, EduTooltip, EduTag, EduInputText, EduCheckbox, EduDrawer, EduTabs, EduTab, EduTabPanel, PageHeaderComponent, KpiStatsComponent, VistasComponent, EduTemplate],
+	imports: [CommonModule, FormsModule, EduTable, EduButton, EduDialog, EduTooltip, EduTag, EduInputText, EduCheckbox, EduDrawer, EduTabs, EduTab, EduTabPanel, PageHeaderComponent, KpiStatsComponent, VistasComponent, EduTemplate],
 	templateUrl: './permisos-roles.component.html',
 	styleUrl: './permisos-roles.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

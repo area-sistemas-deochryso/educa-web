@@ -75,16 +75,14 @@
 
 	<ng-template #footer>
 		<div class="sync-range-form__actions">
-			<button
-				pButton
+			<edu-button
 				type="button"
 				label="Cancelar"
-				class="p-button-text"
+				[text]="true"
 				(click)="onHide()"
 				data-info-anchor="admin-asistencia-sync-range-cancelar-btn"
-			></button>
-			<button
-				pButton
+			/>
+			<edu-button
 				type="button"
 				label="Sincronizar"
 				icon="pi pi-sync"
@@ -93,7 +91,7 @@
 				(click)="onConfirm()"
 				[pt]="{ root: { 'aria-label': 'Iniciar sincronización del rango seleccionado' } }"
 				data-info-anchor="admin-asistencia-sync-range-confirmar-btn"
-			></button>
+			/>
 		</div>
 	</ng-template>
 </edu-dialog>

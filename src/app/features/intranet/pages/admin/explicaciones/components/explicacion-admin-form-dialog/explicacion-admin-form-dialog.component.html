@@ -72,17 +72,15 @@
 	</div>
 
 	<ng-template pTemplate="footer">
-		<button
-			pButton
+		<edu-button
 			type="button"
 			label="Cancelar"
-			class="p-button-text"
+			[text]="true"
 			(click)="onCancel()"
 			[pt]="{ root: { 'aria-label': 'Cancelar' } }"
 			data-info-anchor="admin-explicaciones-form-cancelar-btn"
-		></button>
-		<button
-			pButton
+		/>
+		<edu-button
 			type="button"
 			label="Guardar"
 			icon="pi pi-check"
@@ -91,6 +89,6 @@
 			(click)="onSave()"
 			[pt]="{ root: { 'aria-label': 'Guardar explicación' } }"
 			data-info-anchor="admin-explicaciones-form-guardar-btn"
-		></button>
+		/>
 	</ng-template>
 </edu-dialog>

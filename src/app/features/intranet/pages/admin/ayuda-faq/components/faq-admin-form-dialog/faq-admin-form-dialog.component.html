@@ -70,15 +70,15 @@
 		<div class="wizard-editor">
 			<div class="wizard-editor-header">
 				<h4>Wizard (opcional)</h4>
-				<button
-					pButton
+				<edu-button
 					type="button"
 					label="Agregar paso"
 					icon="pi pi-plus"
-					class="p-button-text p-button-sm"
+					[text]="true"
+					size="small"
 					(click)="addPaso()"
 					data-info-anchor="admin-faq-form-agregar-paso-btn"
-				></button>
+				/>
 			</div>
 
 			@if (pasos().length > 0) {
@@ -120,38 +120,39 @@
 							/>
 						</div>
 						<div class="wizard-step-actions">
-							<button
-								pButton
+							<edu-button
 								type="button"
 								icon="pi pi-arrow-up"
-								class="p-button-text p-button-sm"
+								[text]="true"
+								size="small"
 								eduTooltip="Subir"
 								[disabled]="$index === 0"
 								(click)="movePaso($index, -1)"
 								[pt]="{ root: { 'aria-label': 'Subir paso ' + ($index + 1) } }"
 								data-info-anchor="admin-faq-form-paso-subir-btn"
-							></button>
-							<button
-								pButton
+							/>
+							<edu-button
 								type="button"
 								icon="pi pi-arrow-down"
-								class="p-button-text p-button-sm"
+								[text]="true"
+								size="small"
 								eduTooltip="Bajar"
 								[disabled]="$index === pasos().length - 1"
 								(click)="movePaso($index, 1)"
 								[pt]="{ root: { 'aria-label': 'Bajar paso ' + ($index + 1) } }"
 								data-info-anchor="admin-faq-form-paso-bajar-btn"
-							></button>
-							<button
-								pButton
+							/>
+							<edu-button
 								type="button"
 								icon="pi pi-trash"
-								class="p-button-text p-button-sm p-button-danger"
+								[text]="true"
+								size="small"
+								severity="danger"
 								eduTooltip="Quitar paso"
 								(click)="removePaso($index)"
 								[pt]="{ root: { 'aria-label': 'Quitar paso ' + ($index + 1) } }"
 								data-info-anchor="admin-faq-form-paso-quitar-btn"
-							></button>
+							/>
 						</div>
 					</div>
 				}
@@ -162,17 +163,15 @@
 	</div>
 
 	<ng-template pTemplate="footer">
-		<button
-			pButton
+		<edu-button
 			type="button"
 			label="Cancelar"
-			class="p-button-text"
+			[text]="true"
 			(click)="onCancel()"
 			[pt]="{ root: { 'aria-label': 'Cancelar' } }"
 			data-info-anchor="admin-faq-form-cancelar-btn"
-		></button>
-		<button
-			pButton
+		/>
+		<edu-button
 			type="button"
 			label="Guardar"
 			icon="pi pi-check"
@@ -181,6 +180,6 @@
 			(click)="onSave()"
 			[pt]="{ root: { 'aria-label': 'Guardar FAQ' } }"
 			data-info-anchor="admin-faq-form-guardar-btn"
-		></button>
+		/>
 	</ng-template>
 </edu-dialog>

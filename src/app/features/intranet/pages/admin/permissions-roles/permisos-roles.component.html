@@ -6,14 +6,13 @@
 		title="Gestión de Permisos"
 		subtitle="Administre capabilities por rol y gestione el catálogo de capabilities del sistema"
 	>
-		<button
-			pButton
+		<edu-button
 			label="Refrescar"
 			icon="pi pi-refresh"
-			class="p-button-outlined"
+			[outlined]="true"
 			data-info-anchor="admin-permissions-refresh-btn"
 			(click)="refresh()"
-		></button>
+		/>
 	</app-page-header>
 	<!-- #endregion -->
 
@@ -102,24 +101,26 @@
 								</td>
 								<td>
 									<div class="actions">
-										<button
-											pButton
+										<edu-button
 											icon="pi pi-eye"
-											class="p-button-rounded p-button-text p-button-secondary"
+											[text]="true"
+											[rounded]="true"
+											severity="secondary"
 											eduTooltip="Ver detalles"
 											aria-label="Ver detalles"
 											data-info-anchor="admin-permissions-roles-ver-detalle-btn"
 											(click)="openDetail(row)"
-										></button>
-										<button
-											pButton
+										/>
+										<edu-button
 											icon="pi pi-pencil"
-											class="p-button-rounded p-button-text p-button-success"
+											[text]="true"
+											[rounded]="true"
+											severity="success"
 											eduTooltip="Editar"
 											aria-label="Editar"
 											data-info-anchor="admin-permissions-roles-editar-btn"
 											(click)="editRole(row)"
-										></button>
+										/>
 									</div>
 								</td>
 							</tr>
@@ -200,22 +201,20 @@
 		</div>
 
 		<div class="drawer-footer">
-			<button
-				pButton
+			<edu-button
 				label="Cerrar"
 				icon="pi pi-times"
-				class="p-button-text"
+				[text]="true"
 				data-info-anchor="cerrar-drawer-btn"
 				(click)="closeDetail()"
-			></button>
-			<button
-				pButton
+			/>
+			<edu-button
 				label="Editar Capabilities"
 				icon="pi pi-pencil"
-				class="p-button-primary"
+				severity="primary"
 				data-info-anchor="admin-permissions-roles-editar-desde-detalle-btn"
 				(click)="editFromDetail()"
-			></button>
+			/>
 		</div>
 	}
 </edu-drawer>
@@ -319,24 +318,22 @@
 
 	<ng-template #footer>
 		<div class="dialog-footer">
-			<button
-				pButton
+			<edu-button
 				label="Cancelar"
 				icon="pi pi-times"
-				class="p-button-text"
+				[text]="true"
 				data-info-anchor="admin-permissions-roles-editar-cancelar-btn"
 				(click)="onDialogVisibleChange(false)"
-			></button>
-			<button
-				pButton
+			/>
+			<edu-button
 				label="Guardar Cambios"
 				icon="pi pi-check"
-				class="p-button-success"
+				severity="success"
 				[loading]="saving()"
 				data-info-anchor="admin-permissions-roles-editar-guardar-btn"
 				(click)="saveCapabilities()"
 				[disabled]="vm().selectedCapIds.length === 0 || saving()"
-			></button>
+			/>
 		</div>
 	</ng-template>
 </edu-dialog>

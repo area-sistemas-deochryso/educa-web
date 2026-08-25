@@ -5,7 +5,6 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { ButtonModule } from 'primeng/button';
 import {
 	REPORTE_ESTADOS,
 	REPORTE_TIPO_LABEL_MAP,
@@ -18,7 +17,7 @@ import { CorrelationIdPillComponent } from '@intranet-shared/components';
 
 import { HubContextBannerComponent, readHubContext } from '../monitoreo/shared';
 import { FeedbackReportsFacade } from './services';
-import { EduConfirmDialog, EduConfirmationService, EduDatePicker, EduDrawer, EduInputText, EduSelect, EduTable, EduTag, EduTextarea, EduTooltip } from '@edu-ui';
+import { EduButton, EduConfirmDialog, EduConfirmationService, EduDatePicker, EduDrawer, EduInputText, EduSelect, EduTable, EduTag, EduTextarea, EduTooltip } from '@edu-ui';
 import type { EduTableLazyLoadEvent } from '@edu-ui';
 
 // #endregion
@@ -37,7 +36,7 @@ interface EstadoOption {
 		FormsModule,
 		EduTable,
 		EduTag,
-		ButtonModule,
+		EduButton,
 		EduConfirmDialog,
 		EduSelect,
 		EduDatePicker,

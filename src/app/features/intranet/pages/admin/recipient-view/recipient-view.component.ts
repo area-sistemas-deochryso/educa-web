@@ -3,19 +3,17 @@ import { ChangeDetectionStrategy, Component, computed, inject, OnInit } from '@a
 import { DatePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
-import { ButtonModule } from 'primeng/button';
-
 import { PageHeaderComponent } from '@intranet-shared/components';
 
 import { RecipientViewActionsFacade } from './facades/recipient-view-actions.facade';
 import { RecipientViewDataFacade } from './facades/recipient-view-data.facade';
-import { EduConfirmDialog, EduConfirmationService, EduTag, EduTooltip } from '@edu-ui';
+import { EduButton, EduConfirmDialog, EduConfirmationService, EduTag, EduTooltip } from '@edu-ui';
 // #endregion
 
 @Component({
 	selector: 'app-recipient-view',
 	standalone: true,
-	imports: [DatePipe, RouterLink, ButtonModule, EduConfirmDialog, EduTag, EduTooltip, PageHeaderComponent],
+	imports: [DatePipe, RouterLink, EduButton, EduConfirmDialog, EduTag, EduTooltip, PageHeaderComponent],
 	providers: [EduConfirmationService],
 	templateUrl: './recipient-view.component.html',
 	styleUrl: './recipient-view.component.scss',

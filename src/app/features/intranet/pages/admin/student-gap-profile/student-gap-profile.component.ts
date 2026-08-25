@@ -4,13 +4,11 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { firstValueFrom, map } from 'rxjs';
 import { CommonModule } from '@angular/common';
 
-import { ButtonModule } from 'primeng/button';
-
 import { logger } from '@core/helpers';
 import { EmailOutboxLista } from '@data/models';
 import { UsersService } from '../users/services';
 import { AttendanceGapRow, EmailOutboxDashboardDiaService } from '../email-outbox-shared';
-import { EduSkeleton, EduTable, EduTag } from '@edu-ui';
+import { EduButton, EduSkeleton, EduTable, EduTag } from '@edu-ui';
 
 interface StudentIdentity {
 	alumno: string;
@@ -22,7 +20,7 @@ interface StudentIdentity {
 @Component({
 	selector: 'app-student-gap-profile',
 	standalone: true,
-	imports: [CommonModule, ButtonModule, EduTable, EduTag, EduSkeleton, RouterLink],
+	imports: [CommonModule, EduButton, EduTable, EduTag, EduSkeleton, RouterLink],
 	templateUrl: './student-gap-profile.component.html',
 	styleUrl: './student-gap-profile.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

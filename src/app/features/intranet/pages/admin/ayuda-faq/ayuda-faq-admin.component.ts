@@ -3,8 +3,6 @@ import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal 
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 
-import { ButtonModule } from 'primeng/button';
-
 import { CapabilityCatalogItem, PermissionsService } from '@core/services/permissions';
 import { logger } from '@core/helpers';
 import { PageHeaderComponent } from '@intranet-shared/components';
@@ -17,7 +15,7 @@ import {
 	FaqAdminDto,
 } from './models/faq-admin.models';
 import { FaqAdminFacade } from './services/faq-admin.facade';
-import { EduConfirmDialog, EduConfirmationService, EduInputText, EduMessageService, EduToast, EduTooltip } from '@edu-ui';
+import { EduButton, EduConfirmDialog, EduConfirmationService, EduInputText, EduMessageService, EduToast, EduTooltip } from '@edu-ui';
 // #endregion
 
 /**
@@ -29,7 +27,7 @@ import { EduConfirmDialog, EduConfirmationService, EduInputText, EduMessageServi
 @Component({
 	selector: 'app-ayuda-faq-admin',
 	standalone: true,
-	imports: [FormsModule, ButtonModule, EduInputText, EduToast, EduTooltip, EduConfirmDialog, PageHeaderComponent, FaqAdminTableComponent, FaqAdminFormDialogComponent],
+	imports: [FormsModule, EduButton, EduInputText, EduToast, EduTooltip, EduConfirmDialog, PageHeaderComponent, FaqAdminTableComponent, FaqAdminFormDialogComponent],
 	providers: [FaqAdminFacade, EduConfirmationService, EduMessageService],
 	templateUrl: './ayuda-faq-admin.component.html',
 	styleUrl: './ayuda-faq-admin.component.scss',

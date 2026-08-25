@@ -5,7 +5,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
 import { logger } from '@core/helpers';
 import { ErrorStateComponent } from '@shared/components';
 import { SkeletonColumnDef, TableSkeletonComponent, StatsSkeletonComponent, PageHeaderComponent, KpiStatsComponent, type KpiStatItem } from '@intranet-shared/components';
@@ -37,7 +36,7 @@ import {
 	tipoPersonaLabel,
 	formatFechaIso,
 } from './services';
-import { EduCheckbox, EduConfirmDialog, EduConfirmationService, EduDatePicker, EduDialog, EduIconField, EduInputIcon, EduInputText, EduMessageService, EduSelect, EduSelectButton, EduTab, EduTabPanel, EduTable, EduTabs, EduTag, EduToast, EduTooltip } from '@edu-ui';
+import { EduButton, EduCheckbox, EduConfirmDialog, EduConfirmationService, EduDatePicker, EduDialog, EduIconField, EduInputIcon, EduInputText, EduMessageService, EduSelect, EduSelectButton, EduTab, EduTabPanel, EduTable, EduTabs, EduTag, EduToast, EduTooltip } from '@edu-ui';
 // #endregion
 
 @Component({
@@ -46,7 +45,7 @@ import { EduCheckbox, EduConfirmDialog, EduConfirmationService, EduDatePicker, E
 	imports: [
 		CommonModule,
 		FormsModule,
-		ButtonModule,
+		EduButton,
 		EduDatePicker,
 		EduConfirmDialog,
 		EduDialog,

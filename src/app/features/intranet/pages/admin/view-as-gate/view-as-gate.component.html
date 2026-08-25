@@ -5,15 +5,15 @@
 		[title]="'Ver como ' + (rol() ?? '')"
 		[subtitle]="'Elegí un ' + (rol() ?? 'usuario') + ' para ver cursos, salones y horarios exactamente como esa persona los vería.'"
 	>
-		<button
-			pButton
+		<edu-button
 			type="button"
 			label="Cancelar"
 			icon="pi pi-times"
-			class="p-button-outlined p-button-sm"
+			[outlined]="true"
+			size="small"
 			routerLink="/intranet"
 			data-info-anchor="admin-view-as-gate-cancel-btn"
-		></button>
+		/>
 	</app-page-header>
 
 	@if (rol(); as currentRol) {

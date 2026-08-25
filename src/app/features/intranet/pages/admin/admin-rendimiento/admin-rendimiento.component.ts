@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ButtonModule } from 'primeng/button';
+import { EduButton } from '@edu-ui';
 
 import { PageHeaderComponent, StatsSkeletonComponent, KpiStatsComponent, type KpiStatItem } from '@intranet-shared/components';
 
@@ -10,7 +10,7 @@ import { AdminRendimientoCursoCardComponent } from './components';
 @Component({
 	selector: 'app-admin-rendimiento',
 	standalone: true,
-	imports: [CommonModule, ButtonModule, PageHeaderComponent, StatsSkeletonComponent, KpiStatsComponent, AdminRendimientoCursoCardComponent],
+	imports: [CommonModule, EduButton, PageHeaderComponent, StatsSkeletonComponent, KpiStatsComponent, AdminRendimientoCursoCardComponent],
 	templateUrl: './admin-rendimiento.component.html',
 	styleUrl: './admin-rendimiento.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

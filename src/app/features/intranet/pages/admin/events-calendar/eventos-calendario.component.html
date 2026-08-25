@@ -8,13 +8,12 @@
 		placeholder="Año"
 		data-info-anchor="admin-eventos-anio-select"
 	/>
-	<button
-		pButton
+	<edu-button
 		label="Nuevo Evento"
 		icon="pi pi-plus"
 		(click)="onNew()"
 		data-info-anchor="admin-eventos-nuevo-btn"
-	></button>
+	/>
 </app-page-header>
 <!-- #endregion -->
 
@@ -58,16 +57,15 @@
 		placeholder="Estado"
 		data-info-anchor="admin-eventos-estado-select"
 	/>
-	<button
-		pButton
+	<edu-button
 		icon="pi pi-filter-slash"
-		class="p-button-outlined"
+		[outlined]="true"
 		(click)="onClearFiltros()"
 		eduTooltip="Limpiar filtros"
 		eduTooltipPosition="top"
 		[pt]="{ root: { 'aria-label': 'Limpiar filtros' } }"
 		data-info-anchor="admin-eventos-limpiar-filtros-btn"
-	></button>
+	/>
 </div>
 <!-- #endregion -->
 
@@ -124,38 +122,38 @@
 			</td>
 			<td>
 				<div class="actions-cell">
-					<button
-						pButton
+					<edu-button
 						icon="pi pi-pencil"
-						class="p-button-rounded p-button-text"
+						[text]="true"
+						[rounded]="true"
 						(click)="onEdit(item)"
 						eduTooltip="Editar"
 						eduTooltipPosition="top"
 						[pt]="{ root: { 'aria-label': 'Editar' } }"
 						data-info-anchor="admin-eventos-editar-btn"
-					></button>
-					<button
-						pButton
+					/>
+					<edu-button
 						[icon]="item.estado ? 'pi pi-eye-slash' : 'pi pi-eye'"
-						class="p-button-rounded p-button-text"
-						[class.p-button-warning]="item.estado"
-						[class.p-button-success]="!item.estado"
+						[text]="true"
+						[rounded]="true"
+						[severity]="item.estado ? 'warn' : 'success'"
 						(click)="onToggleEstado(item)"
 						[eduTooltip]="item.estado | estadoToggleLabel"
 						eduTooltipPosition="top"
 						[pt]="{ root: { 'aria-label': item.estado | estadoToggleLabel } }"
 						data-info-anchor="admin-eventos-toggle-estado-btn"
-					></button>
-					<button
-						pButton
+					/>
+					<edu-button
 						icon="pi pi-trash"
-						class="p-button-rounded p-button-text p-button-danger"
+						[text]="true"
+						[rounded]="true"
+						severity="danger"
 						(click)="onDelete(item)"
 						eduTooltip="Eliminar"
 						eduTooltipPosition="top"
 						[pt]="{ root: { 'aria-label': 'Eliminar' } }"
 						data-info-anchor="admin-eventos-eliminar-btn"
-					></button>
+					/>
 				</div>
 			</td>
 		</tr>
@@ -315,16 +313,15 @@
 	</div>
 
 	<ng-template #footer>
-		<button pButton label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="onDialogVisibleChange(false)" data-info-anchor="admin-eventos-form-cancelar-btn"></button>
-		<button
-			pButton
+		<edu-button label="Cancelar" icon="pi pi-times" [text]="true" (click)="onDialogVisibleChange(false)" data-info-anchor="admin-eventos-form-cancelar-btn"/>
+		<edu-button
 			[label]="vm().isEditing ? 'Actualizar' : 'Crear'"
 			icon="pi pi-check"
 			(click)="onSave()"
 			[disabled]="!vm().isFormValid || vm().saving"
 			[loading]="vm().saving"
 			data-info-anchor="admin-eventos-form-guardar-btn"
-		></button>
+		/>
 	</ng-template>
 </edu-dialog>
 <!-- #endregion -->
