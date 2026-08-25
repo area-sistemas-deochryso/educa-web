@@ -12,6 +12,8 @@ export type EduButtonSeverity =
 	| 'contrast';
 
 export type EduButtonSize = 'small' | 'large';
+export type EduButtonIconPos = 'left' | 'right';
+export type EduButtonType = 'button' | 'submit';
 
 @Component({
 	selector: 'edu-button',
@@ -21,22 +23,36 @@ export type EduButtonSize = 'small' | 'large';
 	template: `
 		<button
 			class="edu-button"
-			type="button"
+			[attr.type]="type()"
 			[eduPtRoot]="pt()?.root"
-			[disabled]="disabled()"
+			[disabled]="disabled() || loading()"
 			[attr.data-severity]="severity()"
+			[attr.aria-busy]="loading()"
 			[class.edu-button--text]="text()"
 			[class.edu-button--outlined]="outlined()"
 			[class.edu-button--rounded]="rounded()"
 			[class.edu-button--sm]="size() === 'small'"
 			[class.edu-button--lg]="size() === 'large'"
-			[class.edu-button--icon-only]="!!icon() && !label()"
+			[class.edu-button--icon-only]="(!!icon() || loading()) && !label()"
 		>
-			@if (icon()) {
-				<i class="edu-button__icon" [class]="icon()"></i>
-			}
-			@if (label()) {
-				<span class="edu-button__label">{{ label() }}</span>
+			@if (iconPos() === 'right') {
+				@if (label()) {
+					<span class="edu-button__label">{{ label() }}</span>
+				}
+				@if (loading()) {
+					<i class="edu-button__icon pi pi-spinner pi-spin"></i>
+				} @else if (icon()) {
+					<i class="edu-button__icon" [class]="icon()"></i>
+				}
+			} @else {
+				@if (loading()) {
+					<i class="edu-button__icon pi pi-spinner pi-spin"></i>
+				} @else if (icon()) {
+					<i class="edu-button__icon" [class]="icon()"></i>
+				}
+				@if (label()) {
+					<span class="edu-button__label">{{ label() }}</span>
+				}
 			}
 			<ng-content></ng-content>
 		</button>
@@ -52,5 +68,8 @@ export class EduButton {
 	readonly rounded = input(false);
 	readonly outlined = input(false);
 	readonly disabled = input(false);
+	readonly loading = input(false);
+	readonly iconPos = input<EduButtonIconPos>('left');
+	readonly type = input<EduButtonType>('button');
 	readonly pt = input<EduPassThrough>();
 }

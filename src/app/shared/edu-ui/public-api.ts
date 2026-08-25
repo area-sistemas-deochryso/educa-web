@@ -1,12 +1,12 @@
-// Vendored from educa-libs (packages/edu-ui/src) — commit 614fbaa (content 290803d),
-// 2026-08-24. Not published to a registry (P79 F6); source-of-truth stays in
+// Vendored from educa-libs (packages/edu-ui/src) — commit ad1df08 (fix content 87a8154,
+// F6d), 2026-08-25. Not published to a registry (P79 F6); source-of-truth stays in
 // educa-libs, re-sync manually on changes.
 //
 // F1 — Foundation + trivial components (CSS-only wrappers).
 // Design tokens: import 'dist/edu-ui/tokens.css' in the consuming app (F6).
 
 export { EduButton } from './lib/button/edu-button';
-export type { EduButtonSeverity, EduButtonSize } from './lib/button/edu-button';
+export type { EduButtonSeverity, EduButtonSize, EduButtonIconPos, EduButtonType } from './lib/button/edu-button';
 
 export { EduPtRoot } from './lib/passthrough/edu-pt-root';
 export type { EduPassThrough, EduPassThroughRoot } from './lib/passthrough/edu-pt-root';
