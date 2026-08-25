@@ -7,20 +7,19 @@ import {
 	signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
 import {
 	METRIC_LABELS,
 	ThresholdConfig,
 	ThresholdDirection,
 } from '../../models/runtime-health.models';
-import { EduInputNumber, EduSelect, EduTable, EduTag } from '@edu-ui';
+import { EduButton, EduInputNumber, EduSelect, EduTable, EduTag } from '@edu-ui';
 
 @Component({
 	selector: 'app-threshold-config',
 	standalone: true,
 	imports: [
 		FormsModule,
-		ButtonModule,
+		EduButton,
 		EduInputNumber,
 		EduSelect,
 		EduTable,

@@ -64,16 +64,16 @@
 						}
 					</td>
 					<td>
-						<button
-							pButton
+						<edu-button
 							type="button"
 							label="Ver bandeja"
 							icon="pi pi-inbox"
-							class="p-button-text p-button-sm"
+							[text]="true"
+							size="small"
 							(click)="onGoToOutbox(row)"
 							data-info-anchor="admin-correlation-row-action"
 							[pt]="{ root: { 'aria-label': 'Ver bandeja del destinatario' } }"
-						></button>
+						/>
 					</td>
 				</tr>
 			</ng-template>

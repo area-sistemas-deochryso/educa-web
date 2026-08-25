@@ -2,10 +2,9 @@ import { ChangeDetectionStrategy, Component, computed, input, output } from '@an
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { ButtonModule } from 'primeng/button';
 import { HeatmapCalendarCell, HeatmapCell } from '../../models';
 import { ErrorHeatmapSeverityChartComponent } from '../error-heatmap-severity-chart';
-import { EduDatePicker, EduSelectButton, EduTooltip } from '@edu-ui';
+import { EduButton, EduDatePicker, EduSelectButton, EduTooltip } from '@edu-ui';
 
 const DAY_LABELS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 
@@ -32,7 +31,7 @@ export interface HeatmapPeriodOption {
 		CommonModule,
 		DatePipe,
 		FormsModule,
-		ButtonModule,
+		EduButton,
 		EduDatePicker,
 		EduSelectButton,
 		EduTooltip,

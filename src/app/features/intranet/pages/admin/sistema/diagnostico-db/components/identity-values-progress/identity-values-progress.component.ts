@@ -1,12 +1,11 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
 import { IdentityValueDto } from '../../models/diagnostico-db.models';
-import { EduProgressBar } from '@edu-ui';
+import { EduButton, EduProgressBar } from '@edu-ui';
 
 @Component({
 	selector: 'app-identity-values-progress',
 	standalone: true,
-	imports: [ButtonModule, EduProgressBar],
+	imports: [EduButton, EduProgressBar],
 	templateUrl: './identity-values-progress.component.html',
 	styleUrl: './identity-values-progress.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

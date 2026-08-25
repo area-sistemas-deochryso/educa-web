@@ -52,14 +52,15 @@
 		</label>
 	</div>
 
-	<button
-		pButton
+	<edu-button
 		icon="pi pi-filter-slash"
-		class="p-button-text p-button-sm btn-clear"
+		[text]="true"
+		size="small"
+		class="btn-clear"
 		eduTooltip="Limpiar filtros"
 		eduTooltipPosition="top"
 		data-info-anchor="admin-rate-limit-limpiar-filtros-btn"
 		(click)="onClear()"
 		[pt]="{ root: { 'aria-label': 'Limpiar filtros' } }"
-	></button>
+	/>
 </div>

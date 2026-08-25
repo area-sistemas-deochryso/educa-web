@@ -9,12 +9,12 @@ import {
 	OUTBOX_ESTADO_SEVERITY_MAP,
 	SECTION_DEFENSIVE_CAP,
 } from '../../models';
-import { EduTable, EduTag, EduTemplate, EduTooltip } from '@edu-ui';
+import { EduButton, EduTable, EduTag, EduTemplate, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-correlation-emails-section',
 	standalone: true,
-	imports: [CommonModule, DatePipe, RouterLink, ButtonModule, EduTable, EduTag, EduTooltip, EduTemplate],
+	imports: [CommonModule, DatePipe, RouterLink, ButtonModule, EduButton, EduTable, EduTag, EduTooltip, EduTemplate],
 	templateUrl: './correlation-emails-section.component.html',
 	styleUrl: './correlation-emails-section.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

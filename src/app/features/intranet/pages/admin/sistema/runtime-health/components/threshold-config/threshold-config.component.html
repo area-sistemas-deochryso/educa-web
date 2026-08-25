@@ -6,34 +6,34 @@
 		</div>
 		<div class="section-actions">
 			@if (editableRows().length === 0) {
-				<button
-					pButton
+				<edu-button
 					icon="pi pi-pencil"
 					label="Editar"
-					class="p-button-outlined p-button-sm"
+					[outlined]="true"
+					size="small"
 					[loading]="loading()"
 					data-info-anchor="admin-runtime-health-thresholds-editar-btn"
 					(click)="onLoadClick()"
-				></button>
+				/>
 			} @else {
-				<button
-					pButton
+				<edu-button
 					icon="pi pi-check"
 					label="Guardar"
-					class="p-button-sm p-button-success"
+					size="small"
+					severity="success"
 					[loading]="saving()"
 					[disabled]="!dirty()"
 					data-info-anchor="admin-runtime-health-thresholds-guardar-btn"
 					(click)="onSave()"
-				></button>
-				<button
-					pButton
+				/>
+				<edu-button
 					icon="pi pi-times"
 					label="Cancelar"
-					class="p-button-sm p-button-text"
+					[text]="true"
+					size="small"
 					data-info-anchor="admin-runtime-health-thresholds-cancelar-btn"
 					(click)="onCancel()"
-				></button>
+				/>
 			}
 		</div>
 	</header>

@@ -1,11 +1,10 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 
-import { ButtonModule } from 'primeng/button';
 import { CorrelationIdPillComponent } from '@intranet-shared/components';
 
 import { RateLimitEventListaDto, displayPolicy } from '../../models';
-import { EduTable, EduTag, EduTooltip } from '@edu-ui';
+import { EduButton, EduTable, EduTag, EduTooltip } from '@edu-ui';
 import type { EduTableLazyLoadEvent } from '@edu-ui';
 
 @Component({
@@ -14,7 +13,7 @@ import type { EduTableLazyLoadEvent } from '@edu-ui';
 	imports: [
 		CommonModule,
 		DatePipe,
-		ButtonModule,
+		EduButton,
 		EduTable,
 		EduTag,
 		EduTooltip,

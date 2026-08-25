@@ -7,7 +7,6 @@ import {
 	output,
 	signal,
 } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
 
 import {
@@ -17,7 +16,7 @@ import {
 	RECOMMENDATION_TAB_TARGETS,
 	RuntimeHealthAlert,
 } from '../../models/runtime-health.models';
-import { EduCheckbox, EduSelect, EduSelectButton, EduTag } from '@edu-ui';
+import { EduButton, EduCheckbox, EduSelect, EduSelectButton, EduTag } from '@edu-ui';
 
 type SeverityFilter = 'all' | 'warn' | 'critical';
 
@@ -38,7 +37,7 @@ const PAGE_SIZE = 15;
 @Component({
 	selector: 'app-alert-timeline',
 	standalone: true,
-	imports: [DatePipe, DecimalPipe, FormsModule, ButtonModule, EduCheckbox, EduSelect, EduSelectButton, EduTag],
+	imports: [DatePipe, DecimalPipe, FormsModule, EduButton, EduCheckbox, EduSelect, EduSelectButton, EduTag],
 	templateUrl: './alert-timeline.component.html',
 	styleUrl: './alert-timeline.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

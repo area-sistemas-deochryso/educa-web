@@ -1,13 +1,12 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
 import { UnusedIndexDto } from '../../models/diagnostico-db.models';
-import { EduTable } from '@edu-ui';
+import { EduButton, EduTable } from '@edu-ui';
 
 @Component({
 	selector: 'app-unused-indexes-table',
 	standalone: true,
-	imports: [DecimalPipe, ButtonModule, EduTable],
+	imports: [DecimalPipe, EduButton, EduTable],
 	templateUrl: './unused-indexes-table.component.html',
 	styleUrl: './unused-indexes-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

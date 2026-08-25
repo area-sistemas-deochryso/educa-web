@@ -4,65 +4,62 @@
 	subtitle="Hub central que agrupa los 4 tipos de telemetría que comparten un mismo correlation id"
 >
 	<div class="header-actions">
-		<button
-			pButton
+		<edu-button
 			icon="pi pi-arrow-left"
 			label="Volver"
-			class="p-button-text p-button-sm"
+			[text]="true"
+			size="small"
 			(click)="onBack()"
 			data-info-anchor="admin-correlation-back"
 			[pt]="{ root: { 'aria-label': 'Volver' } }"
-		></button>
+		/>
 
 		<div class="view-toggle" role="group" aria-label="Modo de vista">
-			<button
-				pButton
+			<edu-button
 				type="button"
 				icon="pi pi-clock"
 				label="Timeline"
-				class="p-button-sm"
-				[class.p-button-text]="viewMode() !== 'timeline'"
-				[class.p-button-outlined]="viewMode() === 'timeline'"
+				size="small"
+				[text]="viewMode() !== 'timeline'"
+				[outlined]="viewMode() === 'timeline'"
 				(click)="onToggleView('timeline')"
 				[attr.aria-pressed]="viewMode() === 'timeline'"
 				data-info-anchor="admin-correlation-view-toggle"
 				[pt]="{ root: { 'aria-label': 'Vista timeline cronológica' } }"
-			></button>
-			<button
-				pButton
+			/>
+			<edu-button
 				type="button"
 				icon="pi pi-th-large"
 				label="Por sección"
-				class="p-button-sm"
-				[class.p-button-text]="viewMode() !== 'section'"
-				[class.p-button-outlined]="viewMode() === 'section'"
+				size="small"
+				[text]="viewMode() !== 'section'"
+				[outlined]="viewMode() === 'section'"
 				(click)="onToggleView('section')"
 				[attr.aria-pressed]="viewMode() === 'section'"
 				data-info-anchor="admin-correlation-view-toggle"
 				[pt]="{ root: { 'aria-label': 'Vista por sección' } }"
-			></button>
+			/>
 		</div>
 
-		<button
-			pButton
+		<edu-button
 			icon="pi pi-download"
 			label="Exportar JSON"
-			class="p-button-outlined p-button-sm"
+			[outlined]="true"
+			size="small"
 			[disabled]="vm().loading || isSnapshotEmpty()"
 			(click)="onExport()"
 			data-info-anchor="admin-correlation-export"
 			eduTooltip="Descargar snapshot como JSON"
 			[pt]="{ root: { 'aria-label': 'Exportar snapshot como JSON' } }"
-		></button>
+		/>
 
-		<button
-			pButton
+		<edu-button
 			type="button"
 			[icon]="autoRefresh() ? 'pi pi-pause' : 'pi pi-play'"
 			label="Auto-refresh (30s)"
-			class="p-button-sm"
-			[class.p-button-text]="!autoRefresh()"
-			[class.p-button-outlined]="autoRefresh()"
+			size="small"
+			[text]="!autoRefresh()"
+			[outlined]="autoRefresh()"
 			(click)="onToggleAutoRefresh()"
 			[attr.aria-pressed]="autoRefresh()"
 			data-info-anchor="admin-correlation-autorefresh-toggle"
@@ -78,18 +75,19 @@
 						: 'Activar auto-refresh cada 30 segundos',
 				},
 			}"
-		></button>
+		/>
 
-		<button
-			pButton
+		<edu-button
 			icon="pi pi-refresh"
-			class="p-button-text p-button-sm btn-icon"
+			[text]="true"
+			size="small"
+			class="btn-icon"
 			[disabled]="vm().loading || !vm().correlationId"
 			(click)="onRetry()"
 			data-info-anchor="admin-correlation-refresh"
 			eduTooltip="Recargar snapshot"
 			[pt]="{ root: { 'aria-label': 'Recargar snapshot' } }"
-		></button>
+		/>
 	</div>
 </app-page-header>
 
@@ -105,15 +103,15 @@
 					Snapshot generado: {{ ts | date: 'dd/MM/yyyy HH:mm:ss' }}
 				</span>
 			}
-			<button
-				pButton
+			<edu-button
 				icon="pi pi-copy"
 				label="Copiar id"
-				class="p-button-text p-button-sm"
+				[text]="true"
+				size="small"
 				(click)="onCopyId(vm().correlationId)"
 				data-info-anchor="admin-correlation-copy-id"
 				[pt]="{ root: { 'aria-label': 'Copiar correlation id al portapapeles' } }"
-			></button>
+			/>
 		</div>
 	</section>
 }
@@ -128,14 +126,14 @@
 		<i class="pi pi-exclamation-triangle"></i>
 		<h3>No se pudo cargar el snapshot</h3>
 		<p>{{ vm().error }}</p>
-		<button
-			pButton
+		<edu-button
 			label="Reintentar"
 			icon="pi pi-refresh"
-			class="p-button-outlined p-button-sm"
+			[outlined]="true"
+			size="small"
 			(click)="onRetry()"
 			data-info-anchor="reintentar"
-		></button>
+		/>
 	</div>
 } @else {
 	@if (vm().hasDefensiveCap) {

@@ -9,12 +9,12 @@ import {
 	SECTION_DEFENSIVE_CAP,
 	SEVERIDAD_SEVERITY_MAP,
 } from '../../models';
-import { EduTable, EduTag, EduTemplate, EduTooltip } from '@edu-ui';
+import { EduButton, EduTable, EduTag, EduTemplate, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-correlation-errors-section',
 	standalone: true,
-	imports: [CommonModule, DatePipe, RouterLink, ButtonModule, EduTable, EduTag, EduTooltip, EduTemplate],
+	imports: [CommonModule, DatePipe, RouterLink, ButtonModule, EduButton, EduTable, EduTag, EduTooltip, EduTemplate],
 	templateUrl: './correlation-errors-section.component.html',
 	styleUrl: './correlation-errors-section.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

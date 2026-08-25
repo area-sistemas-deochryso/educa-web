@@ -7,8 +7,6 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { ButtonModule } from 'primeng/button';
-
 import { ErrorGroupsViewMode, StorageService } from '@core/services/storage';
 import { PageHeaderComponent, KpiStatsComponent, type KpiStatItem } from '@intranet-shared/components';
 import { TableSkeletonComponent } from '@intranet-shared/components/table-skeleton';
@@ -51,7 +49,7 @@ import {
 	ErrorGroupsStore,
 	ErrorGroupsUiFacade,
 } from './services';
-import { EduCheckbox, EduConfirmDialog, EduConfirmationService, EduDialog, EduIconField, EduInputIcon, EduInputNumber, EduInputText, EduPaginator, EduSelect, EduTable, EduTag, EduTooltip } from '@edu-ui';
+import { EduButton, EduCheckbox, EduConfirmDialog, EduConfirmationService, EduDialog, EduIconField, EduInputIcon, EduInputNumber, EduInputText, EduPaginator, EduSelect, EduTable, EduTag, EduTooltip } from '@edu-ui';
 import type { EduPaginatorPageEvent } from '@edu-ui';
 
 /**
@@ -65,7 +63,7 @@ const VIEW_MODE_VOLUME_THRESHOLD = 40;
 @Component({
 	selector: 'app-error-groups',
 	standalone: true,
-	imports: [CommonModule, DatePipe, FormsModule, ButtonModule, EduCheckbox, EduConfirmDialog, EduDialog, EduIconField, EduInputIcon, EduInputNumber, EduInputText, EduPaginator, EduSelect, EduTable, EduTag, EduTooltip, ErrorOccurrenceTimelineComponent, PageHeaderComponent, KpiStatsComponent, TableSkeletonComponent, ErrorGroupDetailDrawerComponent, ErrorOccurrenceDrawerComponent, ChangeGroupStatusDialogComponent, ErrorGroupsKanbanBoardComponent, ErrorGroupsViewToggleComponent, ErrorHeatmapComponent, ErrorParetoChartComponent, HubContextBannerComponent],
+	imports: [CommonModule, DatePipe, FormsModule, EduButton, EduCheckbox, EduConfirmDialog, EduDialog, EduIconField, EduInputIcon, EduInputNumber, EduInputText, EduPaginator, EduSelect, EduTable, EduTag, EduTooltip, ErrorOccurrenceTimelineComponent, PageHeaderComponent, KpiStatsComponent, TableSkeletonComponent, ErrorGroupDetailDrawerComponent, ErrorOccurrenceDrawerComponent, ChangeGroupStatusDialogComponent, ErrorGroupsKanbanBoardComponent, ErrorGroupsViewToggleComponent, ErrorHeatmapComponent, ErrorParetoChartComponent, HubContextBannerComponent],
 	templateUrl: './error-groups.component.html',
 	styleUrl: './error-groups.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

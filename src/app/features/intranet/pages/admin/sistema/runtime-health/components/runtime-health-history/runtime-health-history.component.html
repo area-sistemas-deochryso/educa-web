@@ -15,15 +15,15 @@
 				optionValue="value"
 				size="small"
 			/>
-			<button
-				pButton
+			<edu-button
 				icon="pi pi-refresh"
-				class="p-button-text p-button-sm"
+				[text]="true"
+				size="small"
 				[loading]="loading()"
 				data-info-anchor="admin-runtime-health-history-refresh-btn"
 				(click)="onRefresh()"
 				[pt]="{ root: { 'aria-label': 'Refrescar historial' } }"
-			></button>
+			/>
 		</div>
 	</header>
 
@@ -106,14 +106,15 @@
 							/>
 						}
 					</div>
-					<button
-						pButton
+					<edu-button
 						icon="pi pi-times"
-						class="p-button-text p-button-sm p-button-secondary"
+						[text]="true"
+						size="small"
+						severity="secondary"
 						data-info-anchor="admin-runtime-health-history-cerrar-correlacion-btn"
 						(click)="dismissCorrelation()"
 						[pt]="{ root: { 'aria-label': 'Cerrar correlación' } }"
-					></button>
+					/>
 				</header>
 
 				@if (snap.reason) {

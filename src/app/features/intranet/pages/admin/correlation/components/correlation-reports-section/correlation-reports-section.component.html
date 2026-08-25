@@ -77,16 +77,16 @@
 					</td>
 					<td>{{ row.fechaReg | date: 'dd/MM/yyyy HH:mm:ss' }}</td>
 					<td>
-						<button
-							pButton
+						<edu-button
 							type="button"
 							label="Ver reporte"
 							icon="pi pi-external-link"
-							class="p-button-text p-button-sm"
+							[text]="true"
+							size="small"
 							(click)="onGoToReport(row)"
 							data-info-anchor="admin-correlation-row-action"
 							[pt]="{ root: { 'aria-label': 'Ver reporte' } }"
-						></button>
+						/>
 					</td>
 				</tr>
 			</ng-template>

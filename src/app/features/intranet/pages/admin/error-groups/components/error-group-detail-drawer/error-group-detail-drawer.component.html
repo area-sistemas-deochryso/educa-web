@@ -151,15 +151,15 @@
 						</div>
 					} @else {
 						<div class="ocurrencias-toolbar">
-							<button
-								pButton
+							<edu-button
 								icon="pi pi-download"
 								label="Exportar CSV"
-								class="p-button-outlined p-button-sm"
+								[outlined]="true"
+								size="small"
 								(click)="onExportOcurrenciasClick()"
 								[pt]="{ root: { 'aria-label': 'Exportar ocurrencias a CSV' } }"
 								data-info-anchor="admin-error-groups-export-ocurrencias-btn"
-							></button>
+							/>
 						</div>
 						<edu-table
 							[value]="vm().ocurrencias"
@@ -200,16 +200,17 @@
 										</span>
 									</td>
 									<td>
-										<button
-											pButton
+										<edu-button
 											icon="pi pi-eye"
-											class="p-button-rounded p-button-text p-button-sm"
+											[text]="true"
+											[rounded]="true"
+											size="small"
 											eduTooltip="Ver detalle"
 											eduTooltipPosition="left"
 											(click)="$event.stopPropagation(); onOccurrenceClick(item)"
 											[pt]="{ root: { 'aria-label': 'Ver detalle de la ocurrencia' } }"
 											data-info-anchor="admin-error-groups-ver-detalle-btn"
-										></button>
+										/>
 									</td>
 								</tr>
 							</ng-template>
@@ -233,17 +234,16 @@
 
 		<!-- #region Footer con transiciones -->
 		<div class="drawer-footer">
-			<button
-				pButton
+			<edu-button
 				type="button"
 				icon="pi pi-pencil"
 				label="Cambiar estado"
-				class="p-button-success"
+				severity="success"
 				[disabled]="transitionButtons().length === 0"
 				(click)="onStatusChangeClick()"
 				[pt]="{ root: { 'aria-label': 'Cambiar estado del grupo' } }"
 				data-info-anchor="admin-error-groups-cambiar-estado-btn"
-			></button>
+			/>
 		</div>
 		<!-- #endregion -->
 	}

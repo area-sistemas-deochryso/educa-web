@@ -58,28 +58,26 @@
 
 	<ng-template #footer>
 		<div class="dialog-footer">
-			<button
-				pButton
+			<edu-button
 				type="button"
 				label="Cancelar"
 				icon="pi pi-times"
-				class="p-button-text"
+				[text]="true"
 				(click)="onCancel()"
 				[pt]="{ root: { 'aria-label': 'Cancelar' } }"
 				data-info-anchor="admin-error-groups-status-dialog-cancelar-btn"
-			></button>
-			<button
-				pButton
+			/>
+			<edu-button
 				type="button"
 				label="Guardar"
 				icon="pi pi-check"
-				class="p-button-success"
+				severity="success"
 				[disabled]="!canSubmit()"
 				[loading]="loading()"
 				(click)="onConfirm()"
 				[pt]="{ root: { 'aria-label': 'Guardar cambio de estado' } }"
 				data-info-anchor="admin-error-groups-status-dialog-guardar-btn"
-			></button>
+			/>
 		</div>
 	</ng-template>
 </edu-dialog>

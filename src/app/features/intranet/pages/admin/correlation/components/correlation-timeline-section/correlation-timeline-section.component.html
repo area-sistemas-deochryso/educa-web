@@ -51,17 +51,17 @@
 									}
 								</div>
 								<div class="timeline-event__actions">
-									<button
-										pButton
+									<edu-button
 										type="button"
 										label="Ver grupo"
 										icon="pi pi-sitemap"
-										class="p-button-text p-button-sm"
+										[text]="true"
+										size="small"
 										[disabled]="!canGoToGroup(event.payload)"
 										(click)="onGoToGroup(event.payload)"
 										data-info-anchor="admin-correlation-row-action"
 										[pt]="{ root: { 'aria-label': 'Ver grupo de errores' } }"
-									></button>
+									/>
 								</div>
 							}
 							@case ('rate-limit') {
@@ -100,16 +100,16 @@
 									</span>
 								</div>
 								<div class="timeline-event__actions">
-									<button
-										pButton
+									<edu-button
 										type="button"
 										label="Ver reporte"
 										icon="pi pi-external-link"
-										class="p-button-text p-button-sm"
+										[text]="true"
+										size="small"
 										(click)="onGoToReport(event.payload)"
 										data-info-anchor="admin-correlation-row-action"
 										[pt]="{ root: { 'aria-label': 'Ver detalle del reporte' } }"
-									></button>
+									/>
 								</div>
 							}
 							@case ('outbox') {
@@ -129,16 +129,16 @@
 									}
 								</div>
 								<div class="timeline-event__actions">
-									<button
-										pButton
+									<edu-button
 										type="button"
 										label="Ver en bandeja"
 										icon="pi pi-envelope"
-										class="p-button-text p-button-sm"
+										[text]="true"
+										size="small"
 										(click)="onGoToOutbox(event.payload)"
 										data-info-anchor="admin-correlation-row-action"
 										[pt]="{ root: { 'aria-label': 'Ver correos del destinatario en bandeja' } }"
-									></button>
+									/>
 								</div>
 							}
 						}

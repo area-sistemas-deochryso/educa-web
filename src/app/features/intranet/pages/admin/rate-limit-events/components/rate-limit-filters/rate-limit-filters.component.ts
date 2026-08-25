@@ -2,8 +2,6 @@ import { ChangeDetectionStrategy, Component, computed, inject, input, output } f
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { ButtonModule } from 'primeng/button';
-
 import { RolService } from '@core/services/roles';
 
 import {
@@ -11,7 +9,7 @@ import {
 	RateLimitEventFiltro,
 	RateLimitPolicy,
 } from '../../models';
-import { EduDatePicker, EduInputText, EduSelect, EduToggle, EduTooltip } from '@edu-ui';
+import { EduButton, EduDatePicker, EduInputText, EduSelect, EduToggle, EduTooltip } from '@edu-ui';
 
 interface SelectOption<T> {
 	label: string;
@@ -21,7 +19,7 @@ interface SelectOption<T> {
 @Component({
 	selector: 'app-rate-limit-filters',
 	standalone: true,
-	imports: [CommonModule, FormsModule, ButtonModule, EduDatePicker, EduInputText, EduSelect, EduToggle, EduTooltip],
+	imports: [CommonModule, FormsModule, EduButton, EduDatePicker, EduInputText, EduSelect, EduToggle, EduTooltip],
 	templateUrl: './rate-limit-filters.component.html',
 	styleUrl: './rate-limit-filters.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

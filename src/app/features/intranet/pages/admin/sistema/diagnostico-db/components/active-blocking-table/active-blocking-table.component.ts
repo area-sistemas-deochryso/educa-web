@@ -1,13 +1,12 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
 import { ActiveBlockingSessionDto } from '../../models/diagnostico-db.models';
-import { EduTable, EduTooltip } from '@edu-ui';
+import { EduButton, EduTable, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-active-blocking-table',
 	standalone: true,
-	imports: [DecimalPipe, ButtonModule, EduTable, EduTooltip],
+	imports: [DecimalPipe, EduButton, EduTable, EduTooltip],
 	templateUrl: './active-blocking-table.component.html',
 	styleUrl: './active-blocking-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

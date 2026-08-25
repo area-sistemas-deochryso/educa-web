@@ -15,30 +15,32 @@
 				data-info-anchor="period-toggle"
 			/>
 			<div class="heatmap-nav">
-				<button
-					pButton
+				<edu-button
 					icon="pi pi-chevron-left"
-					class="p-button-text p-button-sm heatmap-nav-btn"
+					[text]="true"
+					size="small"
+					class="heatmap-nav-btn"
 					(click)="onPrev()"
 					[eduTooltip]="isWeekMode() ? 'Semana anterior' : 'Mes anterior'"
 					eduTooltipPosition="top"
 					[pt]="{ root: { 'aria-label': isWeekMode() ? 'Semana anterior' : 'Mes anterior' } }"
 					data-info-anchor="admin-error-groups-heatmap-prev-btn"
-				></button>
+				/>
 				<span class="heatmap-range-label">
 					{{ rangeLabel().start | date: 'dd MMM' }} – {{ rangeLabel().end | date: 'dd MMM' }}
 				</span>
-				<button
-					pButton
+				<edu-button
 					icon="pi pi-chevron-right"
-					class="p-button-text p-button-sm heatmap-nav-btn"
+					[text]="true"
+					size="small"
+					class="heatmap-nav-btn"
 					(click)="onNext()"
 					[disabled]="!canGoNext()"
 					[eduTooltip]="isWeekMode() ? 'Semana siguiente' : 'Mes siguiente'"
 					eduTooltipPosition="top"
 					[pt]="{ root: { 'aria-label': isWeekMode() ? 'Semana siguiente' : 'Mes siguiente' } }"
 					data-info-anchor="admin-error-groups-heatmap-next-btn"
-				></button>
+				/>
 			</div>
 			<span [eduTooltip]="calendarTooltip()" eduTooltipPosition="top">
 				<edu-datepicker

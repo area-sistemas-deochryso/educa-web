@@ -22,23 +22,23 @@
 >
 	<div class="header-actions">
 		<app-error-groups-view-toggle [activeMode]="viewMode()" (modeChange)="onViewModeChange($event)" />
-		<button
-			pButton
+		<edu-button
 			icon="pi pi-download"
 			label="Exportar CSV"
-			class="p-button-outlined p-button-sm"
+			[outlined]="true"
+			size="small"
 			(click)="onExportGrupos()"
 			data-info-anchor="admin-error-groups-export-btn"
-		></button>
-		<button
-			pButton
+		/>
+		<edu-button
 			icon="pi pi-refresh"
 			label="Refrescar"
-			class="p-button-outlined p-button-sm"
+			[outlined]="true"
+			size="small"
 			(click)="onRefresh()"
 			[loading]="loading()"
 			data-info-anchor="admin-error-groups-refresh-btn"
-		></button>
+		/>
 	</div>
 </app-page-header>
 <!-- #endregion -->
@@ -149,15 +149,16 @@
 		</label>
 	</div>
 
-	<button
-		pButton
+	<edu-button
 		icon="pi pi-filter-slash"
-		class="p-button-text p-button-sm btn-clear"
+		[text]="true"
+		size="small"
+		class="btn-clear"
 		eduTooltip="Limpiar filtros"
 		(click)="onClearFilters()"
 		[pt]="{ root: { 'aria-label': 'Limpiar filtros' } }"
 		data-info-anchor="admin-error-groups-limpiar-filtros-btn"
-	></button>
+	/>
 </div>
 <!-- #endregion -->
 
@@ -281,14 +282,14 @@
 		@if (selectedCount() > 0) {
 			<div class="selection-toolbar">
 				<span>{{ selectedCount() }} seleccionado(s)</span>
-				<button
-					pButton
+				<edu-button
 					icon="pi pi-trash"
 					label="Eliminar seleccionados"
-					class="p-button-danger p-button-sm"
+					size="small"
+					severity="danger"
 					(click)="onDeleteSelectedRequested()"
 					data-info-anchor="admin-error-groups-eliminar-seleccionados-btn"
-				></button>
+				/>
 			</div>
 		}
 		<edu-table
@@ -411,36 +412,40 @@
 					</td>
 					<td class="col-fecha">{{ item.ultimaFecha | date: 'dd/MM HH:mm' }}</td>
 					<td (click)="$event.stopPropagation()">
-						<button
-							pButton
+						<edu-button
 							icon="pi pi-eye"
-							class="p-button-rounded p-button-text p-button-sm"
+							[text]="true"
+							[rounded]="true"
+							size="small"
 							eduTooltip="Ver detalle"
 							eduTooltipPosition="left"
 							(click)="onRowClick(item)"
 							[pt]="{ root: { 'aria-label': 'Ver detalle del grupo' } }"
 							data-info-anchor="admin-error-groups-ver-detalle-btn"
-						></button>
-						<button
-							pButton
+						/>
+						<edu-button
 							icon="pi pi-pencil"
-							class="p-button-rounded p-button-text p-button-sm"
+							[text]="true"
+							[rounded]="true"
+							size="small"
 							eduTooltip="Cambiar estado"
 							eduTooltipPosition="left"
 							(click)="onStatusChangeRequested(item)"
 							[pt]="{ root: { 'aria-label': 'Cambiar estado del grupo' } }"
 							data-info-anchor="admin-error-groups-cambiar-estado-btn"
-						></button>
-						<button
-							pButton
+						/>
+						<edu-button
 							icon="pi pi-trash"
-							class="p-button-rounded p-button-text p-button-sm p-button-danger"
+							[text]="true"
+							[rounded]="true"
+							size="small"
+							severity="danger"
 							eduTooltip="Eliminar"
 							eduTooltipPosition="left"
 							(click)="onDeleteRequested(item)"
 							[pt]="{ root: { 'aria-label': 'Eliminar grupo' } }"
 							data-info-anchor="admin-error-groups-eliminar-btn"
-						></button>
+						/>
 					</td>
 				</tr>
 			</ng-template>

@@ -2,18 +2,16 @@ import { ChangeDetectionStrategy, Component, inject, input, output } from '@angu
 import { CommonModule, DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 
-import { ButtonModule } from 'primeng/button';
-
 import { logger } from '@core/helpers';
 import { CorrelationIdPillComponent } from '@intranet-shared/components';
 
 import { RateLimitEventListaDto, displayPolicy } from '../../models';
-import { EduDrawer, EduMessageService, EduTag, EduTemplate, EduTooltip } from '@edu-ui';
+import { EduButton, EduDrawer, EduMessageService, EduTag, EduTemplate, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-rate-limit-detail-drawer',
 	standalone: true,
-	imports: [CommonModule, DatePipe, ButtonModule, EduDrawer, EduTag, EduTooltip, CorrelationIdPillComponent, EduTemplate],
+	imports: [CommonModule, DatePipe, EduButton, EduDrawer, EduTag, EduTooltip, CorrelationIdPillComponent, EduTemplate],
 	templateUrl: './rate-limit-detail-drawer.component.html',
 	styleUrl: './rate-limit-detail-drawer.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

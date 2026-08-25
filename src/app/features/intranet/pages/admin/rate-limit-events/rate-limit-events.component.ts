@@ -3,8 +3,6 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { ButtonModule } from 'primeng/button';
-
 import { PageHeaderComponent } from '@intranet-shared/components';
 import {
 	SkeletonColumnDef,
@@ -18,14 +16,14 @@ import { RateLimitTableComponent } from './components/rate-limit-table';
 import { HubContextBannerComponent, readHubContext } from '../monitoreo/shared';
 import { RateLimitEventFiltro, RateLimitEventListaDto } from './models';
 import { RateLimitEventsFacade } from './services';
-import { EduMessageService, EduToast } from '@edu-ui';
+import { EduButton, EduMessageService, EduToast } from '@edu-ui';
 import type { EduTableLazyLoadEvent } from '@edu-ui';
 @Component({
 	selector: 'app-rate-limit-events',
 	standalone: true,
 	imports: [
 		CommonModule,
-		ButtonModule,
+		EduButton,
 		EduToast,
 		PageHeaderComponent,
 		TableSkeletonComponent,

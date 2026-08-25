@@ -28,14 +28,14 @@
 				data-info-anchor="admin-runtime-health-alerts-severidad-toggle"
 				(onChange)="onSeverityChange()"
 			/>
-			<button
-				pButton
+			<edu-button
 				icon="pi pi-refresh"
-				class="p-button-text p-button-sm"
+				[text]="true"
+				size="small"
 				[loading]="loading()"
 				data-info-anchor="admin-runtime-health-alerts-refresh-btn"
 				(click)="onRefresh()"
-			></button>
+			/>
 		</div>
 	</header>
 
@@ -56,14 +56,14 @@
 			/>
 			@if (selectedCount() > 0) {
 				<span>{{ selectedCount() }} seleccionado(s)</span>
-				<button
-					pButton
+				<edu-button
 					icon="pi pi-trash"
 					label="Eliminar seleccionados"
-					class="p-button-danger p-button-sm"
+					size="small"
+					severity="danger"
 					data-info-anchor="admin-runtime-health-alerts-eliminar-seleccionados-btn"
 					(click)="deleteSelected()"
-				></button>
+				/>
 			}
 		</div>
 		<div class="timeline-list">
@@ -91,14 +91,16 @@
 								{{ group.firstTimestamp | date: 'short' }}
 							}
 						</span>
-						<button
-							pButton
+						<edu-button
 							icon="pi pi-trash"
-							class="p-button-rounded p-button-text p-button-sm p-button-danger"
+							[text]="true"
+							[rounded]="true"
+							size="small"
+							severity="danger"
 							data-info-anchor="admin-runtime-health-alerts-eliminar-fila-btn"
 							(click)="deleteGroup(group)"
 							[pt]="{ root: { 'aria-label': 'Eliminar alerta' } }"
-						></button>
+						/>
 					</div>
 					<div class="timeline-item__body">
 						<span class="value-info">
@@ -129,23 +131,23 @@
 
 		@if (totalPages() > 1) {
 			<div class="pagination">
-				<button
-					pButton
+				<edu-button
 					icon="pi pi-chevron-left"
-					class="p-button-text p-button-sm"
+					[text]="true"
+					size="small"
 					[disabled]="page() <= 1"
 					data-info-anchor="admin-runtime-health-alerts-paginacion-btn"
 					(click)="prevPage()"
-				></button>
+				/>
 				<span class="page-info">{{ page() }} / {{ totalPages() }}</span>
-				<button
-					pButton
+				<edu-button
 					icon="pi pi-chevron-right"
-					class="p-button-text p-button-sm"
+					[text]="true"
+					size="small"
 					[disabled]="page() >= totalPages()"
 					data-info-anchor="admin-runtime-health-alerts-paginacion-btn"
 					(click)="nextPage()"
-				></button>
+				/>
 			</div>
 		}
 	}

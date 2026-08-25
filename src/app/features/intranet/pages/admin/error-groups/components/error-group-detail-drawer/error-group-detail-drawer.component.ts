@@ -7,8 +7,6 @@ import {
 } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 
-import { ButtonModule } from 'primeng/button';
-
 import {
 	ESTADO_LABEL_MAP,
 	ESTADO_SEVERITY_MAP,
@@ -23,7 +21,7 @@ import {
 	ORIGEN_LABEL_MAP,
 	SEVERIDAD_SEVERITY_MAP,
 } from '../../models';
-import { EduDrawer, EduPaginator, EduTab, EduTabPanel, EduTable, EduTabs, EduTag, EduTooltip } from '@edu-ui';
+import { EduButton, EduDrawer, EduPaginator, EduTab, EduTabPanel, EduTable, EduTabs, EduTag, EduTooltip } from '@edu-ui';
 import type { EduPaginatorPageEvent } from '@edu-ui';
 
 interface DrawerVm {
@@ -52,7 +50,7 @@ interface DrawerVm {
 	selector: 'app-error-group-detail-drawer',
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [CommonModule, DatePipe, ButtonModule, EduDrawer, EduPaginator, EduTable, EduTag, EduTooltip, EduTab, EduTabPanel, EduTabs],
+	imports: [CommonModule, DatePipe, EduButton, EduDrawer, EduPaginator, EduTable, EduTag, EduTooltip, EduTab, EduTabPanel, EduTabs],
 	templateUrl: './error-group-detail-drawer.component.html',
 	styleUrl: './error-group-detail-drawer.component.scss',
 })
