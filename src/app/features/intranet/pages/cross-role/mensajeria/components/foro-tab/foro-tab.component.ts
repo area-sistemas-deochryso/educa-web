@@ -1,21 +1,16 @@
 import { Component, ChangeDetectionStrategy, inject, input, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { MultiSelectModule } from 'primeng/multiselect';
-import { Select } from 'primeng/select';
-import { TagModule } from 'primeng/tag';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { GrupoContenidoDto } from '@features/intranet/pages/profesor/models';
 import { CrearConversacionDto } from '@data/models';
 import { getInitial } from '@core/helpers';
 import { SalonMensajeriaFacade } from '../../services/mensajeria.facade';
+import { EduButton, EduInputText, EduMultiSelect, EduSelect, EduSpinner, EduTag } from '@edu-ui';
 
 @Component({
 	selector: 'app-salon-foro-tab',
 	standalone: true,
-	imports: [CommonModule, FormsModule, ButtonModule, InputTextModule, MultiSelectModule, Select, TagModule, ProgressSpinnerModule],
+	imports: [CommonModule, FormsModule, EduButton, EduInputText, EduMultiSelect, EduSelect, EduTag, EduSpinner],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './foro-tab.component.html',
 	styleUrl: './foro-tab.component.scss',
@@ -108,8 +103,7 @@ export class SalonForoTabComponent {
 
 	private readonly avatarColors = [
 		'#4f46e5', '#0891b2', '#059669', '#d97706', '#dc2626',
-		'#7c3aed', '#db2777', '#2563eb', '#ca8a04', '#0d9488',
-	];
+		'#7c3aed', '#db2777', '#2563eb', '#ca8a04', '#0d9488'];
 
 	getAvatarColor(name: string): string {
 		let hash = 0;

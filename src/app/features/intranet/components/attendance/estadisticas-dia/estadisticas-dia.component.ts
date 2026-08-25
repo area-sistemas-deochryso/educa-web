@@ -1,12 +1,10 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, ViewChild, input, output } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { Menu, MenuModule } from 'primeng/menu';
 
-import { ButtonModule } from 'primeng/button';
 import { EstadisticasDia } from '@data/models';
-import { MenuItem } from 'primeng/api';
-import { TooltipModule } from 'primeng/tooltip';
+import { EduButton, EduMenu, EduTooltip } from '@edu-ui';
+import type { EduMenuItem } from '@edu-ui';
 
 /**
  * Componente presentacional para mostrar las estadísticas del día.
@@ -17,13 +15,13 @@ import { TooltipModule } from 'primeng/tooltip';
 @Component({
 	selector: 'app-estadisticas-dia',
 	standalone: true,
-	imports: [DatePipe, DecimalPipe, ButtonModule, TooltipModule, MenuModule],
+	imports: [DatePipe, DecimalPipe, EduButton, EduTooltip, EduMenu],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './estadisticas-dia.component.html',
 	styleUrls: ['./estadisticas-dia.component.scss'],
 })
 export class EstadisticasDiaComponent {
-	@ViewChild('pdfMenu') pdfMenu!: Menu;
+	@ViewChild('pdfMenu') pdfMenu!: EduMenu;
 
 	// * Inputs
 	estadisticas = input.required<EstadisticasDia | null>();
@@ -34,7 +32,7 @@ export class EstadisticasDiaComponent {
 	descargarPdf = output<void>();
 	descargarExcel = output<void>();
 
-	readonly menuItems: MenuItem[] = [
+	readonly menuItems: EduMenuItem[] = [
 		{
 			label: 'Ver PDF',
 			icon: 'pi pi-file-pdf',
@@ -49,8 +47,7 @@ export class EstadisticasDiaComponent {
 			label: 'Descargar Excel',
 			icon: 'pi pi-file-excel',
 			command: () => this.onDescargarExcel(),
-		},
-	];
+		}];
 
 	toggleMenu(event: Event): void {
 		this.pdfMenu.toggle(event);

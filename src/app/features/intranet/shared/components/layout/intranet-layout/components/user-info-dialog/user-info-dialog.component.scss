@@ -1,16 +1,3 @@
-// #region Dialog overrides
-:host ::ng-deep .user-info-dialog {
-	.p-dialog-header {
-		padding: 1.25rem 1.5rem 1rem;
-		border-bottom: 1px solid var(--surface-border);
-	}
-
-	.p-dialog-content {
-		padding: 0;
-	}
-}
-// #endregion
-
 // #region Profile header
 .profile-header {
 	display: flex;
@@ -54,35 +41,6 @@
 .tab-icon {
 	margin-right: 0.5rem;
 }
-
-// #region Tabs
-:host ::ng-deep .p-tabs {
-	.p-tablist {
-		padding: 0 1.5rem;
-		border-bottom: 1px solid var(--surface-border);
-	}
-
-	.p-tab {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		padding: 0.875rem 0.25rem;
-		font-size: 0.875rem;
-
-		i {
-			font-size: 0.875rem;
-		}
-	}
-
-	.p-tabpanels {
-		padding: 0;
-	}
-
-	.p-tabpanel {
-		padding: 1.5rem;
-	}
-}
-// #endregion
 
 // #region Info grid (tab Mis Datos)
 .info-grid {

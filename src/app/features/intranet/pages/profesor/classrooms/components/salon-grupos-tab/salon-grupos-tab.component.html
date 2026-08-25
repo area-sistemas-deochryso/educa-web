@@ -2,7 +2,7 @@
 @if (cursoOptions().length > 1) {
 	<div class="flex align-items-center gap-2 mb-3">
 		<label class="font-semibold text-sm">Curso:</label>
-		<p-select
+		<edu-select
 			data-info-anchor="curso-selector"
 			[options]="cursoOptions()"
 			[ngModel]="selectedCurso()"
@@ -28,7 +28,7 @@
 @if (loading()) {
 	<div class="flex flex-column gap-3 p-2">
 		@for (_ of [1, 2, 3]; track $index) {
-			<p-skeleton height="4rem" />
+			<edu-skeleton height="4rem" />
 		}
 	</div>
 }
@@ -65,7 +65,7 @@
 				Máx. por grupo:
 			</label>
 			<input
-				pInputText
+				eduInputText
 				type="number"
 				[ngModel]="maxInputValue()"
 				(ngModelChange)="onMaxInputChange($event)"
@@ -77,26 +77,27 @@
 				aria-label="Máximo de estudiantes por grupo"
 			/>
 			@if (maxInputDirty()) {
-				<button
-					pButton
+				<edu-button
 					icon="pi pi-check"
-					class="p-button-sm p-button-success p-button-rounded"
+					[rounded]="true"
+					size="small"
+					severity="success"
 					data-info-anchor="profesor-grupos-guardar-max"
 					(click)="onSaveMax()"
 					[disabled]="saving()"
-					pTooltip="Guardar límite"
-					tooltipPosition="top"
+					eduTooltip="Guardar límite"
+					eduTooltipPosition="top"
 					[pt]="{ root: { 'aria-label': 'Guardar máximo' } }"
-				></button>
+				/>
 			}
 		</div>
 		<div class="flex align-items-center gap-2">
-			<p-tag
+			<edu-tag
 				[value]="grupos().length + ' grupo' + (grupos().length !== 1 ? 's' : '')"
 				styleClass="tag-neutral"
 				icon="pi pi-th-large"
 			/>
-			<p-tag
+			<edu-tag
 				[value]="totalEstudiantesEnGrupos() + ' asignados'"
 				styleClass="tag-neutral"
 				icon="pi pi-users"
@@ -115,74 +116,82 @@
 						@if (editingGrupoId() === grupo.id) {
 							<div class="flex align-items-center gap-2 flex-1">
 								<input
-									pInputText
+									eduInputText
 									[(ngModel)]="editingGrupoNombre"
 									class="p-inputtext-sm flex-1"
 									(keydown.enter)="onSaveEditing(grupo.id)"
 									(keydown.escape)="onCancelEditing()"
 								/>
-								<button
-									pButton
+								<edu-button
 									icon="pi pi-check"
-									class="p-button-rounded p-button-text p-button-success p-button-sm"
+									[text]="true"
+									[rounded]="true"
+									size="small"
+									severity="success"
 									data-info-anchor="profesor-grupos-guardar-nombre"
 									(click)="onSaveEditing(grupo.id)"
 									[disabled]="saving()"
 									[pt]="{ root: { 'aria-label': 'Guardar nombre' } }"
-								></button>
-								<button
-									pButton
+								/>
+								<edu-button
 									icon="pi pi-times"
-									class="p-button-rounded p-button-text p-button-secondary p-button-sm"
+									[text]="true"
+									[rounded]="true"
+									size="small"
+									severity="secondary"
 									data-info-anchor="profesor-grupos-cancelar-nombre"
 									(click)="onCancelEditing()"
 									[pt]="{ root: { 'aria-label': 'Cancelar edición' } }"
-								></button>
+								/>
 							</div>
 						} @else {
 							<div class="grupo-title">
 								<i class="pi pi-users grupo-icon"></i>
 								<span class="grupo-nombre">{{ grupo.nombre }}</span>
-								<p-tag
+								<edu-tag
 									[value]="grupoCountLabel(grupo)"
 									[severity]="maxEstudiantesPorGrupo() && grupo.estudiantes.length >= maxEstudiantesPorGrupo()! ? 'warn' : 'secondary'"
 									[rounded]="true"
 								/>
 							</div>
 							<div class="grupo-actions">
-								<button
-									pButton
+								<edu-button
 									icon="pi pi-user-plus"
-									class="p-button-rounded p-button-text p-button-sm"
+									[text]="true"
+									[rounded]="true"
+									size="small"
 									data-info-anchor="profesor-grupos-asignar-estudiantes"
 									(click)="onOpenAsignar(grupo.id)"
 									[disabled]="saving() || estudiantesSinGrupo().length === 0"
-									pTooltip="Asignar estudiantes"
-									tooltipPosition="top"
+									eduTooltip="Asignar estudiantes"
+									eduTooltipPosition="top"
 									[pt]="{ root: { 'aria-label': 'Asignar estudiantes al grupo' } }"
-								></button>
-								<button
-									pButton
+								/>
+								<edu-button
 									icon="pi pi-pencil"
-									class="p-button-rounded p-button-text p-button-sm"
+									[text]="true"
+									[rounded]="true"
+									size="small"
 									data-info-anchor="profesor-grupos-editar-nombre"
 									(click)="onStartEditing(grupo)"
 									[disabled]="saving()"
-									pTooltip="Renombrar"
-									tooltipPosition="top"
+									eduTooltip="Renombrar"
+									eduTooltipPosition="top"
 									[pt]="{ root: { 'aria-label': 'Renombrar grupo' } }"
-								></button>
-								<button
-									pButton
+								/>
+								<edu-button
 									icon="pi pi-trash"
-									class="p-button-rounded p-button-text p-button-danger p-button-sm"
+									[text]="true"
+									[rounded]="true"
+									size="small"
+									severity="danger"
 									data-info-anchor="profesor-grupos-eliminar-grupo"
 									(click)="onEliminarGrupo(grupo)"
 									[disabled]="saving()"
-									pTooltip="Eliminar grupo"
-									tooltipPosition="top"
+									eduTooltip="Eliminar grupo"
+									eduTooltipPosition="top"
 									[pt]="{ root: { 'aria-label': 'Eliminar grupo' } }"
-								></button>
+								/>
 							</div>
 						}
 					</div>
@@ -215,15 +224,17 @@
 										<span class="miembro-dni">{{ est.estudianteDni }}</span>
 										<span class="miembro-nombre">{{ est.estudianteNombre }}</span>
 									</div>
-									<button
-										pButton
+									<edu-button
 										icon="pi pi-times"
-										class="p-button-rounded p-button-text p-button-danger p-button-sm"
+										[text]="true"
+										[rounded]="true"
+										size="small"
+										severity="danger"
 										data-info-anchor="profesor-grupos-remover-estudiante"
 										(click)="onRemoverEstudiante(grupo.id, est)"
 										[disabled]="saving()"
 										[pt]="{ root: { 'aria-label': 'Remover ' + est.estudianteNombre } }"
-									></button>
+									/>
 								</div>
 							}
 						}
@@ -238,22 +249,21 @@
 	<div class="crear-grupo-bar mb-3">
 		<i class="pi pi-plus-circle text-color-secondary"></i>
 		<input
-			pInputText
+			eduInputText
 			[(ngModel)]="nuevoGrupoNombre"
 			placeholder="Nombre del nuevo grupo"
 			class="p-inputtext-sm flex-1"
 			(keydown.enter)="onCrearGrupo()"
 			[disabled]="saving()"
 		/>
-		<button
-			pButton
+		<edu-button
 			label="Crear"
 			icon="pi pi-plus"
-			class="p-button-sm"
+			size="small"
 			data-info-anchor="profesor-grupos-crear-grupo"
 			(click)="onCrearGrupo()"
 			[disabled]="saving() || !nuevoGrupoNombre.trim()"
-		></button>
+		/>
 	</div>
 	<!-- #endregion -->
 
@@ -297,7 +307,7 @@
 <!-- #endregion -->
 
 <!-- #region Asignar estudiantes dialog -->
-<p-dialog
+<edu-dialog
 	[visible]="asignarDialogVisible()"
 	(visibleChange)="onAsignarDialogVisibleChange($event)"
 	[modal]="true"
@@ -324,7 +334,7 @@
 						data-info-anchor="profesor-grupos-asignar-dialog-row"
 						(click)="toggleEstudiante(est.estudianteId)"
 					>
-						<p-checkbox
+						<edu-checkbox
 							[binary]="true"
 							[ngModel]="selectedEstudianteIds().includes(est.estudianteId)"
 							(click)="$event.stopPropagation()"
@@ -338,28 +348,27 @@
 				}
 			</div>
 			<div class="flex justify-content-end gap-2 mt-3 pt-2 border-top-1 surface-border">
-				<button
-					pButton
+				<edu-button
 					label="Cancelar"
-					class="p-button-text p-button-sm"
+					[text]="true"
+					size="small"
 					data-info-anchor="profesor-grupos-asignar-dialog-cancelar"
 					(click)="onCloseAsignar()"
-				></button>
-				<button
-					pButton
+				/>
+				<edu-button
 					[label]="'Asignar (' + selectedEstudianteIds().length + ')'"
 					icon="pi pi-check"
 					data-info-anchor="profesor-grupos-asignar-dialog-confirmar"
-					class="p-button-sm"
+					size="small"
 					(click)="onAsignarEstudiantes()"
 					[disabled]="selectedEstudianteIds().length === 0 || saving()"
 					[loading]="saving()"
-				></button>
+				/>
 			</div>
 		}
 	}
-</p-dialog>
+</edu-dialog>
 <!-- #endregion -->
 
 <!-- Confirm dialog -->
-<p-confirmDialog (onHide)="onConfirmDialogHide()" />
+<edu-confirm-dialog (onHide)="onConfirmDialogHide()" />

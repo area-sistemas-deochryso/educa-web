@@ -2,22 +2,18 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
-import { ButtonModule } from 'primeng/button';
-import { TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
-
 import {
 	AuditoriaCorreoAsistenciaDto,
 	TIPO_FALLO_LABEL,
 	TIPO_FALLO_SEVERITY,
 	TipoFalloAuditoria,
 } from '../../models';
+import { EduButton, EduTable, EduTag, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-auditoria-correos-table',
 	standalone: true,
-	imports: [CommonModule, ButtonModule, RouterLink, TableModule, TagModule, TooltipModule],
+	imports: [CommonModule, EduButton, RouterLink, EduTable, EduTag, EduTooltip],
 	templateUrl: './auditoria-correos-table.component.html',
 	styleUrl: './auditoria-correos-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

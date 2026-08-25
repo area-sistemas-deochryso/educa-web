@@ -4,124 +4,124 @@
 	subtitle="Uso de recursos, consultas costosas, bloqueos activos y estado de almacenamiento del motor SQL."
 />
 
-<p-tabs [(value)]="activeTab">
-	<p-tablist>
-		<p-tab value="resource-stats" data-info-anchor="tab-switch">
+<edu-tabs [(value)]="activeTab">
+	
+		<edu-tab value="resource-stats" data-info-anchor="tab-switch">
 			<i class="pi pi-chart-line tab-icon"></i>
 			Recursos
-		</p-tab>
-		<p-tab value="top-queries" data-info-anchor="tab-switch">
+		</edu-tab>
+		<edu-tab value="top-queries" data-info-anchor="tab-switch">
 			<i class="pi pi-database tab-icon"></i>
 			Top consultas
-		</p-tab>
-		<p-tab value="active-blocking" data-info-anchor="tab-switch">
+		</edu-tab>
+		<edu-tab value="active-blocking" data-info-anchor="tab-switch">
 			<i class="pi pi-lock tab-icon"></i>
 			Bloqueos activos
-		</p-tab>
-		<p-tab value="storage" data-info-anchor="tab-switch">
+		</edu-tab>
+		<edu-tab value="storage" data-info-anchor="tab-switch">
 			<i class="pi pi-hdd tab-icon"></i>
 			Almacenamiento
-		</p-tab>
-		<p-tab value="table-sizes" data-info-anchor="tab-switch">
+		</edu-tab>
+		<edu-tab value="table-sizes" data-info-anchor="tab-switch">
 			<i class="pi pi-table tab-icon"></i>
 			Tamaño de tablas
-		</p-tab>
-		<p-tab value="missing-indexes" data-info-anchor="tab-switch">
+		</edu-tab>
+		<edu-tab value="missing-indexes" data-info-anchor="tab-switch">
 			<i class="pi pi-search-plus tab-icon"></i>
 			Índices sugeridos
-		</p-tab>
-		<p-tab value="index-fragmentation" data-info-anchor="tab-switch">
+		</edu-tab>
+		<edu-tab value="index-fragmentation" data-info-anchor="tab-switch">
 			<i class="pi pi-percentage tab-icon"></i>
 			Fragmentación
-		</p-tab>
-		<p-tab value="unused-indexes" data-info-anchor="tab-switch">
+		</edu-tab>
+		<edu-tab value="unused-indexes" data-info-anchor="tab-switch">
 			<i class="pi pi-eye-slash tab-icon"></i>
 			Índices sin uso
-		</p-tab>
-		<p-tab value="identity-values" data-info-anchor="tab-switch">
+		</edu-tab>
+		<edu-tab value="identity-values" data-info-anchor="tab-switch">
 			<i class="pi pi-hashtag tab-icon"></i>
 			Valores identity
-		</p-tab>
-	</p-tablist>
+		</edu-tab>
+	
 
-	<p-tabpanel value="resource-stats">
+	<edu-tabpanel value="resource-stats">
 		<app-resource-stats-chart
 			[data]="resourceStatsVm().data"
 			[loading]="resourceStatsVm().loading"
 			[error]="resourceStatsVm().error"
 			(refresh)="onResourceStatsRefresh()"
 		/>
-	</p-tabpanel>
+	</edu-tabpanel>
 
-	<p-tabpanel value="top-queries">
+	<edu-tabpanel value="top-queries">
 		<app-top-queries-table
 			[queries]="topQueriesVm().data"
 			[loading]="topQueriesVm().loading"
 			[error]="topQueriesVm().error"
 			(refresh)="onTopQueriesRefresh()"
 		/>
-	</p-tabpanel>
+	</edu-tabpanel>
 
-	<p-tabpanel value="active-blocking">
+	<edu-tabpanel value="active-blocking">
 		<app-active-blocking-table
 			[sessions]="activeBlockingVm().data"
 			[loading]="activeBlockingVm().loading"
 			[error]="activeBlockingVm().error"
 			(refresh)="onActiveBlockingRefresh()"
 		/>
-	</p-tabpanel>
+	</edu-tabpanel>
 
-	<p-tabpanel value="storage">
+	<edu-tabpanel value="storage">
 		<app-storage-gauges
 			[files]="storageVm().data"
 			[loading]="storageVm().loading"
 			[error]="storageVm().error"
 			(refresh)="onStorageRefresh()"
 		/>
-	</p-tabpanel>
+	</edu-tabpanel>
 
-	<p-tabpanel value="table-sizes">
+	<edu-tabpanel value="table-sizes">
 		<app-table-sizes-table
 			[tables]="tableSizesVm().data"
 			[loading]="tableSizesVm().loading"
 			[error]="tableSizesVm().error"
 			(refresh)="onTableSizesRefresh()"
 		/>
-	</p-tabpanel>
+	</edu-tabpanel>
 
-	<p-tabpanel value="missing-indexes">
+	<edu-tabpanel value="missing-indexes">
 		<app-missing-indexes-table
 			[indexes]="missingIndexesVm().data"
 			[loading]="missingIndexesVm().loading"
 			[error]="missingIndexesVm().error"
 			(refresh)="onMissingIndexesRefresh()"
 		/>
-	</p-tabpanel>
+	</edu-tabpanel>
 
-	<p-tabpanel value="index-fragmentation">
+	<edu-tabpanel value="index-fragmentation">
 		<app-index-fragmentation-table
 			[indexes]="indexFragmentationVm().data"
 			[loading]="indexFragmentationVm().loading"
 			[error]="indexFragmentationVm().error"
 			(refresh)="onIndexFragmentationRefresh()"
 		/>
-	</p-tabpanel>
+	</edu-tabpanel>
 
-	<p-tabpanel value="unused-indexes">
+	<edu-tabpanel value="unused-indexes">
 		<app-unused-indexes-table
 			[indexes]="unusedIndexesVm().data"
 			[loading]="unusedIndexesVm().loading"
 			[error]="unusedIndexesVm().error"
 			(refresh)="onUnusedIndexesRefresh()"
 		/>
-	</p-tabpanel>
+	</edu-tabpanel>
 
-	<p-tabpanel value="identity-values">
+	<edu-tabpanel value="identity-values">
 		<app-identity-values-progress
 			[columns]="identityValuesVm().data"
 			[loading]="identityValuesVm().loading"
 			[error]="identityValuesVm().error"
 			(refresh)="onIdentityValuesRefresh()"
 		/>
-	</p-tabpanel>
-</p-tabs>
+	</edu-tabpanel>
+</edu-tabs>

@@ -10,28 +10,28 @@
 				</span>
 			</div>
 			<div class="view-as-banner__actions">
-				<button
-					pButton
+				<edu-button
 					type="button"
 					label="Cambiar"
 					icon="pi pi-sync"
-					class="p-button-sm p-button-outlined"
+					[outlined]="true"
+					size="small"
 					(click)="openPicker()"
-				></button>
-				<button
-					pButton
+				/>
+				<edu-button
 					type="button"
 					label="Salir"
 					icon="pi pi-sign-out"
-					class="p-button-sm p-button-text"
+					[text]="true"
+					size="small"
 					(click)="exit()"
-				></button>
+				/>
 			</div>
 		</div>
 	</div>
 }
 
-<p-dialog
+<edu-dialog
 	[visible]="pickerOpen()"
 	(visibleChange)="onDialogVisibleChange($event)"
 	[header]="'Cambiar ' + (activeContext()?.rol ?? '')"
@@ -41,5 +41,5 @@
 	@if (activeContext(); as context) {
 		<app-view-as-picker [rol]="context.rol" (userSelected)="onUserSelected($event)" />
 	}
-</p-dialog>
+</edu-dialog>
 <!-- #endregion -->

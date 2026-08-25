@@ -2,13 +2,9 @@ import { ChangeDetectionStrategy, Component, computed, input, output } from '@an
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { ButtonModule } from 'primeng/button';
-import { DatePickerModule } from 'primeng/datepicker';
-import { SelectButtonModule } from 'primeng/selectbutton';
-import { TooltipModule } from 'primeng/tooltip';
-
 import { HeatmapCalendarCell, HeatmapCell } from '../../models';
 import { ErrorHeatmapSeverityChartComponent } from '../error-heatmap-severity-chart';
+import { EduButton, EduDatePicker, EduSelectButton, EduTooltip } from '@edu-ui';
 
 const DAY_LABELS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 
@@ -35,12 +31,11 @@ export interface HeatmapPeriodOption {
 		CommonModule,
 		DatePipe,
 		FormsModule,
-		ButtonModule,
-		DatePickerModule,
-		SelectButtonModule,
-		TooltipModule,
-		ErrorHeatmapSeverityChartComponent,
-	],
+		EduButton,
+		EduDatePicker,
+		EduSelectButton,
+		EduTooltip,
+		ErrorHeatmapSeverityChartComponent],
 	templateUrl: './error-heatmap.component.html',
 	styleUrl: './error-heatmap.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -63,8 +58,7 @@ export class ErrorHeatmapComponent {
 	// para no prometer una vista de heatmap que ese modo no muestra.
 	readonly periodOptions: HeatmapPeriodOption[] = [
 		{ label: 'Semanal', value: 7 },
-		{ label: 'Tendencia', value: 30 },
-	];
+		{ label: 'Tendencia', value: 30 }];
 
 	readonly today = new Date();
 
@@ -165,6 +159,6 @@ export class ErrorHeatmapComponent {
 
 	getCellColor(intensity: number): string {
 		if (intensity === 0) return 'transparent';
-		return `color-mix(in srgb, var(--p-red-500) ${Math.round(intensity * 100)}%, var(--p-orange-100))`;
+		return `color-mix(in srgb, var(--red-500) ${Math.round(intensity * 100)}%, var(--orange-100))`;
 	}
 }

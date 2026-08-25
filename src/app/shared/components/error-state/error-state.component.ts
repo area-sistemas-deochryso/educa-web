@@ -1,16 +1,15 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-
-import { ButtonModule } from 'primeng/button';
+import { EduButton } from '@edu-ui';
 
 @Component({
 	selector: 'app-error-state',
 	standalone: true,
-	imports: [ButtonModule],
+	imports: [EduButton],
 	template: `
 		<div class="error-state">
 			<i class="pi pi-exclamation-triangle error-state__icon"></i>
 			<p class="error-state__message">{{ message() }}</p>
-			<p-button
+			<edu-button
 				label="Reintentar"
 				icon="pi pi-refresh"
 				[outlined]="true"

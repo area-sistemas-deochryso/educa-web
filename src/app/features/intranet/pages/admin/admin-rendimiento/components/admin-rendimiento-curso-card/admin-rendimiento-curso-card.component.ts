@@ -11,9 +11,9 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Chart, registerables } from 'chart.js';
-import { CardModule } from 'primeng/card';
 
 import { ReporteRendimientoDto, tieneOutlier } from '../../models';
+import { EduCard } from '@edu-ui';
 
 Chart.register(...registerables);
 
@@ -31,7 +31,7 @@ const COLOR_NEUTRO = '#6366f1';
 @Component({
 	selector: 'app-admin-rendimiento-curso-card',
 	standalone: true,
-	imports: [CommonModule, CardModule],
+	imports: [CommonModule, EduCard],
 	templateUrl: './admin-rendimiento-curso-card.component.html',
 	styleUrl: './admin-rendimiento-curso-card.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

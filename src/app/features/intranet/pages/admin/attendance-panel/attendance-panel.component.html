@@ -3,7 +3,7 @@
 	<section class="attendance-panel__filters">
 		<div class="filter-field">
 			<label for="panel-sede">Sede</label>
-			<p-select
+			<edu-select
 				id="panel-sede"
 				[options]="sedeOptions()"
 				[ngModel]="vm().filters.sedeId"
@@ -22,7 +22,7 @@
 
 		<div class="filter-field">
 			<label for="panel-rango">Rango</label>
-			<p-selectbutton
+			<edu-select-button
 				id="panel-rango"
 				[options]="rangoOptions"
 				[ngModel]="vm().filters.rango"
@@ -35,7 +35,7 @@
 
 		<div class="filter-field">
 			<label for="panel-fecha">Fecha</label>
-			<p-datepicker
+			<edu-datepicker
 				id="panel-fecha"
 				[ngModel]="vm().filters.fecha"
 				(ngModelChange)="onFechaChange($event)"

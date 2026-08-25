@@ -1,22 +1,21 @@
 import { Component, ChangeDetectionStrategy, inject, effect, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
+
 import { PageHeaderComponent, PeriodToggleComponent, EmptyStateComponent } from '@intranet-shared/components';
 import { StudentClassroomsFacade } from './services/estudiante-salones.facade';
 import { EstudianteSalon, EstudianteSalonCurso, JustificarInasistenciaContext } from '../models';
 import { EstudianteSalonDialogComponent } from './components/estudiante-salon-dialog/estudiante-salon-dialog.component';
+import { EduSpinner, EduTag, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-student-classrooms',
 	standalone: true,
 	imports: [
 		CommonModule,
-		TagModule,
-		TooltipModule,
-		ProgressSpinnerModule,
+		EduTag,
+		EduTooltip,
+		EduSpinner,
 		PageHeaderComponent,
 		PeriodToggleComponent,
 		EmptyStateComponent,
@@ -31,8 +30,8 @@ import { EstudianteSalonDialogComponent } from './components/estudiante-salon-di
 		}
 		.salon-card {
 			border-radius: 8px;
-			border: 1px solid var(--p-surface-200);
-			border-left: 4px solid var(--p-primary-color);
+			border: 1px solid var(--surface-200);
+			border-left: 4px solid var(--primary-accent);
 			background: var(--surface-card, #fcfdfe);
 			padding: 1rem 1.25rem;
 			cursor: pointer;
@@ -40,14 +39,14 @@ import { EstudianteSalonDialogComponent } from './components/estudiante-salon-di
 		}
 		.salon-card:hover {
 			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-			border-color: var(--p-surface-300);
-			border-left-color: var(--p-primary-color);
+			border-color: var(--surface-300);
+			border-left-color: var(--primary-accent);
 		}
 	`,
 	template: `
 		@if (vm().loading) {
 			<div class="flex justify-content-center p-5">
-				<p-progressSpinner strokeWidth="4" />
+				<edu-spinner strokeWidth="4" />
 			</div>
 		} @else if (vm().isEmpty) {
 			<app-empty-state icon="pi pi-building" title="Mis Salones" message="No tienes salones asignados" />
@@ -65,7 +64,7 @@ import { EstudianteSalonDialogComponent } from './components/estudiante-salon-di
 						<div class="salon-card" data-info-anchor="estudiante-salones-card" (click)="onVerSalon(salon)">
 							<div class="flex align-items-center justify-content-between mb-2">
 								<span class="font-bold text-lg">{{ salon.salonDescripcion }}</span>
-								<p-tag
+								<edu-tag
 									[value]="salon.cantidadEstudiantes + ' estudiantes'"
 									styleClass="tag-neutral"
 								/>
@@ -73,13 +72,13 @@ import { EstudianteSalonDialogComponent } from './components/estudiante-salon-di
 
 							<div class="flex flex-wrap gap-1">
 								@for (curso of salon.cursos; track curso.cursoId) {
-									<p-tag
+									<edu-tag
 										[value]="curso.cursoNombre"
 										styleClass="tag-neutral cursor-pointer"
 										data-info-anchor="estudiante-salones-card-curso-tag"
 										(click)="onVerCurso(curso, $event)"
-										pTooltip="Ver contenido del curso"
-										tooltipPosition="top"
+										eduTooltip="Ver contenido del curso"
+										eduTooltipPosition="top"
 									/>
 								}
 								@if (salon.cursos.length === 0) {

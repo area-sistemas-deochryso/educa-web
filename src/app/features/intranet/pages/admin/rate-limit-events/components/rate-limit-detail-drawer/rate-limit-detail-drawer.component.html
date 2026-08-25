@@ -1,11 +1,11 @@
-<p-drawer
+<edu-drawer
 	[visible]="visible()"
 	(visibleChange)="onVisibleChange($event)"
 	position="right"
 	[style]="{ width: '480px' }"
 	[modal]="true"
 >
-	<ng-template pTemplate="header">
+	<ng-template #header>
 		<div class="drawer-header">
 			<i class="pi pi-shield"></i>
 			<span>Detalle del evento</span>
@@ -39,13 +39,13 @@
 					</div>
 					<div class="detail-row">
 						<span class="detail-label">Endpoint</span>
-						<span class="detail-value mono" [pTooltip]="item()!.endpoint">
+						<span class="detail-value mono" [eduTooltip]="item()!.endpoint">
 							{{ item()!.endpoint }}
 						</span>
 					</div>
 					<div class="detail-row">
 						<span class="detail-label">Policy</span>
-						<p-tag [value]="displayPolicy(item()!.policy)" styleClass="tag-neutral" />
+						<edu-tag [value]="displayPolicy(item()!.policy)" styleClass="tag-neutral" />
 					</div>
 				</div>
 			</div>
@@ -102,28 +102,28 @@
 							<code class="correlation-code">{{ item()!.correlationId }}</code>
 						</div>
 						<div class="correlation-actions">
-							<button
-								pButton
+							<edu-button
 								icon="pi pi-copy"
 								label="Copiar"
-								class="p-button-text p-button-sm"
+								[text]="true"
+								size="small"
 								data-info-anchor="copiar-btn"
 								(click)="onCopyCorrelation(item()!.correlationId)"
 								[pt]="{ root: { 'aria-label': 'Copiar correlationId' } }"
-							></button>
-							<button
-								pButton
+							/>
+							<edu-button
 								icon="pi pi-share-alt"
 								label="Ver eventos correlacionados"
-								class="p-button-outlined p-button-sm"
+								[outlined]="true"
+								size="small"
 								data-info-anchor="admin-error-groups-ver-correlacionados-link"
 								(click)="onBuscarEnErrorLog(item()!.correlationId)"
 								[pt]="{ root: { 'aria-label': 'Ver eventos correlacionados en el hub' } }"
-							></button>
+							/>
 						</div>
 					</div>
 				</div>
 			}
 		</div>
 	}
-</p-drawer>
+</edu-drawer>

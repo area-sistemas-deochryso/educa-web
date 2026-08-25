@@ -1,18 +1,15 @@
 import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { TableModule } from 'primeng/table';
-import { ButtonModule } from 'primeng/button';
-import { TagModule } from 'primeng/tag';
-
 import { type ModoAsignacion, resolveModoAsignacion } from '@data/models';
 import { ModoAsignacionBadgeComponent } from '@shared/components';
 import { SalonAdminListDto, PeriodoCierreEstado } from '../../models';
+import { EduButton, EduSortableColumn, EduTable, EduTag, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-classrooms-admin-table',
 	standalone: true,
-	imports: [CommonModule, TableModule, ButtonModule, TagModule, ModoAsignacionBadgeComponent],
+	imports: [CommonModule, EduTable, EduButton, EduTag, ModoAsignacionBadgeComponent, EduTooltip, EduSortableColumn],
 	templateUrl: './salones-admin-table.component.html',
 	styleUrl: './salones-admin-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

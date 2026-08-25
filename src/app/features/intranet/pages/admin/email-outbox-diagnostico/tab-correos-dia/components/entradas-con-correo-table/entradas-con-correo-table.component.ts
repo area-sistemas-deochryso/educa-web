@@ -1,23 +1,15 @@
 import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
 
 import { CorrelationIdPillComponent } from '@intranet-shared/components';
 
 import { EntradaConCorreoEnviado } from '../../models/correos-dia.models';
+import { EduTable, EduTag, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-entradas-con-correo-table',
 	standalone: true,
-	imports: [
-		TableModule,
-		TagModule,
-		TooltipModule,
-		DatePipe,
-		CorrelationIdPillComponent,
-	],
+	imports: [EduTable, EduTag, EduTooltip, DatePipe, CorrelationIdPillComponent],
 	templateUrl: './entradas-con-correo-table.component.html',
 	styleUrl: './entradas-con-correo-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

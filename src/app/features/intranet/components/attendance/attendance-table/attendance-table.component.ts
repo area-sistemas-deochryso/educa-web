@@ -2,9 +2,6 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TableModule } from 'primeng/table';
-import { Select } from 'primeng/select';
-import { Tooltip } from 'primeng/tooltip';
 import { HijoApoderado } from '@data/models';
 import {
 	AttendanceTable,
@@ -17,6 +14,7 @@ import {
 	getStatusClass,
 } from '@features/intranet/pages/cross-role/attendance-component/config/attendance.constants';
 import { AttendanceTemporalNavComponent } from '../attendance-temporal-nav/attendance-temporal-nav.component';
+import { EduSelect, EduTable, EduTemplate, EduTooltip } from '@edu-ui';
 
 // #endregion
 // #region Implementation
@@ -30,7 +28,7 @@ export interface HijoOption {
 @Component({
 	selector: 'app-attendance-table',
 	standalone: true,
-	imports: [DatePipe, FormsModule, TableModule, Select, Tooltip, AttendanceTemporalNavComponent],
+	imports: [DatePipe, FormsModule, EduTable, EduSelect, EduTooltip, EduTemplate, AttendanceTemporalNavComponent],
 	templateUrl: './attendance-table.component.html',
 	styleUrl: './attendance-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

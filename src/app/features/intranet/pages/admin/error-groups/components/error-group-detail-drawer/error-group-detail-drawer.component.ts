@@ -7,14 +7,6 @@ import {
 } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 
-import { ButtonModule } from 'primeng/button';
-import { DrawerModule } from 'primeng/drawer';
-import { PaginatorModule, PaginatorState } from 'primeng/paginator';
-import { TableModule } from 'primeng/table';
-import { TabsModule } from 'primeng/tabs';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
-
 import {
 	ESTADO_LABEL_MAP,
 	ESTADO_SEVERITY_MAP,
@@ -29,6 +21,8 @@ import {
 	ORIGEN_LABEL_MAP,
 	SEVERIDAD_SEVERITY_MAP,
 } from '../../models';
+import { EduButton, EduDrawer, EduPaginator, EduTab, EduTabPanel, EduTable, EduTabs, EduTag, EduTooltip } from '@edu-ui';
+import type { EduPaginatorPageEvent } from '@edu-ui';
 
 interface DrawerVm {
 	visible: boolean;
@@ -56,17 +50,7 @@ interface DrawerVm {
 	selector: 'app-error-group-detail-drawer',
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [
-		CommonModule,
-		DatePipe,
-		ButtonModule,
-		DrawerModule,
-		PaginatorModule,
-		TableModule,
-		TabsModule,
-		TagModule,
-		TooltipModule,
-	],
+	imports: [CommonModule, DatePipe, EduButton, EduDrawer, EduPaginator, EduTable, EduTag, EduTooltip, EduTab, EduTabPanel, EduTabs],
 	templateUrl: './error-group-detail-drawer.component.html',
 	styleUrl: './error-group-detail-drawer.component.scss',
 })
@@ -143,7 +127,7 @@ export class ErrorGroupDetailDrawerComponent {
 		if (grp) this.statusChangeRequested.emit(grp);
 	}
 
-	onOcurrenciasPageChange(event: PaginatorState): void {
+	onOcurrenciasPageChange(event: EduPaginatorPageEvent): void {
 		this.ocurrenciasPageChange.emit({
 			page: (event.page ?? 0) + 1,
 			pageSize: event.rows ?? this.ocurrenciasPageSize(),

@@ -3,7 +3,7 @@
 	<div class="filter-group">
 		<!-- * Grade filter -->
 		<label>Grado</label>
-		<p-select
+		<edu-select
 			[options]="gradoOptions"
 			[ngModel]="selectedGrado"
 			(ngModelChange)="onGradoChange($event)"
@@ -17,7 +17,7 @@
 	<div class="filter-group">
 		<!-- * Section filter -->
 		<label>Sección</label>
-		<p-select
+		<edu-select
 			[options]="seccionOptions"
 			[ngModel]="selectedSeccion"
 			(ngModelChange)="onSeccionChange($event)"

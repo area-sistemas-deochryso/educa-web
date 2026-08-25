@@ -2,21 +2,18 @@
 import { Component, ChangeDetectionStrategy, input, output, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DialogModule } from 'primeng/dialog';
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { TextareaModule } from 'primeng/textarea';
 import { CursoContenidoSemanaDto, ActualizarSemanaRequest } from '@features/intranet/pages/profesor/models';
+import { EduButton, EduDialog, EduInputText, EduTextarea } from '@edu-ui';
 
 // #endregion
 // #region Implementation
 @Component({
 	selector: 'app-semana-edit-dialog',
 	standalone: true,
-	imports: [CommonModule, FormsModule, DialogModule, ButtonModule, InputTextModule, TextareaModule],
+	imports: [CommonModule, FormsModule, EduDialog, EduButton, EduInputText, EduTextarea],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
-		<p-dialog
+		<edu-dialog
 			[visible]="visible()"
 			(visibleChange)="onVisibleChange($event)"
 			[modal]="true"
@@ -30,7 +27,7 @@ import { CursoContenidoSemanaDto, ActualizarSemanaRequest } from '@features/intr
 						Título
 					</label>
 					<input
-						pInputText
+						eduInputText
 						id="titulo"
 						[(ngModel)]="titulo"
 						placeholder="Ej: Introducción al tema"
@@ -45,7 +42,7 @@ import { CursoContenidoSemanaDto, ActualizarSemanaRequest } from '@features/intr
 						Descripción
 					</label>
 					<textarea
-						pTextarea
+						eduTextarea
 						id="descripcion"
 						[(ngModel)]="descripcion"
 						[rows]="3"
@@ -62,7 +59,7 @@ import { CursoContenidoSemanaDto, ActualizarSemanaRequest } from '@features/intr
 						Mensaje para estudiantes
 					</label>
 					<textarea
-						pTextarea
+						eduTextarea
 						id="mensaje"
 						[(ngModel)]="mensajeDocente"
 						[rows]="2"
@@ -76,18 +73,17 @@ import { CursoContenidoSemanaDto, ActualizarSemanaRequest } from '@features/intr
 
 			<ng-template #footer>
 				<div class="flex justify-content-end gap-2">
-					<button pButton label="Cancelar" class="p-button-text" data-info-anchor="profesor-semana-edit-cancelar" (click)="onCancel()"></button>
-					<button
-						pButton
+					<edu-button label="Cancelar" [text]="true" data-info-anchor="profesor-semana-edit-cancelar" (click)="onCancel()" />
+					<edu-button
 						label="Guardar"
 						icon="pi pi-check"
 						data-info-anchor="profesor-semana-edit-guardar"
 						(click)="onSave()"
 						[loading]="saving()"
-					></button>
+					/>
 				</div>
 			</ng-template>
-		</p-dialog>
+		</edu-dialog>
 	`,
 	styles: `
 		.edit-form {

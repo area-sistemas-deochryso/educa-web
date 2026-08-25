@@ -2,38 +2,19 @@
 import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { BadgeModule } from 'primeng/badge';
-import { ButtonModule } from 'primeng/button';
-import { DrawerModule } from 'primeng/drawer';
-import { SelectModule } from 'primeng/select';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
 import type { ModoAsignacion } from '@data/models';
 import { ModoAsignacionBadgeComponent } from '@shared/components';
 import type { HorarioDetalleResponseDto, EstudianteHorarioDto } from '../../models/horario.interface';
 import { EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleIconPipe, EstadoToggleLabelPipe } from '@intranet-shared/pipes';
 import type { ProfesorOption } from '../../models/profesor.interface';
+import { EduBadge, EduButton, EduDrawer, EduSelect, EduTag, EduTooltip } from '@edu-ui';
 
 // #endregion
 // #region Implementation
 @Component({
 	selector: 'app-schedule-detail-drawer',
 	standalone: true,
-	imports: [
-		CommonModule,
-		FormsModule,
-		BadgeModule,
-		ButtonModule,
-		DrawerModule,
-		SelectModule,
-		TagModule,
-		TooltipModule,
-		ModoAsignacionBadgeComponent,
-		EstadoLabelPipe,
-		EstadoSeverityPipe,
-		EstadoToggleIconPipe,
-		EstadoToggleLabelPipe,
-	],
+	imports: [CommonModule, FormsModule, EduBadge, EduButton, EduDrawer, EduSelect, EduTag, EduTooltip, ModoAsignacionBadgeComponent, EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleIconPipe, EstadoToggleLabelPipe],
 	templateUrl: './horario-detail-drawer.component.html',
 	styleUrl: './horario-detail-drawer.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

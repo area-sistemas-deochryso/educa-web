@@ -1,4 +1,4 @@
-<p-drawer
+<edu-drawer
 	[visible]="vm().visible"
 	(visibleChange)="onVisibleChange($event)"
 	position="right"
@@ -9,36 +9,36 @@
 		<!-- #region Header del grupo -->
 		<header class="group-header">
 			<div class="group-header-tags">
-				<p-tag
+				<edu-tag
 					[value]="grp.severidad"
 					[severity]="getSeveridadSeverity(grp.severidad)"
 				/>
-				<p-tag
+				<edu-tag
 					[value]="getEstadoLabel(grp.estado)"
 					[severity]="getEstadoSeverity(grp.estado)"
 				/>
-				<p-tag [value]="grp.origen" [icon]="getOrigenIcon(grp.origen)" severity="info" />
+				<edu-tag [value]="grp.origen" [icon]="getOrigenIcon(grp.origen)" severity="info" />
 				@if (grp.httpStatus) {
-					<p-tag
+					<edu-tag
 						[value]="'' + grp.httpStatus"
 						[severity]="grp.httpStatus >= 500 ? 'danger' : 'warn'"
 					/>
 				}
 				@if (grp.contadorPostResolucion > 0) {
-					<p-tag
+					<edu-tag
 						value="Reabierto"
 						severity="danger"
 						icon="pi pi-history"
-						[pTooltip]="'Reabierto — ' + grp.contadorPostResolucion + ' ocurrencia(s) después de resolver'"
-						tooltipPosition="top"
+						[eduTooltip]="'Reabierto — ' + grp.contadorPostResolucion + ' ocurrencia(s) después de resolver'"
+						eduTooltipPosition="top"
 					/>
 				}
-				<span class="meta-usuarios" pTooltip="Usuarios únicos afectados" tooltipPosition="top">
+				<span class="meta-usuarios" eduTooltip="Usuarios únicos afectados" eduTooltipPosition="top">
 					<i class="pi pi-users"></i>
 					{{ grp.usuariosUnicos }}
 				</span>
 			</div>
-			<h3 class="group-header-mensaje" [pTooltip]="grp.mensajeRepresentativo" tooltipPosition="bottom">
+			<h3 class="group-header-mensaje" [eduTooltip]="grp.mensajeRepresentativo" eduTooltipPosition="bottom">
 				{{ grp.mensajeRepresentativo }}
 			</h3>
 			<div class="group-header-meta">
@@ -57,21 +57,21 @@
 		<!-- #endregion -->
 
 		<!-- #region Tabs -->
-		<p-tabs value="resumen" class="group-tabs">
-			<p-tablist>
-				<p-tab value="resumen" data-info-anchor="tab-switch">
+		<edu-tabs value="resumen" class="group-tabs">
+			
+				<edu-tab value="resumen" data-info-anchor="tab-switch">
 					<i class="pi pi-info-circle"></i>
 					Resumen
-				</p-tab>
-				<p-tab value="ocurrencias" data-info-anchor="tab-switch">
+				</edu-tab>
+				<edu-tab value="ocurrencias" data-info-anchor="tab-switch">
 					<i class="pi pi-list"></i>
 					Ocurrencias ({{ vm().ocurrenciasTotal }})
-				</p-tab>
-			</p-tablist>
+				</edu-tab>
+			
 
-			<p-tabpanels>
+			
 				<!-- #region Tab Resumen -->
-				<p-tabpanel value="resumen">
+				<edu-tabpanel value="resumen">
 					@if (vm().detalleLoading) {
 						<div class="tab-loading">
 							<i class="pi pi-spinner pi-spin"></i>
@@ -134,11 +134,11 @@
 							<span>No se pudo cargar el detalle del grupo.</span>
 						</div>
 					}
-				</p-tabpanel>
+				</edu-tabpanel>
 				<!-- #endregion -->
 
 				<!-- #region Tab Ocurrencias -->
-				<p-tabpanel value="ocurrencias">
+				<edu-tabpanel value="ocurrencias">
 					@if (vm().ocurrenciasLoading) {
 						<div class="tab-loading">
 							<i class="pi pi-spinner pi-spin"></i>
@@ -151,17 +151,17 @@
 						</div>
 					} @else {
 						<div class="ocurrencias-toolbar">
-							<button
-								pButton
+							<edu-button
 								icon="pi pi-download"
 								label="Exportar CSV"
-								class="p-button-outlined p-button-sm"
+								[outlined]="true"
+								size="small"
 								(click)="onExportOcurrenciasClick()"
 								[pt]="{ root: { 'aria-label': 'Exportar ocurrencias a CSV' } }"
 								data-info-anchor="admin-error-groups-export-ocurrencias-btn"
-							></button>
+							/>
 						</div>
-						<p-table
+						<edu-table
 							[value]="vm().ocurrencias"
 							[dataKey]="'id'"
 							[rowHover]="true"
@@ -195,26 +195,27 @@
 										}
 									</td>
 									<td class="col-mensaje">
-										<span [pTooltip]="item.mensaje" tooltipPosition="top">
+										<span [eduTooltip]="item.mensaje" eduTooltipPosition="top">
 											{{ item.mensaje }}
 										</span>
 									</td>
 									<td>
-										<button
-											pButton
+										<edu-button
 											icon="pi pi-eye"
-											class="p-button-rounded p-button-text p-button-sm"
-											pTooltip="Ver detalle"
-											tooltipPosition="left"
+											[text]="true"
+											[rounded]="true"
+											size="small"
+											eduTooltip="Ver detalle"
+											eduTooltipPosition="left"
 											(click)="$event.stopPropagation(); onOccurrenceClick(item)"
 											[pt]="{ root: { 'aria-label': 'Ver detalle de la ocurrencia' } }"
 											data-info-anchor="admin-error-groups-ver-detalle-btn"
-										></button>
+										/>
 									</td>
 								</tr>
 							</ng-template>
-						</p-table>
-						<p-paginator
+						</edu-table>
+						<edu-paginator
 							[rows]="vm().ocurrenciasPageSize"
 							[first]="paginatorFirst()"
 							[totalRecords]="vm().ocurrenciasTotal"
@@ -225,26 +226,25 @@
 							data-info-anchor="paginador"
 						/>
 					}
-				</p-tabpanel>
+				</edu-tabpanel>
 				<!-- #endregion -->
-			</p-tabpanels>
-		</p-tabs>
+			
+		</edu-tabs>
 		<!-- #endregion -->
 
 		<!-- #region Footer con transiciones -->
 		<div class="drawer-footer">
-			<button
-				pButton
+			<edu-button
 				type="button"
 				icon="pi pi-pencil"
 				label="Cambiar estado"
-				class="p-button-success"
+				severity="success"
 				[disabled]="transitionButtons().length === 0"
 				(click)="onStatusChangeClick()"
 				[pt]="{ root: { 'aria-label': 'Cambiar estado del grupo' } }"
 				data-info-anchor="admin-error-groups-cambiar-estado-btn"
-			></button>
+			/>
 		</div>
 		<!-- #endregion -->
 	}
-</p-drawer>
+</edu-drawer>

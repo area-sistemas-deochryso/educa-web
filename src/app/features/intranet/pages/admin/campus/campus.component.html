@@ -25,17 +25,19 @@
 			<div class="editor-toolbar">
 				<div class="toolbar-group">
 					@for (t of tools; track t.tool) {
-						<button
-							pButton
+						<edu-button
 							[icon]="t.icon"
-							class="p-button-sm p-button-text p-button-rounded toolbar-btn"
+							[text]="true"
+							[rounded]="true"
+							size="small"
+							class="toolbar-btn"
 							[class.active]="vm().activeTool === t.tool"
 							(click)="onToolSelect(t.tool)"
-							pTooltip="{{ t.label }}"
-							tooltipPosition="bottom"
+							eduTooltip="{{ t.label }}"
+							eduTooltipPosition="bottom"
 							[pt]="{ root: { 'aria-label': t.label } }"
 							data-info-anchor="admin-campus-toolbar-tool-btn"
-						></button>
+						/>
 					}
 				</div>
 
@@ -57,7 +59,7 @@
 
 				@if (vm().activeTool === 'addNode') {
 					<span class="toolbar-separator"></span>
-					<p-select
+					<edu-select
 						[options]="nodeTypeOptions"
 						[ngModel]="vm().newNodeType"
 						(ngModelChange)="onNodeTypeChange($event)"
@@ -72,7 +74,7 @@
 
 				<div class="toolbar-right">
 					@if (vm().selectedPiso; as piso) {
-						<p-tag [value]="piso.nombre" styleClass="tag-neutral" [rounded]="true" />
+						<edu-tag [value]="piso.nombre" styleClass="tag-neutral" [rounded]="true" />
 					}
 					@if (vm().saving) {
 						<i class="pi pi-spin pi-spinner saving-indicator"></i>
@@ -140,15 +142,18 @@
 				<div class="tooltip-body">
 					<div class="tooltip-header">
 						<span class="tooltip-type" style="color: #f59e0b">Conexión Vertical</span>
-						<p-tag [value]="conexion.tipo" styleClass="tag-neutral" [rounded]="true" />
-						<button
-							pButton
+						<edu-tag [value]="conexion.tipo" styleClass="tag-neutral" [rounded]="true" />
+						<edu-button
 							icon="pi pi-trash"
-							class="p-button-sm p-button-text p-button-rounded p-button-danger tooltip-action"
+							[text]="true"
+							[rounded]="true"
+							size="small"
+							severity="danger"
+							class="tooltip-action"
 							(click)="facade.eliminarConexionVertical(conexion.id)"
 							[pt]="{ root: { 'aria-label': 'Eliminar conexión vertical' } }"
 							data-info-anchor="admin-campus-eliminar-conexion-vertical-btn"
-						></button>
+						/>
 					</div>
 					<div class="tooltip-meta">
 						<span class="tooltip-meta-item">
@@ -163,7 +168,7 @@
 							<i class="pi pi-arrow-down"></i>
 							{{ conexion.pesoBajada }}
 						</span>
-						<p-tag
+						<edu-tag
 							[value]="conexion.bidireccional ? 'Bidireccional' : 'Unidireccional'"
 							[severity]="conexion.bidireccional ? 'info' : 'warn'"
 							[rounded]="true"

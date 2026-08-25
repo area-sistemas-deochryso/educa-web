@@ -2,16 +2,13 @@ import { ChangeDetectionStrategy, Component, computed, input, output, signal } f
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { ButtonModule } from 'primeng/button';
-import { TooltipModule } from 'primeng/tooltip';
-import { ToggleSwitch } from 'primeng/toggleswitch';
-
 import type {
   DiaSemana,
   EmptySlotClickEvent,
   HorarioWeeklyBlock,
 } from '../../models/horario.interface';
 import { DIAS_SEMANA, HORAS_DIA } from '../../models/horario.interface';
+import { EduButton, EduToggle, EduTooltip } from '@edu-ui';
 
 /** Fila renderizable de la grilla: una hora normal o un tramo colapsado de horas vacías. */
 type GridRow =
@@ -27,7 +24,7 @@ const COMPRESS_PREF_KEY = 'educaweb.schedule-weekly-grid.compressEmptyHours';
 @Component({
   selector: 'app-schedule-weekly-grid',
   standalone: true,
-  imports: [CommonModule, FormsModule, ButtonModule, TooltipModule, ToggleSwitch],
+  imports: [CommonModule, FormsModule, EduButton, EduTooltip, EduToggle],
   templateUrl: './schedule-weekly-grid.component.html',
   styleUrl: './schedule-weekly-grid.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -178,8 +175,7 @@ export class ScheduleWeeklyGridComponent {
     const lines = [
       h.cursoNombre,
       `${h.horaInicio} - ${h.horaFin}`,
-      `Salón: ${h.salonDescripcion}`,
-    ];
+      `Salón: ${h.salonDescripcion}`];
     if (h.profesorNombreCompleto) {
       lines.push(`Profesor: ${h.profesorNombreCompleto}`);
     } else {

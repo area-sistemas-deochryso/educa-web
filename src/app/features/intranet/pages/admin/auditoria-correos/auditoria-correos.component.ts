@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { ButtonModule } from 'primeng/button';
+import { EduButton } from '@edu-ui';
 
 import { PageHeaderComponent } from '@intranet-shared/components';
 
@@ -16,16 +16,7 @@ import { EmailDeferFailBannerComponent } from '@features/intranet/pages/admin/em
 @Component({
 	selector: 'app-auditoria-correos',
 	standalone: true,
-	imports: [
-		CommonModule,
-		ButtonModule,
-		PageHeaderComponent,
-		AuditoriaCorreosStatsComponent,
-		AuditoriaCorreosFiltersComponent,
-		AuditoriaCorreosTableComponent,
-		AuditoriaCorreosSkeletonComponent,
-		EmailDeferFailBannerComponent,
-	],
+	imports: [CommonModule, EduButton, PageHeaderComponent, AuditoriaCorreosStatsComponent, AuditoriaCorreosFiltersComponent, AuditoriaCorreosTableComponent, AuditoriaCorreosSkeletonComponent, EmailDeferFailBannerComponent],
 	templateUrl: './auditoria-correos.component.html',
 	styleUrl: './auditoria-correos.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

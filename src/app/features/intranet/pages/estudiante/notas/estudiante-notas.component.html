@@ -12,7 +12,14 @@
 	<div class="flex flex-column align-items-center p-5 text-color-secondary">
 		<i class="pi pi-exclamation-triangle text-4xl mb-3 text-yellow-600"></i>
 		<p class="font-semibold">{{ vm().error }}</p>
-		<button pButton label="Reintentar" icon="pi pi-refresh" class="p-button-outlined mt-2" data-info-anchor="reintentar" (click)="onRetry()"></button>
+		<edu-button
+			label="Reintentar"
+			icon="pi pi-refresh"
+			[outlined]="true"
+			class="mt-2"
+			data-info-anchor="reintentar"
+			(click)="onRetry()"
+		/>
 	</div>
 } @else if (vm().isEmpty) {
 	@if (embedded()) {
@@ -35,17 +42,17 @@
 	<!-- #region Header -->
 	@if (!embedded()) {
 		<app-page-header icon="pi pi-chart-bar" title="Mis Calificaciones">
-			<button
-				pButton
+			<edu-button
 				label="Simular"
 				icon="pi pi-calculator"
-				class="p-button-outlined p-button-help"
+				[outlined]="true"
+				severity="help"
 				data-info-anchor="estudiante-notas-simular"
 				(click)="onOpenSimulador()"
 				[disabled]="!vm().selectedCurso"
-				pTooltip="Simular qué nota necesitás para aprobar"
-				tooltipPosition="bottom"
-			></button>
+				eduTooltip="Simular qué nota necesitás para aprobar"
+				eduTooltipPosition="bottom"
+			/>
 		</app-page-header>
 	}
 
@@ -70,15 +77,16 @@
 				/>
 			}
 			@if (embedded()) {
-				<button
-					pButton
+				<edu-button
 					label="Simular"
 					icon="pi pi-calculator"
-					class="p-button-outlined p-button-help p-button-sm"
+					[outlined]="true"
+					size="small"
+					severity="help"
 					data-info-anchor="estudiante-notas-simular"
 					(click)="onOpenSimulador()"
 					[disabled]="!vm().selectedCurso"
-				></button>
+				/>
 			}
 		</div>
 		<!-- #endregion -->

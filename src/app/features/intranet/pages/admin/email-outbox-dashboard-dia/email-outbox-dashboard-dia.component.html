@@ -16,28 +16,28 @@
 }
 
 <!-- #region Tabs -->
-<p-tabs value="resumen" class="dashboard-tabs">
-	<p-tablist>
-		<p-tab value="resumen" data-info-anchor="admin-email-outbox-dashboard-tab">
+<edu-tabs value="resumen" class="dashboard-tabs">
+	
+		<edu-tab value="resumen" data-info-anchor="admin-email-outbox-dashboard-tab">
 			<i class="pi pi-th-large"></i>
 			<span>Resumen</span>
-		</p-tab>
-		<p-tab value="detalle" data-info-anchor="admin-email-outbox-dashboard-tab">
+		</edu-tab>
+		<edu-tab value="detalle" data-info-anchor="admin-email-outbox-dashboard-tab">
 			<i class="pi pi-list"></i>
 			<span>Detalle de fallos</span>
 			@if (totalFallos() + totalBounces() > 0) {
 				<span class="tab-badge">{{ totalFallos() + totalBounces() }}</span>
 			}
-		</p-tab>
-		<p-tab value="mapa" data-info-anchor="admin-email-outbox-dashboard-tab">
+		</edu-tab>
+		<edu-tab value="mapa" data-info-anchor="admin-email-outbox-dashboard-tab">
 			<i class="pi pi-compass"></i>
 			<span>Mapa de envío</span>
-		</p-tab>
-	</p-tablist>
+		</edu-tab>
+	
 
-	<p-tabpanels>
+	
 		<!-- Tab 1: Resumen (cards + banner + desglose + chart) -->
-		<p-tabpanel value="resumen">
+		<edu-tabpanel value="resumen">
 			@if (vm().loading && !hasData()) {
 				<app-stats-skeleton [count]="3" iconPosition="right" />
 			} @else if (vm().resumen; as resumen) {
@@ -55,10 +55,10 @@
 			} @else if (hasData()) {
 				<app-dashboard-chart-hora [data]="vm().porHora" />
 			}
-		</p-tabpanel>
+		</edu-tabpanel>
 
 		<!-- Tab 2: Detalle (KPIs + tablas) -->
-		<p-tabpanel value="detalle">
+		<edu-tabpanel value="detalle">
 			<!-- #region KPIs del detalle -->
 			@if (vm().loading && !hasData()) {
 				<app-stats-skeleton [count]="4" iconPosition="right" />
@@ -116,12 +116,12 @@
 					<app-dashboard-fallos-por-sender-table [data]="vm().fallosPorSender" />
 				}
 			</div>
-		</p-tabpanel>
+		</edu-tabpanel>
 
 		<!-- Tab 3: Mapa de envío (Plan 39 Chat C) -->
-		<p-tabpanel value="mapa">
+		<edu-tabpanel value="mapa">
 			<app-mapa-envio-tab />
-		</p-tabpanel>
-	</p-tabpanels>
-</p-tabs>
+		</edu-tabpanel>
+	
+</edu-tabs>
 <!-- #endregion -->

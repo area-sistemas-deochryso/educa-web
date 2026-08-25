@@ -1,21 +1,3 @@
-// #region Dialog overrides
-:host ::ng-deep {
-	.p-dialog-content {
-		padding: 1.25rem 1.5rem !important;
-	}
-
-	// Force p-inputNumber to fill width in grid
-	.form-field p-inputnumber {
-		width: 100%;
-
-		.p-inputnumber,
-		.p-inputtext {
-			width: 100%;
-		}
-	}
-}
-
-// #endregion
 // #region Periods list
 .periodos-list {
 	margin-bottom: 1.5rem;

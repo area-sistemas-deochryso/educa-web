@@ -758,24 +758,6 @@
 		font-size: 0.9rem;
 	}
 
-	// Phase tabs: scroll horizontal en vez de cortar texto
-	::ng-deep {
-		.p-tablist {
-			overflow-x: auto;
-			-webkit-overflow-scrolling: touch;
-			scrollbar-width: none;
-
-			&::-webkit-scrollbar {
-				display: none;
-			}
-		}
-
-		.p-tab {
-			white-space: nowrap;
-			font-size: 0.8rem;
-		}
-	}
-
 	.simulation-flow,
 	.phase-flow {
 		padding: 0.625rem;

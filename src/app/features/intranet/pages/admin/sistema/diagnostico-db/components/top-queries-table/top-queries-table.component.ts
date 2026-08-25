@@ -1,15 +1,12 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
-import { TableModule } from 'primeng/table';
-import { TooltipModule } from 'primeng/tooltip';
-
 import { TopQueryDto } from '../../models/diagnostico-db.models';
+import { EduButton, EduTable, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-top-queries-table',
 	standalone: true,
-	imports: [DecimalPipe, DatePipe, ButtonModule, TableModule, TooltipModule],
+	imports: [DecimalPipe, DatePipe, EduButton, EduTable, EduTooltip],
 	templateUrl: './top-queries-table.component.html',
 	styleUrl: './top-queries-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

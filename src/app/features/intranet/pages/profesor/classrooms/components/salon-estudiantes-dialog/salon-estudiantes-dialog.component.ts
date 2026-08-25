@@ -1,11 +1,5 @@
 import { Component, ChangeDetectionStrategy, input, output, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DialogModule } from 'primeng/dialog';
-import { TabsModule } from 'primeng/tabs';
-import { TagModule } from 'primeng/tag';
-import { SkeletonModule } from 'primeng/skeleton';
-import { ButtonModule } from 'primeng/button';
-import { TooltipModule } from 'primeng/tooltip';
 import { environment } from '@config/environment';
 import { ProfesorSalonConEstudiantes } from '@features/intranet/pages/profesor/models';
 import { ClassroomGradesTabComponent } from '../salon-notas-tab/salon-notas-tab.component';
@@ -25,24 +19,23 @@ import {
 	DateValidationResult,
 } from '@features/intranet/pages/profesor/models';
 import { NotaSaveEvent } from '../salon-notas-estudiante-tab/salon-notas-estudiante-tab.component';
+import { EduButton, EduDialog, EduTab, EduTabPanel, EduTabs, EduTag, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-salon-estudiantes-dialog',
 	standalone: true,
 	imports: [
 		CommonModule,
-		DialogModule,
-		TabsModule,
-		TagModule,
-		SkeletonModule,
-		ButtonModule,
-		TooltipModule,
+		EduDialog,
+		EduTabs, EduTab, EduTabPanel,
+		EduTag,
+		EduButton,
+		EduTooltip,
 		ClassroomGradesTabComponent,
 		SalonNotasEstudianteTabComponent,
 		SalonGruposTabComponent,
 		CampusNavigationComponent,
-		SalonHealthPermissionsTabComponent,
-	],
+		SalonHealthPermissionsTabComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './salon-estudiantes-dialog.component.html',
 	styleUrl: './salon-estudiantes-dialog.component.scss',
@@ -94,14 +87,14 @@ export class SalonEstudiantesDialogComponent {
 	readonly activeTab = signal('0');
 	readonly isFullscreen = signal(false);
 
-	readonly dialogStyle = computed(() =>
-		this.isFullscreen()
-			? { width: '100vw', maxWidth: '100vw', height: '100vh', maxHeight: '100vh' }
-			: { width: '700px', maxWidth: '95vw' },
-	);
-	readonly contentStyle = computed(() =>
-		this.isFullscreen() ? { 'overflow-y': 'auto' } : { 'max-height': '80vh', 'overflow-y': 'auto' },
-	);
+	readonly dialogStyle = computed((): Record<string, string> => {
+		if (this.isFullscreen()) return { width: '100vw', maxWidth: '100vw', height: '100vh', maxHeight: '100vh' };
+		return { width: '700px', maxWidth: '95vw' };
+	});
+	readonly contentStyle = computed((): Record<string, string> => {
+		if (this.isFullscreen()) return { 'overflow-y': 'auto' };
+		return { 'max-height': '80vh', 'overflow-y': 'auto' };
+	});
 
 	toggleFullscreen(): void {
 		this.isFullscreen.update((v) => !v);

@@ -3,11 +3,6 @@ import { Component, ChangeDetectionStrategy, inject, OnInit, computed, signal, v
 import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs/operators';
-import { ButtonModule } from 'primeng/button';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { FormsModule } from '@angular/forms';
 import { resolveErrorMessage } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
@@ -17,6 +12,7 @@ import { EstadoSala, VideoconferenciaItem } from './services/videoconferencias.m
 import { resolveEstadoSala } from './services/videoconferencias.window.utils';
 import { VideoconferenciaSalaComponent } from './components/videoconferencia-sala/videoconferencia-sala.component';
 import { VideoconferenciaExcepcionDialogComponent } from './components/videoconferencia-excepcion-dialog/videoconferencia-excepcion-dialog.component';
+import { EduButton, EduSpinner, EduTag, EduToggle, EduTooltip } from '@edu-ui';
 
 // #endregion
 
@@ -26,15 +22,14 @@ import { VideoconferenciaExcepcionDialogComponent } from './components/videoconf
 	imports: [
 		CommonModule,
 		FormsModule,
-		ButtonModule,
-		TagModule,
-		TooltipModule,
-		ProgressSpinnerModule,
-		ToggleSwitchModule,
+		EduButton,
+		EduTag,
+		EduTooltip,
+		EduSpinner,
+		EduToggle,
 		PageHeaderComponent,
 		VideoconferenciaSalaComponent,
-		VideoconferenciaExcepcionDialogComponent,
-	],
+		VideoconferenciaExcepcionDialogComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './videoconferencias.component.html',
 	styleUrl: './videoconferencias.component.scss',

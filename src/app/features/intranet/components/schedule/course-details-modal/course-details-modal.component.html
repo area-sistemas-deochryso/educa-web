@@ -1,5 +1,5 @@
 <!-- #region Template -->
-<p-dialog
+<edu-dialog
 	[visible]="visible"
 	(visibleChange)="onVisibleChange($event)"
 	[modal]="true"
@@ -51,10 +51,10 @@
 				<button
 					class="side-toggle-btn"
 					(click)="toggleSide()"
-					[pTooltip]="
+					[eduTooltip]="
 						isLeftSide ? 'Mover panel a la derecha' : 'Mover panel a la izquierda'
 					"
-					tooltipPosition="top"
+					eduTooltipPosition="top"
 				>
 					<i
 						class="pi"
@@ -92,7 +92,7 @@
 			</div>
 		</div>
 	</div>
-</p-dialog>
+</edu-dialog>
 
 <!-- * Sub-modals for week content -->
 <app-attachments-modal

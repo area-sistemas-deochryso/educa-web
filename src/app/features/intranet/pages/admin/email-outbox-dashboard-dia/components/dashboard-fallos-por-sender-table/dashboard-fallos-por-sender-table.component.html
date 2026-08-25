@@ -11,7 +11,7 @@
 			<span>Sin fallos en el día</span>
 		</div>
 	} @else {
-		<p-table [value]="data()" class="p-datatable-sm" styleClass="p-datatable-gridlines">
+		<edu-table [value]="data()" class="p-datatable-sm" styleClass="p-datatable-gridlines">
 			<ng-template #header>
 				<tr>
 					<th class="label-uppercase">Remitente</th>
@@ -23,12 +23,12 @@
 				<tr>
 					<td class="cell-sender">{{ row.remitente || 'Desconocido' }}</td>
 					<td>
-						<p-tag [value]="row.tipoFallo | tipoFalloLabel" styleClass="tag-neutral" />
+						<edu-tag [value]="row.tipoFallo | tipoFalloLabel" styleClass="tag-neutral" />
 					</td>
 					<td class="col-num val-failed">{{ row.cantidad }}</td>
 				</tr>
 			</ng-template>
-		</p-table>
+		</edu-table>
 	}
 </section>
 <!-- #endregion -->

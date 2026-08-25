@@ -1,4 +1,4 @@
-<p-dialog
+<edu-dialog
 	header="Validación de Datos de Usuarios"
 	[visible]="visible()"
 	(visibleChange)="onVisibleChange($event)"
@@ -23,7 +23,7 @@
 			<span class="p-input-icon-left search-field">
 				<i class="pi pi-search"></i>
 				<input
-					pInputText
+					eduInputText
 					type="text"
 					placeholder="Buscar por nombre, DNI, correo, rol..."
 					[ngModel]="searchTerm()"
@@ -31,7 +31,7 @@
 					data-info-anchor="admin-users-validation-search-input"
 				/>
 			</span>
-			<p-select
+			<edu-select
 				[options]="errorOptions()"
 				[ngModel]="filterError()"
 				(ngModelChange)="filterError.set($event)"
@@ -67,7 +67,7 @@
 			}
 		</p>
 
-		<p-table [value]="filteredItems()" [dataKey]="'dni'" [scrollable]="true" scrollHeight="400px" styleClass="p-datatable-sm">
+		<edu-table [value]="filteredItems()" [dataKey]="'dni'" [scrollable]="true" scrollHeight="400px" styleClass="p-datatable-sm">
 			<ng-template #header>
 				<tr>
 					<th>DNI</th>
@@ -85,27 +85,28 @@
 					</td>
 					<td>{{ item.nombreCompleto }}</td>
 					<td>
-						<p-tag [value]="item.rol" severity="info" styleClass="tag-neutral" />
+						<edu-tag [value]="item.rol" severity="info" styleClass="tag-neutral" />
 					</td>
 					<td>
 						@for (error of item.errores; track error) {
-							<p-tag [value]="error" severity="danger" styleClass="mr-1 mb-1" />
+							<edu-tag [value]="error" severity="danger" styleClass="mr-1 mb-1" />
 						}
 					</td>
 					<td [class.invalid-cell]="hasErrorCategory(item, 'Correo')">
 						{{ item.correo || '(vacío)' }}
 					</td>
 					<td>
-						<button
-							pButton
+						<edu-button
 							icon="pi pi-pencil"
-							class="p-button-rounded p-button-text p-button-info"
-							pTooltip="Editar"
-							tooltipPosition="top"
+							[text]="true"
+							[rounded]="true"
+							severity="info"
+							eduTooltip="Editar"
+							eduTooltipPosition="top"
 							(click)="editUsuario.emit(item)"
 							data-info-anchor="admin-users-validation-edit-btn"
 							[pt]="{ root: { 'aria-label': 'Editar' } }"
-						></button>
+						/>
 					</td>
 				</tr>
 			</ng-template>
@@ -116,6 +117,6 @@
 					</td>
 				</tr>
 			</ng-template>
-		</p-table>
+		</edu-table>
 	}
-</p-dialog>
+</edu-dialog>

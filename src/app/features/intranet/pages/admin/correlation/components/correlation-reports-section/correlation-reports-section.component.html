@@ -8,13 +8,10 @@
 		<a
 			[routerLink]="['/intranet/admin/monitoreo/incidencias/reportes']"
 			[queryParams]="{ correlationId: correlationId() }"
-			pButton
-			type="button"
-			label="Abrir en reportes"
-			icon="pi pi-external-link"
-			class="p-button-text p-button-sm"
+			class="edu-button-link edu-button-link--text edu-button-link--sm"
+			data-severity="primary"
 			data-info-anchor="admin-correlation-open-external"
-		></a>
+		><span>Abrir en reportes</span><i class="edu-button-link__icon pi pi-external-link"></i></a>
 	</header>
 
 	@if (count() === 0) {
@@ -23,7 +20,7 @@
 			<p>Sin reportes de usuario asociados a este correlation id.</p>
 		</div>
 	} @else {
-		<p-table [value]="items()" [dataKey]="'id'" class="p-datatable-sm" [scrollable]="true" scrollHeight="flex">
+		<edu-table [value]="items()" [dataKey]="'id'" class="p-datatable-sm" [scrollable]="true" scrollHeight="flex">
 			<ng-template #header>
 				<tr>
 					<th style="width: 110px">Tipo</th>
@@ -38,16 +35,16 @@
 			</ng-template>
 			<ng-template #body let-row>
 				<tr>
-					<td><p-tag [value]="row.tipo" styleClass="tag-neutral" /></td>
-					<td><p-tag [value]="row.estado" [severity]="getEstadoSeverity(row.estado)" /></td>
+					<td><edu-tag [value]="row.tipo" styleClass="tag-neutral" /></td>
+					<td><edu-tag [value]="row.estado" [severity]="getEstadoSeverity(row.estado)" /></td>
 					<td>
-						<span class="cell-message" [pTooltip]="row.descripcionResumen" tooltipPosition="top">
+						<span class="cell-message" [eduTooltip]="row.descripcionResumen" eduTooltipPosition="top">
 							{{ row.descripcionResumen }}
 						</span>
 					</td>
 					<td>
 						@if (row.propuestaResumen) {
-							<span class="cell-message" [pTooltip]="row.propuestaResumen" tooltipPosition="top">
+							<span class="cell-message" [eduTooltip]="row.propuestaResumen" eduTooltipPosition="top">
 								{{ row.propuestaResumen }}
 							</span>
 						} @else {
@@ -55,7 +52,7 @@
 						}
 					</td>
 					<td>
-						<span class="cell-mono cell-url" [pTooltip]="row.url" tooltipPosition="top">
+						<span class="cell-mono cell-url" [eduTooltip]="row.url" eduTooltipPosition="top">
 							{{ row.url }}
 						</span>
 					</td>
@@ -77,16 +74,16 @@
 					</td>
 					<td>{{ row.fechaReg | date: 'dd/MM/yyyy HH:mm:ss' }}</td>
 					<td>
-						<button
-							pButton
+						<edu-button
 							type="button"
 							label="Ver reporte"
 							icon="pi pi-external-link"
-							class="p-button-text p-button-sm"
+							[text]="true"
+							size="small"
 							(click)="onGoToReport(row)"
 							data-info-anchor="admin-correlation-row-action"
 							[pt]="{ root: { 'aria-label': 'Ver reporte' } }"
-						></button>
+						/>
 					</td>
 				</tr>
 			</ng-template>
@@ -95,7 +92,7 @@
 					<td colspan="8" class="text-center p-4">No hay reportes asociados a esta correlación.</td>
 				</tr>
 			</ng-template>
-		</p-table>
+		</edu-table>
 
 		@if (cappedRows()) {
 			<p class="correlation-section__cap">

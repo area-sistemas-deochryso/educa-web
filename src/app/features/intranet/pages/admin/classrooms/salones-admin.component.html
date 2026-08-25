@@ -5,7 +5,7 @@
 		(valueChange)="onPeriodoChange($event)"
 		data-info-anchor="period-toggle"
 	/>
-	<p-inputNumber
+	<edu-input-number
 		[ngModel]="vm().filtroAnio"
 		(ngModelChange)="onAnioChange($event)"
 		[useGrouping]="false"
@@ -14,10 +14,9 @@
 		[style]="{ width: '100px' }"
 		data-info-anchor="admin-salones-anio-filter-input"
 	/>
-	<button
-		pButton
+	<edu-button
 		icon="pi pi-refresh"
-		class="p-button-outlined"
+		[outlined]="true"
 		(click)="onRefresh()"
 		[pt]="{
 			root: {
@@ -25,15 +24,14 @@
 			},
 		}"
 		data-info-anchor="admin-salones-refresh-btn"
-	></button>
-	<button
-		pButton
+	/>
+	<edu-button
 		label="Nuevo Salón"
 		icon="pi pi-plus"
-		class="p-button-success"
+		severity="success"
 		(click)="onOpenNuevoSalonDialog()"
 		data-info-anchor="admin-salones-nuevo-btn"
-	></button>
+	/>
 </app-page-header>
 <!-- #endregion -->
 
@@ -51,52 +49,52 @@
 <!-- #endregion -->
 
 <!-- #region Tabs por nivel -->
-<p-tabs [value]="nivelTabIndex[vm().selectedNivel]" (valueChange)="onTabChange($any($event))">
-	<p-tablist>
+<edu-tabs [value]="nivelTabIndex[vm().selectedNivel]" (valueChange)="onTabChange($any($event))">
+	
 		@for (nivel of niveles; track nivel; let i = $index) {
-			<p-tab [value]="i" data-info-anchor="admin-salones-nivel-tab">{{ nivel }}</p-tab>
+			<edu-tab [value]="i" data-info-anchor="admin-salones-nivel-tab">{{ nivel }}</edu-tab>
 		}
-	</p-tablist>
-	<p-tabpanels>
+	
+	
 		@for (nivel of niveles; track nivel; let i = $index) {
-			<p-tabpanel [value]="i">
+			<edu-tabpanel [value]="i">
 				<!-- Toolbar del nivel -->
 				<div class="nivel-toolbar">
 					<div class="toolbar-tags">
 						@if (vm().periodoActual; as periodo) {
-							<p-tag
+							<edu-tag
 								[value]="periodo.estadoCierre === 'CERRADO' ? 'Periodo Cerrado' : 'Periodo Abierto'"
 								[severity]="periodo.estadoCierre === 'CERRADO' ? 'success' : 'info'"
 							/>
 						} @else {
-							<p-tag value="Sin periodo" severity="warn" />
+							<edu-tag value="Sin periodo" severity="warn" />
 						}
 
 						@if (vm().configActual; as config) {
-							<p-tag
+							<edu-tag
 								[value]="config.tipoCalificacion === 'NUMERICO' ? 'Numérico' : 'Literal'"
 								styleClass="tag-neutral"
 							/>
 						}
 					</div>
 					<div class="toolbar-actions">
-						<button
-							pButton
+						<edu-button
 							label="Config Calificaciones"
 							icon="pi pi-cog"
-							class="p-button-sm p-button-outlined"
+							[outlined]="true"
+							size="small"
 							(click)="onOpenConfigDialog()"
 							data-info-anchor="admin-salones-config-calificaciones-btn"
-						></button>
+						/>
 						@if (vm().periodoActual && !vm().periodoCerrado) {
-							<button
-								pButton
+							<edu-button
 								label="Cerrar Periodo"
 								icon="pi pi-lock"
-								class="p-button-sm p-button-danger"
+								size="small"
+								severity="danger"
 								(click)="onOpenCerrarPeriodo()"
 								data-info-anchor="admin-salones-cerrar-periodo-btn"
-							></button>
+							/>
 						}
 					</div>
 				</div>
@@ -109,10 +107,10 @@
 					(goToHorarios)="onGoToHorarios($event)"
 					(goToUsuarios)="onGoToUsuarios($event)"
 				/>
-			</p-tabpanel>
+			</edu-tabpanel>
 		}
-	</p-tabpanels>
-</p-tabs>
+	
+</edu-tabs>
 <!-- #endregion -->
 
 <!-- #region Dialogs — siempre en el DOM -->
@@ -167,4 +165,4 @@
 />
 <!-- #endregion -->
 
-<p-toast />
+<edu-toast />

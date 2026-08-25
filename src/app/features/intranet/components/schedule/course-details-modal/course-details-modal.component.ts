@@ -1,8 +1,6 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DialogModule } from 'primeng/dialog';
-import { TooltipModule } from 'primeng/tooltip';
 import { AttachmentsModalComponent } from './attachments-modal/attachments-modal.component';
 import { TasksModalComponent } from './tasks-modal/tasks-modal.component';
 import { SubmissionsModalComponent } from './submissions-modal/submissions-modal.component';
@@ -20,6 +18,7 @@ import {
 	SidebarLink,
 	MemberListComponent,
 } from './components';
+import { EduDialog, EduSelect, EduTooltip } from '@edu-ui';
 
 // #endregion
 // #region Implementation
@@ -41,22 +40,7 @@ export interface CourseDetails {
 
 @Component({
 	selector: 'app-course-details-modal',
-	imports: [
-		CommonModule,
-		DialogModule,
-		TooltipModule,
-		AttachmentsModalComponent,
-		TasksModalComponent,
-		SubmissionsModalComponent,
-		ModalControlsComponent,
-		WeekSearchBoxComponent,
-		WeekAccordionItemComponent,
-		EvaluationsAccordionComponent,
-		StudentCardComponent,
-		CourseSearchComponent,
-		SidebarLinksComponent,
-		MemberListComponent,
-	],
+	imports: [CommonModule, EduDialog, EduTooltip, AttachmentsModalComponent, TasksModalComponent, SubmissionsModalComponent, ModalControlsComponent, WeekSearchBoxComponent, WeekAccordionItemComponent, EvaluationsAccordionComponent, StudentCardComponent, CourseSearchComponent, SidebarLinksComponent, MemberListComponent, EduSelect],
 	templateUrl: './course-details-modal.component.html',
 	styleUrl: './course-details-modal.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -112,13 +96,11 @@ export class CourseDetailsModalComponent implements OnChanges {
 	// #region Sidebar links
 	courseSearchLinks: SidebarLink[] = [
 		{ label: 'HORARIOS', action: 'schedule' },
-		{ label: 'NOTAS / ASISTENCIAS', action: 'summary' },
-	];
+		{ label: 'NOTAS / ASISTENCIAS', action: 'summary' }];
 
 	courseNameLinks: SidebarLink[] = [
 		{ label: 'CALIFICACIONES', action: 'grades' },
-		{ label: 'NOTAS / ASISTENCIAS', action: 'summary' },
-	];
+		{ label: 'NOTAS / ASISTENCIAS', action: 'summary' }];
 	// #endregion
 
 	/**
@@ -160,14 +142,12 @@ export class CourseDetailsModalComponent implements OnChanges {
 				{ name: 'Examen Calificado 2', grade: 0 },
 				{ name: 'Examen Calificado 3', grade: 0 },
 				{ name: 'Examen Calificado 4', grade: 0 },
-				{ name: 'Examen Calificado 5', grade: 0 },
-			],
+				{ name: 'Examen Calificado 5', grade: 0 }],
 			workGroup: [
 				'Tupac Yupanqui Maria Jose',
 				'Garcia Lopez Pedro',
 				'Rodriguez Silva Ana',
-				'Mendoza Quispe Carlos',
-			],
+				'Mendoza Quispe Carlos'],
 			teacher: 'Sifuentes Garcia Diana Isabella',
 		};
 	}
@@ -236,7 +216,7 @@ export class CourseDetailsModalComponent implements OnChanges {
 	}
 
 	/**
-	 * Select a course and reset local state.
+	 * EduSelect a course and reset local state.
 	 *
 	 * @param course Selected course name.
 	 */

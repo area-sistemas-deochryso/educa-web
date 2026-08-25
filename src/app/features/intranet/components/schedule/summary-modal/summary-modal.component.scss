@@ -1,18 +1,4 @@
 // #region Styles
-:host ::ng-deep {
-	.summary-modal.p-dialog {
-		border-radius: 10px;
-		overflow: hidden;
-		background-color: var(--intranet-white-color);
-		max-width: 90vw;
-
-		.p-dialog-content {
-			padding: 0;
-			background: transparent;
-		}
-	}
-}
-
 .modal-content {
 	padding: 2rem;
 	background-color: var(--intranet-white-color);

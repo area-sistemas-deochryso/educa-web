@@ -1,10 +1,5 @@
 import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ButtonModule } from 'primeng/button';
-import { TooltipModule } from 'primeng/tooltip';
-import { ConfirmationService } from 'primeng/api';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-
 import {
 	HealthExitPermissionDto,
 	HealthJustificationDto,
@@ -16,46 +11,39 @@ import { HealthExitListComponent } from './components/health-exit-list.component
 import { HealthJustificationListComponent } from './components/health-justification-list.component';
 import { HealthExitDialogComponent } from './components/health-exit-dialog.component';
 import { HealthJustificationDialogComponent } from './components/health-justification-dialog.component';
+import { EduButton, EduConfirmDialog, EduConfirmationService, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-salon-health-permissions-tab',
 	standalone: true,
-	imports: [
-		CommonModule,
-		ButtonModule,
-		TooltipModule,
-		ConfirmDialogModule,
-		HealthExitListComponent,
-		HealthJustificationListComponent,
-		HealthExitDialogComponent,
-		HealthJustificationDialogComponent,
-	],
-	providers: [ConfirmationService],
+	imports: [CommonModule, EduButton, EduTooltip, EduConfirmDialog, HealthExitListComponent, HealthJustificationListComponent, HealthExitDialogComponent, HealthJustificationDialogComponent],
+	providers: [EduConfirmationService],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
 		<!-- #region Header + Acciones -->
 		<div class="health-tab-header">
 			<div class="health-tab-actions">
-				<button
-					pButton
+				<edu-button
 					label="Permiso de Salida"
 					icon="pi pi-sign-out"
-					class="p-button-outlined p-button-sm"
+					[outlined]="true"
+					size="small"
 					data-info-anchor="profesor-health-abrir-permiso-salida"
 					(click)="openExitDialog.emit()"
-					pTooltip="Emitir permiso de salida por salud (solo hoy)"
-					tooltipPosition="top"
-				></button>
-				<button
-					pButton
+					eduTooltip="Emitir permiso de salida por salud (solo hoy)"
+					eduTooltipPosition="top"
+				/>
+				<edu-button
 					label="Justificación Médica"
 					icon="pi pi-file-plus"
-					class="p-button-outlined p-button-sm p-button-secondary"
+					[outlined]="true"
+					size="small"
+					severity="secondary"
 					data-info-anchor="profesor-health-abrir-justificacion"
 					(click)="openJustificationDialog.emit()"
-					pTooltip="Justificar faltas con documento médico"
-					tooltipPosition="top"
-				></button>
+					eduTooltip="Justificar faltas con documento médico"
+					eduTooltipPosition="top"
+				/>
 			</div>
 		</div>
 		<!-- #endregion -->
@@ -98,7 +86,7 @@ import { HealthJustificationDialogComponent } from './components/health-justific
 			(save)="saveJustification.emit($event)"
 			(validateDates)="validateDates.emit($event)"
 		/>
-		<p-confirmDialog (onHide)="confirmDialogHide.emit()" />
+		<edu-confirm-dialog (onHide)="confirmDialogHide.emit()" />
 		<!-- #endregion -->
 	`,
 	styles: [
@@ -120,8 +108,7 @@ import { HealthJustificationDialogComponent } from './components/health-justific
 				font-size: 1rem;
 				font-weight: 600;
 			}
-		`,
-	],
+		`],
 })
 export class SalonHealthPermissionsTabComponent {
 	// #region Inputs

@@ -3,13 +3,6 @@ import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal 
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 
-import { ButtonModule } from 'primeng/button';
-import { ConfirmationService, MessageService } from 'primeng/api';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { InputTextModule } from 'primeng/inputtext';
-import { ToastModule } from 'primeng/toast';
-import { TooltipModule } from 'primeng/tooltip';
-
 import { CapabilityCatalogItem, PermissionsService } from '@core/services/permissions';
 import { logger } from '@core/helpers';
 import { PageHeaderComponent } from '@intranet-shared/components';
@@ -22,6 +15,7 @@ import {
 	FaqAdminDto,
 } from './models/faq-admin.models';
 import { FaqAdminFacade } from './services/faq-admin.facade';
+import { EduButton, EduConfirmDialog, EduConfirmationService, EduInputText, EduMessageService, EduToast, EduTooltip } from '@edu-ui';
 // #endregion
 
 /**
@@ -33,18 +27,8 @@ import { FaqAdminFacade } from './services/faq-admin.facade';
 @Component({
 	selector: 'app-ayuda-faq-admin',
 	standalone: true,
-	imports: [
-		FormsModule,
-		ButtonModule,
-		InputTextModule,
-		ToastModule,
-		TooltipModule,
-		ConfirmDialogModule,
-		PageHeaderComponent,
-		FaqAdminTableComponent,
-		FaqAdminFormDialogComponent,
-	],
-	providers: [FaqAdminFacade, ConfirmationService, MessageService],
+	imports: [FormsModule, EduButton, EduInputText, EduToast, EduTooltip, EduConfirmDialog, PageHeaderComponent, FaqAdminTableComponent, FaqAdminFormDialogComponent],
+	providers: [FaqAdminFacade, EduConfirmationService, EduMessageService],
 	templateUrl: './ayuda-faq-admin.component.html',
 	styleUrl: './ayuda-faq-admin.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -53,7 +37,7 @@ export class AyudaFaqAdminComponent implements OnInit {
 	// #region Dependencies
 	protected readonly facade = inject(FaqAdminFacade);
 	private readonly permissionsService = inject(PermissionsService);
-	private readonly confirmationService = inject(ConfirmationService);
+	private readonly confirmationService = inject(EduConfirmationService);
 	private readonly destroyRef = inject(DestroyRef);
 	// #endregion
 

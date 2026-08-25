@@ -1,0 +1,93 @@
+/*
+ * Fix de fidelidad (F6 prep, brief 587): el estado seleccionado usaba
+ * `--eduui-primary-color` sólido. Aura real (ToggleButton, que SelectButton
+ * envuelve por-opción — ver `@primeuix/styles/togglebutton`) es un track gris
+ * constante (`surface.100`/`surface.950`, IGUAL seleccionado o no) con un
+ * pill blanco/gris (`surface.0`/`surface.800`) + sombra sutil flotando
+ * adentro sobre el label — no un cambio de color del track. Requirió el
+ * `<span class="edu-select-button__label">` nuevo en el template: sin un
+ * wrapper interno separado del padding externo no hay forma de mostrar el
+ * pill inset dentro del track (documentado como pendiente en el cierre de
+ * F5/586).
+ */
+.edu-select-button {
+	display: inline-flex;
+
+	&--disabled {
+		opacity: 0.6;
+	}
+
+	&__option {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		border: 1px solid var(--eduui-surface-100);
+		border-right-width: 0;
+		background: var(--eduui-surface-100);
+		color: var(--eduui-surface-500);
+		padding: 0.25rem;
+		font-size: 1rem;
+		font-weight: 500;
+		cursor: pointer;
+		transition: color var(--eduui-form-field-transition-duration);
+
+		&:first-child {
+			border-top-left-radius: var(--eduui-form-field-border-radius);
+			border-bottom-left-radius: var(--eduui-form-field-border-radius);
+		}
+
+		&:last-child {
+			border-right-width: 1px;
+			border-top-right-radius: var(--eduui-form-field-border-radius);
+			border-bottom-right-radius: var(--eduui-form-field-border-radius);
+		}
+
+		&:not(:disabled):not(&--selected):hover {
+			color: var(--eduui-surface-700);
+		}
+
+		&:disabled {
+			cursor: default;
+		}
+
+		&--selected {
+			color: var(--eduui-surface-900);
+		}
+
+		&:focus-visible {
+			position: relative;
+			z-index: 1;
+			outline: var(--eduui-focus-ring-width) var(--eduui-focus-ring-style) var(--eduui-focus-ring-color);
+			outline-offset: var(--eduui-focus-ring-offset);
+		}
+	}
+
+	&__label {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0.25rem 0.75rem;
+		border-radius: var(--eduui-content-border-radius);
+		background: transparent;
+		transition: background var(--eduui-form-field-transition-duration), box-shadow var(--eduui-form-field-transition-duration);
+	}
+
+	&__option--selected &__label {
+		background: var(--eduui-surface-0);
+		box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.02), 0px 1px 2px 0px rgba(0, 0, 0, 0.04);
+	}
+}
+
+:host-context(.dark-mode) .edu-select-button {
+	&__option:not(:disabled):not(&__option--selected):hover {
+		color: var(--eduui-surface-300);
+	}
+
+	&__option--selected {
+		color: var(--eduui-surface-0);
+	}
+
+	&__option--selected &__label {
+		background: var(--eduui-surface-800);
+	}
+}

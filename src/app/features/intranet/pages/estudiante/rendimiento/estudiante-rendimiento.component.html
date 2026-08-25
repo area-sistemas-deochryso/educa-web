@@ -9,7 +9,14 @@
 		<div class="flex flex-column align-items-center p-5 text-color-secondary">
 			<i class="pi pi-exclamation-triangle text-4xl mb-3 text-yellow-600"></i>
 			<p class="font-semibold">{{ vm().error }}</p>
-			<button pButton label="Reintentar" icon="pi pi-refresh" class="p-button-outlined mt-2" data-info-anchor="reintentar" (click)="onRetry()"></button>
+			<edu-button
+				label="Reintentar"
+				icon="pi pi-refresh"
+				[outlined]="true"
+				class="mt-2"
+				data-info-anchor="reintentar"
+				(click)="onRetry()"
+			/>
 		</div>
 	} @else if (vm().isEmpty) {
 		<div class="flex flex-column align-items-center p-5 text-color-secondary">
@@ -20,18 +27,16 @@
 	} @else {
 		<div class="rendimiento-cursos">
 			@for (curso of vm().cursos; track curso.cursoContenidoId) {
-				<p-card class="rendimiento-curso-card">
-					<ng-template pTemplate="header">
-						<div class="rendimiento-curso-header">
-							<h3>{{ curso.cursoNombre }}</h3>
-							<span class="text-color-secondary text-sm">{{ curso.anio }}</span>
-						</div>
-					</ng-template>
+				<edu-card class="rendimiento-curso-card">
+					<div class="rendimiento-curso-header">
+						<h3>{{ curso.cursoNombre }}</h3>
+						<span class="text-color-secondary text-sm">{{ curso.anio }}</span>
+					</div>
 					<app-estudiante-rendimiento-chart
 						[periodos]="curso.periodos"
 						[sinPeriodosConfigurados]="curso.sinPeriodosConfigurados"
 					/>
-				</p-card>
+				</edu-card>
 			}
 		</div>
 	}

@@ -6,7 +6,7 @@ import {
 } from '@features/intranet/components/attendance/attendance-header/attendance-header.component';
 import { ChangeDetectionStrategy, Component, ViewChild, AfterViewInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
+import { EduButton } from '@edu-ui';
 
 import { AttendanceApoderadoComponent } from './attendance-apoderado/attendance-apoderado.component';
 import { AttendanceDirectorComponent } from './attendance-director/attendance-director.component';
@@ -31,14 +31,7 @@ import { UserPermissionsService } from '@core/services/permissions';
 	selector: 'app-attendance',
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [
-		AttendanceHeaderComponent,
-		AttendanceApoderadoComponent,
-		AttendanceProfesorComponent,
-		AttendanceDirectorComponent,
-		AttendanceEstudianteComponent,
-		ButtonModule,
-	],
+	imports: [AttendanceHeaderComponent, AttendanceApoderadoComponent, AttendanceProfesorComponent, AttendanceDirectorComponent, AttendanceEstudianteComponent, EduButton],
 	templateUrl: './attendance.component.html',
 	styleUrl: './attendance.component.scss',
 })

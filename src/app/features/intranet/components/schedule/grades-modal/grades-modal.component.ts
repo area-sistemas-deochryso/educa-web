@@ -2,8 +2,8 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DialogModule } from 'primeng/dialog';
 import { getGradeClass as getGradeClassFn } from '@intranet-shared/services/calificacion-config';
+import { EduDialog } from '@edu-ui';
 
 // #endregion
 // #region Implementation
@@ -33,7 +33,7 @@ export interface CourseGrades {
 
 @Component({
 	selector: 'app-grades-modal',
-	imports: [CommonModule, FormsModule, DialogModule],
+	imports: [CommonModule, FormsModule, EduDialog],
 	templateUrl: './grades-modal.component.html',
 	styleUrl: './grades-modal.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -85,8 +85,7 @@ export class GradesModalComponent implements OnChanges {
 				{ name: 'Examen Calificado 2', grade: 0 },
 				{ name: 'Examen Calificado 3', grade: 0 },
 				{ name: 'Examen Calificado 4', grade: 0 },
-				{ name: 'Examen Calificado 5', grade: 0 },
-			],
+				{ name: 'Examen Calificado 5', grade: 0 }],
 		};
 	}
 

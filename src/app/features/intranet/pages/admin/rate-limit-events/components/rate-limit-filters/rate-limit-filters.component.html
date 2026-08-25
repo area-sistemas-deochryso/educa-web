@@ -3,7 +3,7 @@
 		<i class="pi pi-search"></i>
 		<input
 			type="text"
-			pInputText
+			eduInputText
 			placeholder="Buscar por endpoint..."
 			data-info-anchor="admin-rate-limit-buscar-endpoint-input"
 			[ngModel]="endpointSearch()"
@@ -12,7 +12,7 @@
 	</div>
 
 	<div class="filter-dropdowns">
-		<p-select
+		<edu-select
 			[options]="rolOptions()"
 			[ngModel]="filter().rol"
 			data-info-anchor="admin-rate-limit-rol-select"
@@ -21,7 +21,7 @@
 			appendTo="body"
 		/>
 
-		<p-select
+		<edu-select
 			[options]="policyOptions"
 			[ngModel]="filter().policy"
 			data-info-anchor="admin-rate-limit-policy-select"
@@ -30,7 +30,7 @@
 			appendTo="body"
 		/>
 
-		<p-datepicker
+		<edu-datepicker
 			selectionMode="range"
 			[ngModel]="fechaRango()"
 			data-info-anchor="admin-rate-limit-fecha-rango-picker"
@@ -43,7 +43,7 @@
 		/>
 
 		<label class="toggle-label">
-			<p-toggleswitch
+			<edu-toggle
 				[ngModel]="filter().soloRechazados ?? false"
 				data-info-anchor="admin-rate-limit-solo-rechazados-toggle"
 				(ngModelChange)="onSoloRechazadosChange($event)"
@@ -52,14 +52,15 @@
 		</label>
 	</div>
 
-	<button
-		pButton
+	<edu-button
 		icon="pi pi-filter-slash"
-		class="p-button-text p-button-sm btn-clear"
-		pTooltip="Limpiar filtros"
-		tooltipPosition="top"
+		[text]="true"
+		size="small"
+		class="btn-clear"
+		eduTooltip="Limpiar filtros"
+		eduTooltipPosition="top"
 		data-info-anchor="admin-rate-limit-limpiar-filtros-btn"
 		(click)="onClear()"
 		[pt]="{ root: { 'aria-label': 'Limpiar filtros' } }"
-	></button>
+	/>
 </div>

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { TabsModule } from 'primeng/tabs';
+
 
 import { StatsSkeletonComponent, TableSkeletonComponent } from '@intranet-shared/components';
 import { ErrorStateComponent } from '@shared/components';
@@ -15,21 +15,20 @@ import { DashboardFallosPorSenderTableComponent } from './components/dashboard-f
 import { MapaEnvioTabComponent } from './components/mapa-envio-tab/mapa-envio-tab.component';
 import { EmailDeferFailBannerComponent } from '../email-outbox-shared';
 import { EmailOutboxDashboardDiaFacade } from './services';
+import { EduTab, EduTabPanel, EduTabs } from '@edu-ui';
 
 const PORTIPO_SKELETON_COLUMNS: SkeletonColumnDef[] = [
 	{ width: 'flex', cellType: 'badge' },
 	{ width: '100px', cellType: 'text' },
 	{ width: '100px', cellType: 'text' },
-	{ width: '100px', cellType: 'text' },
-];
+	{ width: '100px', cellType: 'text' }];
 
 const BOUNCERS_SKELETON_COLUMNS: SkeletonColumnDef[] = [
 	{ width: 'flex', cellType: 'text' },
 	{ width: '90px', cellType: 'badge' },
 	{ width: '140px', cellType: 'text' },
 	{ width: '220px', cellType: 'text' },
-	{ width: '70px', cellType: 'actions' },
-];
+	{ width: '70px', cellType: 'actions' }];
 
 const FALLOS_SKELETON_COLUMNS: SkeletonColumnDef[] = [
 	{ width: '72px', cellType: 'text' },
@@ -38,8 +37,7 @@ const FALLOS_SKELETON_COLUMNS: SkeletonColumnDef[] = [
 	{ width: '160px', cellType: 'badge' },
 	{ width: '240px', cellType: 'text' },
 	{ width: '92px', cellType: 'text' },
-	{ width: '70px', cellType: 'actions' },
-];
+	{ width: '70px', cellType: 'actions' }];
 
 const BOUNCES_CRITICAL_THRESHOLD = 3;
 
@@ -55,21 +53,7 @@ interface DetalleKpiCard {
 @Component({
 	selector: 'app-email-outbox-dashboard-dia',
 	standalone: true,
-	imports: [
-		TabsModule,
-		StatsSkeletonComponent,
-		TableSkeletonComponent,
-		DashboardHeaderComponent,
-		DashboardResumenComponent,
-		DashboardChartHoraComponent,
-		DashboardPorTipoTableComponent,
-		DashboardBouncersTableComponent,
-		DashboardFallosTableComponent,
-		DashboardFallosPorSenderTableComponent,
-		MapaEnvioTabComponent,
-		EmailDeferFailBannerComponent,
-		ErrorStateComponent,
-	],
+	imports: [StatsSkeletonComponent, TableSkeletonComponent, DashboardHeaderComponent, DashboardResumenComponent, DashboardChartHoraComponent, DashboardPorTipoTableComponent, DashboardBouncersTableComponent, DashboardFallosTableComponent, DashboardFallosPorSenderTableComponent, MapaEnvioTabComponent, EmailDeferFailBannerComponent, ErrorStateComponent, EduTab, EduTabPanel, EduTabs],
 	templateUrl: './email-outbox-dashboard-dia.component.html',
 	styleUrl: './email-outbox-dashboard-dia.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -134,8 +118,7 @@ export class EmailOutboxDashboardDiaComponent {
 				sublabel: tipos === 0 ? 'ningún tipo con fallos' : 'tipos de correo con fallos hoy',
 				icon: 'pi pi-tag',
 				variant: tipos === 0 ? 'success' : 'info',
-			},
-		];
+			}];
 	});
 	// #endregion
 

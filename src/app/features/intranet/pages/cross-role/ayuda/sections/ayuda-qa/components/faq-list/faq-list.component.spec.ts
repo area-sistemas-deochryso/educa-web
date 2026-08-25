@@ -35,7 +35,7 @@ describe('FaqListComponent', () => {
 		fixture.componentRef.setInput('faqs', [FAQ_SIN_WIZARD]);
 		fixture.detectChanges();
 
-		const button = fixture.debugElement.query(By.css('p-button'));
+		const button = fixture.debugElement.query(By.css('edu-button'));
 		expect(button).toBeNull();
 	});
 
@@ -43,7 +43,7 @@ describe('FaqListComponent', () => {
 		fixture.componentRef.setInput('faqs', [FAQ_CON_WIZARD]);
 		fixture.detectChanges();
 
-		const button = fixture.debugElement.query(By.css('p-button'));
+		const button = fixture.debugElement.query(By.css('edu-button'));
 		expect(button).not.toBeNull();
 	});
 

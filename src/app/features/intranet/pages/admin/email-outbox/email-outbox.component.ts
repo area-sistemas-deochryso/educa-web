@@ -10,13 +10,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { DrawerModule } from 'primeng/drawer';
-import { DialogModule } from 'primeng/dialog';
-import { SelectModule } from 'primeng/select';
-import { ButtonModule } from 'primeng/button';
-import { TagModule } from 'primeng/tag';
-import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
 
 import { StatsSkeletonComponent, TableSkeletonComponent } from '@intranet-shared/components';
 import { ErrorStateComponent } from '@shared/components';
@@ -42,35 +35,13 @@ import { ThrottleStatusWidgetComponent } from './components/throttle-status-widg
 import { DeferFailStatusWidgetComponent } from './components/defer-fail-status-widget/defer-fail-status-widget.component';
 
 import { EmailOutboxLista } from '@data/models';
+import { EduButton, EduDialog, EduDrawer, EduMessageService, EduSelect, EduTag, EduToast } from '@edu-ui';
 
 @Component({
 	selector: 'app-email-outbox',
 	standalone: true,
-	imports: [
-		DecimalPipe,
-		FormsModule,
-		DrawerModule,
-		DialogModule,
-		SelectModule,
-		ButtonModule,
-		TagModule,
-		ToastModule,
-		StatsSkeletonComponent,
-		TableSkeletonComponent,
-		EmailOutboxHeaderComponent,
-		EmailOutboxStatsComponent,
-		EmailOutboxFiltersComponent,
-		EmailOutboxTableComponent,
-		EmailOutboxExportDrawerComponent,
-		EmailOutboxChartComponent,
-		ThrottleStatusWidgetComponent,
-		DeferFailStatusWidgetComponent,
-		EmailDeferFailBannerComponent,
-		CorrelationIdPillComponent,
-		HubContextBannerComponent,
-		ErrorStateComponent,
-	],
-	providers: [MessageService],
+	imports: [DecimalPipe, FormsModule, EduDrawer, EduDialog, EduSelect, EduButton, EduTag, EduToast, StatsSkeletonComponent, TableSkeletonComponent, EmailOutboxHeaderComponent, EmailOutboxStatsComponent, EmailOutboxFiltersComponent, EmailOutboxTableComponent, EmailOutboxExportDrawerComponent, EmailOutboxChartComponent, ThrottleStatusWidgetComponent, DeferFailStatusWidgetComponent, EmailDeferFailBannerComponent, CorrelationIdPillComponent, HubContextBannerComponent, ErrorStateComponent],
+	providers: [EduMessageService],
 	templateUrl: './email-outbox.component.html',
 	styleUrl: './email-outbox.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -84,7 +55,7 @@ export class EmailOutboxComponent implements OnInit {
 	private router = inject(Router);
 	private destroyRef = inject(DestroyRef);
 	private hub = inject(EmailHubService);
-	private messageService = inject(MessageService);
+	private messageService = inject(EduMessageService);
 	// #endregion
 
 	// #region Estado
@@ -312,8 +283,7 @@ export class EmailOutboxComponent implements OnInit {
 				{ header: 'Último Error', key: 'ultimoError', width: 40 },
 				{ header: 'Fecha Envío', key: 'fechaEnvio', width: 20 },
 				{ header: 'Registrado por', key: 'usuarioReg', width: 20 },
-				{ header: 'Fecha Registro', key: 'fechaReg', width: 20 },
-			],
+				{ header: 'Fecha Registro', key: 'fechaReg', width: 20 }],
 			data: items.map((i) => ({
 				id: i.id,
 				tipo: i.tipo,

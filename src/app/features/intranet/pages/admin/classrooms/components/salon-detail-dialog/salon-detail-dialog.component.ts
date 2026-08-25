@@ -1,10 +1,6 @@
 import { Component, ChangeDetectionStrategy, input, output, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { DialogModule } from 'primeng/dialog';
-import { TabsModule } from 'primeng/tabs';
-import { ButtonModule } from 'primeng/button';
-
 import { EstudianteAsistencia } from '@intranet-shared/services';
 import {
 	HorarioResponseDto,
@@ -25,22 +21,21 @@ import { ClassroomAttendanceTabComponent } from '../salon-attendance-tab/salon-a
 import { ClassroomGradesTabComponent } from '../salon-notas-tab/salon-notas-tab.component';
 import { ClassroomStudentsTabComponent, SalonOption } from '../salon-estudiantes-tab/salon-estudiantes-tab.component';
 import { ClassroomRendimientoTabComponent } from '../salon-rendimiento-tab/salon-rendimiento-tab.component';
+import { EduDialog, EduTab, EduTabPanel, EduTabs } from '@edu-ui';
 
 @Component({
 	selector: 'app-classroom-detail-dialog',
 	standalone: true,
 	imports: [
 		CommonModule,
-		DialogModule,
-		TabsModule,
-		ButtonModule,
+		EduDialog,
+		EduTabs, EduTab, EduTabPanel,
 		ModoAsignacionBadgeComponent,
 		ClassroomApprovalTabComponent,
 		ClassroomAttendanceTabComponent,
 		ClassroomGradesTabComponent,
 		ClassroomStudentsTabComponent,
-		ClassroomRendimientoTabComponent,
-	],
+		ClassroomRendimientoTabComponent],
 	templateUrl: './salon-detail-dialog.component.html',
 	styleUrl: './salon-detail-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -107,17 +102,15 @@ export class ClassroomDetailDialogComponent {
 		return resolveModoAsignacion(s.gradoOrden, s.seccion);
 	});
 
-	readonly dialogStyle = computed(() =>
-		this.isFullscreen()
-			? { width: '100vw', maxWidth: '100vw', height: '100vh', maxHeight: '100vh' }
-			: { width: '900px', maxWidth: '95vw' },
-	);
+	readonly dialogStyle = computed((): Record<string, string> => {
+		if (this.isFullscreen()) return { width: '100vw', maxWidth: '100vw', height: '100vh', maxHeight: '100vh' };
+		return { width: '900px', maxWidth: '95vw' };
+	});
 
-	readonly contentStyle = computed(() =>
-		this.isFullscreen()
-			? { 'overflow-y': 'auto' }
-			: { 'max-height': '80vh', 'overflow-y': 'auto' },
-	);
+	readonly contentStyle = computed((): Record<string, string> => {
+		if (this.isFullscreen()) return { 'overflow-y': 'auto' };
+		return { 'max-height': '80vh', 'overflow-y': 'auto' };
+	});
 	// #endregion
 
 	// #region Event handlers

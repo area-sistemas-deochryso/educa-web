@@ -5,18 +5,6 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { ConfirmationService } from 'primeng/api';
-import { ButtonModule } from 'primeng/button';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { DatePickerModule } from 'primeng/datepicker';
-import { DrawerModule } from 'primeng/drawer';
-import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
-import { TableModule, TableLazyLoadEvent } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
-import { TextareaModule } from 'primeng/textarea';
-import { TooltipModule } from 'primeng/tooltip';
-
 import {
 	REPORTE_ESTADOS,
 	REPORTE_TIPO_LABEL_MAP,
@@ -29,6 +17,8 @@ import { CorrelationIdPillComponent } from '@intranet-shared/components';
 
 import { HubContextBannerComponent, readHubContext } from '../monitoreo/shared';
 import { FeedbackReportsFacade } from './services';
+import { EduButton, EduConfirmDialog, EduConfirmationService, EduDatePicker, EduDrawer, EduInputText, EduSelect, EduTable, EduTag, EduTemplate, EduTextarea, EduTooltip } from '@edu-ui';
+import type { EduTableLazyLoadEvent } from '@edu-ui';
 
 // #endregion
 // #region Implementation
@@ -44,27 +34,27 @@ interface EstadoOption {
 	imports: [
 		CommonModule,
 		FormsModule,
-		TableModule,
-		TagModule,
-		ButtonModule,
-		ConfirmDialogModule,
-		SelectModule,
-		DatePickerModule,
-		DrawerModule,
-		InputTextModule,
-		TextareaModule,
-		TooltipModule,
+		EduTable,
+		EduTag,
+		EduButton,
+		EduTemplate,
+		EduConfirmDialog,
+		EduSelect,
+		EduDatePicker,
+		EduDrawer,
+		EduInputText,
+		EduTextarea,
+		EduTooltip,
 		CorrelationIdPillComponent,
 		PageHeaderComponent,
-		HubContextBannerComponent,
-	],
-	providers: [ConfirmationService],
+		HubContextBannerComponent],
+	providers: [EduConfirmationService],
 	templateUrl: './feedback-reports.component.html',
 	styleUrl: './feedback-reports.component.scss',
 })
 export class FeedbackReportsComponent implements OnInit {
 	private readonly facade = inject(FeedbackReportsFacade);
-	private readonly confirmationService = inject(ConfirmationService);
+	private readonly confirmationService = inject(EduConfirmationService);
 	private readonly route = inject(ActivatedRoute);
 	private readonly destroyRef = inject(DestroyRef);
 
@@ -139,7 +129,7 @@ export class FeedbackReportsComponent implements OnInit {
 		this.facade.onSearchChange(term);
 	}
 
-	onLazyLoad(event: TableLazyLoadEvent): void {
+	onLazyLoad(event: EduTableLazyLoadEvent): void {
 		const rows = event.rows ?? this.vm().pageSize;
 		const first = event.first ?? 0;
 		const page = Math.floor(first / rows) + 1;

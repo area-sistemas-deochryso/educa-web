@@ -1,4 +1,4 @@
-<p-dialog
+<edu-dialog
 	[visible]="visible()"
 	(visibleChange)="onVisibleChange($event)"
 	[modal]="true"
@@ -26,7 +26,7 @@
 				Nombre del piso
 			</label>
 			<input
-				pInputText
+				eduInputText
 				id="pisoNombre"
 				[ngModel]="formData().nombre"
 				(ngModelChange)="onNombreChange($event)"
@@ -40,7 +40,7 @@
 					<i class="pi pi-sort-numeric-up"></i>
 					Orden
 				</label>
-				<p-inputNumber
+				<edu-input-number
 					id="pisoOrden"
 					[ngModel]="formData().orden"
 					(ngModelChange)="onOrdenChange($event)"
@@ -55,7 +55,7 @@
 					<i class="pi pi-arrows-v"></i>
 					Altura (m)
 				</label>
-				<p-inputNumber
+				<edu-input-number
 					id="pisoAltura"
 					[ngModel]="formData().alturaMetros"
 					(ngModelChange)="onAlturaChange($event)"
@@ -72,22 +72,21 @@
 
 	<!-- #region Footer -->
 	<div class="piso-dialog-footer">
-		<button
-			pButton
+		<edu-button
 			label="Cancelar"
-			class="p-button-text p-button-secondary"
+			[text]="true"
+			severity="secondary"
 			(click)="onCancel()"
 			data-info-anchor="admin-campus-piso-form-cancelar-btn"
-		></button>
-		<button
-			pButton
+		/>
+		<edu-button
 			[label]="isEditing() ? 'Guardar cambios' : 'Crear piso'"
 			[icon]="isEditing() ? 'pi pi-check' : 'pi pi-plus'"
 			(click)="onSave()"
 			[loading]="saving()"
 			[disabled]="!formData().nombre.trim()"
 			data-info-anchor="admin-campus-piso-form-guardar-btn"
-		></button>
+		/>
 	</div>
 	<!-- #endregion -->
-</p-dialog>
+</edu-dialog>

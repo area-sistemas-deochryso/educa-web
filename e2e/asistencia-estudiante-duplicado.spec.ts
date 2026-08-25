@@ -27,7 +27,7 @@ async function login(page: Page): Promise<void> {
 	await page.getByPlaceholder('DNI').fill(PROFESOR_DNI!);
 	await page.getByPlaceholder('Contraseña').fill(PROFESOR_PASSWORD!);
 
-	await page.locator('app-login-role-selector p-select').click();
+	await page.locator('app-login-role-selector edu-select').click();
 	await page.getByRole('option', { name: 'Profesor' }).click();
 
 	await page.getByRole('button', { name: /Iniciar sesión|Ingresar/i }).click();
@@ -48,10 +48,10 @@ test.describe('ASISTENCIA_ESTUDIANTE_DUPLICADO — mensaje curado en FE', () => 
 		await page.locator('a[href="/intranet/profesor/asistencia"]').first().click();
 		await expect(page).toHaveURL(/\/intranet\/profesor\/asistencia/);
 
-		const cursoSelect = page.locator('.filters-row p-select');
+		const cursoSelect = page.locator('.filters-row edu-select');
 		await expect(cursoSelect).toBeVisible({ timeout: 15_000 });
 		await cursoSelect.click();
-		await page.locator('.p-select-overlay .p-select-option').first().click();
+		await page.locator('.edu-select-panel .edu-select-panel__option').first().click();
 
 		// La fecha ya viene precargada (hoy) — hay que buscar para cargar la lista de
 		// estudiantes antes de que aparezca el botón de guardar.

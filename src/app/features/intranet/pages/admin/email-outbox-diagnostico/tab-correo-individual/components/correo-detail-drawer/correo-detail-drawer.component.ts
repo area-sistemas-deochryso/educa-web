@@ -1,14 +1,11 @@
 import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
 import { Router } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
-import { DrawerModule } from 'primeng/drawer';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
 
 import { CorrelationIdPillComponent } from '@intranet-shared/components';
 
 import { EmailDiagnosticoHistoriaItem } from '../../models/correo-individual.models';
+import { EduButton, EduDrawer, EduTag, EduTooltip } from '@edu-ui';
 
 type Severity = 'secondary' | 'success' | 'danger' | 'warn' | 'info';
 
@@ -31,7 +28,7 @@ const TIPO_PERSONA_LABEL: Record<string, string> = {
 @Component({
 	selector: 'app-correo-detail-drawer',
 	standalone: true,
-	imports: [DrawerModule, ButtonModule, TagModule, TooltipModule, DatePipe, CorrelationIdPillComponent],
+	imports: [EduDrawer, EduButton, EduTag, EduTooltip, DatePipe, CorrelationIdPillComponent],
 	templateUrl: './correo-detail-drawer.component.html',
 	styleUrl: './correo-detail-drawer.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

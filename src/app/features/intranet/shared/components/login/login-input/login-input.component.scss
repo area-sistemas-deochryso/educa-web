@@ -45,26 +45,6 @@
 			color: var(--intranet-soft-text-color);
 		}
 	}
-
-	:host ::ng-deep .p-inputtext {
-		border: none !important;
-		background: transparent !important;
-		background-color: transparent !important;
-		box-shadow: none !important;
-		padding: 0;
-		font-size: 1.1rem;
-		color: var(--intranet-soft-text-color);
-
-		&:focus,
-		&:hover,
-		&:active,
-		&.p-filled {
-			background: transparent !important;
-			background-color: transparent !important;
-			box-shadow: none !important;
-			border: none !important;
-		}
-	}
 }
 
 input,
@@ -82,12 +62,4 @@ input:-webkit-autofill:active {
 	transition: background-color 5000s ease-in-out 0s;
 }
 
-:host ::ng-deep {
-	.p-inputtext,
-	.p-component {
-		background: transparent !important;
-		background-color: transparent !important;
-		box-shadow: none !important;
-	}
-}
 // #endregion

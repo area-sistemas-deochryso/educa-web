@@ -1,14 +1,14 @@
 <!-- #region Tabs -->
-<p-tabs [value]="activeTab()" (valueChange)="onTabChange($event)">
-	<p-tablist>
+<edu-tabs [value]="activeTab()" (valueChange)="onTabChange($event)">
+	
 		@for (tab of tabs(); track tab.value) {
-			<p-tab [value]="tab.value" data-info-anchor="tab-switch">
+			<edu-tab [value]="tab.value" data-info-anchor="tab-switch">
 				<i [class]="tab.icon + ' mr-2'"></i>
 				{{ tab.label }}
-			</p-tab>
+			</edu-tab>
 		}
-	</p-tablist>
-</p-tabs>
+	
+</edu-tabs>
 <!-- #endregion -->
 
 <!-- #region Outlet -->

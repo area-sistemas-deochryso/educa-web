@@ -46,21 +46,6 @@
 }
 // #endregion
 
-// #region Overrides PrimeNG locales
-:host ::ng-deep {
-	.p-iconfield,
-	.p-select,
-	.p-datepicker,
-	.p-datepicker-input {
-		width: 100%;
-	}
-
-	.p-datepicker .p-inputtext {
-		width: 100%;
-	}
-}
-// #endregion
-
 // #region Responsive
 @media (max-width: 640px) {
 	.filters-bar {

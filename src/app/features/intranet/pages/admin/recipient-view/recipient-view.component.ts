@@ -3,31 +3,18 @@ import { ChangeDetectionStrategy, Component, computed, inject, OnInit } from '@a
 import { DatePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
-import { ButtonModule } from 'primeng/button';
-import { ConfirmationService } from 'primeng/api';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
-
 import { PageHeaderComponent } from '@intranet-shared/components';
 
 import { RecipientViewActionsFacade } from './facades/recipient-view-actions.facade';
 import { RecipientViewDataFacade } from './facades/recipient-view-data.facade';
+import { EduButton, EduConfirmDialog, EduConfirmationService, EduTag, EduTooltip } from '@edu-ui';
 // #endregion
 
 @Component({
 	selector: 'app-recipient-view',
 	standalone: true,
-	imports: [
-		DatePipe,
-		RouterLink,
-		ButtonModule,
-		ConfirmDialogModule,
-		TagModule,
-		TooltipModule,
-		PageHeaderComponent,
-	],
-	providers: [ConfirmationService],
+	imports: [DatePipe, RouterLink, EduButton, EduConfirmDialog, EduTag, EduTooltip, PageHeaderComponent],
+	providers: [EduConfirmationService],
 	templateUrl: './recipient-view.component.html',
 	styleUrl: './recipient-view.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -38,7 +25,7 @@ export class RecipientViewComponent implements OnInit {
 	private router = inject(Router);
 	private facade = inject(RecipientViewDataFacade);
 	private actions = inject(RecipientViewActionsFacade);
-	private confirmationService = inject(ConfirmationService);
+	private confirmationService = inject(EduConfirmationService);
 	// #endregion
 
 	// #region State

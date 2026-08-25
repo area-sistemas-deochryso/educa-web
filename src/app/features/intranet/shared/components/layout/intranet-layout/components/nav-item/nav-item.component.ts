@@ -13,10 +13,10 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs';
-import { TagModule } from 'primeng/tag';
 
 import { logger } from '@core/helpers';
 import { NavMenuItem } from '../mobile-menu';
+import { EduTag } from '@edu-ui';
 
 // #endregion
 // #region Implementation
@@ -24,7 +24,7 @@ import { NavMenuItem } from '../mobile-menu';
 	selector: 'app-nav-item',
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [RouterLink, RouterLinkActive, TagModule],
+	imports: [RouterLink, RouterLinkActive, EduTag],
 	templateUrl: './nav-item.component.html',
 	styleUrl: './nav-item.component.scss',
 })

@@ -1,7 +1,7 @@
 <!-- #region Filters -->
 <div class="notas-filters">
 	@if (cursoOptions().length > 1) {
-		<p-select
+		<edu-select
 			data-info-anchor="curso-selector"
 			[options]="cursoOptions()"
 			[ngModel]="selectedCurso()"
@@ -13,7 +13,7 @@
 			class="curso-select"
 		/>
 	}
-	<p-selectButton
+	<edu-select-button
 		data-info-anchor="profesor-notas-salon-vista-toggle"
 		[options]="vistaOptions"
 		[ngModel]="vistaActual()"
@@ -22,26 +22,23 @@
 		optionValue="value"
 	/>
 	@if (hasData()) {
-		<button
-			pButton
+		<edu-button
 			icon="pi pi-file-pdf"
-			class="p-button-outlined p-button-sm"
+			[outlined]="true"
+			size="small"
 			data-info-anchor="profesor-notas-salon-descargar-boletas"
 			(click)="descargarBoletas.emit()"
-			pTooltip="Descargar boletas de notas del salón"
-			tooltipPosition="top"
+			eduTooltip="Descargar boletas de notas del salón"
+			eduTooltipPosition="top"
 			[pt]="{ root: { 'aria-label': 'Descargar boletas PDF' } }"
-		></button>
+		/>
 	}
 	<a
-		pButton
-		class="p-button-text p-button-sm"
+		class="edu-button-link edu-button-link--text edu-button-link--sm"
+		data-severity="primary"
 		data-info-anchor="profesor-notas-salon-ir-calificaciones"
 		routerLink="/intranet/profesor/calificaciones"
-		icon="pi pi-arrow-right"
-		iconPos="right"
-		label="Ir a Calificaciones"
-	></a>
+	><span>Ir a Calificaciones</span><i class="edu-button-link__icon pi pi-arrow-right"></i></a>
 </div>
 <!-- #endregion -->
 
@@ -49,7 +46,7 @@
 @if (loading()) {
 	<div class="flex flex-column gap-2 p-2">
 		@for (_ of [1, 2, 3, 4, 5]; track $index) {
-			<p-skeleton height="2rem" />
+			<edu-skeleton height="2rem" />
 		}
 	</div>
 } @else if (error()) {
@@ -61,7 +58,7 @@
 		<span class="text-sm text-color-secondary">Selecciona un curso o espera a que se registren evaluaciones</span>
 	</div>
 } @else if (notasData(); as data) {
-	<p-table
+	<edu-table
 		[value]="data.estudiantes"
 			dataKey="estudianteId"
 		[scrollable]="true"
@@ -84,8 +81,8 @@
 					<th
 						rowspan="2"
 						class="general-header"
-						pTooltip="Promedio ponderado por el peso de cada evaluación — no es un promedio simple de las notas."
-						tooltipPosition="top"
+						eduTooltip="Promedio ponderado por el peso de cada evaluación — no es un promedio simple de las notas."
+						eduTooltipPosition="top"
 					>General</th>
 				</tr>
 				<tr>
@@ -119,8 +116,8 @@
 					<th
 						rowspan="2"
 						class="general-header"
-						pTooltip="Promedio ponderado por el peso de cada evaluación — no es un promedio simple de las notas."
-						tooltipPosition="top"
+						eduTooltip="Promedio ponderado por el peso de cada evaluación — no es un promedio simple de las notas."
+						eduTooltipPosition="top"
 					>General</th>
 				</tr>
 				<tr>
@@ -149,8 +146,8 @@
 					<th style="min-width: 160px">Estudiante</th>
 					<th
 						class="general-header"
-						pTooltip="Promedio ponderado por el peso de cada evaluación — no es un promedio simple de las notas."
-						tooltipPosition="top"
+						eduTooltip="Promedio ponderado por el peso de cada evaluación — no es un promedio simple de las notas."
+						eduTooltipPosition="top"
 					>General</th>
 				</tr>
 			}
@@ -170,7 +167,7 @@
 						@for (eval of group.evaluaciones; track eval.id) {
 							<td class="text-center">
 								@let nota = formattedNotas().get(est.estudianteId + '-' + eval.id);
-								<p-tag
+								<edu-tag
 									[value]="nota?.text ?? '—'"
 									[severity]="nota?.severity ?? 'secondary'"
 									[rounded]="true"
@@ -186,7 +183,7 @@
 						@for (eval of group.evaluaciones; track eval.id) {
 							<td class="text-center">
 								@let nota = formattedNotas().get(est.estudianteId + '-' + eval.id);
-								<p-tag
+								<edu-tag
 									[value]="nota?.text ?? '—'"
 									[severity]="nota?.severity ?? 'secondary'"
 									[rounded]="true"
@@ -224,6 +221,6 @@
 			</tr>
 		</ng-template>
 		<!-- #endregion -->
-	</p-table>
+	</edu-table>
 }
 <!-- #endregion -->

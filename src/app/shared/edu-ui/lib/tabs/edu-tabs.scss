@@ -1,0 +1,11 @@
+.edu-tabs {
+	display: flex;
+	flex-direction: column;
+}
+
+.edu-tabs__list {
+	display: flex;
+	align-items: center;
+	gap: 0.25rem;
+	border-bottom: 1px solid var(--eduui-content-border-color);
+}

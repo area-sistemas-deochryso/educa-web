@@ -6,14 +6,14 @@
 	</div>
 	<div class="header-badges">
 		@if (vm().hasCredentials) {
-			<p-tag
+			<edu-tag
 				[value]="vm().credentials.length + ' credencial(es)'"
 				styleClass="tag-neutral"
 				icon="pi pi-lock"
 			/>
 		}
 		@if (vm().endpointCount.enabled > 0) {
-			<p-tag
+			<edu-tag
 				[value]="vm().endpointCount.enabled + '/' + vm().endpointCount.total + ' endpoints'"
 				styleClass="tag-neutral"
 				icon="pi pi-link"
@@ -24,53 +24,53 @@
 <!-- #endregion -->
 
 <!-- #region Wizard Stepper -->
-<p-stepper [value]="activeStep()" (valueChange)="goToStep($event ?? 0)">
-	<p-step-list>
-		<p-step [value]="0"> <i class="pi pi-cog"></i> Configuración </p-step>
-		<p-step [value]="1"> <i class="pi pi-chart-line"></i> Stages </p-step>
-		<p-step [value]="2"> <i class="pi pi-link"></i> Endpoints </p-step>
-		<p-step [value]="3"> <i class="pi pi-eye"></i> Vista Previa </p-step>
+<edu-stepper [value]="activeStep()" (valueChange)="goToStep(+$event)">
+	<edu-step-list>
+		<edu-step [value]="0"> <i class="pi pi-cog"></i> Configuración </edu-step>
+		<edu-step [value]="1"> <i class="pi pi-chart-line"></i> Stages </edu-step>
+		<edu-step [value]="2"> <i class="pi pi-link"></i> Endpoints </edu-step>
+		<edu-step [value]="3"> <i class="pi pi-eye"></i> Vista Previa </edu-step>
 		@if (scriptGenerated()) {
-			<p-step [value]="4"> <i class="pi pi-code"></i> Script </p-step>
+			<edu-step [value]="4"> <i class="pi pi-code"></i> Script </edu-step>
 		}
-	</p-step-list>
+	</edu-step-list>
 
-	<p-step-panels>
+	<edu-step-panels>
 		<!-- #region Step 0: Configuración del Test -->
-		<p-step-panel [value]="0">
+		<edu-step-panel [value]="0">
 			<ng-template #content>
 				<app-ctest-config-step
 					(goNext)="goToStep(1)"
 					(openCredentials)="onOpenCredentials()"
 				/>
 			</ng-template>
-		</p-step-panel>
+		</edu-step-panel>
 		<!-- #endregion -->
 
 		<!-- #region Step 1: Stages -->
-		<p-step-panel [value]="1">
+		<edu-step-panel [value]="1">
 			<ng-template #content>
 				<app-ctest-stages-step
 					(goNext)="goToStep(2)"
 					(goPrev)="goToStep(0)"
 				/>
 			</ng-template>
-		</p-step-panel>
+		</edu-step-panel>
 		<!-- #endregion -->
 
 		<!-- #region Step 2: Endpoints -->
-		<p-step-panel [value]="2">
+		<edu-step-panel [value]="2">
 			<ng-template #content>
 				<app-ctest-endpoints-step
 					(goNext)="goToStep(3)"
 					(goPrev)="goToStep(1)"
 				/>
 			</ng-template>
-		</p-step-panel>
+		</edu-step-panel>
 		<!-- #endregion -->
 
 		<!-- #region Step 3: Vista Previa -->
-		<p-step-panel [value]="3">
+		<edu-step-panel [value]="3">
 			<ng-template #content>
 				<div class="wizard-step-content">
 					<app-load-profile
@@ -85,31 +85,29 @@
 
 					<!-- Footer -->
 					<div class="step-footer">
-						<button
-							pButton
+						<edu-button
 							label="Anterior"
 							icon="pi pi-arrow-left"
-							class="p-button-outlined"
+							[outlined]="true"
 							(click)="goToStep(2)"
-						></button>
+						/>
 						<div class="step-spacer"></div>
-						<button
-							pButton
+						<edu-button
 							label="Generar Script"
 							icon="pi pi-bolt"
 							class="generate-btn"
 							severity="success"
 							(click)="onGenerateScript()"
-						></button>
+						/>
 					</div>
 				</div>
 			</ng-template>
-		</p-step-panel>
+		</edu-step-panel>
 		<!-- #endregion -->
 
 		<!-- #region Step 4: Script Generado -->
 		@if (scriptGenerated()) {
-			<p-step-panel [value]="4">
+			<edu-step-panel [value]="4">
 				<ng-template #content>
 					<div class="wizard-step-content">
 						<app-script-output
@@ -145,28 +143,26 @@
 
 						<!-- Footer -->
 						<div class="step-footer">
-							<button
-								pButton
+							<edu-button
 								label="Volver a Vista Previa"
 								icon="pi pi-arrow-left"
-								class="p-button-outlined"
+								[outlined]="true"
 								(click)="goToStep(3)"
-							></button>
+							/>
 							<div class="step-spacer"></div>
-							<button
-								pButton
+							<edu-button
 								label="Descargar Script"
 								icon="pi pi-download"
 								(click)="onDownloadScript()"
-							></button>
+							/>
 						</div>
 					</div>
 				</ng-template>
-			</p-step-panel>
+			</edu-step-panel>
 		}
 		<!-- #endregion -->
-	</p-step-panels>
-</p-stepper>
+	</edu-step-panels>
+</edu-stepper>
 <!-- #endregion -->
 
 <!-- #region Credentials Dialog (siempre en el DOM) -->

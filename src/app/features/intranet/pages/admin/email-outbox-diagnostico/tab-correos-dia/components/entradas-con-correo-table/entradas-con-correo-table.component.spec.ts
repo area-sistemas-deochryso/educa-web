@@ -80,7 +80,7 @@ describe('EntradasConCorreoTableComponent', () => {
 		]);
 		fixture.detectChanges();
 
-		const successTags = fixture.nativeElement.querySelectorAll('.p-tag-success');
+		const successTags = fixture.nativeElement.querySelectorAll('.edu-tag[data-severity="success"]');
 		expect(successTags.length).toBeGreaterThan(0);
 	});
 });

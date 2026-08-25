@@ -147,21 +147,6 @@
 	}
 }
 
-// Popover styles
-:host ::ng-deep .profile-popover {
-	.p-popover-content {
-		padding: 0;
-		border-radius: 12px;
-		overflow: hidden;
-	}
-
-	&.p-popover {
-		box-shadow: var(--shadow-3);
-		border: 1px solid var(--surface-border);
-		border-radius: 12px;
-	}
-}
-
 .popover-content {
 	min-width: 240px;
 }

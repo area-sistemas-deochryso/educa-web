@@ -13,11 +13,11 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 
-import { AutoCompleteModule, AutoCompleteCompleteEvent } from 'primeng/autocomplete';
-
 import { PermissionsService, UsuarioBusqueda } from '@core/services/permissions';
 import { ViewAsContext, ViewAsFiltroOption, ViewAsFiltrosService, ViewAsRol } from '@core/services/view-as';
 import { PickerGridComponent } from '../picker-grid';
+import { EduAutoComplete, EduTemplate } from '@edu-ui';
+import type { EduAutoCompleteCompleteEvent } from '@edu-ui';
 // #endregion
 
 // #region Implementation
@@ -43,7 +43,7 @@ import { PickerGridComponent } from '../picker-grid';
 @Component({
 	selector: 'app-view-as-picker',
 	standalone: true,
-	imports: [FormsModule, AutoCompleteModule, PickerGridComponent],
+	imports: [FormsModule, EduAutoComplete, EduTemplate, PickerGridComponent],
 	templateUrl: './view-as-picker.component.html',
 	styleUrl: './view-as-picker.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -98,7 +98,7 @@ export class ViewAsPickerComponent implements OnInit {
 		this.runSearch();
 	}
 
-	onSearch(event: AutoCompleteCompleteEvent): void {
+	onSearch(event: EduAutoCompleteCompleteEvent): void {
 		this.runSearch(event.query || undefined);
 	}
 

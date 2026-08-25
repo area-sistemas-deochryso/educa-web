@@ -2,13 +2,6 @@ import { ChangeDetectionStrategy, Component, computed, inject, input, output } f
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { ButtonModule } from 'primeng/button';
-import { DatePickerModule } from 'primeng/datepicker';
-import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
-import { ToggleSwitchModule } from 'primeng/toggleswitch';
-import { TooltipModule } from 'primeng/tooltip';
-
 import { RolService } from '@core/services/roles';
 
 import {
@@ -16,6 +9,7 @@ import {
 	RateLimitEventFiltro,
 	RateLimitPolicy,
 } from '../../models';
+import { EduButton, EduDatePicker, EduInputText, EduSelect, EduToggle, EduTooltip } from '@edu-ui';
 
 interface SelectOption<T> {
 	label: string;
@@ -25,16 +19,7 @@ interface SelectOption<T> {
 @Component({
 	selector: 'app-rate-limit-filters',
 	standalone: true,
-	imports: [
-		CommonModule,
-		FormsModule,
-		ButtonModule,
-		DatePickerModule,
-		InputTextModule,
-		SelectModule,
-		ToggleSwitchModule,
-		TooltipModule,
-	],
+	imports: [CommonModule, FormsModule, EduButton, EduDatePicker, EduInputText, EduSelect, EduToggle, EduTooltip],
 	templateUrl: './rate-limit-filters.component.html',
 	styleUrl: './rate-limit-filters.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -53,13 +38,11 @@ export class RateLimitFiltersComponent {
 	// #region Opciones
 	readonly rolOptions = computed<SelectOption<string>[]>(() => [
 		{ label: 'Todos los roles', value: null },
-		...this.rolService.all().map((rol) => ({ label: rol.nombre, value: rol.nombre })),
-	]);
+		...this.rolService.all().map((rol) => ({ label: rol.nombre, value: rol.nombre }))]);
 
 	readonly policyOptions: SelectOption<RateLimitPolicy>[] = [
 		{ label: 'Todas', value: null },
-		...RATE_LIMIT_POLICIES.map((p) => ({ label: p, value: p })),
-	];
+		...RATE_LIMIT_POLICIES.map((p) => ({ label: p, value: p }))];
 	// #endregion
 
 	// #region Computed / helpers

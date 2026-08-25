@@ -1,4 +1,4 @@
-<p-dialog
+<edu-dialog
 	header="Sincronizar rango / historial"
 	[modal]="true"
 	[visible]="visible()"
@@ -11,7 +11,7 @@
 		<div class="sync-range-form__dates">
 			<div class="sync-range-form__field">
 				<label for="syncFechaInicio">Fecha inicio</label>
-				<p-datepicker
+				<edu-datepicker
 					inputId="syncFechaInicio"
 					[ngModel]="fechaInicio()"
 					(ngModelChange)="fechaInicio.set($event)"
@@ -23,7 +23,7 @@
 			</div>
 			<div class="sync-range-form__field">
 				<label for="syncFechaFin">Fecha fin</label>
-				<p-datepicker
+				<edu-datepicker
 					inputId="syncFechaFin"
 					[ngModel]="fechaFin()"
 					(ngModelChange)="fechaFin.set($event)"
@@ -42,7 +42,7 @@
 		}
 
 		<div class="sync-range-form__toggle">
-			<p-toggleSwitch
+			<edu-toggle
 				[ngModel]="todosUsuarios()"
 				(ngModelChange)="todosUsuarios.set($event)"
 				inputId="syncTodos"
@@ -54,7 +54,7 @@
 		@if (!todosUsuarios()) {
 			<div class="sync-range-form__field">
 				<label>Filtrar personas</label>
-				<p-multiselect
+				<edu-multi-select
 					[options]="personas()"
 					[ngModel]="selectedPersonIds()"
 					(ngModelChange)="selectedPersonIds.set($event)"
@@ -75,16 +75,14 @@
 
 	<ng-template #footer>
 		<div class="sync-range-form__actions">
-			<button
-				pButton
+			<edu-button
 				type="button"
 				label="Cancelar"
-				class="p-button-text"
+				[text]="true"
 				(click)="onHide()"
 				data-info-anchor="admin-asistencia-sync-range-cancelar-btn"
-			></button>
-			<button
-				pButton
+			/>
+			<edu-button
 				type="button"
 				label="Sincronizar"
 				icon="pi pi-sync"
@@ -93,7 +91,7 @@
 				(click)="onConfirm()"
 				[pt]="{ root: { 'aria-label': 'Iniciar sincronización del rango seleccionado' } }"
 				data-info-anchor="admin-asistencia-sync-range-confirmar-btn"
-			></button>
+			/>
 		</div>
 	</ng-template>
-</p-dialog>
+</edu-dialog>

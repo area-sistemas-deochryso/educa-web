@@ -7,7 +7,7 @@
 	[minHeightPx]="420"
 	[blurPx]="2"
 >
-	<p-table
+	<edu-table
 		[value]="usuarios()"
 		[lazy]="true"
 		[paginator]="true"
@@ -18,7 +18,7 @@
 		[showCurrentPageReport]="true"
 		currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} usuarios"
 		[sortField]="sortField()"
-		[sortOrder]="primeSortOrder()"
+		[sortOrder]="sortOrder()"
 		(onLazyLoad)="onLazyLoad($event)"
 		dataKey="id"
 		class="p-datatable-sm"
@@ -26,17 +26,17 @@
 		<ng-template #header>
 			<tr>
 				<th style="width: 100px">DNI</th>
-				<th pSortableColumn="nombreCompleto" data-info-anchor="tabla-orden-columna">
-					NOMBRE <p-sortIcon field="nombreCompleto" />
+				<th eduSortableColumn="nombreCompleto" data-info-anchor="tabla-orden-columna">
+					NOMBRE
 				</th>
 				@if (activeTab() === null) {
-					<th style="width: 120px" pSortableColumn="rol" data-info-anchor="tabla-orden-columna">ROL <p-sortIcon field="rol" /></th>
+					<th style="width: 120px" eduSortableColumn="rol" data-info-anchor="tabla-orden-columna">ROL</th>
 				}
 				@if (activeTab() === 'estudiantes') {
 					<th style="width: 180px">SALÓN</th>
 				}
-				<th style="width: 120px" pSortableColumn="fechaRegistro" data-info-anchor="tabla-orden-columna">
-					FECHA <p-sortIcon field="fechaRegistro" />
+				<th style="width: 120px" eduSortableColumn="fechaRegistro" data-info-anchor="tabla-orden-columna">
+					FECHA
 				</th>
 				<th style="width: 110px" class="text-center">ACCIONES</th>
 			</tr>
@@ -70,7 +70,7 @@
 				</td>
 				@if (activeTab() === null) {
 					<td>
-						<p-tag [value]="usuario.rol" [severity]="uiMapping.getRolSeverity(usuario.rol)" styleClass="tag-neutral" />
+						<edu-tag [value]="usuario.rol" [severity]="uiMapping.getRolSeverity(usuario.rol)" styleClass="tag-neutral" />
 					</td>
 				}
 				@if (activeTab() === 'estudiantes') {
@@ -82,48 +82,52 @@
 					<span class="date-text">{{ usuario.fechaRegistro | date: 'dd/MM/yyyy' }}</span>
 				</td>
 				<td class="text-center actions-cell">
-					<button
-						pButton
+					<edu-button
 						icon="pi pi-eye"
-						class="p-button-sm p-button-text action-icon"
-						pTooltip="Ver detalles"
-						tooltipPosition="top"
+						[text]="true"
+						size="small"
+						class="action-icon"
+						eduTooltip="Ver detalles"
+						eduTooltipPosition="top"
 						(click)="onView(usuario)"
 						data-info-anchor="admin-users-ver-detalle-btn"
 						[pt]="{ root: { 'aria-label': 'Ver detalles del usuario' } }"
-					></button>
-					<button
-						pButton
+					/>
+					<edu-button
 						icon="pi pi-pencil"
-						class="p-button-sm p-button-text action-icon action-edit"
-						pTooltip="Editar"
-						tooltipPosition="top"
+						[text]="true"
+						size="small"
+						class="action-icon action-edit"
+						eduTooltip="Editar"
+						eduTooltipPosition="top"
 						(click)="onEdit(usuario)"
 						data-info-anchor="admin-users-edit-btn"
 						[pt]="{ root: { 'aria-label': 'Editar usuario' } }"
-					></button>
-					<button
-						pButton
+					/>
+					<edu-button
 						[icon]="usuario.estado ? 'pi pi-ban' : 'pi pi-check'"
-						class="p-button-sm p-button-text action-icon"
+						[text]="true"
+						size="small"
+						class="action-icon"
 						[class.action-deactivate]="usuario.estado"
 						[class.action-activate]="!usuario.estado"
-						[pTooltip]="usuario.estado ? 'Desactivar' : 'Activar'"
-						tooltipPosition="top"
+						[eduTooltip]="usuario.estado ? 'Desactivar' : 'Activar'"
+						eduTooltipPosition="top"
 						(click)="onToggleEstado(usuario)"
 						data-info-anchor="admin-users-toggle-estado-btn"
 						[pt]="{ root: { 'aria-label': usuario.estado ? 'Desactivar usuario' : 'Activar usuario' } }"
-					></button>
-					<button
-						pButton
+					/>
+					<edu-button
 						icon="pi pi-copy"
-						class="p-button-sm p-button-text action-icon"
-						pTooltip="Copiar DNI"
-						tooltipPosition="top"
+						[text]="true"
+						size="small"
+						class="action-icon"
+						eduTooltip="Copiar DNI"
+						eduTooltipPosition="top"
 						(click)="onCopyDni(usuario.dni)"
 						data-info-anchor="copiar-btn"
 						[pt]="{ root: { 'aria-label': 'Copiar DNI al portapapeles' } }"
-					></button>
+					/>
 				</td>
 			</tr>
 		</ng-template>
@@ -139,10 +143,10 @@
 				</td>
 			</tr>
 		</ng-template>
-	</p-table>
+	</edu-table>
 
 	<!-- Salon detail dialog (professors only) -->
-	<p-dialog
+	<edu-dialog
 		[visible]="salonDialogVisible()"
 		(visibleChange)="salonDialogVisible.set($event)"
 		[header]="salonDialogHeader()"
@@ -185,6 +189,6 @@
 				}
 			</div>
 		}
-	</p-dialog>
+	</edu-dialog>
 </section>
 <!-- #endregion -->

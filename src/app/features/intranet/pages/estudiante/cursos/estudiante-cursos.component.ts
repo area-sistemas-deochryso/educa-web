@@ -3,14 +3,13 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter, take } from 'rxjs';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
+
 import { PageHeaderComponent, EmptyStateComponent } from '@intranet-shared/components';
 import { buildCursoColorMap } from '@intranet-shared/config/curso-colors';
 import { EstudianteCursosFacade } from '../services/estudiante-cursos.facade';
 import { CursoContentReadonlyDialogComponent } from './components/curso-content-readonly-dialog/curso-content-readonly-dialog.component';
 import { HorarioProfesorDto } from '../models';
+import { EduSpinner, EduTag, EduTooltip } from '@edu-ui';
 
 const DAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
 
@@ -19,9 +18,9 @@ const DAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Vierne
 	standalone: true,
 	imports: [
 		CommonModule,
-		TagModule,
-		TooltipModule,
-		ProgressSpinnerModule,
+		EduTag,
+		EduTooltip,
+		EduSpinner,
 		RouterLink,
 		PageHeaderComponent,
 		EmptyStateComponent,
@@ -43,8 +42,8 @@ const DAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Vierne
 			min-width: 0;
 			max-width: 100%;
 			border-radius: 8px;
-			border: 1px solid var(--p-surface-200);
-			border-left: 4px solid var(--card-accent, var(--p-primary-color));
+			border: 1px solid var(--surface-200);
+			border-left: 4px solid var(--card-accent, var(--primary-accent));
 			background: var(--surface-card, #fcfdfe);
 			padding: 1rem 1.25rem;
 			cursor: pointer;
@@ -52,8 +51,8 @@ const DAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Vierne
 		}
 		.course-card:hover {
 			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-			border-color: var(--p-surface-300);
-			border-left-color: var(--card-accent, var(--p-primary-color));
+			border-color: var(--surface-300);
+			border-left-color: var(--card-accent, var(--primary-accent));
 		}
 		.course-card-affordance {
 			display: flex;
@@ -63,7 +62,7 @@ const DAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Vierne
 			margin-top: 0.75rem;
 			font-size: 0.75rem;
 			font-weight: 600;
-			color: var(--p-primary-color);
+			color: var(--primary-accent);
 		}
 		.course-card-affordance i {
 			font-size: 0.7rem;
@@ -73,7 +72,7 @@ const DAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Vierne
 			transform: translateX(3px);
 		}
 		.hoy-strip {
-			background: var(--p-surface-50);
+			background: var(--surface-50);
 			border-radius: 8px;
 			padding: 0.5rem 1rem;
 			margin-bottom: 1rem;
@@ -82,7 +81,7 @@ const DAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Vierne
 	template: `
 		@if (vm().loading) {
 			<div class="flex justify-content-center p-5">
-				<p-progressSpinner strokeWidth="4" />
+				<edu-spinner strokeWidth="4" />
 			</div>
 		} @else if (vm().horarios.length === 0) {
 			<app-empty-state icon="pi pi-book" title="Mis Cursos" message="No tienes cursos asignados" />
@@ -112,13 +111,13 @@ const DAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Vierne
 							data-info-anchor="estudiante-cursos-card"
 							[style.--card-accent]="colorMap().get(horario.cursoId)"
 							(click)="onVerContenido(horario)"
-							pTooltip="Ver contenido"
-							tooltipPosition="top"
+							eduTooltip="Ver contenido"
+							eduTooltipPosition="top"
 						>
 							<div class="flex align-items-start justify-content-between mb-2">
 								<span class="font-bold text-lg line-height-3">{{ horario.cursoNombre }}</span>
 								<a routerLink="/intranet/estudiante/salones" data-info-anchor="estudiante-cursos-card-salon-tag" class="no-underline" (click)="$event.stopPropagation()">
-									<p-tag [value]="horario.salonDescripcion" severity="info" />
+									<edu-tag [value]="horario.salonDescripcion" severity="info" />
 								</a>
 							</div>
 							<div class="flex flex-column gap-1 text-sm text-color-secondary">

@@ -1,0 +1,148 @@
+.edu-button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	border: 1px solid transparent;
+	border-radius: var(--eduui-form-field-border-radius);
+	padding: var(--eduui-form-field-padding-y) var(--eduui-form-field-padding-x);
+	font-size: 1rem;
+	font-weight: 500;
+	cursor: pointer;
+	transition: background var(--eduui-form-field-transition-duration), border-color var(--eduui-form-field-transition-duration), color var(--eduui-form-field-transition-duration);
+
+	&:disabled {
+		opacity: 0.6;
+		cursor: default;
+	}
+
+	&:focus-visible {
+		outline: var(--eduui-focus-ring-width) var(--eduui-focus-ring-style) var(--eduui-focus-ring-color);
+		outline-offset: var(--eduui-focus-ring-offset);
+	}
+
+	&--xs {
+		padding: var(--eduui-form-field-padding-y-xs) var(--eduui-form-field-padding-x-xs);
+		font-size: var(--eduui-form-field-font-size-xs);
+	}
+
+	&--sm {
+		padding: var(--eduui-form-field-padding-y-sm) var(--eduui-form-field-padding-x-sm);
+		font-size: var(--eduui-form-field-font-size-sm);
+	}
+
+	&--lg {
+		padding: var(--eduui-form-field-padding-y-lg) var(--eduui-form-field-padding-x-lg);
+		font-size: var(--eduui-form-field-font-size-lg);
+	}
+
+	&--rounded {
+		border-radius: 2rem;
+	}
+
+	&--icon-only {
+		padding-inline: var(--eduui-form-field-padding-y);
+	}
+
+	&__icon {
+		font-size: 1rem;
+	}
+}
+
+/* Solid (default) variant — bg/border/color from severity, hover/active shades darken */
+.edu-button[data-severity='primary'] {
+	background: var(--eduui-primary-color);
+	border-color: var(--eduui-primary-color);
+	color: var(--eduui-primary-contrast-color);
+	&:not(:disabled):hover { background: var(--eduui-primary-hover-color); border-color: var(--eduui-primary-hover-color); }
+	&:not(:disabled):active { background: var(--eduui-primary-active-color); border-color: var(--eduui-primary-active-color); }
+}
+.edu-button[data-severity='secondary'] {
+	background: var(--eduui-surface-100);
+	border-color: var(--eduui-surface-100);
+	color: var(--eduui-surface-600);
+	&:not(:disabled):hover { background: var(--eduui-surface-200); border-color: var(--eduui-surface-200); }
+	&:not(:disabled):active { background: var(--eduui-surface-300); border-color: var(--eduui-surface-300); }
+}
+.edu-button[data-severity='success'] {
+	background: var(--eduui-green-500);
+	border-color: var(--eduui-green-500);
+	color: #fff;
+	&:not(:disabled):hover { background: var(--eduui-green-600); border-color: var(--eduui-green-600); }
+	&:not(:disabled):active { background: var(--eduui-green-700); border-color: var(--eduui-green-700); }
+}
+.edu-button[data-severity='info'] {
+	background: var(--eduui-sky-500);
+	border-color: var(--eduui-sky-500);
+	color: #fff;
+	&:not(:disabled):hover { background: var(--eduui-sky-600); border-color: var(--eduui-sky-600); }
+	&:not(:disabled):active { background: var(--eduui-sky-700); border-color: var(--eduui-sky-700); }
+}
+.edu-button[data-severity='warn'] {
+	background: var(--eduui-orange-500);
+	border-color: var(--eduui-orange-500);
+	color: #fff;
+	&:not(:disabled):hover { background: var(--eduui-orange-600); border-color: var(--eduui-orange-600); }
+	&:not(:disabled):active { background: var(--eduui-orange-700); border-color: var(--eduui-orange-700); }
+}
+.edu-button[data-severity='danger'] {
+	background: var(--eduui-red-500);
+	border-color: var(--eduui-red-500);
+	color: #fff;
+	&:not(:disabled):hover { background: var(--eduui-red-600); border-color: var(--eduui-red-600); }
+	&:not(:disabled):active { background: var(--eduui-red-700); border-color: var(--eduui-red-700); }
+}
+.edu-button[data-severity='help'] {
+	background: var(--eduui-purple-500);
+	border-color: var(--eduui-purple-500);
+	color: #fff;
+	&:not(:disabled):hover { background: var(--eduui-purple-600); border-color: var(--eduui-purple-600); }
+	&:not(:disabled):active { background: var(--eduui-purple-700); border-color: var(--eduui-purple-700); }
+}
+.edu-button[data-severity='contrast'] {
+	background: var(--eduui-surface-950);
+	border-color: var(--eduui-surface-950);
+	color: var(--eduui-surface-0);
+	&:not(:disabled):hover { background: var(--eduui-surface-900); border-color: var(--eduui-surface-900); }
+	&:not(:disabled):active { background: var(--eduui-surface-800); border-color: var(--eduui-surface-800); }
+}
+
+/* Outlined — transparent bg, colored border + text */
+.edu-button.edu-button--outlined {
+	background: transparent;
+	&[data-severity='primary'] { border-color: var(--eduui-primary-200); color: var(--eduui-primary-color); &:not(:disabled):hover { background: var(--eduui-primary-50); } &:not(:disabled):active { background: var(--eduui-primary-100); } }
+	&[data-severity='secondary'] { border-color: var(--eduui-surface-200); color: var(--eduui-surface-500); &:not(:disabled):hover { background: var(--eduui-surface-50); } &:not(:disabled):active { background: var(--eduui-surface-100); } }
+	&[data-severity='success'] { border-color: var(--eduui-green-200); color: var(--eduui-green-500); &:not(:disabled):hover { background: var(--eduui-green-50); } &:not(:disabled):active { background: var(--eduui-green-100); } }
+	&[data-severity='info'] { border-color: var(--eduui-sky-200); color: var(--eduui-sky-500); &:not(:disabled):hover { background: var(--eduui-sky-50); } &:not(:disabled):active { background: var(--eduui-sky-100); } }
+	&[data-severity='warn'] { border-color: var(--eduui-orange-200); color: var(--eduui-orange-500); &:not(:disabled):hover { background: var(--eduui-orange-50); } &:not(:disabled):active { background: var(--eduui-orange-100); } }
+	&[data-severity='danger'] { border-color: var(--eduui-red-200); color: var(--eduui-red-500); &:not(:disabled):hover { background: var(--eduui-red-50); } &:not(:disabled):active { background: var(--eduui-red-100); } }
+	&[data-severity='help'] { border-color: var(--eduui-purple-200); color: var(--eduui-purple-500); &:not(:disabled):hover { background: var(--eduui-purple-50); } &:not(:disabled):active { background: var(--eduui-purple-100); } }
+	&[data-severity='contrast'] { border-color: var(--eduui-surface-700); color: var(--eduui-surface-950); &:not(:disabled):hover { background: var(--eduui-surface-50); } &:not(:disabled):active { background: var(--eduui-surface-100); } }
+}
+
+/* Text — no border, transparent bg, colored text only */
+.edu-button.edu-button--text {
+	background: transparent;
+	border-color: transparent;
+	&[data-severity='primary'] { color: var(--eduui-primary-color); &:not(:disabled):hover { background: var(--eduui-primary-50); } &:not(:disabled):active { background: var(--eduui-primary-100); } }
+	&[data-severity='secondary'] { color: var(--eduui-surface-500); &:not(:disabled):hover { background: var(--eduui-surface-50); } &:not(:disabled):active { background: var(--eduui-surface-100); } }
+	&[data-severity='success'] { color: var(--eduui-green-500); &:not(:disabled):hover { background: var(--eduui-green-50); } &:not(:disabled):active { background: var(--eduui-green-100); } }
+	&[data-severity='info'] { color: var(--eduui-sky-500); &:not(:disabled):hover { background: var(--eduui-sky-50); } &:not(:disabled):active { background: var(--eduui-sky-100); } }
+	&[data-severity='warn'] { color: var(--eduui-orange-500); &:not(:disabled):hover { background: var(--eduui-orange-50); } &:not(:disabled):active { background: var(--eduui-orange-100); } }
+	&[data-severity='danger'] { color: var(--eduui-red-500); &:not(:disabled):hover { background: var(--eduui-red-50); } &:not(:disabled):active { background: var(--eduui-red-100); } }
+	&[data-severity='help'] { color: var(--eduui-purple-500); &:not(:disabled):hover { background: var(--eduui-purple-50); } &:not(:disabled):active { background: var(--eduui-purple-100); } }
+	&[data-severity='contrast'] { color: var(--eduui-surface-950); &:not(:disabled):hover { background: var(--eduui-surface-50); } &:not(:disabled):active { background: var(--eduui-surface-100); } }
+}
+
+:host-context(.dark-mode) {
+	.edu-button[data-severity='secondary'] {
+		background: var(--eduui-surface-800); border-color: var(--eduui-surface-800); color: var(--eduui-surface-300);
+		&:not(:disabled):hover { background: var(--eduui-surface-700); border-color: var(--eduui-surface-700); }
+		&:not(:disabled):active { background: var(--eduui-surface-600); border-color: var(--eduui-surface-600); }
+	}
+	.edu-button[data-severity='contrast'] {
+		background: var(--eduui-surface-0); border-color: var(--eduui-surface-0); color: var(--eduui-surface-950);
+		&:not(:disabled):hover { background: var(--eduui-surface-100); border-color: var(--eduui-surface-100); }
+		&:not(:disabled):active { background: var(--eduui-surface-200); border-color: var(--eduui-surface-200); }
+	}
+}

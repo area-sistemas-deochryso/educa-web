@@ -20,23 +20,18 @@ import {
 	VIEW_MODE,
 	ViewMode,
 } from '@features/intranet/components/attendance/attendance-header/attendance-header.component';
-import { ButtonModule } from 'primeng/button';
 import { DatePipe } from '@angular/common';
 import { EmptyStateComponent } from '@features/intranet/components/attendance/empty-state/empty-state.component';
 import { FormsModule } from '@angular/forms';
-import { InputTextModule } from 'primeng/inputtext';
-import { Menu, MenuModule } from 'primeng/menu';
-import { MenuItem } from 'primeng/api';
 import { SalonSelectorComponent } from '@features/intranet/components/attendance/salon-selector/salon-selector.component';
-import { Select } from 'primeng/select';
-import { SelectButton } from 'primeng/selectbutton';
-import { TooltipModule } from 'primeng/tooltip';
 import { finalize, forkJoin } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { buildPdfExcelMenuItems } from '../../attendance-director/consolidated-pdf.helper';
 import { MonthSearchState } from '../../attendance-director/month-search-state';
 import { AttendanceSalonesSummaryComponent } from './components/attendance-salones-summary/attendance-salones-summary.component';
+import { EduButton, EduInputText, EduMenu, EduSelect, EduSelectButton, EduTooltip } from '@edu-ui';
+import type { EduMenuItem } from '@edu-ui';
 
 /**
  * Vista "Mis estudiantes" del panel profesor (Plan 21 Chat 4).
@@ -49,32 +44,14 @@ import { AttendanceSalonesSummaryComponent } from './components/attendance-salon
 @Component({
 	selector: 'app-attendance-profesor-estudiantes',
 	standalone: true,
-	imports: [
-		AttendanceHeatmapComponent,
-		AttendanceTableSkeletonComponent,
-		AttendanceScopeStudentNoticeComponent,
-		SalonSelectorComponent,
-		AttendanceDayListComponent,
-		EmptyStateComponent,
-		AttendanceLegendComponent,
-		JustificationDialogComponent,
-		ButtonModule,
-		TooltipModule,
-		MenuModule,
-		InputTextModule,
-		DatePipe,
-		FormsModule,
-		Select,
-		SelectButton,
-		AttendanceSalonesSummaryComponent,
-	],
+	imports: [AttendanceHeatmapComponent, AttendanceTableSkeletonComponent, AttendanceScopeStudentNoticeComponent, SalonSelectorComponent, AttendanceDayListComponent, EmptyStateComponent, AttendanceLegendComponent, JustificationDialogComponent, EduButton, EduTooltip, EduMenu, EduInputText, DatePipe, FormsModule, EduSelect, EduSelectButton, AttendanceSalonesSummaryComponent],
 	providers: [AttendanceViewController, AttendancePdfService, AttendanceStatsService],
 	templateUrl: './attendance-profesor-estudiantes.component.html',
 	styleUrl: './attendance-profesor-estudiantes.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AttendanceProfesorEstudiantesComponent implements OnInit {
-	@ViewChild('pdfMenu') pdfMenu!: Menu;
+	@ViewChild('pdfMenu') pdfMenu!: EduMenu;
 	@ViewChild(JustificationDialogComponent) justificationDialog!: JustificationDialogComponent;
 
 	private asistenciaService = inject(AttendanceService);
@@ -296,7 +273,7 @@ export class AttendanceProfesorEstudiantesComponent implements OnInit {
 	// #endregion
 	// #region PDF menu
 
-	readonly pdfMenuItems = computed<MenuItem[]>(() => {
+	readonly pdfMenuItems = computed<EduMenuItem[]>(() => {
 		const isMonth = this.view.viewMode() === VIEW_MODE.Mes;
 		const isPeriodo = this.view.monthSubMode() === 'periodo';
 		const { selectedMonth, selectedYear } = this.view.ingresos();

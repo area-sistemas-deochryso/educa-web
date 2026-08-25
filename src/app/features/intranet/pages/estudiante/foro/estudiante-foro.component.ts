@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, computed, inject, signal, OnInit, OnDestroy, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
+
 import { PageHeaderComponent } from '@intranet-shared/components';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { logger, withRetry } from '@core/helpers';
@@ -9,11 +9,12 @@ import { SalonMensajeriaFacade } from '@features/intranet/pages/cross-role/mensa
 import { SalonForoTabComponent } from '@features/intranet/pages/cross-role/mensajeria/components/foro-tab/foro-tab.component';
 import { HorarioProfesorDto } from '../models/estudiante.models';
 import { toSelectOptionsFrom } from '@shared/models';
+import { EduSpinner } from '@edu-ui';
 
 @Component({
 	selector: 'app-estudiante-foro',
 	standalone: true,
-	imports: [CommonModule, ProgressSpinnerModule, PageHeaderComponent, SalonForoTabComponent],
+	imports: [CommonModule, EduSpinner, PageHeaderComponent, SalonForoTabComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	styles: `
 		:host {
@@ -30,7 +31,7 @@ import { toSelectOptionsFrom } from '@shared/models';
 
 			@if (loading()) {
 				<div class="flex justify-content-center p-5">
-					<p-progressSpinner strokeWidth="4" />
+					<edu-spinner strokeWidth="4" />
 				</div>
 			} @else if (cursoOptions().length === 0) {
 				<div class="flex flex-column align-items-center p-5 text-color-secondary">

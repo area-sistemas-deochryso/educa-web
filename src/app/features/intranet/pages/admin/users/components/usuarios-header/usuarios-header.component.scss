@@ -83,25 +83,6 @@
 }
 // #endregion
 
-// #region Overrides PrimeNG
-:host ::ng-deep {
-	.p-dialog .p-inputtext,
-	.p-dialog .p-select {
-		background: transparent;
-		color: var(--text-color);
-		border-color: var(--surface-300);
-	}
-
-	.p-dialog .p-select-label {
-		color: var(--text-color);
-	}
-
-	.p-dialog .p-select-dropdown {
-		color: var(--text-color);
-	}
-}
-// #endregion
-
 // #region Responsive
 @media (max-width: 768px) {
 	.header-actions {

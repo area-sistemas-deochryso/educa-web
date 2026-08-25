@@ -2,14 +2,11 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-import { InputTextModule } from 'primeng/inputtext';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { SelectModule } from 'primeng/select';
-
 import { FaqDto } from '../../models/faq.models';
 import { FaqListComponent } from './components/faq-list/faq-list.component';
 import { FaqWizardDialogComponent } from './components/faq-wizard-dialog/faq-wizard-dialog.component';
 import { AyudaQaFacade } from './services/ayuda-qa.facade';
+import { EduInputText, EduSelect, EduSpinner } from '@edu-ui';
 // #endregion
 
 interface CategoriaOption {
@@ -27,9 +24,9 @@ interface CategoriaOption {
 	standalone: true,
 	imports: [
 		FormsModule,
-		InputTextModule,
-		SelectModule,
-		ProgressSpinnerModule,
+		EduInputText,
+		EduSelect,
+		EduSpinner,
 		FaqListComponent,
 		FaqWizardDialogComponent,
 	],

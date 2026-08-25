@@ -1,20 +1,19 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DialogModule } from 'primeng/dialog';
-import { Menu, MenuModule } from 'primeng/menu';
-import { MenuItem } from 'primeng/api';
 import {
 	CourseSummary,
 	getCourseSummaries,
 } from '@features/intranet/pages/cross-role/schedule-component/courses.config';
 import { getGradeClass as getGradeClassFn } from '@intranet-shared/services/calificacion-config';
+import { EduDialog, EduMenu } from '@edu-ui';
+import type { EduMenuItem } from '@edu-ui';
 
 // #endregion
 // #region Implementation
 @Component({
 	selector: 'app-summary-modal',
-	imports: [CommonModule, DialogModule, MenuModule],
+	imports: [CommonModule, EduDialog, EduMenu],
 	templateUrl: './summary-modal.component.html',
 	styleUrl: './summary-modal.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -24,7 +23,7 @@ import { getGradeClass as getGradeClassFn } from '@intranet-shared/services/cali
  */
 export class SummaryModalComponent {
 	/** Context menu reference for a selected course. */
-	@ViewChild('courseMenu') courseMenu!: Menu;
+	@ViewChild('courseMenu') courseMenu!: EduMenu;
 	// #region Inputs/Outputs
 	/** Whether the modal is visible. */
 	@Input() visible = false;
@@ -43,10 +42,9 @@ export class SummaryModalComponent {
 	courseSummaries: CourseSummary[] = getCourseSummaries();
 
 	/** Context menu items for the selected course. */
-	courseMenuItems: MenuItem[] = [
+	courseMenuItems: EduMenuItem[] = [
 		{ label: 'Ver Detalles', command: () => this.onOpenDetails() },
-		{ label: 'Ver Calificaciones', command: () => this.onOpenGrades() },
-	];
+		{ label: 'Ver Calificaciones', command: () => this.onOpenGrades() }];
 
 	/**
 	 * Sync visibility and emit the two way binding event.

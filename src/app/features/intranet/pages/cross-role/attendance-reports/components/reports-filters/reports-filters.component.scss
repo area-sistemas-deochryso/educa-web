@@ -87,19 +87,6 @@
 }
 // #endregion
 
-// #region Overrides PrimeNG — selectButton compacto
-:host ::ng-deep {
-	.p-multiselect {
-		width: 100%;
-	}
-
-	// SelectButton: variantes de color por opción para distinguir Estudiante / Profesor / Asist. / Todos
-	.p-selectbutton {
-		flex-wrap: wrap;
-	}
-}
-// #endregion
-
 // #region Responsive
 @media (max-width: 900px) {
 	.filters-bar {

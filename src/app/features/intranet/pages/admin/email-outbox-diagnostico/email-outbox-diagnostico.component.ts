@@ -2,11 +2,11 @@ import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject } from
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TabsModule } from 'primeng/tabs';
 
 import { TabCorreoIndividualComponent } from './tab-correo-individual/tab-correo-individual.component';
 import { TabCorreosDiaComponent } from './tab-correos-dia/tab-correos-dia.component';
 import { EmailDeferFailBannerComponent } from '@features/intranet/pages/admin/email-outbox-shared';
+import { EduTab, EduTabPanel, EduTabs } from '@edu-ui';
 
 type TabId = 'gap' | 'correo';
 
@@ -15,12 +15,7 @@ const TAB_IDS: readonly TabId[] = ['gap', 'correo'] as const;
 @Component({
 	selector: 'app-email-outbox-diagnostico',
 	standalone: true,
-	imports: [
-		TabsModule,
-		TabCorreosDiaComponent,
-		TabCorreoIndividualComponent,
-		EmailDeferFailBannerComponent,
-	],
+	imports: [TabCorreosDiaComponent, TabCorreoIndividualComponent, EmailDeferFailBannerComponent, EduTab, EduTabPanel, EduTabs],
 	templateUrl: './email-outbox-diagnostico.component.html',
 	styleUrl: './email-outbox-diagnostico.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

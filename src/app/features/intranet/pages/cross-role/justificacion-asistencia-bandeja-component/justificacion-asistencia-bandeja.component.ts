@@ -3,21 +3,12 @@ import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { ButtonModule } from 'primeng/button';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ConfirmationService } from 'primeng/api';
-import { DialogModule } from 'primeng/dialog';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { SelectModule } from 'primeng/select';
-import { TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
-import { TextareaModule } from 'primeng/textarea';
-
 import { UserPermissionsService } from '@core/services';
 import { ErrorStateComponent } from '@shared/components';
 import { SolicitudJustificacionAsistenciaDto, EstadoSolicitudJustificacion } from '@features/intranet/pages/estudiante/models';
 
 import { JustificacionAsistenciaBandejaFacade } from './justificacion-asistencia-bandeja.facade';
+import { EduButton, EduConfirmDialog, EduConfirmationService, EduDialog, EduSelect, EduSpinner, EduTable, EduTag, EduTextarea } from '@edu-ui';
 // #endregion
 
 const JUSTIFICACION_ASISTENCIA_APROBAR = 'JUSTIFICACION_ASISTENCIA_APROBAR';
@@ -31,8 +22,7 @@ const ESTADO_FILTRO_OPTIONS: EstadoOption[] = [
 	{ label: 'Pendiente', value: 'PENDIENTE' },
 	{ label: 'Aprobada', value: 'APROBADA' },
 	{ label: 'Rechazada', value: 'RECHAZADA' },
-	{ label: 'Todos', value: null },
-];
+	{ label: 'Todos', value: null }];
 
 const ESTADO_SEVERITY: Record<EstadoSolicitudJustificacion, 'warn' | 'success' | 'danger'> = {
 	PENDIENTE: 'warn',
@@ -57,20 +47,8 @@ const ESTADO_LABEL: Record<EstadoSolicitudJustificacion, string> = {
 @Component({
 	selector: 'app-justificacion-asistencia-bandeja',
 	standalone: true,
-	imports: [
-		CommonModule,
-		FormsModule,
-		ButtonModule,
-		ConfirmDialogModule,
-		DialogModule,
-		ProgressSpinnerModule,
-		SelectModule,
-		TableModule,
-		TagModule,
-		TextareaModule,
-		ErrorStateComponent,
-	],
-	providers: [JustificacionAsistenciaBandejaFacade, ConfirmationService],
+	imports: [CommonModule, FormsModule, EduButton, EduConfirmDialog, EduDialog, EduSpinner, EduSelect, EduTable, EduTag, EduTextarea, ErrorStateComponent],
+	providers: [JustificacionAsistenciaBandejaFacade, EduConfirmationService],
 	templateUrl: './justificacion-asistencia-bandeja.component.html',
 	styleUrl: './justificacion-asistencia-bandeja.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -79,7 +57,7 @@ export class JustificacionAsistenciaBandejaComponent implements OnInit {
 	// #region Dependencies
 	private readonly facade = inject(JustificacionAsistenciaBandejaFacade);
 	private readonly userPermisos = inject(UserPermissionsService);
-	private readonly confirmationService = inject(ConfirmationService);
+	private readonly confirmationService = inject(EduConfirmationService);
 	// #endregion
 
 	// #region State

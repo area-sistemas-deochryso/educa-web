@@ -1,6 +1,6 @@
 <!-- #region Filtro de mes -->
 <div class="filtro-row">
-	<p-select
+	<edu-select
 		[options]="mesesOptions"
 		[ngModel]="selectedMes()"
 		(ngModelChange)="onMesChange($event)"
@@ -36,7 +36,7 @@
 <!-- #endregion -->
 
 <!-- #region Tabla de asistencia -->
-<p-table
+<edu-table
 	[value]="asistenciaData()"
 	[dataKey]="'estudianteId'"
 	[loading]="loading()"
@@ -78,7 +78,7 @@
 			</td>
 		</tr>
 	</ng-template>
-</p-table>
+</edu-table>
 <!-- #endregion -->
 
 <!-- #region Leyenda -->

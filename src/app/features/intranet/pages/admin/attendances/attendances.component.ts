@@ -5,24 +5,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ConfirmationService, MessageService } from 'primeng/api';
-
-import { ButtonModule } from 'primeng/button';
-import { DatePickerModule } from 'primeng/datepicker';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { DialogModule } from 'primeng/dialog';
-import { IconFieldModule } from 'primeng/iconfield';
-import { InputIconModule } from 'primeng/inputicon';
-import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
-import { SelectButtonModule } from 'primeng/selectbutton';
-import { TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
-import { CheckboxModule } from 'primeng/checkbox';
-import { Tab, TabList, TabPanel, Tabs } from 'primeng/tabs';
-import { ToastModule } from 'primeng/toast';
-
 import { logger } from '@core/helpers';
 import { ErrorStateComponent } from '@shared/components';
 import { SkeletonColumnDef, TableSkeletonComponent, StatsSkeletonComponent, PageHeaderComponent, KpiStatsComponent, type KpiStatItem } from '@intranet-shared/components';
@@ -54,6 +36,7 @@ import {
 	tipoPersonaLabel,
 	formatFechaIso,
 } from './services';
+import { EduButton, EduCheckbox, EduConfirmDialog, EduConfirmationService, EduDatePicker, EduDialog, EduIconField, EduInputIcon, EduInputText, EduMessageService, EduSelect, EduSelectButton, EduTab, EduTabPanel, EduTable, EduTabs, EduTag, EduToast, EduTooltip } from '@edu-ui';
 // #endregion
 
 @Component({
@@ -62,36 +45,34 @@ import {
 	imports: [
 		CommonModule,
 		FormsModule,
-		ButtonModule,
-		DatePickerModule,
-		ConfirmDialogModule,
-		DialogModule,
-		IconFieldModule,
-		InputIconModule,
-		InputTextModule,
-		SelectModule,
-		SelectButtonModule,
-		TableModule,
-		TagModule,
-		ToastModule,
-		TooltipModule,
-		CheckboxModule,
+		EduButton,
+		EduDatePicker,
+		EduConfirmDialog,
+		EduDialog,
+		EduIconField,
+		EduInputIcon,
+		EduInputText,
+		EduSelect,
+		EduSelectButton,
+		EduTable,
+		EduTag,
+		EduToast,
+		EduTooltip,
+		EduCheckbox,
 		TableSkeletonComponent,
 		StatsSkeletonComponent,
 		KpiStatsComponent,
-		Tabs,
-		TabList,
-		Tab,
-		TabPanel,
+		EduTabs,
+		EduTab,
+		EduTabPanel,
 		AttendanceScopeBannerComponent,
 		AttendanceReportsComponent,
 		AttendancePanelComponent,
 		CrossChexSyncBannerComponent,
 		SyncRangeDialogComponent,
 		PageHeaderComponent,
-		ErrorStateComponent,
-	],
-	providers: [ConfirmationService, MessageService],
+		ErrorStateComponent],
+	providers: [EduConfirmationService, EduMessageService],
 	templateUrl: './attendances.component.html',
 	styleUrl: './attendances.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -105,8 +86,8 @@ export class AttendancesComponent implements OnInit {
 	protected uiFacade = inject(AttendancesUiFacade);
 	protected store = inject(AttendancesAdminStore);
 	private syncService = inject(CrossChexSyncStatusService);
-	private confirmationService = inject(ConfirmationService);
-	private messageService = inject(MessageService);
+	private confirmationService = inject(EduConfirmationService);
+	private messageService = inject(EduMessageService);
 	private route = inject(ActivatedRoute);
 	private router = inject(Router);
 	private destroyRef = inject(DestroyRef);
@@ -139,8 +120,7 @@ export class AttendancesComponent implements OnInit {
 			},
 			{ icon: 'pi pi-check-circle', label: 'Completas', value: stats.completas },
 			{ icon: 'pi pi-exclamation-circle', label: 'Incompletas', value: stats.incompletas },
-			{ icon: 'pi pi-pencil', label: 'Manuales', value: stats.registrosManuales },
-		];
+			{ icon: 'pi pi-pencil', label: 'Manuales', value: stats.registrosManuales }];
 	});
 	// #endregion
 
@@ -150,23 +130,20 @@ export class AttendancesComponent implements OnInit {
 	readonly tipoOptions = signal<{ label: string; value: TipoOperacionAsistencia }[]>([
 		{ label: 'Solo entrada', value: 'entrada' },
 		{ label: 'Solo salida', value: 'salida' },
-		{ label: 'Entrada + Salida', value: 'completa' },
-	]);
+		{ label: 'Entrada + Salida', value: 'completa' }]);
 	readonly tipoPersonaOptions = signal<{ label: string; value: TipoPersonaFilter }[]>([
 		{ label: 'Estudiantes', value: 'E' },
 		{ label: 'Profesores', value: 'P' },
 		{ label: 'Asist. Admin.', value: 'A' },
 		{ label: 'Coordinadores', value: 'C' },
 		{ label: 'Promotores', value: 'M' },
-		{ label: 'Todos', value: 'todos' },
-	]);
+		{ label: 'Todos', value: 'todos' }]);
 	readonly tipoPersonaFormOptions = signal<{ label: string; value: TipoPersonaAsistencia }[]>([
 		{ label: 'Estudiante', value: 'E' },
 		{ label: 'Profesor', value: 'P' },
 		{ label: 'Asistente Admin.', value: 'A' },
 		{ label: 'Coordinador', value: 'C' },
-		{ label: 'Promotor', value: 'M' },
-	]);
+		{ label: 'Promotor', value: 'M' }]);
 	readonly cierreAnio = signal(new Date().getFullYear());
 	readonly cierreMes = signal(new Date().getMonth() + 1);
 	readonly cierreObservacion = signal('');
@@ -184,8 +161,7 @@ export class AttendancesComponent implements OnInit {
 		{ width: '100px', cellType: 'text' },
 		{ width: '90px', cellType: 'badge' },
 		{ width: '80px', cellType: 'badge' },
-		{ width: '120px', cellType: 'actions' },
-	];
+		{ width: '120px', cellType: 'actions' }];
 	// #endregion
 
 	// #region Computed

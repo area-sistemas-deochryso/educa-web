@@ -1,4 +1,4 @@
-<p-dialog
+<edu-dialog
 	[visible]="visible()"
 	(visibleChange)="onVisibleChange($event)"
 	[modal]="true"
@@ -26,7 +26,7 @@
 				Nombre / Etiqueta
 			</label>
 			<input
-				pInputText
+				eduInputText
 				id="nodeEtiqueta"
 				[ngModel]="formData().etiqueta"
 				(ngModelChange)="onEtiquetaChange($event)"
@@ -39,7 +39,7 @@
 				<i class="pi pi-th-large"></i>
 				Tipo
 			</label>
-			<p-select
+			<edu-select
 				id="nodeTipo"
 				[options]="nodeTypeOptions()"
 				[ngModel]="formData().tipo"
@@ -56,7 +56,7 @@
 					<i class="pi pi-arrows-h"></i>
 					Ancho
 				</label>
-				<p-inputNumber
+				<edu-input-number
 					id="nodeWidth"
 					[ngModel]="formData().width"
 					(ngModelChange)="onWidthChange($event)"
@@ -72,7 +72,7 @@
 					<i class="pi pi-arrows-v"></i>
 					Alto
 				</label>
-				<p-inputNumber
+				<edu-input-number
 					id="nodeHeight"
 					[ngModel]="formData().height"
 					(ngModelChange)="onHeightChange($event)"
@@ -89,21 +89,20 @@
 
 	<!-- #region Footer -->
 	<div class="piso-dialog-footer">
-		<button
-			pButton
+		<edu-button
 			label="Cancelar"
-			class="p-button-text p-button-secondary"
+			[text]="true"
+			severity="secondary"
 			(click)="onCancel()"
 			data-info-anchor="admin-campus-nodo-form-cancelar-btn"
-		></button>
-		<button
-			pButton
+		/>
+		<edu-button
 			label="Guardar cambios"
 			icon="pi pi-check"
 			(click)="onSave()"
 			[loading]="saving()"
 			data-info-anchor="admin-campus-nodo-form-guardar-btn"
-		></button>
+		/>
 	</div>
 	<!-- #endregion -->
-</p-dialog>
+</edu-dialog>

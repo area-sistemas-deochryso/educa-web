@@ -1,14 +1,6 @@
 import { Component, ChangeDetectionStrategy, input, output, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DialogModule } from 'primeng/dialog';
-import { ButtonModule } from 'primeng/button';
-import { InputNumberModule } from 'primeng/inputnumber';
-import { InputTextModule } from 'primeng/inputtext';
-import { Select } from 'primeng/select';
-import { TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
 import {
 	CalificacionConNotasDto,
 	CalificarLoteDto,
@@ -33,6 +25,7 @@ import {
 	calcIndividualStats,
 	calcGrupoStats,
 } from './calificar-dialog.helpers';
+import { EduButton, EduDialog, EduInputNumber, EduInputText, EduSelect, EduTable, EduTag, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-calificar-dialog',
@@ -40,15 +33,14 @@ import {
 	imports: [
 		CommonModule,
 		FormsModule,
-		DialogModule,
-		ButtonModule,
-		InputNumberModule,
-		InputTextModule,
-		Select,
-		TableModule,
-		TagModule,
-		TooltipModule,
-	],
+		EduDialog,
+		EduButton,
+		EduInputNumber,
+		EduInputText,
+		EduSelect,
+		EduTable,
+		EduTag,
+		EduTooltip],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './calificar-dialog.component.html',
 	styleUrl: './calificar-dialog.component.scss',

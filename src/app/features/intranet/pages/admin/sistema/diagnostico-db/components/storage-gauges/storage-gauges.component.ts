@@ -1,14 +1,12 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 
-import { ButtonModule } from 'primeng/button';
 import { DatabaseFileStatsDto } from '../../models/diagnostico-db.models';
 import { DecimalPipe } from '@angular/common';
-import { ProgressBarModule } from 'primeng/progressbar';
-
+import { EduButton, EduProgressBar } from '@edu-ui';
 @Component({
 	selector: 'app-storage-gauges',
 	standalone: true,
-	imports: [DecimalPipe, ButtonModule, ProgressBarModule],
+	imports: [DecimalPipe, EduButton, EduProgressBar],
 	templateUrl: './storage-gauges.component.html',
 	styleUrl: './storage-gauges.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

@@ -8,9 +8,6 @@ import {
 } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
-
 import {
 	ErrorGroupLista,
 	ErrorOrigen,
@@ -20,6 +17,7 @@ import {
 } from '../../models';
 import type { TrendCacheEntry } from '../../services';
 import { ErrorOccurrenceTimelineComponent } from '../error-occurrence-timeline';
+import { EduTag, EduTooltip } from '@edu-ui';
 
 /**
  * Card presentacional para la vista Kanban del feature `error-groups`.
@@ -30,7 +28,7 @@ import { ErrorOccurrenceTimelineComponent } from '../error-occurrence-timeline';
 	selector: 'app-error-group-card',
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [CommonModule, DatePipe, TagModule, TooltipModule, ErrorOccurrenceTimelineComponent],
+	imports: [CommonModule, DatePipe, EduTag, EduTooltip, ErrorOccurrenceTimelineComponent],
 	templateUrl: './error-group-card.component.html',
 	styleUrl: './error-group-card.component.scss',
 	host: {

@@ -39,7 +39,7 @@
 			<i class="pi pi-search"></i>
 			<input
 				type="text"
-				pInputText
+				eduInputText
 				placeholder="Buscar por nombre o código..."
 				[ngModel]="vm().searchTerm"
 				(ngModelChange)="onSearchTermChange($event)"
@@ -47,7 +47,7 @@
 			/>
 		</div>
 
-		<p-select
+		<edu-select
 			[options]="vm().modulosOptions"
 			[ngModel]="vm().filterModulo"
 			(ngModelChange)="onFilterModuloChange($event)"
@@ -57,7 +57,7 @@
 			data-info-anchor="admin-vistas-modulo-filter"
 		/>
 
-		<p-select
+		<edu-select
 			[options]="vm().rutaFilterOptions"
 			[ngModel]="vm().filterRuta"
 			(ngModelChange)="onFilterRutaChange($event)"
@@ -66,40 +66,37 @@
 			data-info-anchor="admin-vistas-ruta-filter"
 		/>
 
-		<button
-			pButton
+		<edu-button
 			label="Limpiar"
 			icon="pi pi-filter-slash"
-			class="p-button-text"
+			[text]="true"
 			(click)="clearFilters()"
 			data-info-anchor="admin-vistas-clear-filters-btn"
-		></button>
+		/>
 
 		<div class="filter-spacer"></div>
 
-		<button
-			pButton
+		<edu-button
 			label="Refrescar"
 			icon="pi pi-refresh"
-			class="p-button-outlined"
+			[outlined]="true"
 			(click)="refresh()"
 			data-info-anchor="admin-vistas-refresh-btn"
-		></button>
+		/>
 
-		<button
-			pButton
+		<edu-button
 			label="Nueva Capability"
 			icon="pi pi-plus"
-			class="p-button-success"
+			severity="success"
 			(click)="openNew()"
 			data-info-anchor="admin-vistas-new-btn"
-		></button>
+		/>
 	</section>
 	<!-- #endregion -->
 
 	<!-- #region Table -->
 	<section class="table-section">
-		<p-table
+		<edu-table
 			[value]="vm().items"
 			dataKey="id"
 			[paginator]="true"
@@ -114,13 +111,13 @@
 		>
 				<ng-template #header>
 					<tr>
-						<th style="width: 70px" pSortableColumn="id" data-info-anchor="tabla-orden-columna">
-							ID <p-sortIcon field="id" />
+						<th style="width: 70px" eduSortableColumn="id" data-info-anchor="tabla-orden-columna">
+							ID
 						</th>
-						<th style="width: 120px" pSortableColumn="modulo" data-info-anchor="tabla-orden-columna">MÓDULO <p-sortIcon field="modulo" /></th>
-						<th pSortableColumn="codigo" data-info-anchor="tabla-orden-columna">CÓDIGO <p-sortIcon field="codigo" /></th>
-						<th pSortableColumn="nombre" data-info-anchor="tabla-orden-columna">NOMBRE <p-sortIcon field="nombre" /></th>
-						<th pSortableColumn="ruta" data-info-anchor="tabla-orden-columna">RUTA / DESCRIPCIÓN <p-sortIcon field="ruta" /></th>
+						<th style="width: 120px" eduSortableColumn="modulo" data-info-anchor="tabla-orden-columna">MÓDULO</th>
+						<th eduSortableColumn="codigo" data-info-anchor="tabla-orden-columna">CÓDIGO</th>
+						<th eduSortableColumn="nombre" data-info-anchor="tabla-orden-columna">NOMBRE</th>
+						<th eduSortableColumn="ruta" data-info-anchor="tabla-orden-columna">RUTA / DESCRIPCIÓN</th>
 						<th style="width: 100px">ACCIONES</th>
 					</tr>
 				</ng-template>
@@ -146,7 +143,7 @@
 							@if (cap.ruta) {
 								<div class="ruta-cell">
 									<code class="ruta-text">/{{ cap.ruta }}</code>
-									<p-tag [value]="cap.segmento" [severity]="segmentSeverity(cap.segmento)" styleClass="tag-sm" />
+									<edu-tag [value]="cap.segmento" [severity]="segmentSeverity(cap.segmento)" styleClass="tag-sm" />
 								</div>
 							} @else if (cap.descripcion) {
 								<span class="text-muted">{{ cap.descripcion }}</span>
@@ -156,26 +153,28 @@
 						</td>
 						<td>
 							<div class="actions">
-								<button
-									pButton
+								<edu-button
 									icon="pi pi-pencil"
-									class="p-button-rounded p-button-text p-button-info"
-									pTooltip="Editar"
-									tooltipPosition="top"
+									[text]="true"
+									[rounded]="true"
+									severity="info"
+									eduTooltip="Editar"
+									eduTooltipPosition="top"
 									aria-label="Editar"
 									(click)="editCapability(cap)"
 									data-info-anchor="admin-vistas-edit-btn"
-								></button>
-								<button
-									pButton
+								/>
+								<edu-button
 									icon="pi pi-trash"
-									class="p-button-rounded p-button-text p-button-danger"
-									pTooltip="Eliminar"
-									tooltipPosition="top"
+									[text]="true"
+									[rounded]="true"
+									severity="danger"
+									eduTooltip="Eliminar"
+									eduTooltipPosition="top"
 									aria-label="Eliminar"
 									(click)="deleteCapability(cap)"
 									data-info-anchor="admin-vistas-delete-btn"
-								></button>
+								/>
 							</div>
 						</td>
 					</tr>
@@ -192,13 +191,13 @@
 						</td>
 					</tr>
 				</ng-template>
-			</p-table>
+			</edu-table>
 	</section>
 	<!-- #endregion -->
 </div>
 
 <!-- #region Edit/Create dialog -->
-<p-dialog
+<edu-dialog
 	[visible]="vm().dialogVisible"
 	(visibleChange)="onDialogVisibleChange($event)"
 	[header]="vm().isEditing ? 'Editar Capability' : 'Nueva Capability'"
@@ -215,7 +214,7 @@
 				<input
 					id="codigo"
 					type="text"
-					pInputText
+					eduInputText
 					[ngModel]="vm().formData.codigo"
 					(ngModelChange)="updateFormField('codigo', $event)"
 					placeholder="ADMIN_HORARIOS"
@@ -233,7 +232,7 @@
 				<input
 					id="nombre"
 					type="text"
-					pInputText
+					eduInputText
 					[ngModel]="vm().formData.nombre"
 					(ngModelChange)="updateFormField('nombre', $event)"
 					placeholder="Nombre descriptivo"
@@ -249,7 +248,7 @@
 				<input
 					id="modulo"
 					type="text"
-					pInputText
+					eduInputText
 					[ngModel]="vm().formData.modulo"
 					(ngModelChange)="updateFormField('modulo', $event)"
 					placeholder="admin"
@@ -265,7 +264,7 @@
 				<input
 					id="descripcion"
 					type="text"
-					pInputText
+					eduInputText
 					[ngModel]="vm().formData.descripcion"
 					(ngModelChange)="updateFormField('descripcion', $event)"
 					placeholder="Descripción de la capability"
@@ -277,30 +276,28 @@
 
 	<ng-template #footer>
 		<div class="dialog-footer">
-			<button
-				pButton
+			<edu-button
 				label="Cancelar"
 				icon="pi pi-times"
-				class="p-button-text"
+				[text]="true"
 				(click)="onDialogVisibleChange(false)"
 				[disabled]="vm().saving"
 				data-info-anchor="admin-vistas-dialog-cancelar-btn"
-			></button>
-			<button
-				pButton
+			/>
+			<edu-button
 				label="Guardar"
 				icon="pi pi-check"
-				class="p-button-success"
+				severity="success"
 				(click)="saveCapability()"
 				[disabled]="!vm().isFormValid || vm().saving"
 				[loading]="vm().saving"
 				data-info-anchor="admin-vistas-dialog-guardar-btn"
-			></button>
+			/>
 		</div>
 	</ng-template>
-</p-dialog>
+</edu-dialog>
 <!-- #endregion -->
 
 <!-- ConfirmDialog -->
-<p-confirmDialog (onHide)="onConfirmDialogHide()" />
+<edu-confirm-dialog (onHide)="onConfirmDialogHide()" />
 <!-- #endregion -->

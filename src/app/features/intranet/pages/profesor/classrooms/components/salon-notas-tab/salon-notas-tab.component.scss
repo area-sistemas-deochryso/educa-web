@@ -61,9 +61,9 @@
 	text-align: center !important;
 	font-weight: 700 !important;
 	font-size: 0.8rem;
-	background: var(--p-primary-50, rgba(79, 70, 229, 0.05)) !important;
-	border-bottom: 2px solid var(--p-primary-200, rgba(79, 70, 229, 0.2)) !important;
-	color: var(--p-primary-700, #4338ca);
+	background: var(--primary-50) !important;
+	border-bottom: 2px solid var(--primary-200) !important;
+	color: var(--primary-700);
 }
 
 .periodo-header-single {
@@ -71,7 +71,7 @@
 	font-weight: 700 !important;
 	font-size: 0.8rem;
 	min-width: 100px;
-	color: var(--p-primary-700, #4338ca);
+	color: var(--primary-700);
 }
 
 .promedio-col-header {
@@ -79,7 +79,7 @@
 	font-weight: 700 !important;
 	font-size: 0.75rem;
 	min-width: 60px;
-	color: var(--p-primary-600, #4f46e5);
+	color: var(--primary-600);
 	background: var(--surface-50, #fafafa) !important;
 }
 
@@ -91,7 +91,7 @@
 	text-align: center !important;
 	font-weight: 700 !important;
 	min-width: 75px;
-	color: var(--p-primary-800, #3730a3);
+	color: var(--primary-800);
 }
 
 .general-col {
@@ -134,80 +134,8 @@
 // #endregion
 
 // #region Table overrides
-:host ::ng-deep {
-	.p-datatable {
-		margin-top: 0.5rem;
-		background: transparent;
-
-		.p-datatable-table {
-			background: transparent;
-		}
-
-		.p-datatable-thead > tr > th {
-			background: transparent;
-		}
-
-		.p-datatable-tbody > tr {
-			background: transparent;
-
-			> td {
-				background: transparent;
-			}
-		}
-
-		.p-datatable-paginator-bottom,
-		.p-paginator {
-			background: transparent;
-		}
-	}
-
-	.p-datatable .p-datatable-thead > tr > th {
-		padding: 0.5rem;
-		font-size: 0.8rem;
-		white-space: nowrap;
-	}
-
-	.p-datatable .p-datatable-tbody > tr > td {
-		padding: 0.4rem 0.5rem;
-		font-size: 0.85rem;
-	}
-
-	// Visual separator after each period's promedio column
-	.notas-salon-table .p-datatable-tbody > tr > td.promedio-col {
-		border-right: 2px solid var(--p-primary-100, rgba(79, 70, 229, 0.1));
-	}
-}
-
 .font-mono {
 	font-family: 'Courier New', monospace;
 	font-size: 0.8rem;
-}
-// #endregion
-
-// #region Overrides PrimeNG
-:host ::ng-deep {
-	.p-inputtext,
-	.p-select {
-		background: transparent;
-		color: var(--text-color);
-		border-color: var(--surface-300);
-
-		&::placeholder {
-			color: var(--text-color-secondary);
-		}
-
-		&:enabled:focus {
-			border-color: var(--text-color);
-			box-shadow: 0 0 0 1px var(--text-color);
-		}
-	}
-
-	.p-select-label {
-		color: var(--text-color);
-	}
-
-	.p-select-dropdown {
-		color: var(--text-color);
-	}
 }
 // #endregion

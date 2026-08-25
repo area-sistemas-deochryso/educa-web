@@ -310,19 +310,6 @@
 }
 // #endregion
 
-// #region Overrides PrimeNG — filtros (tabla cubierta por global)
-:host ::ng-deep {
-	.p-inputtext,
-	.p-select,
-	.p-datepicker-input,
-	textarea.p-textarea {
-		background: transparent;
-		color: var(--text-color);
-		border-color: var(--surface-300);
-	}
-}
-// #endregion
-
 // #region Eliminar reporte
 .delete-section {
 	display: flex;

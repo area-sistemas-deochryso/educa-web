@@ -3,22 +3,22 @@
 	<div class="estadisticas-container">
 		<div class="header-row">
 			<!-- * Descarga PDF/Excel -->
-			<p-button
+			<edu-button
 				icon="pi pi-download"
 				[loading]="downloadingPdf()"
 				severity="secondary"
 				[text]="true"
 				[rounded]="true"
-				(onClick)="toggleMenu($event)"
-				pTooltip="Descargar reporte"
-				tooltipPosition="top"
+				(click)="toggleMenu($event)"
+				eduTooltip="Descargar reporte"
+				eduTooltipPosition="top"
 				[pt]="{
 					root: {
 						'aria-label': 'Descargar reporte',
 					},
 				}"
 			/>
-			<p-menu #pdfMenu [model]="menuItems" [popup]="true" appendTo="body" />
+			<edu-menu #pdfMenu [model]="menuItems" [popup]="true" appendTo="body" />
 			<!-- * Date headline -->
 			<h2>Estadísticas del día - {{ estadisticas()!.fecha | date: 'EEEE d MMMM yyyy' }}</h2>
 		</div>

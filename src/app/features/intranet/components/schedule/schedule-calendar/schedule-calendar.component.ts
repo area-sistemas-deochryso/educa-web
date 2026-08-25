@@ -1,10 +1,8 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
-import { Menu, MenuModule } from 'primeng/menu';
 
 import { CommonModule } from '@angular/common';
-import { MenuItem } from 'primeng/api';
-import { TooltipModule } from 'primeng/tooltip';
+import { EduMenu, EduMenuItem, EduTooltip } from '@edu-ui';
 
 // #endregion
 // #region Implementation
@@ -22,7 +20,7 @@ export interface CalendarDay {
 
 @Component({
 	selector: 'app-schedule-calendar',
-	imports: [CommonModule, MenuModule, TooltipModule],
+	imports: [CommonModule, EduMenu, EduTooltip],
 	templateUrl: './schedule-calendar.component.html',
 	styleUrl: './schedule-calendar.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -32,7 +30,7 @@ export interface CalendarDay {
  */
 export class ScheduleCalendarComponent implements OnInit {
 	/** Context menu reference for a day. */
-	@ViewChild('dayMenu') dayMenu!: Menu;
+	@ViewChild('dayMenu') dayMenu!: EduMenu;
 	/** Emits when user opens the schedule modal. */
 	@Output() openSchedule = new EventEmitter<void>();
 	/** Emits when user opens the summary modal. */
@@ -65,7 +63,7 @@ export class ScheduleCalendarComponent implements OnInit {
 	];
 	// #endregion
 
-	menuItems: MenuItem[] = [
+	menuItems: EduMenuItem[] = [
 		{ label: 'Ver Horarios', command: () => this.openSchedule.emit() },
 		{ label: 'Ver Notas / Asistencias', command: () => this.openSummary.emit() },
 	];

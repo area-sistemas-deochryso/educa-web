@@ -4,14 +4,14 @@
 			<i class="pi pi-hdd"></i>
 			<h3>Almacenamiento</h3>
 		</div>
-		<button
-			pButton
+		<edu-button
 			icon="pi pi-refresh"
-			class="p-button-text p-button-sm"
+			[text]="true"
+			size="small"
 			[loading]="loading()"
 			data-info-anchor="admin-diagnostico-db-refresh-btn"
 			(click)="onRefresh()"
-		></button>
+		/>
 	</header>
 
 	@if (error()) {
@@ -36,7 +36,7 @@
 						<span class="file-card__name">{{ file.fileName }}</span>
 						<span class="file-card__type">{{ file.fileType }}</span>
 					</div>
-					<p-progressBar
+					<edu-progress-bar
 						[value]="file.fillPercent"
 						[showValue]="true"
 						[color]="getFillColor(file.fillPercent)"

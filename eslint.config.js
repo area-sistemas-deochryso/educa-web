@@ -1139,6 +1139,9 @@ const layerEnforcementPlugin = {
 module.exports = tseslint.config(
 	// #region Global ignores — build artifacts y outputs generados
 	// No son código fuente: nativos de Capacitor, coverage de Vitest, dist de build, node_modules.
+	// edu-ui: vendorizado de educa-libs (P79 F6) — su naming (`Edu*`, selectores `edu-*` sin
+	// prefijo "app") es el de esa librería, no el de este app; lintearlo con las reglas de
+	// educa-web sería igual de incorrecto que lintear node_modules.
 	{
 		ignores: [
 			'android/**',
@@ -1147,6 +1150,7 @@ module.exports = tseslint.config(
 			'dist/**',
 			'.angular/**',
 			'node_modules/**',
+			'src/app/shared/edu-ui/**',
 		],
 	},
 	// #endregion

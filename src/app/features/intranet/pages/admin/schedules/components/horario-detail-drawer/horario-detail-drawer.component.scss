@@ -373,14 +373,6 @@
 // #endregion
 // #region Responsive
 @media (max-width: 768px) {
-  ::ng-deep {
-    p-drawer {
-      .p-drawer {
-        width: 90vw !important;
-      }
-    }
-  }
-
   .info-section {
     .info-grid {
       grid-template-columns: 1fr;

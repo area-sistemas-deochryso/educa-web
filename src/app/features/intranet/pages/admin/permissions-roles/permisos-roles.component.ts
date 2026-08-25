@@ -2,41 +2,17 @@ import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } 
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
-import { TableModule } from 'primeng/table';
-import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
-import { TooltipModule } from 'primeng/tooltip';
-import { TagModule } from 'primeng/tag';
-import { InputTextModule } from 'primeng/inputtext';
-import { CheckboxModule } from 'primeng/checkbox';
-import { DrawerModule } from 'primeng/drawer';
-import { Tab, TabList, TabPanel, Tabs } from 'primeng/tabs';
-
 import { PageHeaderComponent, KpiStatsComponent, type KpiStatItem } from '@intranet-shared/components';
 
 import { PermissionsRolesFacade } from './services';
 import type { RolCapabilityMatrixRow } from '@core/services';
 import { VistasComponent } from '../vistas';
+import { EduButton, EduCheckbox, EduDialog, EduDrawer, EduInputText, EduTab, EduTabPanel, EduTable, EduTabs, EduTag, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-permissions-roles',
 	standalone: true,
-	imports: [
-		CommonModule,
-		FormsModule,
-		TableModule,
-		ButtonModule,
-		DialogModule,
-		TooltipModule,
-		TagModule,
-		InputTextModule,
-		CheckboxModule,
-		DrawerModule,
-		Tabs, TabList, Tab, TabPanel,
-		PageHeaderComponent,
-		KpiStatsComponent,
-		VistasComponent,
-	],
+	imports: [CommonModule, FormsModule, EduTable, EduButton, EduDialog, EduTooltip, EduTag, EduInputText, EduCheckbox, EduDrawer, EduTabs, EduTab, EduTabPanel, PageHeaderComponent, KpiStatsComponent, VistasComponent],
 	templateUrl: './permisos-roles.component.html',
 	styleUrl: './permisos-roles.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -51,8 +27,7 @@ export class PermissionsRolesComponent implements OnInit {
 		return [
 			{ icon: 'pi pi-id-card', label: 'Roles', value: stats.totalRoles, sublabel: 'en el sistema' },
 			{ icon: 'pi pi-th-large', label: 'Módulos', value: stats.totalModulos, sublabel: 'categorías' },
-			{ icon: 'pi pi-shield', label: 'Capabilities', value: stats.totalCapabilities, sublabel: 'disponibles' },
-		];
+			{ icon: 'pi pi-shield', label: 'Capabilities', value: stats.totalCapabilities, sublabel: 'disponibles' }];
 	});
 
 	ngOnInit(): void {

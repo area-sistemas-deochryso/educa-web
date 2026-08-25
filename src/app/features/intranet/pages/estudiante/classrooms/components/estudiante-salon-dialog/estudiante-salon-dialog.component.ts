@@ -1,10 +1,6 @@
 // #region Imports
 import { Component, ChangeDetectionStrategy, input, output, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DialogModule } from 'primeng/dialog';
-import { TabsModule } from 'primeng/tabs';
-import { ButtonModule } from 'primeng/button';
-import { TooltipModule } from 'primeng/tooltip';
 import { environment } from '@config/environment';
 import { detectarNivel } from '@core/helpers';
 import {
@@ -18,6 +14,7 @@ import { EstudianteGruposTabComponent } from '../estudiante-grupos-tab/estudiant
 import { StudentAttendanceTabComponent } from '../student-attendance-tab/student-attendance-tab.component';
 import { CampusNavigationComponent } from '@features/intranet/pages/cross-role/campus-navigation/campus-navigation.component';
 import { EstudianteNotasComponent } from '@features/intranet/pages/estudiante/notas/estudiante-notas.component';
+import { EduButton, EduDialog, EduTab, EduTabPanel, EduTabs, EduTooltip } from '@edu-ui';
 
 // #endregion
 @Component({
@@ -25,15 +22,14 @@ import { EstudianteNotasComponent } from '@features/intranet/pages/estudiante/no
 	standalone: true,
 	imports: [
 		CommonModule,
-		DialogModule,
-		TabsModule,
-		ButtonModule,
-		TooltipModule,
+		EduDialog,
+		EduTabs, EduTab, EduTabPanel,
+		EduButton,
+		EduTooltip,
 		EstudianteGruposTabComponent,
 		StudentAttendanceTabComponent,
 		CampusNavigationComponent,
-		EstudianteNotasComponent,
-	],
+		EstudianteNotasComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	styles: `
 		:host ::ng-deep .p-datatable {
@@ -90,7 +86,7 @@ import { EstudianteNotasComponent } from '@features/intranet/pages/estudiante/no
 		}
 	`,
 	template: `
-		<p-dialog
+		<edu-dialog
 			[visible]="visible()"
 			(visibleChange)="onVisibleChange($event)"
 			[modal]="true"
@@ -113,39 +109,40 @@ import { EstudianteNotasComponent } from '@features/intranet/pages/estudiante/no
 				</div>
 			</ng-template>
 			@if (salon(); as s) {
-				<p-tabs value="0" (valueChange)="onTabChange($any($event))">
-					<p-tablist>
-						<p-tab value="0" data-info-anchor="estudiante-salon-dialog-tab">
+				<edu-tabs value="0" (valueChange)="onTabChange($any($event))">
+					
+						<edu-tab value="0" data-info-anchor="estudiante-salon-dialog-tab">
 							<i class="pi pi-users tab-icon"></i>Grupos
-						</p-tab>
-						<p-tab value="1" data-info-anchor="estudiante-salon-dialog-tab">
+						</edu-tab>
+						<edu-tab value="1" data-info-anchor="estudiante-salon-dialog-tab">
 							<i class="pi pi-chart-bar tab-icon"></i>Notas
-						</p-tab>
-						<p-tab value="2" data-info-anchor="estudiante-salon-dialog-tab">
+						</edu-tab>
+						<edu-tab value="2" data-info-anchor="estudiante-salon-dialog-tab">
 							<i class="pi pi-calendar-times tab-icon"></i>Asistencia
-						</p-tab>
+						</edu-tab>
 						@if (showCampusNav) {
-							<p-tab value="3" data-info-anchor="estudiante-salon-dialog-tab">
+							<edu-tab value="3" data-info-anchor="estudiante-salon-dialog-tab">
 								<i class="pi pi-map tab-icon"></i>Ubicación
-							</p-tab>
+							</edu-tab>
 						}
-					</p-tablist>
+					
 
-					<p-tabpanels>
-						<!-- #region Tab Grupos -->
-						<p-tabpanel value="0">
+					
+						<!-- #region EduTab Grupos -->
+						<edu-tabpanel value="0">
 							<div style="display: flex; justify-content: flex-end; margin-bottom: 0.5rem">
-								<button
-									pButton
+								<edu-button
 									icon="pi pi-refresh"
-									class="p-button-rounded p-button-text p-button-sm"
+									[rounded]="true"
+									[text]="true"
+									size="small"
 									data-info-anchor="estudiante-salon-dialog-refresh-grupos"
 									(click)="onRefreshGrupos()"
 									[disabled]="gruposLoading()"
-									pTooltip="Refrescar"
-									tooltipPosition="top"
+									eduTooltip="Refrescar"
+									eduTooltipPosition="top"
 									[pt]="{ root: { 'aria-label': 'Refrescar grupos' } }"
-								></button>
+								/>
 							</div>
 							<app-estudiante-grupos-tab
 								[gruposData]="gruposData()"
@@ -154,19 +151,19 @@ import { EstudianteNotasComponent } from '@features/intranet/pages/estudiante/no
 								[selectedCurso]="gruposCursoId()"
 								(cursoChange)="onGruposCursoChange($event)"
 							/>
-						</p-tabpanel>
+						</edu-tabpanel>
 						<!-- #endregion -->
 
-						<!-- #region Tab Notas -->
-						<p-tabpanel value="1">
+						<!-- #region EduTab Notas -->
+						<edu-tabpanel value="1">
 							@if (activeTab() === '1') {
 								<app-estudiante-notas [cursoNombres]="cursoNombresOptions()" [embedded]="true" />
 							}
-						</p-tabpanel>
+						</edu-tabpanel>
 						<!-- #endregion -->
 
-						<!-- #region Tab Asistencia -->
-						<p-tabpanel value="2">
+						<!-- #region EduTab Asistencia -->
+						<edu-tabpanel value="2">
 							@if (activeTab() === '2') {
 								<app-student-attendance-tab
 									[asistenciaData]="asistenciaData()"
@@ -186,25 +183,25 @@ import { EstudianteNotasComponent } from '@features/intranet/pages/estudiante/no
 									(guardarJustificacion)="guardarJustificacion.emit($event)"
 								/>
 							}
-						</p-tabpanel>
+						</edu-tabpanel>
 						<!-- #endregion -->
 
-						<!-- #region Tab Ubicación -->
+						<!-- #region EduTab Ubicación -->
 						@if (showCampusNav) {
-							<p-tabpanel value="3">
+							<edu-tabpanel value="3">
 								@if (activeTab() === '3') {
 									<app-campus-navigation
 										[embedded]="true"
 										[targetSalonId]="s.salonId"
 									/>
 								}
-							</p-tabpanel>
+							</edu-tabpanel>
 						}
 						<!-- #endregion -->
-					</p-tabpanels>
-				</p-tabs>
+					
+				</edu-tabs>
 			}
-		</p-dialog>
+		</edu-dialog>
 	`,
 })
 export class EstudianteSalonDialogComponent {
@@ -245,14 +242,14 @@ export class EstudianteSalonDialogComponent {
 		return descripcion ? detectarNivel(descripcion) : null;
 	});
 
-	readonly dialogStyle = computed(() =>
-		this.isFullscreen()
-			? { width: '100vw', maxWidth: '100vw', height: '100vh', maxHeight: '100vh' }
-			: { width: '700px', maxWidth: '95vw' },
-	);
-	readonly contentStyle = computed(() =>
-		this.isFullscreen() ? { 'overflow-y': 'auto' } : { 'max-height': '80vh', 'overflow-y': 'auto' },
-	);
+	readonly dialogStyle = computed((): Record<string, string> => {
+		if (this.isFullscreen()) return { width: '100vw', maxWidth: '100vw', height: '100vh', maxHeight: '100vh' };
+		return { width: '700px', maxWidth: '95vw' };
+	});
+	readonly contentStyle = computed((): Record<string, string> => {
+		if (this.isFullscreen()) return { 'overflow-y': 'auto' };
+		return { 'max-height': '80vh', 'overflow-y': 'auto' };
+	});
 
 	toggleFullscreen(): void {
 		this.isFullscreen.update((v) => !v);

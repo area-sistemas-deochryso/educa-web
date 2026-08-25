@@ -1,4 +1,4 @@
-<p-drawer
+<edu-drawer
 	[visible]="visible()"
 	(visibleChange)="onVisibleChange($event)"
 	position="right"
@@ -28,7 +28,7 @@
 					</div>
 					<div class="info-item">
 						<span class="info-label">Tipo</span>
-						<p-tag [value]="row.tipo" styleClass="tag-neutral" />
+						<edu-tag [value]="row.tipo" styleClass="tag-neutral" />
 					</div>
 					@if (row.bcc) {
 						<div class="info-item">
@@ -62,7 +62,7 @@
 				<div class="info-grid">
 					<div class="info-item">
 						<span class="info-label">Estado</span>
-						<p-tag [value]="row.estado" [severity]="estadoSeverity()" />
+						<edu-tag [value]="row.estado" [severity]="estadoSeverity()" />
 					</div>
 					@if (row.tipoFallo) {
 						<div class="info-item">
@@ -199,30 +199,29 @@
 				} @else if (htmlBody(); as body) {
 					<div class="html-preview" [innerHTML]="body"></div>
 				} @else {
-					<button
-						pButton
+					<edu-button
 						label="Cargar vista previa"
 						icon="pi pi-eye"
-						class="p-button-outlined p-button-sm"
+						[outlined]="true"
+						size="small"
 						(click)="onLoadHtml()"
 						[pt]="{ root: { 'aria-label': 'Cargar vista previa del correo' } }"
 						data-info-anchor="admin-email-outbox-diagnostico-cargar-preview-btn"
-					></button>
+					/>
 				}
 			</section>
 			<!-- #endregion -->
 		</div>
 
 		<div class="drawer-footer">
-			<button
-				pButton
+			<edu-button
 				label="Cerrar"
 				icon="pi pi-times"
-				class="p-button-text"
+				[text]="true"
 				(click)="onClose()"
 				[pt]="{ root: { 'aria-label': 'Cerrar' } }"
 				data-info-anchor="cerrar-drawer-btn"
-			></button>
+			/>
 		</div>
 	}
-</p-drawer>
+</edu-drawer>

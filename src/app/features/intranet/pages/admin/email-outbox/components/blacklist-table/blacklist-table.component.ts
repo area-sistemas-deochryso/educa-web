@@ -6,15 +6,12 @@ import {
 	input,
 	output,
 } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
 import { RouterLink } from '@angular/router';
-import { TableLazyLoadEvent, TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
-
 import type { SkeletonColumnDef } from '@intranet-shared/components';
 import { UiMappingService } from '@intranet-shared/services';
 import { EmailBlacklistEntry } from '@data/models';
+import { EduButton, EduTable, EduTag, EduTooltip } from '@edu-ui';
+import type { EduTableLazyLoadEvent } from '@edu-ui';
 
 /**
  * Plan 38 Chat 5 — tabla server-paginated de entradas en `EmailBlacklist`.
@@ -24,7 +21,7 @@ import { EmailBlacklistEntry } from '@data/models';
 @Component({
 	selector: 'app-blacklist-table',
 	standalone: true,
-	imports: [TableModule, TagModule, ButtonModule, TooltipModule, DatePipe, RouterLink],
+	imports: [EduTable, EduTag, EduButton, EduTooltip, DatePipe, RouterLink],
 	templateUrl: './blacklist-table.component.html',
 	styleUrl: './blacklist-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -45,7 +42,7 @@ export class BlacklistTableComponent {
 	readonly viewDetail = output<EmailBlacklistEntry>();
 	readonly despejar = output<EmailBlacklistEntry>();
 	readonly unblock = output<EmailBlacklistEntry>();
-	readonly lazyLoad = output<TableLazyLoadEvent>();
+	readonly lazyLoad = output<EduTableLazyLoadEvent>();
 	// #endregion
 
 	// #region Skeleton config (consumido por el smart container)
@@ -56,8 +53,7 @@ export class BlacklistTableComponent {
 		{ width: '70px', cellType: 'text' },
 		{ width: '110px', cellType: 'text' },
 		{ width: '90px', cellType: 'badge' },
-		{ width: '110px', cellType: 'actions' },
-	];
+		{ width: '110px', cellType: 'actions' }];
 	// #endregion
 
 	// #region Event handlers
@@ -73,7 +69,7 @@ export class BlacklistTableComponent {
 		this.unblock.emit(item);
 	}
 
-	onLazyLoad(event: TableLazyLoadEvent): void {
+	onLazyLoad(event: EduTableLazyLoadEvent): void {
 		this.lazyLoad.emit(event);
 	}
 	// #endregion

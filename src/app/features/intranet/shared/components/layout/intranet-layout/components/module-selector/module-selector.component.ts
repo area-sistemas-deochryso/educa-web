@@ -15,12 +15,12 @@ import { FormsModule } from '@angular/forms';
 import { NavigationEnd, Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, startWith } from 'rxjs/operators';
-import { TooltipModule } from 'primeng/tooltip';
 
 import { ModuloMenu } from '../../intranet-menu.config';
 import { ModuloId } from '@shared/constants';
 import { QuickAccessFavoritesService } from '@intranet-shared/services';
 import { buildAllResults, buildMegaColumns, scoreResult, SearchResult, TreeGroup } from './module-selector.helpers';
+import { EduTooltip } from '@edu-ui';
 
 export type { SearchResult, TreeGroup, TreeSection, TreeSubsection } from './module-selector.helpers';
 // #endregion
@@ -30,7 +30,7 @@ export type { SearchResult, TreeGroup, TreeSection, TreeSubsection } from './mod
 	selector: 'app-module-selector',
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [FormsModule, TooltipModule],
+	imports: [FormsModule, EduTooltip],
 	templateUrl: './module-selector.component.html',
 	styleUrl: './module-selector.component.scss',
 })

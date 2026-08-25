@@ -1,7 +1,6 @@
 /* eslint-disable max-lines -- Razón: soporte táctil (brief 462) agrega pointer events + pinch-zoom sobre el patrón preexistente de estado duplicado nodo/bloqueo (ya duplicado antes de este cambio). Toda la lógica pura reusable ya está extraída a campus-editor.helpers.ts; fusionar node/bloqueo en un único drag state genérico es un refactor de mayor alcance que el brief no pidió. */
 import { ChangeDetectionStrategy, Component, computed, ElementRef, input, output, signal, viewChild } from '@angular/core';
 
-import { TooltipModule } from 'primeng/tooltip';
 
 import { CampusNodoDto, CampusAristaDto, CampusBloqueoDto, EditorTool } from '../../models';
 import {
@@ -21,11 +20,12 @@ import {
 	computeAristaTooltipScreenPos,
 	classifyPointerGesture,
 } from './campus-editor.helpers';
+import { EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-campus-editor',
 	standalone: true,
-	imports: [TooltipModule],
+	imports: [EduTooltip],
 	templateUrl: './campus-editor.component.html',
 	styleUrl: './campus-editor.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

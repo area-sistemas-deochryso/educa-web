@@ -9,7 +9,7 @@
 		</span>
 	</header>
 
-	<p-table [value]="data()" [dataKey]="'id'" class="p-datatable-sm" styleClass="p-datatable-gridlines">
+	<edu-table [value]="data()" [dataKey]="'id'" class="p-datatable-sm" styleClass="p-datatable-gridlines">
 		<ng-template #header>
 			<tr>
 				<th class="label-uppercase col-tipofallo">Tipo</th>
@@ -21,7 +21,7 @@
 		<ng-template #body let-row>
 			<tr>
 				<td class="col-tipofallo">
-					<p-tag [value]="row.tipoPersona | tipoPersonaLabel" [severity]="severity(row.tipoPersona)" />
+					<edu-tag [value]="row.tipoPersona | tipoPersonaLabel" [severity]="severity(row.tipoPersona)" />
 				</td>
 				<td class="col-dni">
 					<code>{{ row.dniMasked }}</code>
@@ -42,5 +42,5 @@
 				</td>
 			</tr>
 		</ng-template>
-	</p-table>
+	</edu-table>
 </section>

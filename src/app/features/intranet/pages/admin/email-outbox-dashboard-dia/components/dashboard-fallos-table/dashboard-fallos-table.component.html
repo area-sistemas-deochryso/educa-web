@@ -8,7 +8,7 @@
 		</span>
 	</header>
 
-	<p-table
+	<edu-table
 		[value]="items()"
 		[dataKey]="'id'"
 		class="p-datatable-sm fallos-table"
@@ -34,24 +34,25 @@
 					<code>{{ row.destinatario }}</code>
 				</td>
 				<td>
-					<p-tag [value]="row.tipo" styleClass="tag-neutral" />
+					<edu-tag [value]="row.tipo" styleClass="tag-neutral" />
 				</td>
 				<td>
-					<p-tag [value]="row.tipoFallo | tipoFalloLabel" severity="danger" />
+					<edu-tag [value]="row.tipoFallo | tipoFalloLabel" severity="danger" />
 				</td>
 				<td class="cell-error" [title]="row.ultimoError ?? ''">
 					{{ row.ultimoError ?? '—' }}
 				</td>
 				<td class="col-actions">
-					<button
-						pButton
+					<edu-button
 						icon="pi pi-copy"
-						class="p-button-text p-button-sm btn-icon"
-						pTooltip="Copiar correo"
+						[text]="true"
+						size="small"
+						class="btn-icon"
+						eduTooltip="Copiar correo"
 						(click)="onCopy(row.destinatario)"
 						data-info-anchor="admin-email-outbox-dashboard-copiar-destinatario"
 						[pt]="{ root: { 'aria-label': 'Copiar correo' } }"
-					></button>
+					/>
 				</td>
 			</tr>
 		</ng-template>
@@ -65,6 +66,6 @@
 				</td>
 			</tr>
 		</ng-template>
-	</p-table>
+	</edu-table>
 </section>
 <!-- #endregion -->

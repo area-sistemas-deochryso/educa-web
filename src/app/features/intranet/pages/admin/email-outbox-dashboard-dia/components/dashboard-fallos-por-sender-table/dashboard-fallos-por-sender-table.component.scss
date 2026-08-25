@@ -38,35 +38,6 @@
 		font-size: 0.85rem;
 	}
 
-	:host ::ng-deep .p-datatable {
-		.p-datatable-table-container,
-		.p-datatable-wrapper,
-		&.p-datatable {
-			overflow-x: auto !important;
-			width: 100%;
-		}
-
-		table {
-			table-layout: fixed;
-			width: 100%;
-		}
-
-		td {
-			vertical-align: middle !important;
-			word-break: break-all;
-			overflow-wrap: anywhere;
-			white-space: normal;
-		}
-
-		.p-tag {
-			display: inline-block;
-			max-width: 100%;
-			white-space: normal;
-			text-align: left;
-			line-height: 1.25;
-			word-break: break-word;
-		}
-	}
 }
 
 .empty-state {

@@ -3,13 +3,6 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
-import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
-import { TextareaModule } from 'primeng/textarea';
-import { TooltipModule } from 'primeng/tooltip';
-
 import { CapabilityCatalogItem } from '@core/services/permissions';
 
 import {
@@ -18,6 +11,7 @@ import {
 	FaqAdminDto,
 	WizardPasoInput,
 } from '../../models/faq-admin.models';
+import { EduButton, EduDialog, EduInputText, EduSelect, EduTextarea, EduTooltip } from '@edu-ui';
 // #endregion
 
 interface CapabilityOption {
@@ -34,16 +28,7 @@ interface CapabilityOption {
 @Component({
 	selector: 'app-faq-admin-form-dialog',
 	standalone: true,
-	imports: [
-		CommonModule,
-		FormsModule,
-		ButtonModule,
-		DialogModule,
-		InputTextModule,
-		SelectModule,
-		TextareaModule,
-		TooltipModule,
-	],
+	imports: [CommonModule, FormsModule, EduButton, EduDialog, EduInputText, EduSelect, EduTextarea, EduTooltip],
 	templateUrl: './faq-admin-form-dialog.component.html',
 	styleUrl: './faq-admin-form-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -73,8 +58,7 @@ export class FaqAdminFormDialogComponent {
 
 	readonly capabilityOptions = computed<CapabilityOption[]>(() => [
 		{ label: 'Todos (sin capability)', value: null },
-		...this.capabilities().map((c) => ({ label: `${c.nombre} (${c.codigo})`, value: c.id })),
-	]);
+		...this.capabilities().map((c) => ({ label: `${c.nombre} (${c.codigo})`, value: c.id }))]);
 
 	readonly isValid = computed(() => this.pregunta().trim().length > 0 && this.respuesta().trim().length > 0);
 	// #endregion

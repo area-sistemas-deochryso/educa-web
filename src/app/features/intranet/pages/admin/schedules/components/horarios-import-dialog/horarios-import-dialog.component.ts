@@ -1,11 +1,7 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
+
 import { ExcelService } from '@core/services';
 import { logger } from '@core/helpers';
 import {
@@ -20,6 +16,7 @@ import {
 	parseId,
 	validateImportRowRango,
 } from '../../helpers/horario-import.config';
+import { EduButton, EduDialog, EduSpinner, EduTable, EduTag, EduTemplate } from '@edu-ui';
 
 // #endregion
 
@@ -29,14 +26,7 @@ type DialogStep = 'upload' | 'preview' | 'result';
 @Component({
 	selector: 'app-schedules-import-dialog',
 	standalone: true,
-	imports: [
-		CommonModule,
-		ButtonModule,
-		DialogModule,
-		ProgressSpinnerModule,
-		TableModule,
-		TagModule,
-	],
+	imports: [CommonModule, EduButton, EduDialog, EduSpinner, EduTable, EduTag, EduTemplate],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './horarios-import-dialog.component.html',
 	styleUrl: './horarios-import-dialog.component.scss',

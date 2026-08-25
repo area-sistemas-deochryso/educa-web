@@ -141,22 +141,6 @@
 }
 // #endregion
 
-// #region Table overrides
-:host ::ng-deep .p-datatable {
-	--p-datatable-header-cell-background: transparent;
-	--p-datatable-row-background: transparent;
-}
-
-:host ::ng-deep .p-datatable-gridlines .p-datatable-thead > tr > th {
-	border-width: 0 0 1px 0;
-}
-
-:host ::ng-deep .p-datatable-gridlines .p-datatable-tbody > tr > td {
-	border-width: 0 0 1px 0;
-	border-color: var(--surface-border);
-}
-// #endregion
-
 // #region Empty state
 .empty-state {
 	display: flex;

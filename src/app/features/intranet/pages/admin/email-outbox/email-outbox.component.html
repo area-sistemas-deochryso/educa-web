@@ -13,7 +13,7 @@
 <!-- #region Defer/fail banner cross-páginas + toast scoped (Plan 38 Chat 6 + Plan 39 Chat D) -->
 <app-email-defer-fail-banner />
 @if (deferAlertsEnabled) {
-	<p-toast position="top-right" key="email-outbox-alerts" />
+	<edu-toast position="top-right" key="email-outbox-alerts" />
 }
 <!-- #endregion -->
 
@@ -127,7 +127,7 @@
 <!-- #endregion -->
 
 <!-- #region Detail Drawer -->
-<p-drawer
+<edu-drawer
 	[visible]="vm().drawerVisible"
 	(visibleChange)="onDrawerVisibleChange($event)"
 	position="right"
@@ -151,7 +151,7 @@
 			<div class="detail-row">
 				<span class="detail-label">Estado</span>
 				<span class="detail-value">
-					<p-tag
+					<edu-tag
 						[value]="item.estado"
 						[severity]="item.estado === 'SENT' ? 'success' : item.estado === 'FAILED' ? 'danger' : item.estado === 'PROCESSING' ? 'info' : 'warn'"
 					/>
@@ -239,15 +239,14 @@
 			<!-- Manual retry button -->
 			@if (item.estado === 'FAILED') {
 				<div class="retry-action">
-					<button
-						pButton
+					<edu-button
 						label="Reintentar manualmente"
 						icon="pi pi-replay"
 						severity="warn"
 						[outlined]="true"
 						data-info-anchor="reintentar"
 						(click)="onOpenManualRetry()"
-					></button>
+					/>
 				</div>
 			}
 
@@ -278,7 +277,7 @@
 									<span class="truncate">{{ attempt.senderAddress }}</span>
 									<span>{{ attempt.forced ? 'Sí' : 'No' }}</span>
 									<span>
-										<p-tag
+										<edu-tag
 											[value]="attempt.resultado"
 											[severity]="attempt.resultado === 'SENT' ? 'success' : 'danger'"
 											[style]="{ fontSize: '0.75rem' }"
@@ -311,11 +310,11 @@
 			</div>
 		</div>
 	}
-</p-drawer>
+</edu-drawer>
 <!-- #endregion -->
 
 <!-- #region Manual Retry Dialog -->
-<p-dialog
+<edu-dialog
 	header="Reintentar manualmente"
 	[visible]="vm().manualRetryDialogVisible"
 	(visibleChange)="!$event && onCloseManualRetryDialog()"
@@ -341,7 +340,7 @@
 			}
 			<div class="retry-sender-field">
 				<label class="detail-label" for="senderSelect">Remitente</label>
-				<p-select
+				<edu-select
 					id="senderSelect"
 					data-info-anchor="admin-email-outbox-retry-sender-select"
 					[options]="senderOptions"
@@ -356,7 +355,7 @@
 
 			@if (vm().manualRetryResult; as result) {
 				<div class="retry-result" [class.success]="result.resultado === 'SENT'" [class.failed]="result.resultado !== 'SENT'">
-					<p-tag
+					<edu-tag
 						[value]="result.resultado"
 						[severity]="result.resultado === 'SENT' ? 'success' : 'danger'"
 					/>
@@ -369,22 +368,31 @@
 		</div>
 	}
 	<ng-template #footer>
-		<button pButton label="Cancelar" severity="secondary" [text]="true" data-info-anchor="email-outbox-dialog-cancel-btn" (click)="onCloseManualRetryDialog()"></button>
+		<edu-button
+			label="Cancelar"
+			severity="secondary"
+			[text]="true"
+			data-info-anchor="email-outbox-dialog-cancel-btn"
+			(click)="onCloseManualRetryDialog()"
+		/>
 		@if (!vm().manualRetryResult) {
-			<button
-				pButton
+			<edu-button
 				label="Reintentar"
 				icon="pi pi-replay"
 				severity="warn"
 				data-info-anchor="reintentar"
 				[loading]="vm().manualRetryLoading"
 				(click)="onConfirmManualRetry()"
-			></button>
+			/>
 		} @else {
-			<button pButton label="Cerrar" data-info-anchor="email-outbox-dialog-close-btn" (click)="onCloseManualRetryDialog()"></button>
+			<edu-button
+				label="Cerrar"
+				data-info-anchor="email-outbox-dialog-close-btn"
+				(click)="onCloseManualRetryDialog()"
+			/>
 		}
 	</ng-template>
-</p-dialog>
+</edu-dialog>
 <!-- #endregion -->
 
 <!-- #region Export Drawer -->

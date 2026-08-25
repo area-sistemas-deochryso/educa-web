@@ -7,7 +7,6 @@ import {
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { SelectButtonModule } from 'primeng/selectbutton';
 
 import { SkeletonLoaderComponent } from '@shared/components';
 
@@ -15,6 +14,7 @@ import {
 	DashboardSerieTemporalPunto,
 	SerieTemporalGranularidad,
 } from '@features/intranet/pages/admin/email-outbox-shared';
+import { EduSelectButton } from '@edu-ui';
 
 interface Bucket {
 	bucket: string;
@@ -34,7 +34,7 @@ interface Bucket {
 @Component({
 	selector: 'app-serie-temporal-tile',
 	standalone: true,
-	imports: [DatePipe, FormsModule, SelectButtonModule, SkeletonLoaderComponent],
+	imports: [DatePipe, FormsModule, EduSelectButton, SkeletonLoaderComponent],
 	templateUrl: './serie-temporal-tile.component.html',
 	styleUrl: './serie-temporal-tile.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

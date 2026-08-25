@@ -1,14 +1,14 @@
 import { ChangeDetectionStrategy, Component, computed, effect, input, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TableModule } from 'primeng/table';
-import { SelectModule } from 'primeng/select';
+
 import type {
 	PersonaAsistenteAdminReporte,
 	PersonaProfesorReporte,
 	ReporteFiltrado,
 	SalonReporteFiltrado,
 } from '../../models';
+import { EduSelect, EduTable } from '@edu-ui';
 
 interface SalonSelectOption {
 	label: string;
@@ -19,7 +19,7 @@ interface SalonSelectOption {
 @Component({
 	selector: 'app-reports-result',
 	standalone: true,
-	imports: [FormsModule, TableModule, SelectModule, DatePipe],
+	imports: [FormsModule, EduTable, EduSelect, DatePipe],
 	templateUrl: './reports-result.component.html',
 	styleUrl: './reports-result.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

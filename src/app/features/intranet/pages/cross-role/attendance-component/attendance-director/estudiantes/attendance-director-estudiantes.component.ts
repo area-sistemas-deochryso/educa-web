@@ -22,14 +22,9 @@ import { SelectorContext } from '@features/intranet/services/attendance/attendan
 import { AttendancePdfService } from '@features/intranet/services/attendance/attendance-pdf.service';
 import { AttendanceStatsService } from '@features/intranet/services/attendance/attendance-stats.service';
 import { VIEW_MODE, ViewMode } from '@features/intranet/components/attendance/attendance-header/attendance-header.component';
-import { ButtonModule } from 'primeng/button';
 import { EmptyStateComponent } from '@features/intranet/components/attendance/empty-state/empty-state.component';
 import { FormsModule } from '@angular/forms';
 import { GradoSeccionSelectorComponent } from '@features/intranet/components/attendance/grado-seccion-selector/grado-seccion-selector.component';
-import { InputTextModule } from 'primeng/inputtext';
-import { Menu, MenuModule } from 'primeng/menu';
-import { MenuItem } from 'primeng/api';
-import { TooltipModule } from 'primeng/tooltip';
 import { finalize } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
@@ -41,6 +36,8 @@ import {
 	getTodosSalonesExcelObservable,
 	getConsolidadoFileName,
 } from '../consolidated-pdf.helper';
+import { EduButton, EduInputText, EduMenu, EduTooltip } from '@edu-ui';
+import type { EduMenuItem } from '@edu-ui';
 
 /**
  * Vista "Estudiantes" dentro del panel admin de asistencia
@@ -52,29 +49,14 @@ import {
 @Component({
 	selector: 'app-attendance-director-estudiantes',
 	standalone: true,
-	imports: [
-		AttendanceHeatmapComponent,
-		AttendanceTemporalNavComponent,
-		AttendanceTableSkeletonComponent,
-		GradoSeccionSelectorComponent,
-		AttendanceDayListComponent,
-		EmptyStateComponent,
-		AttendanceLegendStatsComponent,
-		AttendanceScopeBannerComponent,
-		JustificationDialogComponent,
-		ButtonModule,
-		TooltipModule,
-		MenuModule,
-		InputTextModule,
-		FormsModule,
-	],
+	imports: [AttendanceHeatmapComponent, AttendanceTemporalNavComponent, AttendanceTableSkeletonComponent, GradoSeccionSelectorComponent, AttendanceDayListComponent, EmptyStateComponent, AttendanceLegendStatsComponent, AttendanceScopeBannerComponent, JustificationDialogComponent, EduButton, EduTooltip, EduMenu, EduInputText, FormsModule],
 	providers: [AttendanceViewController, AttendancePdfService, AttendanceStatsService],
 	templateUrl: './attendance-director-estudiantes.component.html',
 	styleUrl: './attendance-director-estudiantes.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AttendanceDirectorEstudiantesComponent implements OnInit {
-	@ViewChild('pdfMenu') pdfMenu!: Menu;
+	@ViewChild('pdfMenu') pdfMenu!: EduMenu;
 	@ViewChild(JustificationDialogComponent) justificationDialog!: JustificationDialogComponent;
 
 	private asistenciaService = inject(AttendanceService);
@@ -284,7 +266,7 @@ export class AttendanceDirectorEstudiantesComponent implements OnInit {
 
 	// #endregion
 	// #region PDF/Excel menu
-	readonly pdfMenuItems = computed<MenuItem[]>(() => {
+	readonly pdfMenuItems = computed<EduMenuItem[]>(() => {
 		if (this.view.viewMode() === 'mes') {
 			const isPeriodo = this.view.monthSubMode() === 'periodo';
 			const { selectedMonth, selectedYear } = this.view.ingresos();

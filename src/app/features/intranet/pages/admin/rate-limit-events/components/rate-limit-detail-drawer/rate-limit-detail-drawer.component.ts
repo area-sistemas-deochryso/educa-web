@@ -2,29 +2,16 @@ import { ChangeDetectionStrategy, Component, inject, input, output } from '@angu
 import { CommonModule, DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 
-import { ButtonModule } from 'primeng/button';
-import { DrawerModule } from 'primeng/drawer';
-import { MessageService } from 'primeng/api';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
-
 import { logger } from '@core/helpers';
 import { CorrelationIdPillComponent } from '@intranet-shared/components';
 
 import { RateLimitEventListaDto, displayPolicy } from '../../models';
+import { EduButton, EduDrawer, EduMessageService, EduTag, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-rate-limit-detail-drawer',
 	standalone: true,
-	imports: [
-		CommonModule,
-		DatePipe,
-		ButtonModule,
-		DrawerModule,
-		TagModule,
-		TooltipModule,
-		CorrelationIdPillComponent,
-	],
+	imports: [CommonModule, DatePipe, EduButton, EduDrawer, EduTag, EduTooltip, CorrelationIdPillComponent],
 	templateUrl: './rate-limit-detail-drawer.component.html',
 	styleUrl: './rate-limit-detail-drawer.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -32,7 +19,7 @@ import { RateLimitEventListaDto, displayPolicy } from '../../models';
 export class RateLimitDetailDrawerComponent {
 	// #region Dependencias
 	private readonly router = inject(Router);
-	private readonly messageService = inject(MessageService);
+	private readonly messageService = inject(EduMessageService);
 	// #endregion
 
 	// #region Inputs / Outputs

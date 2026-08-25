@@ -1,7 +1,7 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 
-import { ButtonModule } from 'primeng/button';
+import { EduButton } from '@edu-ui';
 
 import { MiHorarioHoyItem } from '../../models';
 
@@ -10,7 +10,7 @@ import { MiHorarioHoyItem } from '../../models';
 @Component({
 	selector: 'app-schedule-panel',
 	standalone: true,
-	imports: [ButtonModule],
+	imports: [EduButton],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
 		<div class="schedule-panel">
@@ -50,10 +50,10 @@ import { MiHorarioHoyItem } from '../../models';
 									</span>
 								}
 							</div>
-							<button
-								pButton
+							<edu-button
 								icon="pi pi-directions"
-								class="p-button-sm p-button-text"
+								size="small"
+								[text]="true"
 								label="Navegar"
 								(click)="navigate.emit(item.salonId)"
 								[pt]="{
@@ -61,7 +61,7 @@ import { MiHorarioHoyItem } from '../../models';
 										'aria-label': 'Navegar a ' + item.salonDescripcion,
 									},
 								}"
-							></button>
+							/>
 						</div>
 					}
 				</div>

@@ -1,12 +1,8 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
-import { TooltipModule } from 'primeng/tooltip';
-
 import { TipoOrigenAuditoria } from '../../models';
+import { EduButton, EduInputText, EduSelect, EduTooltip } from '@edu-ui';
 
 interface TipoOption {
 	label: string;
@@ -16,7 +12,7 @@ interface TipoOption {
 @Component({
 	selector: 'app-auditoria-correos-filters',
 	standalone: true,
-	imports: [FormsModule, ButtonModule, InputTextModule, SelectModule, TooltipModule],
+	imports: [FormsModule, EduButton, EduInputText, EduSelect, EduTooltip],
 	templateUrl: './auditoria-correos-filters.component.html',
 	styleUrl: './auditoria-correos-filters.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -34,8 +30,7 @@ export class AuditoriaCorreosFiltersComponent {
 		{ label: 'Todos los tipos', value: null },
 		{ label: 'Estudiante', value: 'Estudiante' },
 		{ label: 'Apoderado', value: 'Apoderado' },
-		{ label: 'Profesor', value: 'Profesor' },
-	];
+		{ label: 'Profesor', value: 'Profesor' }];
 
 	onSearchChange(value: string): void {
 		this.searchChange.emit(value);

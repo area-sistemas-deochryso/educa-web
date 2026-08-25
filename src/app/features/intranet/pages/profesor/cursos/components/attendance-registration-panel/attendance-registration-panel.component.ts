@@ -1,13 +1,7 @@
 import { Component, ChangeDetectionStrategy, input, output, computed, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
-import { DatePickerModule } from 'primeng/datepicker';
-import { TagModule } from 'primeng/tag';
-import { InputTextModule } from 'primeng/inputtext';
-import { TooltipModule } from 'primeng/tooltip';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ConfirmationService } from 'primeng/api';
+
 import {
 	AsistenciaCursoEstudianteDto,
 	EstadoAsistenciaCurso,
@@ -16,27 +10,19 @@ import {
 	ESTADO_ASISTENCIA_ICONS,
 } from '@features/intranet/pages/profesor/models';
 import { findNearestValidDate } from './attendance-registration-panel.helpers';
+import { EduButton, EduConfirmDialog, EduConfirmationService, EduDatePicker, EduInputText, EduTag, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-attendance-registration-panel',
 	standalone: true,
-	imports: [
-		CommonModule,
-		FormsModule,
-		ButtonModule,
-		DatePickerModule,
-		TagModule,
-		InputTextModule,
-		TooltipModule,
-		ConfirmDialogModule,
-	],
-	providers: [ConfirmationService],
+	imports: [CommonModule, FormsModule, EduButton, EduDatePicker, EduTag, EduInputText, EduTooltip, EduConfirmDialog],
+	providers: [EduConfirmationService],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './attendance-registration-panel.component.html',
 	styleUrl: './attendance-registration-panel.component.scss',
 })
 export class AttendanceRegistrationPanelComponent {
-	private readonly confirmationService = inject(ConfirmationService);
+	private readonly confirmationService = inject(EduConfirmationService);
 
 	// #region Inputs
 	readonly estudiantes = input<AsistenciaCursoEstudianteDto[]>([]);

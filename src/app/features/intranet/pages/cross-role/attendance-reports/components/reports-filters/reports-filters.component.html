@@ -7,7 +7,7 @@
 		<div class="filter-fields">
 			<div class="filter-item">
 				<label for="estado">Tipo de reporte</label>
-				<p-select
+				<edu-select
 					inputId="estado"
 					[options]="estadoOptions"
 					[ngModel]="selectedEstado()"
@@ -20,7 +20,7 @@
 
 			<div class="filter-item">
 				<label for="rango">Rango</label>
-				<p-select
+				<edu-select
 					inputId="rango"
 					[options]="rangoOptions"
 					[ngModel]="selectedRango()"
@@ -33,7 +33,7 @@
 
 			<div class="filter-item">
 				<label for="fecha">Fecha</label>
-				<p-datepicker
+				<edu-datepicker
 					inputId="fecha"
 					[ngModel]="selectedFecha()"
 					(ngModelChange)="fechaChange.emit($event)"
@@ -51,7 +51,7 @@
 
 		<div class="filter-fields">
 			<div class="filter-item filter-item--persona">
-				<p-selectButton
+				<edu-select-button
 					[options]="tipoPersonaOptions"
 					[ngModel]="selectedTipoPersona()"
 					(ngModelChange)="tipoPersonaChange.emit($event)"
@@ -71,7 +71,7 @@
 			<div class="filter-fields">
 				<div class="filter-item filter-item--salones">
 					<label for="salones">Salones</label>
-					<p-multiselect
+					<edu-multi-select
 						inputId="salones"
 						[options]="salonOptions()"
 						[ngModel]="selectedSalones()"
@@ -94,15 +94,14 @@
 
 	<!-- Acción -->
 	<div class="filter-action">
-		<button
-			pButton
+		<edu-button
 			label="Visualizar tabla"
 			icon="pi pi-table"
-			class="p-button-success"
+			severity="success"
 			(click)="generar.emit()"
 			[loading]="loading()"
 			[disabled]="disableGenerar()"
-		></button>
+		/>
 	</div>
 </div>
 <!-- #endregion -->

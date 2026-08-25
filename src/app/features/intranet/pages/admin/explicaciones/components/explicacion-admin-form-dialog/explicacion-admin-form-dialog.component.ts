@@ -3,13 +3,6 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
-import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
-import { TextareaModule } from 'primeng/textarea';
-import { TooltipModule } from 'primeng/tooltip';
-
 import { CapabilityCatalogItem } from '@core/services/permissions';
 import { Rol } from '@data/models';
 
@@ -18,6 +11,7 @@ import {
 	CrearExplicacionRequest,
 	ExplicacionAdminDto,
 } from '../../models/explicacion-admin.models';
+import { EduButton, EduDialog, EduInputText, EduSelect, EduTextarea, EduTooltip } from '@edu-ui';
 // #endregion
 
 interface SelectOption<T> {
@@ -33,16 +27,7 @@ interface SelectOption<T> {
 @Component({
 	selector: 'app-explicacion-admin-form-dialog',
 	standalone: true,
-	imports: [
-		CommonModule,
-		FormsModule,
-		ButtonModule,
-		DialogModule,
-		InputTextModule,
-		SelectModule,
-		TextareaModule,
-		TooltipModule,
-	],
+	imports: [CommonModule, FormsModule, EduButton, EduDialog, EduInputText, EduSelect, EduTextarea, EduTooltip],
 	templateUrl: './explicacion-admin-form-dialog.component.html',
 	styleUrl: './explicacion-admin-form-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -71,13 +56,11 @@ export class ExplicacionAdminFormDialogComponent {
 
 	readonly rolOptions = computed<SelectOption<number | null>[]>(() => [
 		{ label: 'Default (todos los roles)', value: null },
-		...this.roles().map((r) => ({ label: r.nombre, value: r.id })),
-	]);
+		...this.roles().map((r) => ({ label: r.nombre, value: r.id }))]);
 
 	readonly capabilityOptions = computed<SelectOption<number | null>[]>(() => [
 		{ label: 'Sin gating (todos)', value: null },
-		...this.capabilities().map((c) => ({ label: `${c.nombre} (${c.codigo})`, value: c.id })),
-	]);
+		...this.capabilities().map((c) => ({ label: `${c.nombre} (${c.codigo})`, value: c.id }))]);
 
 	readonly isValid = computed(() => this.ancla().trim().length > 0 && this.texto().trim().length > 0);
 	// #endregion

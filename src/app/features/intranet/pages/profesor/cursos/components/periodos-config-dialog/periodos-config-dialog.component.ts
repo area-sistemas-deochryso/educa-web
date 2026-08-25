@@ -1,25 +1,15 @@
 import { Component, ChangeDetectionStrategy, input, output, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DialogModule } from 'primeng/dialog';
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { InputNumberModule } from 'primeng/inputnumber';
-import { TooltipModule } from 'primeng/tooltip';
+
+
 import { PeriodoCalificacionDto, CrearPeriodoDto } from '@features/intranet/pages/profesor/models';
+import { EduButton, EduDialog, EduInputNumber, EduInputText, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-periodos-config-dialog',
 	standalone: true,
-	imports: [
-		CommonModule,
-		FormsModule,
-		DialogModule,
-		ButtonModule,
-		InputTextModule,
-		InputNumberModule,
-		TooltipModule,
-	],
+	imports: [CommonModule, FormsModule, EduDialog, EduButton, EduInputText, EduInputNumber, EduTooltip],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './periodos-config-dialog.component.html',
 	styleUrl: './periodos-config-dialog.component.scss',

@@ -1,14 +1,11 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 
-import { ButtonModule } from 'primeng/button';
-import { TableLazyLoadEvent, TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
-
 import { CorrelationIdPillComponent } from '@intranet-shared/components';
 
 import { RateLimitEventListaDto, displayPolicy } from '../../models';
+import { EduButton, EduTable, EduTag, EduTooltip } from '@edu-ui';
+import type { EduTableLazyLoadEvent } from '@edu-ui';
 
 @Component({
 	selector: 'app-rate-limit-table',
@@ -16,12 +13,11 @@ import { RateLimitEventListaDto, displayPolicy } from '../../models';
 	imports: [
 		CommonModule,
 		DatePipe,
-		ButtonModule,
-		TableModule,
-		TagModule,
-		TooltipModule,
-		CorrelationIdPillComponent,
-	],
+		EduButton,
+		EduTable,
+		EduTag,
+		EduTooltip,
+		CorrelationIdPillComponent],
 	templateUrl: './rate-limit-table.component.html',
 	styleUrl: './rate-limit-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -37,7 +33,7 @@ export class RateLimitTableComponent {
 
 	// #region Outputs
 	readonly rowSelected = output<RateLimitEventListaDto>();
-	readonly lazyLoad = output<TableLazyLoadEvent>();
+	readonly lazyLoad = output<EduTableLazyLoadEvent>();
 	// #endregion
 
 	readonly displayPolicy = displayPolicy;
@@ -46,7 +42,7 @@ export class RateLimitTableComponent {
 		this.rowSelected.emit(item);
 	}
 
-	onLazyLoad(event: TableLazyLoadEvent): void {
+	onLazyLoad(event: EduTableLazyLoadEvent): void {
 		this.lazyLoad.emit(event);
 	}
 

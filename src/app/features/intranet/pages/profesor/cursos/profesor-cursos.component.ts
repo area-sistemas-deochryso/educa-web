@@ -12,9 +12,6 @@ import {
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { filter, take } from 'rxjs';
 import { PageHeaderComponent, EmptyStateComponent } from '@intranet-shared/components';
 import { PluralizePipe } from '@intranet-shared/pipes';
@@ -25,22 +22,22 @@ import { CursoContenidoUiFacade } from './services/curso-contenido-ui.facade';
 import { CursoContentDialogComponent } from './components/curso-content-dialog/curso-content-dialog.component';
 import { CursoBuilderDialogComponent } from './components/curso-builder-dialog/curso-builder-dialog.component';
 import { HorarioProfesorDto, CrearCursoContenidoRequest } from '../models';
+import { EduSpinner, EduTag, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-profesor-cursos',
 	standalone: true,
 	imports: [
 		CommonModule,
-		TagModule,
-		TooltipModule,
-		ProgressSpinnerModule,
+		EduTag,
+		EduTooltip,
+		EduSpinner,
 		RouterLink,
 		PageHeaderComponent,
 		EmptyStateComponent,
 		PluralizePipe,
 		CursoContentDialogComponent,
-		CursoBuilderDialogComponent,
-	],
+		CursoBuilderDialogComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	styles: `
 		.course-grid {
@@ -50,8 +47,8 @@ import { HorarioProfesorDto, CrearCursoContenidoRequest } from '../models';
 		}
 		.course-card {
 			border-radius: 8px;
-			border: 1px solid var(--p-surface-200);
-			border-left: 4px solid var(--card-accent, var(--p-primary-color));
+			border: 1px solid var(--surface-200);
+			border-left: 4px solid var(--card-accent, var(--primary-accent));
 			background: var(--surface-card, #fcfdfe);
 			padding: 1rem 1.25rem;
 			cursor: pointer;
@@ -59,8 +56,8 @@ import { HorarioProfesorDto, CrearCursoContenidoRequest } from '../models';
 		}
 		.course-card:hover {
 			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-			border-color: var(--p-surface-300);
-			border-left-color: var(--card-accent, var(--p-primary-color));
+			border-color: var(--surface-300);
+			border-left-color: var(--card-accent, var(--primary-accent));
 		}
 		.course-card-affordance {
 			display: flex;
@@ -70,7 +67,7 @@ import { HorarioProfesorDto, CrearCursoContenidoRequest } from '../models';
 			margin-top: 0.75rem;
 			font-size: 0.75rem;
 			font-weight: 600;
-			color: var(--p-primary-color);
+			color: var(--primary-accent);
 		}
 		.course-card-affordance i {
 			font-size: 0.7rem;
@@ -83,7 +80,7 @@ import { HorarioProfesorDto, CrearCursoContenidoRequest } from '../models';
 	template: `
 		@if (vm().loading) {
 			<div class="flex justify-content-center p-5">
-				<p-progressSpinner strokeWidth="4" />
+				<edu-spinner strokeWidth="4" />
 			</div>
 		} @else if (vm().horarios.length === 0) {
 			<app-empty-state icon="pi pi-book" title="Mis Cursos" message="No tienes cursos asignados" />
@@ -102,14 +99,14 @@ import { HorarioProfesorDto, CrearCursoContenidoRequest } from '../models';
 							data-info-anchor="profesor-cursos-card"
 							[style.--card-accent]="colorMap().get(horario.cursoId)"
 							(click)="onVerContenido(horario)"
-							pTooltip="Ver contenido"
-							tooltipPosition="top"
+							eduTooltip="Ver contenido"
+							eduTooltipPosition="top"
 							[tooltipDisabled]="!tooltipsReady()"
 						>
 							<div class="flex align-items-start justify-content-between mb-2">
 								<span class="font-bold text-lg line-height-3">{{ horario.cursoNombre }}</span>
 								<a routerLink="/intranet/profesor/salones" data-info-anchor="profesor-cursos-card-salon-tag" class="no-underline" (click)="$event.stopPropagation()">
-									<p-tag [value]="horario.salonDescripcion" severity="info" />
+									<edu-tag [value]="horario.salonDescripcion" severity="info" />
 								</a>
 							</div>
 							<div class="flex flex-column gap-1 text-sm text-color-secondary">

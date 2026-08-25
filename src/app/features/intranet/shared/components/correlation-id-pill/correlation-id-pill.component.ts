@@ -1,9 +1,8 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { Router } from '@angular/router';
+import { EduTag, EduTooltip } from '@edu-ui';
 
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
 // #endregion
 
 // #region Implementation
@@ -26,7 +25,7 @@ import { TooltipModule } from 'primeng/tooltip';
 @Component({
 	selector: 'app-correlation-id-pill',
 	standalone: true,
-	imports: [TagModule, TooltipModule],
+	imports: [EduTag, EduTooltip],
 	templateUrl: './correlation-id-pill.component.html',
 	styleUrl: './correlation-id-pill.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

@@ -4,7 +4,7 @@
 	[subtitle]="generatedAtLabel() || 'Buscá por nombre, apellido, correo o DNI'"
 >
 	<form class="header-actions" (ngSubmit)="onSubmit()">
-		<p-autoComplete
+		<edu-autocomplete
 			class="correo-autocomplete"
 			[ngModel]="correoInput()"
 			name="correo"
@@ -73,30 +73,31 @@
 					</div>
 				</ng-template>
 			}
-		</p-autoComplete>
+		</edu-autocomplete>
 
-		<button
+		<edu-button
 			type="submit"
-			pButton
 			label="Buscar"
 			icon="pi pi-search"
-			class="p-button-success p-button-sm"
+			size="small"
+			severity="success"
 			[disabled]="loading() || !correoInput().trim()"
 			[pt]="{ root: { 'aria-label': 'Buscar diagnóstico' } }"
 			data-info-anchor="admin-email-outbox-diagnostico-buscar-btn"
-		></button>
+		/>
 
 		@if (correoConsultado()) {
-			<button
+			<edu-button
 				type="button"
-				pButton
 				icon="pi pi-times"
-				class="p-button-text p-button-sm btn-icon"
-				pTooltip="Limpiar"
+				[text]="true"
+				size="small"
+				class="btn-icon"
+				eduTooltip="Limpiar"
 				(click)="onLimpiar()"
 				[pt]="{ root: { 'aria-label': 'Limpiar' } }"
 				data-info-anchor="admin-email-outbox-diagnostico-limpiar-btn"
-			></button>
+			/>
 		}
 	</form>
 </app-page-header>
@@ -106,16 +107,17 @@
 	<section class="correo-echo" aria-label="Correo consultado">
 		<div class="correo-echo__label">Mostrando resultados para:</div>
 		<code class="correo-echo__value">{{ correoConsultado() }}</code>
-		<button
+		<edu-button
 			type="button"
-			pButton
 			icon="pi pi-copy"
-			class="p-button-text p-button-sm btn-icon"
-			pTooltip="Copiar correo"
+			[text]="true"
+			size="small"
+			class="btn-icon"
+			eduTooltip="Copiar correo"
 			(click)="onCopyConsultado()"
 			[pt]="{ root: { 'aria-label': 'Copiar correo consultado' } }"
 			data-info-anchor="copiar-btn"
-		></button>
+		/>
 		@if (mostrarEcoNormalizado()) {
 			<span class="correo-echo__hint">
 				<i class="pi pi-info-circle"></i>

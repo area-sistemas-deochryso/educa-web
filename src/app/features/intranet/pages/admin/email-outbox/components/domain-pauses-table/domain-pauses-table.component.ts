@@ -6,14 +6,11 @@ import {
 	input,
 	output,
 } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
-import { TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
 
 import type { SkeletonColumnDef } from '@intranet-shared/components';
 import { UiMappingService } from '@intranet-shared/services';
 import { EmailDomainPauseListaDto } from '@data/models';
+import { EduButton, EduTable, EduTag, EduTooltip } from '@edu-ui';
 
 /**
  * Plan 37 Chat 3 — tabla client-side de dominios pausados
@@ -22,7 +19,7 @@ import { EmailDomainPauseListaDto } from '@data/models';
 @Component({
 	selector: 'app-domain-pauses-table',
 	standalone: true,
-	imports: [TableModule, TagModule, ButtonModule, TooltipModule, DatePipe],
+	imports: [EduTable, EduTag, EduButton, EduTooltip, DatePipe],
 	templateUrl: './domain-pauses-table.component.html',
 	styleUrl: './domain-pauses-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -43,8 +40,7 @@ export class DomainPausesTableComponent {
 		{ width: '110px', cellType: 'text' },
 		{ width: '170px', cellType: 'text' },
 		{ width: '110px', cellType: 'badge' },
-		{ width: '110px', cellType: 'actions' },
-	];
+		{ width: '110px', cellType: 'actions' }];
 
 	onRelease(item: EmailDomainPauseListaDto): void {
 		this.release.emit(item);

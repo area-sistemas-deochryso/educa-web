@@ -6,12 +6,6 @@ import {
 	signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ConfirmationService } from 'primeng/api';
-import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
-import { TooltipModule } from 'primeng/tooltip';
 
 import { TableSkeletonComponent } from '@intranet-shared/components';
 import {
@@ -34,6 +28,7 @@ import {
 import { DomainPausesTableComponent } from '../domain-pauses-table/domain-pauses-table.component';
 import { DomainPausesAddDialogComponent } from '../domain-pauses-add-dialog/domain-pauses-add-dialog.component';
 import { DomainBlockedAlertBannerComponent } from '../domain-blocked-alert-banner/domain-blocked-alert-banner.component';
+import { EduButton, EduConfirmationService, EduConfirmDialog, EduInputText, EduSelect, EduTooltip } from '@edu-ui';
 
 interface SelectOption<T> {
 	label: string;
@@ -52,26 +47,13 @@ const MOTIVO_OPTIONS: SelectOption<DomainPauseMotivo>[] = EMAIL_DOMAIN_PAUSE_MOT
 
 const ESTADO_OPTIONS: SelectOption<EmailDomainPauseFiltroEstado>[] = [
 	{ label: 'Activas', value: 'activa' },
-	{ label: 'Liberadas', value: 'liberada' },
-];
+	{ label: 'Liberadas', value: 'liberada' }];
 
 @Component({
 	selector: 'app-domain-pauses-tab',
 	standalone: true,
-	imports: [
-		FormsModule,
-		ButtonModule,
-		InputTextModule,
-		SelectModule,
-		TooltipModule,
-		ConfirmDialogModule,
-		TableSkeletonComponent,
-		DomainPausesTableComponent,
-		DomainPausesAddDialogComponent,
-		DomainBlockedAlertBannerComponent,
-		HubContextBannerComponent,
-	],
-	providers: [ConfirmationService],
+	imports: [FormsModule, EduButton, EduInputText, EduSelect, EduTooltip, EduConfirmDialog, TableSkeletonComponent, DomainPausesTableComponent, DomainPausesAddDialogComponent, DomainBlockedAlertBannerComponent, HubContextBannerComponent],
+	providers: [EduConfirmationService],
 	templateUrl: './domain-pauses-tab.component.html',
 	styleUrl: './domain-pauses-tab.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -80,7 +62,7 @@ export class DomainPausesTabComponent implements OnInit {
 	private readonly dataFacade = inject(EmailDomainPauseDataFacade);
 	private readonly crudFacade = inject(EmailDomainPauseCrudFacade);
 	private readonly uiFacade = inject(EmailDomainPauseUiFacade);
-	private readonly confirmationService = inject(ConfirmationService);
+	private readonly confirmationService = inject(EduConfirmationService);
 	private readonly route = inject(ActivatedRoute);
 
 	readonly vm = this.dataFacade.vm;
@@ -180,14 +162,12 @@ export class DomainPausesTabComponent implements OnInit {
 					e.triggerEventCount,
 					e.estado ? 'Activa' : 'Liberada',
 					e.pausedUntil,
-					(e.observacion ?? '').replace(/[\r\n,]/g, ' '),
+					(e.observacion ?? '').replace(/[\r\n]/g, ' '),
 					e.fechaReg,
-					e.usuarioReg,
-				]
+					e.usuarioReg]
 					.map((v) => `"${String(v).replace(/"/g, '""')}"`)
 					.join(','),
-			),
-		];
+			)];
 		const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
 		const url = URL.createObjectURL(blob);
 		const a = document.createElement('a');

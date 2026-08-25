@@ -1,6 +1,6 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import { TooltipModule } from 'primeng/tooltip';
+import { EduTooltip } from '@edu-ui';
 
 // #endregion
 // #region Implementation
@@ -14,7 +14,7 @@ export type ViewMode = (typeof VIEW_MODE)[keyof typeof VIEW_MODE];
 @Component({
 	selector: 'app-attendance-header',
 	standalone: true,
-	imports: [TooltipModule],
+	imports: [EduTooltip],
 	templateUrl: './attendance-header.component.html',
 	styleUrl: './attendance-header.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
