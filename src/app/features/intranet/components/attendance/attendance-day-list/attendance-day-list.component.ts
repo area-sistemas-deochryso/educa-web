@@ -10,9 +10,6 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-// Exception (588 retry, F6c): eduTooltip has no `tooltipOptions` input (confirmed missing,
-// not a false positive) -- kept on PrimeNG for this one row-hover tooltip only.
-import { TooltipModule } from 'primeng/tooltip';
 import { EstudianteAsistencia, EstadisticasAsistenciaDia } from '@data/models';
 import { ResponsiveTableComponent, TableSkeletonComponent } from '@intranet-shared/components';
 import type { SkeletonColumnDef } from '@intranet-shared/components';
@@ -52,7 +49,6 @@ export interface JustificacionEvent {
 		TableSkeletonComponent,
 		ResponsiveTableComponent,
 		EduButton,
-		TooltipModule,
 		EduMenu,
 		EduTooltip,
 		EduDialog,

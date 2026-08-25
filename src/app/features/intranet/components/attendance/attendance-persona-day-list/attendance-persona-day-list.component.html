@@ -116,15 +116,14 @@
 				<ng-template #body let-persona let-i="rowIndex">
 					<tr
 						[class.row-clickable]="allowJustify() && persona.puedeJustificar"
-						[pTooltip]="
+						[eduTooltip]="
 							allowJustify() && persona.puedeJustificar
 								? persona.esJustificado
 									? 'Clic para editar/quitar justificación'
 									: 'Clic para justificar'
 								: ''
 						"
-						tooltipPosition="top"
-						[appendTo]="'body'"
+						eduTooltipPosition="top"
 						[tooltipOptions]="{ showDelay: 300 }"
 						(click)="onPersonaClick(persona)"
 					>
