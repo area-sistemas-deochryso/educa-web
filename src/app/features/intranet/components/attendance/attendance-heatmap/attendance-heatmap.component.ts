@@ -13,11 +13,7 @@ import {
 	getStatusClass,
 } from '@features/intranet/pages/cross-role/attendance-component/config/attendance.constants';
 import { AttendanceTemporalNavComponent } from '../attendance-temporal-nav/attendance-temporal-nav.component';
-// Exception (588 retry, F6c): edu-select has no `pt` passthrough input (pt landed on
-// edu-select-button only, confirmed missing on edu-select) -- kept on PrimeNG here since
-// [pt] is load-bearing a11y (aria-label on the trigger).
-import { SelectModule } from 'primeng/select';
-import { EduTooltip } from '@edu-ui';
+import { EduSelect, EduTooltip } from '@edu-ui';
 
 export interface HijoOption {
 	label: string;
@@ -34,7 +30,7 @@ export interface HeatmapCellClick {
 @Component({
 	selector: 'app-attendance-heatmap',
 	standalone: true,
-	imports: [CommonModule, FormsModule, SelectModule, EduTooltip, AttendanceTemporalNavComponent],
+	imports: [CommonModule, FormsModule, EduSelect, EduTooltip, AttendanceTemporalNavComponent],
 	templateUrl: './attendance-heatmap.component.html',
 	styleUrl: './attendance-heatmap.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

@@ -14,11 +14,7 @@ import {
 	getStatusClass,
 } from '@features/intranet/pages/cross-role/attendance-component/config/attendance.constants';
 import { AttendanceTemporalNavComponent } from '../attendance-temporal-nav/attendance-temporal-nav.component';
-// Exception (588 retry, F6c): edu-select has no `pt` passthrough input (pt landed on
-// edu-select-button only, confirmed missing on edu-select) -- kept on PrimeNG here since
-// [pt] is load-bearing a11y (aria-label on the trigger).
-import { SelectModule } from 'primeng/select';
-import { EduTable, EduTooltip } from '@edu-ui';
+import { EduSelect, EduTable, EduTooltip } from '@edu-ui';
 
 // #endregion
 // #region Implementation
@@ -32,7 +28,7 @@ export interface HijoOption {
 @Component({
 	selector: 'app-attendance-table',
 	standalone: true,
-	imports: [DatePipe, FormsModule, EduTable, SelectModule, EduTooltip, AttendanceTemporalNavComponent],
+	imports: [DatePipe, FormsModule, EduTable, EduSelect, EduTooltip, AttendanceTemporalNavComponent],
 	templateUrl: './attendance-table.component.html',
 	styleUrl: './attendance-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

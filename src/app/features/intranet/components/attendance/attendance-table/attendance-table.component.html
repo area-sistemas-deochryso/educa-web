@@ -6,8 +6,7 @@
 				@if (hasHijos()) {
 					<!-- * Inline selector when multiple children are available -->
 					{{ table().title.split(' de ')[0] }} de
-					<p-select
-						appendTo="body"
+					<edu-select
 						[options]="hijosOptions()"
 						[ngModel]="selectedHijoId()"
 						(ngModelChange)="onHijoChange($event)"
@@ -16,8 +15,6 @@
 						class="hijo-select"
 						[style]="{ minWidth: '200px' }"
 						[filter]="true"
-						filterBy="label"
-						filterPlaceholder="Buscar..."
 						[pt]="{
 							root: {
 								'aria-label': 'Seleccionar estudiante',
@@ -37,7 +34,7 @@
 						<ng-template #item let-option>
 							{{ option.label }}
 						</ng-template>
-					</p-select>
+					</edu-select>
 				} @else {
 					{{ table().title }}
 				}
@@ -75,8 +72,7 @@
 			(pickerOpen)="monthSelectVisible = !monthSelectVisible"
 		/>
 		@if (monthSelectVisible) {
-			<p-select
-				appendTo="body"
+			<edu-select
 				[options]="monthOptions"
 				[ngModel]="table().selectedMonth"
 				(ngModelChange)="onMonthChange($event); monthSelectVisible = false"
@@ -84,8 +80,6 @@
 				optionValue="value"
 				class="month-select-dropdown"
 				[filter]="true"
-				filterBy="label"
-				filterPlaceholder="Buscar mes..."
 				[pt]="{
 					root: {
 						'aria-label': 'Seleccionar mes',
