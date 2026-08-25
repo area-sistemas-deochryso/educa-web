@@ -6,9 +6,6 @@
 				@if (faq.categoria) {
 					<span class="faq-category">{{ faq.categoria }}</span>
 				}
-			</edu-accordion-header>
-			
-				<p class="faq-answer">{{ faq.respuesta }}</p>
 				@if (faq.wizard) {
 					<edu-button
 						label="Ver guía paso a paso"
@@ -18,7 +15,10 @@
 						(click)="onOpenWizard(faq, $event)"
 					/>
 				}
-			
+			</edu-accordion-header>
+
+				<p class="faq-answer">{{ faq.respuesta }}</p>
+
 		</edu-accordion-panel>
 	}
 </edu-accordion>
