@@ -1,30 +1,29 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 
-import { ButtonModule } from 'primeng/button';
+import { EduButton } from '@edu-ui';
 
 // #endregion
 // #region Implementation
 @Component({
 	selector: 'app-floor-selector',
 	standalone: true,
-	imports: [ButtonModule],
+	imports: [EduButton],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
 		<div class="floor-selector">
 			@for (floor of floors(); track floor) {
-				<button
-					pButton
+				<edu-button
 					[label]="'Piso ' + floor"
-					[class.p-button-outlined]="selectedFloor() !== floor"
-					class="p-button-sm"
+					[outlined]="selectedFloor() !== floor"
+					size="small"
 					(click)="floorChange.emit(floor)"
 					[pt]="{
 						root: {
 							'aria-label': 'Ver piso ' + floor,
 						},
 					}"
-				></button>
+				/>
 			}
 		</div>
 	`,

@@ -1,15 +1,13 @@
 import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { ButtonModule } from 'primeng/button';
-
 import { HealthExitPermissionDto } from '@features/intranet/pages/profesor/models';
-import { EduSkeleton, EduTable, EduTag, EduTooltip } from '@edu-ui';
+import { EduButton, EduSkeleton, EduTable, EduTag, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-health-exit-list',
 	standalone: true,
-	imports: [CommonModule, EduTable, ButtonModule, EduTag, EduTooltip, EduSkeleton],
+	imports: [CommonModule, EduTable, EduButton, EduTag, EduTooltip, EduSkeleton],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
 		@if (loading()) {
@@ -46,16 +44,18 @@ import { EduSkeleton, EduTable, EduTag, EduTooltip } from '@edu-ui';
 							>{{ p.sintomasDisplay }}</span>
 						</td>
 						<td>
-							<button
-								pButton
+							<edu-button
 								icon="pi pi-times"
-								class="p-button-rounded p-button-text p-button-danger p-button-sm"
+								[rounded]="true"
+								[text]="true"
+								severity="danger"
+								size="small"
 								data-info-anchor="profesor-health-anular-permiso"
 								(click)="anular.emit(p.id)"
 								eduTooltip="Anular permiso"
 								eduTooltipPosition="top"
 								[pt]="{ root: { 'aria-label': 'Anular permiso' } }"
-							></button>
+							/>
 						</td>
 					</tr>
 				</ng-template>

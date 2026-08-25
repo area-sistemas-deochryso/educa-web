@@ -1,7 +1,6 @@
 // #region Imports
 import { Component, ChangeDetectionStrategy, input, output, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ButtonModule } from 'primeng/button';
 import { environment } from '@config/environment';
 import { detectarNivel } from '@core/helpers';
 import {
@@ -15,7 +14,7 @@ import { EstudianteGruposTabComponent } from '../estudiante-grupos-tab/estudiant
 import { StudentAttendanceTabComponent } from '../student-attendance-tab/student-attendance-tab.component';
 import { CampusNavigationComponent } from '@features/intranet/pages/cross-role/campus-navigation/campus-navigation.component';
 import { EstudianteNotasComponent } from '@features/intranet/pages/estudiante/notas/estudiante-notas.component';
-import { EduDialog, EduTab, EduTabPanel, EduTabs, EduTooltip } from '@edu-ui';
+import { EduButton, EduDialog, EduTab, EduTabPanel, EduTabs, EduTooltip } from '@edu-ui';
 
 // #endregion
 @Component({
@@ -25,7 +24,7 @@ import { EduDialog, EduTab, EduTabPanel, EduTabs, EduTooltip } from '@edu-ui';
 		CommonModule,
 		EduDialog,
 		EduTabs, EduTab, EduTabPanel,
-		ButtonModule,
+		EduButton,
 		EduTooltip,
 		EstudianteGruposTabComponent,
 		StudentAttendanceTabComponent,
@@ -132,17 +131,18 @@ import { EduDialog, EduTab, EduTabPanel, EduTabs, EduTooltip } from '@edu-ui';
 						<!-- #region EduTab Grupos -->
 						<edu-tabpanel value="0">
 							<div style="display: flex; justify-content: flex-end; margin-bottom: 0.5rem">
-								<button
-									pButton
+								<edu-button
 									icon="pi pi-refresh"
-									class="p-button-rounded p-button-text p-button-sm"
+									[rounded]="true"
+									[text]="true"
+									size="small"
 									data-info-anchor="estudiante-salon-dialog-refresh-grupos"
 									(click)="onRefreshGrupos()"
 									[disabled]="gruposLoading()"
 									eduTooltip="Refrescar"
 									eduTooltipPosition="top"
 									[pt]="{ root: { 'aria-label': 'Refrescar grupos' } }"
-								></button>
+								/>
 							</div>
 							<app-estudiante-grupos-tab
 								[gruposData]="gruposData()"

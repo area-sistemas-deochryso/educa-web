@@ -2,8 +2,7 @@
 import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-import { ButtonModule } from 'primeng/button';
-import { EduIconField, EduInputIcon, EduInputText } from '@edu-ui';
+import { EduButton, EduIconField, EduInputIcon, EduInputText } from '@edu-ui';
 
 // #endregion
 
@@ -18,7 +17,7 @@ type SelectionMode = 'start' | 'destination';
 @Component({
 	selector: 'app-location-selector',
 	standalone: true,
-	imports: [FormsModule, ButtonModule, EduInputText, EduIconField, EduInputIcon],
+	imports: [FormsModule, EduButton, EduInputText, EduIconField, EduInputIcon],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
 		<div class="location-selector">
@@ -83,12 +82,14 @@ type SelectionMode = 'start' | 'destination';
 
 			<!-- Limpiar ruta -->
 			@if (hasPath()) {
-				<button pButton icon="pi pi-times"
-					class="p-button-sm p-button-outlined p-button-secondary"
+				<edu-button icon="pi pi-times"
+					size="small"
+					[outlined]="true"
+					severity="secondary"
 					label="Limpiar"
 					(click)="clear.emit()"
 					[pt]="{ root: { 'aria-label': 'Limpiar ruta' } }"
-				></button>
+				/>
 			}
 		</div>
 	`,
