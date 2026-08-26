@@ -9,7 +9,7 @@ export type EduTagSeverity = 'primary' | 'secondary' | 'success' | 'info' | 'war
 	imports: [EduPtRoot],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
-		<span class="edu-tag" [class.edu-tag--rounded]="rounded()" [attr.data-severity]="severity()" [eduPtRoot]="pt()?.root">
+		<span class="edu-tag" [class.edu-tag--rounded]="rounded()" [class]="styleClass()" [attr.data-severity]="severity()" [eduPtRoot]="pt()?.root">
 			@if (icon()) {
 				<i class="edu-tag__icon" [class]="icon()"></i>
 			}
@@ -24,5 +24,6 @@ export class EduTag {
 	readonly severity = input<EduTagSeverity>('primary');
 	readonly rounded = input(false);
 	readonly icon = input<string>();
+	readonly styleClass = input('');
 	readonly pt = input<EduPassThrough>();
 }

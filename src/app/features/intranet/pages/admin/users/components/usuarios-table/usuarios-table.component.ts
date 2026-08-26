@@ -5,13 +5,13 @@ import { RoleTab } from '../../models';
 import { UiMappingService } from '@intranet-shared/services';
 import { FullNamePipe } from '@shared/pipes';
 import { TableLoadingDirective } from '@intranet-shared/directives';
-import { EduButton, EduDialog, EduTable, EduTag, EduTooltip } from '@edu-ui';
+import { EduButton, EduDialog, EduSortableColumn, EduTable, EduTag, EduTooltip } from '@edu-ui';
 import type { EduTableLazyLoadEvent } from '@edu-ui';
 
 @Component({
 	selector: 'app-users-table',
 	standalone: true,
-	imports: [CommonModule, EduTable, EduButton, EduDialog, EduTag, EduTooltip, TableLoadingDirective, FullNamePipe],
+	imports: [CommonModule, EduTable, EduButton, EduDialog, EduTag, EduTooltip, TableLoadingDirective, FullNamePipe, EduSortableColumn],
 	templateUrl: './usuarios-table.component.html',
 	styleUrl: './usuarios-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
