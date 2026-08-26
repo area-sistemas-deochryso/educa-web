@@ -1,5 +1,5 @@
 // #region Imports
-import { inject, Inject, Injectable, Optional, isDevMode } from '@angular/core';
+import { inject, Injectable, isDevMode } from '@angular/core';
 import { environment } from '@config';
 import {
 	safeGetLocalStorage,
@@ -34,9 +34,8 @@ export class FeatureFlagsFacade {
 
 	readonly vm = this.store.vm;
 
-	constructor(
-		@Optional() @Inject(FEATURE_FLAGS_CONFIG) cfg?: FeatureFlagsConfig,
-	) {
+	constructor() {
+		const cfg = inject(FEATURE_FLAGS_CONFIG, { optional: true });
 		this.cfg = { ...DEFAULTS, ...(cfg ?? {}) };
 		this.base = environment.features;
 		this.refreshFromStorage();

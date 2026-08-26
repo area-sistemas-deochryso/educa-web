@@ -1,11 +1,15 @@
 // #region Imports
-import { afterNextRender, Component, inject } from '@angular/core';
+import { afterNextRender, Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { CacheVersionManagerService } from '@core/services/cache';
 import { CapacitorService } from '@core/services/capacitor';
 import { SwService } from '@core/services/sw';
 import { ThemeService } from '@core/services/theme';
-import { DevtoolsPanelComponent, RateLimitCountdownToastComponent, ToastContainerComponent } from '@shared/components';
+import {
+	DevtoolsPanelComponent,
+	RateLimitCountdownToastComponent,
+	ToastContainerComponent,
+} from '@shared/components';
 
 // #endregion
 // #region Implementation
@@ -19,6 +23,7 @@ import { DevtoolsPanelComponent, RateLimitCountdownToastComponent, ToastContaine
 		RateLimitCountdownToastComponent,
 	],
 	templateUrl: './app.html',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	styleUrl: './app.scss',
 })
 export class AppComponent {

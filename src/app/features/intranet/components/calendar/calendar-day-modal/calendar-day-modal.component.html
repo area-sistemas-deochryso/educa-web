@@ -24,8 +24,8 @@
 							class="pi"
 							[ngClass]="
 								modalData.type === 'holiday'
-									? modalData.holiday?.icon
-									: modalData.event?.icon
+									? $safeNavigationMigration(modalData.holiday?.icon)
+									: $safeNavigationMigration(modalData.event?.icon)
 							"
 						></i>
 					</div>

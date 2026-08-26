@@ -1,5 +1,5 @@
 // #region Imports
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 // #endregion
@@ -9,6 +9,7 @@ import { RouterLink } from '@angular/router';
 	standalone: true,
 	imports: [RouterLink],
 	templateUrl: './secundaria.html',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	styleUrl: './secundaria.scss',
 })
 export class SecundariaComponent {

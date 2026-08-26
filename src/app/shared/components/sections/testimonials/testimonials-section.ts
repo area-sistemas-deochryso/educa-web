@@ -1,5 +1,12 @@
 // #region Imports
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import {
+	Component,
+	OnInit,
+	OnDestroy,
+	ChangeDetectionStrategy,
+	ChangeDetectorRef,
+	inject,
+} from '@angular/core';
 
 // #endregion
 // #region Implementation
@@ -16,9 +23,13 @@ interface Testimonial {
 	standalone: true,
 	imports: [],
 	templateUrl: './testimonials-section.html',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	styleUrl: './testimonials-section.scss',
 })
 export class TestimonialsSectionComponent implements OnInit, OnDestroy {
+	// * Detect changes after autoplay timer callback (outside template event flow).
+	private cdr = inject(ChangeDetectorRef);
+
 	// * Static testimonials data for the carousel.
 	testimonials: Testimonial[] = [
 		{
@@ -101,6 +112,8 @@ export class TestimonialsSectionComponent implements OnInit, OnDestroy {
 	private nextSlide(): void {
 		const maxSlide = Math.ceil(this.testimonials.length / 2) - 1;
 		this.currentSlide = this.currentSlide >= maxSlide ? 0 : this.currentSlide + 1;
+		// * OnPush: mark dirty since this runs from a setInterval timer, not a template event.
+		this.cdr.markForCheck();
 	}
 }
 // #endregion

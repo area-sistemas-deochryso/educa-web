@@ -6,6 +6,7 @@ import {
 	ChangeDetectorRef,
 	inject,
 	PLATFORM_ID,
+	ChangeDetectionStrategy,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
@@ -16,6 +17,7 @@ import { isPlatformBrowser } from '@angular/common';
 	standalone: true,
 	imports: [],
 	templateUrl: './counter-section.html',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	styleUrl: './counter-section.scss',
 })
 export class CounterSectionComponent implements AfterViewInit, OnDestroy {

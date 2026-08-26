@@ -16,7 +16,11 @@ import {
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { EduOverlayHandle } from '../overlay/edu-overlay-handle';
-import { filterOptionsByLabel, resolveOptionLabel, resolveOptionValue } from '../select/select-option-utils';
+import {
+	filterOptionsByLabel,
+	resolveOptionLabel,
+	resolveOptionValue,
+} from '../select/select-option-utils';
 import { SelectListNav } from '../select/select-list-nav';
 import { EduPassThrough, EduPtRoot } from '../passthrough/edu-pt-root';
 import { EduSpinner } from '../spinner/edu-spinner';
@@ -55,7 +59,7 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 			aria-haspopup="listbox"
 			[attr.aria-expanded]="isOpen()"
 			[attr.tabindex]="disabled() ? -1 : 0"
-			[eduPtRoot]="pt()?.root"
+			[eduPtRoot]="$safeNavigationMigration(pt()?.root)"
 			(click)="toggle($event)"
 			(keydown)="onTriggerKeydown($event)"
 		>
@@ -64,26 +68,42 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 					<ul class="edu-multi-select__tokens">
 						@for (opt of visibleSelectedOptions(); track $index) {
 							<li class="edu-multi-select__token">
-								<span class="edu-multi-select__token-label">{{ resolveLabel(opt) }}</span>
+								<span class="edu-multi-select__token-label">{{
+									resolveLabel(opt)
+								}}</span>
 								@if (!disabled()) {
-									<button type="button" class="edu-multi-select__token-remove" tabindex="-1" (click)="removeOption(opt, $event)">
+									<button
+										type="button"
+										class="edu-multi-select__token-remove"
+										tabindex="-1"
+										(click)="removeOption(opt, $event)"
+									>
 										<i class="pi pi-times"></i>
 									</button>
 								}
 							</li>
 						}
 						@if (overflowLabel(); as label) {
-							<li class="edu-multi-select__token edu-multi-select__token--overflow">{{ label }}</li>
+							<li class="edu-multi-select__token edu-multi-select__token--overflow">
+								{{ label }}
+							</li>
 						}
 					</ul>
 				} @else {
 					<span class="edu-multi-select__label">{{ commaLabel() }}</span>
 				}
 			} @else {
-				<span class="edu-multi-select__label edu-multi-select__label--placeholder">{{ placeholder() ?? '' }}</span>
+				<span class="edu-multi-select__label edu-multi-select__label--placeholder">{{
+					placeholder() ?? ''
+				}}</span>
 			}
 			@if (showClear() && hasValue() && !disabled()) {
-				<button type="button" class="edu-multi-select__clear" tabindex="-1" (click)="clear($event)">
+				<button
+					type="button"
+					class="edu-multi-select__clear"
+					tabindex="-1"
+					(click)="clear($event)"
+				>
 					<i class="pi pi-times"></i>
 				</button>
 			}
@@ -109,20 +129,36 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 						<edu-spinner></edu-spinner>
 					</div>
 				} @else {
-					<ul class="edu-multi-select-panel__list" role="listbox" aria-multiselectable="true" (keydown)="onListKeydown($event)">
+					<ul
+						class="edu-multi-select-panel__list"
+						role="listbox"
+						aria-multiselectable="true"
+						(keydown)="onListKeydown($event)"
+					>
 						@if (group()) {
 							@for (g of filteredGroups(); track $index) {
-								<li class="edu-multi-select-panel__group-label" role="presentation">{{ g.label }}</li>
+								<li class="edu-multi-select-panel__group-label" role="presentation">
+									{{ g.label }}
+								</li>
 								@for (opt of g.children; track $index) {
 									<li
 										class="edu-multi-select-panel__option"
-										[class.edu-multi-select-panel__option--active]="optionIndex(opt) === activeIndex()"
-										[class.edu-multi-select-panel__option--selected]="isSelected(opt)"
+										[class.edu-multi-select-panel__option--active]="
+											optionIndex(opt) === activeIndex()
+										"
+										[class.edu-multi-select-panel__option--selected]="
+											isSelected(opt)
+										"
 										role="option"
 										[attr.aria-selected]="isSelected(opt)"
 										(click)="toggleOption(opt)"
 									>
-										<i class="edu-multi-select-panel__check pi pi-check" [class.edu-multi-select-panel__check--visible]="isSelected(opt)"></i>
+										<i
+											class="edu-multi-select-panel__check pi pi-check"
+											[class.edu-multi-select-panel__check--visible]="
+												isSelected(opt)
+											"
+										></i>
 										<span>{{ resolveLabel(opt) }}</span>
 									</li>
 								}
@@ -131,19 +167,30 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 							@for (opt of filteredOptions(); track $index) {
 								<li
 									class="edu-multi-select-panel__option"
-									[class.edu-multi-select-panel__option--active]="optionIndex(opt) === activeIndex()"
-									[class.edu-multi-select-panel__option--selected]="isSelected(opt)"
+									[class.edu-multi-select-panel__option--active]="
+										optionIndex(opt) === activeIndex()
+									"
+									[class.edu-multi-select-panel__option--selected]="
+										isSelected(opt)
+									"
 									role="option"
 									[attr.aria-selected]="isSelected(opt)"
 									(click)="toggleOption(opt)"
 								>
-									<i class="edu-multi-select-panel__check pi pi-check" [class.edu-multi-select-panel__check--visible]="isSelected(opt)"></i>
+									<i
+										class="edu-multi-select-panel__check pi pi-check"
+										[class.edu-multi-select-panel__check--visible]="
+											isSelected(opt)
+										"
+									></i>
 									<span>{{ resolveLabel(opt) }}</span>
 								</li>
 							}
 						}
 						@if (flatOptions().length === 0) {
-							<li class="edu-multi-select-panel__empty" role="presentation">Sin resultados</li>
+							<li class="edu-multi-select-panel__empty" role="presentation">
+								Sin resultados
+							</li>
 						}
 					</ul>
 				}
@@ -194,12 +241,16 @@ export class EduMultiSelect implements ControlValueAccessor, OnDestroy {
 			return this.options();
 		}
 		const childrenKey = this.optionGroupChildren();
-		return (this.options() as Record<string, unknown>[]).flatMap((g) => (childrenKey ? ((g[childrenKey] as unknown[]) ?? []) : []));
+		return (this.options() as Record<string, unknown>[]).flatMap((g) =>
+			childrenKey ? ((g[childrenKey] as unknown[]) ?? []) : [],
+		);
 	});
 
 	protected readonly selectedOptions = computed(() => {
 		const values = this.value();
-		return this.flatOptionsUnfiltered().filter((opt) => values.includes(resolveOptionValue(opt, this.optionValue())));
+		return this.flatOptionsUnfiltered().filter((opt) =>
+			values.includes(resolveOptionValue(opt, this.optionValue())),
+		);
 	});
 
 	protected readonly visibleSelectedOptions = computed(() => {
@@ -224,7 +275,9 @@ export class EduMultiSelect implements ControlValueAccessor, OnDestroy {
 		return selected.map((opt) => this.resolveLabel(opt)).join(', ');
 	});
 
-	protected readonly filteredOptions = computed(() => filterOptionsByLabel(this.options(), this.query(), this.optionLabel(), this.filterBy()));
+	protected readonly filteredOptions = computed(() =>
+		filterOptionsByLabel(this.options(), this.query(), this.optionLabel(), this.filterBy()),
+	);
 
 	protected readonly filteredGroups = computed<EduMultiSelectGroup[]>(() => {
 		const groupLabelKey = this.optionGroupLabel();
@@ -235,13 +288,20 @@ export class EduMultiSelect implements ControlValueAccessor, OnDestroy {
 				const children = (childrenKey ? (g[childrenKey] as unknown[]) : []) ?? [];
 				return {
 					label: groupLabelKey ? String(g[groupLabelKey]) : '',
-					children: filterOptionsByLabel(children, q, this.optionLabel(), this.filterBy()),
+					children: filterOptionsByLabel(
+						children,
+						q,
+						this.optionLabel(),
+						this.filterBy(),
+					),
 				};
 			})
 			.filter((g) => g.children.length > 0);
 	});
 
-	protected readonly flatOptions = computed(() => (this.group() ? this.filteredGroups().flatMap((g) => g.children) : this.filteredOptions()));
+	protected readonly flatOptions = computed(() =>
+		this.group() ? this.filteredGroups().flatMap((g) => g.children) : this.filteredOptions(),
+	);
 
 	private onChange: (value: unknown[]) => void = () => {};
 	private onTouched: () => void = () => {};
@@ -336,7 +396,9 @@ export class EduMultiSelect implements ControlValueAccessor, OnDestroy {
 	protected toggleOption(opt: unknown): void {
 		const optValue = resolveOptionValue(opt, this.optionValue());
 		const current = this.value();
-		const next = current.includes(optValue) ? current.filter((v) => v !== optValue) : [...current, optValue];
+		const next = current.includes(optValue)
+			? current.filter((v) => v !== optValue)
+			: [...current, optValue];
 		this.emitValue(next);
 	}
 

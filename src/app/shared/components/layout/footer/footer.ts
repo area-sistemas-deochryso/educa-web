@@ -1,5 +1,5 @@
 // #region Imports
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 
@@ -13,6 +13,7 @@ import { EduTooltip } from '@edu-ui';
 	standalone: true,
 	imports: [RouterLink, FormsModule, EduTooltip],
 	templateUrl: './footer.html',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	styleUrl: './footer.scss',
 })
 export class FooterComponent {

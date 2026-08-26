@@ -24,12 +24,18 @@ import { EduPassThrough, EduPtRoot } from '../passthrough/edu-pt-root';
 				[attr.aria-checked]="checked()"
 				[class.edu-checkbox__box--checked]="checked()"
 				[disabled]="disabled()"
-				[eduPtRoot]="pt()?.root"
+				[eduPtRoot]="$safeNavigationMigration(pt()?.root)"
 				(click)="toggle()"
 			>
 				@if (checked()) {
 					<svg class="edu-checkbox__icon" viewBox="0 0 14 14" fill="none">
-						<path d="M2 7L5.5 10.5L12 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+						<path
+							d="M2 7L5.5 10.5L12 3"
+							stroke="currentColor"
+							stroke-width="1.6"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						/>
 					</svg>
 				}
 			</button>

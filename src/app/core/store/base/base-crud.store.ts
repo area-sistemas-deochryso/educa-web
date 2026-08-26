@@ -100,7 +100,10 @@ export abstract class BaseCrudStore<
 	readonly itemCount = computed(() => this._items().length);
 	// #endregion
 
+	// These are plain values passed explicitly by subclasses via super(...), not DI tokens;
+	// TForm/TStats are generic type params with no injection token to resolve.
 	constructor(
+		// eslint-disable-next-line @angular-eslint/prefer-inject -- not a DI token, see above
 		defaultFormData: TForm,
 		defaultStats: TStats | null = null,
 	) {

@@ -1,5 +1,5 @@
 // #region Imports
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { EduTooltip } from '@edu-ui';
 
@@ -15,9 +15,13 @@ interface ContactForm {
 	standalone: true,
 	imports: [FormsModule, EduTooltip],
 	templateUrl: './hero-section.html',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	styleUrl: './hero-section.scss',
 })
 export class HeroSectionComponent {
+	// * Detect changes after async fetch callbacks (outside template event flow).
+	private cdr = inject(ChangeDetectorRef);
+
 	// * Simple contact form state.
 	formData: ContactForm = {
 		name: '',
@@ -51,6 +55,8 @@ export class HeroSectionComponent {
 				})
 				.finally(() => {
 					this.isSubmitting = false;
+					// * OnPush: mark dirty since this runs outside the (ngSubmit) event flow.
+					this.cdr.markForCheck();
 				});
 		}
 	}

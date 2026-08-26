@@ -1,5 +1,5 @@
 // #region Imports
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { EduTooltip } from '@edu-ui';
 
 // #endregion
@@ -18,6 +18,7 @@ interface Course {
 	standalone: true,
 	imports: [EduTooltip],
 	templateUrl: './courses-section.html',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	styleUrl: './courses-section.scss',
 })
 export class CoursesSectionComponent {

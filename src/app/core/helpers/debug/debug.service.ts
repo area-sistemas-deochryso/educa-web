@@ -1,9 +1,8 @@
 // debug.service.ts
 // #region Imports
 import {
-	Inject,
 	Injectable,
-	Optional,
+	inject,
 	isDevMode,
 	effect,
 	EffectCleanupFn,
@@ -39,7 +38,8 @@ export class DebugService {
 	private activePattern = '';
 	private minLevel: DbgLevel;
 
-	constructor(@Optional() @Inject(DEBUG_CONFIG) cfg?: DebugConfig) {
+	constructor() {
+		const cfg = inject(DEBUG_CONFIG, { optional: true });
 		const defaults: Required<DebugConfig> = {
 			enabled: true,
 			minLevel: 'INFO',

@@ -18,7 +18,7 @@ import { EduPassThrough, EduPtRoot } from '../passthrough/edu-pt-root';
 		<div
 			class="edu-select-button"
 			role="group"
-			[eduPtRoot]="pt()?.root"
+			[eduPtRoot]="$safeNavigationMigration(pt()?.root)"
 			[class.edu-select-button--disabled]="disabled()"
 		>
 			@for (opt of options(); track $index) {
@@ -63,12 +63,16 @@ export class EduSelectButton implements ControlValueAccessor {
 
 	protected getOptionLabel(opt: unknown): unknown {
 		const key = this.optionLabel();
-		return key && typeof opt === 'object' && opt !== null ? (opt as Record<string, unknown>)[key] : opt;
+		return key && typeof opt === 'object' && opt !== null
+			? (opt as Record<string, unknown>)[key]
+			: opt;
 	}
 
 	protected getOptionValue(opt: unknown): unknown {
 		const key = this.optionValue();
-		return key && typeof opt === 'object' && opt !== null ? (opt as Record<string, unknown>)[key] : opt;
+		return key && typeof opt === 'object' && opt !== null
+			? (opt as Record<string, unknown>)[key]
+			: opt;
 	}
 
 	protected isSelected(opt: unknown): boolean {

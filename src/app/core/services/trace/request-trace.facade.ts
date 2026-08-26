@@ -1,5 +1,5 @@
 // #region Imports
-import { inject, Inject, Injectable, Optional, isDevMode } from '@angular/core';
+import { inject, Injectable, isDevMode } from '@angular/core';
 import { environment } from '@config';
 import {
 	compileDebugFilter,
@@ -56,9 +56,8 @@ export class RequestTraceFacade {
 	private visibleErrors: { id: string; timestamp: number }[] = [];
 	private static readonly MAX_VISIBLE_ERRORS = 5;
 
-	constructor(
-		@Optional() @Inject(REQUEST_TRACE_CONFIG) cfg?: RequestTraceConfig,
-	) {
+	constructor() {
+		const cfg = inject(REQUEST_TRACE_CONFIG, { optional: true });
 		this.cfg = { ...DEFAULTS, ...(cfg ?? {}) };
 		this.refreshFromStorage();
 	}

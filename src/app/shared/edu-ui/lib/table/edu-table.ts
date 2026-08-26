@@ -1,5 +1,16 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { ChangeDetectionStrategy, Component, TemplateRef, computed, contentChild, contentChildren, effect, inject, input, output } from '@angular/core';
+import {
+	ChangeDetectionStrategy,
+	Component,
+	TemplateRef,
+	computed,
+	contentChild,
+	contentChildren,
+	effect,
+	inject,
+	input,
+	output,
+} from '@angular/core';
 import { EduPaginator, EduPaginatorPageEvent } from '../paginator/edu-paginator';
 import { EduTemplate } from './edu-template';
 import { EduTableService } from './edu-table.service';
@@ -46,7 +57,7 @@ function normalizeSortOrder(value: EduTableSortOrderInput): EduTableSortOrder {
 		<div
 			class="edu-table-wrapper"
 			[class.edu-table-wrapper--scrollable]="scrollable()"
-			[eduPtRoot]="pt()?.root"
+			[eduPtRoot]="$safeNavigationMigration(pt()?.root)"
 		>
 			<table
 				class="edu-table"
@@ -66,7 +77,10 @@ function normalizeSortOrder(value: EduTableSortOrderInput): EduTableSortOrder {
 				<tbody class="edu-table__tbody">
 					@if (bodyTemplate(); as body) {
 						@for (row of value(); track trackByFn(row, $index); let index = $index) {
-							<ng-container [ngTemplateOutlet]="body" [ngTemplateOutletContext]="{ $implicit: row, index }"></ng-container>
+							<ng-container
+								[ngTemplateOutlet]="body"
+								[ngTemplateOutletContext]="{ $implicit: row, index }"
+							></ng-container>
 						}
 					}
 					@if (value().length === 0 && emptyTemplate(); as empty) {
@@ -138,11 +152,19 @@ export class EduTable<T = unknown> {
 	private readonly captionRef = contentChild<TemplateRef<unknown>>('caption');
 	private readonly legacyTemplates = contentChildren(EduTemplate);
 
-	protected readonly headerTemplate = computed(() => this.headerRef() ?? this.legacyTemplate('header'));
+	protected readonly headerTemplate = computed(
+		() => this.headerRef() ?? this.legacyTemplate('header'),
+	);
 	protected readonly bodyTemplate = computed(() => this.bodyRef() ?? this.legacyTemplate('body'));
-	protected readonly footerTemplate = computed(() => this.footerRef() ?? this.legacyTemplate('footer'));
-	protected readonly emptyTemplate = computed(() => this.emptyRef() ?? this.legacyTemplate('emptymessage'));
-	protected readonly captionTemplate = computed(() => this.captionRef() ?? this.legacyTemplate('caption'));
+	protected readonly footerTemplate = computed(
+		() => this.footerRef() ?? this.legacyTemplate('footer'),
+	);
+	protected readonly emptyTemplate = computed(
+		() => this.emptyRef() ?? this.legacyTemplate('emptymessage'),
+	);
+	protected readonly captionTemplate = computed(
+		() => this.captionRef() ?? this.legacyTemplate('caption'),
+	);
 
 	private readonly normalizedSortOrder = computed(() => normalizeSortOrder(this.sortOrder()));
 
@@ -177,12 +199,14 @@ export class EduTable<T = unknown> {
 		if (trackBy) return trackBy(row);
 
 		const dataKey = this.dataKey();
-		if (dataKey && row && typeof row === 'object') return (row as Record<string, unknown>)[dataKey];
+		if (dataKey && row && typeof row === 'object')
+			return (row as Record<string, unknown>)[dataKey];
 
 		return index;
 	};
 
 	private legacyTemplate(name: string): TemplateRef<unknown> | undefined {
-		return this.legacyTemplates().find((template) => template.pTemplate() === name)?.templateRef;
+		return this.legacyTemplates().find((template) => template.pTemplate() === name)
+			?.templateRef;
 	}
 }

@@ -1,6 +1,13 @@
 // #region Imports
-import { Component } from '@angular/core';
-import { AboutSectionComponent, CoursesSectionComponent, CounterSectionComponent, CtaSectionComponent, HeroSectionComponent, TestimonialsSectionComponent } from '@shared/components';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
+import {
+	AboutSectionComponent,
+	CoursesSectionComponent,
+	CounterSectionComponent,
+	CtaSectionComponent,
+	HeroSectionComponent,
+	TestimonialsSectionComponent,
+} from '@shared/components';
 
 // #endregion
 // #region Implementation
@@ -16,6 +23,7 @@ import { AboutSectionComponent, CoursesSectionComponent, CounterSectionComponent
 		CtaSectionComponent,
 	],
 	templateUrl: './home.html',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	styleUrl: './home.scss',
 })
 export class HomeComponent {

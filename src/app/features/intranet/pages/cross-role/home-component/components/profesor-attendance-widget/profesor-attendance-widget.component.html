@@ -5,7 +5,10 @@
 			<i class="pi pi-users"></i>
 			<h3>Asistencia de Hoy</h3>
 		</div>
-		<a routerLink="/intranet/asistencia" class="widget-link" data-info-anchor="home-attendance-ver-detalle"
+		<a
+			routerLink="/intranet/asistencia"
+			class="widget-link"
+			data-info-anchor="home-attendance-ver-detalle"
 			>Ver detalle <i class="pi pi-arrow-right"></i
 		></a>
 	</div>
@@ -67,10 +70,11 @@
 				@if (hasMultipleSalonesTutor()) {
 					<a
 						routerLink="/intranet/asistencia"
-						[queryParams]="{ salonId: salon()?.salonId }"
+						[queryParams]="{ salonId: $safeNavigationMigration(salon()?.salonId) }"
 						class="salones-tutor-link"
 						data-info-anchor="home-attendance-mas-salones"
-						>Tutoría en {{ tutorSalonesCount() }} salones <i class="pi pi-arrow-right"></i
+						>Tutoría en {{ tutorSalonesCount() }} salones
+						<i class="pi pi-arrow-right"></i
 					></a>
 				}
 
@@ -85,7 +89,9 @@
 							<span class="main-total">{{ s.total }}</span>
 							<span class="main-label">presentes</span>
 						</div>
-						<div class="percentage" [class]="percentageClass()">{{ porcentaje() }}%</div>
+						<div class="percentage" [class]="percentageClass()">
+							{{ porcentaje() }}%
+						</div>
 					</div>
 
 					<div class="stat-bars">

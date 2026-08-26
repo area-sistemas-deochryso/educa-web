@@ -5,10 +5,7 @@ import {
 	LOCALE_ID,
 	provideBrowserGlobalErrorListeners,
 } from '@angular/core';
-import {
-	withEnabledBlockingInitialNavigation,
-	withPreloading,
-} from '@angular/router';
+import { withEnabledBlockingInitialNavigation, withPreloading } from '@angular/router';
 import {
 	apiResponseInterceptor,
 	authInterceptor,
@@ -22,8 +19,17 @@ import {
 	timeoutInterceptor,
 	viewAsInterceptor,
 } from '@core/interceptors';
-import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
-import { provideHttpClient, withFetch, withInterceptors, withXsrfConfiguration } from '@angular/common/http';
+import {
+	provideClientHydration,
+	withEventReplay,
+	withNoIncrementalHydration,
+} from '@angular/platform-browser';
+import {
+	provideHttpClient,
+	withFetch,
+	withInterceptors,
+	withXsrfConfiguration,
+} from '@angular/common/http';
 
 import { DEBUG_CONFIG } from './core/helpers/debug/debug.type';
 import { GlobalErrorHandler } from '@core/services/error';
@@ -69,7 +75,7 @@ export const appConfig: ApplicationConfig = {
 		provideAnimationsAsync(),
 		{ provide: ErrorHandler, useClass: GlobalErrorHandler },
 		{ provide: LOCALE_ID, useValue: 'es-PE' },
-		provideClientHydration(withEventReplay()),
+		provideClientHydration(withEventReplay(), withNoIncrementalHydration()),
 		{
 			provide: DEBUG_CONFIG,
 			useValue: {

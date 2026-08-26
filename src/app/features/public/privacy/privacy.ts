@@ -1,5 +1,5 @@
 // #region Imports
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 
 // #endregion
 // #region Implementation
@@ -8,6 +8,7 @@ import { Component } from '@angular/core';
 	standalone: true,
 	imports: [],
 	templateUrl: './privacy.html',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	styleUrl: './privacy.scss',
 })
 export class PrivacyComponent {

@@ -62,7 +62,7 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 				aria-haspopup="dialog"
 				[attr.aria-expanded]="isOpen()"
 				[attr.tabindex]="isInputReadonly() && !disabled() ? 0 : -1"
-				[eduPtRoot]="pt()?.root"
+				[eduPtRoot]="$safeNavigationMigration(pt()?.root)"
 				(click)="onWrapperClick($event)"
 				(keydown)="onTriggerKeydown($event)"
 			>
@@ -102,11 +102,21 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 			<div class="edu-datepicker-panel" [class.edu-datepicker-panel--inline]="inline()">
 				@if (!timeOnly()) {
 					<div class="edu-datepicker-panel__header">
-						<button type="button" class="edu-datepicker-panel__nav" (click)="prevMonth()" aria-label="Mes anterior">
+						<button
+							type="button"
+							class="edu-datepicker-panel__nav"
+							(click)="prevMonth()"
+							aria-label="Mes anterior"
+						>
 							<i class="pi pi-chevron-left"></i>
 						</button>
 						<span class="edu-datepicker-panel__title">{{ monthTitle() }}</span>
-						<button type="button" class="edu-datepicker-panel__nav" (click)="nextMonth()" aria-label="Mes siguiente">
+						<button
+							type="button"
+							class="edu-datepicker-panel__nav"
+							(click)="nextMonth()"
+							aria-label="Mes siguiente"
+						>
 							<i class="pi pi-chevron-right"></i>
 						</button>
 					</div>
@@ -135,25 +145,75 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 				@if (showTime() || timeOnly()) {
 					<div class="edu-datepicker-panel__time">
 						@if (hourFormat() === '12') {
-							<input class="edu-datepicker-panel__time-input" type="number" min="1" max="12" [value]="hours12()" (change)="onHourInput12($event)" aria-label="Hora" />
+							<input
+								class="edu-datepicker-panel__time-input"
+								type="number"
+								min="1"
+								max="12"
+								[value]="hours12()"
+								(change)="onHourInput12($event)"
+								aria-label="Hora"
+							/>
 						} @else {
-							<input class="edu-datepicker-panel__time-input" type="number" min="0" max="23" [value]="hours()" (change)="onHourInput($event)" aria-label="Hora" />
+							<input
+								class="edu-datepicker-panel__time-input"
+								type="number"
+								min="0"
+								max="23"
+								[value]="hours()"
+								(change)="onHourInput($event)"
+								aria-label="Hora"
+							/>
 						}
 						<span>:</span>
-						<input class="edu-datepicker-panel__time-input" type="number" min="0" max="59" [value]="minutes()" (change)="onMinuteInput($event)" aria-label="Minutos" />
+						<input
+							class="edu-datepicker-panel__time-input"
+							type="number"
+							min="0"
+							max="59"
+							[value]="minutes()"
+							(change)="onMinuteInput($event)"
+							aria-label="Minutos"
+						/>
 						@if (showSeconds()) {
 							<span>:</span>
-							<input class="edu-datepicker-panel__time-input" type="number" min="0" max="59" [value]="seconds()" (change)="onSecondInput($event)" aria-label="Segundos" />
+							<input
+								class="edu-datepicker-panel__time-input"
+								type="number"
+								min="0"
+								max="59"
+								[value]="seconds()"
+								(change)="onSecondInput($event)"
+								aria-label="Segundos"
+							/>
 						}
 						@if (hourFormat() === '12') {
-							<button type="button" class="edu-datepicker-panel__meridiem" (click)="toggleMeridiem()">{{ meridiem() }}</button>
+							<button
+								type="button"
+								class="edu-datepicker-panel__meridiem"
+								(click)="toggleMeridiem()"
+							>
+								{{ meridiem() }}
+							</button>
 						}
 					</div>
 				}
 				@if (showButtonBar()) {
 					<div class="edu-datepicker-panel__buttonbar">
-						<button type="button" class="edu-datepicker-panel__buttonbar-btn" (click)="goToday()">Hoy</button>
-						<button type="button" class="edu-datepicker-panel__buttonbar-btn" (click)="clearValue()">Limpiar</button>
+						<button
+							type="button"
+							class="edu-datepicker-panel__buttonbar-btn"
+							(click)="goToday()"
+						>
+							Hoy
+						</button>
+						<button
+							type="button"
+							class="edu-datepicker-panel__buttonbar-btn"
+							(click)="clearValue()"
+						>
+							Limpiar
+						</button>
 					</div>
 				}
 			</div>
@@ -237,7 +297,9 @@ export class EduDatePicker implements ControlValueAccessor, OnDestroy {
 		return fmt(dates[0]);
 	});
 
-	protected readonly isInputReadonly = computed(() => this.readonlyInput() || this.selectionMode() !== 'single');
+	protected readonly isInputReadonly = computed(
+		() => this.readonlyInput() || this.selectionMode() !== 'single',
+	);
 	protected readonly inputValue = computed(() => this.draftText() ?? this.displayLabel());
 	protected readonly hasValue = computed(() => this.selectedDates().length > 0);
 
@@ -278,7 +340,8 @@ export class EduDatePicker implements ControlValueAccessor, OnDestroy {
 	}
 
 	protected onWrapperClick(event: Event): void {
-		const clickedTypableInput = !this.isInputReadonly() && (event.target as HTMLElement).tagName === 'INPUT';
+		const clickedTypableInput =
+			!this.isInputReadonly() && (event.target as HTMLElement).tagName === 'INPUT';
 		if (clickedTypableInput) {
 			// Let the click focus the input for typing instead of opening the overlay,
 			// which would immediately steal focus back via FocusTrap.
@@ -346,7 +409,9 @@ export class EduDatePicker implements ControlValueAccessor, OnDestroy {
 
 		if (mode === 'multiple') {
 			const current = this.selectedDates();
-			const next = this.isSelected(date) ? current.filter((d) => !isSameDay(d, date)) : [...current, date];
+			const next = this.isSelected(date)
+				? current.filter((d) => !isSameDay(d, date))
+				: [...current, date];
 			this.commit(next);
 			return;
 		}
@@ -394,7 +459,9 @@ export class EduDatePicker implements ControlValueAccessor, OnDestroy {
 		}
 		const parsed = parseDate(draft, this.dateFormat());
 		if (parsed && !this.isDisabled(parsed)) {
-			this.commit(this.showTime() ? withTime(parsed, this.selectedDates()[0] ?? new Date()) : parsed);
+			this.commit(
+				this.showTime() ? withTime(parsed, this.selectedDates()[0] ?? new Date()) : parsed,
+			);
 		}
 		this.draftText.set(null);
 	}
@@ -405,7 +472,10 @@ export class EduDatePicker implements ControlValueAccessor, OnDestroy {
 	}
 
 	protected onHourInput12(event: Event): void {
-		const h12 = Math.min(Math.max(this.clampTimeUnit((event.target as HTMLInputElement).value, 12), 1), 12);
+		const h12 = Math.min(
+			Math.max(this.clampTimeUnit((event.target as HTMLInputElement).value, 12), 1),
+			12,
+		);
 		const isPm = this.meridiem() === 'PM';
 		const hours = isPm ? (h12 === 12 ? 12 : h12 + 12) : h12 === 12 ? 0 : h12;
 		this.commitTime(hours, this.minutes(), this.seconds());
@@ -452,7 +522,9 @@ export class EduDatePicker implements ControlValueAccessor, OnDestroy {
 		if (this.timeOnly()) {
 			return formatTime(date);
 		}
-		return this.showTime() ? `${formatDate(date, this.dateFormat())} ${formatTime(date)}` : formatDate(date, this.dateFormat());
+		return this.showTime()
+			? `${formatDate(date, this.dateFormat())} ${formatTime(date)}`
+			: formatDate(date, this.dateFormat());
 	}
 
 	private commit(value: Date | Date[] | null): void {

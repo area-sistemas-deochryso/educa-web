@@ -33,17 +33,28 @@ import { EduPassThrough, EduPtRoot } from '../passthrough/edu-pt-root';
 				[attr.role]="modal() ? 'dialog' : null"
 				[attr.aria-modal]="modal() ? 'true' : null"
 				[attr.aria-label]="header() || null"
-				[eduPtRoot]="pt()?.root"
+				[eduPtRoot]="$safeNavigationMigration(pt()?.root)"
 			>
 				@if (showHeader()) {
-					<div class="edu-dialog-header" [class.edu-dialog-header--draggable]="draggable()" (mousedown)="onHeaderMouseDown($event)">
+					<div
+						class="edu-dialog-header"
+						[class.edu-dialog-header--draggable]="draggable()"
+						(mousedown)="onHeaderMouseDown($event)"
+					>
 						@if (headerTemplate(); as tpl) {
 							<ng-container [ngTemplateOutlet]="tpl"></ng-container>
 						} @else {
 							<span class="edu-dialog-header__title">{{ header() }}</span>
 						}
 						@if (closable()) {
-							<button type="button" class="edu-dialog-header__close" (click)="requestClose()" aria-label="Cerrar">✕</button>
+							<button
+								type="button"
+								class="edu-dialog-header__close"
+								(click)="requestClose()"
+								aria-label="Cerrar"
+							>
+								✕
+							</button>
 						}
 					</div>
 				}
@@ -56,7 +67,10 @@ import { EduPassThrough, EduPtRoot } from '../passthrough/edu-pt-root';
 					</div>
 				}
 				@if (resizable()) {
-					<div class="edu-dialog-resize-handle" (mousedown)="onResizeMouseDown($event)"></div>
+					<div
+						class="edu-dialog-resize-handle"
+						(mousedown)="onResizeMouseDown($event)"
+					></div>
 				}
 			</div>
 		</ng-template>
@@ -81,7 +95,8 @@ export class EduDialog implements OnDestroy {
 	protected readonly headerTemplate = contentChild<TemplateRef<unknown>>('header');
 	protected readonly footerTemplate = contentChild<TemplateRef<unknown>>('footer');
 
-	private readonly overlayTemplateRef = viewChild.required<TemplateRef<unknown>>('overlayTemplate');
+	private readonly overlayTemplateRef =
+		viewChild.required<TemplateRef<unknown>>('overlayTemplate');
 	private readonly viewContainerRef = inject(ViewContainerRef);
 	private readonly overlay = inject(Overlay);
 	private readonly focusTrapFactory = inject(FocusTrapFactory);
@@ -124,7 +139,10 @@ export class EduDialog implements OnDestroy {
 		const panel = this.panelEl;
 
 		const onMove = (moveEvent: MouseEvent) => {
-			this.dragOffset = { x: baseX + (moveEvent.clientX - startX), y: baseY + (moveEvent.clientY - startY) };
+			this.dragOffset = {
+				x: baseX + (moveEvent.clientX - startX),
+				y: baseY + (moveEvent.clientY - startY),
+			};
 			panel.style.transform = `translate3d(${this.dragOffset.x}px, ${this.dragOffset.y}px, 0)`;
 		};
 		const onUp = () => {
@@ -164,7 +182,11 @@ export class EduDialog implements OnDestroy {
 		this.dragOffset = { x: 0, y: 0 };
 
 		const portal = new TemplatePortal(this.overlayTemplateRef(), this.viewContainerRef);
-		const positionStrategy = this.overlay.position().global().centerHorizontally().centerVertically();
+		const positionStrategy = this.overlay
+			.position()
+			.global()
+			.centerHorizontally()
+			.centerVertically();
 
 		this.handle.open(
 			portal,
@@ -179,6 +201,7 @@ export class EduDialog implements OnDestroy {
 			() => this.requestClose(),
 		);
 
-		this.panelEl = this.handle.overlayElement?.querySelector<HTMLElement>('.edu-dialog-panel') ?? null;
+		this.panelEl =
+			this.handle.overlayElement?.querySelector<HTMLElement>('.edu-dialog-panel') ?? null;
 	}
 }

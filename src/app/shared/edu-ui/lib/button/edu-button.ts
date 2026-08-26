@@ -24,7 +24,7 @@ export type EduButtonType = 'button' | 'submit';
 		<button
 			class="edu-button"
 			[attr.type]="type()"
-			[eduPtRoot]="pt()?.root"
+			[eduPtRoot]="$safeNavigationMigration(pt()?.root)"
 			[disabled]="disabled() || loading()"
 			[attr.data-severity]="severity()"
 			[attr.aria-busy]="loading()"

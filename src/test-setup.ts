@@ -2,7 +2,7 @@
 import { BrowserTestingModule, platformBrowserTesting } from '@angular/platform-browser/testing';
 
 import { TestBed } from '@angular/core/testing';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideRouter } from '@angular/router';
 import { provideZonelessChangeDetection } from '@angular/core';
@@ -70,7 +70,7 @@ TestBed.initTestEnvironment(BrowserTestingModule, platformBrowserTesting(), {
 export const testProviders = [
 	provideZonelessChangeDetection(),
 	provideRouter([]),
-	provideHttpClient(),
+	provideHttpClient(withXhr()),
 	provideHttpClientTesting(),
 ];
 // #endregion

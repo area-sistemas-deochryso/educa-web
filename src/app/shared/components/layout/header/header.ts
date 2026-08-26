@@ -1,6 +1,14 @@
 // #region Imports
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { afterNextRender, Component, computed, DestroyRef, inject, signal } from '@angular/core';
+import {
+	afterNextRender,
+	Component,
+	computed,
+	DestroyRef,
+	inject,
+	signal,
+	ChangeDetectionStrategy,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { fromEvent, throttleTime, map } from 'rxjs';
 import { environment } from '@config/environment';
@@ -12,6 +20,7 @@ import { environment } from '@config/environment';
 	standalone: true,
 	imports: [RouterLink, RouterLinkActive],
 	templateUrl: './header.html',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	styleUrl: './header.scss',
 })
 export class HeaderComponent {

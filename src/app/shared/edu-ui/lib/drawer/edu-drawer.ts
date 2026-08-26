@@ -33,7 +33,7 @@ export type EduDrawerPosition = 'left' | 'right' | 'top' | 'bottom';
 				[style]="style()"
 				role="dialog"
 				[attr.aria-label]="header() || null"
-				[eduPtRoot]="pt()?.root"
+				[eduPtRoot]="$safeNavigationMigration(pt()?.root)"
 			>
 				@if (showHeader()) {
 					<div class="edu-drawer-header">
@@ -42,7 +42,14 @@ export type EduDrawerPosition = 'left' | 'right' | 'top' | 'bottom';
 						} @else {
 							<span class="edu-drawer-header__title">{{ header() }}</span>
 						}
-						<button type="button" class="edu-drawer-header__close" (click)="requestClose()" aria-label="Cerrar">✕</button>
+						<button
+							type="button"
+							class="edu-drawer-header__close"
+							(click)="requestClose()"
+							aria-label="Cerrar"
+						>
+							✕
+						</button>
 					</div>
 				}
 				<div class="edu-drawer-body">
@@ -71,7 +78,8 @@ export class EduDrawer implements OnDestroy {
 	protected readonly headerTemplate = contentChild<TemplateRef<unknown>>('header');
 	protected readonly footerTemplate = contentChild<TemplateRef<unknown>>('footer');
 
-	private readonly overlayTemplateRef = viewChild.required<TemplateRef<unknown>>('overlayTemplate');
+	private readonly overlayTemplateRef =
+		viewChild.required<TemplateRef<unknown>>('overlayTemplate');
 	private readonly viewContainerRef = inject(ViewContainerRef);
 	private readonly overlay = inject(Overlay);
 	private readonly focusTrapFactory = inject(FocusTrapFactory);
@@ -113,7 +121,10 @@ export class EduDrawer implements OnDestroy {
 		);
 	}
 
-	private pinToEdge(strategy: GlobalPositionStrategy, position: EduDrawerPosition): GlobalPositionStrategy {
+	private pinToEdge(
+		strategy: GlobalPositionStrategy,
+		position: EduDrawerPosition,
+	): GlobalPositionStrategy {
 		switch (position) {
 			case 'left':
 				return strategy.left('0').top('0').height('100%');

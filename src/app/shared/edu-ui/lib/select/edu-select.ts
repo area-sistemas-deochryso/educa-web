@@ -20,7 +20,11 @@ import {
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { EduOverlayHandle } from '../overlay/edu-overlay-handle';
 import { EduPassThrough, EduPtRoot } from '../passthrough/edu-pt-root';
-import { filterOptionsByLabel, resolveOptionLabel, resolveOptionValue } from './select-option-utils';
+import {
+	filterOptionsByLabel,
+	resolveOptionLabel,
+	resolveOptionValue,
+} from './select-option-utils';
 import { SelectListNav } from './select-list-nav';
 
 export interface EduSelectFilterEvent {
@@ -53,7 +57,7 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 	template: `
 		<div
 			class="edu-select"
-			[eduPtRoot]="pt()?.root"
+			[eduPtRoot]="$safeNavigationMigration(pt()?.root)"
 			[class.edu-select--disabled]="disabled()"
 			[class.edu-select--loading]="loading()"
 			role="combobox"
@@ -67,18 +71,31 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 			@if (selectedItemTemplate(); as tpl) {
 				@if (hasValue()) {
 					<span class="edu-select__label">
-						<ng-container [ngTemplateOutlet]="tpl" [ngTemplateOutletContext]="{ $implicit: selectedOption() }"></ng-container>
+						<ng-container
+							[ngTemplateOutlet]="tpl"
+							[ngTemplateOutletContext]="{ $implicit: selectedOption() }"
+						></ng-container>
 					</span>
 				} @else {
-					<span class="edu-select__label edu-select__label--placeholder">{{ placeholder() ?? '' }}</span>
+					<span class="edu-select__label edu-select__label--placeholder">{{
+						placeholder() ?? ''
+					}}</span>
 				}
 			} @else {
-				<span class="edu-select__label" [class.edu-select__label--placeholder]="!hasValue()">
+				<span
+					class="edu-select__label"
+					[class.edu-select__label--placeholder]="!hasValue()"
+				>
 					{{ selectedLabel() ?? placeholder() ?? '' }}
 				</span>
 			}
 			@if (showClear() && hasValue() && !disabled() && !loading()) {
-				<button type="button" class="edu-select__clear" tabindex="-1" (click)="clear($event)">
+				<button
+					type="button"
+					class="edu-select__clear"
+					tabindex="-1"
+					(click)="clear($event)"
+				>
 					<i class="pi pi-times"></i>
 				</button>
 			}
@@ -105,18 +122,25 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 				<ul class="edu-select-panel__list" role="listbox" (keydown)="onListKeydown($event)">
 					@if (group()) {
 						@for (g of filteredGroups(); track $index) {
-							<li class="edu-select-panel__group-label" role="presentation">{{ g.label }}</li>
+							<li class="edu-select-panel__group-label" role="presentation">
+								{{ g.label }}
+							</li>
 							@for (opt of g.children; track $index) {
 								<li
 									class="edu-select-panel__option"
-									[class.edu-select-panel__option--active]="optionIndex(opt) === activeIndex()"
+									[class.edu-select-panel__option--active]="
+										optionIndex(opt) === activeIndex()
+									"
 									[class.edu-select-panel__option--selected]="isSelected(opt)"
 									role="option"
 									[attr.aria-selected]="isSelected(opt)"
 									(click)="selectOption(opt)"
 								>
 									@if (itemTemplate(); as tpl) {
-										<ng-container [ngTemplateOutlet]="tpl" [ngTemplateOutletContext]="{ $implicit: opt }"></ng-container>
+										<ng-container
+											[ngTemplateOutlet]="tpl"
+											[ngTemplateOutletContext]="{ $implicit: opt }"
+										></ng-container>
 									} @else {
 										{{ resolveLabel(opt) }}
 									}
@@ -127,14 +151,19 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 						@for (opt of filteredOptions(); track $index) {
 							<li
 								class="edu-select-panel__option"
-								[class.edu-select-panel__option--active]="optionIndex(opt) === activeIndex()"
+								[class.edu-select-panel__option--active]="
+									optionIndex(opt) === activeIndex()
+								"
 								[class.edu-select-panel__option--selected]="isSelected(opt)"
 								role="option"
 								[attr.aria-selected]="isSelected(opt)"
 								(click)="selectOption(opt)"
 							>
 								@if (itemTemplate(); as tpl) {
-									<ng-container [ngTemplateOutlet]="tpl" [ngTemplateOutletContext]="{ $implicit: opt }"></ng-container>
+									<ng-container
+										[ngTemplateOutlet]="tpl"
+										[ngTemplateOutletContext]="{ $implicit: opt }"
+									></ng-container>
 								} @else {
 									{{ resolveLabel(opt) }}
 								}
@@ -182,7 +211,9 @@ export class EduSelect implements ControlValueAccessor, OnDestroy {
 
 	protected readonly activeIndex = this.nav.activeIndex;
 
-	protected readonly hasValue = computed(() => this.value() !== null && this.value() !== undefined);
+	protected readonly hasValue = computed(
+		() => this.value() !== null && this.value() !== undefined,
+	);
 
 	protected readonly selectedOption = computed(() => this.findSelectedOption());
 
@@ -191,7 +222,9 @@ export class EduSelect implements ControlValueAccessor, OnDestroy {
 		return found ? this.resolveLabel(found) : null;
 	});
 
-	protected readonly filteredOptions = computed(() => filterOptionsByLabel(this.options(), this.query(), this.optionLabel()));
+	protected readonly filteredOptions = computed(() =>
+		filterOptionsByLabel(this.options(), this.query(), this.optionLabel()),
+	);
 
 	protected readonly filteredGroups = computed<EduSelectGroup[]>(() => {
 		const groupLabelKey = this.optionGroupLabel();
@@ -208,7 +241,9 @@ export class EduSelect implements ControlValueAccessor, OnDestroy {
 			.filter((g) => g.children.length > 0);
 	});
 
-	protected readonly flatOptions = computed(() => (this.group() ? this.filteredGroups().flatMap((g) => g.children) : this.filteredOptions()));
+	protected readonly flatOptions = computed(() =>
+		this.group() ? this.filteredGroups().flatMap((g) => g.children) : this.filteredOptions(),
+	);
 
 	private onChange: (value: unknown) => void = () => {};
 	private onTouched: () => void = () => {};
@@ -310,7 +345,9 @@ export class EduSelect implements ControlValueAccessor, OnDestroy {
 	}
 
 	private findSelectedOption(): unknown {
-		return this.flatOptionsUnfiltered().find((opt) => resolveOptionValue(opt, this.optionValue()) === this.value());
+		return this.flatOptionsUnfiltered().find(
+			(opt) => resolveOptionValue(opt, this.optionValue()) === this.value(),
+		);
 	}
 
 	private flatOptionsUnfiltered(): unknown[] {
@@ -318,7 +355,9 @@ export class EduSelect implements ControlValueAccessor, OnDestroy {
 			return this.options();
 		}
 		const childrenKey = this.optionGroupChildren();
-		return (this.options() as Record<string, unknown>[]).flatMap((g) => (childrenKey ? ((g[childrenKey] as unknown[]) ?? []) : []));
+		return (this.options() as Record<string, unknown>[]).flatMap((g) =>
+			childrenKey ? ((g[childrenKey] as unknown[]) ?? []) : [],
+		);
 	}
 
 	private close(): void {

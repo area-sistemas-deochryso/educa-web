@@ -1,5 +1,5 @@
 // #region Imports
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { EduTooltip } from '@edu-ui';
 
 // #endregion
@@ -9,6 +9,7 @@ import { EduTooltip } from '@edu-ui';
 	standalone: true,
 	imports: [EduTooltip],
 	templateUrl: './cta-section.html',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	styleUrl: './cta-section.scss',
 })
 export class CtaSectionComponent {

@@ -52,7 +52,11 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 		},
 	],
 	template: `
-		<span class="edu-autocomplete" [style]="style()" [eduPtRoot]="pt()?.root">
+		<span
+			class="edu-autocomplete"
+			[style]="style()"
+			[eduPtRoot]="$safeNavigationMigration(pt()?.root)"
+		>
 			<input
 				class="edu-input-text edu-autocomplete__input"
 				[class.edu-autocomplete__input--with-dropdown]="dropdown()"
@@ -71,7 +75,13 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 				(keydown)="onKeydown($event)"
 			/>
 			@if (dropdown()) {
-				<button type="button" class="edu-autocomplete__dropdown" tabindex="-1" [disabled]="disabled()" (mousedown)="onDropdownMousedown($event)">
+				<button
+					type="button"
+					class="edu-autocomplete__dropdown"
+					tabindex="-1"
+					[disabled]="disabled()"
+					(mousedown)="onDropdownMousedown($event)"
+				>
 					<i class="pi pi-chevron-down"></i>
 				</button>
 			}
@@ -83,13 +93,18 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 					@for (opt of suggestions(); track $index) {
 						<li
 							class="edu-autocomplete-panel__option"
-							[class.edu-autocomplete-panel__option--active]="$index === activeIndex()"
+							[class.edu-autocomplete-panel__option--active]="
+								$index === activeIndex()
+							"
 							role="option"
 							[attr.aria-selected]="$index === activeIndex()"
 							(mousedown)="onOptionMousedown($event, opt)"
 						>
 							@if (itemTemplate(); as tpl) {
-								<ng-container [ngTemplateOutlet]="tpl" [ngTemplateOutletContext]="{ $implicit: opt }"></ng-container>
+								<ng-container
+									[ngTemplateOutlet]="tpl"
+									[ngTemplateOutletContext]="{ $implicit: opt }"
+								></ng-container>
 							} @else {
 								{{ resolveLabel(opt) }}
 							}
@@ -148,9 +163,15 @@ export class EduAutoComplete<T = unknown> implements ControlValueAccessor, OnDes
 	private readonly footerTemplateRef = contentChild<TemplateRef<unknown>>('footer');
 	private readonly legacyTemplates = contentChildren(EduTemplate);
 
-	protected readonly itemTemplate = computed(() => this.itemTemplateRef() ?? this.legacyTemplate('item'));
-	protected readonly emptyTemplate = computed(() => this.emptyTemplateRef() ?? this.legacyTemplate('empty'));
-	protected readonly footerTemplate = computed(() => this.footerTemplateRef() ?? this.legacyTemplate('footer'));
+	protected readonly itemTemplate = computed(
+		() => this.itemTemplateRef() ?? this.legacyTemplate('item'),
+	);
+	protected readonly emptyTemplate = computed(
+		() => this.emptyTemplateRef() ?? this.legacyTemplate('empty'),
+	);
+	protected readonly footerTemplate = computed(
+		() => this.footerTemplateRef() ?? this.legacyTemplate('footer'),
+	);
 
 	private readonly overlayTemplateRef = viewChild<TemplateRef<unknown>>('overlayTemplate');
 	private readonly viewContainerRef = inject(ViewContainerRef);
@@ -175,8 +196,12 @@ export class EduAutoComplete<T = unknown> implements ControlValueAccessor, OnDes
 
 	writeValue(value: T | null): void {
 		this.value = value ?? null;
-		const found = this.suggestions().find((opt) => resolveOptionValue(opt, this.optionValue()) === (this.value as unknown));
-		this.query.set(found ? this.resolveLabel(found) : this.value === null ? '' : String(this.value));
+		const found = this.suggestions().find(
+			(opt) => resolveOptionValue(opt, this.optionValue()) === (this.value as unknown),
+		);
+		this.query.set(
+			found ? this.resolveLabel(found) : this.value === null ? '' : String(this.value),
+		);
 	}
 
 	registerOnChange(fn: (value: unknown) => void): void {
@@ -289,7 +314,8 @@ export class EduAutoComplete<T = unknown> implements ControlValueAccessor, OnDes
 	}
 
 	private legacyTemplate(name: string): TemplateRef<unknown> | undefined {
-		return this.legacyTemplates().find((template) => template.pTemplate() === name)?.templateRef;
+		return this.legacyTemplates().find((template) => template.pTemplate() === name)
+			?.templateRef;
 	}
 
 	private close(): void {
