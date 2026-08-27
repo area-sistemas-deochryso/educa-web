@@ -12,7 +12,7 @@ import { filter } from 'rxjs/operators';
  */
 export interface EduOverlayOpenOptions {
 	positionStrategy: PositionStrategy;
-	panelClass: string;
+	panelClass: string | string[];
 	hasBackdrop: boolean;
 	backdropClass?: string;
 	closeOnBackdropClick: boolean;

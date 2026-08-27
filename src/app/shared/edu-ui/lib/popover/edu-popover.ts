@@ -8,6 +8,8 @@ import { EduOverlayHandle } from '../overlay/edu-overlay-handle';
 const POPUP_POSITIONS: ConnectedPosition[] = [
 	{ originX: 'start', originY: 'bottom', overlayX: 'start', overlayY: 'top', offsetY: 4 },
 	{ originX: 'start', originY: 'top', overlayX: 'start', overlayY: 'bottom', offsetY: -4 },
+	{ originX: 'end', originY: 'bottom', overlayX: 'end', overlayY: 'top', offsetY: 4 },
+	{ originX: 'end', originY: 'top', overlayX: 'end', overlayY: 'bottom', offsetY: -4 },
 ];
 
 @Component({
@@ -71,7 +73,9 @@ export class EduPopover implements OnDestroy {
 			portal,
 			{
 				positionStrategy,
-				panelClass: ['edu-popover-pane', this.styleClass()].filter(Boolean).join(' '),
+				// classList.add() rejects tokens containing spaces — split each class
+				// individually rather than joining into one space-separated string.
+				panelClass: ['edu-popover-pane', ...(this.styleClass()?.split(' ').filter(Boolean) ?? [])],
 				hasBackdrop: true,
 				backdropClass: 'cdk-overlay-transparent-backdrop',
 				closeOnBackdropClick: true,
