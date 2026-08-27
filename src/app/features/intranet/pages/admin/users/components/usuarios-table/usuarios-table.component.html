@@ -85,6 +85,7 @@
 					<edu-button
 						icon="pi pi-eye"
 						[text]="true"
+						severity="secondary"
 						size="small"
 						class="action-icon"
 						eduTooltip="Ver detalles"
@@ -96,8 +97,9 @@
 					<edu-button
 						icon="pi pi-pencil"
 						[text]="true"
+						severity="success"
 						size="small"
-						class="action-icon action-edit"
+						class="action-icon"
 						eduTooltip="Editar"
 						eduTooltipPosition="top"
 						(click)="onEdit(usuario)"
@@ -107,10 +109,9 @@
 					<edu-button
 						[icon]="usuario.estado ? 'pi pi-ban' : 'pi pi-check'"
 						[text]="true"
+						[severity]="usuario.estado ? 'warn' : 'info'"
 						size="small"
 						class="action-icon"
-						[class.action-deactivate]="usuario.estado"
-						[class.action-activate]="!usuario.estado"
 						[eduTooltip]="usuario.estado ? 'Desactivar' : 'Activar'"
 						eduTooltipPosition="top"
 						(click)="onToggleEstado(usuario)"
@@ -120,6 +121,7 @@
 					<edu-button
 						icon="pi pi-copy"
 						[text]="true"
+						severity="secondary"
 						size="small"
 						class="action-icon"
 						eduTooltip="Copiar DNI"

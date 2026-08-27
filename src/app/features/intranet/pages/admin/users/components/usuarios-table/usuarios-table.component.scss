@@ -92,27 +92,6 @@
 		width: 1.75rem !important;
 		height: 1.75rem !important;
 		padding: 0 !important;
-		color: var(--text-color-secondary) !important;
-
-		&:hover {
-			color: var(--text-color) !important;
-			background: var(--surface-100) !important;
-		}
-	}
-
-	/* Paleta estándar de acciones de tabla (2026-07-20): editar=verde,
-	   activar=azul, desactivar=naranja, copiar=gris (sin cambio),
-	   eliminar=rojo (ya consistente en otras tablas). */
-	.action-edit {
-		color: var(--green-600) !important;
-	}
-
-	.action-deactivate {
-		color: var(--orange-600) !important;
-	}
-
-	.action-activate {
-		color: var(--blue-600, #2563eb) !important;
 	}
 
 	.empty-message {

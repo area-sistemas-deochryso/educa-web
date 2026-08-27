@@ -75,6 +75,8 @@
 		@if (viewMode() === 'table') {
 			<edu-select
 				[options]="estadoOptions"
+				[optionLabel]="'label'"
+				[optionValue]="'value'"
 				[ngModel]="filterEstado()"
 				(ngModelChange)="onFilterEstadoChange($event)"
 				placeholder="Estado"
@@ -84,6 +86,8 @@
 		}
 		<edu-select
 			[options]="severidadOptions"
+			[optionLabel]="'label'"
+			[optionValue]="'value'"
 			[ngModel]="filterSeveridad()"
 			(ngModelChange)="onFilterSeveridadChange($event)"
 			placeholder="Severidad"
@@ -92,6 +96,8 @@
 		/>
 		<edu-select
 			[options]="origenOptions"
+			[optionLabel]="'label'"
+			[optionValue]="'value'"
 			[ngModel]="filterOrigen()"
 			(ngModelChange)="onFilterOrigenChange($event)"
 			placeholder="Origen"

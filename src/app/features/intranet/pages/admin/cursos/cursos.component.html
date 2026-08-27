@@ -42,6 +42,8 @@
 
 		<edu-select
 			[options]="estadoOptions"
+			[optionLabel]="'label'"
+			[optionValue]="'value'"
 			[ngModel]="vm().filterEstado"
 			(ngModelChange)="onFilterEstadoChange($event)"
 			placeholder="Estado"
@@ -52,6 +54,8 @@
 
 		<edu-select
 			[options]="nivelOptions"
+			[optionLabel]="'label'"
+			[optionValue]="'value'"
 			[ngModel]="vm().filterNivel"
 			(ngModelChange)="onFilterNivelChange($event)"
 			placeholder="Nivel educativo"
@@ -62,6 +66,8 @@
 
 		<edu-select
 			[options]="completitudOptions"
+			[optionLabel]="'label'"
+			[optionValue]="'value'"
 			[ngModel]="vm().filterCompletitud"
 			(ngModelChange)="onFilterCompletitudChange($event)"
 			placeholder="Completitud"

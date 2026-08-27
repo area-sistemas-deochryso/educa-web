@@ -24,6 +24,8 @@
 					<edu-select
 						inputId="newEstado"
 						[options]="estadoOptions()"
+						[optionLabel]="'label'"
+						[optionValue]="'value'"
 						[ngModel]="estado()"
 						(ngModelChange)="onEstadoChange($event)"
 						placeholder="Selecciona el nuevo estado"

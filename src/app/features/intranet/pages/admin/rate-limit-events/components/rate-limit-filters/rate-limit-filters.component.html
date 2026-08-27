@@ -14,6 +14,8 @@
 	<div class="filter-dropdowns">
 		<edu-select
 			[options]="rolOptions()"
+			[optionLabel]="'label'"
+			[optionValue]="'value'"
 			[ngModel]="filter().rol"
 			data-info-anchor="admin-rate-limit-rol-select"
 			(ngModelChange)="onRolChange($event)"
@@ -23,6 +25,8 @@
 
 		<edu-select
 			[options]="policyOptions"
+			[optionLabel]="'label'"
+			[optionValue]="'value'"
 			[ngModel]="filter().policy"
 			data-info-anchor="admin-rate-limit-policy-select"
 			(ngModelChange)="onPolicyChange($event)"

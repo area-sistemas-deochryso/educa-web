@@ -2,6 +2,8 @@
 <app-page-header icon="pi pi-bell" title="Gestión de Notificaciones" subtitle="Administra las notificaciones que ven los usuarios del sistema">
 	<edu-select
 		[options]="[{ label: '2025', value: 2025 }, { label: '2026', value: 2026 }, { label: '2027', value: 2027 }]"
+		[optionLabel]="'label'"
+		[optionValue]="'value'"
 		[ngModel]="vm().filterAnio"
 		(ngModelChange)="onChangeAnio($event)"
 		appendTo="body"
@@ -43,6 +45,8 @@
 	</edu-icon-field>
 	<edu-select
 		[options]="tipoOptions"
+		[optionLabel]="'label'"
+		[optionValue]="'value'"
 		[ngModel]="vm().filterTipo"
 		(ngModelChange)="onFilterTipo($event)"
 		appendTo="body"
@@ -51,6 +55,8 @@
 	/>
 	<edu-select
 		[options]="estadoOptions"
+		[optionLabel]="'label'"
+		[optionValue]="'value'"
 		[ngModel]="vm().filterEstado"
 		(ngModelChange)="onFilterEstado($event)"
 		appendTo="body"
@@ -218,6 +224,8 @@
 			<edu-select
 				id="tipo"
 				[options]="tipoOptions.slice(1)"
+				[optionLabel]="'label'"
+				[optionValue]="'value'"
 				[ngModel]="vm().formData.tipo"
 				(ngModelChange)="updateField('tipo', $event)"
 				appendTo="body"
@@ -230,6 +238,8 @@
 			<edu-select
 				id="prioridad"
 				[options]="prioridadOptions"
+				[optionLabel]="'label'"
+				[optionValue]="'value'"
 				[ngModel]="vm().formData.prioridad"
 				(ngModelChange)="updateField('prioridad', $event)"
 				appendTo="body"
@@ -242,6 +252,8 @@
 			<edu-select
 				id="destinatarioRol"
 				[options]="destinatarioRolOptions"
+				[optionLabel]="'label'"
+				[optionValue]="'value'"
 				[ngModel]="vm().formData.destinatarioRol"
 				(ngModelChange)="updateField('destinatarioRol', $event)"
 				appendTo="body"
@@ -255,6 +267,8 @@
 			<edu-select
 				id="destinatarioGrado"
 				[options]="destinatarioGradoOptions"
+				[optionLabel]="'label'"
+				[optionValue]="'value'"
 				[ngModel]="vm().formData.destinatarioGrado"
 				(ngModelChange)="updateField('destinatarioGrado', $event)"
 				appendTo="body"
@@ -268,6 +282,8 @@
 			<edu-select
 				id="destinatarioSeccion"
 				[options]="destinatarioSeccionOptions"
+				[optionLabel]="'label'"
+				[optionValue]="'value'"
 				[ngModel]="vm().formData.destinatarioSeccion"
 				(ngModelChange)="updateField('destinatarioSeccion', $event)"
 				appendTo="body"
@@ -281,6 +297,8 @@
 			<edu-select
 				id="icono"
 				[options]="iconoOptions"
+				[optionLabel]="'label'"
+				[optionValue]="'value'"
 				[ngModel]="vm().formData.icono"
 				(ngModelChange)="updateField('icono', $event)"
 				appendTo="body"

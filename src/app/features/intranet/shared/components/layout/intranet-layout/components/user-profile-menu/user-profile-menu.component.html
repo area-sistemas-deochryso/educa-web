@@ -27,54 +27,56 @@
 	(onShow)="onPopoverShow()"
 	(onHide)="onPopoverHide()"
 >
-	<div class="popover-content">
-		<div class="popover-header">
-			<edu-avatar [label]="initials()" shape="circle" size="large" class="popover-avatar" />
-			<div class="popover-user-info">
-				<span class="popover-name">{{ displayName() }}</span>
-				<span class="popover-role">{{ userRole() }}</span>
+	<ng-template>
+		<div class="popover-content">
+			<div class="popover-header">
+				<edu-avatar [label]="initials()" shape="circle" size="large" class="popover-avatar" />
+				<div class="popover-user-info">
+					<span class="popover-name">{{ displayName() }}</span>
+					<span class="popover-role">{{ userRole() }}</span>
+				</div>
 			</div>
-		</div>
-		<div class="popover-divider"></div>
-		<div class="theme-toggle-row">
-			<i class="pi" [class.pi-moon]="isDarkMode()" [class.pi-sun]="!isDarkMode()"></i>
-			<span>Modo oscuro</span>
-			<edu-toggle
-				[ngModel]="isDarkMode()"
-				(ngModelChange)="onThemeToggle()"
-				inputId="theme-toggle"
-				class="theme-toggle-switch"
-				data-info-anchor="header-user-menu-theme-toggle"
-			/>
-		</div>
-		@if (showNotifications()) {
 			<div class="popover-divider"></div>
-			<button class="menu-btn" data-info-anchor="header-user-menu-notifications" (click)="onNotificationsClick()" type="button">
-				<i class="pi pi-bell" [class.bell-shake]="unreadBadge()"></i>
-				<span>Notificaciones</span>
-				@if (unreadBadge()) {
-					<edu-badge [value]="unreadBadge()" severity="danger" class="notif-badge" />
-				}
-			</button>
-		}
-		<div class="popover-divider"></div>
-		<button class="menu-btn" data-info-anchor="header-user-menu-info" (click)="onInfoClick()" type="button">
-			<i class="pi pi-user-edit"></i>
-			<span>Información</span>
-		</button>
-		@if (fabHidden()) {
+			<div class="theme-toggle-row">
+				<i class="pi" [class.pi-moon]="isDarkMode()" [class.pi-sun]="!isDarkMode()"></i>
+				<span>Modo oscuro</span>
+				<edu-toggle
+					[ngModel]="isDarkMode()"
+					(ngModelChange)="onThemeToggle()"
+					inputId="theme-toggle"
+					class="theme-toggle-switch"
+					data-info-anchor="header-user-menu-theme-toggle"
+				/>
+			</div>
+			@if (showNotifications()) {
+				<div class="popover-divider"></div>
+				<button class="menu-btn" data-info-anchor="header-user-menu-notifications" (click)="onNotificationsClick()" type="button">
+					<i class="pi pi-bell" [class.bell-shake]="unreadBadge()"></i>
+					<span>Notificaciones</span>
+					@if (unreadBadge()) {
+						<edu-badge [value]="unreadBadge()" severity="danger" class="notif-badge" />
+					}
+				</button>
+			}
 			<div class="popover-divider"></div>
-			<button class="menu-btn" data-info-anchor="header-user-menu-show-fab" (click)="onShowFabClick()" type="button">
-				<i class="pi pi-eye"></i>
-				<span>Mostrar accesos flotantes</span>
+			<button class="menu-btn" data-info-anchor="header-user-menu-info" (click)="onInfoClick()" type="button">
+				<i class="pi pi-user-edit"></i>
+				<span>Información</span>
 			</button>
-		}
-		<div class="popover-divider"></div>
-		<button class="logout-btn" data-info-anchor="header-user-menu-logout" (click)="onLogout()" type="button">
-			<i class="pi pi-sign-out"></i>
-			<span>Cerrar sesión</span>
-		</button>
-	</div>
+			@if (fabHidden()) {
+				<div class="popover-divider"></div>
+				<button class="menu-btn" data-info-anchor="header-user-menu-show-fab" (click)="onShowFabClick()" type="button">
+					<i class="pi pi-eye"></i>
+					<span>Mostrar accesos flotantes</span>
+				</button>
+			}
+			<div class="popover-divider"></div>
+			<button class="logout-btn" data-info-anchor="header-user-menu-logout" (click)="onLogout()" type="button">
+				<i class="pi pi-sign-out"></i>
+				<span>Cerrar sesión</span>
+			</button>
+		</div>
+	</ng-template>
 </edu-popover>
 
 <!-- Diálogo de información - siempre en el DOM, nunca en @if -->
