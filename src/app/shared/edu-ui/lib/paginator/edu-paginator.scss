@@ -1,12 +1,14 @@
 .edu-paginator {
 	display: flex;
 	align-items: center;
+	justify-content: center;
 	gap: 0.25rem;
 	flex-wrap: wrap;
+	padding: 1rem 0;
 
 	&__report {
 		margin-right: 0.5rem;
-		font-size: 0.875rem;
+		font-size: 1rem;
 		color: var(--eduui-text-muted-color);
 	}
 
@@ -41,11 +43,12 @@
 	}
 
 	&__page--active {
-		background: var(--eduui-primary-color);
-		color: var(--eduui-primary-contrast-color);
+		background: rgba(0, 0, 0, 0.08);
+		color: rgb(51, 65, 85);
+		font-weight: 600;
 
 		&:not(:disabled):hover {
-			background: var(--eduui-primary-hover-color);
+			background: rgba(0, 0, 0, 0.08);
 		}
 	}
 

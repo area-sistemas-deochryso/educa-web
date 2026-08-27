@@ -133,7 +133,7 @@
 	--eduui-content-border-radius: var(--eduui-radius-md);
 	--eduui-content-color: var(--eduui-text-color);
 
-	--eduui-form-field-background: var(--eduui-surface-0);
+	--eduui-form-field-background: transparent;
 	--eduui-form-field-disabled-background: var(--eduui-surface-200);
 	--eduui-form-field-border-color: var(--eduui-surface-300);
 	--eduui-form-field-hover-border-color: var(--eduui-surface-400);
