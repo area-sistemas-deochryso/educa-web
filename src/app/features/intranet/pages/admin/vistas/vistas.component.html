@@ -49,6 +49,8 @@
 
 		<edu-select
 			[options]="vm().modulosOptions"
+			[optionLabel]="'label'"
+			[optionValue]="'value'"
 			[ngModel]="vm().filterModulo"
 			(ngModelChange)="onFilterModuloChange($event)"
 			placeholder="Todos los módulos"
@@ -59,6 +61,8 @@
 
 		<edu-select
 			[options]="vm().rutaFilterOptions"
+			[optionLabel]="'label'"
+			[optionValue]="'value'"
 			[ngModel]="vm().filterRuta"
 			(ngModelChange)="onFilterRutaChange($event)"
 			[style]="{ minWidth: '160px' }"

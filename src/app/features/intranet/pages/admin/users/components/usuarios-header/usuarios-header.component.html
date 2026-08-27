@@ -60,6 +60,8 @@
 			<label>Año académico</label>
 			<edu-select
 				[options]="anioOptions"
+				[optionLabel]="'label'"
+				[optionValue]="'value'"
 				[ngModel]="exportAnio()"
 				(ngModelChange)="exportAnio.set($event)"
 				appendTo="body"

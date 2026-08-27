@@ -37,6 +37,8 @@
 							appendTo="body"
 							id="rol"
 							[options]="rolesSelectOptions()"
+							[optionLabel]="'label'"
+							[optionValue]="'value'"
 							[ngModel]="rolValue"
 							(ngModelChange)="onFieldChange('rol', $event)"
 							placeholder="Seleccione el rol"
@@ -51,6 +53,8 @@
 						appendTo="body"
 						id="sede"
 						[options]="sedeOptions()"
+						[optionLabel]="'label'"
+						[optionValue]="'value'"
 						[ngModel]="formData().sedeId"
 						(ngModelChange)="onFieldChange('sedeId', $event)"
 						placeholder="Seleccione la sede"
@@ -243,6 +247,8 @@
 							<edu-select
 								id="grado"
 								[options]="gradosOptions()"
+								[optionLabel]="'label'"
+								[optionValue]="'value'"
 								[ngModel]="_gradoSeleccionado()"
 								(ngModelChange)="onGradoChange($event)"
 								placeholder="Seleccione el grado"
@@ -258,6 +264,8 @@
 								<edu-select
 									id="seccion"
 									[options]="seccionesOptions()"
+									[optionLabel]="'label'"
+									[optionValue]="'value'"
 									[ngModel]="_seccionSeleccionada()"
 									(ngModelChange)="onSeccionChange($event)"
 									placeholder="Seleccione la sección"
@@ -314,6 +322,8 @@
 							<div class="agregar-salon-row">
 								<edu-select
 									[options]="gradosOptions()"
+									[optionLabel]="'label'"
+									[optionValue]="'value'"
 									[ngModel]="_gradoSeleccionado()"
 									(ngModelChange)="onGradoChange($event)"
 									placeholder="Grado"
@@ -325,6 +335,8 @@
 								@if (_gradoSeleccionado()) {
 									<edu-select
 										[options]="seccionesOptions()"
+										[optionLabel]="'label'"
+										[optionValue]="'value'"
 										[ngModel]="_seccionSeleccionada()"
 										(ngModelChange)="onSeccionChange($event)"
 										placeholder="Sección"
@@ -395,6 +407,8 @@
 									<div class="agregar-cursos-row">
 										<edu-multi-select
 											[options]="cursosOptions()"
+											[optionLabel]="'label'"
+											[optionValue]="'value'"
 											[ngModel]="_cursosSeleccionados()"
 											(ngModelChange)="_cursosSeleccionados.set($event)"
 											placeholder="Seleccionar cursos..."

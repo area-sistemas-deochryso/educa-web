@@ -2,6 +2,8 @@
 <app-page-header icon="pi pi-calendar" title="Gestión de Eventos del Calendario" subtitle="Administra los eventos que aparecen en el calendario escolar">
 	<edu-select
 		[options]="[{ label: '2025', value: 2025 }, { label: '2026', value: 2026 }, { label: '2027', value: 2027 }]"
+		[optionLabel]="'label'"
+		[optionValue]="'value'"
 		[ngModel]="vm().filterAnio"
 		(ngModelChange)="onChangeAnio($event)"
 		appendTo="body"
@@ -43,6 +45,8 @@
 	</edu-icon-field>
 	<edu-select
 		[options]="tipoOptions"
+		[optionLabel]="'label'"
+		[optionValue]="'value'"
 		[ngModel]="vm().filterTipo"
 		(ngModelChange)="onFilterTipo($event)"
 		appendTo="body"
@@ -51,6 +55,8 @@
 	/>
 	<edu-select
 		[options]="estadoOptions"
+		[optionLabel]="'label'"
+		[optionValue]="'value'"
 		[ngModel]="vm().filterEstado"
 		(ngModelChange)="onFilterEstado($event)"
 		appendTo="body"
@@ -217,6 +223,8 @@
 			<edu-select
 				id="tipo"
 				[options]="tipoOptions.slice(1)"
+				[optionLabel]="'label'"
+				[optionValue]="'value'"
 				[ngModel]="vm().formData.tipo"
 				(ngModelChange)="updateField('tipo', $event)"
 				appendTo="body"
@@ -229,6 +237,8 @@
 			<edu-select
 				id="icono"
 				[options]="iconoOptions"
+				[optionLabel]="'label'"
+				[optionValue]="'value'"
 				[ngModel]="vm().formData.icono"
 				(ngModelChange)="updateField('icono', $event)"
 				appendTo="body"

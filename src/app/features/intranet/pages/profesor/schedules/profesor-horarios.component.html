@@ -179,46 +179,48 @@
 
 				<!-- Popover de detalle de clase (desktop) -->
 				<edu-popover #detailPopover appendTo="body" styleClass="class-detail-popover">
-					@if (selectedBlock(); as block) {
-						<div class="popover-content">
-							<div class="popover-header">
-								<span class="popover-curso">{{ block.cursoNombre }}</span>
-								<span class="popover-horario">{{ block.horaInicio }} - {{ block.horaFin }}</span>
+					<ng-template>
+						@if (selectedBlock(); as block) {
+							<div class="popover-content">
+								<div class="popover-header">
+									<span class="popover-curso">{{ block.cursoNombre }}</span>
+									<span class="popover-horario">{{ block.horaInicio }} - {{ block.horaFin }}</span>
+								</div>
+								<div class="popover-details">
+									<span><i class="pi pi-building"></i> {{ block.salonDescripcion }}</span>
+									<span><i class="pi pi-users"></i> {{ block.cantidadEstudiantes }} estudiantes</span>
+								</div>
+								<div class="popover-actions">
+									<edu-button
+										type="button"
+										icon="pi pi-check-square"
+										label="Asistencia"
+										size="small"
+										data-info-anchor="profesor-horario-popover-asistencia"
+										(click)="irAAsistencia(detailPopover)"
+									/>
+									<edu-button
+										type="button"
+										icon="pi pi-book"
+										label="Contenido"
+										[outlined]="true"
+										size="small"
+										data-info-anchor="profesor-horario-popover-contenido"
+										(click)="irAContenido(detailPopover)"
+									/>
+									<edu-button
+										type="button"
+										icon="pi pi-chart-bar"
+										label="Calificaciones"
+										[outlined]="true"
+										size="small"
+										data-info-anchor="profesor-horario-popover-calificaciones"
+										(click)="irACalificaciones(detailPopover)"
+									/>
+								</div>
 							</div>
-							<div class="popover-details">
-								<span><i class="pi pi-building"></i> {{ block.salonDescripcion }}</span>
-								<span><i class="pi pi-users"></i> {{ block.cantidadEstudiantes }} estudiantes</span>
-							</div>
-							<div class="popover-actions">
-								<edu-button
-									type="button"
-									icon="pi pi-check-square"
-									label="Asistencia"
-									size="small"
-									data-info-anchor="profesor-horario-popover-asistencia"
-									(click)="irAAsistencia(detailPopover)"
-								/>
-								<edu-button
-									type="button"
-									icon="pi pi-book"
-									label="Contenido"
-									[outlined]="true"
-									size="small"
-									data-info-anchor="profesor-horario-popover-contenido"
-									(click)="irAContenido(detailPopover)"
-								/>
-								<edu-button
-									type="button"
-									icon="pi pi-chart-bar"
-									label="Calificaciones"
-									[outlined]="true"
-									size="small"
-									data-info-anchor="profesor-horario-popover-calificaciones"
-									(click)="irACalificaciones(detailPopover)"
-								/>
-							</div>
-						</div>
-					}
+						}
+					</ng-template>
 				</edu-popover>
 			</div>
 		</div>

@@ -677,6 +677,34 @@ strong {
 }
 
 /*---------------------------------------
+  TAG NEUTRAL - SEMANTIC OPT-IN (A1 / Opción C)
+  Design System: convención semántica para edu-tag.
+  - tag-neutral (esta clase): tags informativos
+    (rol, sección, categoría, metadato) → gris neutro.
+  - Sin clase: tags críticos/operativos (severity,
+    estado F/APROBADO/CRITICAL) → conservan los
+    colores del tema por severidad.
+  Se aplica con styleClass="tag-neutral" en cada
+  <edu-tag> cuya severidad NO sea información útil
+  para el usuario.
+-----------------------------------------*/
+.edu-tag.tag-neutral {
+	/* Brief 523: era --surface-200 (primitivo de Aura, gris claro FIJO en
+	   los dos colorScheme -- no es "más claro que el fondo de ESE modo").
+	   Con --text-color (que sí varía) terminaban casi idénticos en dark
+	   (#e4e4e7 los dos, coincidencia que lo hizo evidente). --surface-100
+	   es nuestro, con variante dark real (#e3e3e3 claro / #37373c oscuro)
+	   -- se ve gris neutro en los dos modos, no una isla clara en dark. */
+	/* Brief 589: !important necesario -- edu-tag.scss usa ViewEncapsulation
+	   Emulated (default), así que su selector [data-severity] compila con el
+	   atributo _ngcontent-* agregado, superando en especificidad a esta regla
+	   global sin ese atributo aunque tengan el mismo número de clases. */
+	background: var(--surface-100) !important;
+	color: var(--text-color) !important;
+	font-weight: 600;
+}
+
+/*---------------------------------------
   UTILITY: .label-uppercase (A4)
   Utility class para labels UPPERCASE del
   design system. Opt-in (no afecta nada salvo

@@ -371,6 +371,8 @@
 				<label>Tipo de registro</label>
 				<edu-select
 					[options]="tipoOptions()"
+					[optionLabel]="'label'"
+					[optionValue]="'value'"
 					[ngModel]="vm().formData.tipoOperacion"
 					(ngModelChange)="store.updateFormData({ tipoOperacion: $event })"
 					appendTo="body"
@@ -558,6 +560,8 @@
 		<div class="cierre-fields">
 			<edu-select
 				[options]="mesesOptions()"
+				[optionLabel]="'label'"
+				[optionValue]="'value'"
 				[(ngModel)]="cierreMes"
 				placeholder="Mes"
 				appendTo="body"

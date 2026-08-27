@@ -8,7 +8,7 @@ export type EduMessageSeverity = 'info' | 'success' | 'warn' | 'error' | 'second
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
 		@if (visible()) {
-			<div class="edu-message" [attr.data-severity]="severity()" role="alert">
+			<div class="edu-message" [class]="styleClass()" [attr.data-severity]="severity()" role="alert">
 				{{ text() }}
 				<ng-content></ng-content>
 				@if (closable()) {
@@ -69,6 +69,7 @@ export class EduMessage {
 	readonly text = input<string>();
 	readonly severity = input<EduMessageSeverity>('info');
 	readonly closable = input(false);
+	readonly styleClass = input('');
 	readonly onClose = output<void>();
 
 	/** Controla la visibilidad interna del mensaje; el cierre por click es la fuente de verdad por default. */

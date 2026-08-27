@@ -14,6 +14,8 @@
 	<div class="filter-dropdowns">
 		<edu-select
 			[options]="tipoOptions"
+			[optionLabel]="'label'"
+			[optionValue]="'value'"
 			[ngModel]="filterTipo()"
 			(ngModelChange)="onTipoChange($event)"
 			placeholder="Tipo"

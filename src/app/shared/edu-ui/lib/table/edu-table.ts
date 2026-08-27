@@ -57,6 +57,7 @@ function normalizeSortOrder(value: EduTableSortOrderInput): EduTableSortOrder {
 		<div
 			class="edu-table-wrapper"
 			[class.edu-table-wrapper--scrollable]="scrollable()"
+			[class]="styleClass()"
 			[eduPtRoot]="$safeNavigationMigration(pt()?.root)"
 		>
 			<table
@@ -79,7 +80,7 @@ function normalizeSortOrder(value: EduTableSortOrderInput): EduTableSortOrder {
 						@for (row of value(); track trackByFn(row, $index); let index = $index) {
 							<ng-container
 								[ngTemplateOutlet]="body"
-								[ngTemplateOutletContext]="{ $implicit: row, index }"
+								[ngTemplateOutletContext]="{ $implicit: row, rowIndex: index }"
 							></ng-container>
 						}
 					}
@@ -126,6 +127,7 @@ export class EduTable<T = unknown> {
 	/** Accepted for template-binding parity with real usage — edu-table never slices `value()` locally (the paginator only emits page events), so it's already server-driven and this flag doesn't change rendering. */
 	readonly lazy = input(false);
 	readonly rowHover = input(true);
+	readonly styleClass = input('');
 	readonly pt = input<EduPassThrough>();
 
 	readonly paginator = input(false);

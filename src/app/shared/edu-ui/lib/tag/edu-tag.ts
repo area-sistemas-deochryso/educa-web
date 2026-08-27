@@ -19,6 +19,7 @@ export type EduTagSeverity =
 		<span
 			class="edu-tag"
 			[class.edu-tag--rounded]="rounded()"
+			[class]="styleClass()"
 			[attr.data-severity]="severity()"
 			[eduPtRoot]="$safeNavigationMigration(pt()?.root)"
 		>
@@ -36,5 +37,6 @@ export class EduTag {
 	readonly severity = input<EduTagSeverity>('primary');
 	readonly rounded = input(false);
 	readonly icon = input<string>();
+	readonly styleClass = input('');
 	readonly pt = input<EduPassThrough>();
 }

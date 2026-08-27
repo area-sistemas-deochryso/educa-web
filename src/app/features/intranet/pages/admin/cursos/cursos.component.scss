@@ -424,26 +424,6 @@
 		flex-wrap: wrap;
 		gap: 0.35rem;
 	}
-
-	// Botón de grados - transparente con borde
-	.grados-button {
-		background: transparent !important;
-		color: var(--black-color) !important;
-		border: 1px solid rgba(0, 0, 0, 0.2) !important;
-
-		.pi {
-			color: var(--black-color) !important;
-		}
-
-		&:hover {
-			background: rgba(0, 0, 0, 0.05) !important;
-			border-color: rgba(0, 0, 0, 0.3) !important;
-		}
-
-		&:focus {
-			box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1) !important;
-		}
-	}
 }
 // #endregion
 // #region GRADOS CONTENT

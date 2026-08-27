@@ -15,6 +15,8 @@
 	<div class="filter-dropdowns">
 		<edu-select
 			[options]="options().estadoOptions"
+			[optionLabel]="'label'"
+			[optionValue]="'value'"
 			[ngModel]="filterEstado()"
 			(ngModelChange)="onFilterEstadoChange($event)"
 			placeholder="Estado"
@@ -25,6 +27,8 @@
 		@if (showSalonFilter()) {
 			<edu-select
 				[options]="salonOptions()"
+				[optionLabel]="'label'"
+				[optionValue]="'value'"
 				[ngModel]="filterSalonId()"
 				(ngModelChange)="onFilterSalonIdChange($event)"
 				placeholder="Salón"
