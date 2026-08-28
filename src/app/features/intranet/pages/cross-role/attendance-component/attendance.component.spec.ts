@@ -5,8 +5,10 @@ import { signal } from '@angular/core';
 import { testProviders } from '@test';
 import { AttendanceComponent } from './attendance.component';
 import { UserProfileService } from '@core/services';
+import { ViewAsContextService, ViewAsContext } from '@core/services/view-as';
 import { AttendanceApoderadoComponent } from './attendance-apoderado/attendance-apoderado.component';
 import { AttendanceEstudianteComponent } from './attendance-estudiante/attendance-estudiante.component';
+import { AttendanceProfesorComponent } from './attendance-profesor/attendance-profesor.component';
 
 // #endregion
 // #region Implementation
@@ -14,6 +16,7 @@ describe('AttendanceComponent', () => {
 	let component: AttendanceComponent;
 	let fixture: ComponentFixture<AttendanceComponent>;
 	let userProfileMock: Partial<UserProfileService>;
+	let viewAsContextMock: Partial<ViewAsContextService>;
 
 	beforeEach(async () => {
 		userProfileMock = {
@@ -21,10 +24,17 @@ describe('AttendanceComponent', () => {
 			userName: signal('Test User'),
 			rol: (() => undefined) as UserProfileService['rol'],
 		};
+		viewAsContextMock = {
+			activeContext: signal<ViewAsContext | null>(null),
+		};
 
 		await TestBed.configureTestingModule({
 			imports: [AttendanceComponent],
-			providers: [...testProviders, { provide: UserProfileService, useValue: userProfileMock }],
+			providers: [
+				...testProviders,
+				{ provide: UserProfileService, useValue: userProfileMock },
+				{ provide: ViewAsContextService, useValue: viewAsContextMock },
+			],
 		}).compileComponents();
 
 		fixture = TestBed.createComponent(AttendanceComponent);
@@ -96,6 +106,65 @@ describe('AttendanceComponent', () => {
 		expect(() => {
 			TestBed.createComponent(AttendanceComponent);
 		}).not.toThrow();
+	});
+
+	// * Brief 578 (P104 F1) — "ver como" debe pisar el rol real, no el de la sesión del admin.
+	describe('"ver como" (effectiveRole)', () => {
+		it('falls back to the real userRole when no ver-como context is active', () => {
+			userProfileMock.userRole = signal('Director');
+
+			const newFixture = TestBed.createComponent(AttendanceComponent);
+			const newComponent = newFixture.componentInstance;
+
+			expect(newComponent.effectiveRole()).toBe('Director');
+		});
+
+		it('uses the impersonated rol instead of the real (staff) rol while viewing as', () => {
+			userProfileMock.userRole = signal('Director');
+			viewAsContextMock.activeContext = signal<ViewAsContext | null>({
+				entityId: 1,
+				rol: 'Estudiante',
+				nombreCompleto: 'Test Student',
+			});
+
+			const newFixture = TestBed.createComponent(AttendanceComponent);
+			const newComponent = newFixture.componentInstance;
+
+			expect(newComponent.effectiveRole()).toBe('Estudiante');
+		});
+
+		it('never shows the director mode selector while impersonating, even if the admin is staff', () => {
+			userProfileMock.userRole = signal('Director');
+			userProfileMock.rol = (() => ({ esStaff: true })) as UserProfileService['rol'];
+			viewAsContextMock.activeContext = signal<ViewAsContext | null>({
+				entityId: 1,
+				rol: 'Estudiante',
+				nombreCompleto: 'Test Student',
+			});
+
+			const newFixture = TestBed.createComponent(AttendanceComponent);
+			const newComponent = newFixture.componentInstance;
+
+			expect(newComponent.showModeSelector()).toBe(false);
+		});
+
+		it('delegates reload to the estudiante component while impersonating a Profesor as director', () => {
+			userProfileMock.userRole = signal('Director');
+			viewAsContextMock.activeContext = signal<ViewAsContext | null>({
+				entityId: 1,
+				rol: 'Profesor',
+				nombreCompleto: 'Test Teacher',
+			});
+
+			const newFixture = TestBed.createComponent(AttendanceComponent);
+			const newComponent = newFixture.componentInstance;
+			const mockProfesor = { reload: vi.fn(), setViewMode: vi.fn() };
+			newComponent.profesorComponent = mockProfesor as unknown as AttendanceProfesorComponent;
+
+			newComponent.onReload();
+
+			expect(mockProfesor.reload).toHaveBeenCalled();
+		});
 	});
 });
 // #endregion
