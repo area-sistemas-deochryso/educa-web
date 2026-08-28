@@ -22,3 +22,13 @@ En `/intranet/admin/usuarios`, la acción "Ver detalles" de una fila dispara la 
 ## Plan cross-repo
 
 [`educa-coord/plans/xrepo-103-bug-modal-ver-detalles-usuarios.md`](../../../../educa-coord/plans/xrepo-103-bug-modal-ver-detalles-usuarios.md)
+
+## Hallazgo (2026-08-28)
+
+**Reproducido en vivo contra `educa.com.pe/intranet` real** (cuenta CODE CLAUDE, Administrador), 2/2 intentos. Instrumentando un `MutationObserver` + hooks de `console.error`/`unhandledrejection` antes del click: el nodo `p-drawer` nace **ya con clases de animación "leave"** (`p-drawer-leave-right p-leave-to`) en vez de "enter", y se remueve del DOM ~500-800ms después — sin ningún error en consola ni `unhandledrejection`. Esto confirma la hipótesis 3 del brief: el signal `visible` pasa a `true` y casi inmediatamente vuelve a `false` en el mismo ciclo, tan rápido que Angular Animations nunca llega a reproducir la transición de entrada.
+
+**No reproduce en el build local con `edu-ui`** (worktree de este brief, basado en `main`, que ya incluye el swap 588): mismo flujo probado 8+ veces (roles admin/asistente/estudiante, tabs, clicks simples y rápidos, con Service Worker activo vía `start:prod`) — el drawer abre y permanece abierto siempre.
+
+`usuarios-ui.facade.ts` y `usuarios.store.ts` son **byte-idénticos** entre el commit pre-swap (`27408cdd`) y `main` actual — el único cambio real es `p-drawer` (PrimeNG) → `edu-drawer` (CDK propio). El bug es específico del componente `Drawer` de PrimeNG 21 (probablemente una colisión entre el ciclo de animación de PrimeNG y el patrón async-then-open del facade), no del código de la app.
+
+**Conclusión**: el swap a `edu-ui` (588, mergeado a `main`, pendiente solo de desplegar) ya resuelve este bug como efecto colateral — no hace falta un fix propio en PrimeNG (librería que se está retirando). Recomendación: cerrar 577 sin código adicional, verificar en el post-deploy de 588.
