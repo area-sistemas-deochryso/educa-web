@@ -38,9 +38,12 @@ Canonical exposed headers: `Retry-After`, `X-Correlation-Id`, `X-Schema-Version`
 
 **FE — mounted components**: a component/facade that already fetched data before a context switch will not refresh on its own — `ViewAsContextService` changing does not force a re-subscribe. Either the component subscribes to `activeContext()` and re-fetches, or (the pattern currently used) `ViewAsBannerComponent.onUserSelected()` triggers `window.location.reload()` after `setContext()`.
 
+**FE — role-switch dispatcher components**: a cross-role route kept reachable during "ver como" via `ViewAsContextService.SHARED_ROUTES` (e.g. `/intranet/asistencia`) that renders a different child component per role must branch on `effectiveRole = viewAsContext.activeContext()?.rol ?? userProfile.userRole()` — the pattern already used by `IntranetLayoutComponent` for nav/breadcrumb/menu — not on the raw session role. Branching on the raw role renders the admin's own sub-view while nav/breadcrumb correctly show the impersonated role, a silent desync with no console error (found in `AttendanceComponent`, Plan 104 F1, brief 578, 2026-08-28).
+
 **Checklist for any new endpoint or cache that touches per-user data**:
 1. Does it resolve identity server-side? → use `ResolveViewAsIdentity()`, not the raw session user.
 2. Does it cache client-side (in-memory or IndexedDB/SW)? → key or invalidate by `ViewAsContextService.activeContext().entityId`.
 3. Does a component hold fetched state across a context switch? → re-subscribe to `activeContext()` or rely on the reload-after-switch pattern.
+4. Does a component pick which child to render based on the user's role? → branch on `effectiveRole`, not the raw session role.
 
 **Rationale**: found via live QA in Plan 97 (2026-08-10) — 4 independent violations of this invariant (Mensajería recipient resolution, FE in-memory cache, Service Worker cache, and component remount) surfaced across 4 different layers of the stack, all from the same root cause: new code written before "ver como" (Plan 92) existed doesn't know the pattern exists. This entry exists so the checklist is citable in design/review instead of rediscovered per endpoint. See `educa-coord/plans/xrepo-97-verificacion-identidad-ver-como.md` (F1-F4, F6) for the concrete fixes and affected endpoint list.
