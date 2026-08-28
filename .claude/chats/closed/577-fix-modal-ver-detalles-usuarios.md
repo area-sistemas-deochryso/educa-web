@@ -1,5 +1,5 @@
 > **Repo destino**: `educa-web` (frontend, branch `main`).
-> **Plan**: 103 (coord) · **Fase**: F1 · **Creado**: 2026-08-21 · **Estado**: ⏳ abierto.
+> **Plan**: 103 (coord) · **Fase**: F1 · **Creado**: 2026-08-21 · **Cerrado**: 2026-08-28 · **Estado**: ✅ cerrado sin fix propio — resuelto por 588 (swap edu-ui), verificación real subsumida en el post-deploy de 588.
 
 ---
 
