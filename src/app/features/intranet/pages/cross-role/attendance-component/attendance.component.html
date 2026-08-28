@@ -26,8 +26,8 @@
 		</div>
 	}
 
-	<!-- * Componentes especializados por rol -->
-	@switch (userRole()) {
+	<!-- * Componentes especializados por rol — respeta "ver como" (effectiveRole) -->
+	@switch (effectiveRole()) {
 		@case ('Apoderado') {
 			<app-attendance-apoderado />
 		}
