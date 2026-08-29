@@ -1,4 +1,5 @@
 import { StorageService, UserProfileService } from '@core/services';
+import { ViewAsContextService } from '@core/services/view-as';
 import { SalonProfesor } from '@data/models';
 import { AttendanceService } from '@intranet-shared/services';
 import { esGradoAsistenciaDiaria } from '@shared/constants';
@@ -59,8 +60,16 @@ export class AttendanceProfesorEstudiantesComponent implements OnInit {
 	private destroyRef = inject(DestroyRef);
 	// * Shared controller handles month/day, tables, and PDF actions.
 	readonly view = inject(AttendanceViewController);
-	// * Used by the selector and PDF header.
-	readonly nombreProfesor = inject(UserProfileService).userName;
+	private userProfile = inject(UserProfileService);
+	private viewAsContext = inject(ViewAsContextService);
+	/**
+	 * Used by the selector and PDF header. Bajo "ver como" debe mostrar el nombre del
+	 * profesor impersonado, no el del admin real — mismo patrón `effectiveRole` que
+	 * `AttendanceComponent` (INV-VIEWAS01).
+	 */
+	readonly nombreProfesor = computed(
+		() => this.viewAsContext.activeContext()?.nombreCompleto ?? this.userProfile.userName(),
+	);
 
 	/**
 	 * Emite cuando se terminó de cargar la lista de salones del profesor.

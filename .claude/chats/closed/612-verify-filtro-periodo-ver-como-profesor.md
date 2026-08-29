@@ -50,3 +50,38 @@ El filtro (`periodoEnMes` / `filtrarPorPeriodoAcademico`) ya está implementado 
 Brief **613** (`Educa.API`) cerró: `profesor/salones` y `profesor/salones-horario` ya resuelven la identidad "ver como" correctamente, verificado en vivo (`chat/613-fix-ver-como-profesor-salones-antipatron`, pendiente `/wt-merge`). El obstáculo técnico que bloqueaba este brief está resuelto — la fuente de datos que F3 necesita ya no viene rota desde el backend.
 
 **Bloqueo remanente** (el original de F3, no el derivado): sigue sin identificarse un profesor de prueba con salones-**tutor** en ambos periodos (verano y regular). El profesor usado para verificar 613 (RAMIREZ BERNARDO, profesorId 22) tiene un salón donde dicta clase pero `esTutor: false` — no sirve para este brief, que específicamente necesita el tab "Mis estudiantes" (solo visible con salones-tutor). Retomar este brief requiere primero encontrar ese profesor de prueba (vía admin/salones o consulta directa a TEST DB).
+
+---
+
+## ✅ CERRADO (2026-08-29)
+
+### Profesor de prueba
+
+Barrido completo de `/intranet/admin/salones` (Regular + Verano, Primaria + Secundaria — Inicial queda fuera de `esGradoAsistenciaDiaria`, `GRA_Orden < 8`): **ningún profesor tenía salones-tutor en ambos periodos** — gap de datos de prueba en TestConnection, no un bug. Con confirmación del usuario, se asignó **VIVIAN COLET CANCHARI RIVAS** (DNI 70525906, profesorId ya tutor de `3RO SECUNDARIA - A` en Regular, 24 estudiantes) también como tutora de `3RO SECUNDARIA - V` en Verano (8 estudiantes, antes sin tutor) vía `/intranet/admin/usuarios` → Editar → Asignaciones → Grado + Sección "Verano" + toggle Tutor. Queda como fixture reutilizable para futuras verificaciones "ver como" + periodo.
+
+(Intento previo con MENDO CALDERON MARIELA descartado: su único salón-tutor Regular, `1RO PRIMARIA - A`, tiene `GRA_Orden < 8` y queda excluido del filtro `esGradoAsistenciaDiaria` — no servía para probar el caso real. Se revirtió esa asignación de Verano antes de continuar.)
+
+### Verificación en vivo — filtro de periodo
+
+Backend local (`dotnet run`, perfil `https`, 5139/7102, `TestConnection`) + frontend local (`ng serve --port=4201`, Node 22 vía fnm) — sesión CODE CLAUDE (Administrador) → "ver como" Profesor VIVIAN COLET CANCHARI RIVAS → `/intranet/asistencia` → tab "Mis estudiantes". Con el mes en Agosto 2026 (regular), el selector de salón mostraba `3RO SECUNDARIA - A`; retrocediendo el mes hasta Enero 2026 (verano), el componente **re-seleccionó automáticamente** `3RO SECUNDARIA - Verano` — mismo comportamiento que navegación directa (`reselectSalonIfNeeded()` + `periodoEnMes`/`filtrarPorPeriodoAcademico`). **El filtro de periodo funciona correctamente bajo "ver como" — sin bug, sin fix necesario en el filtro en sí.**
+
+### Bug encontrado y corregido (fuera del alcance del filtro, mismo componente)
+
+Durante la verificación se notó que el selector de salón mostraba **"(Tutor CODE CLAUDE)"** (el admin real) en vez de "(Tutor VIVIAN COLET CANCHARI RIVAS)" (la profesora impersonada) — mismo antipatrón INV-VIEWAS01 que F1/F2/F3b, esta vez en el label del selector, no en resolución de datos. Causa raíz: `nombreProfesor` (`attendance-profesor-estudiantes.component.ts:63`, usado también para el header del PDF) leía `UserProfileService.userName` directo — no ver-como-aware.
+
+**Fix**: `nombreProfesor` ahora es `computed(() => viewAsContext.activeContext()?.nombreCompleto ?? userProfile.userName())` — mismo patrón `effectiveRole` que `AttendanceComponent` (INV-VIEWAS01). Único punto de uso confirmado por grep (`salon-selector` vía `[nombreProfesor]`, también usado para el header del PDF). Lint 0 errores, 72/72 tests verdes en `attendance-component/**`. Verificado en vivo tras el fix: selector muestra correctamente "(Tutor VIVIAN COLET CANCHARI RIVAS)".
+
+### Criterios de cierre
+
+- [x] Filtro de periodo verificado en vivo con datos reales de ambos periodos — funciona igual que en navegación directa.
+- [x] Bug derivado encontrado (`nombreProfesor` no ver-como-aware) — corregido y verificado en vivo.
+- [x] Lint 0 errores, 72/72 tests verdes (`attendance-component/**`).
+- [x] `educa-coord/plans/xrepo-104-ver-como-asistencia-periodo.md` — Done-when 3/3, plan 104 completo.
+- [x] `educa-web/.claude/plan/maestro.md` actualizado.
+- [x] Dev servers locales (backend/frontend) detenidos tras la verificación.
+
+### Commit message
+
+```
+fix(asistencia): resolve "ver como" identity leak in profesor selector label (P104 F3)
+```
