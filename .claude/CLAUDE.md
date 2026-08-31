@@ -1,8 +1,8 @@
 # educa-web
 
-Aplicacion Angular 21 para gestion educativa con portal publico e intranet privada.
+Aplicacion Angular 22 para gestion educativa con portal publico e intranet privada.
 
-**Stack**: Angular 21, TypeScript 5.9, NgRx Signals, PrimeNG 21, Vitest | ASP.NET Core 9, EF Core 9, SQL Server (Azure) | PWA (SWR único — siempre cache inmediato + revalidación en background) + Capacitor (Android/iOS nativo)
+**Stack**: Angular 22, TypeScript 6.0, NgRx Signals, edu-ui (reemplazó PrimeNG, ver P79), Vitest | ASP.NET Core 9, EF Core 9, SQL Server (Azure) | PWA (SWR único — siempre cache inmediato + revalidación en background) + Capacitor (Android/iOS nativo)
 
 ---
 
@@ -60,11 +60,11 @@ Cada línea: `- ruta/archivo.md — <trigger>`. Leé el archivo cuando el trigge
 - [.claude/reference/domain-modeling.md](reference/domain-modeling.md) — definís interface/DTO/tipo de dominio y necesitás decidir capa (data/shared/feature/component), convenciones de naming, patrón `const + type`. Para reemplazo de primitivas genéricas (`string`/`number` → tipo del dominio) ver `reference/semantic-types.md`
 - [.claude/reference/permissions.md](reference/permissions.md) — tocás guards / `permisosService` / roles / vistas / jurisdicción admin
 
-### UI / PrimeNG / estilos
+### UI / edu-ui / estilos
 
 - [.claude/reference/design-system.md](reference/design-system.md) — **BIG (946 ln)** estilás página intranet: overrides globales (A1-A5), pautas estructurales por componente (B1-B11), tokens de color. **Trigger por path**: si editás cualquier `.scss` o `.html` bajo `features/intranet/**` o `shared/components/**`, leelo. Cualquier hex literal (`#...`) que pongas debería pasar primero por la sección 7 (tokens)
-- [.claude/reference/primeng.md](reference/primeng.md) — usás componente PrimeNG nuevo (cómo importar, `appendTo="body"`, `pt` para a11y). Para sync de `p-dialog`/`p-drawer`/`p-confirmDialog` (NUNCA dentro de `@if`) ver `reference/dialogs-sync.md`
-- [.claude/reference/a11y.md](reference/a11y.md) — agregás botón/icono con PrimeNG (aria-label vía `pt`, contraste WCAG, azul oscuro). **Trigger por path/sintaxis**: si tu diff de `.html` contiene `pButton`, `p-button`, `<button`, `<img`, `<input`, `<h1..h6`, o cualquier elemento interactivo sin texto visible, leelo antes de cerrar el cambio
+- [.claude/reference/eduui.md](reference/eduui.md) — usás componente `edu-ui` nuevo (cómo importar desde `@edu-ui`, `appendTo="body"` en overlays, slots `<ng-template #header>`/`#footer>` en Dialog/Drawer, contenido de Popover). Para sync de `edu-dialog`/`edu-drawer`/`edu-confirm-dialog` (NUNCA dentro de `@if`) ver `reference/dialogs-sync.md`
+- [.claude/reference/a11y.md](reference/a11y.md) — agregás botón/icono con `edu-ui` (aria-label vía `pt`, contraste WCAG, azul oscuro). **Trigger por path/sintaxis**: si tu diff de `.html` contiene `edu-button`, `<button`, `<img`, `<input`, `<h1..h6`, o cualquier elemento interactivo sin texto visible, leelo antes de cerrar el cambio
 - [.claude/reference/pagination.md](reference/pagination.md) — agregás tabla paginada (decisión client vs server, `/count`, anti-pattern doble unwrap)
 
 > Reglas niche de UI: `reference/skeletons.md` (3 niveles shared), `reference/lazy-rendering.md` (progressive multi-fase con `<app-lazy-content>`), `reference/menu-modules.md` (los 5 módulos del menú intranet), `reference/dialogs-sync.md` (sync overlay). Leelos directo cuando aparezca el trigger.

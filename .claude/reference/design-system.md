@@ -583,7 +583,7 @@ Flex horizontal con **search-box (relative, icono absolute dentro) + filter-drop
 
 **Por qué `opacity: 0.5 → 1` en `.btn-clear`**: el "limpiar filtros" es una acción secundaria, NO debe competir visualmente con los filtros mismos. El hover la "ilumina" cuando el usuario se acerca.
 
-**Requisito de PrimeNG**: los `p-select` SIEMPRE con `appendTo="body"` (ver `reference/primeng.md`).
+**Requisito de edu-ui**: los `edu-select` SIEMPRE con `appendTo="body"` (ver `reference/eduui.md`).
 
 ---
 
