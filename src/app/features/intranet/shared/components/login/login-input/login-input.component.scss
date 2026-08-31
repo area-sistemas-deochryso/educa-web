@@ -1,5 +1,10 @@
 // #region Styles
-.input-group {
+// Solo el contenedor: <i>/<input> se proyectan vía <ng-content> desde
+// login-intranet.component.html, que es donde viven sus estilos reales
+// (ver comentario en login-intranet.component.scss — un selector
+// descendiente acá nunca calzaría contra contenido proyectado bajo
+// ViewEncapsulation Emulated).
+.login-field {
 	display: flex;
 	align-items: center;
 	gap: 1rem;
@@ -12,54 +17,5 @@
 	&:focus-within {
 		border-bottom-color: var(--intranet-accent-color-blue);
 	}
-
-	i {
-		color: var(--gray-600);
-		font-size: 1.1rem;
-		transition: color 0.2s;
-	}
-
-	&:focus-within > i:first-child {
-		color: var(--intranet-accent-color-blue);
-	}
-
-	.password-toggle {
-		cursor: pointer;
-		transition: color 0.2s ease;
-
-		&:hover {
-			color: var(--intranet-accent-color-blue);
-		}
-	}
-
-	input {
-		flex: 1;
-		border: none;
-		background: transparent;
-		font-size: 1.1rem;
-		color: var(--intranet-soft-text-color);
-		outline: none;
-		font-weight: 400;
-
-		&::placeholder {
-			color: var(--intranet-soft-text-color);
-		}
-	}
 }
-
-input,
-input:focus,
-input:active,
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
-input:-webkit-autofill:active {
-	background: transparent !important;
-	background-color: transparent !important;
-	-webkit-box-shadow: none !important;
-	box-shadow: none !important;
-	-webkit-text-fill-color: var(--intranet-soft-text-color) !important;
-	transition: background-color 5000s ease-in-out 0s;
-}
-
 // #endregion

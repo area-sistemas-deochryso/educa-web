@@ -79,6 +79,10 @@
 }
 
 .edu-select-panel__option {
+	/* Explicit, not inherited from .edu-select-panel — the global `ul li`
+	   rule (styles.scss) targets <li> directly and otherwise wins over the
+	   inherited value regardless of specificity. */
+	color: var(--eduui-content-color);
 	padding: 0.5rem 0.75rem;
 	border-radius: var(--eduui-radius-sm);
 	cursor: pointer;

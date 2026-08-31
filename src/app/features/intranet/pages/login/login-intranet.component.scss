@@ -44,6 +44,65 @@
 }
 // #endregion
 
+// #region Login Field (icon + input/select inline)
+// Vive acá, no en login-input/login-role-selector.component.scss: <i> e
+// <input>/<edu-select> se declaran en ESTE template y se proyectan vía
+// <ng-content> — bajo ViewEncapsulation Emulated, Angular les asigna el
+// atributo de scope de ESTE componente, no el del wrapper. Un selector
+// descendiente escrito en el wrapper (`.login-field i { ... }`) nunca
+// calza contra contenido proyectado; por eso el ícono quedaba negro
+// (color heredado por default) y el input con el borde/fondo de eduui
+// en vez del estilo "solo línea inferior" de este form.
+.login-field__icon {
+	color: var(--gray-600);
+	font-size: 1.1rem;
+	transition: color 0.2s;
+}
+
+app-login-input:focus-within .login-field__icon,
+app-login-role-selector:focus-within .login-field__icon {
+	color: var(--intranet-accent-color-blue);
+}
+
+.password-toggle {
+	cursor: pointer;
+	transition: color 0.2s ease;
+
+	&:hover {
+		color: var(--intranet-accent-color-blue);
+	}
+}
+
+.login-field__input {
+	flex: 1;
+	border: none;
+	background: transparent;
+	font-size: 1.1rem;
+	color: var(--intranet-soft-text-color);
+	outline: none;
+	font-weight: 400;
+
+	&::placeholder {
+		color: var(--intranet-soft-text-color);
+	}
+
+	&,
+	&:focus,
+	&:active,
+	&:-webkit-autofill,
+	&:-webkit-autofill:hover,
+	&:-webkit-autofill:focus,
+	&:-webkit-autofill:active {
+		background: transparent !important;
+		background-color: transparent !important;
+		-webkit-box-shadow: none !important;
+		box-shadow: none !important;
+		-webkit-text-fill-color: var(--intranet-soft-text-color) !important;
+		transition: background-color 5000s ease-in-out 0s;
+	}
+}
+// #endregion
+
 // #region Stored Sessions
 .stored-sessions {
 	display: flex;

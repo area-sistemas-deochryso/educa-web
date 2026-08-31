@@ -65,10 +65,11 @@
 
 				<!-- * DNI input -->
 				<app-login-input>
-					<i class="pi pi-id-card"></i>
+					<i class="pi pi-id-card login-field__icon"></i>
 					<input
 						type="text"
 						eduInputText
+						class="login-field__input"
 						placeholder="DNI"
 						formControlName="dni"
 						autocomplete="username"
@@ -82,7 +83,7 @@
 				<!-- * Password input with toggle -->
 				<app-login-input>
 					<i
-						class="pi password-toggle"
+						class="pi password-toggle login-field__icon"
 						[class.pi-lock]="!showPassword()"
 						[class.pi-lock-open]="showPassword()"
 						(click)="togglePasswordVisibility()"
@@ -92,6 +93,7 @@
 					<input
 						[type]="showPassword() ? 'text' : 'password'"
 						eduInputText
+						class="login-field__input"
 						placeholder="Contraseña"
 						formControlName="password"
 						autocomplete="current-password"
@@ -103,7 +105,7 @@
 
 				<!-- * Role selector -->
 				<app-login-role-selector>
-					<i class="pi pi-users"></i>
+					<i class="pi pi-users login-field__icon"></i>
 					<edu-select
 						appendTo="body"
 						[options]="roles"

@@ -8,4 +8,13 @@
 	align-items: center;
 	gap: 0.25rem;
 	border-bottom: 1px solid var(--eduui-content-border-color);
+	/* Without this, tabs that don't fit the container shrink/wrap their
+	   text instead of scrolling (default flex-shrink: 1 on flex items). */
+	overflow-x: auto;
+	overflow-y: hidden;
+	scrollbar-width: thin;
+}
+
+.edu-tabs__list > * {
+	flex: 0 0 auto;
 }

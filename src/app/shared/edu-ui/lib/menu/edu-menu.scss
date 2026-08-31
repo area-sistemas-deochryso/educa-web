@@ -13,6 +13,10 @@
 }
 
 .edu-menu__item {
+	/* Explicit, not inherited from .edu-menu — the global `ul li` rule
+	   (styles.scss) targets <li> directly and wins over the inherited
+	   value regardless of specificity. */
+	color: var(--eduui-content-color);
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;

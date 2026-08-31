@@ -1,7 +1,10 @@
 /*
- * EduUI design tokens — extracted from PrimeNG Aura preset (default, unmodified —
- * verified against educa-web's app.config.ts, no definePreset override).
- * Primitives + semantic layer only; no PrimeNG/CDK dependency at runtime.
+ * EduUI design tokens — extracted from PrimeNG Aura preset (default,
+ * verified against educa-web's app.config.ts, no definePreset override),
+ * except surface-50/100 and dark text-color: those follow the app's shim
+ * overrides (styles.scss / _tokens.scss) instead of raw Aura — see inline
+ * comments below. Primitives + semantic layer only; no PrimeNG/CDK
+ * dependency at runtime.
  *
  * Naming: --eduui-* prefix (not --p-*) so these coexist without collision with
  * PrimeNG's own tokens and the app's legacy --blue-500-style shim during F1-F6.
@@ -87,8 +90,12 @@
 
 	/* Surface = slate in light, zinc in dark (Aura colorScheme.light/dark.surface) */
 	--eduui-surface-0: #ffffff;
-	--eduui-surface-50: #f8fafc;
-	--eduui-surface-100: #f1f5f9;
+	/* 50/100 are NOT raw Aura slate — the app's shim (styles.scss) intentionally
+	   replaced them with a neutral gray (--surface-card / #e3e3e3), rejected the
+	   blue-tinted Aura tone as "too light for prolonged use" (user feedback).
+	   Matched here so eduui hover/stripe backgrounds don't clash with legacy. */
+	--eduui-surface-50: #f0f0f0;
+	--eduui-surface-100: #e3e3e3;
 	--eduui-surface-200: #e2e8f0;
 	--eduui-surface-300: #cbd5e1;
 	--eduui-surface-400: #94a3b8;
@@ -174,9 +181,11 @@
 	--eduui-primary-active-color: var(--eduui-primary-200);
 	--eduui-primary-contrast-color: var(--eduui-surface-900);
 
-	/* Surface scale flips to zinc in dark (Aura colorScheme.dark.surface) */
-	--eduui-surface-50: #fafafa;
-	--eduui-surface-100: #f4f4f5;
+	/* Surface scale flips to zinc in dark (Aura colorScheme.dark.surface).
+	   50/100 keep following the shim's custom neutral (_tokens.scss dark
+	   --surface-card/--surface-100), not zinc — same rationale as light mode. */
+	--eduui-surface-50: #2c2c30;
+	--eduui-surface-100: #37373c;
 	--eduui-surface-200: #e4e4e7;
 	--eduui-surface-300: #d4d4d8;
 	--eduui-surface-400: #a1a1aa;
@@ -187,7 +196,11 @@
 	--eduui-surface-900: #18181b;
 	--eduui-surface-950: #09090b;
 
-	--eduui-text-color: var(--eduui-surface-0);
+	/* Not raw Aura white (#ffffff) — the shim (_tokens.scss dark --text-color)
+	   deliberately softened this per user feedback ("ni tan brillante que
+	   canse"). Matched here so eduui text isn't brighter than the rest of the
+	   dark-mode intranet. */
+	--eduui-text-color: #e4e4e7;
 	--eduui-text-muted-color: var(--eduui-surface-400);
 
 	--eduui-content-background: var(--eduui-surface-900);

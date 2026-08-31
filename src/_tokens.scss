@@ -201,6 +201,54 @@
 //   oscuros por diseño (paneles de video) — impacto visual bajo, revisado y
 //   descartado.
 :root.dark-mode {
+	/* --- Encabezados nativos (h1-h6) sin color propio ---
+	   El default global (styles.scss, regla h1..h6) fija --dark-color a
+	   #000000 sin variante dark. Cualquier <h1..h6> del intranet que no
+	   declare su propio `color` (patrón repetido en 9+ tarjetas de
+	   diagnostico-db y en runtime-health, cada módulo nuevo lo reintroduce)
+	   queda negro-sobre-fondo-oscuro. Se corrige acá una sola vez, scopeado
+	   a `.intranet-content` (el `<main>` de intranet-layout.component.html)
+	   en vez de parchear cada componente — el sitio público nunca expone
+	   el toggle de tema, así que este override no le llega. */
+	.intranet-content h1,
+	.intranet-content h2,
+	.intranet-content h3,
+	.intranet-content h4,
+	.intranet-content h5,
+	.intranet-content h6 {
+		color: var(--text-color);
+	}
+
+	/* --- blue-800 usado como color de ícono de encabezado de sección ---
+	   59 archivos (diagnostico-db, runtime-health, error-groups, email-outbox*,
+	   correlation, rate-limit-events, usuarios-*, etc.) repiten el mismo
+	   patrón `.xxx-title i { color: var(--blue-800) }` para el ícono junto
+	   al <h3> de cada tarjeta. --blue-800 (#1e40af) es un primitivo
+	   documentado como "paleta fija, no varía entre esquemas" (styles.scss,
+	   shim) — pero usado así, siempre como `color` de ícono/texto sobre un
+	   fondo que SÍ cambia, queda casi invisible en modo oscuro en las 59
+	   implementaciones a la vez. Mismo criterio que el fix de --surface-card
+	   de abajo: se rompe la regla "primitivo plano" a propósito, en el
+	   primitivo, para no parchear 59 componentes uno por uno. */
+	--blue-800: var(--blue-400);
+
+	/* --- Mismo patrón, otras familias de color ---
+	   El barrido de blue-800 encontró el mismo uso (matiz 700/800 "para
+	   texto sobre fondo claro" usado directo como `color` de ícono/texto)
+	   repetido con otros colores: yellow-700 (25 archivos), red-700 (8),
+	   green-700 (6), purple-700 y orange-700 (1 c/u), red-800 y yellow-800
+	   (usos puntuales adicionales). Mismo fix, mismo criterio: se sube el
+	   matiz al más claro ya definido en el shim (styles.scss) para esa
+	   familia — no se inventan valores nuevos. purple y orange no tienen
+	   escala más allá de 500 en el shim, así que caen a ese primitivo. */
+	--red-700: var(--red-300);
+	--red-800: var(--red-300);
+	--green-700: var(--green-400);
+	--yellow-700: var(--yellow-300);
+	--yellow-800: var(--yellow-300);
+	--purple-700: var(--purple-500);
+	--orange-700: var(--orange-500);
+
 	/* --- Fix crítico no listado en el brief original: --surface-card/
 	   -ground/-100 y --surface-dialog son hex FIJOS en el shim de
 	   styles.scss (NO alias de --p-surface-*, a pesar de la sección

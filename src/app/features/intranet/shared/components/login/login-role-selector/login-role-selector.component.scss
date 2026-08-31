@@ -1,5 +1,8 @@
 // #region Styles
-.input-group {
+// Solo el contenedor: <i>/<edu-select> se proyectan vía <ng-content> desde
+// login-intranet.component.html, que es donde viven sus estilos reales
+// (ver comentario en login-intranet.component.scss).
+.login-field {
 	display: flex;
 	align-items: center;
 	gap: 1rem;
@@ -12,16 +15,5 @@
 	&:focus-within {
 		border-bottom-color: var(--intranet-accent-color-blue);
 	}
-
-	i {
-		color: var(--gray-600);
-		font-size: 1.1rem;
-		transition: color 0.2s;
-	}
-
-	&:focus-within i {
-		color: var(--intranet-accent-color-blue);
-	}
 }
-
 // #endregion

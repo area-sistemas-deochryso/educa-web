@@ -52,6 +52,9 @@
 }
 
 .edu-multi-select__token {
+	/* Explicit — it's an <li>, the global `ul li` rule (styles.scss) would
+	   otherwise win over the inherited color from .edu-multi-select. */
+	color: var(--eduui-form-field-color);
 	display: inline-flex;
 	align-items: center;
 	gap: 0.25rem;
@@ -130,6 +133,9 @@
 }
 
 .edu-multi-select-panel__option {
+	/* Explicit, not inherited from .edu-multi-select-panel — see
+	   .edu-multi-select__token comment above for why. */
+	color: var(--eduui-content-color);
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;
