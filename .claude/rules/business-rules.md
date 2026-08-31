@@ -2,23 +2,7 @@
 
 ## REST Contracts FE↔BE
 
-### INV-CONTRACT01 — JSON casing convention
-
-All REST responses between FE↔BE serialize JSON properties in **camelCase**. All FE requests (query params and body) use **camelCase**.
-
-PascalCase is allowed **only** in payloads for external integrations (CrossChex webhook, JaaS, Firebase) and must carry an explicit `[JsonProperty("Foo")]` with a justifying comment.
-
-**Mechanism**: ASP.NET Core's `AddNewtonsoftJson()` registers `CamelCaseNamingStrategy` via an internal `IConfigureOptions<MvcOptions>` in the Microsoft package — no explicit `ContractResolver` is needed in `Program.cs`. SignalR uses a separate serializer (`System.Text.Json`) and configures `CamelCase` explicitly.
-
-**Rationale**: verified empirically in Plan 42 F1. The implicit convention is invisible to grep on project code — it lives in the NuGet package binary. This invariant makes the contract explicit.
-
-### INV-CONTRACT02 — CORS Expose-Headers
-
-Custom headers emitted by BE must be listed in CORS `Access-Control-Expose-Headers` to be readable from FE in a browser. Without this, `response.headers.get('X-Foo')` returns `null` silently.
-
-Canonical exposed headers: `Retry-After`, `X-Correlation-Id`, `X-Schema-Version`.
-
-**Rule**: when adding a new custom response header in BE, add it to the CORS expose list in the same PR. Omitting this causes silent failure only visible in browser (Postman and SSR bypass CORS).
+**`INV-CONTRACT01`** (JSON casing, camelCase) and **`INV-CONTRACT02`** (CORS Expose-Headers) are cross-repo wire contracts — single source of truth is `../educa-coord/contracts/api-protocol.md` (per `COORD.md` §1.3, same criterion applied to `INV-VIEWAS01` above). Read them on-demand when adding a BE response header or touching (de)serialization.
 
 ### INV-CONTRACT03 — WAL endpoint persistence casing
 
