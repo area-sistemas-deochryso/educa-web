@@ -12,6 +12,17 @@ export function viewBlobInNewTab(blob: Blob): void {
 }
 
 /**
+ * Strip accents, spaces and punctuation from a label so it's safe to use as a filename segment.
+ *
+ * @example
+ * sanitizeFileNameSegment('Asist. Admin.'); // 'AsistAdmin'
+ * sanitizeFileNameSegment('Día'); // 'Dia'
+ */
+export function sanitizeFileNameSegment(label: string): string {
+	return label.normalize('NFD').replace(/[^a-zA-Z0-9]/g, '');
+}
+
+/**
  * Download a Blob as a file and revoke its object URL.
  *
  * @param blob File data to download.

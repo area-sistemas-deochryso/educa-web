@@ -1,7 +1,7 @@
 import { DestroyRef, inject, Injectable } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { UserProfileService } from '@core/services';
-import { downloadBlob, formatDateLocalIso, logger } from '@core/helpers';
+import { downloadBlob, logger, sanitizeFileNameSegment } from '@core/helpers';
 import {
 	DirectorAttendanceApiService,
 	TeacherAttendanceApiService,
@@ -11,7 +11,8 @@ import { esGradoAsistenciaDiaria } from '@shared/constants';
 import { forkJoin } from 'rxjs';
 import { AttendanceReportsApiService } from './attendance-reports-api.service';
 import { AttendanceReportsStore } from './attendance-reports.store';
-import type { ReporteFilters } from '../models';
+import { ESTADO_OPTIONS, RANGO_OPTIONS, TIPO_PERSONA_OPTIONS } from '../config/attendance-reports.config';
+import type { ReporteFilters, ReporteFiltrado } from '../models';
 
 @Injectable({ providedIn: 'root' })
 export class AttendanceReportsFacade {
@@ -105,6 +106,9 @@ export class AttendanceReportsFacade {
 		if (this.store.exportingPdf()) return;
 
 		const filters = this.store.filters();
+		const resultado = this.store.resultado();
+		if (!resultado) return;
+
 		this.store.setExportingPdf(true);
 
 		this.api
@@ -112,8 +116,7 @@ export class AttendanceReportsFacade {
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: (blob) => {
-					const url = URL.createObjectURL(blob);
-					window.open(url, '_blank');
+					downloadBlob(blob, `${this.buildReportFileName(resultado)}.pdf`);
 					this.store.setExportingPdf(false);
 				},
 				error: (err) => {
@@ -139,8 +142,7 @@ export class AttendanceReportsFacade {
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: (blob) => {
-					const fechaStr = formatDateLocalIso(filters.fecha);
-					downloadBlob(blob, `Reporte_${resultado.filtroEstado}_${fechaStr}.xlsx`);
+					downloadBlob(blob, `${this.buildReportFileName(resultado)}.xlsx`);
 					this.store.setExportingExcel(false);
 				},
 				error: (err) => {
@@ -148,6 +150,42 @@ export class AttendanceReportsFacade {
 					this.store.setExportingExcel(false);
 				},
 			});
+	}
+	// #endregion
+
+	// #region Helpers — Naming de archivos exportados
+	/** Reporte_Asistencia_{Tipo}_{Rango}_{Fecha(s)}_{ReportarSobre}, ej: Reporte_Asistencia_Todos_Mes_Septiembre_2026_Estudiantes */
+	private buildReportFileName(resultado: ReporteFiltrado): string {
+		const tipo = sanitizeFileNameSegment(
+			ESTADO_OPTIONS.find((o) => o.value === resultado.filtroEstado)?.label ?? resultado.filtroEstado,
+		);
+		const rango = sanitizeFileNameSegment(
+			RANGO_OPTIONS.find((o) => o.value === resultado.rangoTipo)?.label ?? resultado.rangoTipo,
+		);
+		const reportarSobre = sanitizeFileNameSegment(
+			TIPO_PERSONA_OPTIONS.find((o) => o.value === resultado.tipoPersona)?.label ?? resultado.tipoPersona,
+		);
+		const fecha = this.buildFileNameFecha(resultado);
+
+		return `Reporte_Asistencia_${tipo}_${rango}_${fecha}_${reportarSobre}`;
+	}
+
+	/**
+	 * Precisión del segmento fecha según el rango: Día → un solo día, Semana → rango de días,
+	 * Mes → nombre del mes en español + año (el BE ya calcula `nombreMes`, ej. "Septiembre").
+	 * FechaInicio/FechaFin llegan del BE como DateTime ISO ("2026-09-01T00:00:00") — se recortan
+	 * con slice, no con `Date`, para evitar corrimientos de huso horario.
+	 */
+	private buildFileNameFecha(resultado: ReporteFiltrado): string {
+		const inicio = resultado.fechaInicio.slice(0, 10);
+		const fin = resultado.fechaFin.slice(0, 10);
+
+		if (resultado.rangoTipo === 'mes') {
+			const anio = inicio.slice(0, 4);
+			return resultado.nombreMes ? `${resultado.nombreMes}_${anio}` : inicio.slice(0, 7);
+		}
+		if (resultado.rangoTipo === 'semana') return `${inicio}_${fin}`;
+		return inicio;
 	}
 	// #endregion
 
