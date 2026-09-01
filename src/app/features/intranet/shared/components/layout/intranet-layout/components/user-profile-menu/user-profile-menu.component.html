@@ -8,7 +8,7 @@
 	type="button"
 >
 	<div class="profile-avatar-wrapper">
-		<edu-avatar [label]="initials()" shape="circle" size="normal" class="profile-avatar" />
+		<edu-avatar [label]="initials()" shape="circle" variant="brand" size="normal" />
 		@if (showNotifications() && unreadBadge()) {
 			<span class="avatar-notif-badge">{{ unreadBadge() }}</span>
 		}
@@ -30,7 +30,7 @@
 	<ng-template>
 		<div class="popover-content">
 			<div class="popover-header">
-				<edu-avatar [label]="initials()" shape="circle" size="large" class="popover-avatar" />
+				<edu-avatar [label]="initials()" shape="circle" variant="brand" size="large" />
 				<div class="popover-user-info">
 					<span class="popover-name">{{ displayName() }}</span>
 					<span class="popover-role">{{ userRole() }}</span>

@@ -10,6 +10,10 @@
 	font-size: 1rem;
 	overflow: hidden;
 
+	&--circle {
+		border-radius: 50%;
+	}
+
 	&--lg {
 		width: 3rem;
 		height: 3rem;
@@ -26,5 +30,14 @@
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
+	}
+
+	// color-mix en vez de rgba hardcoded: rgba(79,70,229,x) queda lavado sobre
+	// tema dark (accent-interactive cambia de indigo-600 a indigo-400 en dark).
+	&[data-variant='brand'] {
+		background: linear-gradient(135deg, var(--accent-interactive-light) 0%, var(--accent-interactive) 100%);
+		color: var(--white-color);
+		font-weight: 600;
+		box-shadow: 0 2px 8px color-mix(in srgb, var(--accent-interactive) 35%, transparent);
 	}
 }

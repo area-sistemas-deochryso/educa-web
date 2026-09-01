@@ -99,15 +99,6 @@
 	}
 }
 
-:host ::ng-deep .profile-avatar {
-	// Colores con contraste WCAG AA (4.5:1 mínimo)
-	background: linear-gradient(135deg, var(--accent-interactive-light) 0%, var(--accent-interactive) 100%); // indigo-600 a indigo-700
-	color: var(--white-color);
-	font-weight: 600;
-	font-size: 0.875rem;
-	box-shadow: 0 2px 8px rgba(79, 70, 229, 0.35);
-}
-
 .profile-info {
 	display: flex;
 	flex-direction: column;
@@ -156,14 +147,6 @@
 	align-items: center;
 	gap: 0.875rem;
 	padding: 1.25rem;
-}
-
-:host ::ng-deep .popover-avatar {
-	// Colores con contraste WCAG AA (4.5:1 mínimo)
-	background: linear-gradient(135deg, var(--accent-interactive-light) 0%, var(--accent-interactive) 100%); // indigo-600 a indigo-700
-	color: var(--white-color);
-	font-weight: 600;
-	box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
 }
 
 .popover-user-info {
