@@ -56,6 +56,16 @@
 						<i [class]="result.icon" class="result-icon"></i>
 						<span class="result-label">{{ result.label }}</span>
 						<span class="result-badge">{{ result.moduloLabel }}</span>
+						<button
+							type="button"
+							class="star-btn"
+							data-info-anchor="header-module-selector-favorite-toggle"
+							[class.starred]="favorites.isFavorite(result.route)"
+							(click)="onStarClick($event, result.route)"
+							[attr.aria-label]="favorites.isFavorite(result.route) ? 'Quitar de accesos rápidos' : 'Agregar a accesos rápidos'"
+						>
+							<i [class]="favorites.isFavorite(result.route) ? 'pi pi-star-fill' : 'pi pi-star'"></i>
+						</button>
 					</button>
 				} @empty {
 					<div class="nav-empty">
