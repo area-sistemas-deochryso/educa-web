@@ -311,7 +311,7 @@ export class EduMultiSelect implements ControlValueAccessor, OnDestroy {
 	}
 
 	ngOnDestroy(): void {
-		this.handle.close();
+		this.handle.close({ immediate: true });
 	}
 
 	writeValue(value: unknown[]): void {

@@ -4,4 +4,12 @@
 	border: 1px solid var(--eduui-content-border-color);
 	border-radius: var(--eduui-content-border-radius);
 	box-shadow: var(--eduui-overlay-popover-shadow);
+	opacity: 0;
+	transform: translateY(-4px) scale(0.98);
+	transition: opacity 120ms ease-out, transform 120ms ease-out;
+
+	&[data-open] {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
 }

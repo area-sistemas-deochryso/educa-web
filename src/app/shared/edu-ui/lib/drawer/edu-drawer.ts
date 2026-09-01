@@ -96,7 +96,7 @@ export class EduDrawer implements OnDestroy {
 	}
 
 	ngOnDestroy(): void {
-		this.handle.close();
+		this.handle.close({ immediate: true });
 	}
 
 	protected requestClose(): void {

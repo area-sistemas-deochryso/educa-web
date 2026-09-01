@@ -307,7 +307,7 @@ export class EduDatePicker implements ControlValueAccessor, OnDestroy {
 	private onTouched: () => void = () => {};
 
 	ngOnDestroy(): void {
-		this.handle.close();
+		this.handle.close({ immediate: true });
 	}
 
 	writeValue(value: Date | Date[] | null): void {

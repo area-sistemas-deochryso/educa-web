@@ -62,7 +62,7 @@ export class EduMenu implements OnDestroy {
 	private readonly handle = new EduOverlayHandle(this.overlay, this.focusTrapFactory);
 
 	ngOnDestroy(): void {
-		this.handle.close();
+		this.handle.close({ immediate: true });
 	}
 
 	toggle(event: Event): void {

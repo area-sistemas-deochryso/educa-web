@@ -190,7 +190,7 @@ export class EduAutoComplete<T = unknown> implements ControlValueAccessor, OnDes
 	}
 
 	ngOnDestroy(): void {
-		this.handle.close();
+		this.handle.close({ immediate: true });
 		if (this.delayTimer) clearTimeout(this.delayTimer);
 	}
 

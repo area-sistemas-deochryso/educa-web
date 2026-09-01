@@ -7,6 +7,21 @@
 	background: var(--eduui-content-background);
 	color: var(--eduui-content-color);
 	box-shadow: var(--eduui-overlay-modal-shadow);
+	transition: transform 240ms ease-out;
+	transform: translateX(100%);
+
+	&[data-position='left'] {
+		transform: translateX(-100%);
+	}
+	&[data-position='top'] {
+		transform: translateY(-100%);
+	}
+	&[data-position='bottom'] {
+		transform: translateY(100%);
+	}
+	&[data-open] {
+		transform: translate(0, 0);
+	}
 
 	&[data-position='top'],
 	&[data-position='bottom'] {

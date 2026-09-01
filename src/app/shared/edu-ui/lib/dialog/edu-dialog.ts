@@ -116,7 +116,7 @@ export class EduDialog implements OnDestroy {
 	}
 
 	ngOnDestroy(): void {
-		this.handle.close();
+		this.handle.close({ immediate: true });
 	}
 
 	protected requestClose(): void {
