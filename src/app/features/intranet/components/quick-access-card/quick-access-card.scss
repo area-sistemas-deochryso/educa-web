@@ -789,6 +789,370 @@ $wf-yellow: rgba(234, 179, 8, 0.45);
 }
 // #endregion
 
+// #region Home dashboard
+.wf-home-greeting {
+	width: 60%;
+	height: 8px;
+	border-radius: 3px;
+	background: $wf-bar-dark;
+}
+
+.wf-home-widget {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 4px 6px;
+	border-radius: 4px;
+	background: var(--surface-100, #f5f5f5);
+}
+
+.wf-home-donut {
+	width: 22px;
+	height: 22px;
+	border-radius: 50%;
+	flex-shrink: 0;
+	background: conic-gradient($wf-accent-solid 0deg 260deg, $wf-bar 260deg 360deg);
+
+	&::after {
+		content: '';
+		display: block;
+		width: 10px;
+		height: 10px;
+		margin: 6px;
+		border-radius: 50%;
+		background: var(--surface-100, #f5f5f5);
+	}
+}
+
+.wf-home-widget-lines {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+
+	span {
+		height: 4px;
+		border-radius: 2px;
+		background: $wf-bar;
+
+		&:nth-child(1) { width: 90%; }
+		&:nth-child(2) { width: 70%; }
+		&:nth-child(3) { width: 50%; }
+	}
+}
+// #endregion
+
+// #region FAQ accordion
+.wf-faq-list {
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+}
+
+.wf-faq-item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 4px 6px;
+	border-radius: 4px;
+	background: var(--surface-50, #fafafa);
+	border: 1px solid var(--surface-200, #eee);
+
+	.wf-faq-q {
+		width: 75%;
+		height: 5px;
+		border-radius: 2px;
+		background: $wf-bar-dark;
+	}
+
+	.wf-faq-chevron {
+		font-size: 0.55rem;
+		color: $wf-bar-dark;
+	}
+}
+// #endregion
+
+// #region Calendar
+.wf-cal-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+
+	.wf-cal-nav {
+		font-size: 0.55rem;
+		color: $wf-bar-dark;
+	}
+
+	.wf-cal-month {
+		width: 40%;
+		height: 6px;
+		border-radius: 3px;
+		background: $wf-bar-dark;
+	}
+}
+
+.wf-cal-grid {
+	display: grid;
+	grid-template-columns: repeat(7, 1fr);
+	gap: 2px;
+}
+
+.wf-cal-daylabel {
+	height: 4px;
+	border-radius: 2px;
+	background: $wf-bar;
+}
+
+.wf-cal-cell {
+	height: 11px;
+	border-radius: 2px;
+	background: var(--surface-50, #fafafa);
+	border: 1px solid var(--surface-100, #f0f0f0);
+	display: flex;
+	align-items: flex-end;
+	justify-content: center;
+	padding-bottom: 1px;
+}
+
+.wf-cal-dot {
+	width: 4px;
+	height: 4px;
+	border-radius: 50%;
+	background: $wf-accent-solid;
+}
+// #endregion
+
+// #region Video call
+.wf-video-grid {
+	flex: 1;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 3px;
+}
+
+.wf-video-tile {
+	border-radius: 4px;
+	background: var(--surface-800, #2a2a2a);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 28px;
+}
+
+.wf-video-avatar {
+	width: 14px;
+	height: 14px;
+	border-radius: 50%;
+	background: $wf-bar-dark;
+}
+
+.wf-video-controls {
+	display: flex;
+	justify-content: center;
+	gap: 5px;
+}
+
+.wf-video-btn {
+	width: 12px;
+	height: 12px;
+	border-radius: 50%;
+	background: $wf-bar-dark;
+
+	&.wf-video-btn-end {
+		background: $wf-red;
+	}
+}
+// #endregion
+
+// #region Campus map
+.wf-map {
+	position: relative;
+	flex: 1;
+	min-height: 90px;
+	border: 1px solid var(--surface-200, #e5e5e5);
+	border-radius: 4px;
+	background: var(--surface-50, #fafafa);
+}
+
+.wf-map-room {
+	position: absolute;
+	border-radius: 2px;
+	background: $wf-blue;
+
+	&.wf-map-room-1 { top: 8%; left: 8%; width: 32%; height: 34%; }
+	&.wf-map-room-2 { top: 8%; right: 8%; width: 22%; height: 20%; background: $wf-accent; }
+	&.wf-map-room-3 { bottom: 10%; left: 8%; width: 24%; height: 26%; background: $wf-accent; }
+	&.wf-map-room-4 { bottom: 10%; right: 8%; width: 30%; height: 40%; }
+}
+
+.wf-map-pin {
+	position: absolute;
+	top: 38%;
+	left: 46%;
+	font-size: 0.9rem;
+	color: $wf-red;
+}
+// #endregion
+
+// #region Load test
+.wf-loadtest-chart {
+	flex: 1;
+	display: flex;
+	align-items: flex-end;
+	gap: 3px;
+	min-height: 60px;
+	padding: 4px;
+	border: 1px solid var(--surface-200, #e5e5e5);
+	border-radius: 4px;
+}
+
+.wf-loadtest-bar {
+	flex: 1;
+	border-radius: 2px 2px 0 0;
+	background: $wf-accent-solid;
+}
+// #endregion
+
+// #region System metrics
+.wf-metrics-row {
+	display: flex;
+	gap: 6px;
+	justify-content: center;
+}
+
+.wf-metric-gauge {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 3px;
+}
+
+.wf-gauge-ring {
+	width: 26px;
+	height: 26px;
+	border-radius: 50%;
+	background: conic-gradient($wf-accent-solid 0deg 250deg, $wf-bar 250deg 360deg);
+
+	&::after {
+		content: '';
+		display: block;
+		width: 14px;
+		height: 14px;
+		margin: 6px;
+		border-radius: 50%;
+		background: var(--surface-card, #fff);
+	}
+}
+
+.wf-gauge-label {
+	width: 20px;
+	height: 4px;
+	border-radius: 2px;
+	background: $wf-bar;
+}
+// #endregion
+
+// #region Hub tiles
+.wf-hub-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 4px;
+}
+
+.wf-hub-tile {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 3px;
+	padding: 5px 3px;
+	border-radius: 4px;
+	background: var(--surface-100, #f5f5f5);
+}
+
+.wf-hub-icon {
+	width: 12px;
+	height: 12px;
+	border-radius: 3px;
+	background: $wf-bar-dark;
+}
+
+.wf-hub-label {
+	width: 70%;
+	height: 3px;
+	border-radius: 2px;
+	background: $wf-bar;
+}
+
+.wf-hub-dot {
+	position: absolute;
+	top: 2px;
+	right: 2px;
+	width: 5px;
+	height: 5px;
+	border-radius: 50%;
+	background: $wf-green;
+
+	&.wf-hub-dot-warn {
+		background: $wf-orange;
+	}
+}
+// #endregion
+
+// #region Kanban
+.wf-kanban {
+	flex: 1;
+	display: flex;
+	gap: 4px;
+}
+
+.wf-kanban-col {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+	padding: 3px;
+	border-radius: 4px;
+	background: var(--surface-50, #fafafa);
+	border: 1px solid var(--surface-200, #eee);
+}
+
+.wf-kanban-col-header {
+	width: 65%;
+	height: 4px;
+	border-radius: 2px;
+	background: $wf-bar-dark;
+}
+
+.wf-kanban-card {
+	height: 14px;
+	border-radius: 3px;
+	background: var(--surface-card, #fff);
+	box-shadow: var(--shadow-1);
+	border: 1px solid var(--surface-200, #eee);
+}
+// #endregion
+
+// #region Bar chart
+.wf-barchart {
+	flex: 1;
+	display: flex;
+	align-items: flex-end;
+	gap: 4px;
+	min-height: 60px;
+}
+
+.wf-bar {
+	flex: 1;
+	border-radius: 2px 2px 0 0;
+	background: $wf-blue;
+
+	&.wf-bar-alert {
+		background: $wf-red;
+	}
+}
+// #endregion
+
 // #region Preview footer
 .preview-footer {
 	padding: 7px 10px;

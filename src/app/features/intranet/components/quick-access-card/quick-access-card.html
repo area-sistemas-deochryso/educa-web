@@ -309,6 +309,162 @@
 					</div>
 				}
 
+				<!-- Greeting bar + stats + widget card -->
+				@case ('home-dashboard') {
+					<div class="wf-home-greeting"></div>
+					<div class="wf-stats-row">
+						@for (_ of [1, 2, 3]; track $index) {
+							<div class="wf-stat-card">
+								<div class="wf-stat-value"></div>
+								<div class="wf-stat-label"></div>
+							</div>
+						}
+					</div>
+					<div class="wf-home-widget">
+						<div class="wf-home-donut"></div>
+						<div class="wf-home-widget-lines">
+							<span></span><span></span><span></span>
+						</div>
+					</div>
+				}
+
+				<!-- Tabs + FAQ accordion list -->
+				@case ('faq-tabs') {
+					<div class="wf-tab-bar wf-tab-bar-full">
+						<div class="wf-tab wf-tab-active"></div>
+						<div class="wf-tab"></div>
+						<div class="wf-tab"></div>
+					</div>
+					<div class="wf-faq-list">
+						@for (_ of [1, 2, 3]; track $index) {
+							<div class="wf-faq-item">
+								<div class="wf-faq-q"></div>
+								<i class="pi pi-chevron-down wf-faq-chevron"></i>
+							</div>
+						}
+					</div>
+				}
+
+				<!-- Month nav + calendar grid with event dots -->
+				@case ('calendar') {
+					<div class="wf-cal-header">
+						<i class="pi pi-chevron-left wf-cal-nav"></i>
+						<div class="wf-cal-month"></div>
+						<i class="pi pi-chevron-right wf-cal-nav"></i>
+					</div>
+					<div class="wf-cal-grid">
+						@for (_ of [1, 2, 3, 4, 5, 6, 7]; track $index) {
+							<div class="wf-cal-daylabel"></div>
+						}
+						@for (_ of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]; track $index) {
+							<div class="wf-cal-cell">
+								@if ($index === 3 || $index === 9 || $index === 10 || $index === 16) {
+									<span class="wf-cal-dot"></span>
+								}
+							</div>
+						}
+					</div>
+				}
+
+				<!-- Video tile grid + call controls -->
+				@case ('video-call') {
+					<div class="wf-video-grid">
+						@for (_ of [1, 2, 3, 4]; track $index) {
+							<div class="wf-video-tile"><div class="wf-video-avatar"></div></div>
+						}
+					</div>
+					<div class="wf-video-controls">
+						<span class="wf-video-btn"></span>
+						<span class="wf-video-btn"></span>
+						<span class="wf-video-btn wf-video-btn-end"></span>
+					</div>
+				}
+
+				<!-- Floor plan with rooms and a location pin -->
+				@case ('campus-map') {
+					<div class="wf-map">
+						<div class="wf-map-room wf-map-room-1"></div>
+						<div class="wf-map-room wf-map-room-2"></div>
+						<div class="wf-map-room wf-map-room-3"></div>
+						<div class="wf-map-room wf-map-room-4"></div>
+						<i class="pi pi-map-marker wf-map-pin"></i>
+					</div>
+				}
+
+				<!-- Config row + ramping load chart -->
+				@case ('load-test') {
+					<div class="wf-filter-row">
+						<div class="wf-filter-input"></div>
+						<div class="wf-filter-btn wf-accent-bg"></div>
+					</div>
+					<div class="wf-loadtest-chart">
+						@for (h of [3, 5, 7, 9, 9, 6, 4, 2]; track $index) {
+							<div class="wf-loadtest-bar" [style.height.px]="h * 6"></div>
+						}
+					</div>
+				}
+
+				<!-- Gauge metrics + slow-items list -->
+				@case ('system-metrics') {
+					<div class="wf-metrics-row">
+						@for (_ of [1, 2, 3]; track $index) {
+							<div class="wf-metric-gauge">
+								<div class="wf-gauge-ring"></div>
+								<div class="wf-gauge-label"></div>
+							</div>
+						}
+					</div>
+					<div class="wf-table">
+						@for (_ of [1, 2]; track $index) {
+							<div class="wf-row">
+								<div class="wf-cell" style="width: 55%"></div>
+								<div class="wf-cell wf-badge-cell"></div>
+							</div>
+						}
+					</div>
+				}
+
+				<!-- Hub of shortcut tiles with status dots -->
+				@case ('hub-tiles') {
+					<div class="wf-title-bar">
+						<div class="wf-title"></div>
+					</div>
+					<div class="wf-hub-grid">
+						@for (_ of [1, 2, 3, 4, 5, 6]; track $index) {
+							<div class="wf-hub-tile">
+								<div class="wf-hub-icon"></div>
+								<div class="wf-hub-label"></div>
+								<span class="wf-hub-dot" [class.wf-hub-dot-warn]="$index === 2"></span>
+							</div>
+						}
+					</div>
+				}
+
+				<!-- Kanban columns with cards -->
+				@case ('kanban') {
+					<div class="wf-kanban">
+						@for (_ of [1, 2, 3]; track $index) {
+							<div class="wf-kanban-col">
+								<div class="wf-kanban-col-header"></div>
+								<div class="wf-kanban-card"></div>
+								<div class="wf-kanban-card"></div>
+							</div>
+						}
+					</div>
+				}
+
+				<!-- Institutional bar chart with a deviation highlight -->
+				@case ('bar-chart') {
+					<div class="wf-title-bar">
+						<div class="wf-title"></div>
+					</div>
+					<div class="wf-barchart">
+						@for (h of [6, 8, 5, 9, 4, 7]; track $index) {
+							<div class="wf-bar" [class.wf-bar-alert]="$index === 4" [style.height.px]="h * 6"></div>
+						}
+					</div>
+				}
+
 				<!-- Tab bar + content sections -->
 				@case ('salon-tabs') {
 					<div class="wf-stats-row">

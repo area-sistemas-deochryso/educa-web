@@ -20,7 +20,17 @@ export type PreviewLayout =
 	| 'forum'
 	| 'messaging'
 	| 'course-cards'
-	| 'salon-tabs';
+	| 'salon-tabs'
+	| 'home-dashboard'
+	| 'calendar'
+	| 'video-call'
+	| 'campus-map'
+	| 'load-test'
+	| 'system-metrics'
+	| 'hub-tiles'
+	| 'kanban'
+	| 'bar-chart'
+	| 'faq-tabs';
 
 export interface MenuItemDef {
 	route: string;
@@ -68,10 +78,10 @@ export interface ModuloMenu {
 // #region Items del menú (flat, declarativo)
 export const MENU_ITEMS: MenuItemDef[] = [
 	// --- Inicio ---
-	{ route: '/intranet', label: 'Inicio', icon: 'pi pi-home', capability: 'INTRANET', modulo: 'inicio', exact: true, preview: 'admin-table', description: 'Página principal de la intranet' },
+	{ route: '/intranet', label: 'Inicio', icon: 'pi pi-home', capability: 'INTRANET', modulo: 'inicio', exact: true, preview: 'home-dashboard', description: 'Página principal de la intranet' },
 	// Ayuda (xrepo-panel-ayuda-intranet F4) — capability 'INTRANET' (misma que Inicio, sin soloParaRol):
 	// visible a todo usuario logueado, sin gate de capability propio para la página.
-	{ route: '/intranet/ayuda', label: 'Ayuda', icon: 'pi pi-question-circle', capability: 'INTRANET', modulo: 'inicio', preview: 'admin-table', description: 'Preguntas frecuentes, tickets y salud de tu sede' },
+	{ route: '/intranet/ayuda', label: 'Ayuda', icon: 'pi pi-question-circle', capability: 'INTRANET', modulo: 'inicio', preview: 'faq-tabs', description: 'Preguntas frecuentes, tickets y salud de tu sede' },
 
 	// --- Estudiante ---
 	{ route: '/intranet/estudiante/cursos', label: 'Mis Cursos', icon: 'pi pi-book', capability: 'ESTUDIANTE_CURSOS', modulo: 'estudiante', featureFlag: 'estudiante', group: { label: 'Mi Aula', icon: 'pi pi-graduation-cap' }, preview: 'course-cards', description: 'Contenido y materiales de tus cursos' },
@@ -84,8 +94,8 @@ export const MENU_ITEMS: MenuItemDef[] = [
 	{ route: '/intranet/estudiante/foro', label: 'Anuncios', icon: 'pi pi-comments', capability: 'ESTUDIANTE_FORO', modulo: 'estudiante', featureFlag: 'estudiante', group: { label: 'Mensajes', icon: 'pi pi-inbox' }, preview: 'forum', description: 'Ver publicaciones del profesor' },
 	{ route: '/intranet/estudiante/mensajeria', label: 'Mensajería', icon: 'pi pi-envelope', capability: 'ESTUDIANTE_MENSAJERIA', modulo: 'estudiante', featureFlag: 'estudiante', group: { label: 'Mensajes', icon: 'pi pi-inbox' }, preview: 'messaging', description: 'Enviar y recibir mensajes' },
 	// Compartido (duplicado, ver §1 brief 444) — capability sin dueño de rol fijo, soloParaRol evita que otros roles con la misma capability disparen este módulo
-	{ route: '/intranet/calendario', label: 'Calendario', icon: 'pi pi-calendar', capability: 'CALENDARIO', modulo: 'estudiante', featureFlag: 'calendario', soloParaRol: ['Estudiante'], preview: 'admin-table', description: 'Calendario de eventos y actividades' },
-	{ route: '/intranet/videoconferencias', label: 'Videoconferencias', icon: 'pi pi-video', capability: 'VIDEOCONFERENCIAS', modulo: 'estudiante', featureFlag: 'videoconferencias', soloParaRol: ['Estudiante'], preview: 'admin-table', description: 'Salas de videoconferencia' },
+	{ route: '/intranet/calendario', label: 'Calendario', icon: 'pi pi-calendar', capability: 'CALENDARIO', modulo: 'estudiante', featureFlag: 'calendario', soloParaRol: ['Estudiante'], preview: 'calendar', description: 'Calendario de eventos y actividades' },
+	{ route: '/intranet/videoconferencias', label: 'Videoconferencias', icon: 'pi pi-video', capability: 'VIDEOCONFERENCIAS', modulo: 'estudiante', featureFlag: 'videoconferencias', soloParaRol: ['Estudiante'], preview: 'video-call', description: 'Salas de videoconferencia' },
 
 	// --- Profesor ---
 	{ route: '/intranet/profesor/cursos', label: 'Mis Cursos', icon: 'pi pi-book', capability: 'PROFESOR_CURSOS', modulo: 'profesor', featureFlag: 'profesor', group: { label: 'Mi Aula', icon: 'pi pi-graduation-cap' }, preview: 'course-cards', description: 'Contenido y materiales de tus cursos' },
@@ -104,8 +114,8 @@ export const MENU_ITEMS: MenuItemDef[] = [
 	{ route: '/intranet/profesor/foro', label: 'Foro', icon: 'pi pi-comments', capability: 'PROFESOR_FORO', modulo: 'profesor', featureFlag: 'profesor', group: { label: 'Mensajes', icon: 'pi pi-inbox' }, preview: 'forum', description: 'Participar en discusiones del aula' },
 	{ route: '/intranet/profesor/mensajeria', label: 'Mensajería', icon: 'pi pi-envelope', capability: 'PROFESOR_MENSAJERIA', modulo: 'profesor', featureFlag: 'profesor', group: { label: 'Mensajes', icon: 'pi pi-inbox' }, preview: 'messaging', description: 'Enviar y recibir mensajes' },
 	// Compartido (duplicado, ver §1 brief 444) — capability sin dueño de rol fijo, soloParaRol evita que otros roles con la misma capability disparen este módulo
-	{ route: '/intranet/calendario', label: 'Calendario', icon: 'pi pi-calendar', capability: 'CALENDARIO', modulo: 'profesor', featureFlag: 'calendario', soloParaRol: ['Profesor'], preview: 'admin-table', description: 'Calendario de eventos y actividades' },
-	{ route: '/intranet/videoconferencias', label: 'Videoconferencias', icon: 'pi pi-video', capability: 'VIDEOCONFERENCIAS', modulo: 'profesor', featureFlag: 'videoconferencias', soloParaRol: ['Profesor'], preview: 'admin-table', description: 'Salas de videoconferencia' },
+	{ route: '/intranet/calendario', label: 'Calendario', icon: 'pi pi-calendar', capability: 'CALENDARIO', modulo: 'profesor', featureFlag: 'calendario', soloParaRol: ['Profesor'], preview: 'calendar', description: 'Calendario de eventos y actividades' },
+	{ route: '/intranet/videoconferencias', label: 'Videoconferencias', icon: 'pi pi-video', capability: 'VIDEOCONFERENCIAS', modulo: 'profesor', featureFlag: 'videoconferencias', soloParaRol: ['Profesor'], preview: 'video-call', description: 'Salas de videoconferencia' },
 
 	// --- Administrador (cluster: Director, Asistente Administrativo, Promotor, Coordinador Académico, Administrador) ---
 	// soloParaRol en TODOS los items de este módulo: varias capabilities ADMIN_* también las tiene Apoderado
@@ -116,7 +126,7 @@ export const MENU_ITEMS: MenuItemDef[] = [
 	// Brief 495 (P91 F2) — capability de página nueva y separada de `REPORTES_RENDIMIENTO`
 	// (capability de datos que valida el propio endpoint), mismo patrón que
 	// `ADMIN_ASISTENCIAS` (página) vs `ASISTENCIA`/`ASISTENCIA_ADMIN` (datos).
-	{ route: '/intranet/admin/rendimiento', label: 'Rendimiento', icon: 'pi pi-chart-line', capability: 'ADMIN_RENDIMIENTO', modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Académico', icon: 'pi pi-graduation-cap' }, preview: 'grades', description: 'Rendimiento académico institucional por curso, resaltando desvíos' },
+	{ route: '/intranet/admin/rendimiento', label: 'Rendimiento', icon: 'pi pi-chart-line', capability: 'ADMIN_RENDIMIENTO', modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Académico', icon: 'pi pi-graduation-cap' }, preview: 'bar-chart', description: 'Rendimiento académico institucional por curso, resaltando desvíos' },
 	{ route: '/intranet/admin/asistencias', label: 'Gestión', icon: 'pi pi-cog', capability: 'ADMIN_ASISTENCIAS', modulo: 'administrador', soloParaRol: ADMIN_ROLES, queryParams: { tab: 'gestion' }, group: { label: 'Asistencia', icon: 'pi pi-clock' }, subgroup: [{ label: 'Admin', icon: 'pi pi-cog' }, { label: 'Asistencias', icon: 'pi pi-clock' }], preview: 'attendance', description: 'Editar y corregir registros de asistencia' },
 	{ route: '/intranet/admin/asistencias', label: 'Reportes', icon: 'pi pi-chart-bar', capability: 'ADMIN_ASISTENCIAS', modulo: 'administrador', soloParaRol: ADMIN_ROLES, queryParams: { tab: 'reportes' }, group: { label: 'Asistencia', icon: 'pi pi-clock' }, subgroup: [{ label: 'Admin', icon: 'pi pi-cog' }, { label: 'Asistencias', icon: 'pi pi-clock' }], preview: 'admin-table', description: 'Estadísticas y exportación de asistencia' },
 	{ route: '/intranet/admin/asistencias', label: 'Panel', icon: 'pi pi-th-large', capability: 'ADMIN_ASISTENCIAS', modulo: 'administrador', soloParaRol: ADMIN_ROLES, queryParams: { tab: 'panel' }, group: { label: 'Asistencia', icon: 'pi pi-clock' }, subgroup: [{ label: 'Admin', icon: 'pi pi-cog' }, { label: 'Asistencias', icon: 'pi pi-clock' }], preview: 'admin-table', description: 'Panel administrativo con estadísticas por sede y rango de fechas' },
@@ -133,7 +143,7 @@ export const MENU_ITEMS: MenuItemDef[] = [
 	// Monitoreo — hub con 3 dominios (Correos/Incidencias/Seguridad, ver monitoreo-hub.catalog.ts).
 	// "Resumen" es la landing del hub (tarjetas de los 3 dominios); cada dominio es un subgrupo
 	// con sus páginas propias, para que el menú/búsqueda lleguen directo sin pasar por el hub.
-	{ route: '/intranet/admin/monitoreo', label: 'Resumen', icon: 'pi pi-th-large', capability: 'ADMIN_MONITOREO', modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Monitoreo', icon: 'pi pi-chart-bar' }, preview: 'admin-table', description: 'Hub de monitoreo: correos, incidencias y seguridad' },
+	{ route: '/intranet/admin/monitoreo', label: 'Resumen', icon: 'pi pi-th-large', capability: 'ADMIN_MONITOREO', modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Monitoreo', icon: 'pi pi-chart-bar' }, preview: 'hub-tiles', description: 'Hub de monitoreo: correos, incidencias y seguridad' },
 	{ route: '/intranet/admin/monitoreo/correos/bandeja', label: 'Bandeja', icon: 'pi pi-inbox', capability: 'ADMIN_EMAIL_OUTBOX', modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Monitoreo', icon: 'pi pi-chart-bar' }, subgroup: [{ label: 'Correos', icon: 'pi pi-envelope' }], preview: 'admin-table', description: 'Trazabilidad completa del outbox: filtros por tipo, estado y rango — con HTML del cuerpo y exportación.' },
 	{ route: '/intranet/admin/monitoreo/correos/dashboard', label: 'Dashboard del día', icon: 'pi pi-chart-bar', capability: 'ADMIN_EMAIL_OUTBOX_DASHBOARD_DIA', modulo: 'administrador', soloParaRol: ADMIN_ROLES, featureFlag: 'emailOutboxDashboardDia', group: { label: 'Monitoreo', icon: 'pi pi-chart-bar' }, subgroup: [{ label: 'Correos', icon: 'pi pi-envelope' }], preview: 'admin-table', description: 'Métricas en vivo: throttle, sender stats, dominios receptores y mapa de envío.' },
 	{ route: '/intranet/admin/monitoreo/correos/diagnostico', label: 'Diagnóstico', icon: 'pi pi-search', capability: 'ADMIN_EMAIL_OUTBOX_DIAGNOSTICO', modulo: 'administrador', soloParaRol: ADMIN_ROLES, featureFlag: 'emailOutboxDiagnostico', group: { label: 'Monitoreo', icon: 'pi pi-chart-bar' }, subgroup: [{ label: 'Correos', icon: 'pi pi-envelope' }], preview: 'admin-table', description: 'Candidatos a blacklistear y dominios con tasa de fallo elevada.' },
@@ -142,24 +152,24 @@ export const MENU_ITEMS: MenuItemDef[] = [
 	{ route: '/intranet/admin/monitoreo/correos/quarantine', label: 'Cuarentena', icon: 'pi pi-clock', capability: 'ADMIN_EMAIL_QUARANTINE', modulo: 'administrador', soloParaRol: ADMIN_ROLES, featureFlag: 'emailQuarantineTab', group: { label: 'Monitoreo', icon: 'pi pi-chart-bar' }, subgroup: [{ label: 'Correos', icon: 'pi pi-envelope' }], preview: 'admin-table', description: 'Pausas temporales con auto-release. Promueve a blacklist al 3.er hit.' },
 	{ route: '/intranet/admin/monitoreo/correos/domain-pauses', label: 'Dominios pausados', icon: 'pi pi-pause', capability: 'ADMIN_EMAIL_DOMAIN_PAUSES', modulo: 'administrador', soloParaRol: ADMIN_ROLES, featureFlag: 'emailDomainPausesTab', group: { label: 'Monitoreo', icon: 'pi pi-chart-bar' }, subgroup: [{ label: 'Correos', icon: 'pi pi-envelope' }], preview: 'admin-table', description: 'Dominios receptores pausados con timeout y auto-resume.' },
 	{ route: '/intranet/admin/monitoreo/correos/defer-events', label: 'Eventos defer', icon: 'pi pi-replay', capability: 'ADMIN_EMAIL_DEFER_EVENTS', modulo: 'administrador', soloParaRol: ADMIN_ROLES, featureFlag: 'emailDeferEventsTab', group: { label: 'Monitoreo', icon: 'pi pi-chart-bar' }, subgroup: [{ label: 'Correos', icon: 'pi pi-envelope' }], preview: 'admin-table', description: 'Historial de defers/fails sincrónicos del MTA por destinatario.' },
-	{ route: '/intranet/admin/monitoreo/incidencias/errores', label: 'Errores', icon: 'pi pi-exclamation-circle', capability: 'ADMIN_ERROR_LOGS', modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Monitoreo', icon: 'pi pi-chart-bar' }, subgroup: [{ label: 'Incidencias', icon: 'pi pi-megaphone' }], preview: 'admin-table', description: 'Bugs agrupados por fingerprint con kanban de estados (NUEVO → RESUELTO).' },
+	{ route: '/intranet/admin/monitoreo/incidencias/errores', label: 'Errores', icon: 'pi pi-exclamation-circle', capability: 'ADMIN_ERROR_LOGS', modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Monitoreo', icon: 'pi pi-chart-bar' }, subgroup: [{ label: 'Incidencias', icon: 'pi pi-megaphone' }], preview: 'kanban', description: 'Bugs agrupados por fingerprint con kanban de estados (NUEVO → RESUELTO).' },
 	{ route: '/intranet/admin/monitoreo/incidencias/reportes', label: 'Reportes de Usuarios', icon: 'pi pi-comment', capability: 'ADMIN_REPORTES_USUARIO', modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Monitoreo', icon: 'pi pi-chart-bar' }, subgroup: [{ label: 'Incidencias', icon: 'pi pi-megaphone' }], preview: 'admin-table', description: 'Feedback manual: tipo, descripción y propuesta enviada por usuarios.' },
 	{ route: '/intranet/admin/monitoreo/seguridad/rate-limit', label: 'Rate Limit', icon: 'pi pi-bolt', capability: 'ADMIN_RATE_LIMIT_EVENTS', modulo: 'administrador', soloParaRol: ADMIN_ROLES, featureFlag: 'rateLimitMonitoring', group: { label: 'Monitoreo', icon: 'pi pi-chart-bar' }, subgroup: [{ label: 'Seguridad', icon: 'pi pi-shield' }], preview: 'admin-table', description: 'Eventos 429 con policy, partition, top endpoints y top roles afectados.' },
 	// Brief 444: grupo renombrado de "Monitoreo" a "Diagnóstico" — colisionaba de nombre con el ítem suelto "Monitoreo" de arriba.
-	{ route: '/intranet/admin/sistema/runtime-health', label: 'Salud del runtime', icon: 'pi pi-server', capability: 'ADMIN_SISTEMA_RUNTIME_HEALTH', modulo: 'administrador', soloParaRol: ADMIN_ROLES, featureFlag: 'runtimeHealth', group: { label: 'Diagnóstico', icon: 'pi pi-chart-bar' }, preview: 'admin-table', description: 'Snapshot del runtime ASP.NET (ThreadPool, Requests, BD, GC)' },
-	{ route: '/intranet/admin/sistema/db-diagnostics', label: 'Diagnóstico de BD', icon: 'pi pi-database', capability: 'ADMIN_SISTEMA_DB_DIAGNOSTICS', modulo: 'administrador', soloParaRol: ADMIN_ROLES, featureFlag: 'dbDiagnostics', group: { label: 'Diagnóstico', icon: 'pi pi-chart-bar' }, preview: 'admin-table', description: 'Uso de recursos, consultas costosas, bloqueos activos y almacenamiento del motor SQL' },
-	{ route: '/intranet/admin/campus', label: 'Campus', icon: 'pi pi-map', capability: 'ADMIN_CAMPUS', modulo: 'administrador', soloParaRol: ADMIN_ROLES, featureFlag: 'campusNavigation', group: { label: 'Herramientas', icon: 'pi pi-wrench' }, preview: 'admin-table', description: 'Navegar el campus virtual' },
+	{ route: '/intranet/admin/sistema/runtime-health', label: 'Salud del runtime', icon: 'pi pi-server', capability: 'ADMIN_SISTEMA_RUNTIME_HEALTH', modulo: 'administrador', soloParaRol: ADMIN_ROLES, featureFlag: 'runtimeHealth', group: { label: 'Diagnóstico', icon: 'pi pi-chart-bar' }, preview: 'system-metrics', description: 'Snapshot del runtime ASP.NET (ThreadPool, Requests, BD, GC)' },
+	{ route: '/intranet/admin/sistema/db-diagnostics', label: 'Diagnóstico de BD', icon: 'pi pi-database', capability: 'ADMIN_SISTEMA_DB_DIAGNOSTICS', modulo: 'administrador', soloParaRol: ADMIN_ROLES, featureFlag: 'dbDiagnostics', group: { label: 'Diagnóstico', icon: 'pi pi-chart-bar' }, preview: 'system-metrics', description: 'Uso de recursos, consultas costosas, bloqueos activos y almacenamiento del motor SQL' },
+	{ route: '/intranet/admin/campus', label: 'Campus', icon: 'pi pi-map', capability: 'ADMIN_CAMPUS', modulo: 'administrador', soloParaRol: ADMIN_ROLES, featureFlag: 'campusNavigation', group: { label: 'Herramientas', icon: 'pi pi-wrench' }, preview: 'campus-map', description: 'Navegar el campus virtual' },
 	// xrepo-panel-ayuda-intranet F7b — gate por AYUDA_TICKET_MANAGE (capability propia del
 	// dominio Ticket, distinta de INTRANET que gatea la sección pública `/intranet/ayuda`).
 	// Misma ruta con `tab` por queryParam (no 2 rutas hijas) — ver nota en
 	// `intranet.routes.ts`: la capability tiene una sola `CAP_Ruta` seedeada en BE.
 	{ route: '/intranet/admin/ayuda/tickets', label: 'Bandeja de Tickets', icon: 'pi pi-inbox', capability: 'AYUDA_TICKET_MANAGE', modulo: 'administrador', soloParaRol: ADMIN_ROLES, queryParams: { tab: 'bandeja' }, group: { label: 'Ayuda', icon: 'pi pi-question-circle' }, preview: 'admin-table', description: 'Gestionar tickets de soporte de los usuarios' },
 	{ route: '/intranet/admin/ayuda/tickets', label: 'Tipos de Ticket', icon: 'pi pi-tags', capability: 'AYUDA_TICKET_MANAGE', modulo: 'administrador', soloParaRol: ADMIN_ROLES, queryParams: { tab: 'tipos' }, group: { label: 'Ayuda', icon: 'pi pi-question-circle' }, preview: 'admin-table', description: 'Administrar el catálogo de tipos de problema' },
-	{ route: '/intranet/ctest-k6', label: 'Test k6', icon: 'pi pi-bolt', capability: 'CTEST_K6', modulo: 'administrador', soloParaRol: ADMIN_ROLES, featureFlag: 'ctestK6', group: { label: 'Herramientas', icon: 'pi pi-wrench' }, preview: 'admin-table', description: 'Herramienta de testing de carga' },
+	{ route: '/intranet/ctest-k6', label: 'Test k6', icon: 'pi pi-bolt', capability: 'CTEST_K6', modulo: 'administrador', soloParaRol: ADMIN_ROLES, featureFlag: 'ctestK6', group: { label: 'Herramientas', icon: 'pi pi-wrench' }, preview: 'load-test', description: 'Herramienta de testing de carga' },
 	// Compartido (duplicado, ver §1 brief 444) — capability sin dueño de rol fijo
 	{ route: '/intranet/asistencia', label: 'Asistencia diaria', icon: 'pi pi-check-square', capability: 'ASISTENCIA', modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Asistencia', icon: 'pi pi-clock' }, preview: 'attendance', description: 'Control de asistencia diaria' },
-	{ route: '/intranet/calendario', label: 'Calendario', icon: 'pi pi-calendar', capability: 'CALENDARIO', modulo: 'administrador', soloParaRol: ADMIN_ROLES, featureFlag: 'calendario', group: { label: 'Calendario', icon: 'pi pi-calendar' }, preview: 'admin-table', description: 'Calendario de eventos y actividades' },
-	{ route: '/intranet/videoconferencias', label: 'Videoconferencias', icon: 'pi pi-video', capability: 'VIDEOCONFERENCIAS', modulo: 'administrador', soloParaRol: ADMIN_ROLES, featureFlag: 'videoconferencias', preview: 'admin-table', description: 'Salas de videoconferencia' },
+	{ route: '/intranet/calendario', label: 'Calendario', icon: 'pi pi-calendar', capability: 'CALENDARIO', modulo: 'administrador', soloParaRol: ADMIN_ROLES, featureFlag: 'calendario', group: { label: 'Calendario', icon: 'pi pi-calendar' }, preview: 'calendar', description: 'Calendario de eventos y actividades' },
+	{ route: '/intranet/videoconferencias', label: 'Videoconferencias', icon: 'pi pi-video', capability: 'VIDEOCONFERENCIAS', modulo: 'administrador', soloParaRol: ADMIN_ROLES, featureFlag: 'videoconferencias', preview: 'video-call', description: 'Salas de videoconferencia' },
 
 	// --- Apoderado (nuevo, brief 444 — derivado de quick-access.config.ts) ---
 	// soloParaRol: ['Apoderado'] en todos — estos items reutilizan capabilities ADMIN_*/ASISTENCIA/CALENDARIO
@@ -168,7 +178,7 @@ export const MENU_ITEMS: MenuItemDef[] = [
 	{ route: '/intranet/admin/horarios', label: 'Horarios', icon: 'pi pi-calendar', capability: 'ADMIN_HORARIOS', modulo: 'apoderado', soloParaRol: ['Apoderado'], preview: 'admin-schedule', description: 'Consultar horario de clases' },
 	{ route: '/intranet/admin/notificaciones', label: 'Notificaciones', icon: 'pi pi-bell', capability: 'ADMIN_NOTIFICACIONES', modulo: 'apoderado', soloParaRol: ['Apoderado'], preview: 'admin-notif', description: 'Avisos del colegio' },
 	{ route: '/intranet/asistencia', label: 'Asistencia diaria', icon: 'pi pi-check-square', capability: 'ASISTENCIA', modulo: 'apoderado', soloParaRol: ['Apoderado'], preview: 'attendance', description: 'Revisar asistencia de tu hijo(a)' },
-	{ route: '/intranet/calendario', label: 'Calendario', icon: 'pi pi-calendar', capability: 'CALENDARIO', modulo: 'apoderado', soloParaRol: ['Apoderado'], featureFlag: 'calendario', preview: 'admin-table', description: 'Calendario de eventos y actividades' },
+	{ route: '/intranet/calendario', label: 'Calendario', icon: 'pi pi-calendar', capability: 'CALENDARIO', modulo: 'apoderado', soloParaRol: ['Apoderado'], featureFlag: 'calendario', preview: 'calendar', description: 'Calendario de eventos y actividades' },
 ];
 // #endregion
 
