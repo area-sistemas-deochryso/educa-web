@@ -3,7 +3,7 @@ export * from './calificacion-config';
 export * from './fab-menu-visibility.service';
 export * from './foro-unread';
 export * from './informative-mode.service';
-export * from './quick-access-favorites.service';
+export * from './quick-access-layout.service';
 export * from './ui-mapping/ui-mapping.service';
 export * from './attendance';
 // #endregion

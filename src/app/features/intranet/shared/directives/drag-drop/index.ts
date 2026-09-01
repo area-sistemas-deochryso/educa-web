@@ -8,7 +8,7 @@
 
 // --- CDK (activo) ---
 export { CdkDropList, CdkDrag, CdkDragHandle } from '@angular/cdk/drag-drop';
-export type { CdkDragDrop } from '@angular/cdk/drag-drop';
+export type { CdkDragDrop, CdkDragMove } from '@angular/cdk/drag-drop';
 
 // --- Nativo (fallback) ---
 // export { CdkDropList, CdkDrag, CdkDragHandle } from './cdk-drop-list.directive';

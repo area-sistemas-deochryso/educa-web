@@ -24,7 +24,7 @@ import { ModuloMenu, buildModuloMenus, detectModuloFromUrl } from './intranet-me
 import { findMenuItemDefByUrl, resolveMenuItemLabel } from '@intranet-shared/config/intranet-menu.config';
 import { ModuloId, MODULOS } from '@shared/constants';
 import { FeatureFlagsFacade } from '@core/services/feature-flags';
-import { QuickAccessFavoritesService, ForoUnreadService } from '@intranet-shared/services';
+import { QuickAccessLayoutService, ForoUnreadService } from '@intranet-shared/services';
 import { AccessDeniedModalComponent } from '@intranet-shared/components/access-denied-modal';
 import { WalMigrationBannerComponent } from '@intranet-shared/components/wal-migration-banner';
 import { WalDegradedBannerComponent } from '@intranet-shared/components/wal-degraded-banner';
@@ -106,7 +106,7 @@ export class IntranetLayoutComponent implements OnInit, AfterViewInit, OnDestroy
 	private router = inject(Router);
 	private keyboardService = inject(KeyboardShortcutsService);
 	private feedbackFacade = inject(FeedbackReportFacade);
-	readonly favoritesService = inject(QuickAccessFavoritesService);
+	readonly favoritesService = inject(QuickAccessLayoutService);
 	private readonly foroUnread = inject(ForoUnreadService);
 	private readonly moduleSelector = viewChild(ModuleSelectorComponent);
 	private readonly mobileMenu = viewChild(MobileMenuComponent);

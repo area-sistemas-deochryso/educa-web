@@ -18,7 +18,7 @@ import { filter, map, startWith } from 'rxjs/operators';
 
 import { ModuloMenu } from '../../intranet-menu.config';
 import { ModuloId } from '@shared/constants';
-import { QuickAccessFavoritesService } from '@intranet-shared/services';
+import { QuickAccessLayoutService } from '@intranet-shared/services';
 import { buildAllResults, buildMegaColumns, scoreResult, SearchResult, TreeGroup } from './module-selector.helpers';
 import { EduTooltip } from '@edu-ui';
 
@@ -37,7 +37,7 @@ export type { SearchResult, TreeGroup, TreeSection, TreeSubsection } from './mod
 export class ModuleSelectorComponent {
 	private elementRef = inject(ElementRef);
 	private router = inject(Router);
-	readonly favorites = inject(QuickAccessFavoritesService);
+	readonly favorites = inject(QuickAccessLayoutService);
 
 	// #region Inputs / Outputs
 	readonly modulos = input.required<ModuloMenu[]>();

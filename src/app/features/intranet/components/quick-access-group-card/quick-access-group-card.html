@@ -1,0 +1,32 @@
+<!-- #region Template -->
+<button
+	type="button"
+	class="quick-access-group-card"
+	data-info-anchor="home-quick-access-group-card"
+	(click)="groupPopover.toggle($event)"
+>
+	<div class="group-icon-grid">
+		@for (icon of previewIcons(); track icon) {
+			<i class="pi" [class]="icon"></i>
+		}
+	</div>
+	<span class="group-label">{{ label() }}</span>
+</button>
+
+<edu-popover #groupPopover appendTo="body" styleClass="quick-access-group-popover">
+	<ng-template>
+		<div class="group-popover-header">{{ label() }}</div>
+		<div class="group-popover-items">
+			@for (item of items(); track item.route) {
+				<app-quick-access-card
+					[label]="item.label"
+					[path]="item.route"
+					[icon]="item.icon"
+					[description]="item.description"
+					[preview]="item.preview"
+				/>
+			}
+		</div>
+	</ng-template>
+</edu-popover>
+<!-- #endregion -->

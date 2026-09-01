@@ -77,5 +77,4 @@ export const QUICK_ACCESS_BY_ROLE: Record<UserRole, QuickAccessItem[]> = {
 	],
 };
 
-export const MAX_QUICK_ACCESS = 4;
 // #endregion

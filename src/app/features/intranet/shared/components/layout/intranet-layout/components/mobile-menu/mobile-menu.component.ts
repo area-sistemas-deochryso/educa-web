@@ -18,7 +18,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, startWith } from 'rxjs/operators';
 
 import { ModuloId } from '@shared/constants';
-import { QuickAccessFavoritesService } from '@intranet-shared/services';
+import { QuickAccessLayoutService } from '@intranet-shared/services';
 import { UserProfileMenuComponent } from '../user-profile-menu';
 import { EduTag } from '@edu-ui';
 // #endregion
@@ -77,7 +77,7 @@ interface MobileTreeGroup {
 export class MobileMenuComponent {
 	private router = inject(Router);
 	private destroyRef = inject(DestroyRef);
-	readonly favorites = inject(QuickAccessFavoritesService);
+	readonly favorites = inject(QuickAccessLayoutService);
 
 	readonly modulos = input.required<ModuloMenu[]>();
 	readonly selectedModuloId = input<ModuloId | null>(null);

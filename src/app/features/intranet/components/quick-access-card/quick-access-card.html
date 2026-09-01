@@ -1,11 +1,47 @@
 <!-- #region Template -->
-<a [routerLink]="path()" class="quick-access-card" data-info-anchor="home-quick-access-card">
+<a
+	[routerLink]="path()"
+	class="quick-access-card"
+	[class]="'size-' + size()"
+	[class.editing]="editMode()"
+	(click)="onCardClick($event)"
+	data-info-anchor="home-quick-access-card"
+>
+	@if (editMode()) {
+		<div class="edit-overlay">
+			<button type="button" class="edit-btn edit-btn-remove" aria-label="Quitar acceso" (click)="onRemove($event)">
+				<i class="pi pi-times"></i>
+			</button>
+			<button type="button" class="edit-btn edit-btn-size" aria-label="Cambiar tamaño" (click)="cycleSize($event)">
+				<i class="pi pi-arrows-alt"></i>
+			</button>
+			<button type="button" class="edit-btn edit-btn-rename" aria-label="Renombrar" (click)="startRename($event)">
+				<i class="pi pi-pencil"></i>
+			</button>
+		</div>
+	}
+
 	<div class="card-icon">
 		<i class="pi" [class]="icon()"></i>
 	</div>
-	<span class="card-label">{{ label() }}</span>
+
+	@if (renaming()) {
+		<input
+			class="card-label-input"
+			type="text"
+			[value]="draftLabel()"
+			(input)="draftLabel.set($any($event.target).value)"
+			(click)="$event.preventDefault(); $event.stopPropagation()"
+			(keydown.enter)="commitRename()"
+			(keydown.escape)="renaming.set(false)"
+			(blur)="commitRename()"
+		/>
+	} @else {
+		<span class="card-label">{{ label() }}</span>
+	}
 
 	<!-- Floating preview popup -->
+	@if (!editMode()) {
 	<div class="preview-popup">
 		<div class="preview-chrome">
 			<div class="chrome-dots">
@@ -311,5 +347,6 @@
 			<span class="preview-desc">{{ description() }}</span>
 		</div>
 	</div>
+	}
 </a>
 <!-- #endregion -->

@@ -14,6 +14,7 @@ export * from './mensajeria.models';
 export * from './notification.models';
 export * from './notificaciones-admin.models';
 export * from './profesor-curso.models';
+export * from './quick-access-layout.models';
 export * from './rendimiento.models';
 export * from './schedule.models';
 export * from './rol.models';

@@ -127,7 +127,6 @@
 														class="star-btn"
 														data-info-anchor="header-module-selector-favorite-toggle"
 														[class.starred]="favorites.isFavorite(item.route)"
-														[disabled]="!favorites.isFavorite(item.route) && !favorites.canAddMore()"
 														(click)="onStarClick($event, item.route)"
 														[attr.aria-label]="favorites.isFavorite(item.route) ? 'Quitar de accesos rápidos' : 'Agregar a accesos rápidos'"
 													>
@@ -158,7 +157,6 @@
 														class="star-btn"
 														data-info-anchor="header-module-selector-favorite-toggle"
 														[class.starred]="favorites.isFavorite(item.route)"
-														[disabled]="!favorites.isFavorite(item.route) && !favorites.canAddMore()"
 														(click)="onStarClick($event, item.route)"
 														[attr.aria-label]="favorites.isFavorite(item.route) ? 'Quitar de accesos rápidos' : 'Agregar a accesos rápidos'"
 													>
