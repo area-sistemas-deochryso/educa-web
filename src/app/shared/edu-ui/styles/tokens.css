@@ -130,6 +130,11 @@
 	--eduui-primary-hover-color: var(--eduui-primary-600);
 	--eduui-primary-active-color: var(--eduui-primary-700);
 	--eduui-primary-contrast-color: #ffffff;
+	/* Accent for text/icons/fills that need guaranteed contrast against a light
+	   background — --eduui-primary-color (500) alone is ~2.5:1 against white,
+	   below WCAG AA. Same rationale as the app's "no celeste sobre fondo claro"
+	   rule (reference/a11y.md), applied to eduui's emerald primary. */
+	--eduui-primary-strong-color: var(--eduui-primary-700);
 
 	/* --- Semantic: text / content / form-field / focus-ring / overlay --- */
 	--eduui-text-color: var(--eduui-surface-700);
@@ -142,10 +147,14 @@
 
 	--eduui-form-field-background: transparent;
 	--eduui-form-field-disabled-background: var(--eduui-surface-200);
-	--eduui-form-field-border-color: var(--eduui-surface-300);
-	--eduui-form-field-hover-border-color: var(--eduui-surface-400);
-	--eduui-form-field-focus-border-color: var(--eduui-primary-color);
+	/* surface-500, not surface-300 — surface-300 is only ~1.5:1 against a
+	   white/light page background, well under the 3:1 WCAG needs for a
+	   form-field boundary to be perceivable. */
+	--eduui-form-field-border-color: var(--eduui-surface-500);
+	--eduui-form-field-hover-border-color: var(--eduui-surface-600);
+	--eduui-form-field-focus-border-color: var(--eduui-primary-strong-color);
 	--eduui-form-field-invalid-border-color: var(--eduui-red-400);
+	--eduui-form-field-invalid-text-color: var(--eduui-red-600);
 	--eduui-form-field-color: var(--eduui-surface-700);
 	--eduui-form-field-disabled-color: var(--eduui-surface-500);
 	--eduui-form-field-placeholder-color: var(--eduui-surface-500);
@@ -166,7 +175,7 @@
 
 	--eduui-focus-ring-width: 1px;
 	--eduui-focus-ring-style: solid;
-	--eduui-focus-ring-color: var(--eduui-primary-color);
+	--eduui-focus-ring-color: var(--eduui-primary-strong-color);
 	--eduui-focus-ring-offset: 2px;
 
 	--eduui-overlay-select-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
@@ -180,6 +189,9 @@
 	--eduui-primary-hover-color: var(--eduui-primary-300);
 	--eduui-primary-active-color: var(--eduui-primary-200);
 	--eduui-primary-contrast-color: var(--eduui-surface-900);
+	/* primary-400 is already ~9:1 against the dark surfaces it's used on —
+	   alias instead of introducing a second dark-mode green. */
+	--eduui-primary-strong-color: var(--eduui-primary-color);
 
 	/* Surface scale flips to zinc in dark (Aura colorScheme.dark.surface).
 	   50/100 keep following the shim's custom neutral (_tokens.scss dark
@@ -208,9 +220,12 @@
 
 	--eduui-form-field-background: var(--eduui-surface-950);
 	--eduui-form-field-disabled-background: var(--eduui-surface-700);
-	--eduui-form-field-border-color: var(--eduui-surface-600);
-	--eduui-form-field-hover-border-color: var(--eduui-surface-500);
+	/* surface-500, not surface-600 — surface-600 is only ~2.6:1 against the
+	   near-black form-field background, under the 3:1 boundary minimum. */
+	--eduui-form-field-border-color: var(--eduui-surface-500);
+	--eduui-form-field-hover-border-color: var(--eduui-surface-400);
 	--eduui-form-field-invalid-border-color: var(--eduui-red-300);
+	--eduui-form-field-invalid-text-color: var(--eduui-red-300);
 	--eduui-form-field-color: var(--eduui-surface-0);
 	--eduui-form-field-disabled-color: var(--eduui-surface-400);
 	--eduui-form-field-placeholder-color: var(--eduui-surface-400);

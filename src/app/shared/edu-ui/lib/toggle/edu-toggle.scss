@@ -6,16 +6,19 @@
 	padding: 0.15rem;
 	border: 1px solid transparent;
 	border-radius: 30px;
-	background: var(--eduui-surface-300);
+	/* surface-500, not surface-300 — surface-300 leaves the white handle at
+	   ~1.5:1 against the track, well under the 3:1 WCAG needs for a control's
+	   state indicator to be perceivable. */
+	background: var(--eduui-surface-500);
 	cursor: pointer;
 	transition: background var(--eduui-form-field-transition-duration);
 
 	&:hover:not(:disabled) {
-		background: var(--eduui-surface-400);
+		background: var(--eduui-surface-600);
 	}
 
 	&--checked {
-		background: var(--eduui-primary-color);
+		background: var(--eduui-primary-strong-color);
 		justify-content: flex-end;
 
 		&:hover:not(:disabled) {
@@ -41,9 +44,20 @@
 		box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.25), 0 1px 2px 0 rgba(0, 0, 0, 0.15);
 		transition: transform 0.2s;
 	}
+
+	/* Checked track uses --primary-strong-color, which in dark mode is a
+	   lighter green (~0.5 luminance) — a plain white handle drops to ~1.9:1
+	   against it. Match the checkbox's approach: the handle adapts via
+	   --primary-contrast-color instead of a fixed white. */
+	&--checked &__handle {
+		background: var(--eduui-primary-contrast-color);
+	}
 }
 
-:host-context(.dark-mode) .edu-toggle {
+/* :not(--checked) — otherwise this ties in specificity with .edu-toggle--checked
+   above and wins on source order, silently overriding the checked track back
+   to gray in dark mode regardless of which color --checked resolves to. */
+:host-context(.dark-mode) .edu-toggle:not(.edu-toggle--checked) {
 	background: var(--eduui-surface-700);
 	&:hover:not(:disabled) { background: var(--eduui-surface-600); }
 }

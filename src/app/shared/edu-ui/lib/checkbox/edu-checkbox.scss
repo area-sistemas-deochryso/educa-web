@@ -27,8 +27,8 @@
 		}
 
 		&--checked {
-			background: var(--eduui-primary-color);
-			border-color: var(--eduui-primary-color);
+			background: var(--eduui-primary-strong-color);
+			border-color: var(--eduui-primary-strong-color);
 
 			&:hover:not(:disabled) {
 				background: var(--eduui-primary-hover-color);

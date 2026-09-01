@@ -167,7 +167,7 @@
 }
 
 .edu-datepicker-panel__day--selected {
-	background: var(--eduui-primary-color);
+	background: var(--eduui-primary-strong-color);
 	color: var(--eduui-primary-contrast-color);
 
 	&:hover:not(:disabled) {
@@ -214,7 +214,7 @@
 .edu-datepicker-panel__buttonbar-btn {
 	background: none;
 	border: none;
-	color: var(--eduui-primary-color);
+	color: var(--eduui-primary-strong-color);
 	font-size: 0.875rem;
 	font-weight: 600;
 	cursor: pointer;
