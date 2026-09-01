@@ -13,7 +13,6 @@ import { QuickAccessSize } from '@data/models';
 import { WelcomeSectionComponent } from '@features/intranet/components/welcome-section/welcome-section';
 import { AttendanceSummaryWidgetComponent } from './components/attendance-summary-widget/attendance-summary-widget.component';
 import { ProfesorAttendanceWidgetComponent } from './components/profesor-attendance-widget/profesor-attendance-widget.component';
-import { QUICK_ACCESS_BY_ROLE } from './quick-access.config';
 
 // #endregion
 // #region Implementation
@@ -64,35 +63,17 @@ export class HomeComponent {
 		return 'Bienvenido a tu Intranet';
 	});
 
-	/** Layout personalizado del usuario, con fallback a defaults por rol si nunca lo personalizó. */
-	readonly resolvedSlots = computed<ResolvedQuickAccessSlot[]>(() => {
-		const user = this.storage.getUser();
-		if (!user?.rol) return [];
-
-		if (this.layoutService.hasCustomLayout()) {
-			return this.layoutService
-				.resolveLayout()
-				.slots.filter((slot) => (slot.kind === 'item' ? this.userPermisos.hasCapability(slot.capability) : true));
-		}
-
-		const candidates = QUICK_ACCESS_BY_ROLE[user.rol] ?? [];
-		return candidates
-			.filter((item) => this.userPermisos.hasCapability(item.capability))
-			.map((item): ResolvedQuickAccessSlot => ({ kind: 'item', ...item, size: 'sm' }));
-	});
+	/** Layout personalizado del usuario. Vacío hasta que marque accesos con el buscador Ctrl+K. */
+	readonly resolvedSlots = computed<ResolvedQuickAccessSlot[]>(() =>
+		this.layoutService
+			.resolveLayout()
+			.slots.filter((slot) => (slot.kind === 'item' ? this.userPermisos.hasCapability(slot.capability) : true)),
+	);
 
 	// #endregion
 
 	// #region Comandos de edición
 	toggleEditMode(): void {
-		const entering = !this.editMode();
-		const user = this.storage.getUser();
-		if (entering && user?.rol && !this.layoutService.hasCustomLayout()) {
-			const seedRoutes = (QUICK_ACCESS_BY_ROLE[user.rol] ?? [])
-				.filter((item) => this.userPermisos.hasCapability(item.capability))
-				.map((item) => item.route);
-			this.layoutService.seedFromRoutes(seedRoutes);
-		}
 		this.editMode.update((v) => !v);
 	}
 

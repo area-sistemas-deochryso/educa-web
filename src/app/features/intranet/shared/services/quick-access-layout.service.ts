@@ -70,13 +70,6 @@ export class QuickAccessLayoutService {
 	}
 	// #endregion
 
-	/** Materializa el fallback por rol como layout editable, si el usuario nunca personalizó nada. */
-	seedFromRoutes(routes: string[]): void {
-		if (this.hasCustomLayout()) return;
-		const slots: QuickAccessItemSlot[] = routes.map((route) => ({ kind: 'item', route, size: 'sm' }));
-		this.commit({ slots });
-	}
-
 	// #region Comandos — items sueltos
 	addItem(route: string, size: QuickAccessSize = 'sm'): void {
 		const current = this._layout();
