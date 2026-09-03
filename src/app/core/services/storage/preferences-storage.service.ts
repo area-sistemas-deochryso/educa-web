@@ -1,6 +1,7 @@
 import { Injectable, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { logger } from '@app/core/helpers';
+import { QuickAccessLayout } from '@data/models';
 import { AttendanceMonthData } from './storage.models';
 import { SessionStorageService } from './session-storage.service';
 
@@ -31,8 +32,9 @@ const PREFERENCES_KEYS = {
 	SIDEBAR_COLLAPSED: 'educa_pref_sidebar_collapsed',
 	NOTIFICATIONS_SOUND: 'educa_pref_notif_sound',
 
-	// Quick access favorites
+	// Quick access favorites (legado, ver migración en getQuickAccessLayout)
 	FAVORITE_ROUTES: 'educa_pref_favorite_routes',
+	QUICK_ACCESS_LAYOUT: 'educa_pref_quick_access_layout',
 
 	// Plan 22 Chat B — throttle status widget
 	THROTTLE_WIDGET_AUTO_REFRESH: 'educa_pref_throttle_widget_auto_refresh',
@@ -493,14 +495,26 @@ export class PreferencesStorageService {
 	}
 
 	// #endregion
-	// #region QUICK ACCESS FAVORITES
+	// #region QUICK ACCESS LAYOUT
 
-	getFavoriteRoutes(): string[] {
-		return this.getJSON<string[]>(PREFERENCES_KEYS.FAVORITE_ROUTES + this.userScope) ?? [];
+	/** Migra el modelo legado (rutas favoritas simples) al layout nuevo, una sola vez. */
+	getQuickAccessLayout(): QuickAccessLayout {
+		const stored = this.getJSON<QuickAccessLayout>(PREFERENCES_KEYS.QUICK_ACCESS_LAYOUT + this.userScope);
+		if (stored) return stored;
+
+		const legacyRoutes = this.getJSON<string[]>(PREFERENCES_KEYS.FAVORITE_ROUTES + this.userScope) ?? [];
+		if (legacyRoutes.length === 0) return { slots: [] };
+
+		const migrated: QuickAccessLayout = {
+			slots: legacyRoutes.map((route) => ({ kind: 'item', route, size: 'sm' })),
+		};
+		this.setQuickAccessLayout(migrated);
+		this.removeItem(PREFERENCES_KEYS.FAVORITE_ROUTES + this.userScope);
+		return migrated;
 	}
 
-	setFavoriteRoutes(routes: string[]): void {
-		this.setJSON(PREFERENCES_KEYS.FAVORITE_ROUTES + this.userScope, routes);
+	setQuickAccessLayout(layout: QuickAccessLayout): void {
+		this.setJSON(PREFERENCES_KEYS.QUICK_ACCESS_LAYOUT + this.userScope, layout);
 	}
 
 	// #endregion
@@ -695,7 +709,7 @@ export class PreferencesStorageService {
 		this.removeItem(PREFERENCES_KEYS.THEME);
 		this.removeItem(PREFERENCES_KEYS.SIDEBAR_COLLAPSED);
 		this.removeItem(PREFERENCES_KEYS.NOTIFICATIONS_SOUND);
-		this.removeItem(PREFERENCES_KEYS.FAVORITE_ROUTES + this.userScope);
+		this.removeItem(PREFERENCES_KEYS.QUICK_ACCESS_LAYOUT + this.userScope);
 	}
 	// #endregion
 }

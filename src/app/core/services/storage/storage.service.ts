@@ -2,6 +2,7 @@
 import { Injectable, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { logger } from '@app/core/helpers';
+import { QuickAccessLayout } from '@data/models';
 import {
 	AuthUser,
 	ScheduleModalsState,
@@ -273,13 +274,13 @@ export class StorageService {
 	}
 	// #endregion
 
-	// #region QUICK ACCESS FAVORITES
-	getFavoriteRoutes(): string[] {
-		return this.preferences.getFavoriteRoutes();
+	// #region QUICK ACCESS LAYOUT
+	getQuickAccessLayout(): QuickAccessLayout {
+		return this.preferences.getQuickAccessLayout();
 	}
 
-	setFavoriteRoutes(routes: string[]): void {
-		this.preferences.setFavoriteRoutes(routes);
+	setQuickAccessLayout(layout: QuickAccessLayout): void {
+		this.preferences.setQuickAccessLayout(layout);
 	}
 	// #endregion
 

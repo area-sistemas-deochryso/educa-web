@@ -5,7 +5,7 @@ import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 
 import { UserPermissionsService, SessionActivityService, KeyboardShortcutsService, FeedbackReportFacade } from '@core/services';
 import { FeatureFlagsFacade } from '@core/services/feature-flags';
-import { QuickAccessFavoritesService } from '@intranet-shared/services';
+import { QuickAccessLayoutService } from '@intranet-shared/services';
 
 import { IntranetLayoutComponent } from './intranet-layout.component';
 import { FeedbackReportDialogComponent } from '@intranet-shared/components/feedback-report-dialog';
@@ -92,7 +92,7 @@ describe('IntranetLayoutComponent', () => {
 				{ provide: KeyboardShortcutsService, useFactory: mockKeyboardService },
 				{ provide: FeatureFlagsFacade, useFactory: mockFeatureFlags },
 				{ provide: FeedbackReportFacade, useFactory: mockFeedbackFacade },
-				{ provide: QuickAccessFavoritesService, useFactory: mockFavoritesService },
+				{ provide: QuickAccessLayoutService, useFactory: mockFavoritesService },
 			],
 		});
 		TestBed.overrideComponent(IntranetLayoutComponent, {

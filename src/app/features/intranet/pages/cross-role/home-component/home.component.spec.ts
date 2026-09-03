@@ -31,8 +31,8 @@ describe('HomeComponent (Intranet)', () => {
 			getPermisos: vi.fn().mockReturnValue([]),
 			getDismissedNotifications: vi.fn().mockReturnValue([]),
 			removeDismissedNotifications: vi.fn(),
-			getFavoriteRoutes: vi.fn().mockReturnValue([]),
-			setFavoriteRoutes: vi.fn(),
+			getQuickAccessLayout: vi.fn().mockReturnValue({ slots: [] }),
+			setQuickAccessLayout: vi.fn(),
 		};
 
 		const featureFlagsMock = {
@@ -104,9 +104,9 @@ describe('HomeComponent (Intranet)', () => {
 		expect(component.welcomeTitle()).toBe('Bienvenido, Juan Pérez');
 	});
 
-	it('should have quickAccessItems as array', () => {
-		expect(component.quickAccessItems()).toBeDefined();
-		expect(Array.isArray(component.quickAccessItems())).toBe(true);
+	it('should have resolvedSlots as array', () => {
+		expect(component.resolvedSlots()).toBeDefined();
+		expect(Array.isArray(component.resolvedSlots())).toBe(true);
 	});
 
 	describe('showAttendanceWidget gate', () => {
