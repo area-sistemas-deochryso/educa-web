@@ -45,6 +45,7 @@ export const environment = {
 	// Debug panels (solo development)
 	debug: {
 		horarioSync: true,
+		testTools: true,
 	},
 };
 

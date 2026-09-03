@@ -45,6 +45,7 @@ export const environment = {
 	// Debug panels (siempre false en producción)
 	debug: {
 		horarioSync: false,
+		testTools: false,
 	},
 };
 

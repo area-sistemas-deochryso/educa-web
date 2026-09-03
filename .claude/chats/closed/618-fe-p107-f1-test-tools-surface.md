@@ -32,11 +32,36 @@ Construir el andamiaje de la sección "herramientas de prueba" — visible solo 
 
 ## CRITERIOS DE CIERRE
 
-- [ ] Sección/ruta creada y gateada correctamente (invisible fuera de dev).
-- [ ] Confirmado invisible en build de producción.
-- [ ] `educa-coord/plans/xrepo-107-entorno-dev-datos-prueba.md` actualizado (F1 FE marcado).
-- [ ] `educa-web/.claude/plan/maestro.md` actualizado (fila `xP107`).
-- [ ] Brief movido `open/` → `closed/`.
+- [x] Sección/ruta creada y gateada correctamente (invisible fuera de dev).
+- [x] Confirmado invisible en build de producción.
+- [x] `educa-coord/plans/xrepo-107-entorno-dev-datos-prueba.md` actualizado (F1 FE marcado).
+- [x] `educa-web/.claude/plan/maestro.md` actualizado (fila `xP107`).
+- [x] Brief movido `open/` → `closed/`.
+
+## RESULTADO (2026-09-03)
+
+Diseño ajustado en vivo respecto al texto original del brief — el precedente citado
+(`profesor-horarios.component.ts:90-91`) usa solo `environment.debug.horarioSync`, sin
+`isDevMode()`: ese runtime check está roto en Angular 22 + esbuild (`ngDevMode` no se
+setea, ver `reference/debug.md`), así que gatear con `isDevMode()` hubiera dejado la
+sección invisible incluso en dev. Gate final: solo `environment.debug.testTools`
+(swap build-time vía `fileReplacements`).
+
+El sistema de menú por capability (`intranet-menu.config.ts`) requiere un `CapabilityCode`
+cerrado generado del backend — no encaja para un flag puramente dev-only sin rol/permiso
+real. Se optó por una entrada standalone en el header de intranet (`TestToolsNavLinkComponent`,
+extraído a componente propio porque `intranet-layout.component.ts` ya estaba al límite de
+300 líneas — con el agregado cruzó por 1 línea, resuelto con el escape hatch documentado
+del proyecto, `eslint-disable max-lines` justificado).
+
+Archivos: `environment.{ts,development.ts,capacitor.ts}` (+1 flag c/u), `intranet.routes.ts`
+(+ruta condicional), `pages/cross-role/test-tools/` (shell nuevo), `intranet-layout/components/test-tools-nav-link/`
+(componente nuevo) + 2 líneas en `intranet-layout.component.{ts,html}`.
+
+Validación: lint ✅ · build prod ✅ · 2533 tests unit + 10 del layout ✅ · confirmado que
+`herramientas-prueba` no aparece en `main-*.js` de producción (mismo comportamiento que
+`campusNavigation`, también `false` en prod — el chunk lazy queda huérfano en `dist/`, no
+referenciado, no es una regresión).
 
 ## COMMIT MESSAGE sugerido
 

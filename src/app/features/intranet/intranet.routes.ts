@@ -204,6 +204,19 @@ const experimentalRoutes: Route[] = [
 				},
 			]
 		: []),
+	// P107 F1: entorno de desarrollo orientado a pruebas. Gateado solo por environment.debug
+	// (swap build-time vía fileReplacements) — NO isDevMode(), roto en Angular 22 + esbuild
+	// (ver reference/debug.md).
+	...(environment.debug.testTools
+		? [
+				{
+					path: 'herramientas-prueba',
+					loadComponent: () =>
+						import('./pages/cross-role/test-tools').then((m) => m.TestToolsComponent),
+					title: 'Intranet - Herramientas de prueba',
+				},
+			]
+		: []),
 	...(environment.features.runtimeHealth
 		? [
 				{

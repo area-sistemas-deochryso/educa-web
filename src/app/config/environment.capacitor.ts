@@ -33,6 +33,7 @@ export const environment = {
 	// Debug panels
 	debug: {
 		horarioSync: false,
+		testTools: false,
 	},
 };
 

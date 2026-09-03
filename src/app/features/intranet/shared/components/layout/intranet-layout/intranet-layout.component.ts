@@ -1,3 +1,6 @@
+/* eslint-disable max-lines -- Razón: shell único de la intranet, ya al límite antes de P107 F1;
+   agregar la referencia a app-test-tools-nav-link (import + entrada en `imports:`) cruza el
+   límite por 1 línea. Partir este componente es un refactor propio, fuera de alcance de P107 F1. */
 // #region Imports
 import { ChangeDetectionStrategy, Component, HostListener, inject, OnInit, OnDestroy, AfterViewInit, DestroyRef, signal, effect, computed, viewChild, viewChildren, ElementRef, afterRenderEffect } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -25,6 +28,7 @@ import { findMenuItemDefByUrl, resolveMenuItemLabel } from '@intranet-shared/con
 import { ModuloId, MODULOS } from '@shared/constants';
 import { FeatureFlagsFacade } from '@core/services/feature-flags';
 import { QuickAccessFavoritesService, ForoUnreadService } from '@intranet-shared/services';
+import { TestToolsNavLinkComponent } from './components/test-tools-nav-link';
 import { AccessDeniedModalComponent } from '@intranet-shared/components/access-denied-modal';
 import { WalMigrationBannerComponent } from '@intranet-shared/components/wal-migration-banner';
 import { WalDegradedBannerComponent } from '@intranet-shared/components/wal-degraded-banner';
@@ -92,6 +96,7 @@ const NAV_GAP = 4;
 		SaludSedeBannerComponent,
 		ConnectionStatusIndicatorComponent,
 		ViewAsBannerComponent,
+		TestToolsNavLinkComponent,
 	],
 	templateUrl: './intranet-layout.component.html',
 	styleUrl: './intranet-layout.component.scss',

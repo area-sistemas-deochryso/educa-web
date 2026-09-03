@@ -1,0 +1,18 @@
+:host {
+	display: contents;
+}
+
+.dev-test-tools-link {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 2rem;
+	height: 2rem;
+	margin-left: 0.5rem;
+	flex-shrink: 0;
+	color: var(--text-color-secondary);
+
+	&:hover {
+		color: var(--text-color);
+	}
+}
