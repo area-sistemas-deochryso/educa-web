@@ -5,11 +5,18 @@
 	subtitle="Solo disponible en desarrollo"
 />
 
-<div class="test-tools-placeholder">
-	<p>
-		Todavía no hay acciones disponibles acá. Esta sección va a alojar el trigger de
-		simulación CrossChex + correo y las herramientas de creación/borrado masivo de datos
-		de prueba.
+<section class="test-tools-section">
+	<h2>Simulación de asistencia CrossChex</h2>
+	<p class="test-tools-section__hint">
+		Dispara una marcación simulada (sin CrossChex real) para una persona de prueba y
+		verificá el correo de confirmación en la bandeja de correos.
 	</p>
-</div>
+	<app-crosschex-trigger-form />
+	<edu-button
+		label="Ver bandeja de correos"
+		icon="pi pi-envelope"
+		[text]="true"
+		(click)="onGoToEmailOutbox()"
+	/>
+</section>
 <!-- #endregion -->

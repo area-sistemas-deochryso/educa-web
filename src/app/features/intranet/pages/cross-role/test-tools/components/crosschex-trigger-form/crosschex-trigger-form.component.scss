@@ -1,0 +1,35 @@
+// #region Form
+.form-field {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	margin-bottom: 1rem;
+	max-width: 24rem;
+
+	label {
+		font-weight: 600;
+		font-size: 0.875rem;
+	}
+}
+// #endregion
+
+// #region Suggestions
+.crosschex-trigger-form__suggestion {
+	display: flex;
+	flex-direction: column;
+
+	&-name {
+		font-weight: 600;
+	}
+
+	&-detail {
+		font-size: 0.8rem;
+		color: var(--text-color-secondary);
+	}
+}
+
+.crosschex-trigger-form__empty {
+	padding: 0.5rem;
+	color: var(--text-color-secondary);
+}
+// #endregion

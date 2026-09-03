@@ -1,6 +1,14 @@
-// #region Placeholder
-.test-tools-placeholder {
+// #region Sections
+.test-tools-section {
 	padding: 1.5rem;
-	color: var(--text-color-secondary);
+
+	h2 {
+		margin: 0 0 0.5rem;
+	}
+
+	&__hint {
+		color: var(--text-color-secondary);
+		margin-bottom: 1.5rem;
+	}
 }
 // #endregion

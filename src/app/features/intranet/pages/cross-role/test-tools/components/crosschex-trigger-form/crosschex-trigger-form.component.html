@@ -1,0 +1,54 @@
+<!-- #region Template -->
+<div class="form-field">
+	<label for="crosschexTriggerPersona">Persona a marcar</label>
+	<edu-autocomplete
+		id="crosschexTriggerPersona"
+		[suggestions]="personaSuggestions()"
+		[ngModel]="selectedPersona()"
+		(completeMethod)="onSearchPersona($event)"
+		(onSelect)="onSelectPersona($event.value)"
+		optionLabel="nombreCompleto"
+		placeholder="Buscar por nombre o DNI..."
+		[minLength]="2"
+		[dropdown]="true"
+		appendTo="body"
+		[style]="{ width: '100%' }"
+		[inputStyle]="{ width: '100%' }"
+	>
+		<ng-template let-persona pTemplate="item">
+			<div class="crosschex-trigger-form__suggestion">
+				<span class="crosschex-trigger-form__suggestion-name">{{ persona.nombreCompleto }}</span>
+				<span class="crosschex-trigger-form__suggestion-detail">{{ persona.rol }} &middot; {{ persona.dni }}</span>
+			</div>
+		</ng-template>
+		<ng-template pTemplate="empty">
+			<div class="crosschex-trigger-form__empty">
+				{{ searchingPersona() ? 'Buscando...' : 'Sin resultados' }}
+			</div>
+		</ng-template>
+	</edu-autocomplete>
+</div>
+
+<div class="form-field">
+	<label for="crosschexTriggerSede">Sede simulada</label>
+	<edu-select
+		id="crosschexTriggerSede"
+		[options]="sedes()"
+		[ngModel]="selectedSedeId()"
+		(ngModelChange)="selectedSedeId.set($event)"
+		optionLabel="nombre"
+		optionValue="id"
+		placeholder="Seleccionar sede"
+		appendTo="body"
+		[style]="{ width: '100%' }"
+	/>
+</div>
+
+<edu-button
+	label="Simular marcación"
+	icon="pi pi-bolt"
+	[loading]="triggering()"
+	[disabled]="!isFormValid()"
+	(click)="onTrigger()"
+/>
+<!-- #endregion -->
