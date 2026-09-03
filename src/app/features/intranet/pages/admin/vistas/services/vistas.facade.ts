@@ -80,19 +80,26 @@ export class VistasFacade extends BaseCrudFacade<CapabilityCatalogItem, { codigo
 	// #region CRUD commands
 	saveCapability(): void {
 		const formData = this.store.formData();
+		const ruta = this.normalizeRuta(formData.ruta);
 
 		if (this.store.isEditing()) {
 			const cap = this.store.selectedItem();
 			if (!cap) return;
-			const payload = { nombre: formData.nombre, modulo: formData.modulo, descripcion: formData.descripcion, ruta: formData.ruta || undefined };
-			this.walUpdate(cap.id, payload, { ...formData },
+			const payload = { nombre: formData.nombre, modulo: formData.modulo, descripcion: formData.descripcion, ruta };
+			this.walUpdate(cap.id, payload, { ...formData, ruta: ruta ?? '' },
 				() => this.api.updateCapability(cap.id, payload),
 				`catalog/${cap.id}`,
 			);
 		} else {
-			const payload = { codigo: formData.codigo, nombre: formData.nombre, modulo: formData.modulo, descripcion: formData.descripcion, ruta: formData.ruta || undefined };
+			const payload = { codigo: formData.codigo, nombre: formData.nombre, modulo: formData.modulo, descripcion: formData.descripcion, ruta };
 			this.walCreate(payload, () => this.api.createCapability(payload), 'catalog');
 		}
+	}
+
+	private normalizeRuta(ruta: string): string | undefined {
+		const trimmed = ruta.trim();
+		if (!trimmed) return undefined;
+		return trimmed.startsWith('/') ? trimmed.substring(1) : trimmed;
 	}
 
 	delete(cap: CapabilityCatalogItem): void {

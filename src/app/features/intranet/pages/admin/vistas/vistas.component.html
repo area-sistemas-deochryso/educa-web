@@ -275,6 +275,20 @@
 					data-info-anchor="admin-vistas-dialog-descripcion-input"
 				/>
 			</div>
+
+			<div class="field">
+				<label for="ruta">Ruta</label>
+				<input
+					id="ruta"
+					type="text"
+					eduInputText
+					[ngModel]="vm().formData.ruta"
+					(ngModelChange)="updateFormField('ruta', $event)"
+					placeholder="intranet/herramientas-prueba"
+					data-info-anchor="admin-vistas-dialog-ruta-input"
+				/>
+				<small class="field-hint">Opcional — sin "/" inicial. Debe coincidir exacto con la URL que gatea (case-insensitive).</small>
+			</div>
 		</div>
 	</div>
 

@@ -75,7 +75,7 @@ export class VistasComponent implements OnInit {
 		});
 	}
 
-	updateFormField(field: 'codigo' | 'nombre' | 'modulo' | 'descripcion', value: string): void {
+	updateFormField(field: 'codigo' | 'nombre' | 'modulo' | 'descripcion' | 'ruta', value: string): void {
 		this.facade.updateFormField(field, value);
 	}
 
