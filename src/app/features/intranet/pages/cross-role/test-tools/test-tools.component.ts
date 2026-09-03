@@ -6,13 +6,21 @@ import { PageHeaderComponent } from '@intranet-shared/components';
 import { EduButton } from '@edu-ui';
 
 import { CrosschexTriggerFormComponent } from './components/crosschex-trigger-form/crosschex-trigger-form.component';
+import { SalonesBulkCreateComponent } from './components/salones-bulk-create/salones-bulk-create.component';
+import { CursosBulkCreateComponent } from './components/cursos-bulk-create/cursos-bulk-create.component';
 
 // #endregion
 // #region Component
 @Component({
 	selector: 'app-test-tools',
 	standalone: true,
-	imports: [PageHeaderComponent, CrosschexTriggerFormComponent, EduButton],
+	imports: [
+		PageHeaderComponent,
+		CrosschexTriggerFormComponent,
+		SalonesBulkCreateComponent,
+		CursosBulkCreateComponent,
+		EduButton,
+	],
 	templateUrl: './test-tools.component.html',
 	styleUrl: './test-tools.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

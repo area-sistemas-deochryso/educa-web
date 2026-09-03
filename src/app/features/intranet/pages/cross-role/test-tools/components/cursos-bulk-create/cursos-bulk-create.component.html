@@ -1,0 +1,27 @@
+<!-- #region Panel Cursos -->
+<div class="cursos-bulk-create">
+	<app-bulk-generate-form
+		entityLabel="cursos"
+		[generating]="generating()"
+		[result]="generateResult()"
+		(generar)="onGenerar($event)"
+	/>
+
+	<edu-button
+		type="button"
+		icon="pi pi-upload"
+		label="Importar archivo"
+		[outlined]="true"
+		data-info-anchor="test-tools-cursos-importar-archivo-btn"
+		(click)="onAbrirImportDialog()"
+	/>
+</div>
+
+<app-cursos-import-dialog
+	[visible]="importDialogVisible()"
+	[loading]="importing()"
+	[result]="importResult()"
+	(visibleChange)="importDialogVisible.set($event)"
+	(importar)="onImportar($event)"
+/>
+<!-- #endregion -->

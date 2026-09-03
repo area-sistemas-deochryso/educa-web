@@ -1,0 +1,237 @@
+		<!-- #region Dialog -->
+		<edu-dialog
+			[visible]="visible()"
+			(visibleChange)="onDialogHide()"
+			[modal]="true"
+			[draggable]="false"
+			[resizable]="false"
+			[style]="{ width: '700px', maxWidth: '95vw' }"
+			styleClass="import-dialog"
+		>
+			<ng-template #header>
+				<span class="dialog-title">
+					<i class="pi pi-upload"></i>
+					Importar Salones
+				</span>
+			</ng-template>
+
+			<!-- #region Paso 1: Upload -->
+			@if (step() === 'upload') {
+				<div class="step-upload">
+					<p class="step-description">
+						Sube un archivo Excel (.xlsx) o CSV con los salones a crear.
+					</p>
+
+					<div class="upload-area">
+						<input
+							#fileInput
+							type="file"
+							accept=".xlsx,.csv"
+							class="file-input-hidden"
+							(change)="onSelectFile($event)"
+						/>
+						<edu-button
+							type="button"
+							icon="pi pi-file-excel"
+							label="Seleccionar archivo"
+							[outlined]="true"
+							data-info-anchor="test-tools-salones-import-seleccionar-archivo-btn"
+							(click)="fileInput.click()"
+						/>
+						@if (fileName()) {
+							<span class="file-name">
+								<i class="pi pi-check-circle text-green-500"></i>
+								{{ fileName() }}
+							</span>
+						}
+					</div>
+
+					@if (parseError()) {
+						<div class="parse-error">
+							<i class="pi pi-exclamation-triangle"></i>
+							{{ parseError() }}
+						</div>
+					}
+
+					<div class="column-hint">
+						<p class="hint-title">Columnas esperadas (IDs numéricos crudos de los catálogos existentes):</p>
+						<div class="hint-grid">
+							<span><strong>GradoId</strong> - ID del grado</span>
+							<span><strong>SeccionId</strong> - ID de la sección</span>
+							<span><strong>SedeId</strong> - ID de la sede</span>
+							<span><strong>Anio</strong> - Año escolar</span>
+						</div>
+					</div>
+				</div>
+			}
+			<!-- #endregion -->
+
+			<!-- #region Paso 2: Preview -->
+			@if (step() === 'preview') {
+				<div class="step-preview">
+					<div class="preview-summary">
+						<span class="summary-count">
+							<strong>{{ totalFilas() }}</strong> salones encontrados
+							@if (invalidCount() > 0) {
+								&mdash;
+								<edu-tag [value]="invalidCount() + ' con errores'" severity="danger" />
+							}
+						</span>
+						<edu-button
+							type="button"
+							icon="pi pi-arrow-left"
+							label="Cambiar archivo"
+							[text]="true"
+							size="small"
+							data-info-anchor="test-tools-salones-import-cambiar-archivo-btn"
+							(click)="onNuevoArchivo()"
+							[pt]="{ root: { 'aria-label': 'Cambiar archivo' } }"
+						/>
+					</div>
+
+					<edu-table
+						[value]="filas()"
+						[dataKey]="'fila'"
+						[scrollable]="true"
+						scrollHeight="340px"
+						styleClass="p-datatable-sm"
+					>
+						<ng-template pTemplate="header">
+							<tr>
+								<th style="width: 60px">Fila</th>
+								<th style="width: 100px">Grado ID</th>
+								<th style="width: 100px">Seccion ID</th>
+								<th style="width: 90px">Sede ID</th>
+								<th style="width: 90px">Anio</th>
+								<th>Estado</th>
+							</tr>
+						</ng-template>
+						<ng-template pTemplate="body" let-fila>
+							<tr [class.row-invalid]="!fila.valido">
+								<td>{{ fila.fila }}</td>
+								<td>{{ fila.gradoId ?? '—' }}</td>
+								<td>{{ fila.seccionId ?? '—' }}</td>
+								<td>{{ fila.sedeId ?? '—' }}</td>
+								<td>{{ fila.anio ?? '—' }}</td>
+								<td>
+									@if (fila.valido) {
+										<edu-tag value="OK" severity="success" />
+									} @else {
+										<edu-tag [value]="fila.error!" severity="danger" />
+									}
+								</td>
+							</tr>
+						</ng-template>
+					</edu-table>
+				</div>
+			}
+			<!-- #endregion -->
+
+			<!-- #region Paso 3: Result -->
+			@if (step() === 'result') {
+				<div class="step-result">
+					@if (loading()) {
+						<div class="loading-state">
+							<edu-spinner
+								strokeWidth="4"
+								animationDuration=".8s"
+								[style]="{ width: '48px', height: '48px' }"
+							/>
+							<p>Creando salones...</p>
+						</div>
+					} @else if (result()) {
+						<div class="result-summary">
+							<div class="result-stat">
+								<i class="pi pi-plus-circle text-green-500"></i>
+								<span class="result-number">{{ result()!.creados }}</span>
+								<span class="result-label">creados</span>
+							</div>
+							<div class="result-stat">
+								<i class="pi pi-exclamation-triangle text-orange-500"></i>
+								<span class="result-number">{{ result()!.rechazados }}</span>
+								<span class="result-label">rechazados</span>
+							</div>
+						</div>
+
+						@if (result()!.errores.length > 0) {
+							<edu-table
+								[value]="result()!.errores"
+								[dataKey]="'fila'"
+								styleClass="p-datatable-sm error-table"
+								[scrollable]="true"
+								scrollHeight="220px"
+							>
+								<ng-template pTemplate="caption">
+									<span class="error-table-title">
+										<i class="pi pi-exclamation-circle"></i> Errores de creación
+									</span>
+								</ng-template>
+								<ng-template pTemplate="header">
+									<tr>
+										<th style="width: 60px">Fila</th>
+										<th>Detalle</th>
+										<th>Razón</th>
+									</tr>
+								</ng-template>
+								<ng-template pTemplate="body" let-err>
+									<tr>
+										<td>{{ err.fila }}</td>
+										<td>{{ err.detalle }}</td>
+										<td class="error-reason">{{ err.razon }}</td>
+									</tr>
+								</ng-template>
+							</edu-table>
+						}
+					}
+				</div>
+			}
+			<!-- #endregion -->
+
+			<ng-template #footer>
+				@if (step() === 'upload') {
+					<edu-button
+						type="button"
+						label="Cancelar"
+						[text]="true"
+						data-info-anchor="test-tools-salones-import-cancelar-btn"
+						(click)="onClose()"
+					/>
+				}
+				@if (step() === 'preview') {
+					<edu-button
+						type="button"
+						label="Cancelar"
+						[text]="true"
+						data-info-anchor="test-tools-salones-import-cancelar-btn"
+						(click)="onClose()"
+					/>
+					<edu-button
+						type="button"
+						icon="pi pi-upload"
+						[label]="'Importar ' + validCount() + ' salones'"
+						[disabled]="!canImport()"
+						data-info-anchor="test-tools-salones-import-confirmar-btn"
+						(click)="onImportar()"
+					/>
+				}
+				@if (step() === 'result') {
+					@if (!loading()) {
+						<edu-button
+							type="button"
+							icon="pi pi-refresh"
+							label="Importar otro archivo"
+							[outlined]="true"
+							data-info-anchor="test-tools-salones-import-cambiar-archivo-btn"
+							(click)="onNuevoArchivo()"
+						/>
+						<edu-button
+							type="button"
+							label="Cerrar"
+							data-info-anchor="test-tools-salones-import-cerrar-btn"
+							(click)="onClose()"
+						/>
+					}
+				}
+			</ng-template>
+		</edu-dialog>
+		<!-- #endregion -->

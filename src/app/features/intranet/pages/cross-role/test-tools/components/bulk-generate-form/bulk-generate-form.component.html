@@ -1,0 +1,42 @@
+<!-- #region Generación sintética -->
+<div class="bulk-generate-form">
+	<label class="bulk-generate-form__label">
+		Cantidad de {{ entityLabel() }}
+	</label>
+	<div class="bulk-generate-form__controls">
+		<edu-input-number
+			[ngModel]="cantidad()"
+			(ngModelChange)="cantidad.set($event)"
+			[min]="1"
+			[max]="100"
+			[showButtons]="true"
+		/>
+		<edu-button
+			type="button"
+			icon="pi pi-bolt"
+			[label]="'Generar ' + entityLabel()"
+			[loading]="generating()"
+			[disabled]="generating()"
+			(click)="onGenerar()"
+		/>
+	</div>
+
+	@if (result()) {
+		<div class="bulk-generate-form__result">
+			<div class="bulk-generate-form__result-tags">
+				<edu-tag [value]="result()!.creados + ' creados'" severity="success" />
+				@if (result()!.rechazados > 0) {
+					<edu-tag [value]="result()!.rechazados + ' rechazados'" severity="danger" />
+				}
+			</div>
+			@if (result()!.errores.length > 0) {
+				<ul class="bulk-generate-form__result-errors">
+					@for (error of result()!.errores; track error.detalle + error.razon) {
+						<li>{{ error.razon }}</li>
+					}
+				</ul>
+			}
+		</div>
+	}
+</div>
+<!-- #endregion -->
