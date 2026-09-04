@@ -7,7 +7,7 @@ import { catchError, tap } from 'rxjs/operators';
 import { ErrorHandlerService } from '@core/services/error';
 
 import { BulkTestDataApiService } from './bulk-test-data-api.service';
-import { CreacionMasivaResponseDto, CrearCursoDto, CrearSalonDto } from '../models';
+import { CreacionMasivaResponseDto, CrearCursoDto, CrearSalonDto, CrearUsuarioDto } from '../models';
 
 // #endregion
 // #region Implementation
@@ -30,6 +30,14 @@ export class BulkTestDataFacade {
 
 	loteCursos(cursos: CrearCursoDto[]): Observable<CreacionMasivaResponseDto> {
 		return this.api.loteCursos(cursos).pipe(this.resultPipe('cursos'));
+	}
+
+	generarUsuarios(rol: string, cantidad: number): Observable<CreacionMasivaResponseDto> {
+		return this.api.generarUsuarios(rol, cantidad).pipe(this.resultPipe('usuarios'));
+	}
+
+	loteUsuarios(usuarios: CrearUsuarioDto[]): Observable<CreacionMasivaResponseDto> {
+		return this.api.loteUsuarios(usuarios).pipe(this.resultPipe('usuarios'));
 	}
 
 	private resultPipe(entidadLabel: string): OperatorFunction<CreacionMasivaResponseDto, CreacionMasivaResponseDto> {

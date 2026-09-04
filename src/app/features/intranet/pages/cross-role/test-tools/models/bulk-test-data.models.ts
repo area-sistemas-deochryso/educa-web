@@ -26,3 +26,14 @@ export interface CrearCursoDto {
 	nombre: string;
 	gradosIds: number[];
 }
+
+export interface CrearUsuarioDto {
+	dni: string;
+	nombres: string;
+	apellidos: string;
+	contrasena: string;
+	rol: string;
+	sedeId?: number;
+	telefono?: string;
+	correo?: string;
+}

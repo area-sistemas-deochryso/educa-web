@@ -39,12 +39,12 @@ Completar F3 (creación masiva) agregando Usuarios de cualquier rol a la UI de "
 
 ## CRITERIOS DE CIERRE
 
-- [ ] UI de generación sintética funcional para Usuarios (rol + cantidad).
-- [ ] UI de import de archivo funcional.
-- [ ] Verificado en vivo contra `TestConnection` real.
-- [ ] `educa-coord/plans/xrepo-107-entorno-dev-datos-prueba.md` actualizado (F3 FE Usuarios marcado, **F3 queda 100% completo**).
-- [ ] `educa-web/.claude/plan/maestro.md` actualizado (fila `xP107`).
-- [ ] Brief movido `open/` → `closed/`.
+- [x] UI de generación sintética funcional para Usuarios (rol + cantidad).
+- [x] UI de import de archivo funcional.
+- [x] Verificado en vivo contra `TestConnection` real.
+- [x] `educa-coord/plans/xrepo-107-entorno-dev-datos-prueba.md` actualizado (F3 FE Usuarios marcado, **F3 queda 100% completo**).
+- [x] `educa-web/.claude/plan/maestro.md` actualizado (fila `xP107`).
+- [x] Brief movido `open/` → `closed/`.
 
 ## COMMIT MESSAGE sugerido
 

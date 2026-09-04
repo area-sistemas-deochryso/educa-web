@@ -8,6 +8,7 @@ import { EduButton } from '@edu-ui';
 import { CrosschexTriggerFormComponent } from './components/crosschex-trigger-form/crosschex-trigger-form.component';
 import { SalonesBulkCreateComponent } from './components/salones-bulk-create/salones-bulk-create.component';
 import { CursosBulkCreateComponent } from './components/cursos-bulk-create/cursos-bulk-create.component';
+import { UsuariosBulkCreateComponent } from './components/usuarios-bulk-create/usuarios-bulk-create.component';
 
 // #endregion
 // #region Component
@@ -19,6 +20,7 @@ import { CursosBulkCreateComponent } from './components/cursos-bulk-create/curso
 		CrosschexTriggerFormComponent,
 		SalonesBulkCreateComponent,
 		CursosBulkCreateComponent,
+		UsuariosBulkCreateComponent,
 		EduButton,
 	],
 	templateUrl: './test-tools.component.html',

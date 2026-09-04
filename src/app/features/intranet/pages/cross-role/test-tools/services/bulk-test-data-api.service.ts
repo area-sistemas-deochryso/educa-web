@@ -4,14 +4,14 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { environment } from '@config/environment';
-import { CreacionMasivaResponseDto, CrearCursoDto, CrearSalonDto } from '../models';
+import { CreacionMasivaResponseDto, CrearCursoDto, CrearSalonDto, CrearUsuarioDto } from '../models';
 
 // #endregion
 // #region Implementation
 
 /**
- * Los 4 endpoints de creación masiva de prueba (P107 F3, BusinessTestMode) — 622 (BE)
- * ya los shippeó para Salones y Cursos. Usuarios se suma acá cuando 625 cierre.
+ * Los 6 endpoints de creación masiva de prueba (P107 F3, BusinessTestMode) — 622 (BE)
+ * los shippeó para Salones y Cursos, 625 (BE) sumó Usuarios (cualquier rol).
  */
 @Injectable({ providedIn: 'root' })
 export class BulkTestDataApiService {
@@ -43,6 +43,20 @@ export class BulkTestDataApiService {
 		return this.http.post<CreacionMasivaResponseDto>(
 			`${this.baseUrl}/api/sistema/cursos/prueba/lote`,
 			{ cursos },
+		);
+	}
+
+	generarUsuarios(rol: string, cantidad: number): Observable<CreacionMasivaResponseDto> {
+		return this.http.post<CreacionMasivaResponseDto>(
+			`${this.baseUrl}/api/sistema/usuarios/prueba/generar`,
+			{ rol, cantidad },
+		);
+	}
+
+	loteUsuarios(usuarios: CrearUsuarioDto[]): Observable<CreacionMasivaResponseDto> {
+		return this.http.post<CreacionMasivaResponseDto>(
+			`${this.baseUrl}/api/sistema/usuarios/prueba/lote`,
+			{ usuarios },
 		);
 	}
 }

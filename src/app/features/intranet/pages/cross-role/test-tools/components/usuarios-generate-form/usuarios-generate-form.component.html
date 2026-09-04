@@ -1,0 +1,53 @@
+<!-- #region Generación sintética -->
+<div class="usuarios-generate-form">
+	<label class="usuarios-generate-form__label">
+		Rol y cantidad de usuarios
+	</label>
+	<div class="usuarios-generate-form__controls">
+		<edu-select
+			appendTo="body"
+			[options]="rolesSelectOptions()"
+			[optionLabel]="'label'"
+			[optionValue]="'value'"
+			[ngModel]="rol()"
+			(ngModelChange)="rol.set($event)"
+			placeholder="Seleccione el rol"
+			data-info-anchor="test-tools-usuarios-generar-rol-select"
+		/>
+		<edu-input-number
+			[ngModel]="cantidad()"
+			(ngModelChange)="cantidad.set($event)"
+			[min]="1"
+			[max]="100"
+			[showButtons]="true"
+		/>
+		<edu-button
+			type="button"
+			icon="pi pi-bolt"
+			label="Generar usuarios"
+			[loading]="generating()"
+			[disabled]="generating() || !canGenerar()"
+			data-info-anchor="test-tools-usuarios-generar-btn"
+			(click)="onGenerar()"
+		/>
+	</div>
+
+	@if (result()) {
+		<div class="usuarios-generate-form__result">
+			<div class="usuarios-generate-form__result-tags">
+				<edu-tag [value]="result()!.creados + ' creados'" severity="success" />
+				@if (result()!.rechazados > 0) {
+					<edu-tag [value]="result()!.rechazados + ' rechazados'" severity="danger" />
+				}
+			</div>
+			@if (result()!.errores.length > 0) {
+				<ul class="usuarios-generate-form__result-errors">
+					@for (error of result()!.errores; track error.detalle + error.razon) {
+						<li>{{ error.razon }}</li>
+					}
+				</ul>
+			}
+		</div>
+	}
+</div>
+<!-- #endregion -->

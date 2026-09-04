@@ -1,0 +1,23 @@
+<!-- #region Template -->
+<app-usuarios-generate-form
+	[generating]="generating()"
+	[result]="generateResult()"
+	(generar)="onGenerar($event)"
+/>
+
+<edu-button
+	type="button"
+	label="Importar archivo"
+	icon="pi pi-upload"
+	[outlined]="true"
+	(click)="onAbrirImportDialog()"
+/>
+
+<app-usuarios-import-dialog
+	[visible]="importDialogVisible()"
+	[loading]="importing()"
+	[result]="importResult()"
+	(visibleChange)="onImportDialogVisibleChange($event)"
+	(importar)="onImportar($event)"
+/>
+<!-- #endregion -->
