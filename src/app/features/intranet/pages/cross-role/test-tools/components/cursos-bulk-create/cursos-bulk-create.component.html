@@ -15,6 +15,13 @@
 		data-info-anchor="test-tools-cursos-importar-archivo-btn"
 		(click)="onAbrirImportDialog()"
 	/>
+
+	<app-bulk-delete-action
+		entityLabel="cursos"
+		[deleting]="deleting()"
+		[result]="deleteResult()"
+		(eliminar)="onEliminarPrueba()"
+	/>
 </div>
 
 <app-cursos-import-dialog

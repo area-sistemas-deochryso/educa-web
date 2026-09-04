@@ -37,3 +37,13 @@ export interface CrearUsuarioDto {
 	telefono?: string;
 	correo?: string;
 }
+
+/**
+ * Resultado de borrado masivo de datos de prueba (P107 F4) — mismo shape que
+ * CreacionMasivaResponseDto para errores por fila (acá, id del registro).
+ */
+export interface BorradoMasivoResponseDto {
+	eliminados: number;
+	rechazados: number;
+	errores: CreacionMasivaErrorDto[];
+}

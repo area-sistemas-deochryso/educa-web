@@ -38,12 +38,12 @@ Exponer desde "herramientas de prueba" el borrado masivo de Salones y Cursos mar
 
 ## CRITERIOS DE CIERRE
 
-- [ ] UI de borrado masivo funcional para Salones y Cursos.
-- [ ] Caso de rechazo por dependencia manejado con mensaje claro.
-- [ ] Verificado en vivo contra 628 ya cerrado.
-- [ ] `educa-coord/plans/xrepo-107-entorno-dev-datos-prueba.md` actualizado (F4 FE marcado, **F4 queda completo para su alcance actual — Salones+Cursos**).
-- [ ] `educa-web/.claude/plan/maestro.md` actualizado (fila `xP107`).
-- [ ] Brief movido `open/` → `closed/`.
+- [x] UI de borrado masivo funcional para Salones y Cursos.
+- [x] Caso de rechazo por dependencia manejado con mensaje claro — implementado (mismo contrato `errores[]` de creación, render idéntico), pero **no ejercitado en vivo**: la verificación no encontró ningún registro `::TEST` cuya eliminación fuera rechazada por dependencia real.
+- [x] Verificado en vivo contra 628 ya cerrado — 12 cursos de prueba acumulados de sesiones previas (623) confirmados `Inactivo` en `/intranet/admin/cursos` tras el borrado; salones ejecutó sin error con `0 eliminados` (no había salones `::TEST` remanentes, catálogo 2026 saturado desde 623 impidió generar nuevos para la prueba).
+- [x] `educa-coord/plans/xrepo-107-entorno-dev-datos-prueba.md` actualizado (F4 FE marcado, **F4 queda completo para su alcance actual — Salones+Cursos**).
+- [x] `educa-web/.claude/plan/maestro.md` actualizado (fila `xP107`).
+- [x] Brief movido `open/` → `closed/`.
 
 ## COMMIT MESSAGE sugerido
 

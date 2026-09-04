@@ -7,7 +7,13 @@ import { catchError, tap } from 'rxjs/operators';
 import { ErrorHandlerService } from '@core/services/error';
 
 import { BulkTestDataApiService } from './bulk-test-data-api.service';
-import { CreacionMasivaResponseDto, CrearCursoDto, CrearSalonDto, CrearUsuarioDto } from '../models';
+import {
+	BorradoMasivoResponseDto,
+	CreacionMasivaResponseDto,
+	CrearCursoDto,
+	CrearSalonDto,
+	CrearUsuarioDto,
+} from '../models';
 
 // #endregion
 // #region Implementation
@@ -40,6 +46,14 @@ export class BulkTestDataFacade {
 		return this.api.loteUsuarios(usuarios).pipe(this.resultPipe('usuarios'));
 	}
 
+	eliminarSalonesPrueba(): Observable<BorradoMasivoResponseDto> {
+		return this.api.eliminarSalonesPrueba().pipe(this.deletePipe('salones'));
+	}
+
+	eliminarCursosPrueba(): Observable<BorradoMasivoResponseDto> {
+		return this.api.eliminarCursosPrueba().pipe(this.deletePipe('cursos'));
+	}
+
 	private resultPipe(entidadLabel: string): OperatorFunction<CreacionMasivaResponseDto, CreacionMasivaResponseDto> {
 		return pipe(
 			tap((response: CreacionMasivaResponseDto) => {
@@ -55,6 +69,26 @@ export class BulkTestDataFacade {
 			}),
 			catchError((err: HttpErrorResponse) => {
 				this.errorHandler.handleHttpError(err, { method: 'POST' });
+				return throwError(() => err);
+			}),
+		);
+	}
+
+	private deletePipe(entidadLabel: string): OperatorFunction<BorradoMasivoResponseDto, BorradoMasivoResponseDto> {
+		return pipe(
+			tap((response: BorradoMasivoResponseDto) => {
+				if (response.eliminados > 0) {
+					this.errorHandler.showSuccess('Borrado masivo', `${response.eliminados} ${entidadLabel} eliminados`);
+				}
+				if (response.rechazados > 0) {
+					this.errorHandler.showWarning(
+						'Registros rechazados',
+						`${response.rechazados} ${entidadLabel} de prueba no se pudieron eliminar — revisá el detalle`,
+					);
+				}
+			}),
+			catchError((err: HttpErrorResponse) => {
+				this.errorHandler.handleHttpError(err, { method: 'DELETE' });
 				return throwError(() => err);
 			}),
 		);

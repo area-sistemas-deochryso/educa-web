@@ -5,20 +5,22 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { EduButton } from '@edu-ui';
 
 import { BulkGenerateFormComponent } from '../bulk-generate-form/bulk-generate-form.component';
+import { BulkDeleteActionComponent } from '../bulk-delete-action/bulk-delete-action.component';
 import { SalonesImportDialogComponent } from '../salones-import-dialog/salones-import-dialog.component';
 import { BulkTestDataFacade } from '../../services';
-import { CreacionMasivaResponseDto, CrearSalonDto } from '../../models';
+import { BorradoMasivoResponseDto, CreacionMasivaResponseDto, CrearSalonDto } from '../../models';
 
 // #endregion
 // #region Implementation
 /**
  * Panel de creación masiva de Salones de prueba (P107 F3) — combina generación sintética
- * (BulkGenerateFormComponent) con importación de lote desde archivo (SalonesImportDialogComponent).
+ * (BulkGenerateFormComponent) con importación de lote desde archivo (SalonesImportDialogComponent)
+ * y borrado masivo (BulkDeleteActionComponent, P107 F4).
  */
 @Component({
 	selector: 'app-salones-bulk-create',
 	standalone: true,
-	imports: [BulkGenerateFormComponent, SalonesImportDialogComponent, EduButton],
+	imports: [BulkGenerateFormComponent, SalonesImportDialogComponent, BulkDeleteActionComponent, EduButton],
 	templateUrl: './salones-bulk-create.component.html',
 	styleUrl: './salones-bulk-create.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -33,6 +35,9 @@ export class SalonesBulkCreateComponent {
 	readonly importDialogVisible = signal(false);
 	readonly importing = signal(false);
 	readonly importResult = signal<CreacionMasivaResponseDto | null>(null);
+
+	readonly deleting = signal(false);
+	readonly deleteResult = signal<BorradoMasivoResponseDto | null>(null);
 
 	onGenerar(cantidad: number): void {
 		this.generating.set(true);
@@ -71,6 +76,22 @@ export class SalonesBulkCreateComponent {
 				},
 				error: () => {
 					this.importing.set(false);
+				},
+			});
+	}
+
+	onEliminarPrueba(): void {
+		this.deleting.set(true);
+		this.facade
+			.eliminarSalonesPrueba()
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (result) => {
+					this.deleteResult.set(result);
+					this.deleting.set(false);
+				},
+				error: () => {
+					this.deleting.set(false);
 				},
 			});
 	}

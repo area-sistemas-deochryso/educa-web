@@ -5,20 +5,22 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { EduButton } from '@edu-ui';
 
 import { BulkGenerateFormComponent } from '../bulk-generate-form/bulk-generate-form.component';
+import { BulkDeleteActionComponent } from '../bulk-delete-action/bulk-delete-action.component';
 import { CursosImportDialogComponent } from '../cursos-import-dialog/cursos-import-dialog.component';
 import { BulkTestDataFacade } from '../../services';
-import { CreacionMasivaResponseDto, CrearCursoDto } from '../../models';
+import { BorradoMasivoResponseDto, CreacionMasivaResponseDto, CrearCursoDto } from '../../models';
 
 // #endregion
 // #region Implementation
 /**
  * Panel de creación masiva de Cursos de prueba (P107 F3) — compone el generador
- * sintético reusable y el diálogo de importación por archivo.
+ * sintético reusable, el diálogo de importación por archivo y el borrado masivo
+ * (BulkDeleteActionComponent, P107 F4).
  */
 @Component({
 	selector: 'app-cursos-bulk-create',
 	standalone: true,
-	imports: [BulkGenerateFormComponent, CursosImportDialogComponent, EduButton],
+	imports: [BulkGenerateFormComponent, CursosImportDialogComponent, BulkDeleteActionComponent, EduButton],
 	templateUrl: './cursos-bulk-create.component.html',
 	styleUrl: './cursos-bulk-create.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -33,6 +35,9 @@ export class CursosBulkCreateComponent {
 	readonly importDialogVisible = signal(false);
 	readonly importing = signal(false);
 	readonly importResult = signal<CreacionMasivaResponseDto | null>(null);
+
+	readonly deleting = signal(false);
+	readonly deleteResult = signal<BorradoMasivoResponseDto | null>(null);
 
 	onGenerar(cantidad: number): void {
 		this.generating.set(true);
@@ -67,6 +72,22 @@ export class CursosBulkCreateComponent {
 				},
 				error: () => {
 					this.importing.set(false);
+				},
+			});
+	}
+
+	onEliminarPrueba(): void {
+		this.deleting.set(true);
+		this.facade
+			.eliminarCursosPrueba()
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (result) => {
+					this.deleteResult.set(result);
+					this.deleting.set(false);
+				},
+				error: () => {
+					this.deleting.set(false);
 				},
 			});
 	}

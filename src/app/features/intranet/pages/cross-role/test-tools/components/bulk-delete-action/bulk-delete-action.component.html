@@ -1,0 +1,34 @@
+<!-- #region Template -->
+<div class="bulk-delete-action">
+	<edu-button
+		type="button"
+		icon="pi pi-trash"
+		[label]="'Eliminar ' + entityLabel() + ' de prueba'"
+		severity="danger"
+		[outlined]="true"
+		[loading]="deleting()"
+		[disabled]="deleting()"
+		(click)="onEliminarClick()"
+	/>
+
+	@if (result()) {
+		<div class="bulk-delete-action__result">
+			<div class="bulk-delete-action__result-tags">
+				<edu-tag [value]="result()!.eliminados + ' eliminados'" severity="success" />
+				@if (result()!.rechazados > 0) {
+					<edu-tag [value]="result()!.rechazados + ' rechazados'" severity="danger" />
+				}
+			</div>
+			@if (result()!.errores.length > 0) {
+				<ul class="bulk-delete-action__result-errors">
+					@for (error of result()!.errores; track error.detalle + error.razon) {
+						<li>{{ error.detalle }} — {{ error.razon }}</li>
+					}
+				</ul>
+			}
+		</div>
+	}
+</div>
+
+<edu-confirm-dialog />
+<!-- #endregion -->

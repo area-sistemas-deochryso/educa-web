@@ -21,4 +21,11 @@
 	(visibleChange)="onImportDialogVisibleChange($event)"
 	(importar)="onImportar($event)"
 />
+
+<app-bulk-delete-action
+	entityLabel="salones"
+	[deleting]="deleting()"
+	[result]="deleteResult()"
+	(eliminar)="onEliminarPrueba()"
+/>
 <!-- #endregion -->

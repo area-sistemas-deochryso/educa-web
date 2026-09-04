@@ -1,0 +1,23 @@
+.bulk-delete-action {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+
+	&__result {
+		display: flex;
+		flex-direction: column;
+		gap: 0.375rem;
+	}
+
+	&__result-tags {
+		display: flex;
+		gap: 0.5rem;
+	}
+
+	&__result-errors {
+		margin: 0;
+		padding-left: 1.25rem;
+		color: var(--text-color-secondary);
+		font-size: 0.875rem;
+	}
+}

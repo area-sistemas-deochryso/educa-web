@@ -4,7 +4,13 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { environment } from '@config/environment';
-import { CreacionMasivaResponseDto, CrearCursoDto, CrearSalonDto, CrearUsuarioDto } from '../models';
+import {
+	BorradoMasivoResponseDto,
+	CreacionMasivaResponseDto,
+	CrearCursoDto,
+	CrearSalonDto,
+	CrearUsuarioDto,
+} from '../models';
 
 // #endregion
 // #region Implementation
@@ -58,6 +64,14 @@ export class BulkTestDataApiService {
 			`${this.baseUrl}/api/sistema/usuarios/prueba/lote`,
 			{ usuarios },
 		);
+	}
+
+	eliminarSalonesPrueba(): Observable<BorradoMasivoResponseDto> {
+		return this.http.delete<BorradoMasivoResponseDto>(`${this.baseUrl}/api/sistema/salones/prueba/eliminar`);
+	}
+
+	eliminarCursosPrueba(): Observable<BorradoMasivoResponseDto> {
+		return this.http.delete<BorradoMasivoResponseDto>(`${this.baseUrl}/api/sistema/cursos/prueba/eliminar`);
 	}
 }
 // #endregion
