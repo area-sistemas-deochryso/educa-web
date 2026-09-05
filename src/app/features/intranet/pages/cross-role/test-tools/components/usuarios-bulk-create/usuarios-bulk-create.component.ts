@@ -6,20 +6,21 @@ import { EduButton } from '@edu-ui';
 
 import { UsuariosGenerateFormComponent } from '../usuarios-generate-form/usuarios-generate-form.component';
 import { UsuariosImportDialogComponent } from '../usuarios-import-dialog/usuarios-import-dialog.component';
+import { BulkDeleteActionComponent } from '../bulk-delete-action/bulk-delete-action.component';
 import { BulkTestDataFacade } from '../../services';
-import { CreacionMasivaResponseDto, CrearUsuarioDto } from '../../models';
+import { BorradoMasivoResponseDto, CreacionMasivaResponseDto, CrearUsuarioDto } from '../../models';
 
 // #endregion
 // #region Implementation
 /**
  * Panel de creación masiva de Usuarios de prueba (P107 F3c) — combina generación sintética
  * (UsuariosGenerateFormComponent, con selector de Rol) con importación de lote desde archivo
- * (UsuariosImportDialogComponent, roles mixtos).
+ * (UsuariosImportDialogComponent, roles mixtos) y el borrado masivo (BulkDeleteActionComponent, P107 F4b).
  */
 @Component({
 	selector: 'app-usuarios-bulk-create',
 	standalone: true,
-	imports: [UsuariosGenerateFormComponent, UsuariosImportDialogComponent, EduButton],
+	imports: [UsuariosGenerateFormComponent, UsuariosImportDialogComponent, BulkDeleteActionComponent, EduButton],
 	templateUrl: './usuarios-bulk-create.component.html',
 	styleUrl: './usuarios-bulk-create.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -34,6 +35,9 @@ export class UsuariosBulkCreateComponent {
 	readonly importDialogVisible = signal(false);
 	readonly importing = signal(false);
 	readonly importResult = signal<CreacionMasivaResponseDto | null>(null);
+
+	readonly deleting = signal(false);
+	readonly deleteResult = signal<BorradoMasivoResponseDto | null>(null);
 
 	onGenerar(event: { rol: string; cantidad: number }): void {
 		this.generating.set(true);
@@ -72,6 +76,22 @@ export class UsuariosBulkCreateComponent {
 				},
 				error: () => {
 					this.importing.set(false);
+				},
+			});
+	}
+
+	onEliminarPrueba(): void {
+		this.deleting.set(true);
+		this.facade
+			.eliminarUsuariosPrueba()
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (result) => {
+					this.deleteResult.set(result);
+					this.deleting.set(false);
+				},
+				error: () => {
+					this.deleting.set(false);
 				},
 			});
 	}
