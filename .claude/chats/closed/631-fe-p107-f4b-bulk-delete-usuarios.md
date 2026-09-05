@@ -2,7 +2,7 @@
 
 > **Repos afectados**: `educa-web`
 > **Plan**: `educa-coord/plans/xrepo-107-entorno-dev-datos-prueba.md` (Fase F4, segunda vuelta — Usuarios)
-> **Creado**: 2026-09-04 · **Estado**: 🟢 libre — depende del contrato de 630 (BE) para cerrar, puede arrancar en paralelo.
+> **Creado**: 2026-09-04 · **Estado**: ✅ cerrado 2026-09-05 — 630 (BE) shipped, verificado en vivo.
 > **MODO SUGERIDO**: `/design` → `/execute`
 > **exclusive**: `false`
 > **modules**: `dev-tooling`
@@ -37,11 +37,15 @@ Exponer desde "herramientas de prueba" el borrado masivo de Usuarios marcados co
 
 ## CRITERIOS DE CIERRE
 
-- [ ] UI de borrado masivo funcional para Usuarios.
-- [ ] Verificado en vivo contra 630 ya cerrado, incluyendo un rol Director-family.
-- [ ] `educa-coord/plans/xrepo-107-entorno-dev-datos-prueba.md` actualizado (F4 Usuarios marcado, **F4 y P107 quedan 100% completos**).
-- [ ] `educa-web/.claude/plan/maestro.md` actualizado (fila `xP107`).
-- [ ] Brief movido `open/` → `closed/`.
+- [x] UI de borrado masivo funcional para Usuarios.
+- [x] Verificado en vivo contra 630 ya cerrado, incluyendo un rol Director-family.
+- [x] `educa-coord/plans/xrepo-107-entorno-dev-datos-prueba.md` actualizado (F4 Usuarios marcado, **F4 y P107 quedan 100% completos**).
+- [x] `educa-web/.claude/plan/maestro.md` actualizado (fila `xP107`).
+- [x] Brief movido `open/` → `closed/`.
+
+## RESULTADO
+
+Mismo patrón exacto que 629 (Salones+Cursos): `BulkDeleteActionComponent` instanciado en `UsuariosBulkCreateComponent`, `BulkTestDataApiService`/`BulkTestDataFacade` extendidos con `eliminarUsuariosPrueba()` (DELETE sin body). Lint/build/test unitarios verdes (1 test flaky no relacionado, `eslint-config-guards.spec.ts`, pasa aislado). Verificado en vivo FE+BE local (`BusinessTestMode=true`, `TestConnection`): generado 1 usuario Director de prueba, borrado masivo eliminó exactamente 1 (segunda corrida, limpia); primera corrida eliminó 7 (incluía remanentes de verificaciones previas de 627). **F4 y P107 quedan 100% completos** (Salones+Cursos+Usuarios, creación+borrado, BE+FE).
 
 ## COMMIT MESSAGE sugerido
 

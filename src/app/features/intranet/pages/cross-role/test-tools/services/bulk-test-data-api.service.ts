@@ -73,5 +73,9 @@ export class BulkTestDataApiService {
 	eliminarCursosPrueba(): Observable<BorradoMasivoResponseDto> {
 		return this.http.delete<BorradoMasivoResponseDto>(`${this.baseUrl}/api/sistema/cursos/prueba/eliminar`);
 	}
+
+	eliminarUsuariosPrueba(): Observable<BorradoMasivoResponseDto> {
+		return this.http.delete<BorradoMasivoResponseDto>(`${this.baseUrl}/api/sistema/usuarios/prueba/eliminar`);
+	}
 }
 // #endregion
