@@ -1,5 +1,5 @@
 /* eslint-disable max-lines -- Razón: componente de página cohesivo (CRUD + filtros + dialogs + drawer + import). 307 líneas — 7 sobre el límite por el filtro de completitud (sin profesor/sin estudiantes). */
-import { ChangeDetectionStrategy, Component, OnInit, computed, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, effect, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { CommonModule } from '@angular/common';
@@ -15,6 +15,7 @@ import { PageHeaderComponent, PeriodToggleComponent, KpiStatsComponent, type Kpi
 import { type ImportarHorarioItem } from './helpers/horario-import.config';
 import {
 	type EmptySlotClickEvent,
+	type EstudianteHorarioDto,
 	type HorarioCompletitudFiltro,
 	HorarioResponseDto,
 	type HorarioVistaType,
@@ -32,12 +33,12 @@ import {
 	buildDeleteHorarioMessage,
 	buildToggleHorarioMessage,
 } from '@app/shared/constants';
-import { EduButton, EduConfirmDialog, EduConfirmationService, EduSelect, EduTag, EduTooltip } from '@edu-ui';
+import { EduButton, EduCheckbox, EduConfirmDialog, EduConfirmationService, EduDialog, EduSelect, EduTag, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-schedules',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduButton, EduConfirmDialog, EduSelect, EduTag, EduTooltip, ScheduleDetailDrawerComponent, SchedulesCoursePickerComponent, SchedulesFormDialogComponent, SchedulesImportDialogComponent, SchedulesStatsSkeletonComponent, ScheduleGridLayoutComponent, ScheduleGlobalViewComponent, PageHeaderComponent, PeriodToggleComponent, KpiStatsComponent, DependencyGuidanceComponent],
+	imports: [CommonModule, FormsModule, EduButton, EduCheckbox, EduConfirmDialog, EduDialog, EduSelect, EduTag, EduTooltip, ScheduleDetailDrawerComponent, SchedulesCoursePickerComponent, SchedulesFormDialogComponent, SchedulesImportDialogComponent, SchedulesStatsSkeletonComponent, ScheduleGridLayoutComponent, ScheduleGlobalViewComponent, PageHeaderComponent, PeriodToggleComponent, KpiStatsComponent, DependencyGuidanceComponent],
 	templateUrl: './horarios.component.html',
 	styleUrl: './horarios.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -51,6 +52,8 @@ export class SchedulesComponent implements OnInit {
 	private route = inject(ActivatedRoute);
 
 	readonly vm = this.dataFacade.vm;
+
+	readonly selectedEstudianteIds = signal<number[]>([]);
 
 	// #region Auto-filtro por salonId (brief 436)
 	private pendingSalonId: number | null = null;
@@ -68,6 +71,12 @@ export class SchedulesComponent implements OnInit {
 			this.dataFacade.setVistaActual('salon');
 			this.dataFacade.selectEntity(pendingId);
 			this.pendingSalonId = null;
+		});
+
+		// * Camino optimizado: al cargar la lista de disponibles, arrancar con todos seleccionados.
+		effect(() => {
+			const disponibles = this.vm().estudiantesDisponibles;
+			this.selectedEstudianteIds.set(disponibles.map((e: EstudianteHorarioDto) => e.id));
 		});
 	}
 	// #endregion
@@ -291,24 +300,49 @@ export class SchedulesComponent implements OnInit {
 		});
 	}
 
-	onAsignarTodosEstudiantes(horarioId: number): void {
-		const currentUser = this.vm().currentUser;
-		if (!currentUser) return;
+	onOpenStudentSelection(horarioId: number): void {
+		this.dataFacade.loadEstudiantesDisponibles(horarioId);
+	}
 
-		this.confirmationService.confirm({
-			message: UI_HORARIOS_CONFIRM_MESSAGES.assignAllEstudiantes,
-			header: UI_CONFIRM_HEADERS.assign,
-			icon: 'pi pi-question-circle',
-			acceptLabel: UI_CONFIRM_LABELS.yesAssignAll,
-			rejectLabel: UI_CONFIRM_LABELS.cancel,
-			accept: () => {
-				if (this.vm().loading) return;
-				this.crudFacade.asignarTodosEstudiantes(
-					horarioId,
-					currentUser.dni || currentUser.nombreCompleto,
-				);
-			},
-		});
+	onCloseStudentSelection(): void {
+		this.dataFacade.closeStudentSelection();
+		this.selectedEstudianteIds.set([]);
+	}
+
+	onToggleAllStudents(checked: boolean): void {
+		this.selectedEstudianteIds.set(
+			checked ? this.vm().estudiantesDisponibles.map((e: EstudianteHorarioDto) => e.id) : [],
+		);
+	}
+
+	onToggleStudent(estudianteId: number, checked: boolean): void {
+		if (checked) {
+			this.selectedEstudianteIds.update((ids) => [...ids, estudianteId]);
+		} else {
+			this.selectedEstudianteIds.update((ids) => ids.filter((id) => id !== estudianteId));
+		}
+	}
+
+	onConfirmStudentSelection(): void {
+		const currentUser = this.vm().currentUser;
+		const horarioId = this.vm().studentSelectionHorarioId;
+		const selected = this.selectedEstudianteIds();
+		if (!currentUser || !horarioId || selected.length === 0) return;
+
+		const total = this.vm().estudiantesDisponibles.length;
+		const usuarioReg = currentUser.dni || currentUser.nombreCompleto;
+
+		if (selected.length === total) {
+			this.crudFacade.asignarTodosEstudiantes(horarioId, usuarioReg);
+		} else {
+			this.crudFacade.asignarEstudiantes({
+				horarioId,
+				estudianteIds: selected,
+				usuarioReg,
+			});
+		}
+
+		this.onCloseStudentSelection();
 	}
 
 	onDesasignarProfesor(horarioId: number): void {

@@ -6,6 +6,7 @@ import { environment } from '@config/environment';
 import { type ImportarHorarioItem, type ImportarHorariosResult } from '../helpers/horario-import.config';
 import {
   type DiaSemana,
+  type EstudianteHorarioDto,
   HorarioAsignarEstudiantesDto,
   HorarioAsignarProfesorDto,
   HorarioCreateDto,
@@ -68,6 +69,10 @@ export class SchedulesApiService {
    */
   getProfesoresCandidatos(horarioId: number): Observable<ProfesorListDto[]> {
     return this.http.get<ProfesorListDto[]>(`${this.apiUrl}/${horarioId}/profesores-candidatos`);
+  }
+
+  getEstudiantesDisponibles(horarioId: number): Observable<EstudianteHorarioDto[]> {
+    return this.http.get<EstudianteHorarioDto[]>(`${this.apiUrl}/${horarioId}/estudiantes-disponibles`);
   }
 
   // #endregion

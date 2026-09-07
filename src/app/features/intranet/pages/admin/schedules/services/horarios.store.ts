@@ -7,6 +7,7 @@ import { CursoListaDto } from '../models/curso.interface';
 import { type ImportarHorariosResult } from '../helpers/horario-import.config';
 import { mapProfesToOptions } from '../helpers/horario-mapping.utils';
 import {
+	type EstudianteHorarioDto,
 	type HorarioDetalleResponseDto,
 	type HorarioResponseDto,
 	type HorariosEstadisticas,
@@ -47,6 +48,11 @@ export class SchedulesStore {
 	private readonly _importResult = signal<ImportarHorariosResult | null>(null);
 	// #endregion
 
+	// #region Estado privado - Selección granular de estudiantes
+	private readonly _studentSelectionHorarioId = signal<number | null>(null);
+	private readonly _estudiantesDisponibles = signal<EstudianteHorarioDto[]>([]);
+	// #endregion
+
 	// #region Lecturas públicas - Datos
 	readonly horarios = this._horarios.asReadonly();
 	readonly horarioDetalle = this._horarioDetalle.asReadonly();
@@ -68,6 +74,11 @@ export class SchedulesStore {
 	readonly importDialogVisible = this._importDialogVisible.asReadonly();
 	readonly importLoading = this._importLoading.asReadonly();
 	readonly importResult = this._importResult.asReadonly();
+	// #endregion
+
+	// #region Lecturas públicas - Selección granular de estudiantes
+	readonly studentSelectionHorarioId = this._studentSelectionHorarioId.asReadonly();
+	readonly estudiantesDisponibles = this._estudiantesDisponibles.asReadonly();
 	// #endregion
 
 	// #region Usuario actual
@@ -157,6 +168,8 @@ export class SchedulesStore {
 		importResult: this._importResult(),
 		modoAsignacionDetalle: this.modoAsignacionDetalle(),
 		profesoresParaAsignacionDetalle: this.profesoresParaAsignacionDetalle(),
+		studentSelectionHorarioId: this._studentSelectionHorarioId(),
+		estudiantesDisponibles: this._estudiantesDisponibles(),
 	}));
 
 	readonly formVm = computed(() => ({
@@ -371,6 +384,22 @@ export class SchedulesStore {
 
 	setImportResult(result: ImportarHorariosResult | null): void {
 		this._importResult.set(result);
+	}
+	// #endregion
+
+	// #region Comandos - Selección granular de estudiantes
+	openStudentSelection(horarioId: number): void {
+		this._studentSelectionHorarioId.set(horarioId);
+		this._estudiantesDisponibles.set([]);
+	}
+
+	setEstudiantesDisponibles(estudiantes: EstudianteHorarioDto[]): void {
+		this._estudiantesDisponibles.set(estudiantes);
+	}
+
+	closeStudentSelection(): void {
+		this._studentSelectionHorarioId.set(null);
+		this._estudiantesDisponibles.set([]);
 	}
 	// #endregion
 

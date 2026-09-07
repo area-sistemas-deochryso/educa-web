@@ -221,6 +221,32 @@ export class SchedulesDataFacade {
     this.store.clearProfesoresCurso();
   }
 
+  /**
+   * Abre el diálogo de selección granular de estudiantes y carga los disponibles del salón.
+   */
+  loadEstudiantesDisponibles(horarioId: number): void {
+    this.store.openStudentSelection(horarioId);
+
+    this.api
+      .getEstudiantesDisponibles(horarioId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (estudiantes) => this.store.setEstudiantesDisponibles(estudiantes),
+        error: (err) => {
+          logger.error('Error al cargar estudiantes disponibles:', err);
+          this.errorHandler.showError(
+            UI_SUMMARIES.error,
+            resolveErrorMessage(err, UI_ADMIN_ERROR_DETAILS.loadHorariosData),
+          );
+          this.store.closeStudentSelection();
+        },
+      });
+  }
+
+  closeStudentSelection(): void {
+    this.store.closeStudentSelection();
+  }
+
   // #endregion
   // #region Comandos de filtros
 

@@ -1,5 +1,5 @@
 // #region Imports
-import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import type { ModoAsignacion } from '@data/models';
@@ -45,11 +45,28 @@ export class ScheduleDetailDrawerComponent {
 	selectedProfesorId: number | null = null;
 	readonly showProfesorEdit = signal(false);
 
+	constructor() {
+		effect(() => {
+			const options = this.profesoresOptions();
+			const detalle = this.detalle();
+			if (options.length === 1 && detalle && !detalle.profesorId) {
+				this.selectedProfesorId = options[0].value;
+			}
+		});
+	}
+
 	// #endregion
 	// #region Computed
 	readonly hasEstudiantes = computed(() => {
 		const detalle = this.detalle();
 		return detalle ? detalle.estudiantes.length > 0 : false;
+	});
+
+	/** Único candidato a profesor disponible para un horario todavía sin asignar. */
+	readonly isSingleCandidate = computed(() => {
+		const options = this.profesoresOptions();
+		const detalle = this.detalle();
+		return options.length === 1 && !!detalle && !detalle.profesorId;
 	});
 
 	// #endregion

@@ -248,8 +248,65 @@
 	(delete)="onDelete($event)"
 	(toggleEstado)="onToggleEstado($event.id, $event.estadoActual)"
 	(asignarProfesor)="onAsignarProfesor($event.horarioId, $event.profesorId)"
-	(asignarTodosEstudiantes)="onAsignarTodosEstudiantes($event)"
+	(asignarTodosEstudiantes)="onOpenStudentSelection($event)"
 	(desasignarProfesor)="onDesasignarProfesor($event)"
 	(desasignarEstudiante)="onDesasignarEstudiante($event.horarioId, $event.estudianteId)"
 />
+<!-- #endregion -->
+
+<!-- #region Diálogo de selección granular de estudiantes -->
+<edu-dialog
+	[visible]="!!vm().studentSelectionHorarioId"
+	(visibleChange)="!$event && onCloseStudentSelection()"
+	[modal]="true"
+	[draggable]="false"
+	[resizable]="false"
+	[closable]="true"
+	header="Seleccionar Estudiantes"
+	styleClass="student-selection-dialog"
+	[style]="{ width: '450px' }"
+>
+	@if (vm().estudiantesDisponibles.length > 0) {
+		<div class="student-selection-content">
+			<div class="student-selection-item select-all">
+				<edu-checkbox
+					[binary]="true"
+					[ngModel]="selectedEstudianteIds().length === vm().estudiantesDisponibles.length"
+					(ngModelChange)="onToggleAllStudents($event)"
+					data-info-anchor="admin-schedules-seleccionar-todos-checkbox"
+				/>
+				<span>Seleccionar todos</span>
+			</div>
+
+			@for (estudiante of vm().estudiantesDisponibles; track estudiante.id) {
+				<div class="student-selection-item">
+					<edu-checkbox
+						[binary]="true"
+						[ngModel]="selectedEstudianteIds().includes(estudiante.id)"
+						(ngModelChange)="onToggleStudent(estudiante.id, $event)"
+						data-info-anchor="admin-schedules-seleccionar-estudiante-checkbox"
+					/>
+					<span>{{ estudiante.nombreCompleto }}</span>
+				</div>
+			}
+		</div>
+	} @else {
+		<p class="student-selection-empty">No hay estudiantes disponibles en este salón.</p>
+	}
+
+	<ng-template #footer>
+		<edu-button
+			label="Cancelar"
+			severity="secondary"
+			[text]="true"
+			(click)="onCloseStudentSelection()"
+		/>
+		<edu-button
+			label="Asignar Seleccionados"
+			icon="pi pi-check"
+			[disabled]="selectedEstudianteIds().length === 0"
+			(click)="onConfirmStudentSelection()"
+		/>
+	</ng-template>
+</edu-dialog>
 <!-- #endregion -->

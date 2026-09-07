@@ -151,3 +151,34 @@
 }
 
 // #endregion
+
+// #region Diálogo de selección granular de estudiantes
+.student-selection-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 400px;
+  overflow-y: auto;
+
+  .student-selection-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem;
+    border-radius: 6px;
+
+    &.select-all {
+      border-bottom: 1px solid var(--surface-border);
+      padding-bottom: 0.75rem;
+      margin-bottom: 0.25rem;
+      font-weight: 600;
+    }
+  }
+}
+
+.student-selection-empty {
+  text-align: center;
+  color: var(--text-color-secondary);
+  padding: 1rem;
+}
+// #endregion

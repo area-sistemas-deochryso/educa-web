@@ -247,6 +247,12 @@
 
 						@if (isAdmin()) {
 							<div class="assign-professor-form">
+								@if (isSingleCandidate()) {
+									<div class="single-candidate-hint">
+										<i class="pi pi-info-circle"></i>
+										<span>Único candidato disponible — preseleccionado</span>
+									</div>
+								}
 								<edu-select
 									[options]="profesoresOptions()"
 									[(ngModel)]="selectedProfesorId"
