@@ -163,6 +163,7 @@ export class SchedulesDataFacade {
             if (modo === 'PorCurso') {
               this.loadProfesoresCurso(detalle.cursoId, detalle.anio);
             }
+            this.loadProfesoresCandidatos(id);
           } else {
             this.errorHandler.showError(
               UI_SUMMARIES.error,
@@ -180,6 +181,24 @@ export class SchedulesDataFacade {
           );
           this.store.setDetailLoading(false);
           this.store.closeDetailDrawer();
+        },
+      });
+  }
+
+  /**
+   * Carga los profesores candidatos del horario (ya filtrados server-side por modo
+   * de asignación y por conflicto de horario). No bloquea la apertura del drawer:
+   * se dispara tras resolver el detalle, en paralelo a cualquier otra carga secundaria.
+   */
+  loadProfesoresCandidatos(horarioId: number): void {
+    this.api
+      .getProfesoresCandidatos(horarioId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (profesores) => this.store.setProfesoresCandidatosDetalle(profesores),
+        error: (err) => {
+          logger.error('Error al cargar profesores candidatos:', err);
+          this.store.setProfesoresCandidatosDetalle([]);
         },
       });
   }

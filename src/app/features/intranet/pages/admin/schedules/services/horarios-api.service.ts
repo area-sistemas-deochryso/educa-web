@@ -14,6 +14,7 @@ import {
   HorariosEstadisticas,
   HorarioUpdateDto,
 } from '../models/horario.interface';
+import { type ProfesorListDto } from '../models/profesor.interface';
 
 @Injectable({ providedIn: 'root' })
 export class SchedulesApiService {
@@ -59,6 +60,14 @@ export class SchedulesApiService {
 
   getByDiaSemana(diaSemana: DiaSemana): Observable<HorarioResponseDto[]> {
     return this.http.get<HorarioResponseDto[]>(`${this.apiUrl}/dia/${diaSemana}`);
+  }
+
+  /**
+   * Profesores candidatos para asignar a este horario: ya filtrados server-side
+   * por modo de asignación (INV-AS01/AS02) y por conflicto de horario (INV-C06).
+   */
+  getProfesoresCandidatos(horarioId: number): Observable<ProfesorListDto[]> {
+    return this.http.get<ProfesorListDto[]>(`${this.apiUrl}/${horarioId}/profesores-candidatos`);
   }
 
   // #endregion

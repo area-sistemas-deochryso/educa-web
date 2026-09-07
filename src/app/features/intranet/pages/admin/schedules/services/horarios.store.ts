@@ -5,6 +5,7 @@ import { type ProfesorCursoListaDto } from '@data/models';
 import { isAdminRole } from '@shared/models';
 import { CursoListaDto } from '../models/curso.interface';
 import { type ImportarHorariosResult } from '../helpers/horario-import.config';
+import { mapProfesToOptions } from '../helpers/horario-mapping.utils';
 import {
 	type HorarioDetalleResponseDto,
 	type HorarioResponseDto,
@@ -27,6 +28,8 @@ export class SchedulesStore {
 	private readonly _horarios = signal<HorarioResponseDto[]>([]);
 	private readonly _horarioDetalle = signal<HorarioDetalleResponseDto | null>(null);
 	private readonly _estadisticas = signal<HorariosEstadisticas | null>(null);
+	/** Profesores candidatos del horario en el detail drawer (ya filtrados server-side: modo + conflicto de horario). */
+	private readonly _profesoresCandidatosDetalle = signal<ProfesorListDto[]>([]);
 	// #endregion
 
 	// #region Estado privado - Loading
@@ -96,14 +99,12 @@ export class SchedulesStore {
 
 	/**
 	 * Profesores elegibles para el dropdown de asignación del detail drawer.
-	 * Delega en `SchedulesOptionsStore.profesoresParaSalon` — filtra por el modo de
-	 * asignación real del salón del horario (TutorPleno/PorCurso/Flexible).
+	 * Fuente: candidatos resueltos server-side (modo + conflicto de horario, INV-AS01/AS02 + INV-C06)
+	 * vía `GET /api/horario/{id}/profesores-candidatos`.
 	 */
-	readonly profesoresParaAsignacionDetalle = computed<ProfesorOption[]>(() => {
-		const detalle = this._horarioDetalle();
-		if (!detalle) return this.optionsStore.profesoresOptions();
-		return this.optionsStore.profesoresParaSalon(detalle.salonId);
-	});
+	readonly profesoresParaAsignacionDetalle = computed<ProfesorOption[]>(() =>
+		mapProfesToOptions(this._profesoresCandidatosDetalle()),
+	);
 	// #endregion
 
 	// #region Computed - Estadísticas derivadas
@@ -271,6 +272,10 @@ export class SchedulesStore {
 		this._horarioDetalle.set(detalle);
 	}
 
+	setProfesoresCandidatosDetalle(profesores: ProfesorListDto[]): void {
+		this._profesoresCandidatosDetalle.set(profesores);
+	}
+
 	/** Mutación quirúrgica: quitar profesor del detalle local */
 	clearDetalleProfesor(): void {
 		this._horarioDetalle.update((detalle) => {
@@ -344,6 +349,7 @@ export class SchedulesStore {
 	closeDetailDrawer(): void {
 		this.formStore.closeDetailDrawer();
 		this._horarioDetalle.set(null);
+		this._profesoresCandidatosDetalle.set([]);
 		this.optionsStore.clearProfesoresCurso();
 	}
 	// #endregion
