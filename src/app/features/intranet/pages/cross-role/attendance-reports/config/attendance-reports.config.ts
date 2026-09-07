@@ -1,4 +1,4 @@
-import type { SelectOption, EstadoFiltro, RangoTipo, TipoPersonaReporte } from '../models';
+import type { SelectOption, EstadoFiltro, ModoReporte, RangoTipo, TipoPersonaReporte } from '../models';
 import type { SkeletonColumnDef } from '@intranet-shared/components/table-skeleton/table-skeleton.types';
 
 export const ESTADO_OPTIONS: SelectOption<EstadoFiltro>[] = [
@@ -22,6 +22,11 @@ export const TIPO_PERSONA_OPTIONS: SelectOption<TipoPersonaReporte>[] = [
 	{ label: 'Coordinadores', value: 'C' },
 	{ label: 'Promotores', value: 'M' },
 	{ label: 'Todos', value: 'todos' },
+];
+
+export const MODO_REPORTE_OPTIONS: SelectOption<ModoReporte>[] = [
+	{ label: 'Reporte agrupado', value: 'agrupado' },
+	{ label: 'Reporte por usuario', value: 'usuario' },
 ];
 
 export const TABLE_SKELETON_COLUMNS: SkeletonColumnDef[] = [

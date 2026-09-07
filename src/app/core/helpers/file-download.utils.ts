@@ -23,6 +23,23 @@ export function sanitizeFileNameSegment(label: string): string {
 }
 
 /**
+ * Slugify a label into lowercase, underscore-separated, accent-free segments
+ * for filenames that follow the `word_word_word` convention (as opposed to
+ * {@link sanitizeFileNameSegment}'s PascalCase-concatenated style).
+ *
+ * @example
+ * slugifyFileNameSegment('María José Pérez'); // 'maria_jose_perez'
+ */
+export function slugifyFileNameSegment(label: string): string {
+	return label
+		.normalize('NFD')
+		.replace(/[\u0300-\u036f]/g, '')
+		.toLowerCase()
+		.replace(/[^a-z0-9]+/g, '_')
+		.replace(/^_+|_+$/g, '');
+}
+
+/**
  * Download a Blob as a file and revoke its object URL.
  *
  * @param blob File data to download.

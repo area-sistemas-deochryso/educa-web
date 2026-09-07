@@ -1,4 +1,4 @@
-import type { SalonProfesor } from '@data/models';
+import type { PersonaParaSeleccion, SalonProfesor } from '@data/models';
 
 // #region Tipos semánticos
 export const ESTADO_FILTROS = ['todos', 'faltando', 'viniendo', 'tarde', 'temprano'] as const;
@@ -145,6 +145,26 @@ export function getDefaultFilters(): ReporteFilters {
 		tipoPersona: 'E',
 		sedeId: null,
 	};
+}
+// #endregion
+
+// #region Reporte por usuario individual (Plan xrepo-109 F5/F6)
+/**
+ * Modo del tab de reportes: `agrupado` es el flujo existente (estado/rango/salones/tipoPersona,
+ * con vista previa en tabla); `usuario` es el reporte nuevo — un solo usuario, rango de fechas
+ * libre, entrada+salida diarias, solo descarga (sin vista previa).
+ */
+export const MODOS_REPORTE = ['agrupado', 'usuario'] as const;
+export type ModoReporte = (typeof MODOS_REPORTE)[number];
+
+export interface UsuarioReporteFilters {
+	persona: PersonaParaSeleccion | null;
+	fechaInicio: Date | null;
+	fechaFin: Date | null;
+}
+
+export function getDefaultUsuarioFilters(): UsuarioReporteFilters {
+	return { persona: null, fechaInicio: null, fechaFin: null };
 }
 // #endregion
 

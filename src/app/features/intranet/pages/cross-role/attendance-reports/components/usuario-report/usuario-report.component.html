@@ -1,0 +1,75 @@
+<!-- #region Filtros -->
+<div class="usuario-report">
+	<div class="usuario-report__field">
+		<label for="usuarioReportPersona">Usuario</label>
+		<edu-autocomplete
+			id="usuarioReportPersona"
+			[suggestions]="personaSuggestions()"
+			[ngModel]="selectedPersona()"
+			(completeMethod)="onSearchPersona($event)"
+			(onSelect)="onSelectPersona($event.value)"
+			optionLabel="nombreCompleto"
+			placeholder="Buscar por nombre o DNI..."
+			[minLength]="2"
+			[dropdown]="true"
+			appendTo="body"
+			[style]="{ width: '100%' }"
+			[inputStyle]="{ width: '100%' }"
+		>
+			<ng-template let-persona pTemplate="item">
+				<div class="usuario-report__suggestion">
+					<span class="usuario-report__suggestion-name">{{ persona.nombreCompleto }}</span>
+					<span class="usuario-report__suggestion-detail">{{ persona.contextoPersona }} &middot; {{ persona.dni }}</span>
+				</div>
+			</ng-template>
+			<ng-template pTemplate="empty">
+				<div class="usuario-report__empty">
+					{{ searchingPersona() ? 'Buscando...' : 'Sin resultados' }}
+				</div>
+			</ng-template>
+		</edu-autocomplete>
+	</div>
+
+	<div class="usuario-report__field">
+		<label for="usuarioReportRango">Rango de fechas</label>
+		<edu-datepicker
+			inputId="usuarioReportRango"
+			selectionMode="range"
+			[ngModel]="[fechaInicio(), fechaFin()]"
+			(ngModelChange)="onFechaRangoChange($event)"
+			dateFormat="dd/mm/yy"
+			appendTo="body"
+			[showIcon]="true"
+			placeholder="Fecha inicio - Fecha fin"
+			[style]="{ width: '100%' }"
+		/>
+		@if (rangoError()) {
+			<small class="usuario-report__error">{{ rangoError() }}</small>
+		}
+	</div>
+
+	@if (error()) {
+		<small class="usuario-report__error">{{ error() }}</small>
+	}
+
+	<div class="usuario-report__actions">
+		<edu-button
+			icon="pi pi-file-pdf"
+			label="Descargar PDF"
+			[outlined]="true"
+			severity="danger"
+			(click)="onDescargarPdf()"
+			[loading]="descargandoPdf()"
+			[disabled]="!isValid()"
+		/>
+		<edu-button
+			icon="pi pi-file-excel"
+			label="Descargar Excel"
+			severity="success"
+			(click)="onDescargarExcel()"
+			[loading]="descargandoExcel()"
+			[disabled]="!isValid()"
+		/>
+	</div>
+</div>
+<!-- #endregion -->

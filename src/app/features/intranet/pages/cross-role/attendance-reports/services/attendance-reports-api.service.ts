@@ -3,12 +3,14 @@ import { inject, Injectable } from '@angular/core';
 import { environment } from '@config';
 import type { Observable } from 'rxjs';
 import { formatDateLocalIso } from '@core/helpers';
-import type { ReporteFiltrado, ReporteFilters, TendenciaAsistencia, TendenciaRangoTipo } from '../models';
+import type { PersonaParaSeleccion } from '@data/models';
+import type { ReporteFiltrado, ReporteFilters, TendenciaAsistencia, TendenciaRangoTipo, UsuarioReporteFilters } from '../models';
 
 @Injectable({ providedIn: 'root' })
 export class AttendanceReportsApiService {
 	private readonly http = inject(HttpClient);
 	private readonly apiUrl = `${environment.apiUrl}/api/ReportesAsistencia`;
+	private readonly personasUrl = `${environment.apiUrl}/api/asistencia-admin`;
 
 	// #region Consultas
 	getReporte(filters: ReporteFilters): Observable<ReporteFiltrado> {
@@ -41,6 +43,38 @@ export class AttendanceReportsApiService {
 			params,
 			responseType: 'blob',
 		});
+	}
+	// #endregion
+
+	// #region Reporte por usuario individual (Plan xrepo-109 F5/F6)
+	/** Búsqueda de personas (cualquier rol) para el selector del reporte individual. */
+	buscarPersonas(search: string): Observable<PersonaParaSeleccion[]> {
+		let params = new HttpParams();
+		if (search) params = params.set('search', search);
+		return this.http.get<PersonaParaSeleccion[]>(`${this.personasUrl}/personas`, { params });
+	}
+
+	descargarPdfUsuario(filters: UsuarioReporteFilters): Observable<Blob> {
+		const params = this.buildParamsUsuario(filters);
+		return this.http.get(`${this.apiUrl}/usuario/pdf`, { params, responseType: 'blob' });
+	}
+
+	descargarExcelUsuario(filters: UsuarioReporteFilters): Observable<Blob> {
+		const params = this.buildParamsUsuario(filters);
+		return this.http.get(`${this.apiUrl}/usuario/excel`, { params, responseType: 'blob' });
+	}
+
+	private buildParamsUsuario(filters: UsuarioReporteFilters): HttpParams {
+		const { persona, fechaInicio, fechaFin } = filters;
+		if (!persona || !fechaInicio || !fechaFin) {
+			throw new Error('buildParamsUsuario: persona, fechaInicio y fechaFin son requeridos.');
+		}
+		return new HttpParams()
+			.set('personaCodId', persona.estudianteId.toString())
+			.set('tipoPersona', persona.tipoPersona)
+			.set('nombreCompleto', persona.nombreCompleto)
+			.set('fechaInicio', formatDateLocalIso(fechaInicio))
+			.set('fechaFin', formatDateLocalIso(fechaFin));
 	}
 	// #endregion
 

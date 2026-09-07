@@ -1,20 +1,23 @@
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { TableSkeletonComponent } from '@intranet-shared/components/table-skeleton/table-skeleton.component';
 import { StatsSkeletonComponent } from '@intranet-shared/components/stats-skeleton/stats-skeleton.component';
 import { ErrorStateComponent } from '@shared/components';
-import { TABLE_SKELETON_COLUMNS } from './config/attendance-reports.config';
+import { MODO_REPORTE_OPTIONS, TABLE_SKELETON_COLUMNS } from './config/attendance-reports.config';
 import { ReportsFiltersComponent } from './components/reports-filters/reports-filters.component';
 import { ReportsSummaryComponent } from './components/reports-summary/reports-summary.component';
 import { ReportsResultComponent } from './components/reports-result/reports-result.component';
+import { UsuarioReportComponent } from './components/usuario-report/usuario-report.component';
 import { AttendanceReportsFacade } from './services';
-import { EduButton } from '@edu-ui';
+import { EduButton, EduSelectButton } from '@edu-ui';
 import {
 	salonToOption,
 	TIPOS_PERSONA,
 	RANGO_TIPOS,
 	type EstadoFiltro,
+	type ModoReporte,
 	type RangoTipo,
 	type TipoPersonaReporte,
 } from './models';
@@ -22,7 +25,18 @@ import {
 @Component({
 	selector: 'app-attendance-reports',
 	standalone: true,
-	imports: [EduButton, ReportsFiltersComponent, ReportsSummaryComponent, ReportsResultComponent, TableSkeletonComponent, StatsSkeletonComponent, ErrorStateComponent],
+	imports: [
+		FormsModule,
+		EduButton,
+		EduSelectButton,
+		ReportsFiltersComponent,
+		ReportsSummaryComponent,
+		ReportsResultComponent,
+		UsuarioReportComponent,
+		TableSkeletonComponent,
+		StatsSkeletonComponent,
+		ErrorStateComponent,
+	],
 	templateUrl: './attendance-reports.component.html',
 	styleUrl: './attendance-reports.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -36,6 +50,15 @@ export class AttendanceReportsComponent implements OnInit {
 
 	// #region Estado del facade
 	readonly vm = this.facade.vm;
+	// #endregion
+
+	// #region Modo del tab (Plan xrepo-109 F5)
+	readonly modo = signal<ModoReporte>('agrupado');
+	readonly modoOptions = MODO_REPORTE_OPTIONS;
+
+	onModoChange(modo: ModoReporte): void {
+		this.modo.set(modo);
+	}
 	// #endregion
 
 	// #region Computed locales
