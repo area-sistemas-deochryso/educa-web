@@ -183,6 +183,7 @@ export class SchedulesAssignmentService {
       payload: { horarioId, usuarioMod },
       http$: () => this.api.desasignarProfesor(horarioId, usuarioMod),
       onCommit: () => {
+        this.store.setLoading(false);
         callbacks.refreshHorarios();
         this.store.incrementarEstadistica('horariosSinProfesor', 1);
         this.errorHandler.showSuccess(
@@ -230,6 +231,7 @@ export class SchedulesAssignmentService {
       payload: { horarioId, estudianteId },
       http$: () => this.api.desasignarEstudiante(horarioId, estudianteId),
       onCommit: () => {
+        this.store.setLoading(false);
         callbacks.refreshHorarios();
         this.errorHandler.showSuccess(
           UI_SUMMARIES.success,
