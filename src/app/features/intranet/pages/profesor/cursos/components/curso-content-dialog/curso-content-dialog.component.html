@@ -11,7 +11,12 @@
 >
 	<ng-template #header>
 		<div class="dialog-header-custom">
-			<span class="p-dialog-title">{{ vm().contenido ? vm().contenido!.cursoNombre : 'Contenido del Curso' }}</span>
+			<app-course-switcher
+				[horarios]="horarios()"
+				[selectedHorarioId]="vm().selectedHorarioId"
+				[cursoNombre]="vm().contenido ? vm().contenido!.cursoNombre : 'Contenido del Curso'"
+				(courseChange)="onCourseSwitch($event)"
+			/>
 			<button
 				class="fullscreen-toggle-btn"
 				type="button"

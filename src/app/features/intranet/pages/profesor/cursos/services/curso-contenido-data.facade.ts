@@ -99,6 +99,48 @@ export class CursoContenidoDataFacade {
 			});
 	}
 
+	/**
+	 * Switch to a different course/schedule without leaving the content dialog.
+	 *
+	 * @param horarioId Schedule id to switch to.
+	 * @param options.salonId SalonId del nuevo horario.
+	 * @param options.onLoaded Callback invocado con el id del contenido cargado (o no llamado si el curso no tiene contenido creado).
+	 */
+	switchCourse(horarioId: number, options?: { salonId?: number; onLoaded?: (contenidoId: number) => void }): void {
+		this.store.setSelectedHorarioId(horarioId);
+		if (options?.salonId != null) {
+			this.store.setSalonId(options.salonId);
+		}
+		this.store.setContenido(null);
+		this.store.setLoading(true);
+		this.store.clearError();
+
+		this.api
+			.getContenido(horarioId)
+			.pipe(
+				withRetry({ tag: 'CursoContenidoDataFacade:switchCourse' }),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe({
+				next: (contenido) => {
+					this.store.setContenido(contenido);
+					this.store.setLoading(false);
+					if (contenido) {
+						options?.onLoaded?.(contenido.id);
+					} else {
+						this.store.openBuilderDialog();
+					}
+				},
+				error: (err) => {
+					logger.error('CursoContenidoDataFacade: Error switching course', err);
+					const message = resolveErrorMessage(err, UI_ADMIN_ERROR_DETAILS.loadContenido);
+					this.errorHandler.showError(UI_SUMMARIES.error, message);
+					this.store.setError(message);
+					this.store.setLoading(false);
+				},
+			});
+	}
+
 	/** Refresh content using the currently selected horarioId. */
 	refreshContenido(): void {
 		const horarioId = this.store.selectedHorarioId();
