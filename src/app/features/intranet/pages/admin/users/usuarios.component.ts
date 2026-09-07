@@ -52,6 +52,7 @@ import {
 	readAutoOpenQueryParams,
 } from './helpers/auto-open-from-query.helper';
 import { EduConfirmDialog, EduConfirmationService, EduTab } from '@edu-ui';
+import { resolveModoAsignacion } from '@data/models';
 
 // #endregion
 // #region Implementation
@@ -400,7 +401,11 @@ export class UsersComponent implements AfterViewInit {
 				}
 				const defaults: Partial<UsuarioFormData> = { rol: target.rol };
 				if (target.salonId) {
-					defaults.salones = [{ salonId: target.salonId, esTutor: false }];
+					const salon = this.vm().salones.find((s) => s.salonId === target.salonId);
+					const esTutor = salon
+						? resolveModoAsignacion(salon.gradoOrden, salon.seccion) === 'TutorPleno'
+						: false;
+					defaults.salones = [{ salonId: target.salonId, esTutor }];
 				}
 				this.uiFacade.openNew(defaults);
 				return;
