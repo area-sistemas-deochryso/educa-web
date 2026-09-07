@@ -70,8 +70,8 @@ export class UsersUiFacade {
 	// #endregion
 	// #region Dialog Management
 
-	openNew(): void {
-		this.store.openNewDialog();
+	openNew(defaults?: Parameters<typeof this.store.openNewDialog>[0]): void {
+		this.store.openNewDialog(defaults);
 	}
 
 	editUsuario(usuario: UsuarioLista): void {

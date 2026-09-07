@@ -389,6 +389,23 @@ export class UsersComponent implements AfterViewInit {
 		effect(() => {
 			const target = this.autoOpenTarget();
 			if (!target) return;
+
+			if (target.kind === 'new') {
+				const snapshot = this.vm();
+				if (snapshot.loading !== false) return;
+				this.autoOpenTarget.set(null);
+				this.dataFacade.setFilterRol(target.rol);
+				if (target.salonId) {
+					this.dataFacade.setFilterSalonId(target.salonId);
+				}
+				const defaults: Partial<UsuarioFormData> = { rol: target.rol };
+				if (target.salonId) {
+					defaults.salones = [{ salonId: target.salonId, esTutor: false }];
+				}
+				this.uiFacade.openNew(defaults);
+				return;
+			}
+
 			const snapshot = this.vm();
 			const items = snapshot.usuarios as UsuarioLista[] | undefined;
 			const match = findAutoOpenMatch(target, items);

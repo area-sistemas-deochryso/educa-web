@@ -280,6 +280,53 @@
         }
       }
     }
+
+    .no-candidates-hint {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1.25rem 1rem;
+      text-align: center;
+      background: var(--surface-50);
+      border-radius: 8px;
+      border: 1px solid var(--orange-200);
+
+      > i {
+        font-size: 1.5rem;
+        color: var(--orange-500);
+      }
+
+      p {
+        margin: 0;
+        font-size: 0.875rem;
+        color: var(--text-color-secondary);
+        line-height: 1.4;
+
+        strong {
+          color: var(--text-color);
+        }
+      }
+
+      .no-candidates-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: var(--primary-color);
+        text-decoration: none;
+        cursor: pointer;
+
+        &:hover {
+          text-decoration: underline;
+        }
+
+        i {
+          font-size: 0.8rem;
+        }
+      }
+    }
   }
 
   .students-list {

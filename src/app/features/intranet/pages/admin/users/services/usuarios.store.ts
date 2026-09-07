@@ -308,9 +308,12 @@ export class UsersStore extends BaseCrudStore<UsuarioLista, UsuarioFormData, Usu
 	// #endregion
 
 	// #region Comandos — Dialogs feature-specific
-	openNewDialog(): void {
+	openNewDialog(defaults?: Partial<UsuarioFormData>): void {
 		this._selectedUsuario.set(null);
 		this.resetFormData();
+		if (defaults) {
+			this.setFormData(defaults);
+		}
 		this.clearProfesorCursos();
 		this.setIsEditing(false);
 		this.openDialog();

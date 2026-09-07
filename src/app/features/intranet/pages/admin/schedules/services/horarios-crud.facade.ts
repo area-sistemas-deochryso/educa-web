@@ -56,7 +56,7 @@ export class SchedulesCrudFacade {
       method: 'POST',
       payload: data,
       http$: () => this.api.create(data),
-      onCommit: () => {
+      onCommit: (created) => {
         this.dataFacade.silentRefreshAfterCrud();
         this.store.incrementarEstadistica('totalHorarios', 1);
         this.store.incrementarEstadistica('horariosActivos', 1);
@@ -64,6 +64,9 @@ export class SchedulesCrudFacade {
           UI_SUMMARIES.success,
           UI_HORARIOS_SUCCESS_MESSAGES.created
         );
+        if (created?.id) {
+          this.dataFacade.loadDetalle(created.id);
+        }
       },
       onError: (err) => {
         this.errHandler.handle(err, 'crear horario');
@@ -136,6 +139,9 @@ export class SchedulesCrudFacade {
           UI_SUMMARIES.success,
           UI_HORARIOS_SUCCESS_MESSAGES.updated
         );
+        if (updated.profesorId === null) {
+          this.dataFacade.loadDetalle(id);
+        }
       },
       onError: (err) => {
         this.errHandler.handle(err, 'actualizar horario');

@@ -5,7 +5,8 @@ import type { UsuarioLista } from '../services';
 
 export type AutoOpenTarget =
 	| { kind: 'id'; id: number; rol: string }
-	| { kind: 'dni'; dni: string };
+	| { kind: 'dni'; dni: string }
+	| { kind: 'new'; rol: string; salonId?: number };
 
 /**
  * Lee la query string de la ruta y devuelve el target a auto-abrir, o null.
@@ -34,6 +35,14 @@ export function readAutoOpenQueryParams(
 	}
 
 	if (!autoOpen) return null;
+
+	const newRol = params.get('rol');
+	if (newRol && params.get('action') === 'new') {
+		const salonIdStr = params.get('salonId');
+		const salonId = salonIdStr ? Number(salonIdStr) : undefined;
+		return { kind: 'new', rol: newRol, salonId: Number.isFinite(salonId) ? salonId : undefined };
+	}
+
 	const idStr = params.get('openUserId');
 	const rol = params.get('openUserRol');
 	const name = params.get('openUserName');
@@ -54,7 +63,7 @@ export function findAutoOpenMatch(
 	target: AutoOpenTarget,
 	items: readonly UsuarioLista[] | undefined,
 ): UsuarioLista | null {
-	if (!items?.length) return null;
+	if (!items?.length || target.kind === 'new') return null;
 	if (target.kind === 'id') {
 		return items.find((u) => u.id === target.id && u.rol === target.rol) ?? null;
 	}

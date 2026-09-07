@@ -2,6 +2,7 @@
 import { ChangeDetectionStrategy, Component, computed, effect, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import type { ModoAsignacion } from '@data/models';
 import { ModoAsignacionBadgeComponent } from '@shared/components';
 import type { HorarioDetalleResponseDto, EstudianteHorarioDto } from '../../models/horario.interface';
@@ -14,7 +15,7 @@ import { EduBadge, EduButton, EduDrawer, EduSelect, EduTag, EduTooltip } from '@
 @Component({
 	selector: 'app-schedule-detail-drawer',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduBadge, EduButton, EduDrawer, EduSelect, EduTag, EduTooltip, ModoAsignacionBadgeComponent, EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleIconPipe, EstadoToggleLabelPipe],
+	imports: [CommonModule, FormsModule, RouterLink, EduBadge, EduButton, EduDrawer, EduSelect, EduTag, EduTooltip, ModoAsignacionBadgeComponent, EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleIconPipe, EstadoToggleLabelPipe],
 	templateUrl: './horario-detail-drawer.component.html',
 	styleUrl: './horario-detail-drawer.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
