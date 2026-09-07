@@ -1,10 +1,12 @@
-import { Component, ChangeDetectionStrategy, inject, signal, computed } from '@angular/core';
+/* eslint-disable max-lines -- Razón: orquesta 8 sub-diálogos hijos (semana, tarea, archivos, tareas, student-files, task-submissions, evaluación, calificar, periodos) + course switcher (P108 F3); ya estaba a 286/300 líneas contadas antes de este cambio. Descomponerlo en subcomponentes de handlers es un refactor propio, fuera de alcance de este brief. */
+import { Component, ChangeDetectionStrategy, inject, signal, computed, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { CursoContenidoDataFacade } from '../../services/curso-contenido-data.facade';
 import { CursoContenidoCrudFacade } from '../../services/curso-contenido-crud.facade';
 import { CursoContenidoUiFacade } from '../../services/curso-contenido-ui.facade';
 import { CalificacionesFacade } from '../../services/calificaciones.facade';
+import { ProfesorFacade } from '@features/intranet/pages/profesor/services/profesor.facade';
 import {
 	ActualizarTareaRequest,
 	CrearTareaRequest,
@@ -26,6 +28,7 @@ import { EvaluacionFormDialogComponent } from '../evaluacion-form-dialog/evaluac
 import { CalificarDialogComponent } from '../calificar-dialog/calificar-dialog.component';
 import { PeriodosConfigDialogComponent } from '../periodos-config-dialog/periodos-config-dialog.component';
 import { SemanasAccordionComponent } from '../semanas-accordion/semanas-accordion.component';
+import { CourseSwitcherComponent } from '../course-switcher/course-switcher.component';
 import { EduButton, EduConfirmDialog, EduConfirmationService, EduDialog, EduTab, EduTabPanel, EduTabs, EduTooltip } from '@edu-ui';
 
 @Component({
@@ -38,6 +41,7 @@ import { EduButton, EduConfirmDialog, EduConfirmationService, EduDialog, EduTab,
 		EduTooltip,
 		EduTabs, EduTab, EduTabPanel,
 		EduConfirmDialog,
+		CourseSwitcherComponent,
 		SemanasAccordionComponent,
 		SemanaEditDialogComponent,
 		TareaDialogComponent,
@@ -59,11 +63,15 @@ export class CursoContentDialogComponent {
 	private readonly crudFacade = inject(CursoContenidoCrudFacade);
 	private readonly uiFacade = inject(CursoContenidoUiFacade);
 	private readonly calFacade = inject(CalificacionesFacade);
+	private readonly profesorFacade = inject(ProfesorFacade);
 	private readonly confirmationService = inject(EduConfirmationService);
 	private readonly router = inject(Router);
 
+	readonly closed = output<void>();
+
 	readonly vm = this.uiFacade.vm;
 	readonly calVm = this.calFacade.vm;
+	readonly horarios = computed(() => this.profesorFacade.vm().horarios);
 
 	// #region Estado local
 	readonly activeTab = signal('0');
@@ -107,7 +115,24 @@ export class CursoContentDialogComponent {
 			this.activeTab.set('0');
 			this.isFullscreen.set(false);
 			this.calificacionesLoaded = false;
+			this.closed.emit();
 		}
+	}
+
+	onCourseSwitch(horarioId: number): void {
+		if (horarioId === this.vm().selectedHorarioId) return;
+		const horario = this.profesorFacade.vm().horarios.find((h) => h.id === horarioId);
+		this.calFacade.resetCalificaciones();
+		this.calificacionesLoaded = false;
+		this.dataFacade.switchCourse(horarioId, {
+			salonId: horario?.salonId,
+			onLoaded: (contenidoId) => {
+				if (this.activeTab() === '1') {
+					this.calFacade.loadCalificaciones(contenidoId);
+					this.calificacionesLoaded = true;
+				}
+			},
+		});
 	}
 
 	onDialogShow(): void {

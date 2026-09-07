@@ -267,7 +267,7 @@ export class TeacherSchedulesComponent implements OnInit {
 		if (!block) return;
 		popover.hide();
 		this.router.navigate(['/intranet/profesor/cursos'], {
-			queryParams: { horarioId: block.id },
+			queryParams: { horarioId: block.id, returnTo: 'horarios' },
 		});
 	}
 

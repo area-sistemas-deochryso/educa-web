@@ -1,0 +1,12 @@
+@if (showSwitcher()) {
+	<edu-select
+		class="course-switcher"
+		[options]="cursoOptions()"
+		optionLabel="label"
+		optionValue="value"
+		[ngModel]="selectedHorarioId()"
+		(ngModelChange)="courseChange.emit($event)"
+	/>
+} @else {
+	<span class="p-dialog-title">{{ cursoNombre() }}</span>
+}

@@ -82,7 +82,7 @@ export class TeacherClassroomsComponent implements OnInit {
 	// #region Salon table handlers
 	onVerCursoContenido(curso: SalonCursoInfo): void {
 		this.router.navigate(['/intranet/profesor/cursos'], {
-			queryParams: { horarioId: curso.horarioId },
+			queryParams: { horarioId: curso.horarioId, returnTo: 'salones' },
 		});
 	}
 

@@ -129,7 +129,7 @@ import { EduSpinner, EduTag, EduTooltip } from '@edu-ui';
 			</div>
 		}
 
-		<app-curso-content-dialog />
+		<app-curso-content-dialog (closed)="onContentDialogClosed()" />
 
 		<app-curso-builder-dialog
 			[visible]="contenidoVm().builderDialogVisible"
@@ -151,6 +151,9 @@ export class ProfesorCursosComponent implements OnInit, OnDestroy {
 	readonly contenidoVm = this.contenidoDataFacade.vm;
 
 	readonly colorMap = computed(() => buildCursoColorMap(this.vm().horarios));
+
+	private static readonly VALID_RETURN_TARGETS = new Set(['horarios', 'salones']);
+	private returnTo: string | null = null;
 
 	// #region Tooltip anti-glitch al entrar por navegación programática
 	// Cuando se llega a esta pantalla vía "Ver como" (redirect sin acción real
@@ -209,6 +212,7 @@ export class ProfesorCursosComponent implements OnInit, OnDestroy {
 				const horarioId = Number(params['horarioId']);
 				if (horarioId) {
 					const tab = params['tab'] || undefined;
+					this.returnTo = params['returnTo'] || null;
 					const horario = this.facade.vm().horarios.find((h) => h.id === horarioId);
 					this.contenidoDataFacade.loadContenido(horarioId, {
 						initialTab: tab,
@@ -221,6 +225,16 @@ export class ProfesorCursosComponent implements OnInit, OnDestroy {
 
 	onVerContenido(horario: HorarioProfesorDto): void {
 		this.contenidoDataFacade.loadContenido(horario.id, { salonId: horario.salonId });
+	}
+
+	onContentDialogClosed(): void {
+		if (this.returnTo && ProfesorCursosComponent.VALID_RETURN_TARGETS.has(this.returnTo)) {
+			const target = this.returnTo;
+			this.returnTo = null;
+			this.router.navigate([`/intranet/profesor/${target}`]);
+		} else {
+			this.returnTo = null;
+		}
 	}
 
 	onBuilderVisibleChange(visible: boolean): void {
