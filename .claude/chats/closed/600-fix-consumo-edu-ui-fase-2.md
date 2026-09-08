@@ -1,4 +1,4 @@
-> **Validación prod**: ⏳ pendiente desde 2026-08-27
+> **Validación prod**: ✅ verificada 2026-09-08 — menú de perfil en `educa.com.pe/intranet`: "Información" abre el dialog correctamente, "Cerrar sesión" visible y clickeable (no ejecutado).
 > **Repo destino**: `educa-web` (frontend, branch `main`).
 > **Plan**: `educa-coord/plans/xrepo-79-primeng-replacement-library.md` (P79, F9) · **Creado**: 2026-08-26 · **Estado**: ⏳ abierto.
 > **Hermano**: brief 599 en `educa-libs/.claude/chats/open/` (hallazgos de librería — no depende de este, alcance disjunto).

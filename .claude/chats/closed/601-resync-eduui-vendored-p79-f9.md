@@ -1,6 +1,6 @@
 > **Repo destino**: `educa-web` (frontend, branch `main`).
 > **Plan**: `educa-coord/plans/xrepo-79-primeng-replacement-library.md` (P79, F9) · **Creado**: 2026-08-27 · **Estado**: ✅ shippeado.
-> **Validación prod**: ⏳ pendiente desde 2026-08-27 — depende de que brief 588 (swap completo F6 a `edu-ui`) llegue a `awaiting-prod`/deploy real, ya que prod hoy no corre `edu-ui` en absoluto (verificado: 0 elementos `edu-*`, paginador sigue siendo `p-paginator` de PrimeNG).
+> **Validación prod**: ✅ verificada 2026-09-08 — `/admin/cursos` en `educa.com.pe/intranet`: paginador con estilo `edu-ui` (centrado, dark mode OK), ya no es `p-paginator` crudo de PrimeNG.
 > **Depende de**: brief 599 en `educa-libs` (shippeado, commit `dd2a5df` en `educa-libs`) — trae el fix de fondo transparente en `edu-input-text`/`edu-textarea`/`edu-table` y el fix de estilo del paginador (centrado, padding, tinte de página activa, tipografía). Este brief empieza con **re-sincronizar la copia vendorizada** en `src/app/shared/edu-ui/` desde `educa-libs` main antes de tocar nada más — mismo patrón que brief 589 (post-F8) siguió tras brief 597.
 
 ---

@@ -1,4 +1,4 @@
-> **Validación prod**: ⏳ pendiente desde 2026-08-27 — bloqueada hasta que 588 (swap PrimeNG→edu-ui) se despliegue.
+> **Validación prod**: ✅ verificada 2026-09-08 — `edu-toggle` con contraste visible sin hover (claro y oscuro), `edu-popover` del menú de perfil alineado a la derecha sin solapar la nav en `/admin/cursos`, toast "Error de aplicación" no reproducido en 3 ciclos de apertura del popover.
 > **Repo destino**: `educa-web` (frontend, branch `main`, commit base `3b846017` — Angular 22 + F8/F9 ya mergeados).
 > **Plan**: `educa-coord/plans/xrepo-79-primeng-replacement-library.md` (P79, post-F9) · **Creado**: 2026-08-27 · **Estado**: ⏳ abierto.
 > **Modo**: `/execute` — 3 fixes puntuales de `educa-web`/`edu-ui`, sin scope creep.

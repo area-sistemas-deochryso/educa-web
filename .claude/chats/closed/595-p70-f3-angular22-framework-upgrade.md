@@ -1,6 +1,6 @@
 > **Repo destino**: `educa-web`, worktree dedicado `p70-angular22-migration` (branch `chat/p70-angular22-migration`) — no toca `Educa.API`.
 > **Plan**: 70 (coord, `xrepo-70-angular22-migration.md`) · **Fase**: F3 · **Creado**: 2026-08-25 · **Estado**: ✅ ejecutado, pendiente validación.
-> **Validación prod**: ⏳ pendiente desde 2026-08-26 — e2e Playwright con credenciales reales (los 3 specs se saltearon por falta de `TEST_ADMIN_DNI`/`TEST_ADMIN_PASSWORD`; se verificó manualmente el flujo Curso→Horario→Salón como sustituto, ver sección de auditorías) + merge del worktree a `main` vía `/wt-merge` cuando corresponda.
+> **Validación prod**: ✅ verificada 2026-09-08 — worktree ya mergeado a `main` (`@angular/core` `^22.1.3` en `package.json`); smoke test en vivo en `educa.com.pe/intranet` (login, navegación, dialogs, toggles) sin errores JS visibles.
 > **Depende de**: F1 (345, investigate) ✅ completo — ver [`345-report.md`](../closed/345-report.md). F2 (design) resuelto inline en este brief, ver sección de decisiones.
 > **exclusive**: `true` (heredado del worktree — `package.json`, `angular.json`, `src/**`)
 
