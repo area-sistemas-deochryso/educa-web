@@ -7,10 +7,10 @@
 <!-- INDEX:START -->
 | Key | Plan | Estado | Notas |
 |-----|------|--------|-------|
-| F1 | Enforcement de Reglas | ~95% | F1-F3 ✅ · F4 parcial (F4.4-F4.5 🔒) · F5 awaiting-prod · F5.3 ✅ |
+| F1 | Enforcement de Reglas | ~95% | F1-F3 ✅ · F4 parcial (F4.4-F4.5 🔒) · F5 awaiting-prod · F5.3 ✅ · [detalle](../reference/enforcement-reglas.md) |
 | F5 | Consolidación Frontend | ⏳ 0% | Tras Plan 4 BE |
-| F8 | Design Patterns Backend | Incremental | Al tocar módulos |
-| F9 | Design Patterns Frontend | Incremental | Al tocar módulos |
+| F8 | Design Patterns Backend | Incremental | Al tocar módulos · [detalle](../reference/design-patterns-backend.md) |
+| F9 | Design Patterns Frontend | Incremental | Al tocar módulos · [detalle](../reference/design-patterns-frontend.md) |
 | xP41 | → Correlation Hub (coord) | F1 ✅ · F2 FE ✅ · F3 BE next | ver P41 |
 | xP22 | → Endurecimiento correos (coord) | F3.FE ✅ awaiting-prod (284) | ver P22 |
 | xP43 | → Monitoreo Cowork (coord) | F5:5.2 FE ✅ awaiting-prod (285) · F6.1 FE ✅ awaiting-prod (296) · F6.2 FE ✅ awaiting-prod (297) · F6.3 FE ✅ awaiting-prod (303) · F6.3 follow-up ✅ awaiting-prod (304) | ver P43 |
@@ -30,10 +30,10 @@
 
 | Key | # | Plan | Estado | Notas |
 |-----|---|------|--------|-------|
-| F1 | 1 | Enforcement de Reglas | ~95% | F1-F3 ✅ · F4 parcial (F4.4-F4.5 🔒) · F5 awaiting-prod (brief 137). F5.3 ✅ (3/3 batches) |
+| F1 | 1 | Enforcement de Reglas | ~95% | F1-F3 ✅ · F4 parcial (F4.4-F4.5 🔒) · F5 awaiting-prod (brief 137). F5.3 ✅ (3/3 batches) · [detalle](../reference/enforcement-reglas.md) |
 | F5 | 5 | Consolidación Frontend | ⏳ 0% | Tras Plan 4 BE |
-| F8 | 8 | Design Patterns Backend | Incremental | Al tocar módulos |
-| F9 | 9 | Design Patterns Frontend | Incremental | Al tocar módulos |
+| F8 | 8 | Design Patterns Backend | Incremental | Al tocar módulos · [detalle](../reference/design-patterns-backend.md) |
+| F9 | 9 | Design Patterns Frontend | Incremental | Al tocar módulos · [detalle](../reference/design-patterns-frontend.md) |
 
 **Archivados**: P51 (Reporte Mensual ✅ `86bab2e0`), F13 (Test Gaps ✅ brief 247), F46/F47/F48 (barridos ✅ 2026-05-15).
 
@@ -64,6 +64,7 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub F3-F6), *
 | Pos | Key | Plan | Próximo paso concreto | Gate |
 |---|---|---|---|---|
 | 4 | P15 | Release ops | F3-F5 (post-deploy + rollback + runbook) — puntero coord | libre |
+| 12 | F-SW01 | Bundle stale post-deploy | Banner "nueva versión disponible" vía `SwService.updateAvailable$` — [detalle](../tasks/sw-bundle-stale-detection.md) | libre |
 
 #### Tier 4 — Bloqueados / baja prioridad
 
