@@ -4,12 +4,13 @@ import { FormsModule } from '@angular/forms';
 
 import { AsistenciaCursoResumenDto } from '@features/intranet/pages/profesor/models';
 import { ErrorStateComponent } from '@shared/components';
+import { SkeletonColumnDef, TableSkeletonComponent } from '@intranet-shared/components';
 import { EduButton, EduDatePicker, EduTable, EduTag } from '@edu-ui';
 
 @Component({
 	selector: 'app-attendance-summary-panel',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduButton, EduDatePicker, EduTable, EduTag, ErrorStateComponent],
+	imports: [CommonModule, FormsModule, EduButton, EduDatePicker, EduTable, EduTag, ErrorStateComponent, TableSkeletonComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './attendance-summary-panel.component.html',
 	styleUrl: './attendance-summary-panel.component.scss',
@@ -28,6 +29,18 @@ export class AttendanceSummaryPanelComponent {
 	// #region Estado local
 	fechaInicio: Date = this.getFirstDayOfMonth();
 	fechaFin: Date = new Date();
+	// #endregion
+
+	// #region Skeleton config
+	readonly tableColumns: SkeletonColumnDef[] = [
+		{ width: '50px', cellType: 'text' },
+		{ width: 'flex', cellType: 'text' },
+		{ width: '100px', cellType: 'text' },
+		{ width: '60px', cellType: 'badge' },
+		{ width: '60px', cellType: 'badge' },
+		{ width: '60px', cellType: 'badge' },
+		{ width: '70px', cellType: 'text' },
+		{ width: '90px', cellType: 'badge' }];
 	// #endregion
 
 	// #region Computed

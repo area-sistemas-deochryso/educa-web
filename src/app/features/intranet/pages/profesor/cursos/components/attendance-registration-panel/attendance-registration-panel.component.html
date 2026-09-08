@@ -74,9 +74,10 @@
 
 <!-- #region Loading -->
 @if (loading()) {
-	<div class="loading-state">
-		<i class="pi pi-spinner pi-spin"></i>
-		<span>Cargando asistencia...</span>
+	<div class="estudiantes-list-skeleton" style="min-height: 300px; display: flex; flex-direction: column; gap: 0.5rem;">
+		@for (i of [1, 2, 3, 4, 5, 6]; track i) {
+			<app-skeleton-loader variant="rect" width="100%" height="56px" />
+		}
 	</div>
 }
 <!-- #endregion -->

@@ -45,10 +45,7 @@
 
 <!-- #region Loading -->
 @if (loading()) {
-	<div class="loading-state">
-		<i class="pi pi-spinner pi-spin"></i>
-		<span>Cargando resumen...</span>
-	</div>
+	<app-table-skeleton [columns]="tableColumns" [rows]="8" minHeight="320px" />
 }
 <!-- #endregion -->
 

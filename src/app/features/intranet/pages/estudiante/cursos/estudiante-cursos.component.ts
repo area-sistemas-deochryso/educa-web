@@ -9,7 +9,8 @@ import { buildCursoColorMap } from '@intranet-shared/config/curso-colors';
 import { EstudianteCursosFacade } from '../services/estudiante-cursos.facade';
 import { CursoContentReadonlyDialogComponent } from './components/curso-content-readonly-dialog/curso-content-readonly-dialog.component';
 import { HorarioProfesorDto } from '../models';
-import { EduSpinner, EduTag, EduTooltip } from '@edu-ui';
+import { SkeletonLoaderComponent } from '@shared/components';
+import { EduTag, EduTooltip } from '@edu-ui';
 
 const DAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
 
@@ -20,7 +21,7 @@ const DAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Vierne
 		CommonModule,
 		EduTag,
 		EduTooltip,
-		EduSpinner,
+		SkeletonLoaderComponent,
 		RouterLink,
 		PageHeaderComponent,
 		EmptyStateComponent,
@@ -80,8 +81,10 @@ const DAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Vierne
 	`,
 	template: `
 		@if (vm().loading) {
-			<div class="flex justify-content-center p-5">
-				<edu-spinner strokeWidth="4" />
+			<div class="course-grid" style="min-height: 240px;">
+				@for (i of [1, 2, 3, 4, 5, 6]; track i) {
+					<app-skeleton-loader variant="card" height="140px" />
+				}
 			</div>
 		} @else if (vm().horarios.length === 0) {
 			<app-empty-state icon="pi pi-book" title="Mis Cursos" message="No tienes cursos asignados" />
