@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 
 import { NivelEducativo } from '@core/helpers';
 import { ErrorStateComponent } from '@shared/components';
+import { createClientPaging } from '@shared/utils';
 import {
 	MiAsistenciaCursoResumenDto,
 	MiAsistenciaCursoItemDto,
@@ -56,6 +57,7 @@ export class StudentAttendanceTabComponent implements OnInit {
 	// #region Estado local
 	selectedCursoLocal: number | null = null;
 	readonly mensajeGestionada = MENSAJE_JUSTIFICACION_GESTIONADA;
+	readonly detallePaging = createClientPaging(computed(() => this.asistenciaData()?.detalle ?? []));
 	// #endregion
 
 	// #region Computed

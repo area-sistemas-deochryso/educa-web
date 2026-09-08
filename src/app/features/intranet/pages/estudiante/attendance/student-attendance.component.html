@@ -58,10 +58,13 @@
 			<!-- Tabla detalle -->
 			@if (asistencia()!.detalle.length > 0) {
 				<edu-table
-					[value]="asistencia()!.detalle"
+					[value]="detallePaging.value()"
 					[paginator]="true"
 					[rows]="10"
+					[first]="detallePaging.first()"
+					[totalRecords]="detallePaging.totalRecords()"
 					styleClass="p-datatable-sm"
+					(onPageChange)="detallePaging.onPageChange($event)"
 				>
 					<ng-template #header>
 						<tr>

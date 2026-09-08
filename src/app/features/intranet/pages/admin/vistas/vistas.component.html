@@ -101,12 +101,15 @@
 	<!-- #region Table -->
 	<section class="table-section">
 		<edu-table
-			[value]="vm().items"
+			[value]="itemsPaging.value()"
 			dataKey="id"
 			[paginator]="true"
 			[rows]="10"
+			[first]="itemsPaging.first()"
+			[totalRecords]="itemsPaging.totalRecords()"
 			[rowsPerPageOptions]="[10, 25, 50]"
 			[showCurrentPageReport]="true"
+			(onPageChange)="itemsPaging.onPageChange($event)"
 			[loading]="vm().loading"
 			currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} capabilities"
 			sortField="id"

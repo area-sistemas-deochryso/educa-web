@@ -2,6 +2,7 @@ import { DatePipe } from '@angular/common';
 import {
 	ChangeDetectionStrategy,
 	Component,
+	computed,
 	inject,
 	input,
 	output,
@@ -10,6 +11,7 @@ import {
 import type { SkeletonColumnDef } from '@intranet-shared/components';
 import { UiMappingService } from '@intranet-shared/services';
 import { EmailDomainPauseListaDto } from '@data/models';
+import { createClientPaging } from '@shared/utils';
 import { EduButton, EduTable, EduTag, EduTooltip } from '@edu-ui';
 
 /**
@@ -32,6 +34,8 @@ export class DomainPausesTableComponent {
 	readonly hasActiveFilters = input<boolean>(false);
 
 	readonly release = output<EmailDomainPauseListaDto>();
+
+	readonly itemsPaging = createClientPaging(computed(() => this.items()));
 
 	static readonly skeletonColumns: SkeletonColumnDef[] = [
 		{ width: '50px', cellType: 'text' },

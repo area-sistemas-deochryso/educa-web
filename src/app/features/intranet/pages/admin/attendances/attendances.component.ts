@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { logger } from '@core/helpers';
 import { ErrorStateComponent } from '@shared/components';
+import { createClientPaging } from '@shared/utils';
 import { SkeletonColumnDef, TableSkeletonComponent, StatsSkeletonComponent, PageHeaderComponent, KpiStatsComponent, type KpiStatItem } from '@intranet-shared/components';
 import { AttendanceScopeBannerComponent } from '@intranet-shared/components/attendance-scope-banner';
 import { AttendanceReportsComponent } from '../../cross-role/attendance-reports';
@@ -98,6 +99,7 @@ export class AttendancesComponent implements OnInit {
 
 	/** `true` mientras hay un job de sync activo (QUEUED o RUNNING). */
 	readonly syncActive = this.syncService.isActive;
+	readonly itemsPaging = createClientPaging(computed(() => this.vm().items));
 	// #endregion
 
 	// #region Stats KPI

@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
 import type { CapabilityCatalogItem } from '@core/services';
+import { createClientPaging } from '@shared/utils';
 
 import { VistasFacade } from './services';
 import { EduButton, EduConfirmDialog, EduConfirmationService, EduDialog, EduInputText, EduSelect, EduTable, EduTag, EduTooltip } from '@edu-ui';
@@ -35,6 +36,7 @@ export class VistasComponent implements OnInit {
 	// #region Estado
 	readonly vm = this.facade.vm;
 	showValidation = signal(false);
+	readonly itemsPaging = createClientPaging(computed(() => this.vm().items));
 	// #endregion
 
 	// #region Lifecycle

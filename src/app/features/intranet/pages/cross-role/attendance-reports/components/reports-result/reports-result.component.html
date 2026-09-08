@@ -87,14 +87,17 @@
 				</div>
 			} @else {
 				<edu-table
-					[value]="salon.estudiantes"
+					[value]="estudiantesPaging.value()"
 					dataKey="dni"
 					[paginator]="true"
 					[rows]="10"
+					[first]="estudiantesPaging.first()"
+					[totalRecords]="estudiantesPaging.totalRecords()"
 					[rowsPerPageOptions]="[5, 10, 25, 50]"
 					[showCurrentPageReport]="true"
 					currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}"
 					styleClass="p-datatable-sm"
+					(onPageChange)="estudiantesPaging.onPageChange($event)"
 				>
 					<ng-template #header>
 						<tr>
@@ -187,13 +190,16 @@
 			</div>
 		} @else {
 			<edu-table
-				[value]="profesores()"
+				[value]="profesoresPaging.value()"
 				dataKey="dni"
 				[paginator]="true"
 				[rows]="10"
+				[first]="profesoresPaging.first()"
+				[totalRecords]="profesoresPaging.totalRecords()"
 				[rowsPerPageOptions]="[5, 10, 25, 50]"
 				[showCurrentPageReport]="true"
 				currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}"
+				(onPageChange)="profesoresPaging.onPageChange($event)"
 				styleClass="p-datatable-sm"
 			>
 				<ng-template #header>
@@ -286,13 +292,16 @@
 			</div>
 		} @else {
 			<edu-table
-				[value]="asistentesAdmin()"
+				[value]="asistentesAdminPaging.value()"
 				dataKey="dni"
 				[paginator]="true"
 				[rows]="10"
+				[first]="asistentesAdminPaging.first()"
+				[totalRecords]="asistentesAdminPaging.totalRecords()"
 				[rowsPerPageOptions]="[5, 10, 25, 50]"
 				[showCurrentPageReport]="true"
 				currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}"
+				(onPageChange)="asistentesAdminPaging.onPageChange($event)"
 				styleClass="p-datatable-sm"
 			>
 				<ng-template #header>
@@ -382,7 +391,7 @@
 				</table>
 			</div>
 		} @else {
-			<edu-table [value]="coordinadores()" dataKey="dni" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[5, 10, 25, 50]" [showCurrentPageReport]="true" currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}" styleClass="p-datatable-sm">
+			<edu-table [value]="coordinadoresPaging.value()" dataKey="dni" [paginator]="true" [rows]="10" [first]="coordinadoresPaging.first()" [totalRecords]="coordinadoresPaging.totalRecords()" [rowsPerPageOptions]="[5, 10, 25, 50]" [showCurrentPageReport]="true" currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}" styleClass="p-datatable-sm" (onPageChange)="coordinadoresPaging.onPageChange($event)">
 				<ng-template #header>
 					<tr>
 						<th style="width: 70px">#</th>
@@ -464,7 +473,7 @@
 				</table>
 			</div>
 		} @else {
-			<edu-table [value]="promotores()" dataKey="dni" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[5, 10, 25, 50]" [showCurrentPageReport]="true" currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}" styleClass="p-datatable-sm">
+			<edu-table [value]="promotoresPaging.value()" dataKey="dni" [paginator]="true" [rows]="10" [first]="promotoresPaging.first()" [totalRecords]="promotoresPaging.totalRecords()" [rowsPerPageOptions]="[5, 10, 25, 50]" [showCurrentPageReport]="true" currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}" styleClass="p-datatable-sm" (onPageChange)="promotoresPaging.onPageChange($event)">
 				<ng-template #header>
 					<tr>
 						<th style="width: 70px">#</th>

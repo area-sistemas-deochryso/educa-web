@@ -53,11 +53,14 @@
 
 	<!-- #region Detail table -->
 	<edu-table
-		[value]="asistenciaData()!.detalle"
+		[value]="detallePaging.value()"
 		dataKey="fecha"
 		[paginator]="true"
 		[rows]="10"
+		[first]="detallePaging.first()"
+		[totalRecords]="detallePaging.totalRecords()"
 		styleClass="p-datatable-sm p-datatable-striped"
+		(onPageChange)="detallePaging.onPageChange($event)"
 		[rowsPerPageOptions]="[10, 25, 50]"
 	>
 		<ng-template #header>

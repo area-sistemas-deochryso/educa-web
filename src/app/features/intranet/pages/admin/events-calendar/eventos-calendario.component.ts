@@ -8,6 +8,7 @@ import { UiMappingService } from '@intranet-shared/services';
 import { EventsCalendarFacade, EventsCalendarStore } from './services';
 import type { EventoFormData } from './services';
 import { EventoCalendarioLista } from '@data/models';
+import { createClientPaging } from '@shared/utils';
 import { EduButton, EduConfirmDialog, EduConfirmationService, EduDatePicker, EduDialog, EduIconField, EduInputIcon, EduInputText, EduSelect, EduTable, EduTag, EduTextarea, EduToggle, EduTooltip } from '@edu-ui';
 
 // #endregion
@@ -52,6 +53,7 @@ export class EventsCalendarComponent implements OnInit {
 	// #region Estado del facade
 	readonly vm = this.facade.vm;
 	showValidation = signal(false);
+	readonly itemsPaging = createClientPaging(computed(() => this.vm().items));
 	// #endregion
 
 	// #region Stats KPI

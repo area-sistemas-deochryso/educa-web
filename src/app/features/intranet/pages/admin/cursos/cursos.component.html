@@ -103,15 +103,18 @@
 	<!-- Table -->
 	<section class="table-section">
 		<edu-table
-			[value]="vm().cursos"
+			[value]="cursosPaging.value()"
 			[dataKey]="'id'"
 			[paginator]="true"
 			[rows]="10"
+			[first]="cursosPaging.first()"
+			[totalRecords]="cursosPaging.totalRecords()"
 			[rowsPerPageOptions]="[5, 10, 25, 50]"
 			[showCurrentPageReport]="true"
 			[loading]="vm().loading"
 			currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} cursos"
 			class="p-datatable-sm"
+			(onPageChange)="cursosPaging.onPageChange($event)"
 		>
 			<ng-template #header>
 				<tr>

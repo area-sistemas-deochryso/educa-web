@@ -77,13 +77,16 @@
 
 <!-- #region Tabla -->
 <edu-table
-	[value]="vm().items"
+	[value]="itemsPaging.value()"
 	[dataKey]="'id'"
 	[loading]="vm().loading"
 	[paginator]="true"
 	[rows]="10"
+	[first]="itemsPaging.first()"
+	[totalRecords]="itemsPaging.totalRecords()"
 	[rowsPerPageOptions]="[5, 10, 25]"
 	stateStorage="session"
+	(onPageChange)="itemsPaging.onPageChange($event)"
 	stateKey="eventos-calendario-table"
 	[showCurrentPageReport]="true"
 	currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}"

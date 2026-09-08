@@ -8,6 +8,7 @@ import { UiMappingService } from '@intranet-shared/services';
 import { NotificacionesAdminFacade, NotificacionesAdminStore } from './services';
 import type { NotificacionFormData } from './services';
 import { NotificacionLista } from '@data/models';
+import { createClientPaging } from '@shared/utils';
 import { EduButton, EduConfirmDialog, EduConfirmationService, EduDatePicker, EduDialog, EduIconField, EduInputIcon, EduInputText, EduSelect, EduTable, EduTag, EduTextarea, EduToggle, EduTooltip } from '@edu-ui';
 
 // #endregion
@@ -52,6 +53,7 @@ export class NotificacionesAdminComponent implements OnInit {
 	// #region Estado del facade
 	readonly vm = this.facade.vm;
 	showValidation = signal(false);
+	readonly itemsPaging = createClientPaging(computed(() => this.vm().items));
 	// #endregion
 
 	// #region Stats KPI

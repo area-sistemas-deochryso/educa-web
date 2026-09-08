@@ -210,11 +210,14 @@
 	<app-error-state [message]="vm().error!" (retry)="dataFacade.loadData()" />
 } @else {
 	<edu-table
-		[value]="vm().items"
+		[value]="itemsPaging.value()"
 		[dataKey]="'asistenciaId'"
 		[paginator]="true"
 		[rows]="10"
+		[first]="itemsPaging.first()"
+		[totalRecords]="itemsPaging.totalRecords()"
 		[rowsPerPageOptions]="[10, 25, 50]"
+		(onPageChange)="itemsPaging.onPageChange($event)"
 		[showCurrentPageReport]="true"
 		currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}"
 		styleClass="p-datatable-sm"

@@ -14,6 +14,7 @@ import { ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { logger, withRetry, detectarNivel } from '@core/helpers';
 import { ErrorStateComponent } from '@shared/components';
+import { createClientPaging } from '@shared/utils';
 import { PageHeaderComponent } from '@intranet-shared/components';
 import { EstudianteFacade } from '../services/estudiante.facade';
 import {
@@ -68,6 +69,7 @@ export class StudentAttendanceComponent implements OnInit {
 	readonly pageLoading = this._pageLoading.asReadonly();
 	readonly horariosError = this._horariosError.asReadonly();
 	readonly asistencia = this._asistencia.asReadonly();
+	readonly detallePaging = createClientPaging(computed(() => this.asistencia()?.detalle ?? []));
 	readonly asistenciaLoading = this._asistenciaLoading.asReadonly();
 	readonly asistenciaError = this._asistenciaError.asReadonly();
 	readonly solicitudes = this._solicitudes.asReadonly();

@@ -1,4 +1,5 @@
 export * from './calificacion-config.utils';
+export * from './client-paging.utils';
 export * from './date-range.utils';
 export * from './periodo-academico.utils';
 export * from './role-policies.utils';

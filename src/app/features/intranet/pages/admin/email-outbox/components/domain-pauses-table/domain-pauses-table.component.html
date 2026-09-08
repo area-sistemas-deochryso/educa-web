@@ -1,10 +1,13 @@
 <section class="table-section">
 	<edu-table
-		[value]="items()"
+		[value]="itemsPaging.value()"
 		[dataKey]="'id'"
 		[paginator]="true"
 		[rows]="10"
+		[first]="itemsPaging.first()"
+		[totalRecords]="itemsPaging.totalRecords()"
 		[rowsPerPageOptions]="[10, 25, 50]"
+		(onPageChange)="itemsPaging.onPageChange($event)"
 		[showCurrentPageReport]="true"
 		currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}"
 		[loading]="loading()"

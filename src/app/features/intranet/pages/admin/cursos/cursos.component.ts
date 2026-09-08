@@ -6,6 +6,7 @@ import { UiMappingService } from '@intranet-shared/services';
 import { PageHeaderComponent, KpiStatsComponent, type KpiStatItem } from '@intranet-shared/components';
 import { EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleIconPipe, EstadoToggleLabelPipe } from '@intranet-shared/pipes';
 import { buildDeleteCursoMessage } from '@app/shared/constants';
+import { createClientPaging } from '@shared/utils';
 
 import { CursosFacade } from './services';
 import type { Curso } from './models';
@@ -33,6 +34,7 @@ export class CursosComponent implements OnInit {
 
 	// #region Estado local
 	showValidation = signal(false);
+	readonly cursosPaging = createClientPaging(computed(() => this.vm().cursos));
 	// #endregion
 
 	// #region Stats KPI

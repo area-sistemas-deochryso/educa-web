@@ -8,6 +8,7 @@ import type {
 	ReporteFiltrado,
 	SalonReporteFiltrado,
 } from '../../models';
+import { createClientPaging } from '@shared/utils';
 import { EduSelect, EduTable } from '@edu-ui';
 
 interface SalonSelectOption {
@@ -130,6 +131,12 @@ export class ReportsResultComponent {
 	readonly promotores = computed<PersonaAsistenteAdminReporte[]>(
 		() => this.resultado().promotores ?? [],
 	);
+
+	readonly estudiantesPaging = createClientPaging(computed(() => this.selectedSalon()?.estudiantes ?? []));
+	readonly profesoresPaging = createClientPaging(this.profesores);
+	readonly asistentesAdminPaging = createClientPaging(this.asistentesAdmin);
+	readonly coordinadoresPaging = createClientPaging(this.coordinadores);
+	readonly promotoresPaging = createClientPaging(this.promotores);
 
 	readonly hasProfesores = computed(() => this.profesores().length > 0);
 	readonly hasAsistentesAdmin = computed(() => this.asistentesAdmin().length > 0);
