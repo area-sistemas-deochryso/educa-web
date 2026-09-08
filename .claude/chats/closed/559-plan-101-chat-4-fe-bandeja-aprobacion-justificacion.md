@@ -144,7 +144,7 @@ Ver detalle en CRITERIOS DE CIERRE arriba. Sub-tarea generada en `Educa.API` (no
 
 **Pendiente para cerrar completamente el plan**: confirmar con el usuario si el commit de `Educa.API` se pushea/deploya, y entonces completar la re-verificación en vivo del Aprobar/Rechazar (idealmente con datos frescos, no reutilizando el registro de prueba ya consumido).
 
-> **Validación prod**: ⏳ pendiente desde 2026-08-17 — quedan: (1) decidir push/deploy del fix `7bfa5cba` en `Educa.API`, (2) re-verificación end-to-end de Aprobar/Rechazar con el fix activo, (3) resolver (o descartar como no bloqueante) el 400 encontrado en el registro de asistencia del profesor — no investigado, puede ser un bug no relacionado.
+> **Validación prod**: ✅ verificada 2026-09-08 — (1) fix `7bfa5cba` confirmado en el deploy vivo de `Educa.API` (ancestro del `HEAD` actual); (2) `/intranet/justificacion-asistencia` carga sin el 500 original (verificado en vivo, filtros Pendiente/Aprobada/Rechazada/Todos); **no se pudo re-verificar el flujo Aprobar/Rechazar end-to-end** — no hay ninguna solicitud real en prod (0 registros en todos los estados) y crear/aprobar/rechazar una de prueba está fuera de lo permitido en producción. Queda como riesgo residual documentado, no bloqueante para cerrar. (3) El 400 en el registro de asistencia del profesor sigue sin investigar — no relacionado a este brief, no bloqueante.
 
 ## COMMIT MESSAGE sugerido
 

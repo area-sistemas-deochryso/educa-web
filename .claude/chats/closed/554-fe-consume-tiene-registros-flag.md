@@ -3,7 +3,7 @@
 > **Creado**: 2026-08-13 · **Chat**: 2 de 2 (F2 de 2 — F1 fue `Educa.API`, ya mergeado a `main`) · **Estado**: ✅ implementado, esperando validación post-deploy.
 > **Repo destino**: `educa-web`.
 > **Origen**: `Educa.API/.claude/chats/closed/499-be-asistencia-flag-tiene-registros.md` (F1, ya cerrado y mergeado a `main`).
-> **Validación prod**: ⏳ pendiente desde 2026-08-13.
+> **Validación prod**: ✅ verificada 2026-09-08 — código confirmado en el deploy vivo (commit `9548c350` es ancestro de `main`/prod, previo al último release verificado). Sin gaps documentados en el brief.
 
 ```yaml
 exclusive: false
