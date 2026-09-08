@@ -6,9 +6,21 @@ import { downloadBlob, formatDateLocalIso, logger, slugifyFileNameSegment } from
 import { EduAutoComplete, EduButton, EduDatePicker, EduTemplate } from '@edu-ui';
 import type { EduAutoCompleteCompleteEvent } from '@edu-ui';
 import { AttendanceReportsApiService } from '../../services';
-import { TIPO_PERSONA_OPTIONS } from '../../config/attendance-reports.config';
 
 const RANGO_MAX_DIAS = 366;
+
+/**
+ * Rol en singular para un único usuario — a diferencia de `TIPO_PERSONA_OPTIONS`
+ * (plural: "Estudiantes", "Profesores"...), que es para el selector del reporte
+ * agrupado. Espejo de `TipoPersona.ToDisplayName` en `Educa.API`.
+ */
+const ROL_SINGULAR: Record<string, string> = {
+	E: 'Estudiante',
+	P: 'Profesor',
+	A: 'Asistente Administrativo',
+	C: 'Coordinador Académico',
+	M: 'Promotor',
+};
 
 /**
  * Reporte de asistencia por usuario individual (Plan xrepo-109 F5/F6): un solo usuario
@@ -64,7 +76,7 @@ export class UsuarioReportComponent {
 	readonly personaLabel = computed(() => {
 		const p = this.selectedPersona();
 		if (!p) return '';
-		const rol = TIPO_PERSONA_OPTIONS.find((o) => o.value === p.tipoPersona)?.label ?? p.tipoPersona;
+		const rol = ROL_SINGULAR[p.tipoPersona] ?? p.tipoPersona;
 		return `${p.nombreCompleto} — ${rol}`;
 	});
 	// #endregion
@@ -149,9 +161,7 @@ export class UsuarioReportComponent {
 		const fin = this.fechaFin();
 		if (!persona || !inicio || !fin) return 'reporte_asistencia';
 
-		const rol = slugifyFileNameSegment(
-			TIPO_PERSONA_OPTIONS.find((o) => o.value === persona.tipoPersona)?.label ?? persona.tipoPersona,
-		);
+		const rol = slugifyFileNameSegment(ROL_SINGULAR[persona.tipoPersona] ?? persona.tipoPersona);
 		const nombre = slugifyFileNameSegment(persona.nombreCompleto);
 		const fechaInicioStr = formatDateLocalIso(inicio).replace(/-/g, '');
 		const fechaFinStr = formatDateLocalIso(fin).replace(/-/g, '');
