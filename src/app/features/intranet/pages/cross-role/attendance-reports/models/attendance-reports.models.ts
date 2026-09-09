@@ -130,7 +130,7 @@ export interface ReporteFilters {
 	tipoPersona: TipoPersonaReporte;
 	/**
 	 * Sede a consultar. `null`/`undefined` = sede propia del usuario (comportamiento actual,
-	 * sin cambios). Un valor distinto a la sede propia requiere `Capability.ADMIN_ASISTENCIAS`
+	 * sin cambios). Un valor distinto a la sede propia requiere `Capability.ASISTENCIA_ADMIN_PAGE_VIEW`
 	 * en el BE — en caso contrario responde 403 `ASISTENCIA_SEDE_CRUZADA_NO_AUTORIZADA`.
 	 */
 	sedeId?: number | null;

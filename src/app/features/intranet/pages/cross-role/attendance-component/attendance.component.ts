@@ -44,7 +44,7 @@ export class AttendanceComponent implements AfterViewInit {
 	private viewAsContext = inject(ViewAsContextService);
 
 	/** Gate del link "Ver Panel Administrativo de Asistencias" — mismo código que gatea el tab Panel en el admin. */
-	readonly canViewAdminPanel = computed(() => this.userPermisos.hasCapability('ADMIN_ASISTENCIAS'));
+	readonly canViewAdminPanel = computed(() => this.userPermisos.hasCapability('ASISTENCIA_ADMIN_PAGE_VIEW'));
 
 	// * ViewChild refs are used to delegate reload/mode actions by role.
 	@ViewChild(AttendanceApoderadoComponent) apoderadoComponent?: AttendanceApoderadoComponent;
@@ -114,7 +114,7 @@ export class AttendanceComponent implements AfterViewInit {
 		}
 	}
 
-	/** Drill-down al panel administrativo de asistencias (solo visible con `ADMIN_ASISTENCIAS`). */
+	/** Drill-down al panel administrativo de asistencias (solo visible con `ASISTENCIA_ADMIN_PAGE_VIEW`). */
 	irAPanelAdmin(): void {
 		void this.router.navigate(['/intranet/admin/asistencias'], { queryParams: { tab: 'panel' } });
 	}

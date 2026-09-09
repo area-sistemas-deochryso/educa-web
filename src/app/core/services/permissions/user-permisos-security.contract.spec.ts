@@ -23,7 +23,7 @@ interface PermissionsServiceTestAccess {
 // #region Mocks
 const mockCapabilities: CapabilityAuth[] = [
 	{ codigo: 'ADMIN_USUARIOS', ruta: 'intranet/admin/usuarios' },
-	{ codigo: 'ADMIN_CURSOS', ruta: 'intranet/admin/cursos' },
+	{ codigo: 'CURSOS_PAGE_VIEW', ruta: 'intranet/admin/cursos' },
 ];
 
 function createMocks() {

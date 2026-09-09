@@ -10,7 +10,7 @@ const FAQ_WITH_WIZARD: FaqAdminDto = {
 	respuesta: 'Ve a...',
 	categoria: 'Asistencia',
 	capabilityId: 5,
-	capabilityCodigo: 'ADMIN_ASISTENCIAS',
+	capabilityCodigo: 'ASISTENCIA_ADMIN_PAGE_VIEW',
 	estado: true,
 	wizard: {
 		titulo: 'Registrar asistencia',

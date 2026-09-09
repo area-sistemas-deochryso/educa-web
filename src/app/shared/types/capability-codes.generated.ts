@@ -3,84 +3,102 @@
 // Do not edit manually — regenerate with: npm run gen:caps
 
 export type CapabilityCode =
-	| 'ADMIN_ASISTENCIAS'
 	| 'ADMIN_AUDITORIA_CORREOS'
 	| 'ADMIN_CAMPUS'
-	| 'ADMIN_CURSOS'
 	| 'ADMIN_EMAIL_ALERTS'
 	| 'ADMIN_EMAIL_BLACKLIST'
 	| 'ADMIN_EMAIL_DEFER_EVENTS'
-	| 'ADMIN_EMAIL_DOMAIN_PAUSES'
 	| 'ADMIN_EMAIL_OUTBOX'
-	| 'ADMIN_EMAIL_OUTBOX_DASHBOARD_DIA'
 	| 'ADMIN_EMAIL_OUTBOX_DIAGNOSTICO'
 	| 'ADMIN_EMAIL_QUARANTINE'
 	| 'ADMIN_ERROR_LOGS'
 	| 'ADMIN_EVENTOS_CALENDARIO'
-	| 'ADMIN_HORARIOS'
 	| 'ADMIN_MONITOREO'
 	| 'ADMIN_NOTIFICACIONES'
 	| 'ADMIN_PERMISOS_ROLES'
-	| 'ADMIN_PERMISOS_SALUD'
 	| 'ADMIN_PERMISOS_USUARIOS'
 	| 'ADMIN_RATE_LIMIT_EVENTS'
+	// F10-w1b (2026-09-09): sin contraparte en el BE actual (ni enum ni las 27 filas de seed
+	// confirmadas de Catálogo B) — se limpia solo con la próxima corrida real de `npm run gen:caps`.
 	| 'ADMIN_REGISTRO_VISTAS'
-	// Manually appended (brief 495) — `ADMIN_RENDIMIENTO` fue seedeada en `Educa.API`
-	// (migración manual `20260727_AddAdminRendimientoCapability.sql`, pendiente de correr
-	// en el entorno) pero `npm run gen:caps` necesita una sesión autenticada que no puede
-	// enviar en este entorno. Mismo caso que `AYUDA_MANAGE`/`REPORTES_RENDIMIENTO` arriba.
-	// Remover este comentario cuando un regen naturalmente la incluya.
-	| 'ADMIN_RENDIMIENTO'
 	| 'ADMIN_REPORTES_USUARIO'
-	| 'ADMIN_SALONES'
 	| 'ADMIN_SISTEMA_DB_DIAGNOSTICS'
 	| 'ADMIN_SISTEMA_RUNTIME_HEALTH'
 	| 'ADMIN_USUARIOS'
 	| 'ASISTENCIA'
 	| 'ASISTENCIA_ADMIN'
-	// Manually appended (briefs 483/484) — both `AYUDA_MANAGE` and
-	// `AYUDA_TICKET_MANAGE` are seeded in `Educa.API` migrations but
-	// `npm run gen:caps` needs an authenticated session it can't send, so
-	// these were added by hand. Remove this comment once a regen naturally
-	// includes both.
+	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `ADMIN_ASISTENCIAS`.
+	| 'ASISTENCIA_ADMIN_PAGE_VIEW'
+	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `ESTUDIANTE_ASISTENCIA`.
+	| 'ASISTENCIA_ESTUDIANTE_PAGE_VIEW'
+	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `PROFESOR_ASISTENCIA`.
+	| 'ASISTENCIA_PROFESOR_PAGE_VIEW'
 	| 'AYUDA_MANAGE'
 	| 'AYUDA_TICKET_MANAGE'
-	| 'CALENDARIO'
-	| 'CTEST_K6'
-	| 'ESTUDIANTE_ASISTENCIA'
+	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `CALENDARIO`.
+	| 'CALENDARIO_PAGE_USE'
+	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `ESTUDIANTE_NOTAS`.
+	| 'CALIFICACIONES_ESTUDIANTE_PAGE_VIEW'
+	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `PROFESOR_CALIFICACIONES`.
+	| 'CALIFICACIONES_PROFESOR_PAGE_VIEW'
+	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `ADMIN_CURSOS`.
+	| 'CURSOS_PAGE_VIEW'
+	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `PROFESOR_CURSOS`.
+	| 'CURSOS_PROFESOR_PAGE_VIEW'
+	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `ADMIN_EMAIL_DOMAIN_PAUSES`.
+	| 'EMAIL_DOMINIO_PAGE_VIEW'
+	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `ADMIN_EMAIL_OUTBOX_DASHBOARD_DIA`.
+	| 'EMAIL_OUTBOX_DASHBOARD_PAGE_VIEW'
+	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `ADMIN_EMAIL_RECIPIENT_VIEW`. Esa fila nunca
+	// había aparecido en este tipo generado (drift: seedeada en BE pero sin ítem de menú/uso en FE
+	// hasta hoy, y `gen:caps` nunca corrió después de agregarla) — se agrega recién con su nombre nuevo.
+	| 'EMAIL_RECIPIENT_PAGE_VIEW'
 	| 'ESTUDIANTE_CURSOS'
-	| 'ESTUDIANTE_FORO'
-	| 'ESTUDIANTE_HORARIOS'
-	| 'ESTUDIANTE_MENSAJERIA'
-	| 'ESTUDIANTE_NOTAS'
-	| 'ESTUDIANTE_SALONES'
-	// Manually appended (brief 525) — `EXPLICACIONES_MANAGE` fue seedeada en
-	// `Educa.API` (migración manual `20260805_CreateExplicacionesTable.sql`, pendiente
-	// de correr en el entorno) pero `npm run gen:caps` necesita una sesión autenticada
-	// que no puede enviar en este entorno. Mismo caso que `AYUDA_MANAGE` arriba.
-	// Remover este comentario cuando un regen naturalmente la incluya.
 	| 'EXPLICACIONES_MANAGE'
+	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `ESTUDIANTE_FORO`.
+	| 'FORO_ESTUDIANTE_PAGE_USE'
+	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `PROFESOR_FORO`.
+	| 'FORO_PROFESOR_PAGE_USE'
+	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `CTEST_K6`.
+	| 'HERRAMIENTAS_TEST_PAGE_VIEW'
+	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `ESTUDIANTE_HORARIOS`.
+	| 'HORARIOS_ESTUDIANTE_PAGE_VIEW'
+	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `ADMIN_HORARIOS`.
+	| 'HORARIOS_PAGE_VIEW'
+	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `PROFESOR_HORARIOS`.
+	| 'HORARIOS_PROFESOR_PAGE_VIEW'
 	| 'INTRANET'
 	// Manually appended (brief 559, Plan 101 F4) — `JUSTIFICACION_ASISTENCIA_APROBAR`
 	// fue seedeada en `Educa.API` (migración manual
 	// `20260813_CreateSolicitudJustificacionAsistenciaTable.sql`, brief 557) pero
 	// `npm run gen:caps` necesita una sesión autenticada que no puede enviar en este
-	// entorno. Mismo caso que `ADMIN_RENDIMIENTO`/`AYUDA_MANAGE` arriba.
+	// entorno. Mismo caso que `AYUDA_MANAGE` arriba.
 	// Remover este comentario cuando un regen naturalmente la incluya.
 	| 'JUSTIFICACION_ASISTENCIA_APROBAR'
 	| 'MENSAJERIA'
-	| 'PROFESOR_ASISTENCIA'
-	| 'PROFESOR_CALIFICACIONES'
-	| 'PROFESOR_CURSOS'
-	| 'PROFESOR_FINAL_SALONES'
-	| 'PROFESOR_FORO'
-	| 'PROFESOR_HORARIOS'
-	| 'PROFESOR_MENSAJERIA'
-	| 'PROFESOR_SALONES'
+	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `ESTUDIANTE_MENSAJERIA`.
+	| 'MENSAJERIA_ESTUDIANTE_PAGE_USE'
+	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `PROFESOR_MENSAJERIA`.
+	| 'MENSAJERIA_PROFESOR_PAGE_USE'
+	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `ADMIN_PERMISOS_SALUD`.
+	| 'PERMISOS_SALUD_PAGE_VIEW'
+	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `ADMIN_RENDIMIENTO` (agregada a la tabla del
+	// plan recién en esta wave — no estaba en el listado original de 26, ver plan §Catálogo B).
+	// Sigue sin regen real de `gen:caps` por el mismo motivo que `AYUDA_MANAGE` arriba.
+	| 'RENDIMIENTO_ADMIN_PAGE_VIEW'
 	// Manually appended (brief 489) — `REPORTES_RENDIMIENTO` fue seedeada en
 	// `Educa.API` (briefs 490/489) pero `npm run gen:caps` necesita una sesión
 	// autenticada que no puede enviar en este entorno. Mismo caso que
 	// `AYUDA_MANAGE`/`AYUDA_TICKET_MANAGE` arriba. Remover este comentario
 	// cuando un regen naturalmente la incluya.
 	| 'REPORTES_RENDIMIENTO'
-	| 'VIDEOCONFERENCIAS';
+	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `ESTUDIANTE_SALONES`.
+	| 'SALONES_ESTUDIANTE_PAGE_VIEW'
+	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `ADMIN_SALONES`.
+	| 'SALONES_PAGE_VIEW'
+	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `PROFESOR_FINAL_SALONES`.
+	| 'SALONES_PROFESOR_FINAL_PAGE_VIEW'
+	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `PROFESOR_SALONES`.
+	| 'SALONES_PROFESOR_PAGE_VIEW'
+	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `VIDEOCONFERENCIAS`.
+	| 'VIDEOCONFERENCIAS_PAGE_USE';
