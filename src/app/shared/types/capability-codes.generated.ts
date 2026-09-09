@@ -3,27 +3,9 @@
 // Do not edit manually — regenerate with: npm run gen:caps
 
 export type CapabilityCode =
-	| 'ADMIN_AUDITORIA_CORREOS'
-	| 'ADMIN_CAMPUS'
-	| 'ADMIN_EMAIL_ALERTS'
-	| 'ADMIN_EMAIL_BLACKLIST'
-	| 'ADMIN_EMAIL_DEFER_EVENTS'
-	| 'ADMIN_EMAIL_OUTBOX'
-	| 'ADMIN_EMAIL_OUTBOX_DIAGNOSTICO'
-	| 'ADMIN_EMAIL_QUARANTINE'
-	| 'ADMIN_ERROR_LOGS'
-	| 'ADMIN_EVENTOS_CALENDARIO'
-	| 'ADMIN_MONITOREO'
-	| 'ADMIN_NOTIFICACIONES'
-	| 'ADMIN_PERMISOS_ROLES'
-	| 'ADMIN_PERMISOS_USUARIOS'
-	| 'ADMIN_RATE_LIMIT_EVENTS'
 	// F10-w1b (2026-09-09): sin contraparte en el BE actual (ni enum ni las 27 filas de seed
 	// confirmadas de Catálogo B) — se limpia solo con la próxima corrida real de `npm run gen:caps`.
 	| 'ADMIN_REGISTRO_VISTAS'
-	| 'ADMIN_REPORTES_USUARIO'
-	| 'ADMIN_SISTEMA_DB_DIAGNOSTICS'
-	| 'ADMIN_SISTEMA_RUNTIME_HEALTH'
 	| 'ADMIN_USUARIOS'
 	| 'ASISTENCIA'
 	| 'ASISTENCIA_ADMIN'
@@ -33,6 +15,8 @@ export type CapabilityCode =
 	| 'ASISTENCIA_ESTUDIANTE_PAGE_VIEW'
 	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `PROFESOR_ASISTENCIA`.
 	| 'ASISTENCIA_PROFESOR_PAGE_VIEW'
+	// F10-w2 (2026-09-09) — rename de Catálogo A (enum), ex `ADMIN_AUDITORIA_CORREOS`.
+	| 'AUDITORIA_CORREOS_API_VIEW'
 	| 'AYUDA_MANAGE'
 	| 'AYUDA_TICKET_MANAGE'
 	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `CALENDARIO`.
@@ -41,19 +25,39 @@ export type CapabilityCode =
 	| 'CALIFICACIONES_ESTUDIANTE_PAGE_VIEW'
 	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `PROFESOR_CALIFICACIONES`.
 	| 'CALIFICACIONES_PROFESOR_PAGE_VIEW'
+	// F10-w2 (2026-09-09) — rename de Catálogo A (enum), ex `ADMIN_CAMPUS`.
+	| 'CAMPUS_API_MANAGE'
 	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `ADMIN_CURSOS`.
 	| 'CURSOS_PAGE_VIEW'
 	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `PROFESOR_CURSOS`.
 	| 'CURSOS_PROFESOR_PAGE_VIEW'
+	// F10-w2 (2026-09-09) — rename de Catálogo A (enum), ex `ADMIN_EMAIL_ALERTS`.
+	| 'EMAIL_ALERTS_API_VIEW'
+	// F10-w2 (2026-09-09) — rename de Catálogo A (enum), ex `ADMIN_EMAIL_BLACKLIST`.
+	| 'EMAIL_BLACKLIST_API_MANAGE'
+	// F10-w2 (2026-09-09) — rename de Catálogo A (enum), ex `ADMIN_EMAIL_DEFER_EVENTS`.
+	| 'EMAIL_DEFER_EVENTS_API_VIEW'
 	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `ADMIN_EMAIL_DOMAIN_PAUSES`.
 	| 'EMAIL_DOMINIO_PAGE_VIEW'
+	// F10-w2 (2026-09-09) — rename de Catálogo A (enum), ex `ADMIN_EMAIL_OUTBOX`.
+	| 'EMAIL_OUTBOX_API_VIEW'
 	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `ADMIN_EMAIL_OUTBOX_DASHBOARD_DIA`.
 	| 'EMAIL_OUTBOX_DASHBOARD_PAGE_VIEW'
+	// F10-w2 (2026-09-09) — rename de Catálogo A (enum), ex `ADMIN_EMAIL_OUTBOX_DIAGNOSTICO`. Nombre
+	// propio, no fusionado con `EMAIL_OUTBOX_API_VIEW` como sugería el plan ("sub-vista, mismo verbo")
+	// — tiene su propia CAP_Ruta y gatea su propio Controller, ver brief 645 "Hallazgo 1".
+	| 'EMAIL_OUTBOX_DIAGNOSTICO_PAGE_API_VIEW'
+	// F10-w2 (2026-09-09) — rename de Catálogo A (enum), ex `ADMIN_EMAIL_QUARANTINE`.
+	| 'EMAIL_QUARANTINE_API_MANAGE'
 	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `ADMIN_EMAIL_RECIPIENT_VIEW`. Esa fila nunca
 	// había aparecido en este tipo generado (drift: seedeada en BE pero sin ítem de menú/uso en FE
 	// hasta hoy, y `gen:caps` nunca corrió después de agregarla) — se agrega recién con su nombre nuevo.
 	| 'EMAIL_RECIPIENT_PAGE_VIEW'
+	// F10-w2 (2026-09-09) — rename de Catálogo A (enum), ex `ADMIN_ERROR_LOGS`.
+	| 'ERROR_LOGS_API_VIEW'
 	| 'ESTUDIANTE_CURSOS'
+	// F10-w2 (2026-09-09) — rename de Catálogo A (enum), ex `ADMIN_EVENTOS_CALENDARIO`.
+	| 'EVENTOS_CALENDARIO_API_MANAGE'
 	| 'EXPLICACIONES_MANAGE'
 	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `ESTUDIANTE_FORO`.
 	| 'FORO_ESTUDIANTE_PAGE_USE'
@@ -80,8 +84,18 @@ export type CapabilityCode =
 	| 'MENSAJERIA_ESTUDIANTE_PAGE_USE'
 	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `PROFESOR_MENSAJERIA`.
 	| 'MENSAJERIA_PROFESOR_PAGE_USE'
+	// F10-w2 (2026-09-09) — rename de Catálogo A (enum), ex `ADMIN_MONITOREO`.
+	| 'MONITOREO_PAGE_VIEW'
+	// F10-w2 (2026-09-09) — rename de Catálogo A (enum), ex `ADMIN_NOTIFICACIONES`.
+	| 'NOTIFICACIONES_API_SEND'
+	// F10-w2 (2026-09-09) — rename de Catálogo A (enum), ex `ADMIN_PERMISOS_ROLES`.
+	| 'PERMISOS_ROL_API_MANAGE'
 	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `ADMIN_PERMISOS_SALUD`.
 	| 'PERMISOS_SALUD_PAGE_VIEW'
+	// F10-w2 (2026-09-09) — rename de Catálogo A (enum), ex `ADMIN_PERMISOS_USUARIOS`.
+	| 'PERMISOS_USUARIO_API_MANAGE'
+	// F10-w2 (2026-09-09) — rename de Catálogo A (enum), ex `ADMIN_RATE_LIMIT_EVENTS`.
+	| 'RATE_LIMIT_EVENTS_API_VIEW'
 	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `ADMIN_RENDIMIENTO` (agregada a la tabla del
 	// plan recién en esta wave — no estaba en el listado original de 26, ver plan §Catálogo B).
 	// Sigue sin regen real de `gen:caps` por el mismo motivo que `AYUDA_MANAGE` arriba.
@@ -92,6 +106,8 @@ export type CapabilityCode =
 	// `AYUDA_MANAGE`/`AYUDA_TICKET_MANAGE` arriba. Remover este comentario
 	// cuando un regen naturalmente la incluya.
 	| 'REPORTES_RENDIMIENTO'
+	// F10-w2 (2026-09-09) — rename de Catálogo A (enum), ex `ADMIN_REPORTES_USUARIO`.
+	| 'REPORTES_USUARIO_API_VIEW'
 	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `ESTUDIANTE_SALONES`.
 	| 'SALONES_ESTUDIANTE_PAGE_VIEW'
 	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `ADMIN_SALONES`.
@@ -100,5 +116,9 @@ export type CapabilityCode =
 	| 'SALONES_PROFESOR_FINAL_PAGE_VIEW'
 	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `PROFESOR_SALONES`.
 	| 'SALONES_PROFESOR_PAGE_VIEW'
+	// F10-w2 (2026-09-09) — rename de Catálogo A (enum), ex `ADMIN_SISTEMA_DB_DIAGNOSTICS`.
+	| 'SISTEMA_DB_DIAGNOSTICS_API_VIEW'
+	// F10-w2 (2026-09-09) — rename de Catálogo A (enum), ex `ADMIN_SISTEMA_RUNTIME_HEALTH`.
+	| 'SISTEMA_RUNTIME_HEALTH_API_VIEW'
 	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `VIDEOCONFERENCIAS`.
 	| 'VIDEOCONFERENCIAS_PAGE_USE';
