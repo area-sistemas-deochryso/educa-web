@@ -59,13 +59,13 @@ describe('TicketBandejaComponent', () => {
 		TestBed.resetTestingModule();
 	});
 
-	it('con AYUDA_TICKET_MANAGE, inicializa la bandeja', () => {
+	it('con AYUDA_TICKET_API_MANAGE, inicializa la bandeja', () => {
 		const { component, facadeInit } = setup(true);
 		expect(component.canAccess).toBe(true);
 		expect(facadeInit).toHaveBeenCalled();
 	});
 
-	it('sin AYUDA_TICKET_MANAGE, no accede: no inicializa la bandeja', () => {
+	it('sin AYUDA_TICKET_API_MANAGE, no accede: no inicializa la bandeja', () => {
 		const { component, facadeInit } = setup(false);
 		expect(component.canAccess).toBe(false);
 		expect(facadeInit).not.toHaveBeenCalled();

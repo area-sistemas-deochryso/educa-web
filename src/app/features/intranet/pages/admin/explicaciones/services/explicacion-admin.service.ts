@@ -11,7 +11,7 @@ import {
 } from '../models/explicacion-admin.models';
 
 /**
- * Gateway del CRUD admin de explicaciones del modo informativo (`EXPLICACIONES_MANAGE`).
+ * Gateway del CRUD admin de explicaciones del modo informativo (`EXPLICACIONES_API_MANAGE`).
  * `apiResponseInterceptor` ya desenvuelve `ApiResponse<T>` — los métodos
  * devuelven el payload directo.
  */

@@ -10,7 +10,7 @@ import { TicketTipoCatalogoFacade } from '../services/ticket-tipo-catalogo.facad
 import { EduButton, EduDialog, EduInputText, EduSortableColumn, EduSpinner, EduTable, EduTag, EduToggle } from '@edu-ui';
 // #endregion
 
-const AYUDA_TICKET_MANAGE = 'AYUDA_TICKET_MANAGE';
+const AYUDA_TICKET_API_MANAGE = 'AYUDA_TICKET_API_MANAGE';
 
 /**
  * Catálogo de tipos de problema (`TicketTipo`) — CRUD admin (F7a en `Educa.API`,
@@ -38,7 +38,7 @@ export class TicketTiposComponent implements OnInit {
 	readonly error = this.facade.error;
 	readonly submitting = this.facade.submitting;
 
-	readonly canAccess = this.userPermisos.hasCapability(AYUDA_TICKET_MANAGE);
+	readonly canAccess = this.userPermisos.hasCapability(AYUDA_TICKET_API_MANAGE);
 
 	readonly dialogVisible = signal(false);
 	readonly editingTipo = signal<TicketTipoAdminDto | null>(null);

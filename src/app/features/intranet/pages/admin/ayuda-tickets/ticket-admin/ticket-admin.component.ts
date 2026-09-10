@@ -11,13 +11,13 @@ import { TicketTiposComponent } from '../ticket-tipos/ticket-tipos.component';
 import { EduTab, EduTabs } from '@edu-ui';
 // #endregion
 
-const AYUDA_TICKET_MANAGE = 'AYUDA_TICKET_MANAGE';
+const AYUDA_TICKET_API_MANAGE = 'AYUDA_TICKET_API_MANAGE';
 
 type TicketAdminTab = 'bandeja' | 'tipos';
 
 /**
  * Shell de las 2 vistas admin del dominio Ticket (bandeja + catálogo de tipos),
- * ambas gateadas por la MISMA capability `AYUDA_TICKET_MANAGE` (F7a no creó una
+ * ambas gateadas por la MISMA capability `AYUDA_TICKET_API_MANAGE` (F7a no creó una
  * capability separada para el catálogo). El catálogo de capabilities del BE
  * asocia una única `CAP_Ruta` por capability (`intranet/admin/ayuda/tickets`,
  * seedeada en `20260724_CreateTicketTables.sql`) — el `permissionsGuard`
@@ -25,7 +25,7 @@ type TicketAdminTab = 'bandeja' | 'tipos';
  * esa ruta. Por eso las 2 vistas viven bajo UNA sola ruta con tabs por
  * queryParam, mismo patrón que `AttendancesComponent` (Gestión/Reportes/Panel),
  * en vez de 2 rutas hijas — 2 rutas exigirían 2 capabilities (fuera de alcance
- * del brief 484, que reusa `AYUDA_TICKET_MANAGE` explícitamente).
+ * del brief 484, que reusa `AYUDA_TICKET_API_MANAGE` explícitamente).
  */
 @Component({
 	selector: 'app-ticket-admin',
@@ -43,7 +43,7 @@ export class TicketAdminComponent {
 	private readonly userPermisos = inject(UserPermissionsService);
 	// #endregion
 
-	readonly canAccess = this.userPermisos.hasCapability(AYUDA_TICKET_MANAGE);
+	readonly canAccess = this.userPermisos.hasCapability(AYUDA_TICKET_API_MANAGE);
 	readonly activeTab = signal<TicketAdminTab>('bandeja');
 
 	constructor() {

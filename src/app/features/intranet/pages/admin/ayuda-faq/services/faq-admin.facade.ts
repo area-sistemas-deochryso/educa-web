@@ -18,7 +18,7 @@ import { FaqAdminService } from './faq-admin.service';
 // #endregion
 
 /**
- * Estado + CRUD de la vista admin de FAQ (`AYUDA_MANAGE`, brief 483).
+ * Estado + CRUD de la vista admin de FAQ (`AYUDA_FAQ_API_MANAGE`, brief 483).
  * Scoped al componente (no `providedIn: 'root'`) — mismo motivo que
  * `AyudaQaFacade`: el listado/búsqueda se reinicia al entrar a la vista.
  *

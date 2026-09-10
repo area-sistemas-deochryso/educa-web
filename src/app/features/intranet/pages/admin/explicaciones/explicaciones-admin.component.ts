@@ -21,9 +21,9 @@ import { EduButton, EduConfirmDialog, EduConfirmationService, EduInputText, EduM
 
 /**
  * Vista administrativa del contenido explicativo del modo informativo
- * (`EXPLICACIONES_MANAGE`, brief 525, plan xrepo-96 F3). Ruta `intranet/admin/explicaciones`
+ * (`EXPLICACIONES_API_MANAGE`, brief 525, plan xrepo-96 F3). Ruta `intranet/admin/explicaciones`
  * — el acceso ya lo gatea `permissionsGuard` comparando esa ruta contra la capability
- * `EXPLICACIONES_MANAGE` (seed en `Educa.API/Migrations/Manual/20260805_CreateExplicacionesTable.sql`).
+ * `EXPLICACIONES_API_MANAGE` (seed en `Educa.API/Migrations/Manual/20260805_CreateExplicacionesTable.sql`).
  * Panel propio, separado del admin de FAQ (`ayuda-faq-admin`) — conceptos distintos.
  */
 @Component({

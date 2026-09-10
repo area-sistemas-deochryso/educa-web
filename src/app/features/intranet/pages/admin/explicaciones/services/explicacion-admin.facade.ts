@@ -19,7 +19,7 @@ import { ExplicacionAdminService } from './explicacion-admin.service';
 
 /**
  * Estado + CRUD de la vista admin del contenido explicativo del modo informativo
- * (`EXPLICACIONES_MANAGE`, brief 525, plan xrepo-96 F3). Scoped al componente
+ * (`EXPLICACIONES_API_MANAGE`, brief 525, plan xrepo-96 F3). Scoped al componente
  * (no `providedIn: 'root'`) — el listado se reinicia al entrar a la vista.
  *
  * Mutaciones vía `WalFacadeHelper.execute({ consistencyLevel: 'server-confirmed' })`

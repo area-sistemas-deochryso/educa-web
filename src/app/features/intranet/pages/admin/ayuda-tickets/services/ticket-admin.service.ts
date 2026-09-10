@@ -16,7 +16,7 @@ import {
 
 /**
  * Gateway de los endpoints admin de Ticket del panel de ayuda (bandeja + catálogo de
- * tipos), protegidos por `AYUDA_TICKET_MANAGE` (ver `api-catalog.md` § Ayuda > Ticket).
+ * tipos), protegidos por `AYUDA_TICKET_API_MANAGE` (ver `api-catalog.md` § Ayuda > Ticket).
  * Domino distinto del `TicketService` público de F5 (ese consume `/api/tickets/*`,
  * este `/api/admin/tickets*` y `/api/admin/ticket-tipos*`).
  */

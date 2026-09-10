@@ -49,13 +49,13 @@ describe('TicketTiposComponent', () => {
 		TestBed.resetTestingModule();
 	});
 
-	it('con AYUDA_TICKET_MANAGE, inicializa el catálogo', () => {
+	it('con AYUDA_TICKET_API_MANAGE, inicializa el catálogo', () => {
 		const { component, facadeInit } = setup(true);
 		expect(component.canAccess).toBe(true);
 		expect(facadeInit).toHaveBeenCalled();
 	});
 
-	it('sin AYUDA_TICKET_MANAGE, no accede: no inicializa el catálogo', () => {
+	it('sin AYUDA_TICKET_API_MANAGE, no accede: no inicializa el catálogo', () => {
 		const { component, facadeInit } = setup(false);
 		expect(component.canAccess).toBe(false);
 		expect(facadeInit).not.toHaveBeenCalled();

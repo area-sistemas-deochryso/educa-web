@@ -17,8 +17,10 @@ export type CapabilityCode =
 	| 'ASISTENCIA_PROFESOR_PAGE_VIEW'
 	// F10-w2 (2026-09-09) — rename de Catálogo A (enum), ex `ADMIN_AUDITORIA_CORREOS`.
 	| 'AUDITORIA_CORREOS_API_VIEW'
-	| 'AYUDA_MANAGE'
-	| 'AYUDA_TICKET_MANAGE'
+	// F10-w4 (2026-09-10) — rename de capabilities post-F9, ex `AYUDA_MANAGE`.
+	| 'AYUDA_FAQ_API_MANAGE'
+	// F10-w4 (2026-09-10) — rename de capabilities post-F9, ex `AYUDA_TICKET_MANAGE`.
+	| 'AYUDA_TICKET_API_MANAGE'
 	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `CALENDARIO`.
 	| 'CALENDARIO_PAGE_USE'
 	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `ESTUDIANTE_NOTAS`.
@@ -61,7 +63,8 @@ export type CapabilityCode =
 	| 'ERROR_LOGS_API_VIEW'
 	// F10-w2 (2026-09-09) — rename de Catálogo A (enum), ex `ADMIN_EVENTOS_CALENDARIO`.
 	| 'EVENTOS_CALENDARIO_API_MANAGE'
-	| 'EXPLICACIONES_MANAGE'
+	// F10-w4 (2026-09-10) — rename de capabilities post-F9, ex `EXPLICACIONES_MANAGE`.
+	| 'EXPLICACIONES_API_MANAGE'
 	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `ESTUDIANTE_FORO`.
 	| 'FORO_ESTUDIANTE_PAGE_USE'
 	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `PROFESOR_FORO`.
@@ -75,13 +78,13 @@ export type CapabilityCode =
 	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `PROFESOR_HORARIOS`.
 	| 'HORARIOS_PROFESOR_PAGE_VIEW'
 	| 'INTRANET'
-	// Manually appended (brief 559, Plan 101 F4) — `JUSTIFICACION_ASISTENCIA_APROBAR`
-	// fue seedeada en `Educa.API` (migración manual
+	// Manually appended (brief 559, Plan 101 F4) — seedeada en `Educa.API` (migración manual
 	// `20260813_CreateSolicitudJustificacionAsistenciaTable.sql`, brief 557) pero
 	// `npm run gen:caps` necesita una sesión autenticada que no puede enviar en este
-	// entorno. Mismo caso que `AYUDA_MANAGE` arriba.
+	// entorno. Mismo caso que `AYUDA_FAQ_API_MANAGE` arriba.
+	// F10-w4 (2026-09-10) — rename de capabilities post-F9, ex `JUSTIFICACION_ASISTENCIA_APROBAR`.
 	// Remover este comentario cuando un regen naturalmente la incluya.
-	| 'JUSTIFICACION_ASISTENCIA_APROBAR'
+	| 'JUSTIFICACION_ASISTENCIA_API_APPROVE'
 	| 'MENSAJERIA'
 	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `ESTUDIANTE_MENSAJERIA`.
 	| 'MENSAJERIA_ESTUDIANTE_PAGE_USE'
@@ -101,12 +104,12 @@ export type CapabilityCode =
 	| 'RATE_LIMIT_EVENTS_API_VIEW'
 	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `ADMIN_RENDIMIENTO` (agregada a la tabla del
 	// plan recién en esta wave — no estaba en el listado original de 26, ver plan §Catálogo B).
-	// Sigue sin regen real de `gen:caps` por el mismo motivo que `AYUDA_MANAGE` arriba.
+	// Sigue sin regen real de `gen:caps` por el mismo motivo que `AYUDA_FAQ_API_MANAGE` arriba.
 	| 'RENDIMIENTO_ADMIN_PAGE_VIEW'
 	// Manually appended (brief 489) — `REPORTES_RENDIMIENTO` fue seedeada en
 	// `Educa.API` (briefs 490/489) pero `npm run gen:caps` necesita una sesión
 	// autenticada que no puede enviar en este entorno. Mismo caso que
-	// `AYUDA_MANAGE`/`AYUDA_TICKET_MANAGE` arriba. Remover este comentario
+	// `AYUDA_FAQ_API_MANAGE`/`AYUDA_TICKET_API_MANAGE` arriba. Remover este comentario
 	// cuando un regen naturalmente la incluya.
 	| 'REPORTES_RENDIMIENTO'
 	// F10-w2 (2026-09-09) — rename de Catálogo A (enum), ex `ADMIN_REPORTES_USUARIO`.

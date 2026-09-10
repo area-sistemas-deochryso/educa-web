@@ -19,9 +19,9 @@ import { EduButton, EduConfirmDialog, EduConfirmationService, EduInputText, EduM
 // #endregion
 
 /**
- * Vista administrativa de FAQ + wizard (`AYUDA_MANAGE`, xrepo-panel-ayuda-intranet F7b).
+ * Vista administrativa de FAQ + wizard (`AYUDA_FAQ_API_MANAGE`, xrepo-panel-ayuda-intranet F7b).
  * Ruta `intranet/admin/ayuda/faq` — el acceso ya lo gatea `permissionsGuard`
- * comparando esa ruta contra la capability `AYUDA_MANAGE` (seed en
+ * comparando esa ruta contra la capability `AYUDA_FAQ_API_MANAGE` (seed en
  * `Educa.API/Migrations/Manual/20260724_CreateFaqWizardTables.sql`).
  */
 @Component({

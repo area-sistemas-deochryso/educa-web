@@ -38,13 +38,13 @@ describe('TicketAdminComponent', () => {
 		TestBed.resetTestingModule();
 	});
 
-	it('con AYUDA_TICKET_MANAGE, permite el acceso y arranca en el tab bandeja', () => {
+	it('con AYUDA_TICKET_API_MANAGE, permite el acceso y arranca en el tab bandeja', () => {
 		const { component } = setup(true);
 		expect(component.canAccess).toBe(true);
 		expect(component.activeTab()).toBe('bandeja');
 	});
 
-	it('sin AYUDA_TICKET_MANAGE, bloquea el acceso a ambas vistas', () => {
+	it('sin AYUDA_TICKET_API_MANAGE, bloquea el acceso a ambas vistas', () => {
 		const { component } = setup(false);
 		expect(component.canAccess).toBe(false);
 	});

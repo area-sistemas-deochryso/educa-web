@@ -11,7 +11,7 @@ import { JustificacionAsistenciaBandejaFacade } from './justificacion-asistencia
 import { EduButton, EduConfirmDialog, EduConfirmationService, EduDialog, EduSelect, EduSpinner, EduTable, EduTag, EduTextarea } from '@edu-ui';
 // #endregion
 
-const JUSTIFICACION_ASISTENCIA_APROBAR = 'JUSTIFICACION_ASISTENCIA_APROBAR';
+const JUSTIFICACION_ASISTENCIA_API_APPROVE = 'JUSTIFICACION_ASISTENCIA_API_APPROVE';
 
 interface EstadoOption {
 	label: string;
@@ -66,7 +66,7 @@ export class JustificacionAsistenciaBandejaComponent implements OnInit {
 	readonly resolvingId = this.facade.resolvingId;
 
 	readonly estadoFiltroOptions = ESTADO_FILTRO_OPTIONS;
-	readonly canAccess = this.userPermisos.hasCapability(JUSTIFICACION_ASISTENCIA_APROBAR);
+	readonly canAccess = this.userPermisos.hasCapability(JUSTIFICACION_ASISTENCIA_API_APPROVE);
 
 	private readonly _filtroEstado = signal<EstadoSolicitudJustificacion | null>('PENDIENTE');
 	readonly filtroEstado = this._filtroEstado.asReadonly();

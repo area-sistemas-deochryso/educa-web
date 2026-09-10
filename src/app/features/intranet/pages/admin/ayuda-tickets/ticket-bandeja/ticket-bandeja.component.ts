@@ -10,7 +10,7 @@ import { TicketBandejaFacade } from '../services/ticket-bandeja.facade';
 import { EduSelect, EduSortableColumn, EduSpinner, EduTable, EduTag } from '@edu-ui';
 // #endregion
 
-const AYUDA_TICKET_MANAGE = 'AYUDA_TICKET_MANAGE';
+const AYUDA_TICKET_API_MANAGE = 'AYUDA_TICKET_API_MANAGE';
 
 interface EstadoOption {
 	label: string;
@@ -42,7 +42,7 @@ const ESTADO_LABEL: Record<TicketEstado, string> = {
 
 /**
  * Bandeja administrativa de tickets (xrepo-panel-ayuda-intranet F7b). Protegida
- * por `AYUDA_TICKET_MANAGE` — mismo criterio de gate a nivel componente que
+ * por `AYUDA_TICKET_API_MANAGE` — mismo criterio de gate a nivel componente que
  * `MonitoreoHubComponent`/`AttendanceComponent.canViewAdminPanel`.
  */
 @Component({
@@ -70,7 +70,7 @@ export class TicketBandejaComponent implements OnInit {
 	readonly estadoFiltroOptions = ESTADO_FILTRO_OPTIONS;
 	readonly estadoCambioOptions = ESTADO_CAMBIO_OPTIONS;
 
-	readonly canAccess = this.userPermisos.hasCapability(AYUDA_TICKET_MANAGE);
+	readonly canAccess = this.userPermisos.hasCapability(AYUDA_TICKET_API_MANAGE);
 	// #endregion
 
 	ngOnInit(): void {

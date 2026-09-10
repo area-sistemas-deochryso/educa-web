@@ -11,7 +11,7 @@ import {
 } from '../models/faq-admin.models';
 
 /**
- * Gateway del CRUD admin de FAQ + wizard (`AYUDA_MANAGE`).
+ * Gateway del CRUD admin de FAQ + wizard (`AYUDA_FAQ_API_MANAGE`).
  * `apiResponseInterceptor` ya desenvuelve `ApiResponse<T>` — los métodos
  * devuelven el payload directo.
  */

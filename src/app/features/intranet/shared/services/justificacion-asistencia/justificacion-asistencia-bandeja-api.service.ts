@@ -7,7 +7,7 @@ import { SolicitudJustificacionAsistenciaDto } from '@features/intranet/pages/es
 
 /**
  * Gateway de la bandeja de aprobación (Profesor + roles administrativos),
- * protegida por `JUSTIFICACION_ASISTENCIA_APROBAR` (Plan 101 F4). Dominio
+ * protegida por `JUSTIFICACION_ASISTENCIA_API_APPROVE` (Plan 101 F4). Dominio
  * `/api/justificacion-asistencia`, distinto del `EstudianteApiService`
  * (mismo controller BE, endpoints de autoservicio vs. bandeja).
  */

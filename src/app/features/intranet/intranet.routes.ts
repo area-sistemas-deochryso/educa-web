@@ -383,7 +383,7 @@ export const INTRANET_ROUTES: Routes = [
 			},
 			{
 				// Panel de ayuda — administración de FAQ (xrepo-panel-ayuda-intranet F7b,
-				// brief 483). Ruta debe coincidir con la capability `AYUDA_MANAGE`
+				// brief 483). Ruta debe coincidir con la capability `AYUDA_FAQ_API_MANAGE`
 				// seed en `Educa.API/Migrations/Manual/20260724_CreateFaqWizardTables.sql`
 				// ('intranet/admin/ayuda/faq').
 				path: 'admin/ayuda/faq',
@@ -394,7 +394,7 @@ export const INTRANET_ROUTES: Routes = [
 			{
 				// Panel del modo informativo — administración del contenido explicativo
 				// (plan xrepo-96 F3, brief 525). Ruta debe coincidir con la capability
-				// `EXPLICACIONES_MANAGE` seed en
+				// `EXPLICACIONES_API_MANAGE` seed en
 				// `Educa.API/Migrations/Manual/20260805_CreateExplicacionesTable.sql`
 				// ('intranet/admin/explicaciones'). Panel propio, separado del de FAQ.
 				path: 'admin/explicaciones',
@@ -467,7 +467,7 @@ export const INTRANET_ROUTES: Routes = [
 			// xrepo-panel-ayuda-intranet F7b — bandeja de tickets + catálogo de tipos,
 			// contraparte admin de la sección Ticket pública (F5, `intranet/ayuda`).
 			// Ruta única (tabs por queryParam, mismo patrón que `admin/asistencias`):
-			// la capability `AYUDA_TICKET_MANAGE` tiene una sola `CAP_Ruta` seedeada
+			// la capability `AYUDA_TICKET_API_MANAGE` tiene una sola `CAP_Ruta` seedeada
 			// (`intranet/admin/ayuda/tickets`) contra la que hace match exacto el
 			// `permissionsGuard` — 2 rutas hijas hubieran requerido 2 capabilities,
 			// fuera de alcance (F7a reusa la misma capability a propósito).
