@@ -37,6 +37,16 @@ $manifestPath = "$mainRepo/.claude/.locks/worktrees.json"
 
 Leer `worktrees.json`, remover la entry con `chatId === <NNN>` del array `active`. Escribir el archivo actualizado.
 
+### 3b. Desvincular junctions pesados (si el proyecto los define)
+
+Si `$mainRepo/.claude/rules/worktrees.md` define una sección de junction para carpetas pesadas (`node_modules`, `bin`/`obj`, etc. — mismo mecanismo que aplica `/wt-new` §5b al crear el worktree), desvincular esos junctions **antes** de `git worktree remove`:
+
+```powershell
+Remove-Item -Path "$wtPath\<carpeta>" -Force   # SIN -Recurse: en Windows esto borra solo el punto de enlace del junction, no atraviesa al target real
+```
+
+**Por qué es obligatorio, no opcional**: `git worktree remove` sobre un directorio que contiene un junction puede recorrerlo y borrar el contenido real del *target* en vez de solo el punto de enlace — confirmado en vivo, vació el `node_modules` real del checkout principal de este repo. Sin este paso, limpiar un worktree puede destruir datos del repo principal que nada tiene que ver con el worktree.
+
 ### 4. Eliminar worktree + branches
 
 ```powershell
