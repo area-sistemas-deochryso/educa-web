@@ -75,6 +75,7 @@ export class FeedbackReportFacade {
 	submit(context: { url: string; userAgent: string }): void {
 		const formData = this.store.formData();
 		if (!this.store.isValid() || this.store.submitting()) return;
+		if (!formData.tipo) return;
 
 		this.store.setSubmitting(true);
 		this.store.setError(null);
@@ -88,7 +89,7 @@ export class FeedbackReportFacade {
 			: this.trace.getLastRequestId();
 
 		const request: CrearReporteRequest = {
-			tipo: formData.tipo!,
+			tipo: formData.tipo,
 			descripcion: formData.descripcion.trim(),
 			propuesta: formData.propuesta?.trim() || null,
 			url: context.url.slice(0, 500),

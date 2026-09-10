@@ -13,6 +13,13 @@ import { CreacionMasivaResponseDto, CrearSalonDto } from '../../models';
 
 type DialogStep = 'upload' | 'preview' | 'result';
 
+/** Type guard: una fila `valido` tiene los 4 IDs presentes, pero el tipo no lo codifica. */
+function isCompleteRow(
+	f: SalonImportRow,
+): f is SalonImportRow & { gradoId: number; seccionId: number; sedeId: number; anio: number } {
+	return f.valido && f.gradoId !== null && f.seccionId !== null && f.sedeId !== null && f.anio !== null;
+}
+
 // #region Component
 @Component({
 	selector: 'app-salones-import-dialog',
@@ -83,12 +90,12 @@ export class SalonesImportDialogComponent {
 	}
 
 	onImportar(): void {
-		const validRows = this.filas().filter((f) => f.valido);
+		const validRows = this.filas().filter(isCompleteRow);
 		const payload: CrearSalonDto[] = validRows.map((f) => ({
-			gradoId: f.gradoId!,
-			seccionId: f.seccionId!,
-			sedeId: f.sedeId!,
-			anio: f.anio!,
+			gradoId: f.gradoId,
+			seccionId: f.seccionId,
+			sedeId: f.sedeId,
+			anio: f.anio,
 		}));
 		this.step.set('result');
 		this.importar.emit(payload);

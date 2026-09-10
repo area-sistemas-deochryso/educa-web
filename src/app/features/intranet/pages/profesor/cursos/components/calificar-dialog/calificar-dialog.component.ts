@@ -264,10 +264,10 @@ export class CalificarDialogComponent {
 	private onSaveIndividual(): void {
 		const rows = this.notaRows();
 		const notas: CalificarEstudianteDto[] = rows
-			.filter((r) => r.nota !== null && r.nota !== undefined && r.esEditable)
+			.filter((r): r is NotaRow & { nota: number } => r.nota !== null && r.nota !== undefined && r.esEditable)
 			.map((r) => ({
 				estudianteId: r.estudianteId,
-				nota: r.nota!,
+				nota: r.nota,
 				observacion: r.observacion || null,
 			}));
 
@@ -278,19 +278,19 @@ export class CalificarDialogComponent {
 	private onSaveGrupos(): void {
 		const rows = this.grupoNotaRows();
 		const grupos: CalificarGrupoDto[] = rows
-			.filter((r) => r.nota !== null && r.nota !== undefined)
+			.filter((r): r is GrupoNotaRow & { nota: number } => r.nota !== null && r.nota !== undefined)
 			.map((r) => {
 				const overrides: OverrideMiembroDto[] = r.miembros
-					.filter((m) => m.esOverride && m.overrideNota !== null)
+					.filter((m): m is typeof m & { overrideNota: number } => m.esOverride && m.overrideNota !== null)
 					.map((m) => ({
 						estudianteId: m.estudianteId,
-						nota: m.overrideNota!,
+						nota: m.overrideNota,
 						observacion: null,
 					}));
 
 				return {
 					grupoId: r.grupoId,
-					nota: r.nota!,
+					nota: r.nota,
 					observacion: r.observacion || null,
 					...(overrides.length > 0 ? { overrides } : {}),
 				};

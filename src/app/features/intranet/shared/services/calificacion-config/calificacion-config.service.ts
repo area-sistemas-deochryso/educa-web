@@ -61,8 +61,9 @@ export class CalificacionConfigService {
 		const year = anio ?? new Date().getFullYear();
 		const key = `${nivel}-${year}`;
 
-		if (this.cache.has(key)) {
-			return this.cache.get(key)!;
+		const cached = this.cache.get(key);
+		if (cached) {
+			return cached;
 		}
 
 		const request$ = this.http

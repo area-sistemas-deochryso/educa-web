@@ -26,9 +26,9 @@ describe('MiniSparklineComponent', () => {
 
 		const geometry = component.path();
 		expect(geometry).not.toBeNull();
-		expect(geometry!.d.startsWith('M ')).toBe(true);
+		expect(geometry?.d.startsWith('M ')).toBe(true);
 		// 30 puntos = 1 segmento M + 29 separadores ' L ' → split en 30 chunks
-		expect(geometry!.d.split(' L ').length).toBe(30);
+		expect(geometry?.d.split(' L ').length).toBe(30);
 
 		const svg = fixture.nativeElement.querySelector('svg.mini-sparkline');
 		expect(svg).toBeTruthy();
@@ -88,7 +88,7 @@ describe('MiniSparklineComponent', () => {
 
 		const geometry = component.path();
 		expect(geometry).not.toBeNull();
-		const ys = geometry!.d.match(/(\d+(\.\d+)?)/g)?.filter((_, i) => i % 2 === 1) ?? [];
+		const ys = geometry?.d.match(/(\d+(\.\d+)?)/g)?.filter((_, i) => i % 2 === 1) ?? [];
 		ys.forEach((y) => expect(Number(y)).toBe(20));
 	});
 

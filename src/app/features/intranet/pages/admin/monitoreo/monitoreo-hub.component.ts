@@ -151,15 +151,16 @@ export class MonitoreoHubComponent {
 		const deltas = this.badgesFacade.extras().deltas;
 		return this.domains().flatMap((d) =>
 			d.tiles
-				.filter((t) => t.badge?.level === 'critical' || t.badge?.level === 'warn')
+				.filter((t): t is RenderedTile & { badge: LinkBadge } => t.badge?.level === 'critical' || t.badge?.level === 'warn')
 				.map((t) => {
+					const badge = t.badge;
 					const raw = this.lookupDelta(t.badgeKey, deltas);
 					const showDelta = raw !== null && raw !== 0;
 					return {
 						label: t.label,
 						route: t.route,
 						icon: t.icon,
-						badge: t.badge!,
+						badge,
 						domainTone: d.tone,
 						hubParams: t.hubParams,
 						deltaAbs: showDelta ? Math.abs(raw) : null,

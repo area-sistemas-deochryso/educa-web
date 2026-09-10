@@ -68,11 +68,14 @@ export class NuevoSalonDialogComponent {
 	}
 
 	onSave(): void {
-		if (!this.isFormValid()) return;
+		const gradoId = this.gradoId();
+		const seccionId = this.seccionId();
+		const sedeId = this.sedeId();
+		if (gradoId === null || seccionId === null || sedeId === null || !this.anio()) return;
 		this.crear.emit({
-			gradoId: this.gradoId()!,
-			seccionId: this.seccionId()!,
-			sedeId: this.sedeId()!,
+			gradoId,
+			seccionId,
+			sedeId,
 			anio: this.anio(),
 		});
 	}

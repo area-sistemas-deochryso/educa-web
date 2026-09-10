@@ -218,14 +218,14 @@ export class UsersCrudFacade {
 				this.store.triggerRefresh();
 				this.store.incrementarEstadistica('totalUsuarios', 1);
 				this.store.incrementarEstadistica('usuariosActivos', 1);
-				this.updateRolEstadistica(data.rol!, 1);
+				this.updateRolEstadistica(payload.rol, 1);
 			},
 			onError: (err) => {
 				const match = extractDuplicateMatch(err);
 				if (match) {
 					this._pendingDuplicate.set({
-						nombres: data.nombres!,
-						apellidos: data.apellidos!,
+						nombres: payload.nombres,
+						apellidos: payload.apellidos,
 						match,
 					});
 					this.pendingRetryFn = () => {
@@ -289,8 +289,8 @@ export class UsersCrudFacade {
 				const match = extractDuplicateMatch(err);
 				if (match) {
 					this._pendingDuplicate.set({
-						nombres: data.nombres!,
-						apellidos: data.apellidos!,
+						nombres: payload.nombres,
+						apellidos: payload.apellidos,
 						match,
 					});
 					this.pendingRetryFn = () => {
@@ -311,10 +311,10 @@ export class UsersCrudFacade {
 					this.dataFacade.markCrudMutation();
 					const salonNombre = resolveSalonNombre(data, selectedUsuario, this.store.salones());
 					this.store.updateItem(id, {
-						dni: data.dni!,
-						nombreCompleto: formatFullName(data.apellidos!, data.nombres!),
-						nombres: data.nombres!,
-						apellidos: data.apellidos!,
+						dni: payload.dni,
+						nombreCompleto: formatFullName(payload.apellidos, payload.nombres),
+						nombres: payload.nombres,
+						apellidos: payload.apellidos,
 						correo: data.correo || undefined,
 						telefono: data.telefono || undefined,
 						estado: data.estado ?? true,

@@ -107,9 +107,9 @@ describe('rateLimitInterceptor', () => {
 			);
 
 			expect(receivedError).not.toBeNull();
-			expect(receivedError!.status).toBe(429);
+			expect(receivedError?.status).toBe(429);
 			// Error cuerpo preservado — el caller decide cómo mostrarlo
-			expect((receivedError!.error as { mensaje: string }).mensaje).toBe('Demasiadas solicitudes');
+			expect((receivedError?.error as { mensaje: string }).mensaje).toBe('Demasiadas solicitudes');
 		});
 
 		it('un 429 en un endpoint NO bloquea otros endpoints', () => {
@@ -145,7 +145,8 @@ describe('rateLimitInterceptor', () => {
 				statusText: 'Server Error',
 			});
 
-			expect(receivedError!.status).toBe(500);
+			expect(receivedError).not.toBeNull();
+			expect(receivedError?.status).toBe(500);
 		});
 	});
 	// #endregion

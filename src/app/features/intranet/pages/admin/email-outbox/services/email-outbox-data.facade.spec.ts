@@ -98,7 +98,7 @@ describe('EmailOutboxDataFacade — throttle widget', () => {
 
 		expect(api.throttleStatus).toHaveBeenCalledTimes(1);
 		expect(store.throttleStatus()).not.toBeNull();
-		expect(store.throttleStatus()!.domainCount).toBe(5);
+		expect(store.throttleStatus()?.domainCount).toBe(5);
 		expect(store.throttleLoading()).toBe(false);
 	});
 

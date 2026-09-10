@@ -209,7 +209,11 @@ describe('AttendanceViewController', () => {
 		it('guarda en storage y recarga asistencias', () => {
 			const { controller, config, dataServiceMock } = setup();
 			controller.loadEstudiantes();
-			vi.mocked(dataServiceMock.processAsistencias!).mockClear();
+			const processAsistencias = dataServiceMock.processAsistencias;
+			expect(processAsistencias).toBeDefined();
+			if (processAsistencias) {
+				vi.mocked(processAsistencias).mockClear();
+			}
 
 			controller.selectEstudiante(2);
 

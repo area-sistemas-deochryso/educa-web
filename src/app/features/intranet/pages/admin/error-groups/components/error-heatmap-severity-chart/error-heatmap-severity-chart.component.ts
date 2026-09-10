@@ -196,12 +196,13 @@ export class ErrorHeatmapSeverityChartComponent implements AfterViewInit {
 	}
 
 	private updateChart(dates: string[], series: Record<ErrorSeveridad, number[]>): void {
-		if (!this.chart) return;
-		this.chart.data.labels = dates;
+		const chart = this.chart;
+		if (!chart) return;
+		chart.data.labels = dates;
 		SEVERIDAD_ORDER.forEach((sev, i) => {
-			if (this.chart!.data.datasets[i]) this.chart!.data.datasets[i].data = series[sev];
+			if (chart.data.datasets[i]) chart.data.datasets[i].data = series[sev];
 		});
-		this.chart.update('none');
+		chart.update('none');
 	}
 
 	private handleClick(event: ChartEvent): void {

@@ -257,7 +257,10 @@ export class MobileMenuComponent {
 		modulo: ModuloMenu,
 		groupLabel: string,
 	): MobileSearchResult {
-		const route = item.route!;
+		const route = item.route;
+		if (!route) {
+			throw new Error('toResult called with an item missing route');
+		}
 		const routeExpanded = route.replace(/\//g, ' ').replace(/-/g, ' ');
 		const keywords = [item.label, modulo.label, groupLabel, route, routeExpanded].join(' ').toLowerCase();
 

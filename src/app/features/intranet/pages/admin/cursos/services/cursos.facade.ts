@@ -90,9 +90,11 @@ export class CursosFacade extends BaseCrudFacade<Curso, CursoFormData, CursosEst
 	}
 
 	toggleEstado(curso: Curso): void {
-		const payload = { rowVersion: curso.rowVersion };
+		if (!curso.rowVersion) return;
+		const rowVersion = curso.rowVersion;
+		const payload = { rowVersion };
 		this.walToggle(curso, payload,
-			() => this.api.toggleEstado(curso.id, curso.rowVersion!),
+			() => this.api.toggleEstado(curso.id, rowVersion),
 			STATS_KEYS,
 			(id) => this.store.toggleCursoEstado(id),
 			{

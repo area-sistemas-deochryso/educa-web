@@ -401,12 +401,13 @@ export class WalSyncEngine {
 			return result;
 		}
 
-		// Will retry later
+		// Will retry later — incrementRetry() always sets nextRetryAt when status stays PENDING.
+		const nextRetryAt = updated.nextRetryAt ?? Date.now();
 		const result: WalProcessResult = {
 			status: 'RETRYING',
 			entryId: entry.id,
 			retries: updated.retries,
-			nextRetryAt: updated.nextRetryAt!,
+			nextRetryAt,
 		};
 		this._entryProcessed$.next(result);
 		return result;

@@ -139,8 +139,9 @@ export class IntranetLayoutComponent implements OnInit, AfterViewInit, OnDestroy
 	private readonly _groupNodeChain = computed((): NavMenuItem[] => {
 		const item = findMenuItemDefByUrl(this._currentUrl(), this._selectedModuloId());
 		if (!item?.group) return [];
+		const group = item.group;
 		const chain: NavMenuItem[] = [];
-		const topNode = this._allItems().find((n) => n.label === item.group!.label && n.children);
+		const topNode = this._allItems().find((n) => n.label === group.label && n.children);
 		if (!topNode) return [];
 		chain.push(topNode);
 		let siblings = topNode.children ?? [];

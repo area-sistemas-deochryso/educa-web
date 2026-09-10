@@ -337,7 +337,7 @@ describe('SignalRService', () => {
 			const handler = mockConn.handlers.get('NuevoMensaje');
 			expect(handler).toBeDefined();
 
-			handler!({
+			handler?.({
 				Id: 10,
 				RemitenteDni: '12345678',
 				RemitenteNombre: 'Test User',

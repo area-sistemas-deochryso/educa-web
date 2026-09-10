@@ -64,8 +64,8 @@ export class ErrorReporterService {
 
 		const dedupKey = `${status}:${sanitizeUrl(url, this.isBrowser)}`;
 		const now = Date.now();
-		if (this.recentReports.has(dedupKey) &&
-			now - this.recentReports.get(dedupKey)! < ErrorReporterService.DEDUP_WINDOW_MS) {
+		const lastReportedAt = this.recentReports.get(dedupKey);
+		if (lastReportedAt !== undefined && now - lastReportedAt < ErrorReporterService.DEDUP_WINDOW_MS) {
 			return;
 		}
 		this.recentReports.set(dedupKey, now);
@@ -102,8 +102,8 @@ export class ErrorReporterService {
 		if (!this.isBrowser || !this.canReport()) return;
 		const dedupKey = `slow:${sanitizeUrl(url, this.isBrowser)}`;
 		const now = Date.now();
-		if (this.recentReports.has(dedupKey) &&
-			now - this.recentReports.get(dedupKey)! < ErrorReporterService.DEDUP_WINDOW_MS) {
+		const lastReportedAt = this.recentReports.get(dedupKey);
+		if (lastReportedAt !== undefined && now - lastReportedAt < ErrorReporterService.DEDUP_WINDOW_MS) {
 			return;
 		}
 		this.recentReports.set(dedupKey, now);

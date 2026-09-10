@@ -135,6 +135,7 @@ export class ResourceStatsChartComponent implements AfterViewInit {
 			this.createChart(data);
 			return;
 		}
+		const chart = this.chart;
 
 		const toPoints = (values: (d: ResourceStatsSnapshotDto) => number) =>
 			data.map((d) => ({ x: new Date(d.timestamp).getTime(), y: values(d) }));
@@ -145,14 +146,16 @@ export class ResourceStatsChartComponent implements AfterViewInit {
 			toPoints((d) => d.logWritePercent),
 			toPoints((d) => d.memoryUsagePercent)];
 		values.forEach((v, i) => {
-			if (this.chart!.data.datasets[i]) this.chart!.data.datasets[i].data = v;
+			if (chart.data.datasets[i]) chart.data.datasets[i].data = v;
 		});
 
-		const xScale = this.chart.options.scales!['x']!;
-		xScale.min = Date.now() - CHART_WINDOW_MS;
-		xScale.max = Date.now();
+		const xScale = chart.options.scales?.['x'];
+		if (xScale) {
+			xScale.min = Date.now() - CHART_WINDOW_MS;
+			xScale.max = Date.now();
+		}
 
-		this.chart.update('none');
+		chart.update('none');
 	}
 
 	private destroyChart(): void {

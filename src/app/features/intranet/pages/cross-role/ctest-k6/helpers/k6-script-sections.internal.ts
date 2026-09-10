@@ -189,8 +189,9 @@ export function pushEndpointCalls(
 		const ep = endpoints[i];
 		const role = hasAuth ? detectEndpointRole(ep) : null;
 		if (role) {
-			if (!roleGroups.has(role)) roleGroups.set(role, []);
-			roleGroups.get(role)!.push({ ep, idx: i });
+			const list = roleGroups.get(role) ?? [];
+			list.push({ ep, idx: i });
+			roleGroups.set(role, list);
 		} else {
 			commonEps.push({ ep, idx: i });
 		}

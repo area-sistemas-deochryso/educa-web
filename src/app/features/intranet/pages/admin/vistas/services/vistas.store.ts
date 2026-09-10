@@ -105,7 +105,7 @@ export class VistasStore extends BaseCrudStore<CapabilityCatalogItem, Capability
 		items: this.itemsWithRoute(),
 		loading: this.loading(),
 		error: this.error(),
-		estadisticas: this.estadisticas()!,
+		estadisticas: this.estadisticas() ?? { total: 0, totalModulos: 0, modulos: [] },
 
 		page: this.page(),
 		pageSize: this.pageSize(),

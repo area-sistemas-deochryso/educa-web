@@ -372,12 +372,12 @@ export class EstudianteCursosFacade {
 
 		const snapshots: ActividadSnapshot[] = contenido.semanas
 			.flatMap((s) => s.tareas)
-			.filter((t) => t.fechaLimite)
+			.filter((t): t is typeof t & { fechaLimite: NonNullable<typeof t.fechaLimite> } => !!t.fechaLimite)
 			.map((t) => ({
 				cursoNombre,
 				titulo: t.titulo,
 				tipo: 'Tarea',
-				fecha: t.fechaLimite!,
+				fecha: t.fechaLimite,
 			}));
 
 		if (snapshots.length > 0) {

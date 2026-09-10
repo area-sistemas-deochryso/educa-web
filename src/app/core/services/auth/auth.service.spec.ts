@@ -149,7 +149,10 @@ describe('AuthService', () => {
 			}
 
 			// Reset mock to track the next call
-			vi.mocked(apiMock.login!).mockClear();
+			expect(apiMock.login).toBeDefined();
+			if (apiMock.login) {
+				vi.mocked(apiMock.login).mockClear();
+			}
 
 			service.login('12345678', 'password', 'Estudiante').subscribe((response) => {
 				expect(response.success).toBe(false);

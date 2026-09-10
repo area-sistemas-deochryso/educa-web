@@ -240,19 +240,19 @@ describe('BaseCrudStore', () => {
 		it('should increment a stat field', () => {
 			store.setEstadisticas({ total: 10, activos: 7, inactivos: 3 });
 			store.incrementarEstadistica('total', 1);
-			expect(store.estadisticas()!.total).toBe(11);
+			expect(store.estadisticas()?.total).toBe(11);
 		});
 
 		it('should decrement a stat field', () => {
 			store.setEstadisticas({ total: 10, activos: 7, inactivos: 3 });
 			store.incrementarEstadistica('activos', -1);
-			expect(store.estadisticas()!.activos).toBe(6);
+			expect(store.estadisticas()?.activos).toBe(6);
 		});
 
 		it('should not go below zero', () => {
 			store.setEstadisticas({ total: 0, activos: 0, inactivos: 0 });
 			store.incrementarEstadistica('total', -5);
-			expect(store.estadisticas()!.total).toBe(0);
+			expect(store.estadisticas()?.total).toBe(0);
 		});
 
 		it('should handle null stats gracefully', () => {

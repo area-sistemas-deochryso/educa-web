@@ -132,10 +132,11 @@ describe('ProfesorStore', () => {
 
 		it('should sort by horaInicio within each day', () => {
 			store.setHorarios(mockHorarios);
-			const lunes = store.horariosPorDia().get('Lunes')!;
+			const lunes = store.horariosPorDia().get('Lunes');
 
-			expect(lunes[0].horaInicio).toBe('08:00');
-			expect(lunes[1].horaInicio).toBe('10:00');
+			expect(lunes).toBeDefined();
+			expect(lunes?.[0].horaInicio).toBe('08:00');
+			expect(lunes?.[1].horaInicio).toBe('10:00');
 		});
 	});
 	// #endregion

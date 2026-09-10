@@ -38,7 +38,7 @@ describe('RateLimitCountdownToastComponent', () => {
 		const toast = (fixture.nativeElement as HTMLElement).querySelector('.rate-limit-toast');
 		expect(toast).not.toBeNull();
 
-		const text = toast!.textContent ?? '';
+		const text = toast?.textContent ?? '';
 		expect(text).toContain('Demasiadas solicitudes');
 		expect(text).toContain('30 segundos');
 	});
@@ -61,7 +61,8 @@ describe('RateLimitCountdownToastComponent', () => {
 		const closeBtn = (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>(
 			'.rate-limit-toast__close',
 		);
-		closeBtn!.click();
+		expect(closeBtn).not.toBeNull();
+		closeBtn?.click();
 		fixture.detectChanges();
 
 		expect(countdown.isActive()).toBe(false);

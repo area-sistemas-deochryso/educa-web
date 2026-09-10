@@ -313,7 +313,9 @@ describe('UserPermissionsService', () => {
 	describe('computed signals', () => {
 		it('should derive vistasPermitidas from capabilities with ruta', () => {
 			(service as unknown as ServiceTestAccess)._capabilities.set(mockCapabilities);
-			const expectedRoutes = mockCapabilities.filter((c) => c.ruta !== null).map((c) => c.ruta!);
+			const expectedRoutes = mockCapabilities
+				.filter((c): c is CapabilityAuth & { ruta: string } => c.ruta !== null)
+				.map((c) => c.ruta);
 			expect(service.vistasPermitidas()).toEqual(expectedRoutes);
 		});
 

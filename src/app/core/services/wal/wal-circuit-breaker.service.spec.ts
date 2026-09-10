@@ -82,7 +82,8 @@ describe('WalCircuitBreaker', () => {
 			breaker.recordFailure();
 
 			expect(store.circuitState()).toBe('open');
-			expect(store.circuitOpenedAt()!).toBeGreaterThan(before);
+			expect(store.circuitOpenedAt()).not.toBeNull();
+			expect(store.circuitOpenedAt()).toBeGreaterThan(before);
 		});
 
 		it('counter resets to 0 on success', () => {

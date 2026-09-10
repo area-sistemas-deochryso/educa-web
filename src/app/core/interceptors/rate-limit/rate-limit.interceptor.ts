@@ -24,8 +24,8 @@ const waitQueue: Subject<void>[] = [];
 export function resetRateLimitState(): void {
 	inFlight = 0;
 	while (waitQueue.length > 0) {
-		const s = waitQueue.shift()!;
-		s.complete();
+		const s = waitQueue.shift();
+		s?.complete();
 	}
 }
 
@@ -75,8 +75,9 @@ function releaseSlot(): void {
 	inFlight = Math.max(0, inFlight - 1);
 
 	if (waitQueue.length > 0 && inFlight < MAX_CONCURRENT) {
+		const next = waitQueue.shift();
+		if (!next) return;
 		inFlight++;
-		const next = waitQueue.shift()!;
 		next.next();
 		next.complete();
 	}

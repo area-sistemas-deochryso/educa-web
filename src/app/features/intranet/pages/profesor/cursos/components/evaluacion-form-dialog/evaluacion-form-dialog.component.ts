@@ -170,17 +170,18 @@ export class EvaluacionFormDialogComponent {
 		if (this.submitting()) return;
 
 		const data = this.formData();
-		if (!this.isFormValid() || !this.contenidoId()) return;
+		const contenidoId = this.contenidoId();
+		if (!this.isFormValid() || !contenidoId || data.semanaId === null || data.fechaEvaluacion === null) return;
 
 		this.submitting.set(true);
 
 		const dto: CrearCalificacionDto = {
-			cursoContenidoId: this.contenidoId()!,
+			cursoContenidoId: contenidoId,
 			tareaId: data.tareaId,
-			semanaId: data.semanaId!,
+			semanaId: data.semanaId,
 			titulo: data.titulo.trim(),
 			peso: data.peso,
-			fechaEvaluacion: toLocalIso(data.fechaEvaluacion!),
+			fechaEvaluacion: toLocalIso(data.fechaEvaluacion),
 			tipo: data.tipo,
 			esGrupal: data.esGrupal,
 		};

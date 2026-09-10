@@ -141,9 +141,9 @@ describe('SyncRangeDialogComponent', () => {
 			component.onConfirm();
 
 			expect(emitted).not.toBeNull();
-			expect(emitted!.fechaInicio).toBe('2026-03-01');
-			expect(emitted!.fechaFin).toBe('2026-03-05');
-			expect(emitted!.dnis).toBeUndefined();
+			expect(emitted?.fechaInicio).toBe('2026-03-01');
+			expect(emitted?.fechaFin).toBe('2026-03-05');
+			expect(emitted?.dnis).toBeUndefined();
 		});
 
 		it('emits payload with dnis when todosUsuarios off and persons selected', () => {
@@ -156,7 +156,8 @@ describe('SyncRangeDialogComponent', () => {
 			component.confirm.subscribe((p) => (emitted = p));
 			component.onConfirm();
 
-			expect(emitted!.dnis).toEqual(['12345678', '87654321']);
+			expect(emitted).not.toBeNull();
+			expect(emitted?.dnis).toEqual(['12345678', '87654321']);
 		});
 
 		it('closes dialog after confirm', () => {

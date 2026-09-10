@@ -53,7 +53,7 @@ describe('ErrorHandlerService', () => {
 			service.handleHttpError(httpError);
 
 			expect(service.currentNotification()).not.toBeNull();
-			expect(service.currentNotification()!.severity).toBe('error');
+			expect(service.currentNotification()?.severity).toBe('error');
 		});
 
 		it('should append traceId reference for 500+ errors', () => {
@@ -81,7 +81,7 @@ describe('ErrorHandlerService', () => {
 
 			service.handleHttpError(httpError);
 
-			expect(service.currentNotification()!.action).toEqual({
+			expect(service.currentNotification()?.action).toEqual({
 				label: 'Ir a Usuarios',
 				callback: expect.any(Function),
 			});
@@ -95,7 +95,7 @@ describe('ErrorHandlerService', () => {
 
 			service.handleHttpError(httpError);
 
-			expect(service.currentNotification()!.action?.label).toBe('Ir a Usuarios');
+			expect(service.currentNotification()?.action?.label).toBe('Ir a Usuarios');
 		});
 
 		it('should have no action when errorCode is unmapped and BE sends no suggestedAction', () => {
@@ -106,7 +106,7 @@ describe('ErrorHandlerService', () => {
 
 			service.handleHttpError(httpError);
 
-			expect(service.currentNotification()!.action).toBeUndefined();
+			expect(service.currentNotification()?.action).toBeUndefined();
 		});
 	});
 	// #endregion
@@ -191,7 +191,7 @@ describe('ErrorHandlerService', () => {
 			service.handleValidationError('First');
 			service.handleValidationError('Second');
 
-			expect(service.lastError()!.message).toBe('Second');
+			expect(service.lastError()?.message).toBe('Second');
 		});
 	});
 	// #endregion

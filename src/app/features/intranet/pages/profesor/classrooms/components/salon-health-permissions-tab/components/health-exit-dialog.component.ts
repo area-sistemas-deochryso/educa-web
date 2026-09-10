@@ -157,9 +157,11 @@ export class HealthExitDialogComponent implements OnChanges {
 
 	onSave(): void {
 		if (!this.canSave()) return;
+		const estudianteId = this.selectedStudent;
+		if (!estudianteId) return;
 
 		this.save.emit({
-			estudianteId: this.selectedStudent!,
+			estudianteId,
 			sintomas: this.selectedSymptoms,
 			sintomaDetalle: this.showDetail() ? this.detail.trim() : undefined,
 			observacion: this.observacion.trim() || undefined,

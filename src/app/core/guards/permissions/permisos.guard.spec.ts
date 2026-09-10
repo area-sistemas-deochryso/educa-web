@@ -24,7 +24,10 @@ function buildRouteChain(...segments: string[][]): ActivatedRouteSnapshot {
 		parent = route;
 	}
 
-	return parent!;
+	if (!parent) {
+		throw new Error('buildRouteChain requires at least one segment');
+	}
+	return parent;
 }
 
 // #endregion

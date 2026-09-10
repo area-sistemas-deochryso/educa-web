@@ -111,7 +111,7 @@ export class NotificacionesAdminStore extends BaseCrudStore<
 		items: this.filteredItems(),
 		loading: this.loading(),
 		error: this.error(),
-		estadisticas: this.estadisticas()!,
+		estadisticas: this.estadisticas() ?? { total: 0, activas: 0, inactivas: 0, vigentesHoy: 0 },
 
 		dialogVisible: this.dialogVisible(),
 		isEditing: this.isEditing(),

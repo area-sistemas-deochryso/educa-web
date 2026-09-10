@@ -40,9 +40,9 @@ class MinHeap {
 
 	extractMin(): AStarNode {
 		const min = this.heap[0];
-		const last = this.heap.pop()!;
+		const last = this.heap.pop();
 		this.index.delete(min.id);
-		if (this.heap.length > 0) {
+		if (last !== undefined && this.heap.length > 0) {
 			this.heap[0] = last;
 			this.index.set(last.id, 0);
 			this.siftDown(0);
@@ -55,7 +55,8 @@ class MinHeap {
 	}
 
 	decreaseKey(id: string, g: number, f: number, parent: string | null): void {
-		const i = this.index.get(id)!;
+		const i = this.index.get(id);
+		if (i === undefined) return;
 		this.heap[i].g = g;
 		this.heap[i].f = f;
 		this.heap[i].parent = parent;
@@ -115,6 +116,19 @@ const COLLISION_PADDING = 8;
  */
 @Injectable({ providedIn: 'root' })
 export class PathfindingHelper {
+	/**
+	 * Lee un valor de un Map asumiendo una invariante que el flujo de llamada garantiza
+	 * (ej: todo id de `path` proviene de `nodeMap`). Si la invariante se rompe, es un bug
+	 * real y debe explotar con contexto en vez de propagar `undefined` silenciosamente.
+	 */
+	private getOrThrow<K, V>(map: Map<K, V>, key: K, context: string): V {
+		const value = map.get(key);
+		if (value === undefined) {
+			throw new Error(`PathfindingHelper: ${context} no encontrado (invariante violada)`);
+		}
+		return value;
+	}
+
 	// #region API Pública
 
 	findPath(
@@ -156,7 +170,7 @@ export class PathfindingHelper {
 		nodeMap: Map<string, CampusNode>,
 		adjacency: Map<string, AdjacencyEntry[]>,
 	): string[] | null {
-		const endNode = nodeMap.get(endId)!;
+		const endNode = this.getOrThrow(nodeMap, endId, `nodo destino ${endId}`);
 
 		const openSet = new MinHeap();
 		openSet.insert({ id: startId, g: 0, f: 0, parent: null });
@@ -224,7 +238,7 @@ export class PathfindingHelper {
 		let current = endId;
 
 		while (cameFrom.has(current)) {
-			current = cameFrom.get(current)!;
+			current = this.getOrThrow(cameFrom, current, `predecesor de ${current}`);
 			path.unshift(current);
 		}
 
@@ -294,20 +308,20 @@ export class PathfindingHelper {
 		let i = 0;
 
 		while (i < path.length - 1) {
-			const from = nodeMap.get(path[i])!;
+			const from = this.getOrThrow(nodeMap, path[i], `nodo del path ${path[i]}`);
 
 			// Avanzar saltando corredores intermedios hasta el próximo nodo significativo
 			// o hasta un cambio de piso
 			let j = i + 1;
 			while (j < path.length - 1) {
-				const next = nodeMap.get(path[j])!;
-				const prev = nodeMap.get(path[j - 1])!;
+				const next = this.getOrThrow(nodeMap, path[j], `nodo del path ${path[j]}`);
+				const prev = this.getOrThrow(nodeMap, path[j - 1], `nodo del path ${path[j - 1]}`);
 				// Detener en cambio de piso o en nodo no-corredor
 				if (next.floor !== prev.floor || next.type !== 'corridor') break;
 				j++;
 			}
 
-			const to = nodeMap.get(path[j])!;
+			const to = this.getOrThrow(nodeMap, path[j], `nodo del path ${path[j]}`);
 			const floorChange = from.floor !== to.floor;
 
 			let instruction: string;

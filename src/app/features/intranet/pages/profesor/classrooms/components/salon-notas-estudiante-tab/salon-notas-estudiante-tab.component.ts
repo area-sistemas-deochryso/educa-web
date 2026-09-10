@@ -181,9 +181,10 @@ export class SalonNotasEstudianteTabComponent {
 			// Replace with simulated value when simulator is active
 			const useSimulated = p.periodo in simProms;
 
-			groupMap.get(key)!.push({
+			const groupItems = groupMap.get(key);
+			groupItems?.push({
 				periodo: p.periodo,
-				promedio: useSimulated ? simProms[p.periodo]! : p.promedio,
+				promedio: useSimulated ? simProms[p.periodo] : p.promedio,
 				simulated: useSimulated,
 			});
 		}

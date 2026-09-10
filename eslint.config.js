@@ -253,6 +253,42 @@ const structurePlugin = {
 };
 // #endregion
 
+// #region Plugin local: Seguridad
+// no-bypass-security-trust: prohíbe DomSanitizer.bypassSecurityTrust* sin excepción.
+// Heurística por nombre de método (no resuelve tipos), mismo nivel que walPlugin/structurePlugin.
+const BYPASS_SECURITY_TRUST_METHODS = /^bypassSecurityTrust(Html|Url|ResourceUrl|Script|Style)$/;
+
+const securityPlugin = {
+	rules: {
+		'no-bypass-security-trust': {
+			meta: {
+				type: 'problem',
+				docs: {
+					description:
+						'Prohibe DomSanitizer.bypassSecurityTrust* — deshabilita la sanitización automática de Angular y es un vector de XSS.',
+				},
+				messages: {
+					noBypass:
+						"'{{method}}' deshabilita la sanitización automática de Angular y es un vector de XSS. Si un caso puntual lo requiere, debe discutirse como excepción explícita en eslint.config.js — no silenciarse en el código de uso.",
+				},
+				schema: [],
+			},
+			create(context) {
+				return {
+					CallExpression(node) {
+						if (node.callee?.type !== 'MemberExpression') return;
+						const method = node.callee.property?.name;
+						if (!method || !BYPASS_SECURITY_TRUST_METHODS.test(method)) return;
+
+						context.report({ node, messageId: 'noBypass', data: { method } });
+					},
+				};
+			},
+		},
+	},
+};
+// #endregion
+
 // #region Plugin local: api-shape — anti-pattern del unwrap doble (Plan brief 130)
 // Detecta el patrón: `http.get<X[]>(this.apiBase, ...)` cuando `apiBase` apunta a un endpoint
 // BE que devuelve `ApiResponse<PaginatedResult<X>>`. Tras el `apiResponseInterceptor`, el body
@@ -1168,8 +1204,12 @@ module.exports = tseslint.config(
 		plugins: {
 			structure: structurePlugin,
 			'layer-enforcement': layerEnforcementPlugin,
+			security: securityPlugin,
 		},
 		rules: {
+			// Seguridad
+			'security/no-bypass-security-trust': 'error',
+
 			// Estructura y crecimiento
 			// max-lines: archivos > 300 líneas requieren escape hatch justificado a nivel de archivo.
 			// Escape: /* eslint-disable max-lines -- Razón: <justificación específica> */ al inicio del archivo.
@@ -1209,7 +1249,8 @@ module.exports = tseslint.config(
 			],
 
 			// TypeScript rules
-			'@typescript-eslint/no-explicit-any': 'warn',
+			'@typescript-eslint/no-explicit-any': 'error',
+			'@typescript-eslint/no-non-null-assertion': 'error',
 			'@typescript-eslint/no-unused-vars': [
 				'warn',
 				{

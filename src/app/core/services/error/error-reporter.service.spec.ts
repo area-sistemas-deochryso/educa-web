@@ -417,7 +417,7 @@ describe('ErrorReporterService', () => {
 		});
 
 		it('buildPayload produces correct NETWORK_REVALIDATION_FAILED shape', () => {
-			const payload = swBuildPayload!({ url: '/api/cached-resource' }) as Record<string, unknown>;
+			const payload = swBuildPayload?.({ url: '/api/cached-resource' }) as Record<string, unknown>;
 			expect(payload['origen']).toBe('NETWORK');
 			expect(payload['errorCode']).toBe('NETWORK_REVALIDATION_FAILED');
 			expect(payload['severidad']).toBe('WARNING');
@@ -425,7 +425,7 @@ describe('ErrorReporterService', () => {
 
 		it('savePending delegates to saveReportToOutbox', () => {
 			const fakePayload = { test: true };
-			swSavePending!(fakePayload);
+			swSavePending?.(fakePayload);
 			expect(saveReportToOutbox).toHaveBeenCalledWith(fakePayload);
 		});
 	});

@@ -162,7 +162,7 @@ export class RuntimeHealthHistoryComponent implements AfterViewInit {
 					...baseOpts,
 					scales: {
 						...baseOpts.scales,
-						y: { ...baseOpts.scales!['y'], title: { display: true, text: 'ms' } },
+						y: { ...(baseOpts.scales?.['y'] ?? {}), title: { display: true, text: 'ms' } },
 					},
 				},
 			}));
@@ -183,7 +183,7 @@ export class RuntimeHealthHistoryComponent implements AfterViewInit {
 					...baseOpts,
 					scales: {
 						...baseOpts.scales,
-						y: { ...baseOpts.scales!['y'], title: { display: true, text: 'MB' } },
+						y: { ...(baseOpts.scales?.['y'] ?? {}), title: { display: true, text: 'MB' } },
 						y1: {
 							type: 'linear',
 							position: 'right',

@@ -234,8 +234,8 @@ describe('CursosFacade', () => {
 			facade.toggleEstado(mockCursos[0]); // estado true → false
 
 			expect(store.items()[0].estado).toBe(false);
-			expect(store.estadisticas()!.cursosActivos).toBe(0);
-			expect(store.estadisticas()!.cursosInactivos).toBe(2);
+			expect(store.estadisticas()?.cursosActivos).toBe(0);
+			expect(store.estadisticas()?.cursosInactivos).toBe(2);
 		});
 
 		it('should soft-delete: keep item as inactive, total unchanged, activos→inactivos', () => {
@@ -246,9 +246,9 @@ describe('CursosFacade', () => {
 			expect(store.items()).toHaveLength(2); // item NO se quita
 			const c1 = store.items().find((c) => c.id === 1);
 			expect(c1?.estado).toBe(false); // marcado como inactivo
-			expect(store.estadisticas()!.totalCursos).toBe(2); // sin cambio
-			expect(store.estadisticas()!.cursosActivos).toBe(0); // 1 → 0
-			expect(store.estadisticas()!.cursosInactivos).toBe(2); // 1 → 2
+			expect(store.estadisticas()?.totalCursos).toBe(2); // sin cambio
+			expect(store.estadisticas()?.cursosActivos).toBe(0); // 1 → 0
+			expect(store.estadisticas()?.cursosInactivos).toBe(2); // 1 → 2
 		});
 
 		it('should soft-delete inactive curso as no-op on counters', () => {
@@ -256,9 +256,9 @@ describe('CursosFacade', () => {
 			facade.delete(mockCursos[1]); // estado: false (curso 2)
 
 			expect(store.items()).toHaveLength(2);
-			expect(store.estadisticas()!.totalCursos).toBe(2);
-			expect(store.estadisticas()!.cursosActivos).toBe(1);
-			expect(store.estadisticas()!.cursosInactivos).toBe(1);
+			expect(store.estadisticas()?.totalCursos).toBe(2);
+			expect(store.estadisticas()?.cursosActivos).toBe(1);
+			expect(store.estadisticas()?.cursosInactivos).toBe(1);
 		});
 	});
 	// #endregion

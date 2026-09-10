@@ -46,7 +46,10 @@ function toResult(
 	groupLabel: string,
 	subgroupLabel: string | undefined,
 ): SearchResult {
-	const route = item.route!;
+	const route = item.route;
+	if (!route) {
+		throw new Error('toResult called with an item missing route');
+	}
 	// Include route as-is (for "intranet/admin") AND with separators as spaces (for "admin horarios").
 	const routeExpanded = route.replace(/\//g, ' ').replace(/-/g, ' ');
 	const keywords = [item.label, modulo.label, groupLabel, subgroupLabel ?? '', route, routeExpanded]

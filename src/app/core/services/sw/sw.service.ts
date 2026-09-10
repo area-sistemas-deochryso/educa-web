@@ -151,7 +151,8 @@ export class SwService {
 	 * @param url - URL exacta a invalidar (será normalizada por el SW)
 	 */
 	async invalidateCacheByUrl(url: string): Promise<void> {
-		if (!this.registration?.active) {
+		const active = this.registration?.active;
+		if (!active) {
 			logger.warn('[SwService] No hay SW activo para invalidar cache');
 			return;
 		}
@@ -165,7 +166,7 @@ export class SwService {
 				resolve();
 			};
 
-			this.registration!.active!.postMessage(
+			active.postMessage(
 				{
 					type: 'INVALIDATE_BY_URL',
 					payload: { url },
@@ -200,7 +201,8 @@ export class SwService {
 	 * @returns Número de entradas invalidadas (útil para logging/debug)
 	 */
 	async invalidateCacheByPattern(pattern: string): Promise<number> {
-		if (!this.registration?.active) {
+		const active = this.registration?.active;
+		if (!active) {
 			logger.warn('[SwService] No hay SW activo para invalidar cache');
 			return 0;
 		}
@@ -215,7 +217,7 @@ export class SwService {
 				resolve(count);
 			};
 
-			this.registration!.active!.postMessage(
+			active.postMessage(
 				{
 					type: 'INVALIDATE_BY_PATTERN',
 					payload: { pattern },
@@ -245,7 +247,8 @@ export class SwService {
 	 * @returns número de URLs que emitieron `cacheUpdated$`
 	 */
 	async refetchByPattern(pattern: string): Promise<number> {
-		if (!this._isRegistered() || !this.registration?.active) return 0;
+		const active = this.registration?.active;
+		if (!this._isRegistered() || !active) return 0;
 
 		return new Promise((resolve) => {
 			const messageChannel = new MessageChannel();
@@ -257,7 +260,7 @@ export class SwService {
 				resolve(count);
 			};
 
-			this.registration!.active!.postMessage(
+			active.postMessage(
 				{
 					type: 'REFETCH_BY_PATTERN',
 					payload: { pattern },

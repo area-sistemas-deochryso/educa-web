@@ -103,7 +103,8 @@ export class SignalRService {
 				await this.connect();
 			}
 
-			await this.connection!.invoke('JoinConversacion', conversacionId);
+			if (!this.connection) return;
+			await this.connection.invoke('JoinConversacion', conversacionId);
 			this.joinedGroups.add(conversacionId);
 			logger.log(`SignalR: Unido a conversación ${conversacionId}`);
 		} catch (err) {

@@ -26,7 +26,10 @@ function createDbMock() {
 	const store = new Map<string, WalEntry>();
 	return {
 		put: vi.fn((e: WalEntry) => { store.set(e.id, { ...e }); return Promise.resolve(); }),
-		get: vi.fn((id: string) => Promise.resolve(store.get(id) ? { ...store.get(id)! } : undefined)),
+		get: vi.fn((id: string) => {
+			const entry = store.get(id);
+			return Promise.resolve(entry ? { ...entry } : undefined);
+		}),
 		delete: vi.fn((id: string) => { store.delete(id); return Promise.resolve(); }),
 		getPending: vi.fn(() => Promise.resolve([...store.values()].filter((e) => e.status === 'PENDING'))),
 		getFailed: vi.fn(() => Promise.resolve([...store.values()].filter((e) => e.status === 'FAILED'))),
@@ -202,9 +205,10 @@ describe('WalService', () => {
 
 			const updated = await service.incrementRetry('r1');
 
-			expect(updated!.retries).toBe(1);
-			expect(updated!.status).toBe('PENDING');
-			expect(updated!.nextRetryAt).toBeGreaterThan(Date.now());
+			expect(updated).toBeDefined();
+			expect(updated?.retries).toBe(1);
+			expect(updated?.status).toBe('PENDING');
+			expect(updated?.nextRetryAt).toBeGreaterThan(Date.now());
 		});
 
 		it('marks FAILED when max retries exceeded', async () => {
@@ -212,16 +216,18 @@ describe('WalService', () => {
 
 			const updated = await service.incrementRetry('r2');
 
-			expect(updated!.status).toBe('FAILED');
-			expect(updated!.error).toContain('Max retries');
-			expect(updated!.failedAt).toBeGreaterThan(0);
+			expect(updated).toBeDefined();
+			expect(updated?.status).toBe('FAILED');
+			expect(updated?.error).toContain('Max retries');
+			expect(updated?.failedAt).toBeGreaterThan(0);
 		});
 
 		it('caps backoff at MAX_BACKOFF_MS', async () => {
 			db._store.set('r3', makeEntry({ id: 'r3', retries: 20, maxRetries: 100 }));
 
 			const updated = await service.incrementRetry('r3');
-			const backoff = updated!.nextRetryAt! - Date.now();
+			expect(updated?.nextRetryAt).toBeDefined();
+			const backoff = (updated?.nextRetryAt ?? 0) - Date.now();
 
 			expect(backoff).toBeLessThanOrEqual(WAL_DEFAULTS.MAX_BACKOFF_MS + 50);
 		});

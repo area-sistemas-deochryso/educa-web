@@ -129,7 +129,10 @@ describe('AttendanceEstudianteComponent', () => {
 
 	it('should call getMisAsistencias with new month on onIngresosMonthChange', () => {
 		component.ngOnInit();
-		vi.mocked(asistenciaServiceMock.getMisAsistencias!).mockClear();
+		expect(asistenciaServiceMock.getMisAsistencias).toBeDefined();
+		if (asistenciaServiceMock.getMisAsistencias) {
+			vi.mocked(asistenciaServiceMock.getMisAsistencias).mockClear();
+		}
 
 		component.onIngresosMonthChange(5);
 
@@ -138,7 +141,10 @@ describe('AttendanceEstudianteComponent', () => {
 
 	it('should call getMisAsistencias with new month on onSalidasMonthChange', () => {
 		component.ngOnInit();
-		vi.mocked(asistenciaServiceMock.getMisAsistencias!).mockClear();
+		expect(asistenciaServiceMock.getMisAsistencias).toBeDefined();
+		if (asistenciaServiceMock.getMisAsistencias) {
+			vi.mocked(asistenciaServiceMock.getMisAsistencias).mockClear();
+		}
 
 		component.onSalidasMonthChange(8);
 

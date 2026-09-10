@@ -92,13 +92,16 @@ export class SchedulesImportDialogComponent {
 	}
 
 	onImportar(): void {
-		const validRows = this.filas().filter((f) => f.valido);
+		const validRows = this.filas().filter(
+			(f): f is HorarioImportRow & { diaSemana: NonNullable<HorarioImportRow['diaSemana']>; salonId: number; cursoId: number } =>
+				f.valido && f.diaSemana != null && f.salonId != null && f.cursoId != null,
+		);
 		const payload: ImportarHorarioItem[] = validRows.map((f) => ({
-			diaSemana: f.diaSemana!,
+			diaSemana: f.diaSemana,
 			horaInicio: f.horaInicio,
 			horaFin: f.horaFin,
-			salonId: f.salonId!,
-			cursoId: f.cursoId!,
+			salonId: f.salonId,
+			cursoId: f.cursoId,
 		}));
 		this.step.set('result');
 		this.importar.emit(payload);

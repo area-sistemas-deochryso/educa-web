@@ -31,7 +31,8 @@ export class ErrorGroupsTrendQueue {
 
 	private drainTrendQueue(): void {
 		while (this.trendInFlight < TREND_MAX_CONCURRENT && this.trendQueue.length > 0) {
-			const grupoId = this.trendQueue.shift()!;
+			const grupoId = this.trendQueue.shift();
+			if (grupoId === undefined) break;
 			this.fetchTrendNow(grupoId);
 		}
 	}

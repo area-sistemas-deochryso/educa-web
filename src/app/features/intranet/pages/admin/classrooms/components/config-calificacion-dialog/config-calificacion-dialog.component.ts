@@ -62,8 +62,8 @@ export class ConfigGradeDialogComponent implements OnChanges {
 			return null;
 		}
 		const rangos = this.literales()
-			.filter((l) => l.notaMinima !== null && l.notaMaxima !== null)
-			.map((l) => ({ letra: l.letra, min: l.notaMinima!, max: l.notaMaxima! }));
+			.filter((l): l is LiteralRow & { notaMinima: number; notaMaxima: number } => l.notaMinima !== null && l.notaMaxima !== null)
+			.map((l) => ({ letra: l.letra, min: l.notaMinima, max: l.notaMaxima }));
 
 		const invertido = rangos.find((r) => r.min > r.max);
 		if (invertido) {
@@ -85,7 +85,8 @@ export class ConfigGradeDialogComponent implements OnChanges {
 	readonly isFormValid = computed(() => {
 		const tipo = this.tipoCalificacion();
 		if (tipo === 'NUMERICO') {
-			return this.notaMinAprobatoria() !== null && this.notaMinAprobatoria()! > 0;
+			const nota = this.notaMinAprobatoria();
+			return nota !== null && nota > 0;
 		}
 		return (
 			this.literales().length > 0 &&
@@ -134,13 +135,14 @@ export class ConfigGradeDialogComponent implements OnChanges {
 			esAprobatoria: l.esAprobatoria,
 		}));
 
-		if (this.isEditing()) {
+		const cfg = this.config();
+		if (cfg) {
 			const dto: ActualizarConfiguracionCalificacionDto = {
 				tipoCalificacion: this.tipoCalificacion(),
 				notaMinAprobatoria: this.tipoCalificacion() === 'NUMERICO' ? this.notaMinAprobatoria() : null,
 				literales: this.tipoCalificacion() === 'LITERAL' ? lits : [],
 			};
-			this.actualizar.emit({ id: this.config()!.id, dto });
+			this.actualizar.emit({ id: cfg.id, dto });
 		} else {
 			const dto: CrearConfiguracionCalificacionDto = {
 				nivel: this.nivel(),

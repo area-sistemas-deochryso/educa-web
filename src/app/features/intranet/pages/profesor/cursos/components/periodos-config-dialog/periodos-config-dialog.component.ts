@@ -66,11 +66,12 @@ export class PeriodosConfigDialogComponent {
 	}
 
 	onCrear(): void {
-		if (!this.isFormValid() || !this.contenidoId()) return;
+		const contenidoId = this.contenidoId();
+		if (!this.isFormValid() || !contenidoId) return;
 
 		const p = this.newPeriodo();
 		const dto: CrearPeriodoDto = {
-			cursoContenidoId: this.contenidoId()!,
+			cursoContenidoId: contenidoId,
 			nombre: p.nombre.trim(),
 			orden: this.nextOrden(),
 			semanaInicio: p.semanaInicio,

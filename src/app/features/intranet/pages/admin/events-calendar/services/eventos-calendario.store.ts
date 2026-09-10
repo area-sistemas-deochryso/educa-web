@@ -105,7 +105,7 @@ export class EventsCalendarStore extends BaseCrudStore<
 		items: this.filteredItems(),
 		loading: this.loading(),
 		error: this.error(),
-		estadisticas: this.estadisticas()!,
+		estadisticas: this.estadisticas() ?? { total: 0, activos: 0, inactivos: 0, proximosMes: 0 },
 
 		dialogVisible: this.dialogVisible(),
 		isEditing: this.isEditing(),

@@ -63,8 +63,8 @@ export class EstudianteNotasStore {
 		if (!sims || sims.length === 0) return curso.promedios.general;
 
 		const items = sims
-			.filter((s) => s.notaSimulada !== null)
-			.map((s) => ({ nota: s.notaSimulada!, peso: s.peso }));
+			.filter((s): s is NotaSimulada & { notaSimulada: number } => s.notaSimulada !== null)
+			.map((s) => ({ nota: s.notaSimulada, peso: s.peso }));
 		return calcularPromedioPonderado(items);
 	});
 

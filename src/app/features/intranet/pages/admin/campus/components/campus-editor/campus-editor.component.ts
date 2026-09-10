@@ -238,9 +238,10 @@ export class CampusEditorComponent {
 	onNodeMouseEnter(nodeId: number): void {
 		if (this.isDragging || this.isPanning) return;
 		const nodo = this.nodoMap().get(nodeId);
-		if (!nodo) return;
+		const nodoPos = this.nodePositions().get(nodeId);
+		if (!nodo || !nodoPos) return;
 		this.hoverInfo.set({ type: 'node', id: nodeId });
-		const tip = computeNodeTipPoint(this.nodePositions().get(nodeId)!, nodo);
+		const tip = computeNodeTipPoint(nodoPos, nodo);
 		const pos = this.svgToScreen(tip.x, tip.y);
 		this.tooltipPos.set({ x: pos.x + 8, y: pos.y });
 	}
@@ -248,9 +249,10 @@ export class CampusEditorComponent {
 	onBloqueoMouseEnter(bloqueoId: number): void {
 		if (this.isDraggingBloqueo || this.isPanning) return;
 		const bloqueo = this.bloqueos().find((b) => b.id === bloqueoId);
-		if (!bloqueo) return;
+		const bloqueoPos = this.bloqueoPositions().get(bloqueoId);
+		if (!bloqueo || !bloqueoPos) return;
 		this.hoverInfo.set({ type: 'bloqueo', id: bloqueoId });
-		const tip = computeBloqueoTipPoint(this.bloqueoPositions().get(bloqueoId)!, bloqueo);
+		const tip = computeBloqueoTipPoint(bloqueoPos, bloqueo);
 		const pos = this.svgToScreen(tip.x, tip.y);
 		this.tooltipPos.set({ x: pos.x + 8, y: pos.y });
 	}
@@ -261,10 +263,10 @@ export class CampusEditorComponent {
 		if (!arista) return;
 		const origen = this.nodoMap().get(arista.nodoOrigenId);
 		const destino = this.nodoMap().get(arista.nodoDestinoId);
-		if (!origen || !destino) return;
+		const op = this.nodePositions().get(arista.nodoOrigenId);
+		const dp = this.nodePositions().get(arista.nodoDestinoId);
+		if (!origen || !destino || !op || !dp) return;
 		this.hoverInfo.set({ type: 'arista', id: aristaId });
-		const op = this.nodePositions().get(arista.nodoOrigenId)!;
-		const dp = this.nodePositions().get(arista.nodoDestinoId)!;
 		this.tooltipPos.set(computeAristaTooltipScreenPos(this.svgRef()?.nativeElement, op, dp));
 	}
 

@@ -255,23 +255,29 @@ export class SchedulesComponent implements OnInit {
 			return;
 		}
 
+		const { diaSemana, salonId, cursoId } = formData;
+		if (diaSemana === null || salonId === null || cursoId === null) {
+			logger.error('Formulario de horario incompleto');
+			return;
+		}
+
 		if (editingId === null) {
 			this.crudFacade.create({
-				diaSemana: formData.diaSemana!,
+				diaSemana,
 				horaInicio: formData.horaInicio,
 				horaFin: formData.horaFin,
-				salonId: formData.salonId!,
-				cursoId: formData.cursoId!,
+				salonId,
+				cursoId,
 				usuarioReg: currentUser.dni || currentUser.nombreCompleto,
 			});
 		} else {
 			this.crudFacade.update(editingId, {
 				id: editingId,
-				diaSemana: formData.diaSemana!,
+				diaSemana,
 				horaInicio: formData.horaInicio,
 				horaFin: formData.horaFin,
-				salonId: formData.salonId!,
-				cursoId: formData.cursoId!,
+				salonId,
+				cursoId,
 				usuarioMod: currentUser.dni || currentUser.nombreCompleto,
 			});
 		}

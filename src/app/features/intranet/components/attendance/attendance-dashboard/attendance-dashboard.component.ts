@@ -60,11 +60,14 @@ export class AttendanceDashboardComponent implements OnInit {
 			const rol = d?.roles.find((r) => r.tipoPersona === tipo);
 			const config = ROL_CONFIG[tipo];
 			const hasData = !!rol && rol.total > 0;
+			if (!rol || !hasData) {
+				return { tipo, label: config.label, icon: config.icon, count: '—', hasData };
+			}
 			return {
 				tipo,
 				label: config.label,
 				icon: config.icon,
-				count: hasData ? (isMonth ? `${rol!.total}` : `${rol!.conEntrada}/${rol!.total}`) : '—',
+				count: isMonth ? `${rol.total}` : `${rol.conEntrada}/${rol.total}`,
 				hasData,
 			};
 		});

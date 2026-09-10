@@ -79,7 +79,7 @@ describe('VistasFacade', () => {
 
 			expect(store.items()).toEqual(mockItems);
 			expect(store.estadisticas()).toBeDefined();
-			expect(store.estadisticas()!.total).toBe(2);
+			expect(store.estadisticas()?.total).toBe(2);
 			expect(store.loading()).toBe(false);
 		});
 	});

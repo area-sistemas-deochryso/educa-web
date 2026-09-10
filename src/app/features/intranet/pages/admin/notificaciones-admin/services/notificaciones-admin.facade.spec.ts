@@ -136,15 +136,15 @@ describe('NotificacionesAdminFacade', () => {
 			expect(wal.execute).toHaveBeenCalledTimes(1);
 			expect(wal.last().operation).toBe('CREATE');
 			expect(store.dialogVisible()).toBe(false);
-			expect(store.estadisticas()!.total).toBe(2);
-			expect(store.estadisticas()!.activas).toBe(2);
+			expect(store.estadisticas()?.total).toBe(2);
+			expect(store.estadisticas()?.activas).toBe(2);
 		});
 
 		it('should increment inactivas for inactive notification', () => {
 			store.setFormData({ ...store.formData(), estado: false });
 			facade.create();
 
-			expect(store.estadisticas()!.inactivas).toBe(1);
+			expect(store.estadisticas()?.inactivas).toBe(1);
 		});
 	});
 	// #endregion
@@ -160,8 +160,8 @@ describe('NotificacionesAdminFacade', () => {
 			facade.toggleEstado(mockItems[0]);
 
 			expect(store.items()[0].estado).toBe(false);
-			expect(store.estadisticas()!.activas).toBe(0);
-			expect(store.estadisticas()!.inactivas).toBe(1);
+			expect(store.estadisticas()?.activas).toBe(0);
+			expect(store.estadisticas()?.inactivas).toBe(1);
 		});
 	});
 	// #endregion
@@ -180,10 +180,10 @@ describe('NotificacionesAdminFacade', () => {
 			expect(store.items()).toHaveLength(mockItems.length);
 			const deleted = store.items().find((i) => i.id === mockItems[0].id);
 			expect(deleted).toBeDefined();
-			expect(deleted!.estado).toBe(false);
-			expect(store.estadisticas()!.total).toBe(mockStats.total);
-			expect(store.estadisticas()!.activas).toBe(mockStats.activas - 1);
-			expect(store.estadisticas()!.inactivas).toBe(mockStats.inactivas + 1);
+			expect(deleted?.estado).toBe(false);
+			expect(store.estadisticas()?.total).toBe(mockStats.total);
+			expect(store.estadisticas()?.activas).toBe(mockStats.activas - 1);
+			expect(store.estadisticas()?.inactivas).toBe(mockStats.inactivas + 1);
 		});
 	});
 	// #endregion

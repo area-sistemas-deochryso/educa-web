@@ -114,10 +114,11 @@ export class AyudaTicketComponent implements OnInit {
 	}
 
 	async onSubmit(): Promise<void> {
-		if (!this.canSubmit()) return;
+		const tipoId = this.tipoId();
+		if (!this.canSubmit() || tipoId === null) return;
 
 		const ok = await this.facade.crear({
-			tipoId: this.tipoId()!,
+			tipoId,
 			descripcion: this.descripcion(),
 			propuesta: this.propuesta().trim() || null,
 		});

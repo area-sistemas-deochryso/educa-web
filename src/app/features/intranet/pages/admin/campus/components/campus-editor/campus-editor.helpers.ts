@@ -30,21 +30,23 @@ export function getNodeLabel(nodo: CampusNodoDto): string {
 
 /** Convert browser client coords to SVG viewBox coords */
 export function clientToSvg(svgEl: SVGSVGElement | undefined, clientX: number, clientY: number) {
-	if (!svgEl) return { x: 0, y: 0 };
+	const ctm = svgEl?.getScreenCTM();
+	if (!svgEl || !ctm) return { x: 0, y: 0 };
 	const pt = svgEl.createSVGPoint();
 	pt.x = clientX;
 	pt.y = clientY;
-	const svgPt = pt.matrixTransform(svgEl.getScreenCTM()!.inverse());
+	const svgPt = pt.matrixTransform(ctm.inverse());
 	return { x: svgPt.x, y: svgPt.y };
 }
 
 /** Convert SVG viewBox coords to pixel position relative to the SVG element */
 export function svgToScreen(svgEl: SVGSVGElement | undefined, svgX: number, svgY: number) {
-	if (!svgEl) return { x: 0, y: 0 };
+	const ctm = svgEl?.getScreenCTM();
+	if (!svgEl || !ctm) return { x: 0, y: 0 };
 	const pt = svgEl.createSVGPoint();
 	pt.x = svgX;
 	pt.y = svgY;
-	const screenPt = pt.matrixTransform(svgEl.getScreenCTM()!);
+	const screenPt = pt.matrixTransform(ctm);
 	const rect = svgEl.getBoundingClientRect();
 	return { x: screenPt.x - rect.left, y: screenPt.y - rect.top };
 }

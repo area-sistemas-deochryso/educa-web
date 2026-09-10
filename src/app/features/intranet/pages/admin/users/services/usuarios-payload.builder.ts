@@ -8,14 +8,14 @@ type FormData = Partial<CrearUsuarioRequest & ActualizarUsuarioRequest>;
 
 /**
  * Construye el payload para crear usuario.
- * Retorna null si faltan campos requeridos (rol, contrasena).
+ * Retorna null si faltan campos requeridos (dni, nombres, apellidos, rol, contrasena).
  */
 export function buildCrearUsuarioPayload(data: FormData): CrearUsuarioRequest | null {
-	if (!data.rol || !data.contrasena) return null;
+	if (!data.dni || !data.nombres || !data.apellidos || !data.rol || !data.contrasena) return null;
 	return {
-		dni: data.dni!,
-		nombres: data.nombres!,
-		apellidos: data.apellidos!,
+		dni: data.dni,
+		nombres: data.nombres,
+		apellidos: data.apellidos,
 		contrasena: data.contrasena,
 		rol: data.rol,
 		telefono: data.telefono,
@@ -35,17 +35,17 @@ export function buildCrearUsuarioPayload(data: FormData): CrearUsuarioRequest | 
 
 /**
  * Construye el payload para actualizar usuario.
- * Retorna null si no hay usuario seleccionado.
+ * Retorna null si no hay usuario seleccionado o faltan campos requeridos (dni, nombres, apellidos).
  */
 export function buildActualizarUsuarioPayload(
 	data: FormData,
 	usuario: UsuarioDetalle | null,
 ): ActualizarUsuarioRequest | null {
-	if (!usuario) return null;
+	if (!usuario || !data.dni || !data.nombres || !data.apellidos) return null;
 	return {
-		dni: data.dni!,
-		nombres: data.nombres!,
-		apellidos: data.apellidos!,
+		dni: data.dni,
+		nombres: data.nombres,
+		apellidos: data.apellidos,
 		contrasena: data.contrasena || undefined,
 		estado: data.estado ?? true,
 		telefono: data.telefono,

@@ -39,9 +39,11 @@ export class EmailDeferEventDataFacade {
 
 	// #region Listado paginado
 	private getFiltros(): EmailDeferEventFiltros {
+		const desde = this.store.filterDesde();
+		const hasta = this.store.filterHasta();
 		return {
-			desde: this.store.filterDesde() ? toLocalIso(this.store.filterDesde()!) : null,
-			hasta: this.store.filterHasta() ? toLocalIso(this.store.filterHasta()!) : null,
+			desde: desde ? toLocalIso(desde) : null,
+			hasta: hasta ? toLocalIso(hasta) : null,
 			tipo: this.store.filterTipo(),
 			dominio: this.store.filterDominio() || null,
 		};

@@ -8,7 +8,13 @@ export function makeLabelSprite(text: string, color: number): THREE.Sprite {
 	const canvas = document.createElement('canvas');
 	canvas.width = 320;
 	canvas.height = 72;
-	const ctx = canvas.getContext('2d')!;
+	const ctx = canvas.getContext('2d');
+	if (!ctx) {
+		const mat = new THREE.SpriteMaterial({ transparent: true, opacity: 0 });
+		const sprite = new THREE.Sprite(mat);
+		sprite.scale.set(3.8, 0.85, 1);
+		return sprite;
+	}
 
 	const r = (color >> 16) & 0xff;
 	const g = (color >> 8) & 0xff;

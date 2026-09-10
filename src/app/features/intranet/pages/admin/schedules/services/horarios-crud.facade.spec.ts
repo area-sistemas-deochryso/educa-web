@@ -21,6 +21,16 @@ import type {
 import type { ImportarHorarioItem } from '../helpers/horario-import.config';
 // #endregion
 
+// #region Assertions
+/** Narrows a possibly-null/undefined test value, failing the test (via `expect`) instead of using `!`. */
+function assertDefined<T>(value: T, message?: string): asserts value is NonNullable<T> {
+	expect(value).toBeDefined();
+	if (value === null || value === undefined) {
+		throw new Error(message ?? 'Expected value to be defined');
+	}
+}
+// #endregion
+
 // #region Fixtures
 const mockStats: HorariosEstadisticas = {
 	totalHorarios: 3,
@@ -154,11 +164,13 @@ describe('SchedulesCrudFacade', () => {
 
 		it('onCommit incrementa totalHorarios + horariosActivos y refresca', () => {
 			facade.create({ diaSemana: 2, horaInicio: '10:00', horaFin: '11:00', salonId: 10, cursoId: 100 } as Partial<HorarioCreateDto> as HorarioCreateDto);
-			const before = store.estadisticas()!;
+			const before = store.estadisticas();
+			assertDefined(before);
 
 			wal.commit();
 
-			const after = store.estadisticas()!;
+			const after = store.estadisticas();
+			assertDefined(after);
 			expect(after.totalHorarios).toBe(before.totalHorarios + 1);
 			expect(after.horariosActivos).toBe(before.horariosActivos + 1);
 			expect(dataFacade.silentRefreshAfterCrud).toHaveBeenCalled();
@@ -167,7 +179,9 @@ describe('SchedulesCrudFacade', () => {
 
 		it('onError surface mensaje sin tocar stats', () => {
 			facade.create({ diaSemana: 2, horaInicio: '10:00', horaFin: '11:00', salonId: 10, cursoId: 100 } as Partial<HorarioCreateDto> as HorarioCreateDto);
-			const before = { ...store.estadisticas()! };
+			const stats = store.estadisticas();
+			assertDefined(stats);
+			const before = { ...stats };
 
 			wal.fail(new Error('boom'));
 
@@ -181,25 +195,30 @@ describe('SchedulesCrudFacade', () => {
 		it('apply aplica mutación quirúrgica local al store', () => {
 			facade.update(1, { diaSemana: 5, horaInicio: '14:00', horaFin: '15:00', salonId: 10, cursoId: 100 } as Partial<HorarioUpdateDto> as HorarioUpdateDto);
 
-			const h = store.horarios().find((x) => x.id === 1)!;
+			const h = store.horarios().find((x) => x.id === 1);
+			assertDefined(h);
 			expect(h.diaSemana).toBe(5);
 			expect(h.horaInicio).toBe('14:00');
 		});
 
 		it('rollback restaura valores previos', () => {
-			const original = store.horarios().find((x) => x.id === 1)!;
+			const original = store.horarios().find((x) => x.id === 1);
+			assertDefined(original);
 			facade.update(1, { diaSemana: 5, horaInicio: '14:00', horaFin: '15:00', salonId: 10, cursoId: 100 } as Partial<HorarioUpdateDto> as HorarioUpdateDto);
 
 			wal.fail(new Error('server'));
 
-			const h = store.horarios().find((x) => x.id === 1)!;
+			const h = store.horarios().find((x) => x.id === 1);
+			assertDefined(h);
 			expect(h.diaSemana).toBe(original.diaSemana);
 			expect(h.horaInicio).toBe(original.horaInicio);
 		});
 
 		it('onCommit actualiza stats horariosSinProfesor cuando se asigna profesor a horario sin uno', () => {
 			// id=2 no tiene profesor (profesorId=null) → stats.horariosSinProfesor=1
-			const before = store.estadisticas()!.horariosSinProfesor;
+			const beforeStats = store.estadisticas();
+			assertDefined(beforeStats);
+			const before = beforeStats.horariosSinProfesor;
 			facade.update(2, { diaSemana: 3, horaInicio: '09:00', horaFin: '10:00', salonId: 10, cursoId: 100 } as Partial<HorarioUpdateDto> as HorarioUpdateDto);
 
 			wal.commit({
@@ -215,13 +234,17 @@ describe('SchedulesCrudFacade', () => {
 				profesorNombreCompleto: 'Prof Ana',
 			});
 
-			expect(store.estadisticas()!.horariosSinProfesor).toBe(before - 1);
+			const afterStats = store.estadisticas();
+			assertDefined(afterStats);
+			expect(afterStats.horariosSinProfesor).toBe(before - 1);
 			expect(dataFacade.silentRefreshAfterCrud).toHaveBeenCalled();
 		});
 
 		it('onCommit incrementa horariosSinProfesor cuando se desasigna profesor', () => {
 			// id=1 tiene profesor → al quitarlo stats.horariosSinProfesor sube
-			const before = store.estadisticas()!.horariosSinProfesor;
+			const beforeStats = store.estadisticas();
+			assertDefined(beforeStats);
+			const before = beforeStats.horariosSinProfesor;
 			facade.update(1, { diaSemana: 1, horaInicio: '08:00', horaFin: '09:00', salonId: 10, cursoId: 100 } as Partial<HorarioUpdateDto> as HorarioUpdateDto);
 
 			wal.commit({
@@ -237,7 +260,9 @@ describe('SchedulesCrudFacade', () => {
 				profesorNombreCompleto: null,
 			});
 
-			expect(store.estadisticas()!.horariosSinProfesor).toBe(before + 1);
+			const afterStats = store.estadisticas();
+			assertDefined(afterStats);
+			expect(afterStats.horariosSinProfesor).toBe(before + 1);
 		});
 	});
 	// #endregion
@@ -246,16 +271,20 @@ describe('SchedulesCrudFacade', () => {
 	describe('toggleEstado', () => {
 		it('apply mueve contadores activos↔inactivos según estado actual', () => {
 			// id=1 estaba activo → queda inactivo
-			const before = store.estadisticas()!;
+			const before = store.estadisticas();
+			assertDefined(before);
 			facade.toggleEstado(1, true);
 
-			const after = store.estadisticas()!;
+			const after = store.estadisticas();
+			assertDefined(after);
 			expect(after.horariosActivos).toBe(before.horariosActivos - 1);
 			expect(after.horariosInactivos).toBe(before.horariosInactivos + 1);
 		});
 
 		it('rollback revierte contadores al estado anterior', () => {
-			const before = { ...store.estadisticas()! };
+			const stats = store.estadisticas();
+			assertDefined(stats);
+			const before = { ...stats };
 			facade.toggleEstado(1, true);
 
 			wal.fail(new Error('server'));
@@ -269,13 +298,16 @@ describe('SchedulesCrudFacade', () => {
 	describe('delete', () => {
 		it('apply marca el horario como inactivo, mantiene total y ajusta activos/inactivos', () => {
 			// id=1 activo con profesor
-			const before = store.estadisticas()!;
+			const before = store.estadisticas();
+			assertDefined(before);
 			facade.delete(1);
 
 			const item = store.horarios().find((h) => h.id === 1);
 			expect(item).toBeDefined();
-			expect(item!.estado).toBe(false);
-			const after = store.estadisticas()!;
+			assertDefined(item);
+			expect(item.estado).toBe(false);
+			const after = store.estadisticas();
+			assertDefined(after);
 			expect(after.totalHorarios).toBe(before.totalHorarios);
 			expect(after.horariosActivos).toBe(before.horariosActivos - 1);
 			expect(after.horariosInactivos).toBe(before.horariosInactivos + 1);
@@ -283,14 +315,20 @@ describe('SchedulesCrudFacade', () => {
 
 		it('apply decrementa horariosSinProfesor cuando el horario era activo y sin profesor', () => {
 			// id=2 sin profesor (debe estar activo en el seed para que decremente)
-			const before = store.estadisticas()!.horariosSinProfesor;
+			const beforeStats = store.estadisticas();
+			assertDefined(beforeStats);
+			const before = beforeStats.horariosSinProfesor;
 			facade.delete(2);
-			expect(store.estadisticas()!.horariosSinProfesor).toBe(before - 1);
+			const afterStats = store.estadisticas();
+			assertDefined(afterStats);
+			expect(afterStats.horariosSinProfesor).toBe(before - 1);
 		});
 
 		it('rollback restaura el estado del horario y las stats', () => {
 			const beforeHorarios = store.horarios().map((h) => ({ ...h }));
-			const beforeStats = { ...store.estadisticas()! };
+			const statsBefore = store.estadisticas();
+			assertDefined(statsBefore);
+			const beforeStats = { ...statsBefore };
 
 			facade.delete(1);
 			wal.fail(new Error('server'));
@@ -298,7 +336,8 @@ describe('SchedulesCrudFacade', () => {
 			expect(store.horarios()).toHaveLength(beforeHorarios.length);
 			const item = store.horarios().find((h) => h.id === 1);
 			expect(item).toBeDefined();
-			expect(item!.estado).toBe(true);
+			assertDefined(item);
+			expect(item.estado).toBe(true);
 			expect(store.estadisticas()).toEqual(beforeStats);
 		});
 	});
@@ -315,12 +354,16 @@ describe('SchedulesCrudFacade', () => {
 				cursoId: 100,
 			} as Partial<HorarioCreateDto> as HorarioCreateDto);
 
-			const beforeStats = { ...store.estadisticas()! };
+			const stats = store.estadisticas();
+			assertDefined(stats);
+			const beforeStats = { ...stats };
 			const httpErr = { status: 422, error: { errorCode: 'INV_AS01_TUTOR_PLENO', message: 'Profesor no es tutor' } };
 			wal.fail(httpErr);
 
 			// Stats unchanged (create rollback is no-op since nothing was added)
-			expect(store.estadisticas()!.totalHorarios).toBe(beforeStats.totalHorarios);
+			const afterStats = store.estadisticas();
+			assertDefined(afterStats);
+			expect(afterStats.totalHorarios).toBe(beforeStats.totalHorarios);
 			expect(errorHandler.showError).toHaveBeenCalled();
 		});
 
@@ -348,11 +391,14 @@ describe('SchedulesCrudFacade', () => {
 				cursoId: 100,
 			} as Partial<HorarioCreateDto> as HorarioCreateDto);
 
-			const before = store.estadisticas()!;
+			const before = store.estadisticas();
+			assertDefined(before);
 			wal.commit();
 
-			expect(store.estadisticas()!.totalHorarios).toBe(before.totalHorarios + 1);
-			expect(store.estadisticas()!.horariosActivos).toBe(before.horariosActivos + 1);
+			const after = store.estadisticas();
+			assertDefined(after);
+			expect(after.totalHorarios).toBe(before.totalHorarios + 1);
+			expect(after.horariosActivos).toBe(before.horariosActivos + 1);
 			expect(errorHandler.showSuccess).toHaveBeenCalled();
 		});
 
@@ -365,10 +411,13 @@ describe('SchedulesCrudFacade', () => {
 				cursoId: 300,
 			} as Partial<HorarioCreateDto> as HorarioCreateDto);
 
-			const before = store.estadisticas()!;
+			const before = store.estadisticas();
+			assertDefined(before);
 			wal.commit();
 
-			expect(store.estadisticas()!.totalHorarios).toBe(before.totalHorarios + 1);
+			const after = store.estadisticas();
+			assertDefined(after);
+			expect(after.totalHorarios).toBe(before.totalHorarios + 1);
 			expect(errorHandler.showSuccess).toHaveBeenCalled();
 		});
 	});

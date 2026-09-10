@@ -138,9 +138,10 @@ export class Campus3dViewComponent implements AfterViewInit, OnDestroy {
 				this.world = this.sceneBuilder.buildScene(this.scene, nodes, edges);
 				this.playerService.placePlayerAtStart(this.player, nodes, this.startNodeId(), this.destinationNodeId());
 				this.currentFloor.set(this.player.playerFloor);
-				if (this.destinationNodeId()) {
+				const destId = this.destinationNodeId();
+				if (destId) {
 					this.navStartTime = performance.now();
-					this.lastDestId = this.destinationNodeId()!;
+					this.lastDestId = destId;
 					this.arrivalVisible.set(false);
 				}
 			}
@@ -160,9 +161,10 @@ export class Campus3dViewComponent implements AfterViewInit, OnDestroy {
 			this.world = this.sceneBuilder.buildScene(this.scene, nodes, edges);
 			this.playerService.placePlayerAtStart(this.player, nodes, this.startNodeId(), this.destinationNodeId());
 			this.currentFloor.set(this.player.playerFloor);
-			if (this.destinationNodeId()) {
+			const destId = this.destinationNodeId();
+			if (destId) {
 				this.navStartTime = performance.now();
-				this.lastDestId = this.destinationNodeId()!;
+				this.lastDestId = destId;
 			}
 		}
 		this.pathMesh = this.pathVisualizer.rebuildPath(
@@ -222,15 +224,15 @@ export class Campus3dViewComponent implements AfterViewInit, OnDestroy {
 					this.closestNodeChange.emit(nodeResult.nodeId);
 				}
 				if (nodeResult.arrived) {
-					this._arrivalTimeMs.set(nodeResult.arrivalTimeMs!);
+					this._arrivalTimeMs.set(nodeResult.arrivalTimeMs ?? 0);
 					this.arrivalVisible.set(true);
 				}
 			}
 
 			// Minimap
 			const minimapCanvas = this.minimapRef?.nativeElement;
-			if (minimapCanvas) {
-				const ctx = minimapCanvas.getContext('2d')!;
+			const ctx = minimapCanvas?.getContext('2d');
+			if (minimapCanvas && ctx) {
 				this.minimapService.draw(ctx, {
 					width: minimapCanvas.width, height: minimapCanvas.height,
 					nodes: this.nodes(), world: this.world,

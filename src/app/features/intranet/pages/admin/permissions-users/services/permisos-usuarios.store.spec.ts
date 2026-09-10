@@ -200,16 +200,18 @@ describe('PermissionsUsersStore', () => {
 
 		it('debería ordenar capabilities por orden dentro del módulo', () => {
 			store.setCatalog(mockCatalog);
-			const usuarios = store.moduloCapabilities().find((m) => m.nombre === 'Usuarios')!;
+			const usuarios = store.moduloCapabilities().find((m) => m.nombre === 'Usuarios');
 
-			expect(usuarios.capabilities[0].codigo).toBe('USR_CREATE');
-			expect(usuarios.capabilities[1].codigo).toBe('USR_READ');
+			expect(usuarios).toBeDefined();
+			expect(usuarios?.capabilities[0].codigo).toBe('USR_CREATE');
+			expect(usuarios?.capabilities[1].codigo).toBe('USR_READ');
 		});
 
 		it('debería tener total correcto', () => {
 			store.setCatalog(mockCatalog);
-			const cursos = store.moduloCapabilities().find((m) => m.nombre === 'Cursos')!;
-			expect(cursos.total).toBe(2);
+			const cursos = store.moduloCapabilities().find((m) => m.nombre === 'Cursos');
+			expect(cursos).toBeDefined();
+			expect(cursos?.total).toBe(2);
 		});
 
 		it('debería retornar vacío sin catálogo', () => {

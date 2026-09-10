@@ -283,7 +283,7 @@ export class CursosStore extends BaseCrudStore<Curso, CursoFormData, CursosEstad
 	// #region Sub-ViewModels
 	readonly dataVm = computed(() => ({
 		cursos: this.cursosFiltrados(),
-		estadisticas: this.estadisticas()!,
+		estadisticas: this.estadisticas() ?? { totalCursos: 0, cursosActivos: 0, cursosInactivos: 0 },
 		page: this.page(),
 		pageSize: this.pageSize(),
 		totalRecords: this.totalRecords(),

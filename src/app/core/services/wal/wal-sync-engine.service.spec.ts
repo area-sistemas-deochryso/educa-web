@@ -100,7 +100,7 @@ function setupEngine(opts: SetupOptions = {}): {
 
 	const queue = [...(opts.pendingQueue ?? [[]])];
 	const getRetryableEntries = vi.fn().mockImplementation(() => {
-		return Promise.resolve(queue.length > 0 ? queue.shift()! : []);
+		return Promise.resolve(queue.shift() ?? []);
 	});
 
 	const mocks: EngineMocks = {

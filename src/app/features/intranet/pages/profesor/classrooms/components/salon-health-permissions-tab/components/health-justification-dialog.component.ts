@@ -229,9 +229,12 @@ export class HealthJustificationDialogComponent implements OnChanges {
 
 	onSave(): void {
 		if (!this.canSave()) return;
+		const estudianteId = this.selectedStudent;
+		const file = this.selectedFile();
+		if (!estudianteId || !file) return;
 
 		const formData = new FormData();
-		formData.append('EstudianteId', this.selectedStudent!.toString());
+		formData.append('EstudianteId', estudianteId.toString());
 		formData.append('SalonId', this.salonId().toString());
 
 		// Solo enviar fechas validadas como válidas
@@ -251,7 +254,7 @@ export class HealthJustificationDialogComponent implements OnChanges {
 			formData.append('Observacion', this.observacion.trim());
 		}
 
-		formData.append('documento', this.selectedFile()!);
+		formData.append('documento', file);
 
 		this.save.emit(formData);
 	}

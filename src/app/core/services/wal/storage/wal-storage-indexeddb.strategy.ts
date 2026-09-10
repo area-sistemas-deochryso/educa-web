@@ -75,11 +75,12 @@ export class WalStorageIndexedDbStrategy implements WalStorageStrategy {
 	}
 
 	async put(entry: WalEntry): Promise<void> {
-		if (!this.db) return;
+		const db = this.db;
+		if (!db) return;
 
 		return new Promise((resolve, reject) => {
 			try {
-				const tx = this.db!.transaction(STORE_NAME, 'readwrite');
+				const tx = db.transaction(STORE_NAME, 'readwrite');
 				tx.objectStore(STORE_NAME).put(entry);
 				tx.oncomplete = () => resolve();
 				tx.onerror = () => {
@@ -109,11 +110,12 @@ export class WalStorageIndexedDbStrategy implements WalStorageStrategy {
 	}
 
 	async delete(id: string): Promise<void> {
-		if (!this.db) return;
+		const db = this.db;
+		if (!db) return;
 
 		return new Promise((resolve) => {
 			try {
-				const tx = this.db!.transaction(STORE_NAME, 'readwrite');
+				const tx = db.transaction(STORE_NAME, 'readwrite');
 				tx.objectStore(STORE_NAME).delete(id);
 				tx.oncomplete = () => resolve();
 				tx.onerror = () => resolve();
@@ -124,11 +126,12 @@ export class WalStorageIndexedDbStrategy implements WalStorageStrategy {
 	}
 
 	async deleteCommittedOlderThan(timestamp: number): Promise<number> {
-		if (!this.db) return 0;
+		const db = this.db;
+		if (!db) return 0;
 
 		return new Promise((resolve) => {
 			try {
-				const tx = this.db!.transaction(STORE_NAME, 'readwrite');
+				const tx = db.transaction(STORE_NAME, 'readwrite');
 				const store = tx.objectStore(STORE_NAME);
 				const index = store.index('status');
 				const request = index.openCursor(IDBKeyRange.only('COMMITTED'));
@@ -155,11 +158,12 @@ export class WalStorageIndexedDbStrategy implements WalStorageStrategy {
 	}
 
 	async purgeByResourceType(resourceType: string): Promise<number> {
-		if (!this.db) return 0;
+		const db = this.db;
+		if (!db) return 0;
 
 		return new Promise((resolve) => {
 			try {
-				const tx = this.db!.transaction(STORE_NAME, 'readwrite');
+				const tx = db.transaction(STORE_NAME, 'readwrite');
 				const store = tx.objectStore(STORE_NAME);
 				const request = store.openCursor();
 				let deleted = 0;
@@ -185,11 +189,12 @@ export class WalStorageIndexedDbStrategy implements WalStorageStrategy {
 	}
 
 	async clear(): Promise<void> {
-		if (!this.db) return;
+		const db = this.db;
+		if (!db) return;
 
 		return new Promise((resolve) => {
 			try {
-				const tx = this.db!.transaction(STORE_NAME, 'readwrite');
+				const tx = db.transaction(STORE_NAME, 'readwrite');
 				tx.objectStore(STORE_NAME).clear();
 				tx.oncomplete = () => resolve();
 				tx.onerror = () => resolve();
@@ -200,11 +205,12 @@ export class WalStorageIndexedDbStrategy implements WalStorageStrategy {
 	}
 
 	async get(id: string): Promise<WalEntry | undefined> {
-		if (!this.db) return undefined;
+		const db = this.db;
+		if (!db) return undefined;
 
 		return new Promise((resolve) => {
 			try {
-				const tx = this.db!.transaction(STORE_NAME, 'readonly');
+				const tx = db.transaction(STORE_NAME, 'readonly');
 				const request = tx.objectStore(STORE_NAME).get(id);
 				request.onsuccess = () => resolve(request.result as WalEntry | undefined);
 				request.onerror = () => resolve(undefined);
@@ -215,11 +221,12 @@ export class WalStorageIndexedDbStrategy implements WalStorageStrategy {
 	}
 
 	async getByStatus(status: WalEntryStatus): Promise<WalEntry[]> {
-		if (!this.db) return [];
+		const db = this.db;
+		if (!db) return [];
 
 		return new Promise((resolve) => {
 			try {
-				const tx = this.db!.transaction(STORE_NAME, 'readonly');
+				const tx = db.transaction(STORE_NAME, 'readonly');
 				const index = tx.objectStore(STORE_NAME).index('status');
 				const request = index.getAll(IDBKeyRange.only(status));
 				request.onsuccess = () => {
@@ -235,11 +242,12 @@ export class WalStorageIndexedDbStrategy implements WalStorageStrategy {
 	}
 
 	async count(status?: WalEntryStatus): Promise<number> {
-		if (!this.db) return 0;
+		const db = this.db;
+		if (!db) return 0;
 
 		return new Promise((resolve) => {
 			try {
-				const tx = this.db!.transaction(STORE_NAME, 'readonly');
+				const tx = db.transaction(STORE_NAME, 'readonly');
 				const store = tx.objectStore(STORE_NAME);
 
 				if (status) {
@@ -259,11 +267,12 @@ export class WalStorageIndexedDbStrategy implements WalStorageStrategy {
 	}
 
 	async hasActiveByResourceType(resourceType: string): Promise<boolean> {
-		if (!this.db) return false;
+		const db = this.db;
+		if (!db) return false;
 
 		return new Promise((resolve) => {
 			try {
-				const tx = this.db!.transaction(STORE_NAME, 'readonly');
+				const tx = db.transaction(STORE_NAME, 'readonly');
 				const index = tx.objectStore(STORE_NAME).index('resourceType');
 				const request = index.getAll(IDBKeyRange.only(resourceType));
 				request.onsuccess = () => {
@@ -281,11 +290,12 @@ export class WalStorageIndexedDbStrategy implements WalStorageStrategy {
 	}
 
 	async getAll(): Promise<WalEntry[]> {
-		if (!this.db) return [];
+		const db = this.db;
+		if (!db) return [];
 
 		return new Promise((resolve) => {
 			try {
-				const tx = this.db!.transaction(STORE_NAME, 'readonly');
+				const tx = db.transaction(STORE_NAME, 'readonly');
 				const request = tx.objectStore(STORE_NAME).getAll();
 				request.onsuccess = () => resolve((request.result as WalEntry[]) ?? []);
 				request.onerror = () => resolve([]);

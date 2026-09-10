@@ -145,14 +145,15 @@ export class JustificarInasistenciaDialogComponent {
 
 	onSave(): void {
 		const ctx = this.contexto();
-		if (!ctx || !this.canSave()) return;
+		const file = this.selectedFile();
+		if (!ctx || !file) return;
 
 		const formData = new FormData();
 		formData.append('AsistenciaCursoId', ctx.asistenciaCursoId.toString());
 		if (this.comentario.trim()) {
 			formData.append('Comentario', this.comentario.trim());
 		}
-		formData.append('documento', this.selectedFile()!);
+		formData.append('documento', file);
 
 		this.save.emit({ asistenciaCursoId: ctx.asistenciaCursoId, formData });
 	}

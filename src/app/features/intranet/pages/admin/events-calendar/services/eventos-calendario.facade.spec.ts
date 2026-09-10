@@ -150,8 +150,8 @@ describe('EventsCalendarFacade', () => {
 
 		it('should increment stats on optimistic apply', () => {
 			facade.create();
-			expect(store.estadisticas()!.total).toBe(2);
-			expect(store.estadisticas()!.activos).toBe(2);
+			expect(store.estadisticas()?.total).toBe(2);
+			expect(store.estadisticas()?.activos).toBe(2);
 		});
 
 		it('should rollback stats and show error on failure', () => {
@@ -159,8 +159,8 @@ describe('EventsCalendarFacade', () => {
 			wal.fail(new Error('fail'));
 
 			expect(errorHandler.showError).toHaveBeenCalled();
-			expect(store.estadisticas()!.total).toBe(mockStats.total);
-			expect(store.estadisticas()!.activos).toBe(mockStats.activos);
+			expect(store.estadisticas()?.total).toBe(mockStats.total);
+			expect(store.estadisticas()?.activos).toBe(mockStats.activos);
 		});
 	});
 	// #endregion
@@ -212,8 +212,8 @@ describe('EventsCalendarFacade', () => {
 			facade.toggleEstado(mockItems[0]);
 
 			expect(store.items()[0].estado).toBe(false);
-			expect(store.estadisticas()!.activos).toBe(0);
-			expect(store.estadisticas()!.inactivos).toBe(1);
+			expect(store.estadisticas()?.activos).toBe(0);
+			expect(store.estadisticas()?.inactivos).toBe(1);
 		});
 
 		it('should rollback on error and show error', () => {
@@ -221,8 +221,8 @@ describe('EventsCalendarFacade', () => {
 			wal.fail(new Error('fail'));
 
 			expect(store.items()[0].estado).toBe(true);
-			expect(store.estadisticas()!.activos).toBe(mockStats.activos);
-			expect(store.estadisticas()!.inactivos).toBe(mockStats.inactivos);
+			expect(store.estadisticas()?.activos).toBe(mockStats.activos);
+			expect(store.estadisticas()?.inactivos).toBe(mockStats.inactivos);
 			expect(errorHandler.showError).toHaveBeenCalled();
 		});
 	});
@@ -242,10 +242,10 @@ describe('EventsCalendarFacade', () => {
 			expect(store.items()).toHaveLength(mockItems.length);
 			const deleted = store.items().find((i) => i.id === mockItems[0].id);
 			expect(deleted).toBeDefined();
-			expect(deleted!.estado).toBe(false);
-			expect(store.estadisticas()!.total).toBe(mockStats.total);
-			expect(store.estadisticas()!.activos).toBe(mockStats.activos - 1);
-			expect(store.estadisticas()!.inactivos).toBe(mockStats.inactivos + 1);
+			expect(deleted?.estado).toBe(false);
+			expect(store.estadisticas()?.total).toBe(mockStats.total);
+			expect(store.estadisticas()?.activos).toBe(mockStats.activos - 1);
+			expect(store.estadisticas()?.inactivos).toBe(mockStats.inactivos + 1);
 		});
 	});
 	// #endregion

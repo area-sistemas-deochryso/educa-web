@@ -62,7 +62,7 @@ export abstract class BaseCrudFacade<
 	protected readonly wal = inject(WalFacadeHelper);
 	protected readonly crossTabRefetch = inject(WalCrossTabRefetchService);
 	protected readonly destroyRef = inject(DestroyRef);
-	protected readonly errHandler: FacadeErrorHandler;
+	protected readonly errHandler!: FacadeErrorHandler;
 	private readonly _activityTracker = inject(ActivityTrackerService);
 	protected crudOps!: WalCrudOps<T, TForm, TStats>;
 	// #endregion
@@ -73,11 +73,6 @@ export abstract class BaseCrudFacade<
 	// #endregion
 
 	// #endregion
-
-	constructor() {
-		// Defer errHandler initialization to allow subclass to set config
-		this.errHandler = null!;
-	}
 
 	/** Llamar en el constructor del facade concreto después de super() */
 	protected initErrorHandler(): void {

@@ -60,7 +60,8 @@ export class StudentClassroomsStore {
 					cursos: [],
 				});
 			}
-			const salon = map.get(h.salonId)!;
+			const salon = map.get(h.salonId);
+			if (!salon) continue;
 			const cursoExists = salon.cursos.some((c) => c.cursoId === h.cursoId);
 			if (!cursoExists) {
 				salon.cursos.push({
