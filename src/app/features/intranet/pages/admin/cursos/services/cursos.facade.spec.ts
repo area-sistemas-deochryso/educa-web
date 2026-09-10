@@ -16,8 +16,8 @@ import { Curso, Grado, CursosEstadisticas, CursoCompletitud } from '../models';
 
 // #region Mocks
 const mockCursos: Curso[] = [
-	{ id: 1, nombre: 'Matemática', estado: true, grados: [{ id: 10, nombre: 'Inicial - 3 Años' }] },
-	{ id: 2, nombre: 'Comunicación', estado: false, grados: [] },
+	{ id: 1, nombre: 'Matemática', estado: true, grados: [{ id: 10, nombre: 'Inicial - 3 Años' }], rowVersion: 'AAAAAAAAB9E=' },
+	{ id: 2, nombre: 'Comunicación', estado: false, grados: [], rowVersion: 'AAAAAAAAB9I=' },
 ];
 
 const mockGrados: Grado[] = [
