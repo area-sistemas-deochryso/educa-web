@@ -29,6 +29,10 @@ export type CapabilityCode =
 	| 'CAMPUS_API_MANAGE'
 	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `ADMIN_CURSOS`.
 	| 'CURSOS_PAGE_VIEW'
+	// F10-w3 (2026-09-09) — split de Catálogo A (enum), ex `ESTUDIANTE_CURSOS` (mitad archivos).
+	| 'CURSOS_ESTUDIANTE_ARCHIVO_API_MANAGE'
+	// F10-w3 (2026-09-09) — split de Catálogo A (enum), ex `ESTUDIANTE_CURSOS` (mitad lectura).
+	| 'CURSOS_ESTUDIANTE_PAGE_API_VIEW'
 	// F10-w1b (2026-09-09) — rename de Catálogo B, ex `PROFESOR_CURSOS`.
 	| 'CURSOS_PROFESOR_PAGE_VIEW'
 	// F10-w2 (2026-09-09) — rename de Catálogo A (enum), ex `ADMIN_EMAIL_ALERTS`.
@@ -55,7 +59,6 @@ export type CapabilityCode =
 	| 'EMAIL_RECIPIENT_PAGE_VIEW'
 	// F10-w2 (2026-09-09) — rename de Catálogo A (enum), ex `ADMIN_ERROR_LOGS`.
 	| 'ERROR_LOGS_API_VIEW'
-	| 'ESTUDIANTE_CURSOS'
 	// F10-w2 (2026-09-09) — rename de Catálogo A (enum), ex `ADMIN_EVENTOS_CALENDARIO`.
 	| 'EVENTOS_CALENDARIO_API_MANAGE'
 	| 'EXPLICACIONES_MANAGE'
