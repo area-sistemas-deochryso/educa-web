@@ -23,6 +23,7 @@ import { NotificationsApiService } from './notifications-api.service';
 import { NotificationsSoundService } from './notifications-sound.service';
 import { loadDailyIdSet, saveDailyIdSet } from './notifications-persistence.helper';
 import { NotificacionActiva } from '@data/models';
+import { environment } from '@config/environment';
 
 export interface PriorityCount {
 	urgent: number;
@@ -96,7 +97,7 @@ export class NotificationsService implements OnDestroy {
 
 	// #region Initialization
 	constructor() {
-		if (isPlatformBrowser(this.platformId)) {
+		if (isPlatformBrowser(this.platformId) && environment.features.notifications) {
 			void this.initialize();
 			this.startPeriodicCheck();
 			this.listenToServiceWorker();
