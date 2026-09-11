@@ -1,0 +1,12 @@
+@if (status(); as s) {
+	<div class="crosschex-integration-status-badge">
+		<edu-tag
+			[value]="label"
+			[severity]="s.minutosSinExito === null ? 'secondary' : (isDegraded ? 'warn' : 'success')"
+			[icon]="isDegraded ? 'pi pi-exclamation-triangle' : 'pi pi-sync'"
+			[eduTooltip]="tooltip"
+			eduTooltipPosition="bottom"
+			data-info-anchor="admin-asistencia-crosschex-integration-status-badge"
+		/>
+	</div>
+}

@@ -14,6 +14,7 @@ import { AttendanceReportsComponent } from '../../cross-role/attendance-reports'
 import { AttendancePanelComponent } from '../attendance-panel';
 import { CrossChexSyncStatusService } from '@core/services/signalr';
 import { CrossChexSyncBannerComponent } from './components/crosschex-sync-banner';
+import { CrossChexIntegrationStatusBadgeComponent } from './components/crosschex-integration-status-badge';
 import { SyncRangeDialogComponent, SyncRangePayload } from './components/sync-range-dialog';
 
 import {
@@ -70,6 +71,7 @@ import { EduButton, EduCheckbox, EduConfirmDialog, EduConfirmationService, EduDa
 		AttendanceReportsComponent,
 		AttendancePanelComponent,
 		CrossChexSyncBannerComponent,
+		CrossChexIntegrationStatusBadgeComponent,
 		SyncRangeDialogComponent,
 		PageHeaderComponent,
 		ErrorStateComponent],
