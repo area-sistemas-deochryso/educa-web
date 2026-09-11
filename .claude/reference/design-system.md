@@ -174,7 +174,7 @@ app-intranet-layout {
 
 ---
 
-## 6. `p-tag` — Convención semántica (A1 · Opción C)
+## 6. `edu-tag` — Convención semántica (A1 · Opción C)
 
 > **Dos tipos de tag en el sistema: `tag-neutral` e `tag-crítico`. La decisión es explícita por tag, no global.**
 
@@ -182,37 +182,41 @@ app-intranet-layout {
 
 | Intención del tag | Clase | Color |
 |---|---|---|
-| **Informativo** — responde "¿qué tipo/rol/categoría/metadato es esto?" (rol del usuario, sección, tipo de evento, categoría de notificación, estado de periodo que no requiere atención urgente) | `styleClass="tag-neutral"` | Gris (`--surface-200` + `--text-color`) |
+| **Informativo** — responde "¿qué tipo/rol/categoría/metadato es esto?" (rol del usuario, sección, tipo de evento, categoría de notificación, estado de periodo que no requiere atención urgente) | `styleClass="tag-neutral"` | Gris (`--surface-100` + `--text-color`) |
 | **Crítico/operativo** — responde "¿necesito atención aquí ya?" (severity de error, asistencia F, aprobación APROBADO/DESAPROBADO, CRITICAL logs) | **Sin clase** (`styleClass` ausente) + `severity="danger"/"success"/...` | Colores del tema por severidad |
 
 ### Implementación global (styles.scss)
 
 ```scss
-.p-tag.tag-neutral {
-	background: var(--surface-200);
-	color: var(--text-color);
+.edu-tag.tag-neutral {
+	/* !important necesario: edu-tag.scss usa ViewEncapsulation.Emulated
+	   (default de Angular), así que su selector [data-severity] compila
+	   con el atributo _ngcontent-* agregado, superando en especificidad
+	   a esta regla global aunque tengan el mismo número de clases. */
+	background: var(--surface-100) !important;
+	color: var(--text-color) !important;
 	font-weight: 600;
 }
 ```
 
-No existe `.tag-critical` como clase — los tags críticos usan el default de PrimeNG con `severity`. Se puede introducir en el futuro si se necesita marcador semántico explícito (ej: agregar ícono prefijo a críticos), pero hoy `severity` solo ya hace el trabajo visual.
+No existe `.tag-critical` como clase — los tags críticos usan el default de `edu-tag` con `severity`. Se puede introducir en el futuro si se necesita marcador semántico explícito (ej: agregar ícono prefijo a críticos), pero hoy `severity` solo ya hace el trabajo visual.
 
 ### Ejemplos canónicos
 
 ```html
 <!-- ✅ Informativo: rol, sección, categoría → tag-neutral -->
-<p-tag [value]="usuario.rolNombre" styleClass="tag-neutral" />
-<p-tag [value]="'Sección ' + salon.seccion" styleClass="tag-neutral" />
-<p-tag [value]="evento.tipo" styleClass="tag-neutral" />
-<p-tag [value]="notificacion.categoria" styleClass="tag-neutral" />
+<edu-tag [value]="usuario.rolNombre" styleClass="tag-neutral" />
+<edu-tag [value]="'Sección ' + salon.seccion" styleClass="tag-neutral" />
+<edu-tag [value]="evento.tipo" styleClass="tag-neutral" />
+<edu-tag [value]="notificacion.categoria" styleClass="tag-neutral" />
 
 <!-- ✅ Crítico: severity hace el trabajo → sin tag-neutral -->
-<p-tag [value]="asistencia.estado" [severity]="estadoSeverity" />
-<p-tag [value]="'CRITICAL'" severity="danger" />
-<p-tag [value]="aprobacion.estado" [severity]="aprobacionSeverity" />
+<edu-tag [value]="asistencia.estado" [severity]="estadoSeverity" />
+<edu-tag [value]="'CRITICAL'" severity="danger" />
+<edu-tag [value]="aprobacion.estado" [severity]="aprobacionSeverity" />
 
 <!-- ❌ Incorrecto: tag-neutral + severity pelean -->
-<p-tag value="CRITICAL" severity="danger" styleClass="tag-neutral" />
+<edu-tag value="CRITICAL" severity="danger" styleClass="tag-neutral" />
 ```
 
 ### Criterio de decisión para tags dudosos
@@ -801,7 +805,7 @@ Banners de información, advertencia o éxito (migración pending, preview de fe
 
 			<div class="detail-name">{{ usuario()!.apellidos | fullName: usuario()!.nombres }}</div>
 
-			<p-tag [value]="usuario()!.rol" [severity]="uiMapping.getRolSeverity(usuario()!.rol)" styleClass="tag-neutral" />
+			<edu-tag [value]="usuario()!.rol" [severity]="uiMapping.getRolSeverity(usuario()!.rol)" styleClass="tag-neutral" />
 
 			<div class="detail-info">
 				<div class="info-item">
@@ -810,7 +814,7 @@ Banners de información, advertencia o éxito (migración pending, preview de fe
 				</div>
 				<div class="info-item">
 					<span class="info-label">Estado</span>
-					<p-tag [value]="usuario()!.estado | estadoLabel" [severity]="usuario()!.estado | estadoSeverity" styleClass="tag-neutral" />
+					<edu-tag [value]="usuario()!.estado | estadoLabel" [severity]="usuario()!.estado | estadoSeverity" styleClass="tag-neutral" />
 				</div>
 				@if (usuario()!.correo) {
 					<div class="info-item">
