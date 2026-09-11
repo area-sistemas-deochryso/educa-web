@@ -10,6 +10,7 @@ import {
 	apiResponseInterceptor,
 	authInterceptor,
 	clockSyncInterceptor,
+	connectivityInterceptor,
 	credentialsInterceptor,
 	errorInterceptor,
 	rateLimitInterceptor,
@@ -64,6 +65,7 @@ export const appConfig: ApplicationConfig = {
 				schemaVersionInterceptor, // Plan WAL Resilience M4 — fingerprint en cache
 				swCacheInvalidationInterceptor, // Auto-invalidate SW cache after mutations
 				timeoutInterceptor, // 30s default — opt out with X-No-Timeout header
+				connectivityInterceptor, // P10 F2: observa fallos/éxitos consecutivos para ConnectivityService
 				apiResponseInterceptor,
 				errorInterceptor,
 			]),

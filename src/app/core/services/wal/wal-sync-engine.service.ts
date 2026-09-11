@@ -8,6 +8,7 @@ import {
 	interval,
 	filter,
 	switchMap,
+	tap,
 	from,
 } from 'rxjs';
 import { sendWalEntryRequest } from './wal-http.helper';
@@ -22,6 +23,7 @@ import { WalCoalescer } from './wal-coalescer.service';
 import { WalSyncRecovery } from './wal-sync-recovery.service';
 import { WalReconciler } from './wal-reconciler.service';
 import { WalCircuitBreaker } from './wal-circuit-breaker.service';
+import { WalStorageMonitor } from './wal-storage-monitor.service';
 import { classifyWalError } from './wal-error.utils';
 import {
 	WalEntry,
@@ -46,6 +48,7 @@ export class WalSyncEngine {
 	private recovery = inject(WalSyncRecovery);
 	private reconciler = inject(WalReconciler);
 	private circuitBreaker = inject(WalCircuitBreaker);
+	private storageMonitor = inject(WalStorageMonitor);
 	private destroyRef = inject(DestroyRef);
 
 	// #endregion
@@ -137,9 +140,15 @@ export class WalSyncEngine {
 			)
 			.subscribe();
 
-		// Periodic timer: process retryable entries every SYNC_INTERVAL_MS
+		// Periodic timer: process retryable entries every SYNC_INTERVAL_MS.
+		// Piggybacks the storage-cap check on the same tick (no online
+		// requirement — quota checks work offline) instead of adding a
+		// second interval subscription.
 		this.timerSub = interval(WAL_DEFAULTS.SYNC_INTERVAL_MS)
 			.pipe(
+				tap(() => {
+					void this.storageMonitor.checkAndUpdate();
+				}),
 				filter(() => this.sw.isOnline && !this._isProcessing),
 				switchMap(() => from(this.processRetryable())),
 				takeUntilDestroyed(this.destroyRef),

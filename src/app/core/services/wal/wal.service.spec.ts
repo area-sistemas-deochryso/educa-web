@@ -1,7 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { WalService } from './wal.service';
+import { WalService, WalStorageFullError } from './wal.service';
 import { WalDbService } from './wal-db.service';
+import { WalStatusStore } from './wal-status.store';
 import { WalEntry, WAL_DEFAULTS, CURRENT_WAL_SCHEMA_VERSION } from './models';
 
 function makeEntry(overrides: Partial<WalEntry> = {}): WalEntry {
@@ -46,6 +47,7 @@ function createDbMock() {
 describe('WalService', () => {
 	let service: WalService;
 	let db: ReturnType<typeof createDbMock>;
+	let statusStore: WalStatusStore;
 
 	beforeEach(() => {
 		db = createDbMock();
@@ -53,11 +55,13 @@ describe('WalService', () => {
 		TestBed.configureTestingModule({
 			providers: [
 				WalService,
+				WalStatusStore,
 				{ provide: WalDbService, useValue: db },
 			],
 		});
 
 		service = TestBed.inject(WalService);
+		statusStore = TestBed.inject(WalStatusStore);
 	});
 
 	// #region append
@@ -138,6 +142,58 @@ describe('WalService', () => {
 			});
 
 			expect(entry.maxRetries).toBe(10);
+		});
+	});
+	// #endregion
+
+	// #region storage-full gate
+	describe('append — storage-full gate', () => {
+		it('rejects with WalStorageFullError when mode is frozen', async () => {
+			statusStore.setMode('frozen');
+
+			await expect(
+				service.append({
+					operation: 'UPDATE',
+					resourceType: 'horarios',
+					endpoint: '/api/horario/1',
+					method: 'PUT',
+					payload: {},
+				}),
+			).rejects.toBeInstanceOf(WalStorageFullError);
+
+			expect(db.put).not.toHaveBeenCalled();
+		});
+
+		it('appends normally when mode is persistent', async () => {
+			statusStore.setMode('persistent');
+
+			await expect(
+				service.append({
+					operation: 'UPDATE',
+					resourceType: 'horarios',
+					endpoint: '/api/horario/1',
+					method: 'PUT',
+					payload: {},
+				}),
+			).resolves.toBeDefined();
+
+			expect(db.put).toHaveBeenCalledTimes(1);
+		});
+
+		it('appends normally when mode is ephemeral (only frozen gates writes)', async () => {
+			statusStore.setMode('ephemeral');
+
+			await expect(
+				service.append({
+					operation: 'UPDATE',
+					resourceType: 'horarios',
+					endpoint: '/api/horario/1',
+					method: 'PUT',
+					payload: {},
+				}),
+			).resolves.toBeDefined();
+
+			expect(db.put).toHaveBeenCalledTimes(1);
 		});
 	});
 	// #endregion

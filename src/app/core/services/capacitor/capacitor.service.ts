@@ -186,6 +186,48 @@ export class CapacitorService {
 	}
 	// #endregion
 
+	// #region Network
+	/**
+	 * P10 F2 (resiliencia): estado de conectividad nativo — más confiable que
+	 * `navigator.onLine` en Capacitor (detecta el adaptador de red real del
+	 * dispositivo, no solo el estado del WebView). No-op en web (resuelve `true`).
+	 */
+	async getNetworkStatus(): Promise<boolean> {
+		if (!this.isNative) return navigator.onLine;
+		const { Network } = await import('@capacitor/network');
+		const status = await Network.getStatus();
+		return status.connected;
+	}
+
+	/**
+	 * Suscribe a cambios de conectividad nativa. No-op en web (no llama al callback).
+	 * @returns función de limpieza — llamar en el `OnDestroy`/`DestroyRef` del caller.
+	 */
+	onNetworkChange(callback: (connected: boolean) => void): () => void {
+		if (!this.isNative) return () => {};
+
+		let removeListener: (() => void) | null = null;
+		let cancelled = false;
+
+		import('@capacitor/network').then(({ Network }) => {
+			if (cancelled) return;
+			Network.addListener('networkStatusChange', (status) => callback(status.connected))
+				.then((handle) => {
+					if (cancelled) {
+						handle.remove();
+					} else {
+						removeListener = () => handle.remove();
+					}
+				});
+		});
+
+		return () => {
+			cancelled = true;
+			removeListener?.();
+		};
+	}
+	// #endregion
+
 	// #region Local Notifications
 	private async requestNotificationPermissions(): Promise<void> {
 		const { LocalNotifications } = await import('@capacitor/local-notifications');

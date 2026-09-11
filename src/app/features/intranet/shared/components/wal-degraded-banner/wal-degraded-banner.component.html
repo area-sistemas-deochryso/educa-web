@@ -28,6 +28,17 @@
 						perderse.
 					</span>
 				}
+				@case ('storage-full') {
+					<i
+						class="pi pi-exclamation-triangle wal-degraded-banner__icon"
+						aria-hidden="true"
+					></i>
+					<span>
+						<strong>Almacenamiento lleno</strong> — no se pueden guardar más
+						cambios sin conexión. Liberá espacio o esperá a que se
+						sincronicen los pendientes.
+					</span>
+				}
 			}
 		</div>
 		<div class="wal-degraded-banner__actions">

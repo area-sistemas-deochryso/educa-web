@@ -136,4 +136,71 @@ describe('WalDbService', () => {
 			expect(await db.count('PENDING')).toBe(2);
 		});
 	});
+
+	describe('getStorageUsageRatio', () => {
+		let originalStorage: StorageManager | undefined;
+
+		beforeEach(() => {
+			originalStorage = navigator.storage;
+		});
+
+		afterEach(() => {
+			Object.defineProperty(navigator, 'storage', {
+				value: originalStorage,
+				configurable: true,
+			});
+		});
+
+		it('returns usage/quota when navigator.storage.estimate is available', async () => {
+			const { db } = setup({ indexedDbInit: () => Promise.resolve(true) });
+			await db.isAvailable();
+
+			Object.defineProperty(navigator, 'storage', {
+				value: {
+					estimate: () => Promise.resolve({ usage: 80, quota: 100 }),
+				},
+				configurable: true,
+			});
+
+			expect(await db.getStorageUsageRatio()).toBe(0.8);
+		});
+
+		it('returns null when navigator.storage is unavailable', async () => {
+			const { db } = setup({ indexedDbInit: () => Promise.resolve(true) });
+			await db.isAvailable();
+
+			Object.defineProperty(navigator, 'storage', {
+				value: undefined,
+				configurable: true,
+			});
+
+			expect(await db.getStorageUsageRatio()).toBeNull();
+		});
+
+		it('returns null when quota is 0 or missing', async () => {
+			const { db } = setup({ indexedDbInit: () => Promise.resolve(true) });
+			await db.isAvailable();
+
+			Object.defineProperty(navigator, 'storage', {
+				value: { estimate: () => Promise.resolve({ usage: 10, quota: 0 }) },
+				configurable: true,
+			});
+
+			expect(await db.getStorageUsageRatio()).toBeNull();
+		});
+
+		it('returns null when estimate() throws', async () => {
+			const { db } = setup({ indexedDbInit: () => Promise.resolve(true) });
+			await db.isAvailable();
+
+			Object.defineProperty(navigator, 'storage', {
+				value: {
+					estimate: () => Promise.reject(new Error('boom')),
+				},
+				configurable: true,
+			});
+
+			expect(await db.getStorageUsageRatio()).toBeNull();
+		});
+	});
 });

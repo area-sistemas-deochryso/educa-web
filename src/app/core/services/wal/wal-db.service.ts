@@ -182,5 +182,24 @@ export class WalDbService {
 		return this.strategy.mode;
 	}
 
+	/**
+	 * Ratio of used vs quota storage (0..1) via `navigator.storage.estimate()`.
+	 * Returns `null` when the API is unavailable (non-browser context, old
+	 * Safari, or a `quota` of 0/undefined) or the call throws.
+	 */
+	async getStorageUsageRatio(): Promise<number | null> {
+		if (!this.isBrowser) return null;
+		if (!navigator.storage?.estimate) return null;
+
+		try {
+			const { usage, quota } = await navigator.storage.estimate();
+			if (!quota) return null;
+			return (usage ?? 0) / quota;
+		} catch (e) {
+			logger.error('[WAL-DB] storage.estimate() failed:', e);
+			return null;
+		}
+	}
+
 	// #endregion
 }

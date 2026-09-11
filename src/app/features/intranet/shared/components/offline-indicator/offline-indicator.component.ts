@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
-import { SwService } from '@core/services/sw';
+import { ConnectivityService } from '@core/services/connectivity';
 
 const RECONNECTED_DISPLAY_MS = 3_000;
 
@@ -47,10 +47,10 @@ const RECONNECTED_DISPLAY_MS = 3_000;
 	`,
 })
 export class OfflineIndicatorComponent {
-	private swService = inject(SwService);
+	private connectivity = inject(ConnectivityService);
 	private dismissTimer: ReturnType<typeof setTimeout> | null = null;
 
-	readonly isOffline = toSignal(this.swService.isOnline$.pipe(map((online) => !online)), {
+	readonly isOffline = toSignal(this.connectivity.isOnline$.pipe(map((online) => !online)), {
 		initialValue: false,
 	});
 	readonly justReconnected = signal(false);

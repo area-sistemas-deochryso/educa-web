@@ -5,7 +5,7 @@ import { WalCircuitState, WalEntry, WalMode } from './models';
  * Banner message variant rendered by `WalDegradedBanner`.
  * `null` means the banner is hidden.
  */
-export type WalBannerMessage = 'circuit-open' | 'ephemeral' | null;
+export type WalBannerMessage = 'circuit-open' | 'ephemeral' | 'storage-full' | null;
 
 /**
  * Pure reactive state container for WAL status indicators.
@@ -66,7 +66,8 @@ export class WalStatusStore {
 
 	/** Banner variant to render (null = hidden). */
 	readonly bannerMessage = computed<WalBannerMessage>(() => {
-		if (this._mode() === 'ephemeral' || this._mode() === 'frozen') return 'ephemeral';
+		if (this._mode() === 'frozen') return 'storage-full';
+		if (this._mode() === 'ephemeral') return 'ephemeral';
 		if (this._circuitState() === 'open') return 'circuit-open';
 		return null;
 	});

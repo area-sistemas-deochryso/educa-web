@@ -3,7 +3,7 @@ import { Observable, filter, firstValueFrom, map, timeout } from 'rxjs';
 import { logger } from '@core/helpers';
 import { ActivityTrackerService, ErrorHandlerService } from '@core/services/error';
 import { SwService } from '@core/services/sw';
-import { WalService } from './wal.service';
+import { WalService, WalStorageFullError } from './wal.service';
 import { WalSyncEngine } from './wal-sync-engine.service';
 import { WalStatusFacade } from './wal-status.facade';
 import { WAL_DEFAULTS, WalMutationConfig } from './models';
@@ -102,7 +102,9 @@ export class WalFacadeHelper {
 		} catch (e) {
 			// WAL append failed (IndexedDB unavailable or quota exceeded)
 			// Fall back to direct execution without WAL protection
-			const isQuota = e instanceof DOMException && e.name === 'QuotaExceededError';
+			const isQuota =
+				(e instanceof DOMException && e.name === 'QuotaExceededError') ||
+				e instanceof WalStorageFullError;
 			logger.error('[WAL-Helper] WAL append failed, executing directly', isQuota ? '(QuotaExceeded)' : '', e);
 
 			if (isQuota) {

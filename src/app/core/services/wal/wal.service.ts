@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { logger } from '@core/helpers';
 import { WalDbService } from './wal-db.service';
+import { WalStatusStore } from './wal-status.store';
 import {
 	WalEntry,
 	WalEntryStatus,
@@ -11,6 +12,20 @@ import {
 } from './models';
 
 /**
+ * Thrown by {@link WalService.append} when the WAL is in `'frozen'` mode
+ * (storage cap reached — see `WalStorageMonitor`). Callers (notably
+ * `WalFacadeHelper.execute`) special-case this to warn the user instead of
+ * silently falling back, the same way they already handle
+ * `QuotaExceededError` from IndexedDB itself.
+ */
+export class WalStorageFullError extends Error {
+	constructor() {
+		super('WAL storage lleno — no se pueden encolar más operaciones offline');
+		this.name = 'WalStorageFullError';
+	}
+}
+
+/**
  * Write-Ahead Log lifecycle management.
  *
  * Manages entries from PENDING to COMMITTED or FAILED.
@@ -18,6 +33,7 @@ import {
 @Injectable({ providedIn: 'root' })
 export class WalService {
 	private db = inject(WalDbService);
+	private statusStore = inject(WalStatusStore);
 
 	// #region Append
 
@@ -25,8 +41,14 @@ export class WalService {
 	 * Append a new WAL entry with PENDING status.
 	 * The entry id is used as the X-Idempotency-Key header.
 	 *
+	 * Rejects when {@link WalStatusStore.mode} is `'frozen'` (storage cap
+	 * reached, see `WalStorageMonitor`) — writing more entries to a storage
+	 * that's already at quota would likely fail anyway, so we fail fast
+	 * with a clear message instead of attempting the write.
+	 *
 	 * @param config Entry configuration without id and timestamps.
 	 * @returns Persisted WAL entry.
+	 * @throws {Error} When the WAL is in `'frozen'` mode.
 	 */
 	async append(
 		config: Omit<WalEntry, 'id' | 'timestamp' | 'status' | 'retries' | 'maxRetries' | 'schemaVersion'> & {
@@ -34,6 +56,10 @@ export class WalService {
 			consistencyLevel?: WalConsistencyLevel;
 		},
 	): Promise<WalEntry> {
+		if (this.statusStore.mode() === 'frozen') {
+			throw new WalStorageFullError();
+		}
+
 		const entry: WalEntry = {
 			...config,
 			id: crypto.randomUUID(),
