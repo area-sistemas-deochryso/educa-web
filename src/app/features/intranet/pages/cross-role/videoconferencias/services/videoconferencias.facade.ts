@@ -96,10 +96,12 @@ export class VideoconferenciasFacade {
 
 	/** Obtiene un JWT firmado del backend para autenticarse con JaaS. */
 	getJaaSToken(roomName: string): Observable<JaaSTokenResponse> {
-		return this.http.get<JaaSTokenResponse>(
-			`${this.baseUrl}/api/Videoconferencia/token`,
-			{ params: { roomName } },
-		);
+		return this.http
+			.get<JaaSTokenResponse>(
+				`${this.baseUrl}/api/Videoconferencia/token`,
+				{ params: { roomName } },
+			)
+			.pipe(withRetry({ tag: 'VideoconferenciasFacade:getJaaSToken' }));
 	}
 
 	/** Habilita/deshabilita la sala de un horario (solo rol moderador — el backend re-valida). */

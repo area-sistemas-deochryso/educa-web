@@ -217,10 +217,7 @@ export class VideoconferenciaSalaComponent implements OnInit, OnDestroy {
 			return;
 		}
 
-		const isModerator = this.facade.isModerator();
-		const displayName = this.facade.displayName();
-
-		const toolbarButtons = isModerator ? MODERATOR_TOOLBAR_BUTTONS : PARTICIPANT_TOOLBAR_BUTTONS;
+		const toolbarButtons = this.facade.isModerator() ? MODERATOR_TOOLBAR_BUTTONS : PARTICIPANT_TOOLBAR_BUTTONS;
 
 		try {
 			// JaaS requiere roomName con formato: appId/roomName
@@ -232,7 +229,7 @@ export class VideoconferenciaSalaComponent implements OnInit, OnDestroy {
 				height: '100%',
 				lang: 'es',
 				userInfo: {
-					displayName: displayName || 'Participante',
+					displayName: this.facade.displayName() || 'Participante',
 				},
 				configOverwrite: {
 					startWithAudioMuted: true,
@@ -257,8 +254,11 @@ export class VideoconferenciaSalaComponent implements OnInit, OnDestroy {
 
 			this.setupJitsiEvents();
 
-			// Fallback: si no dispara "Joined" en 10s, ocultar spinner
-			setTimeout(() => this.connecting.set(false), 10000);
+			// Fallback: si Jitsi nunca conecta en 10s, avisar en vez de spinner mudo (P10 DEP-9).
+			setTimeout(() => {
+				if (this.connecting()) this.errorMsg.set('Videoconferencia no disponible temporalmente');
+				this.connecting.set(false);
+			}, 10000);
 		} catch (err) {
 			logger.error('VideoconferenciaSala: Error al inicializar Jitsi', err);
 			this.errorMsg.set('Error al inicializar la sala de videoconferencia');

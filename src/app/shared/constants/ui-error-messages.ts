@@ -264,6 +264,8 @@ export const UI_ERROR_CODES: Record<string, string> = {
 	BLOB_TIPO_NO_PERMITIDO: 'Tipo de archivo no permitido.',
 	BLOB_TAMANO_EXCEDIDO: 'El archivo excede el tamaño máximo permitido.',
 	BLOB_NO_SNAPSHOT: 'No hay un snapshot disponible para este archivo.',
+	BLOB_STORAGE_UNAVAILABLE:
+		'No se pueden cargar archivos en este momento — el almacenamiento no responde. Intenta nuevamente en unos minutos.',
 	VIDEOCONF_ROOM_NAME_REQUIRED: 'Debe indicar el nombre de la sala de videoconferencia.',
 	VIDEOCONF_ROOM_NAME_INVALID: 'El nombre de la sala no es válido.',
 	VIDEOCONF_HORARIO_NOT_FOUND: 'No se encontró el horario de esta sala.',

@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@config/environment';
-import { logger, FileUploadBuilder } from '@core/helpers';
+import { logger, FileUploadBuilder, withRetry } from '@core/helpers';
 
 // #endregion
 // #region Implementation
@@ -48,7 +48,9 @@ export class BlobStorageService {
 			.withTimestamp(appendTimestamp)
 			.build();
 
-		return this.http.post<BlobUploadResponse>(`${this.apiUrl}/upload`, formData);
+		return this.http
+			.post<BlobUploadResponse>(`${this.apiUrl}/upload`, formData)
+			.pipe(withRetry({ tag: 'BlobStorageService:uploadFile' }));
 	}
 
 	/**
