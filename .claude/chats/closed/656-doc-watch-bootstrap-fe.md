@@ -32,10 +32,10 @@ F2 del plan Cwatch (`depends_on: [F1]`, F1 ✅ hecho 2026-05-28; F4 — el boots
 
 ## Criterio de cierre
 
-- [ ] `educa-web/.claude/doc-watch.md` existe con la tabla completa (`Doc | Watches | Scope`).
-- [ ] Todos los docs relevantes de `educa-web/.claude/` clasificados (watchable/broad/stable) — broad en sección aparte, stable excluidos.
-- [ ] Watchable docs tienen al menos un glob de código local (`src/**/...`).
-- [ ] `educa-coord/plans/coord-doc-watch-registry.md` actualizado: F2 marcado ✅ (edición cross-repo, coordinar con coord al cerrar — ver `COORD.md` §1 sobre planes cross-repo).
+- [x] `educa-web/.claude/doc-watch.md` existe con la tabla completa (`Doc | Watches | Scope`).
+- [x] Todos los docs relevantes de `educa-web/.claude/` clasificados (watchable/broad/stable) — broad en sección aparte, stable excluidos.
+- [x] Watchable docs tienen al menos un glob de código local (`src/**/...`).
+- [x] `educa-coord/plans/coord-doc-watch-registry.md` actualizado: F2 marcado ✅ (edición cross-repo, coordinar con coord al cerrar — ver `COORD.md` §1 sobre planes cross-repo).
 
 ## Tiempo estimado
 
