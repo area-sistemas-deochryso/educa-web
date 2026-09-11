@@ -1,7 +1,7 @@
 # Plan: Attendance UX Redesign
 
 > Rediseño completo de `/intranet/asistencia` para maximizar usabilidad.  
-> Scope: FE (Angular 21) + BE (ASP.NET Core 9). Rama dedicada.
+> Scope: FE (Angular 22) + BE (ASP.NET Core 9). Rama dedicada.
 
 ## Problema
 

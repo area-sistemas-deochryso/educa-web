@@ -10,8 +10,8 @@ El upgrade a Angular 22 (F3, commit `1441ab98`) vive hoy solo en el worktree ded
 
 ## Items
 
-- [ ] `.claude/CLAUDE.md` — línea 1 del stack dice "Angular 21 para gestion educativa" y más abajo "Stack: Angular 21, TypeScript 5.9, ...". Actualizar a "Angular 22" / "TypeScript 6.0" recién cuando el merge a `main` esté hecho.
-- [ ] Grep rápido de "Angular 21" en `.claude/` tras el merge — 9 archivos lo mencionan hoy (`tasks/design-patterns-frontend.md`, `reference/debug.md`, `plans/attendance-redesign/01-...md`, `agents/code-reviewer.md`, `agents/README.md`, más los 3 chats de 345/588 que son historia y no necesitan tocarse). Revisar cuáles son menciones vivas (afectan comportamiento actual) vs. históricas (quedan como están).
+- [x] `.claude/CLAUDE.md` — ya estaba en "Angular 22" / "TypeScript 6.0" al arrancar este chat (el merge de `chat/p70-angular22-migration` a `main` trajo el update).
+- [x] Grep de "Angular 21" en `.claude/` tras el merge — actualizados los 5 docs vivos: `agents/code-reviewer.md`, `agents/README.md`, `reference/debug.md` (quirk de esbuild sigue aplicando en 22, no era específico de 21), `reference/design-patterns-frontend.md`, `plans/attendance-redesign/01-attendance-ux-redesign.md`. Quedan sin tocar (histórico, correcto): `chats/closed/345-*` (×2) y `chats/closed/588-*`.
 
 ## Fuera de alcance
 

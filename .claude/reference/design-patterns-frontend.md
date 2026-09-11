@@ -1,4 +1,4 @@
-# Plan de Patrones de Diseño — Frontend (Angular 21)
+# Plan de Patrones de Diseño — Frontend (Angular 22)
 
 > **Estado**: Pendiente
 > **Prioridad**: Media-alta (mejora mantenibilidad y consistencia)
