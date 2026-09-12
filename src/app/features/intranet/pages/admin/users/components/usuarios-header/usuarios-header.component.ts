@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { PageHeaderComponent } from '@intranet-shared/components';
 import { periodoActual, esVerano } from '@shared/models';
+import { UserPermissionsService } from '@core/services';
 
 import { RoleTab } from '../../models';
 import { EduButton, EduDialog, EduMenu, EduSelect, EduTooltip, type EduMenuItem } from '@edu-ui';
@@ -11,6 +12,8 @@ const NEW_BUTTON_LABELS: Record<string, string> = {
 	profesores: 'Nuevo Profesor',
 	admin: 'Nuevo Usuario',
 };
+
+const USUARIOS_EXPORT_CREDENCIALES_MANAGE = 'USUARIOS_EXPORT_CREDENCIALES_MANAGE';
 
 @Component({
 	selector: 'app-users-header',
@@ -24,6 +27,12 @@ const NEW_BUTTON_LABELS: Record<string, string> = {
 	},
 })
 export class UsersHeaderComponent {
+	private userPermisos = inject(UserPermissionsService);
+
+	readonly canExportCredenciales = computed(() =>
+		this.userPermisos.hasCapability(USUARIOS_EXPORT_CREDENCIALES_MANAGE),
+	);
+
 	readonly refresh = output<void>();
 	readonly newUsuario = output<void>();
 	readonly importUsuarios = output<void>();
@@ -42,10 +51,12 @@ export class UsersHeaderComponent {
 	readonly overflowMenuItems = computed<EduMenuItem[]>(() => {
 		const items: EduMenuItem[] = [
 			{ label: 'Refrescar', icon: 'pi pi-refresh', command: () => this.refresh.emit() },
-			{ label: 'Exportar', icon: 'pi pi-download', command: () => this.onOpenExportDialog() },
 			{ label: 'Validar Datos', icon: 'pi pi-check-circle', command: () => this.validarDatos.emit() }];
+		if (this.canExportCredenciales()) {
+			items.splice(1, 0, { label: 'Exportar', icon: 'pi pi-download', command: () => this.onOpenExportDialog() });
+		}
 		if (this.activeTab() === 'estudiantes' || this.activeTab() === null) {
-			items.splice(2, 0, {
+			items.splice(this.canExportCredenciales() ? 2 : 1, 0, {
 				label: 'Importar',
 				icon: 'pi pi-upload',
 				command: () => this.importUsuarios.emit(),

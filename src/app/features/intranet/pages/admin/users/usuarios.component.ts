@@ -43,7 +43,7 @@ import {
 import { environment } from '@env/environment';
 import { logger } from '@core/helpers';
 import { ErrorStateComponent } from '@shared/components';
-import { ExcelService } from '@core/services';
+import { ExcelService, UserPermissionsService } from '@core/services';
 import type { ImportarEstudianteItem } from './services';
 import { validarUsuarios } from './usuarios-validation.helpers';
 import {
@@ -53,6 +53,8 @@ import {
 } from './helpers/auto-open-from-query.helper';
 import { EduConfirmDialog, EduConfirmationService, EduTab } from '@edu-ui';
 import { resolveModoAsignacion } from '@data/models';
+
+const USUARIOS_MIGRAR_CONTRASENAS_MANAGE = 'USUARIOS_MIGRAR_CONTRASENAS_MANAGE';
 
 // #endregion
 // #region Implementation
@@ -75,11 +77,15 @@ export class UsersComponent implements AfterViewInit {
 	private destroyRef = inject(DestroyRef);
 	private route = inject(ActivatedRoute);
 	private router = inject(Router);
+	private userPermisos = inject(UserPermissionsService);
 
 	private autoOpenTarget = signal<AutoOpenTarget | null>(null);
 
 	// * Migration state (one-time, only in development)
 	readonly isDev = !environment.production;
+	readonly canMigrarContrasenas = computed(
+		() => this.isDev && this.userPermisos.hasCapability(USUARIOS_MIGRAR_CONTRASENAS_MANAGE),
+	);
 	readonly migracionLoading = signal(false);
 	readonly migracionCompletada = signal(false);
 	readonly migracionMensaje = signal('');
@@ -295,13 +301,11 @@ export class UsersComponent implements AfterViewInit {
 			columns: [
 				{ header: 'Nombre Completo', key: 'nombreCompleto', width: 40 },
 				{ header: 'DNI', key: 'dni', width: 15 },
-				{ header: 'Contraseña', key: 'contrasena', width: 20 },
 				{ header: 'Grado', key: 'grado', width: 20 },
 				{ header: 'Sección', key: 'seccion', width: 12 }],
 			data: credenciales.map((c) => ({
 				nombreCompleto: c.nombreCompleto,
 				dni: c.dni,
-				contrasena: c.contrasena ?? '(no disponible)',
 				grado: c.grado ?? '',
 				seccion: c.seccion ?? '',
 			})),
@@ -375,7 +379,7 @@ export class UsersComponent implements AfterViewInit {
 
 	// #region Private helpers
 	private initMigrationTimer(): void {
-		if (!this.isDev) return;
+		if (!this.canMigrarContrasenas()) return;
 		setTimeout(() => {
 			if (this.migrationPhase() === 'toast') {
 				this.migrationPhase.set('spotlight');
