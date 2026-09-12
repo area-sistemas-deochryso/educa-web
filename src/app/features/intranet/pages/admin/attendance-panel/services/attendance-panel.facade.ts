@@ -1,6 +1,6 @@
 import { DestroyRef, inject, Injectable } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { forkJoin, of, type Observable } from 'rxjs';
+import { Subject, catchError, forkJoin, of, switchMap, type Observable } from 'rxjs';
 
 import { logger } from '@core/helpers';
 import { UserProfileService } from '@core/services';
@@ -51,36 +51,50 @@ export class AttendancePanelFacade {
 	// #endregion
 
 	// #region Carga de datos
-	loadData(): void {
-		const filters = this.store.filters();
-		this.store.setLoading(true);
-		this.store.setError(null);
+	private readonly load$ = new Subject<void>();
 
-		const esDia = filters.rango === 'dia';
-
-		forkJoin({
-			kpis: this.api.getKpis(filters),
-			breakdown: this.api.getBreakdown(filters),
-			horaBuckets: esDia ? this.api.getHoraBuckets(filters) : forkJoinEmpty<AttendancePanelHoraBucket>(),
-			series: esDia ? forkJoinEmpty<AttendancePanelSerie>() : this.api.getSeries(filters),
-		})
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: ({ kpis, breakdown, horaBuckets, series }) => {
-					const dto = emptyPanelDto();
-					dto.kpis = kpis;
-					dto.breakdown = breakdown;
-					dto.horaBuckets = horaBuckets;
-					dto.series = series;
-					this.store.setDto(dto);
-					this.store.setLoading(false);
-				},
-				error: (err) => {
-					logger.error('[AttendancePanel] Error al cargar el panel', err);
+	constructor() {
+		this.load$
+			.pipe(
+				switchMap(() => {
+					const filters = this.store.filters();
+					const esDia = filters.rango === 'dia';
+					return forkJoin({
+						kpis: this.api.getKpis(filters),
+						breakdown: this.api.getBreakdown(filters),
+						horaBuckets: esDia
+							? this.api.getHoraBuckets(filters)
+							: forkJoinEmpty<AttendancePanelHoraBucket>(),
+						series: esDia ? forkJoinEmpty<AttendancePanelSerie>() : this.api.getSeries(filters),
+					}).pipe(
+						catchError((err) => {
+							logger.error('[AttendancePanel] Error al cargar el panel', err);
+							return of(null);
+						}),
+					);
+				}),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe((result) => {
+				if (!result) {
 					this.store.setError('No se pudo cargar el panel de asistencias.');
 					this.store.setLoading(false);
-				},
+					return;
+				}
+				const dto = emptyPanelDto();
+				dto.kpis = result.kpis;
+				dto.breakdown = result.breakdown;
+				dto.horaBuckets = result.horaBuckets;
+				dto.series = result.series;
+				this.store.setDto(dto);
+				this.store.setLoading(false);
 			});
+	}
+
+	loadData(): void {
+		this.store.setLoading(true);
+		this.store.setError(null);
+		this.load$.next();
 	}
 
 	refresh(): void {

@@ -70,6 +70,8 @@ export class AttendanceReportsFacade {
 
 	// #region Generar reporte
 	generarReporte(): void {
+		if (this.store.loading()) return;
+
 		const filters = this.store.filters();
 
 		// Profesores y Asistentes administrativos no se agrupan por salón — BE ignora el selector

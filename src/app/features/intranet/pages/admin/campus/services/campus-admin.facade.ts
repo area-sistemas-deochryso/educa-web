@@ -1,6 +1,6 @@
 import { DestroyRef, inject, Injectable } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { catchError, EMPTY, Observable } from 'rxjs';
+import { catchError, EMPTY, map, Observable, of, Subject, switchMap } from 'rxjs';
 
 import { facadeErrorHandler, type FacadeErrorHandler, withRetry } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
@@ -41,6 +41,10 @@ export class CampusAdminFacade {
 	readonly vm = this.store.vm;
 
 	// #endregion
+
+	constructor() {
+		this.subscribeLoadPisoCompleto();
+	}
 
 	// #region Ejecución genérica
 
@@ -107,27 +111,35 @@ export class CampusAdminFacade {
 		this.loadPisoCompleto(pisoId);
 	}
 
-	private loadPisoCompleto(pisoId: number): void {
-		if (this.store.editorLoading()) return;
-		this.store.setEditorLoading(true);
+	private readonly loadPisoCompleto$ = new Subject<number>();
 
-		this.api
-			.getPisoCompleto(pisoId)
+	private subscribeLoadPisoCompleto(): void {
+		this.loadPisoCompleto$
 			.pipe(
-				withRetry({ tag: 'CampusAdmin:loadPisoCompleto' }),
+				switchMap((pisoId) =>
+					this.api.getPisoCompleto(pisoId).pipe(
+						withRetry({ tag: 'CampusAdmin:loadPisoCompleto' }),
+						map((piso) => ({ piso, err: null })),
+						catchError((err: unknown) => of({ piso: null, err })),
+					),
+				),
 				takeUntilDestroyed(this.destroyRef),
 			)
-			.subscribe({
-				next: (piso) => {
-					this.store.setPisoCompleto(piso);
-					this.store.setEditorLoading(false);
-				},
-				error: (err) => {
+			.subscribe(({ piso, err }) => {
+				if (err !== null) {
 					this.errHandler.handle(err, 'cargar piso completo', () => {
 						this.store.setEditorLoading(false);
 					});
-				},
+					return;
+				}
+				this.store.setPisoCompleto(piso);
+				this.store.setEditorLoading(false);
 			});
+	}
+
+	private loadPisoCompleto(pisoId: number): void {
+		this.store.setEditorLoading(true);
+		this.loadPisoCompleto$.next(pisoId);
 	}
 
 	loadDestPisoNodos(pisoId: number): void {

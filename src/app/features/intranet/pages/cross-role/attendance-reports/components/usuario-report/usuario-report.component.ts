@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { catchError, debounceTime, of, Subject, switchMap } from 'rxjs';
 import type { PersonaParaSeleccion } from '@data/models';
 import { downloadBlob, formatDateLocalIso, logger, slugifyFileNameSegment } from '@core/helpers';
 import { EduAutoComplete, EduButton, EduDatePicker, EduTemplate } from '@edu-ui';
@@ -82,21 +83,28 @@ export class UsuarioReportComponent {
 	// #endregion
 
 	// #region Persona
+	private readonly searchPersona$ = new Subject<string>();
+
+	constructor() {
+		this.searchPersona$
+			.pipe(
+				debounceTime(300),
+				switchMap((query) =>
+					this.api.buscarPersonas(query).pipe(
+						catchError(() => of([] as PersonaParaSeleccion[])),
+					),
+				),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe((personas) => {
+				this.personaSuggestions.set(personas);
+				this.searchingPersona.set(false);
+			});
+	}
+
 	onSearchPersona(event: EduAutoCompleteCompleteEvent): void {
 		this.searchingPersona.set(true);
-		this.api
-			.buscarPersonas(event.query || '')
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: (personas) => {
-					this.personaSuggestions.set(personas);
-					this.searchingPersona.set(false);
-				},
-				error: () => {
-					this.personaSuggestions.set([]);
-					this.searchingPersona.set(false);
-				},
-			});
+		this.searchPersona$.next(event.query || '');
 	}
 
 	onSelectPersona(persona: PersonaParaSeleccion): void {

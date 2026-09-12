@@ -2,7 +2,7 @@
 import { DestroyRef, Injectable, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpErrorResponse } from '@angular/common/http';
-import { catchError, of } from 'rxjs';
+import { catchError, of, Subject, switchMap } from 'rxjs';
 
 import { logger } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services/error';
@@ -39,6 +39,30 @@ export class TicketBandejaFacade {
 	readonly error = this._error.asReadonly();
 	readonly filtroEstado = this._filtroEstado.asReadonly();
 	readonly updatingId = this._updatingId.asReadonly();
+	// #endregion
+
+	// #region Carga
+	private readonly load$ = new Subject<void>();
+
+	constructor() {
+		this.load$
+			.pipe(
+				switchMap(() =>
+					this.ticketAdminService.getBandeja(this._filtroEstado() ?? undefined).pipe(
+						catchError((err) => {
+							logger.warn('[TicketBandejaFacade] Error cargando bandeja', err?.status);
+							this._error.set(true);
+							return of([] as TicketAdminDto[]);
+						}),
+					),
+				),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe((tickets) => {
+				this._tickets.set(tickets);
+				this._loading.set(false);
+			});
+	}
 	// #endregion
 
 	// #region Commands
@@ -110,21 +134,7 @@ export class TicketBandejaFacade {
 	private loadTickets(): void {
 		this._loading.set(true);
 		this._error.set(false);
-
-		this.ticketAdminService
-			.getBandeja(this._filtroEstado() ?? undefined)
-			.pipe(
-				catchError((err) => {
-					logger.warn('[TicketBandejaFacade] Error cargando bandeja', err?.status);
-					this._error.set(true);
-					return of([] as TicketAdminDto[]);
-				}),
-				takeUntilDestroyed(this.destroyRef),
-			)
-			.subscribe((tickets) => {
-				this._tickets.set(tickets);
-				this._loading.set(false);
-			});
+		this.load$.next();
 	}
 	// #endregion
 }

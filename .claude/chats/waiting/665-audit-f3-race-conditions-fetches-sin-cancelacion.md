@@ -53,3 +53,12 @@ Mismo patrón, distinta severidad según el facade:
 ## Tiempo estimado
 
 ~2h30 (8 fixes del mismo patrón + verificación).
+
+---
+
+## 🟠 BLOQUEADO (2026-09-12)
+
+**Tipo**: dependencia externa (bug de backend descubierto durante verificación)
+**Causa**: los 8 fixes están aplicados y verdes en lint/build/tests (2573/2573), pero el criterio de cierre exige verificar en vivo el punto 3 (`campus-admin`, cambio rápido de piso en el editor 3D). Al levantar BE+FE local (`UseTestEnv: true`) y loguearse como admin, `GET /api/campus/pisos` responde 400 para **cualquier** sede — no es un problema de datos de prueba (se descartó `SedeId` faltante, la cuenta admin ya tenía "Sede Principal" asignada). Causa raíz real: `Educa.API/Repositories/Campus/CampusRepository.Pisos.cs:23-34` usa un patrón LINQ (`SelectMany` con array inline + `.Distinct()` + `.GroupBy()`) que no traduce a SQL Server y lanza `InvalidOperationException` en runtime, mapeado a 400 `INVALID_OPERATION` por el middleware global. Bloquea **toda** la página admin de Campus, no solo el punto bajo verificación.
+**Qué desbloquea**: `Educa.API` brief [668](../../../Educa.API/.claude/chats/open/668-be-fix-linq-selectmany-distinct-groupby-campus-pisos.md) — fix del LINQ en el repo backend. Una vez shipeado, retomar este chat y completar la verificación visual pendiente (los otros 7 puntos no requieren verificación visual, solo el 3).
+**Estado parcial**: los 8 fixes ya están en el working tree del worktree `chat/665-audit-f3-race-conditions-fetches-sin-cancelacion` (sin commitear todavía) — `correlation.facade.ts`, `attendance-panel.facade.ts`, `campus-admin.facade.ts`, `ticket-bandeja.facade.ts`, `attendance-reports.facade.ts` + `usuario-report.component.ts`, `eventos-calendario.facade.ts`, `rate-limit-events.facade.ts`, `correos-dia.facade.ts`. Lint 0 errores, build verde (solo warnings NG8113 preexistentes no relacionados), 2573/2573 tests verdes (257 archivos).

@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { DestroyRef, inject, Injectable } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { catchError, forkJoin, of } from 'rxjs';
+import { catchError, forkJoin, of, Subject, switchMap } from 'rxjs';
 
 import { ErrorHandlerService } from '@core/services/error';
 import { logger } from '@core/helpers';
@@ -30,36 +30,47 @@ export class CorreosDiaFacade {
 	// #endregion
 
 	// #region Comandos
+	private readonly loadData$ = new Subject<void>();
+
+	constructor() {
+		this.loadData$
+			.pipe(
+				switchMap(() => {
+					const fecha = this.store.fechaConsulta() ?? undefined;
+					const sedeId = this.store.sedeId();
+
+					logger.tagged(LOG_TAG, 'info', 'load', { fecha, sedeId });
+
+					return forkJoin({
+						dto: this.api.obtenerDiagnostico(fecha, sedeId),
+						attendanceGaps: this.emailOutboxApi.obtenerAsistenciasSinCorreo(fecha).pipe(
+							catchError((err) => {
+								logger.tagged(LOG_TAG, 'warn', 'attendance_gaps_degraded', err?.status);
+								return of([]);
+							}),
+						),
+					}).pipe(
+						catchError((err: unknown) => {
+							this.handleError(err);
+							this.store.setLoading(false);
+							return of(null);
+						}),
+					);
+				}),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe((result) => {
+				if (!result) return;
+				this.store.setDto(result.dto);
+				this.store.setAttendanceGaps(result.attendanceGaps);
+				this.store.setLoading(false);
+			});
+	}
+
 	loadData(): void {
 		this.store.setLoading(true);
 		this.store.setError(null);
-
-		const fecha = this.store.fechaConsulta() ?? undefined;
-		const sedeId = this.store.sedeId();
-
-		logger.tagged(LOG_TAG, 'info', 'load', { fecha, sedeId });
-
-		forkJoin({
-			dto: this.api.obtenerDiagnostico(fecha, sedeId),
-			attendanceGaps: this.emailOutboxApi.obtenerAsistenciasSinCorreo(fecha).pipe(
-				catchError((err) => {
-					logger.tagged(LOG_TAG, 'warn', 'attendance_gaps_degraded', err?.status);
-					return of([]);
-				}),
-			),
-		})
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: ({ dto, attendanceGaps }) => {
-					this.store.setDto(dto);
-					this.store.setAttendanceGaps(attendanceGaps);
-					this.store.setLoading(false);
-				},
-				error: (err: unknown) => {
-					this.handleError(err);
-					this.store.setLoading(false);
-				},
-			});
+		this.loadData$.next();
 	}
 
 	refresh(): void {

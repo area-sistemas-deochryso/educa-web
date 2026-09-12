@@ -1,6 +1,6 @@
 import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { forkJoin } from 'rxjs';
+import { catchError, forkJoin, of, Subject, switchMap } from 'rxjs';
 
 import {
 	logger,
@@ -40,39 +40,49 @@ export class EventsCalendarFacade {
 	readonly vm = this.store.vm;
 	// #endregion
 
+	private readonly loadAll$ = new Subject<void>();
+
 	constructor() {
 		this.crossTabRefetch.subscribe({
 			resourceType: RESOURCE,
 			refetchItems: () => this.refreshItemsOnly(),
 			destroyRef: this.destroyRef,
 		});
+
+		this.loadAll$
+			.pipe(
+				switchMap(() => {
+					const anio = this.store.filterAnio();
+					return forkJoin({
+						items: this.api.listar(anio),
+						stats: this.api.getEstadisticas(anio),
+					}).pipe(
+						withRetry({ tag: 'EventosCalendarioFacade:loadAll' }),
+						catchError((err) => {
+							logger.error('Error al cargar eventos:', err);
+							this.errorHandler.showError(UI_SUMMARIES.error, resolveErrorMessage(err, 'No se pudieron cargar los eventos'));
+							this.store.setError(resolveErrorMessage(err, 'No se pudieron cargar los eventos'));
+							this.store.setLoading(false);
+							return of(null);
+						}),
+					);
+				}),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe((result) => {
+				if (!result) return;
+				this.store.setItems(Array.isArray(result.items) ? result.items : result.items.data ?? []);
+				this.store.setEstadisticas(result.stats);
+				this.store.setLoading(false);
+			});
 	}
 
 	// #region Comandos CRUD
 
 	loadAll(): void {
-		const anio = this.store.filterAnio();
 		this.store.setLoading(true);
 		this.store.clearError();
-
-		forkJoin({
-			items: this.api.listar(anio),
-			stats: this.api.getEstadisticas(anio),
-		})
-			.pipe(withRetry({ tag: 'EventosCalendarioFacade:loadAll' }), takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: ({ items, stats }) => {
-					this.store.setItems(Array.isArray(items) ? items : items.data ?? []);
-					this.store.setEstadisticas(stats);
-					this.store.setLoading(false);
-				},
-				error: (err) => {
-					logger.error('Error al cargar eventos:', err);
-					this.errorHandler.showError(UI_SUMMARIES.error, resolveErrorMessage(err, 'No se pudieron cargar los eventos'));
-					this.store.setError(resolveErrorMessage(err, 'No se pudieron cargar los eventos'));
-					this.store.setLoading(false);
-				},
-			});
+		this.loadAll$.next();
 	}
 
 	create(): void {
