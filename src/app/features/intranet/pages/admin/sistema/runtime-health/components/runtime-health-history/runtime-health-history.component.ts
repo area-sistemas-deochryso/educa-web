@@ -2,6 +2,7 @@ import {
 	AfterViewInit,
 	ChangeDetectionStrategy,
 	Component,
+	OnDestroy,
 	computed,
 	effect,
 	input,
@@ -46,7 +47,7 @@ Chart.register(...registerables);
 	styleUrl: './runtime-health-history.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class RuntimeHealthHistoryComponent implements AfterViewInit {
+export class RuntimeHealthHistoryComponent implements AfterViewInit, OnDestroy {
 	// #region Inputs / Outputs
 	readonly data = input<RuntimeHealthHistoryDto[]>([]);
 	readonly loading = input(false);
@@ -110,6 +111,10 @@ export class RuntimeHealthHistoryComponent implements AfterViewInit {
 		if (d.length > 0) {
 			this.createCharts(d);
 		}
+	}
+
+	ngOnDestroy(): void {
+		this.destroyCharts();
 	}
 
 	onTimeRangeChange(value: HistoryTimeRange): void {

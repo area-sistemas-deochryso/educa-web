@@ -19,7 +19,7 @@ import { EduBadge, EduConfirmDialog, EduConfirmationService, EduTab, EduTabPanel
 	templateUrl: './runtime-health.component.html',
 	styleUrl: './runtime-health.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	providers: [EduConfirmationService],
+	providers: [EduConfirmationService, RuntimeHealthFacade],
 })
 export class RuntimeHealthPageComponent implements OnInit {
 	private readonly facade = inject(RuntimeHealthFacade);

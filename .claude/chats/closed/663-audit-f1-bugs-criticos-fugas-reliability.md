@@ -2,7 +2,7 @@
 
 > **Repo destino**: `educa-web`
 > **Plan**: [`audit-angular22-ts6-2026-09-12.md`](../../plan/audit-angular22-ts6-2026-09-12.md) (Fase F1)
-> **Creado**: 2026-09-12 · **Estado**: ⏳ pendiente arrancar.
+> **Creado**: 2026-09-12 · **Estado**: ✅ cerrado 2026-09-12.
 > **MODO SUGERIDO**: `/execute`
 > **touches**:
 >   - `src/app/features/intranet/pages/admin/sistema/runtime-health/services/runtime-health.facade.ts`
@@ -35,12 +35,19 @@ Hallazgos de `/audit` (2026-09-12), categoría "Bug" — 4 hallazgos de fugas/re
 
 ## Criterio de cierre
 
-- [ ] Build + lint + tests OK.
-- [ ] Puntos 1-2 verificados: navegar a `sistema/runtime-health` o `diagnostico-db`, salir, confirmar en Network/Memory tab que el polling se detiene y los charts se liberan.
-- [ ] Puntos 3-4 verificados con test de regresión sobre el módulo WAL (simular error no-quota en IndexedDB; simular 2 pestañas compitiendo por liderazgo).
-- [ ] Plan actualizado: F1 → ✅.
-- [ ] Maestro actualizado.
+- [x] Build + lint + tests OK (2565/2565 tests verdes, lint 0 errores, build verde).
+- [x] Puntos 1-2: fix aplicado (`providers: [RuntimeHealthFacade]` / `[DiagnosticoDbFacade]` en cada page component; `ngOnDestroy` → `destroyChart(s)` en ambos componentes Chart.js). **No verificado en navegador en vivo** (Network/Memory tab) — requeriría backend + login para páginas `admin/sistema/*`; el patrón (scoped provider + destroy hook) es estándar de Angular y no introduce lógica nueva a validar visualmente. Queda como riesgo residual documentado si se quiere verificar post-deploy.
+- [x] Puntos 3-4 verificados con test de regresión: `wal-storage-indexeddb.strategy.spec.ts` (2 tests nuevos: reject en error no-quota, reject en QuotaExceededError) y `wal-leader.service.spec.ts` (3 tests nuevos: tie-break entre 2 pestañas simultáneas, backoff ante líder ya heartbeando, resign+cleanup en destroy). Bug adicional encontrado y corregido en el mismo archivo: `teardown()` nunca ponía `_isLeader = false` tras resignar.
+- [x] Plan actualizado: F1 → ✅.
+- [x] Maestro actualizado.
+
+## Resumen de cambios
+
+1. **Polling que no se detiene**: `RuntimeHealthFacade`/`DiagnosticoDbFacade` eran `providedIn:'root'`; su `DestroyRef` era del injector raíz (nunca se destruye en una SPA). Fix: agregar el facade a `providers:` del page component correspondiente para que el injector se destruya al navegar fuera.
+2. **Chart.js sin destroy**: agregado `ngOnDestroy()` en `RuntimeHealthHistoryComponent` y `ResourceStatsChartComponent` llamando a `destroyCharts()`/`destroyChart()` (el método ya existía, solo faltaba el hook de ciclo de vida).
+3. **WAL `put()` resuelve en vez de rechazar**: `wal-storage-indexeddb.strategy.ts` ahora `reject()` en cualquier error de transacción salvo `QuotaExceededError` (que sigue siendo el fallback deliberado a HTTP directo). Verificado que `WalFacadeHelper.execute()` ya envuelve `wal.append()` en `try/catch`, así que el `reject()` no introduce unhandled rejections.
+4. **Race del líder WAL entre pestañas**: `WalLeaderService.claimLeadership()` ya no marca `_isLeader = true` de forma síncrona. Ahora transmite `CLAIM`, lo re-emite cada 50ms durante una ventana de gracia de 300ms (mitiga que el primer mensaje se pierda si el `BroadcastChannel` de la otra pestaña aún no existía) y solo finaliza el liderazgo si nadie con `tabId` menor reclamó en ese lapso. Bug adicional corregido: `teardown()` no reseteaba `_isLeader`.
 
 ## Tiempo estimado
 
-~90 min.
+~90 min. Real: ~2h (incluyó bootstrap de dependencias en worktree + diseño de la ventana de gracia con retransmisión, no contemplado en el estimado original).

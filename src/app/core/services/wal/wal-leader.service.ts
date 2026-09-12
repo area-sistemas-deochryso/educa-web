@@ -22,6 +22,20 @@ const CHANNEL_NAME = 'educa-wal-leader';
 const HEARTBEAT_MS = 3_000;
 /** If no heartbeat from leader in this time, assume dead and claim leadership. */
 const LEADER_TIMEOUT_MS = HEARTBEAT_MS * 3;
+/**
+ * Grace period between broadcasting a leadership CLAIM and finalizing it.
+ * Gives competing tabs time to reply (CLAIM/HEARTBEAT) so the tie-break by
+ * tabId happens before either tab starts processing WAL entries — avoids two
+ * tabs both believing they're leader and double-processing the same entries.
+ */
+const CLAIM_GRACE_MS = 300;
+/**
+ * How often a pending CLAIM is re-broadcast during the grace window. A tab's
+ * very first CLAIM can be missed by another tab whose BroadcastChannel
+ * hadn't been created yet (channel-not-open-yet race) — retransmitting
+ * closes that window instead of relying on a single, possibly-lost message.
+ */
+const CLAIM_RETRY_MS = 50;
 
 /**
  * Multi-tab leader election for WAL processing.
@@ -46,6 +60,8 @@ export class WalLeaderService {
 	private _isLeader = false;
 	private heartbeatTimer: ReturnType<typeof setInterval> | null = null;
 	private leaderCheckTimer: ReturnType<typeof setInterval> | null = null;
+	private pendingClaimTimer: ReturnType<typeof setTimeout> | null = null;
+	private pendingClaimRetryTimer: ReturnType<typeof setInterval> | null = null;
 	private lastLeaderHeartbeat = 0;
 	private currentLeaderId: string | null = null;
 
@@ -117,22 +133,51 @@ export class WalLeaderService {
 
 	// #region Leadership
 
+	/**
+	 * Broadcast intent to claim leadership and wait `CLAIM_GRACE_MS` for a
+	 * competing tab to reply before finalizing — see `CLAIM_GRACE_MS`.
+	 */
 	private claimLeadership(): void {
+		if (this.pendingClaimTimer) return;
+
+		const sendClaim = () =>
+			this.broadcast({ type: 'CLAIM', tabId: this.tabId, timestamp: Date.now() });
+
+		sendClaim();
+		this.pendingClaimRetryTimer = setInterval(sendClaim, CLAIM_RETRY_MS);
+
+		this.pendingClaimTimer = setTimeout(() => {
+			this.pendingClaimTimer = null;
+			this.stopPendingClaimRetry();
+			this.finalizeLeadership();
+		}, CLAIM_GRACE_MS);
+	}
+
+	private stopPendingClaimRetry(): void {
+		if (this.pendingClaimRetryTimer) {
+			clearInterval(this.pendingClaimRetryTimer);
+			this.pendingClaimRetryTimer = null;
+		}
+	}
+
+	private finalizeLeadership(): void {
 		this._isLeader = true;
 		this.currentLeaderId = this.tabId;
 		this.lastLeaderHeartbeat = Date.now();
 
-		// Broadcast claim
-		this.broadcast({
-			type: 'CLAIM',
-			tabId: this.tabId,
-			timestamp: Date.now(),
-		});
-
-		// Start heartbeating
 		this.startHeartbeat();
 
 		logger.log('[WAL-Leader] This tab is now the leader:', this.tabId.slice(0, 8));
+	}
+
+	/** Cancel a leadership claim in progress because another tab already won the tie-break. */
+	private abortPendingClaim(winnerTabId: string, winnerTimestamp: number): void {
+		if (!this.pendingClaimTimer) return;
+		clearTimeout(this.pendingClaimTimer);
+		this.pendingClaimTimer = null;
+		this.stopPendingClaimRetry();
+		this.currentLeaderId = winnerTabId;
+		this.lastLeaderHeartbeat = winnerTimestamp;
 	}
 
 	private resignLeadership(): void {
@@ -228,6 +273,12 @@ export class WalLeaderService {
 				this.lastLeaderHeartbeat = msg.timestamp;
 			}
 			// else: we win, keep leadership (other tab will see our heartbeat)
+		} else if (this.pendingClaimTimer) {
+			// Both tabs are mid-claim (grace period) — resolve by tab ID before either finalizes
+			if (msg.tabId < this.tabId) {
+				this.abortPendingClaim(msg.tabId, msg.timestamp);
+			}
+			// else: we win the tie — keep waiting out our grace period
 		} else {
 			this.currentLeaderId = msg.tabId;
 			this.lastLeaderHeartbeat = msg.timestamp;
@@ -237,6 +288,12 @@ export class WalLeaderService {
 	private handleHeartbeat(msg: WalLeaderMessage): void {
 		this.currentLeaderId = msg.tabId;
 		this.lastLeaderHeartbeat = Date.now();
+
+		if (this.pendingClaimTimer) {
+			// A leader is already established — abort our claim, don't contest it
+			this.abortPendingClaim(msg.tabId, msg.timestamp);
+			return;
+		}
 
 		// If we thought we were leader but another is heartbeating, resolve
 		if (this._isLeader && msg.tabId < this.tabId) {
@@ -274,6 +331,11 @@ export class WalLeaderService {
 	}
 
 	private teardown(): void {
+		if (this.pendingClaimTimer) {
+			clearTimeout(this.pendingClaimTimer);
+			this.pendingClaimTimer = null;
+		}
+		this.stopPendingClaimRetry();
 		if (this._isLeader) {
 			// Notify other tabs before closing
 			this.broadcast({
@@ -281,6 +343,7 @@ export class WalLeaderService {
 				tabId: this.tabId,
 				timestamp: Date.now(),
 			});
+			this._isLeader = false;
 		}
 
 		this.stopHeartbeat();

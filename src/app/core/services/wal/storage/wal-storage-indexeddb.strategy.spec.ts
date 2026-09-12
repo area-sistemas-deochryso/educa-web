@@ -26,6 +26,51 @@ function makeRequest(): FakeRequest {
 	};
 }
 
+interface FakeTx {
+	objectStore: () => { put: (v: unknown) => void };
+	error: Error | null;
+	oncomplete: (() => void) | null;
+	onerror: (() => void) | null;
+}
+
+function makeFakeDb(): { db: { transaction: () => FakeTx }; tx: FakeTx } {
+	const tx: FakeTx = {
+		objectStore: () => ({ put: () => {} }),
+		error: null,
+		oncomplete: null,
+		onerror: null,
+	};
+	return { db: { transaction: () => tx }, tx };
+}
+
+function makeEntry() {
+	return {
+		id: 'x',
+		timestamp: 0,
+		operation: 'UPDATE' as const,
+		resourceType: 'horarios',
+		endpoint: '/api/x',
+		method: 'PUT',
+		payload: {},
+		status: 'PENDING' as const,
+		retries: 0,
+		maxRetries: 2,
+	};
+}
+
+async function initWithFakeDb(strategy: WalStorageIndexedDbStrategy) {
+	const req = makeRequest();
+	const { db, tx } = makeFakeDb();
+	(globalThis as { indexedDB?: { open: () => unknown } }).indexedDB = {
+		open: vi.fn(() => req),
+	};
+	const ready = strategy.init();
+	req.result = db;
+	req.onsuccess?.(new Event('success'));
+	await ready;
+	return tx;
+}
+
 const originalIndexedDB = (globalThis as { indexedDB?: unknown }).indexedDB;
 
 describe('WalStorageIndexedDbStrategy', () => {
@@ -113,5 +158,27 @@ describe('WalStorageIndexedDbStrategy', () => {
 		await expect(strategy.clear()).resolves.toBeUndefined();
 		expect(await strategy.deleteCommittedOlderThan(0)).toBe(0);
 		expect(await strategy.purgeByResourceType('horarios')).toBe(0);
+	});
+
+	it('put rejects on a non-quota transaction error instead of swallowing it (F1 point 3)', async () => {
+		const tx = await initWithFakeDb(strategy);
+
+		const putPromise = strategy.put(makeEntry());
+		tx.error = new Error('generic io error');
+		tx.onerror?.();
+
+		await expect(putPromise).rejects.toThrow('generic io error');
+	});
+
+	it('put still rejects on QuotaExceededError (deliberate fallback signal)', async () => {
+		const tx = await initWithFakeDb(strategy);
+
+		const putPromise = strategy.put(makeEntry());
+		const quotaError = new Error('quota exceeded');
+		quotaError.name = 'QuotaExceededError';
+		tx.error = quotaError;
+		tx.onerror?.();
+
+		await expect(putPromise).rejects.toThrow('quota exceeded');
 	});
 });

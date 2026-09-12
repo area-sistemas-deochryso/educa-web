@@ -21,6 +21,7 @@ import { EduTab, EduTabPanel, EduTabs } from '@edu-ui';
 	templateUrl: './diagnostico-db.component.html',
 	styleUrl: './diagnostico-db.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
+	providers: [DiagnosticoDbFacade],
 })
 export class DiagnosticoDbPageComponent implements OnInit {
 	private readonly facade = inject(DiagnosticoDbFacade);

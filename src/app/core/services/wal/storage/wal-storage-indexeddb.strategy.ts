@@ -93,7 +93,7 @@ export class WalStorageIndexedDbStrategy implements WalStorageStrategy {
 						return;
 					}
 					logger.error('[WAL-DB] Error writing entry:', error);
-					resolve();
+					reject(error ?? new Error('[WAL-DB] Unknown error writing entry'));
 				};
 			} catch (e) {
 				if (e instanceof DOMException && e.name === 'QuotaExceededError') {
@@ -104,7 +104,7 @@ export class WalStorageIndexedDbStrategy implements WalStorageStrategy {
 					return;
 				}
 				logger.error('[WAL-DB] Transaction error:', e);
-				resolve();
+				reject(e);
 			}
 		});
 	}

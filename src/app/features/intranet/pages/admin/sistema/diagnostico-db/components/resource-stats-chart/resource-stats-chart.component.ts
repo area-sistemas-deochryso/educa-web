@@ -3,6 +3,7 @@ import {
 	ChangeDetectionStrategy,
 	Component,
 	ElementRef,
+	OnDestroy,
 	effect,
 	input,
 	output,
@@ -49,7 +50,7 @@ const CHART_WINDOW_MS = 60 * 60 * 1000;
 	styleUrl: './resource-stats-chart.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ResourceStatsChartComponent implements AfterViewInit {
+export class ResourceStatsChartComponent implements AfterViewInit, OnDestroy {
 	// #region Inputs / Outputs
 	readonly data = input<ResourceStatsSnapshotDto[]>([]);
 	readonly loading = input(false);
@@ -74,6 +75,10 @@ export class ResourceStatsChartComponent implements AfterViewInit {
 		this.initialized = true;
 		const d = this.data();
 		if (d.length > 0) this.createChart(d);
+	}
+
+	ngOnDestroy(): void {
+		this.destroyChart();
 	}
 
 	onRefresh(): void {

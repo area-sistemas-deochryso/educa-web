@@ -27,7 +27,7 @@ El codebase tiene una base moderna sólida: 100% standalone, 100% control flow n
 
 | Fase | Tema | Severidad dominante | Brief / Estado |
 |---|---|---|---|
-| F1 | Bugs críticos de fugas/reliability (polling que no se detiene, WAL resuelve-en-vez-de-rechazar, race del líder WAL, Chart.js sin destroy) | Bug | [663](../chats/open/663-audit-f1-bugs-criticos-fugas-reliability.md) |
+| F1 | Bugs críticos de fugas/reliability (polling que no se detiene, WAL resuelve-en-vez-de-rechazar, race del líder WAL, Chart.js sin destroy) | Bug | ✅ [663](../chats/closed/663-audit-f1-bugs-criticos-fugas-reliability.md) |
 | F2 | Seguridad — exposición de password en `users/` | Riesgo | [664](../chats/open/664-audit-f2-seguridad-password-plaintext-users.md) |
 | F3 | Condiciones de carrera por fetches sin cancelación (~9 facades) | Bug/Riesgo | [665](../chats/open/665-audit-f3-race-conditions-fetches-sin-cancelacion.md) |
 | F4 | Bugs funcionales puntuales independientes (9 fixes acotados) | Bug | [666](../chats/open/666-audit-f4-bugs-funcionales-puntuales.md) |
