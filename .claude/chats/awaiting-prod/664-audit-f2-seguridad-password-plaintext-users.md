@@ -2,7 +2,8 @@
 
 > **Repo destino**: `educa-web` (posible contraparte BE si el endpoint de detalle de usuario devuelve la password — confirmar con `/investigate` antes de fix).
 > **Plan**: [`audit-angular22-ts6-2026-09-12.md`](../../plan/audit-angular22-ts6-2026-09-12.md) (Fase F2)
-> **Creado**: 2026-09-12 · **Estado**: ⏳ pendiente arrancar.
+> **Creado**: 2026-09-12 · **Estado**: ✅ FE cerrado (lint/build/test verdes).
+> **Validación prod**: ⏳ pendiente desde 2026-09-12 — smoke test del form de alta/edición de usuario con password manual (verificar que ya no fuerza mayúscula y las 5 reglas son alcanzables) y con password autogenerada (debe pasar las 5 reglas). Los botones "Migrar Contraseñas" y "Exportar" quedan ocultos en prod hasta que `Educa.API` siembre las capabilities (brief 667) — comportamiento esperado, no verificar ahí.
 > **MODO SUGERIDO**: `/investigate` primero (confirmar si el BE devuelve la password en el detalle) → `/execute`
 > **touches**:
 >   - `src/app/features/intranet/pages/admin/users/usuarios.store.ts`
@@ -37,14 +38,14 @@ Hallazgos de `/audit` (2026-09-12), categoría "Riesgo" — el hallazgo de segur
 
 ## Criterio de cierre
 
-- [ ] Punto 1: origen confirmado (FE o BE) y coordinado según corresponda; si es FE, corregido y verificado que el detalle de usuario no expone la password en el DOM/Network tab.
-- [ ] Punto 2: confirmado con el usuario cuál es la intención real de la regla, fix aplicado, formulario de creación/edición de usuario probado end-to-end.
-- [ ] Punto 3: generación de password mejorada (o documentado por qué se acepta el riesgo si hay forzado de cambio en primer login del lado BE).
-- [ ] Punto 4: decisión tomada sobre qué incluye el export, aplicada.
-- [ ] Punto 5: gate de autorización agregado o justificado por qué el gate actual alcanza.
-- [ ] Build + lint + tests OK.
-- [ ] Plan actualizado: F2 → ✅.
-- [ ] Maestro actualizado.
+- [x] Punto 1: origen confirmado — es del BE (`UsuarioDetalleDto.Contrasena` descifra deliberadamente). Documentado y coordinado vía handoff cross-repo `Educa.API` brief [667](../../../Educa.API/.claude/chats/open/667-be-handoff-audit-fe-664-password-plaintext.md). No se corrige en este repo (fuera de scope FE-only).
+- [x] Punto 2: confirmado con el usuario (permitir minúsculas). Fix aplicado (`usuario-form-dialog.component.html:123`, quitado `.toUpperCase()` forzado). Verificado que ninguna otra regla dependía del forzado.
+- [x] Punto 3: generación de password mejorada — `password.utils.ts` ahora agrega 3 letras minúsculas + 1 carácter especial vía `crypto.getRandomValues` (componente aleatorio real, no más 100% derivable de datos públicos). Test nuevo `password.utils.spec.ts` (8 tests, verde).
+- [x] Punto 4: decisión tomada (sacar la contraseña del export xlsx) y aplicada en `usuarios.component.ts` (`generateExcel`). Gate `hasCapability('USUARIOS_EXPORT_CREDENCIALES_MANAGE')` agregado al botón — seed de la capability documentado en el handoff 667 (Sección C), fail-closed hasta entonces.
+- [x] Punto 5: gate de autorización agregado — `hasCapability('USUARIOS_MIGRAR_CONTRASENAS_MANAGE')` combinado con el flag de dev existente, en `usuarios.component.ts`/`.html`. Seed de la capability documentado en el handoff 667 (Sección B), fail-closed hasta entonces.
+- [x] Build + lint + tests OK (`ng lint` limpio, `ng build` sin errores, 8 tests nuevos + 82 tests existentes relacionados en verde).
+- [x] Plan actualizado: F2 → 🟡 FE ✅, BE handoff pendiente (no se puede marcar ✅ completo hasta que `Educa.API` cierre brief 667).
+- [x] Maestro actualizado (`educa-web` y `Educa.API`).
 
 ## Tiempo estimado
 
