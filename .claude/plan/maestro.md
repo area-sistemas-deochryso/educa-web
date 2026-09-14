@@ -50,6 +50,22 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub F3-F6), *
 
 > **Columna `Desbloquea`**: número de tareas/fases downstream que dependen de que este ítem se complete. Score más alto = ejecutar primero.
 
+#### Tier 0 — Prioridad forzada (audit Angular 22/TS 6.0, a pedido explícito del usuario 2026-09-12)
+
+> Reordenado 2026-09-12 para que `/go` priorice estos briefs por sobre el orden normal de desbloqueo. Vigente hasta que F4-F12 cierren o el usuario pida revertir el orden.
+
+| Pos | Key | Plan | Próximo paso concreto | Repo | Gate |
+|---|---|---|---|---|---|
+| 0.1 | BAudit2 | Audit F4 | ✅ Bugs funcionales puntuales (9/9) — brief [666](../chats/closed/666-audit-f4-bugs-funcionales-puntuales.md). Hallazgo pt.9 (link roto en `auditoria-correos-table`, requiere lookup por `entidadId` en el BE) queda pendiente como follow-up cross-repo (`Educa.API` brief 687). | local | cerrado |
+| 0.2 | BAudit2 | Audit F5 | `edu-ui` accesibilidad + `setDisabledState` — brief [679](../chats/open/679-audit-f5-edu-ui-accesibilidad-setdisabledstate.md) | local | libre |
+| 0.3 | BAudit2 | Audit F6 | Config zoneless explícita — brief [680](../chats/open/680-audit-f6-zoneless-config-explicita.md) | local | libre |
+| 0.4 | BAudit2 | Audit F7 | Sitio público — contacto + SEO — brief [681](../chats/open/681-audit-f7-sitio-publico-contacto-seo.md) | local | libre |
+| 0.5 | BAudit2 | Audit F8 | Performance `@defer` + lazy-loading + leaks — brief [682](../chats/open/682-audit-f8-performance-defer-lazy-loading-leaks.md) | local | libre |
+| 0.6 | BAudit2 | Audit F9 | Consolidar duplicación de código — brief [683](../chats/open/683-audit-f9-consolidar-duplicacion-codigo.md) | local | libre |
+| 0.7 | BAudit2 | Audit F10 | Capa de datos — layering + `vistas.facade` — brief [684](../chats/open/684-audit-f10-capa-datos-layering-vistas-facade.md) | local | libre |
+| 0.8 | BAudit2 | Audit F11 | Inconsistencias transversales menores — brief [685](../chats/open/685-audit-f11-inconsistencias-transversales-menores.md) | local | libre |
+| 0.9 | BAudit2 | Audit F12 | Riesgos menores seguridad/UX — brief [686](../chats/open/686-audit-f12-riesgos-menores-seguridad-ux.md) | local | libre |
+
 #### Tier 1 — Alto impacto (desbloquean ≥3 ítems)
 
 | Pos | Key | Plan | Próximo paso concreto | Repo | Desbloquea | Gate |
@@ -69,15 +85,6 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub F3-F6), *
 | 13 | BAudit2 | Audit F1 | ✅ Bugs críticos de fugas/reliability — brief [663](../chats/closed/663-audit-f1-bugs-criticos-fugas-reliability.md) | cerrado |
 | 14 | BAudit2 | Audit F2 | ✅ FE cerrado (seguridad password plaintext `users/`) — brief [664](../chats/awaiting-prod/664-audit-f2-seguridad-password-plaintext-users.md), BE handoff pendiente (`Educa.API` brief 667) | ⏸️ awaiting-prod |
 | 15 | BAudit2 | Audit F3 | ✅ FE cerrado (race conditions en fetches, ~9 facades) — brief [665](../chats/awaiting-prod/665-audit-f3-race-conditions-fetches-sin-cancelacion.md), verificado en local contra `TestConnection` | ⏸️ awaiting-prod |
-| 16 | BAudit2 | Audit F4 | ✅ Bugs funcionales puntuales (9/9) — brief [666](../chats/closed/666-audit-f4-bugs-funcionales-puntuales.md). Hallazgo pt.9 (link roto en `auditoria-correos-table`, requiere lookup por `entidadId` en el BE) queda pendiente como follow-up cross-repo. | cerrado |
-| 17 | BAudit2 | Audit F5 | `edu-ui` accesibilidad + `setDisabledState` — brief [679](../chats/open/679-audit-f5-edu-ui-accesibilidad-setdisabledstate.md) | libre |
-| 18 | BAudit2 | Audit F6 | Config zoneless explícita — brief [680](../chats/open/680-audit-f6-zoneless-config-explicita.md) | libre |
-| 19 | BAudit2 | Audit F7 | Sitio público — contacto + SEO — brief [681](../chats/open/681-audit-f7-sitio-publico-contacto-seo.md) | libre |
-| 20 | BAudit2 | Audit F8 | Performance `@defer` + lazy-loading + leaks — brief [682](../chats/open/682-audit-f8-performance-defer-lazy-loading-leaks.md) | libre |
-| 21 | BAudit2 | Audit F9 | Consolidar duplicación de código — brief [683](../chats/open/683-audit-f9-consolidar-duplicacion-codigo.md) | libre |
-| 22 | BAudit2 | Audit F10 | Capa de datos — layering + `vistas.facade` — brief [684](../chats/open/684-audit-f10-capa-datos-layering-vistas-facade.md) | libre |
-| 23 | BAudit2 | Audit F11 | Inconsistencias transversales menores — brief [685](../chats/open/685-audit-f11-inconsistencias-transversales-menores.md) | libre |
-| 24 | BAudit2 | Audit F12 | Riesgos menores seguridad/UX — brief [686](../chats/open/686-audit-f12-riesgos-menores-seguridad-ux.md) | libre |
 
 #### Tier 4 — Bloqueados / baja prioridad
 
@@ -96,7 +103,7 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub F3-F6), *
 | 10 | F8 | Design Patterns BE | Aplicar al tocar módulos BE | incremental |
 | 11 | F9 | Design Patterns FE | Aplicar al tocar módulos FE | incremental |
 
-**Siguiente accionable**: **BAudit2 F5** — `edu-ui` accesibilidad + `setDisabledState`, brief [679](../chats/open/679-audit-f5-edu-ui-accesibilidad-setdisabledstate.md). Audit F4 (666) ✅ cerrado (9/9 fixes). Nota: si `main` tiene una reordenación Tier 0 pendiente de commitear (prioridad forzada del audit sobre `xP41`), resolver ese diff al mergear esta branch — no pisarlo. Admin block cerrado (P62-P66 ✅/descartado). P50 F3a ✅ (331 closed).
+**Siguiente accionable**: **BAudit2 F5** (Tier 0, pos 0.2) — `edu-ui` accesibilidad + `setDisabledState`, brief [679](../chats/open/679-audit-f5-edu-ui-accesibilidad-setdisabledstate.md). Tier 0 reordenado 2026-09-12 a pedido explícito del usuario para priorizar el resto del audit Angular 22/TS 6.0 (F4-F12) por sobre xP41. Audit F4 (666, pos 0.1) ✅ cerrado (9/9 fixes). xP41 F3 BE (persist request lifecycle) queda como siguiente tras cerrar Tier 0. Admin block cerrado (P62-P66 ✅/descartado). P50 F3a ✅ (331 closed).
 
 ### 🟣 Verificaciones post-deploy (`/verify <NNN>`)
 
