@@ -2,7 +2,8 @@
 
 > **Repo destino**: `educa-web`
 > **Plan**: [`audit-angular22-ts6-2026-09-12.md`](../../plan/audit-angular22-ts6-2026-09-12.md) (Fase F3)
-> **Creado**: 2026-09-12 · **Estado**: ⏳ pendiente arrancar.
+> **Creado**: 2026-09-12 · **Estado**: ✅ cerrado localmente.
+> **Validación prod**: ⏳ pendiente desde 2026-09-12 — verificación visual del punto 3 (`campus-admin`) se hizo en local contra `TestConnection`, falta confirmar en `educa.com.pe/intranet` real.
 > **MODO SUGERIDO**: `/execute`
 > **touches**:
 >   - `src/app/features/intranet/pages/admin/correlation/services/correlation.facade.ts`
@@ -17,6 +18,10 @@
 ## Origen
 
 Hallazgo de `/audit` (2026-09-12), categoría "Bug"/"Riesgo" — patrón repetido en ~9 facades distintos: fetch disparado sin `switchMap`/cancelación del request anterior, permitiendo que una respuesta vieja (más lenta) pise una más nueva.
+
+## Nota — bloqueo de BE resuelto (2026-09-12)
+
+El bug de backend descubierto verificando en vivo el fix de `campus-admin.facade.ts` (`GET /api/campus/pisos` → 400 con cualquier sede) está resuelto: `Educa.API` brief [668](../../../../Educa.API/.claude/chats/running/668-be-fix-linq-selectmany-distinct-groupby-campus-pisos.md), fix + tests de regresión + verificado en vivo (200 OK contra `TestConnection`). Ya no bloquea la verificación visual de este punto (#3, `campus-admin.facade.ts`).
 
 ## Scope
 
@@ -44,21 +49,12 @@ Mismo patrón, distinta severidad según el facade:
 
 ## Criterio de cierre
 
-- [ ] Los 8 puntos corregidos con `switchMap`/cancelación equivalente.
-- [ ] Punto 3 (campus-admin) verificado en vivo: cambiar de piso rápidamente varias veces, confirmar que el editor 3D siempre muestra el piso seleccionado real.
-- [ ] Build + lint + tests OK.
-- [ ] Plan actualizado: F3 → ✅.
-- [ ] Maestro actualizado.
+- [x] Los 8 puntos corregidos con `switchMap`/cancelación equivalente.
+- [x] Punto 3 (campus-admin) verificado en vivo: cambiar de piso rápidamente varias veces, confirmar que el editor 3D siempre muestra el piso seleccionado real. Verificado 2026-09-12 contra `TestConnection` (local, `UseTestEnv=true`) con 2 pisos de prueba (`TEST-Piso 1`/`TEST-Piso 2`) — 4 clicks alternados rápidos, el header y el ítem resaltado en la lista quedaron consistentes con el piso final, sin errores de consola.
+- [x] Build + lint + tests OK. Lint: 0 errores. Build: verde (9 rutas prerenderizadas, sin errores, solo warnings `NG8113` preexistentes). Tests: 2573/2573 verdes.
+- [x] Plan actualizado: F3 → ✅.
+- [x] Maestro actualizado.
 
 ## Tiempo estimado
 
 ~2h30 (8 fixes del mismo patrón + verificación).
-
----
-
-## 🟠 BLOQUEADO (2026-09-12)
-
-**Tipo**: dependencia externa (bug de backend descubierto durante verificación)
-**Causa**: los 8 fixes están aplicados y verdes en lint/build/tests (2573/2573), pero el criterio de cierre exige verificar en vivo el punto 3 (`campus-admin`, cambio rápido de piso en el editor 3D). Al levantar BE+FE local (`UseTestEnv: true`) y loguearse como admin, `GET /api/campus/pisos` responde 400 para **cualquier** sede — no es un problema de datos de prueba (se descartó `SedeId` faltante, la cuenta admin ya tenía "Sede Principal" asignada). Causa raíz real: `Educa.API/Repositories/Campus/CampusRepository.Pisos.cs:23-34` usa un patrón LINQ (`SelectMany` con array inline + `.Distinct()` + `.GroupBy()`) que no traduce a SQL Server y lanza `InvalidOperationException` en runtime, mapeado a 400 `INVALID_OPERATION` por el middleware global. Bloquea **toda** la página admin de Campus, no solo el punto bajo verificación.
-**Qué desbloquea**: `Educa.API` brief [668](../../../Educa.API/.claude/chats/open/668-be-fix-linq-selectmany-distinct-groupby-campus-pisos.md) — fix del LINQ en el repo backend. Una vez shipeado, retomar este chat y completar la verificación visual pendiente (los otros 7 puntos no requieren verificación visual, solo el 3).
-**Estado parcial**: los 8 fixes ya están en el working tree del worktree `chat/665-audit-f3-race-conditions-fetches-sin-cancelacion` (sin commitear todavía) — `correlation.facade.ts`, `attendance-panel.facade.ts`, `campus-admin.facade.ts`, `ticket-bandeja.facade.ts`, `attendance-reports.facade.ts` + `usuario-report.component.ts`, `eventos-calendario.facade.ts`, `rate-limit-events.facade.ts`, `correos-dia.facade.ts`. Lint 0 errores, build verde (solo warnings NG8113 preexistentes no relacionados), 2573/2573 tests verdes (257 archivos).

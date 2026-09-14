@@ -29,7 +29,7 @@ El codebase tiene una base moderna sólida: 100% standalone, 100% control flow n
 |---|---|---|---|
 | F1 | Bugs críticos de fugas/reliability (polling que no se detiene, WAL resuelve-en-vez-de-rechazar, race del líder WAL, Chart.js sin destroy) | Bug | ✅ [663](../chats/closed/663-audit-f1-bugs-criticos-fugas-reliability.md) |
 | F2 | Seguridad — exposición de password en `users/` | Riesgo | 🟡 FE ✅ awaiting-prod · BE handoff pendiente ([664](../chats/awaiting-prod/664-audit-f2-seguridad-password-plaintext-users.md), `Educa.API` brief [667](../../Educa.API/.claude/chats/open/667-be-handoff-audit-fe-664-password-plaintext.md)) |
-| F3 | Condiciones de carrera por fetches sin cancelación (~9 facades) | Bug/Riesgo | [665](../chats/open/665-audit-f3-race-conditions-fetches-sin-cancelacion.md) |
+| F3 | Condiciones de carrera por fetches sin cancelación (~9 facades) | Bug/Riesgo | ✅ FE cerrado, awaiting-prod [665](../chats/awaiting-prod/665-audit-f3-race-conditions-fetches-sin-cancelacion.md) |
 | F4 | Bugs funcionales puntuales independientes (9 fixes acotados) | Bug | [666](../chats/open/666-audit-f4-bugs-funcionales-puntuales.md) |
 | F5 | `edu-ui`: accesibilidad teclado/ARIA (tabs, accordion, menu, tooltip, combobox) + `setDisabledState` faltante en 9 controles CVA | Riesgo | backlog |
 | F6 | Decidir y aplicar configuración zoneless explícita en `app.config.ts` (paridad con `test-setup.ts`) | Regla violada | backlog |
