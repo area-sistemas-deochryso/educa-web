@@ -3,10 +3,10 @@ import {
 	Component,
 	OnDestroy,
 	AfterViewInit,
-	ChangeDetectorRef,
 	inject,
 	PLATFORM_ID,
 	ChangeDetectionStrategy,
+	signal,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
@@ -21,13 +21,11 @@ import { isPlatformBrowser } from '@angular/common';
 	styleUrl: './counter-section.scss',
 })
 export class CounterSectionComponent implements AfterViewInit, OnDestroy {
-	// * Detect changes during animation updates.
-	private cdr = inject(ChangeDetectorRef);
 	private platformId = inject(PLATFORM_ID);
 
 	// * Counter target + displayed state.
 	targetCount = 500;
-	displayedCount = 0;
+	readonly displayedCount = signal(0);
 	private animationFrameId: number | null = null;
 	private observer: IntersectionObserver | null = null;
 	private hasAnimated = false;
@@ -79,14 +77,12 @@ export class CounterSectionComponent implements AfterViewInit, OnDestroy {
 			const progress = Math.min(elapsed / duration, 1);
 			const easedProgress = easeOutQuad(progress);
 
-			this.displayedCount = Math.floor(easedProgress * this.targetCount);
-			this.cdr.detectChanges();
+			this.displayedCount.set(Math.floor(easedProgress * this.targetCount));
 
 			if (progress < 1) {
 				this.animationFrameId = requestAnimationFrame(animate);
 			} else {
-				this.displayedCount = this.targetCount;
-				this.cdr.detectChanges();
+				this.displayedCount.set(this.targetCount);
 			}
 		};
 
