@@ -1,7 +1,7 @@
 <!-- #region Header -->
 <app-page-header
 	icon="pi pi-envelope"
-	[title]="correo()"
+	[title]="correoResuelto()"
 	subtitle="Vista unificada del destinatario"
 >
 	<div class="header-actions">
@@ -148,7 +148,7 @@
 				<a
 					class="cross-link"
 					[routerLink]="['/intranet/admin/monitoreo/correos/bandeja']"
-					[queryParams]="{ correo: correo() }"
+					[queryParams]="{ correo: correoResuelto() }"
 					data-info-anchor="admin-recipient-view-ver-historial-link"
 				>
 					Ver historial completo <i class="pi pi-external-link"></i>
@@ -264,7 +264,7 @@
 				<a
 					class="cross-link"
 					[routerLink]="['/intranet/admin/monitoreo/correos/defer-events']"
-					[queryParams]="{ correo: correo() }"
+					[queryParams]="{ correo: correoResuelto() }"
 					data-info-anchor="admin-recipient-view-ver-defer-eventos-link"
 				>
 					Ver eventos <i class="pi pi-external-link"></i>

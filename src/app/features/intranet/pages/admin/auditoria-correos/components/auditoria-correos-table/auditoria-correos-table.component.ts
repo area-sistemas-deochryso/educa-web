@@ -24,6 +24,7 @@ export class AuditoriaCorreosTableComponent {
 	readonly hasActiveFilters = input<boolean>(false);
 
 	readonly navegarUsuario = output<AuditoriaCorreoAsistenciaDto>();
+	readonly verHistorial = output<AuditoriaCorreoAsistenciaDto>();
 
 	readonly tipoFalloLabel = TIPO_FALLO_LABEL;
 	readonly tipoFalloSeverity = TIPO_FALLO_SEVERITY;
@@ -38,5 +39,9 @@ export class AuditoriaCorreosTableComponent {
 
 	onNavegar(item: AuditoriaCorreoAsistenciaDto): void {
 		this.navegarUsuario.emit(item);
+	}
+
+	onVerHistorial(item: AuditoriaCorreoAsistenciaDto): void {
+		this.verHistorial.emit(item);
 	}
 }

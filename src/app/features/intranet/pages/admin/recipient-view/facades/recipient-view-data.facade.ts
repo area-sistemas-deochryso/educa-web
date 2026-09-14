@@ -17,12 +17,22 @@ export class RecipientViewDataFacade {
 	readonly error = this._error.asReadonly();
 
 	async load(correo: string): Promise<void> {
+		await this.fetch(this.api.getSummary(correo));
+	}
+
+	async loadByEntidad(entidadId: number, tipoOrigen: string): Promise<void> {
+		await this.fetch(this.api.getSummaryByEntidad(entidadId, tipoOrigen));
+	}
+
+	private async fetch(
+		request$: ReturnType<RecipientViewApiService['getSummary']>,
+	): Promise<void> {
 		this._loading.set(true);
 		this._error.set(false);
 		this._summary.set(null);
 
 		try {
-			const data = await firstValueFrom(this.api.getSummary(correo));
+			const data = await firstValueFrom(request$);
 			this._summary.set(data);
 			if (!data) this._error.set(true);
 		} catch {

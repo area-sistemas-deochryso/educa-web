@@ -8,9 +8,20 @@ import { RecipientSummary } from '@data/models';
 @Injectable({ providedIn: 'root' })
 export class RecipientViewApiService {
 	private http = inject(HttpClient);
-	private baseUrl = `${environment.apiUrl}/api/sistema/email-monitoreo`;
+	private baseUrl = `${environment.apiUrl}/api/sistema/email-outbox/monitoreo`;
 
 	getSummary(correo: string): Observable<RecipientSummary> {
-		return this.http.get<RecipientSummary>(`${this.baseUrl}/recipient/${encodeURIComponent(correo)}`);
+		return this.http.get<RecipientSummary>(
+			`${this.baseUrl}/recipient/${encodeURIComponent(correo)}`,
+		);
+	}
+
+	getSummaryByEntidad(entidadId: number, tipoOrigen: string): Observable<RecipientSummary> {
+		return this.http.get<RecipientSummary>(
+			`${this.baseUrl}/recipient/by-entidad/${entidadId}`,
+			{
+				params: { tipoOrigen },
+			},
+		);
 	}
 }

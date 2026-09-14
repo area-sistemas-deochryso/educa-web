@@ -1,9 +1,5 @@
 <section class="table-section">
-	<edu-table
-		[value]="items()"
-		[rowHover]="true"
-		styleClass="p-datatable-sm"
-	>
+	<edu-table [value]="items()" [rowHover]="true" styleClass="p-datatable-sm">
 		<ng-template #header>
 			<tr>
 				<th style="width: 120px">TIPO</th>
@@ -28,7 +24,11 @@
 					<span class="nombre">{{ item.nombreCompleto }}</span>
 				</td>
 				<td>
-					<span class="correo-mono" [eduTooltip]="item.correoActual" eduTooltipPosition="top">
+					<span
+						class="correo-mono"
+						[eduTooltip]="item.correoActual"
+						eduTooltipPosition="top"
+					>
 						{{ item.correoActual }}
 					</span>
 				</td>
@@ -56,9 +56,17 @@
 							[pt]="{ root: { 'aria-label': 'Ir al registro en Usuarios' } }"
 							data-info-anchor="admin-auditoria-correos-ir-usuario-btn"
 						/>
-						<!-- * "Ver historial de correo" deshabilitado (brief 666 pt.9): correoActual llega
-							 enmascarado del BE y /recipient/{correo} requiere match exacto — el link
-							 siempre fallaba. Reactivar cuando el BE exponga lookup por entidadId o el correo real. -->
+						<edu-button
+							icon="pi pi-history"
+							[text]="true"
+							[rounded]="true"
+							severity="secondary"
+							eduTooltip="Ver historial de correo"
+							eduTooltipPosition="top"
+							(click)="onVerHistorial(item)"
+							[pt]="{ root: { 'aria-label': 'Ver historial de correo' } }"
+							data-info-anchor="admin-auditoria-correos-ver-historial-btn"
+						/>
 					</div>
 				</td>
 			</tr>

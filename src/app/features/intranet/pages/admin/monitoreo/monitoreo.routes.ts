@@ -16,22 +16,17 @@ interface TabRouteConfig {
 
 const CORREOS_TAB_ROUTES: Record<string, TabRouteConfig> = {
 	bandeja: {
-		loadComponent: () =>
-			import('../email-outbox').then((m) => m.EmailOutboxComponent),
+		loadComponent: () => import('../email-outbox').then((m) => m.EmailOutboxComponent),
 		title: 'Intranet - Bandeja de Correos',
 	},
 	dashboard: {
 		loadComponent: () =>
-			import('../email-outbox-dashboard-dia').then(
-				(m) => m.EmailOutboxDashboardDiaComponent,
-			),
+			import('../email-outbox-dashboard-dia').then((m) => m.EmailOutboxDashboardDiaComponent),
 		title: 'Intranet - Dashboard de Correos',
 	},
 	diagnostico: {
 		loadComponent: () =>
-			import('../email-outbox-diagnostico').then(
-				(m) => m.EmailOutboxDiagnosticoComponent,
-			),
+			import('../email-outbox-diagnostico').then((m) => m.EmailOutboxDiagnosticoComponent),
 		title: 'Intranet - Diagnóstico de Correos',
 	},
 	auditoria: {
@@ -48,36 +43,34 @@ const CORREOS_TAB_ROUTES: Record<string, TabRouteConfig> = {
 	},
 	quarantine: {
 		loadComponent: () =>
-			import(
-				'../email-outbox/components/quarantine-tab/quarantine-tab.component'
-			).then((m) => m.QuarantineTabComponent),
+			import('../email-outbox/components/quarantine-tab/quarantine-tab.component').then(
+				(m) => m.QuarantineTabComponent,
+			),
 		title: 'Intranet - Cuarentena de Correos',
 	},
 	'domain-pauses': {
 		loadComponent: () =>
-			import(
-				'../email-outbox/components/domain-pauses-tab/domain-pauses-tab.component'
-			).then((m) => m.DomainPausesTabComponent),
+			import('../email-outbox/components/domain-pauses-tab/domain-pauses-tab.component').then(
+				(m) => m.DomainPausesTabComponent,
+			),
 		title: 'Intranet - Dominios Pausados',
 	},
 	'defer-events': {
 		loadComponent: () =>
-			import(
-				'../email-outbox/components/defer-events-tab/defer-events-tab.component'
-			).then((m) => m.DeferEventsTabComponent),
+			import('../email-outbox/components/defer-events-tab/defer-events-tab.component').then(
+				(m) => m.DeferEventsTabComponent,
+			),
 		title: 'Intranet - Eventos Defer',
 	},
 };
 
 const INCIDENCIAS_TAB_ROUTES: Record<string, TabRouteConfig> = {
 	errores: {
-		loadComponent: () =>
-			import('../error-groups').then((m) => m.ErrorGroupsComponent),
+		loadComponent: () => import('../error-groups').then((m) => m.ErrorGroupsComponent),
 		title: 'Intranet - Trazabilidad de Errores',
 	},
 	reportes: {
-		loadComponent: () =>
-			import('../feedback-reports').then((m) => m.FeedbackReportsComponent),
+		loadComponent: () => import('../feedback-reports').then((m) => m.FeedbackReportsComponent),
 		title: 'Intranet - Reportes de Usuarios',
 	},
 };
@@ -92,9 +85,7 @@ function buildDomainChildren(
 	if (!domain) return [];
 
 	const firstSlug = domain.tiles[0]?.route.split('/').pop() ?? '';
-	const children: Routes = [
-		{ path: '', redirectTo: firstSlug, pathMatch: 'full' },
-	];
+	const children: Routes = [{ path: '', redirectTo: firstSlug, pathMatch: 'full' }];
 
 	for (const tile of domain.tiles) {
 		if (tile.featureFlag && !environment.features[tile.featureFlag]) continue;
@@ -127,6 +118,14 @@ export default [
 	...(environment.features.emailRecipientView
 		? [
 				{
+					path: 'correos/persona/by-entidad',
+					loadComponent: () =>
+						import('../recipient-view').then((m) => m.RecipientViewComponent),
+					canActivate: [authGuard, permissionsGuard],
+					data: { permissionPath: 'intranet/admin/monitoreo/correos/persona' },
+					title: 'Intranet - Vista de Destinatario',
+				},
+				{
 					path: 'correos/persona/:correo',
 					loadComponent: () =>
 						import('../recipient-view').then((m) => m.RecipientViewComponent),
@@ -147,18 +146,14 @@ export default [
 	{
 		path: 'correos',
 		loadComponent: () =>
-			import('./shells/monitoreo-shell.component').then(
-				(m) => m.MonitoreoShellComponent,
-			),
+			import('./shells/monitoreo-shell.component').then((m) => m.MonitoreoShellComponent),
 		data: { domainId: 'correos' as DomainId, permissionPath: 'intranet/admin/monitoreo' },
 		children: buildDomainChildren('correos', CORREOS_TAB_ROUTES),
 	},
 	{
 		path: 'incidencias',
 		loadComponent: () =>
-			import('./shells/monitoreo-shell.component').then(
-				(m) => m.MonitoreoShellComponent,
-			),
+			import('./shells/monitoreo-shell.component').then((m) => m.MonitoreoShellComponent),
 		data: { domainId: 'incidencias' as DomainId, permissionPath: 'intranet/admin/monitoreo' },
 		children: buildDomainChildren('incidencias', INCIDENCIAS_TAB_ROUTES),
 	},

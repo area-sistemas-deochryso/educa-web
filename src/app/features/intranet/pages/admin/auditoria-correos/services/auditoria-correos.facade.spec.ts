@@ -108,14 +108,25 @@ describe('AuditoriaCorreosFacade', () => {
 	it('navegarAUsuario navega con queryParams autoOpen+entidadId+rol+nombre (Plan 43 A13)', async () => {
 		setup();
 		await facade.navegarAUsuario(mockItems[0]);
+		expect(router.navigate).toHaveBeenCalledWith(['/intranet/admin/usuarios'], {
+			queryParams: {
+				autoOpen: 'true',
+				openUserId: 1,
+				openUserRol: 'Estudiante',
+				openUserName: 'Perez Lucia',
+			},
+		});
+	});
+
+	it('navegarAHistorialCorreo navega con queryParams entidadId+tipoOrigen (brief 688)', async () => {
+		setup();
+		await facade.navegarAHistorialCorreo(mockItems[0]);
 		expect(router.navigate).toHaveBeenCalledWith(
-			['/intranet/admin/usuarios'],
+			['/intranet/admin/monitoreo/correos/persona/by-entidad'],
 			{
 				queryParams: {
-					autoOpen: 'true',
-					openUserId: 1,
-					openUserRol: 'Estudiante',
-					openUserName: 'Perez Lucia',
+					entidadId: 1,
+					tipoOrigen: 'Estudiante',
 				},
 			},
 		);

@@ -86,5 +86,19 @@ export class AuditoriaCorreosFacade {
 			},
 		});
 	}
+
+	/**
+	 * Brief 688: navega a Recipient View por `entidadId + tipoOrigen` (endpoint
+	 * `recipient/by-entidad`), no por `correoActual` — evita cualquier problema
+	 * de encoding/normalización del correo en la URL (`Educa.API` brief 687).
+	 */
+	navegarAHistorialCorreo(item: AuditoriaCorreoAsistenciaDto): void {
+		this.router.navigate(['/intranet/admin/monitoreo/correos/persona/by-entidad'], {
+			queryParams: {
+				entidadId: item.entidadId,
+				tipoOrigen: item.tipoOrigen,
+			},
+		});
+	}
 	// #endregion
 }

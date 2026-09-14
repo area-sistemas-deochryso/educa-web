@@ -30,7 +30,7 @@ export interface AuditoriaCorreoAsistenciaDto {
 	/** DNI enmascarado por el BE → "***1234". */
 	dni: string;
 	nombreCompleto: string;
-	/** Correo enmascarado por el BE → "pa***el@gmail.com". */
+	/** Correo SIN enmascarar (raw) — el masking se eliminó del BE en mayo (brief 688). */
 	correoActual: string;
 	tipoFallo: TipoFalloAuditoria;
 	razon: string;

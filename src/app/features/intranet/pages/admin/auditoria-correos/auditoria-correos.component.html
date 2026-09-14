@@ -43,9 +43,9 @@
 				zero-width space) o tildes/ñ que el correo no ve pero el validador sí.
 			</p>
 			<p>
-				Al ir a Usuarios desde la tabla, se abre directamente el registro del usuario afectado
-				para que corrijas el dato en la fuente. Tip: pega el correo viejo en Notepad++ o VS Code
-				con whitespace visible para detectar los caracteres invisibles.
+				Al ir a Usuarios desde la tabla, se abre directamente el registro del usuario
+				afectado para que corrijas el dato en la fuente. Tip: pega el correo viejo en
+				Notepad++ o VS Code con whitespace visible para detectar los caracteres invisibles.
 			</p>
 		</div>
 	</details>
@@ -68,6 +68,7 @@
 		[universeTotal]="vm().universeTotal"
 		[hasActiveFilters]="vm().hasActiveFilters"
 		(navegarUsuario)="onNavegarUsuario($event)"
+		(verHistorial)="onVerHistorial($event)"
 	/>
 	<!-- #endregion -->
 }

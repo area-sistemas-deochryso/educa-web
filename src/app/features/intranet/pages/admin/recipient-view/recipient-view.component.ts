@@ -38,6 +38,16 @@ export class RecipientViewComponent implements OnInit {
 		return param ? decodeURIComponent(param) : '';
 	});
 
+	private readonly entidadId = computed(() => {
+		const param = this.route.snapshot.queryParamMap.get('entidadId');
+		return param ? Number(param) : null;
+	});
+
+	private readonly tipoOrigen = computed(() => this.route.snapshot.queryParamMap.get('tipoOrigen'));
+
+	/** Correo resuelto para mostrar/accionar: prioriza el de `summary` (siempre correcto, viene del BE) sobre el del path — necesario cuando se carga por `entidadId` y el path no lleva correo. */
+	readonly correoResuelto = computed(() => this.summary()?.correo ?? this.correo());
+
 	readonly blacklistActive = computed(() => this.summary()?.blacklist.activo ?? false);
 	readonly quarantineActive = computed(() => this.summary()?.quarantine.activo ?? false);
 	readonly hasAuditProblem = computed(() => this.summary()?.audit.tieneProblema ?? false);
@@ -46,10 +56,7 @@ export class RecipientViewComponent implements OnInit {
 
 	// #region Lifecycle
 	ngOnInit(): void {
-		const email = this.correo();
-		if (email) {
-			void this.facade.load(email);
-		}
+		this.loadSummary();
 	}
 	// #endregion
 
@@ -59,6 +66,17 @@ export class RecipientViewComponent implements OnInit {
 	}
 
 	refresh(): void {
+		this.loadSummary();
+	}
+
+	private loadSummary(): void {
+		const entidadId = this.entidadId();
+		const tipoOrigen = this.tipoOrigen();
+		if (entidadId && tipoOrigen) {
+			void this.facade.loadByEntidad(entidadId, tipoOrigen);
+			return;
+		}
+
 		const email = this.correo();
 		if (email) {
 			void this.facade.load(email);
@@ -66,7 +84,7 @@ export class RecipientViewComponent implements OnInit {
 	}
 
 	toggleBlacklist(): void {
-		const correo = this.correo();
+		const correo = this.correoResuelto();
 		if (!correo) return;
 
 		const active = this.blacklistActive();
@@ -89,7 +107,7 @@ export class RecipientViewComponent implements OnInit {
 	}
 
 	releaseQuarantine(): void {
-		const correo = this.correo();
+		const correo = this.correoResuelto();
 		if (!correo) return;
 
 		this.confirmationService.confirm({
