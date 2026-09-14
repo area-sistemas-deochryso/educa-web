@@ -1,6 +1,7 @@
 // #region Imports
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { PublicSeoService } from '@core/services/seo';
 import { HeaderComponent } from '../header';
 import { FooterComponent } from '../footer';
 
@@ -15,5 +16,7 @@ import { FooterComponent } from '../footer';
 })
 export class MainLayoutComponent {
 	// * Shell layout for public pages (header + footer + routed content).
+	// Injected (not consumed) to bootstrap its route-driven meta tag updates (brief 681).
+	private readonly seo = inject(PublicSeoService);
 }
 // #endregion

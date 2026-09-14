@@ -27,4 +27,5 @@ export * from './excel';
 export * from './capacitor';
 export * from './view-as';
 export * from './theme';
+export * from './seo';
 // #endregion
