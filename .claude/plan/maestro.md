@@ -69,7 +69,7 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub F3-F6), *
 | 13 | BAudit2 | Audit F1 | ✅ Bugs críticos de fugas/reliability — brief [663](../chats/closed/663-audit-f1-bugs-criticos-fugas-reliability.md) | cerrado |
 | 14 | BAudit2 | Audit F2 | ✅ FE cerrado (seguridad password plaintext `users/`) — brief [664](../chats/awaiting-prod/664-audit-f2-seguridad-password-plaintext-users.md), BE handoff pendiente (`Educa.API` brief 667) | ⏸️ awaiting-prod |
 | 15 | BAudit2 | Audit F3 | ✅ FE cerrado (race conditions en fetches, ~9 facades) — brief [665](../chats/awaiting-prod/665-audit-f3-race-conditions-fetches-sin-cancelacion.md), verificado en local contra `TestConnection` | ⏸️ awaiting-prod |
-| 16 | BAudit2 | Audit F4 | Bugs funcionales puntuales — brief [666](../chats/open/666-audit-f4-bugs-funcionales-puntuales.md) | libre |
+| 16 | BAudit2 | Audit F4 | ✅ Bugs funcionales puntuales (9/9) — brief [666](../chats/closed/666-audit-f4-bugs-funcionales-puntuales.md). Hallazgo pt.9 (link roto en `auditoria-correos-table`, requiere lookup por `entidadId` en el BE) queda pendiente como follow-up cross-repo. | cerrado |
 | 17 | BAudit2 | Audit F5 | `edu-ui` accesibilidad + `setDisabledState` — brief [679](../chats/open/679-audit-f5-edu-ui-accesibilidad-setdisabledstate.md) | libre |
 | 18 | BAudit2 | Audit F6 | Config zoneless explícita — brief [680](../chats/open/680-audit-f6-zoneless-config-explicita.md) | libre |
 | 19 | BAudit2 | Audit F7 | Sitio público — contacto + SEO — brief [681](../chats/open/681-audit-f7-sitio-publico-contacto-seo.md) | libre |
@@ -96,7 +96,7 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub F3-F6), *
 | 10 | F8 | Design Patterns BE | Aplicar al tocar módulos BE | incremental |
 | 11 | F9 | Design Patterns FE | Aplicar al tocar módulos FE | incremental |
 
-**Siguiente accionable**: **xP41** F3 BE (persist request lifecycle). Admin block cerrado (P62-P66 ✅/descartado). P50 F3a ✅ (331 closed).
+**Siguiente accionable**: **BAudit2 F5** — `edu-ui` accesibilidad + `setDisabledState`, brief [679](../chats/open/679-audit-f5-edu-ui-accesibilidad-setdisabledstate.md). Audit F4 (666) ✅ cerrado (9/9 fixes). Nota: si `main` tiene una reordenación Tier 0 pendiente de commitear (prioridad forzada del audit sobre `xP41`), resolver ese diff al mergear esta branch — no pisarlo. Admin block cerrado (P62-P66 ✅/descartado). P50 F3a ✅ (331 closed).
 
 ### 🟣 Verificaciones post-deploy (`/verify <NNN>`)
 

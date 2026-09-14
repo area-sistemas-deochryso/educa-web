@@ -78,7 +78,7 @@ export class ReportsResultComponent {
 		const dias = this.selectedSalon()?.diasEnMes ?? r.diasEnMes ?? 0;
 		if (!dias) return [];
 		if (r.rangoTipo === 'semana') {
-			const start = new Date(r.fechaInicio + 'T00:00:00');
+			const start = new Date(r.fechaInicio.slice(0, 10) + 'T00:00:00');
 			return Array.from({ length: dias }, (_, i) => {
 				const d = new Date(start);
 				d.setDate(start.getDate() + i);
@@ -94,7 +94,7 @@ export class ReportsResultComponent {
 		if (!dias) return [];
 		const labels = ['D', 'L', 'M', 'M', 'J', 'V', 'S'];
 		if (r.rangoTipo === 'semana') {
-			const start = new Date(r.fechaInicio + 'T00:00:00');
+			const start = new Date(r.fechaInicio.slice(0, 10) + 'T00:00:00');
 			return Array.from({ length: dias }, (_, i) => {
 				const d = new Date(start);
 				d.setDate(start.getDate() + i);

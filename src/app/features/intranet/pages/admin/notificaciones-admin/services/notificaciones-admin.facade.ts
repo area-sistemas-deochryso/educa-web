@@ -305,12 +305,15 @@ export class NotificacionesAdminFacade {
 	/** Refetch silencioso post-CRUD: el interceptor ya invalidó el cache del SW. */
 	private refreshItemsOnly(): void {
 		const anio = this.store.filterAnio();
-		this.api
-			.listar(anio)
+		forkJoin({
+			items: this.api.listar(anio),
+			stats: this.api.getEstadisticas(anio),
+		})
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
-				next: (response) => {
-					this.store.setItems(Array.isArray(response) ? response : response.data ?? []);
+				next: ({ items, stats }) => {
+					this.store.setItems(Array.isArray(items) ? items : items.data ?? []);
+					this.store.setEstadisticas(stats);
 				},
 				error: (err) => {
 					logger.error('Error al refrescar lista:', err);

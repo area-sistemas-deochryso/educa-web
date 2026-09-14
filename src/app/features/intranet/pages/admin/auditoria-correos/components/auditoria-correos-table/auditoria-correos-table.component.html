@@ -50,25 +50,15 @@
 							[text]="true"
 							[rounded]="true"
 							severity="info"
-							eduTooltip="Ir a Usuarios (copia el nombre al portapapeles)"
+							eduTooltip="Ir a Usuarios (filtra el listado por este nombre)"
 							eduTooltipPosition="top"
 							(click)="onNavegar(item)"
 							[pt]="{ root: { 'aria-label': 'Ir al registro en Usuarios' } }"
 							data-info-anchor="admin-auditoria-correos-ir-usuario-btn"
 						/>
-						@if (item.correoActual) {
-							<a
-								[routerLink]="['/intranet/admin/monitoreo/correos/persona', item.correoActual]"
-								class="edu-button-link edu-button-link--rounded edu-button-link--text edu-button-link--icon-only"
-								data-severity="secondary"
-								eduTooltip="Ver historial de correo"
-								eduTooltipPosition="top"
-								[attr.aria-label]="'Ver historial de ' + item.correoActual"
-								data-info-anchor="admin-auditoria-correos-ver-historial-link"
-							>
-								<i class="pi pi-history"></i>
-							</a>
-						}
+						<!-- * "Ver historial de correo" deshabilitado (brief 666 pt.9): correoActual llega
+							 enmascarado del BE y /recipient/{correo} requiere match exacto — el link
+							 siempre fallaba. Reactivar cuando el BE exponga lookup por entidadId o el correo real. -->
 					</div>
 				</td>
 			</tr>

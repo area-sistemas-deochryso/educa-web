@@ -13,7 +13,7 @@
 
 			<!-- * Courses list cards. -->
 			<div class="col-lg-12 col-12">
-				@for (course of courses; track course.id) {
+				@for (course of pagedCourses(); track course.id) {
 					<div class="job-thumb d-flex">
 						<div class="job-image-wrap bg-white shadow-lg">
 							<img
@@ -78,14 +78,14 @@
 								class="page-link"
 								href="#"
 								aria-label="Previous"
-								(click)="onPageChange($event, currentPage - 1)"
+								(click)="onPageChange($event, currentPage() - 1)"
 							>
 								<span aria-hidden="true">&lt;</span>
 							</a>
 						</li>
 
 						@for (page of pages; track page) {
-							<li class="page-item" [class.active]="currentPage === page">
+							<li class="page-item" [class.active]="currentPage() === page">
 								<a
 									class="page-link"
 									href="#"
@@ -100,7 +100,7 @@
 								class="page-link"
 								href="#"
 								aria-label="Next"
-								(click)="onPageChange($event, currentPage + 1)"
+								(click)="onPageChange($event, currentPage() + 1)"
 							>
 								<span aria-hidden="true">&gt;</span>
 							</a>

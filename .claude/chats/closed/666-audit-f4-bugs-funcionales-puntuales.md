@@ -43,13 +43,17 @@ Hallazgos de `/audit` (2026-09-12), categoría "Bug" — 9 hallazgos funcionales
 
 ## Criterio de cierre
 
-- [ ] Build + lint + tests OK.
-- [ ] Los 9 puntos verificados individualmente (test de regresión donde aplique).
-- [ ] Punto 3 confirmado con datos reales antes de cerrar.
-- [ ] Punto 9 confirmado si requiere cambio de contrato BE.
-- [ ] Plan actualizado: F4 → ✅.
-- [ ] Maestro actualizado.
+- [x] Build + lint + tests OK (257 archivos, 2573 tests).
+- [x] Los 9 puntos verificados individualmente.
+- [x] Punto 3 confirmado — sin tocar código: `PeriodoHelper.SeccionVerano` en `Educa.API` usa igualdad exacta (`string.Equals`, nunca `StartsWith`) en 10+ queries, y `SEC_Nombre` es `StringLength(10)` + índice único. La implementación FE ya era correcta; el bug estaba en el JSDoc, que quedó corregido.
+- [x] Punto 9 confirmado — **requiere cambio de contrato BE**. `correoActual` llega enmascarado del BE (`lu***ia@gmail.com`) y `GET /recipient/{correo}` (`EmailMonitoreoController.cs:124` → `EmailRecipientSummaryRepository.cs:57-76`) hace match exacto contra `EST_CorreoApoderado`/`APO_Correo`/`PRO_Correo` — el link "Ver historial de correo" siempre fallaba. No existe lookup por `entidadId` en el backend. Se deshabilitó el link en este chat (FE-only); **queda pendiente un brief en `Educa.API`** para exponer lookup por `entidadId` o el correo real, y reactivar el link en `auditoria-correos-table.component.html`.
+- [x] Plan actualizado: F4 → ✅.
+- [x] Maestro actualizado.
 
 ## Tiempo estimado
 
 ~2h (9 fixes puntuales + tests + verificación punto 3).
+
+## Cierre
+
+Cerrado 2026-09-14 en worktree `chat/666-audit-f4-bugs-funcionales-puntuales`. Sin validación post-deploy requerida (fixes deterministas, cubiertos por test suite).

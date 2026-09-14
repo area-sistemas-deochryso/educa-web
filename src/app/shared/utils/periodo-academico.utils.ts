@@ -53,7 +53,8 @@ export function esVerano(periodo: PeriodoAcademico): boolean {
 
 /**
  * ¿Una sección pertenece al periodo de verano?
- * Invariante: sección "V" o que empieza con "V" = verano.
+ * Invariante: sección exactamente "V" (case-insensitive) = verano. Igualdad exacta,
+ * no prefijo — mismo criterio que `PeriodoHelper.EsSeccionVerano` en el backend.
  */
 export function esSeccionDeVerano(seccion: string | null | undefined): boolean {
 	if (!seccion) return false;

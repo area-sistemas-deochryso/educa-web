@@ -112,6 +112,9 @@ export class EventsCalendarFacade {
 			onError: (err) => {
 				logger.error('Error al crear evento:', err);
 				this.errorHandler.showError(UI_SUMMARIES.error, resolveErrorMessage(err, 'No se pudo crear el evento'));
+				// * El apply optimista ya cerró el diálogo y limpió el form — restaurar lo escrito.
+				this.store.setFormData(formData);
+				this.store.openDialog();
 			},
 		});
 	}

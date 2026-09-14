@@ -1,5 +1,5 @@
 // #region Imports
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, computed, signal } from '@angular/core';
 import { EduTooltip } from '@edu-ui';
 
 // #endregion
@@ -66,14 +66,21 @@ export class CoursesSectionComponent {
 		},
 	];
 
-	currentPage = 1;
 	pages = [1, 2, 3, 4, 5];
+	private readonly itemsPerPage = Math.ceil(this.courses.length / this.pages.length);
+
+	private readonly _currentPage = signal(1);
+	readonly currentPage = this._currentPage.asReadonly();
+
+	readonly pagedCourses = computed(() => {
+		const start = (this._currentPage() - 1) * this.itemsPerPage;
+		return this.courses.slice(start, start + this.itemsPerPage);
+	});
 
 	onPageChange(event: Event, page: number): void {
-		// * Client-side pagination state.
 		event.preventDefault();
 		if (page >= 1 && page <= this.pages.length) {
-			this.currentPage = page;
+			this._currentPage.set(page);
 		}
 	}
 }

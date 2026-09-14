@@ -30,7 +30,7 @@ El codebase tiene una base moderna sólida: 100% standalone, 100% control flow n
 | F1 | Bugs críticos de fugas/reliability (polling que no se detiene, WAL resuelve-en-vez-de-rechazar, race del líder WAL, Chart.js sin destroy) | Bug | ✅ [663](../chats/closed/663-audit-f1-bugs-criticos-fugas-reliability.md) |
 | F2 | Seguridad — exposición de password en `users/` | Riesgo | 🟡 FE ✅ awaiting-prod · BE handoff pendiente ([664](../chats/awaiting-prod/664-audit-f2-seguridad-password-plaintext-users.md), `Educa.API` brief [667](../../Educa.API/.claude/chats/open/667-be-handoff-audit-fe-664-password-plaintext.md)) |
 | F3 | Condiciones de carrera por fetches sin cancelación (~9 facades) | Bug/Riesgo | ✅ FE cerrado, awaiting-prod [665](../chats/awaiting-prod/665-audit-f3-race-conditions-fetches-sin-cancelacion.md) |
-| F4 | Bugs funcionales puntuales independientes (9 fixes acotados) | Bug | [666](../chats/open/666-audit-f4-bugs-funcionales-puntuales.md) |
+| F4 | Bugs funcionales puntuales independientes (9 fixes acotados) | Bug | ✅ [666](../chats/closed/666-audit-f4-bugs-funcionales-puntuales.md) |
 | F5 | `edu-ui`: accesibilidad teclado/ARIA (tabs, accordion, menu, tooltip, combobox) + `setDisabledState` faltante en 9 controles CVA | Riesgo | [679](../chats/open/679-audit-f5-edu-ui-accesibilidad-setdisabledstate.md) |
 | F6 | Decidir y aplicar configuración zoneless explícita en `app.config.ts` (paridad con `test-setup.ts`) | Regla violada | [680](../chats/open/680-audit-f6-zoneless-config-explicita.md) |
 | F7 | Sitio público: formulario de contacto sale de la SPA (Formspree nativo) + meta tags dinámicos por ruta ausentes (SEO) | Bug/Riesgo | [681](../chats/open/681-audit-f7-sitio-publico-contacto-seo.md) |
@@ -42,7 +42,7 @@ El codebase tiene una base moderna sólida: 100% standalone, 100% control flow n
 
 ## Done-when
 
-- [ ] F1-F4 cerrados y verificados.
+- [x] F1-F4 cerrados y verificados.
 - [ ] F5-F12: briefs 679-686 generados 2026-09-12 a pedido explícito del usuario, superando el soft cap de `chats/open/` ≤5 (excepción documentada en `backlog-hygiene.md` para fases de audit deliberadamente pesadas) — cerrados y verificados.
 - [ ] Plan y maestro sincronizados en cada cierre de fase.
 

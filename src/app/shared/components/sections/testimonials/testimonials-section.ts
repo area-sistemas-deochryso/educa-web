@@ -70,6 +70,8 @@ export class TestimonialsSectionComponent implements OnInit, OnDestroy {
 	];
 
 	currentSlide = 0;
+	// * Slides move one testimonial at a time, but the carousel shows 2 at once (translateX 50%).
+	private readonly itemsPerView = 2;
 	private autoplayInterval: ReturnType<typeof setInterval> | null = null;
 
 	ngOnInit(): void {
@@ -83,7 +85,7 @@ export class TestimonialsSectionComponent implements OnInit, OnDestroy {
 	}
 
 	getDots(): number[] {
-		return Array(Math.ceil(this.testimonials.length / 2)).fill(0);
+		return Array(this.maxSlide() + 1).fill(0);
 	}
 
 	goToSlide(index: number): void {
@@ -109,8 +111,12 @@ export class TestimonialsSectionComponent implements OnInit, OnDestroy {
 		this.startAutoplay();
 	}
 
+	private maxSlide(): number {
+		return this.testimonials.length - this.itemsPerView;
+	}
+
 	private nextSlide(): void {
-		const maxSlide = Math.ceil(this.testimonials.length / 2) - 1;
+		const maxSlide = this.maxSlide();
 		this.currentSlide = this.currentSlide >= maxSlide ? 0 : this.currentSlide + 1;
 		// * OnPush: mark dirty since this runs from a setInterval timer, not a template event.
 		this.cdr.markForCheck();
