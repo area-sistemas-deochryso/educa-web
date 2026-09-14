@@ -4,6 +4,7 @@ import {
 	ErrorHandler,
 	LOCALE_ID,
 	provideBrowserGlobalErrorListeners,
+	provideZonelessChangeDetection,
 } from '@angular/core';
 import { withEnabledBlockingInitialNavigation, withPreloading } from '@angular/router';
 import {
@@ -47,6 +48,7 @@ registerLocaleData(localeEs, 'es-PE');
 
 export const appConfig: ApplicationConfig = {
 	providers: [
+		provideZonelessChangeDetection(),
 		provideBrowserGlobalErrorListeners(),
 		provideRouter(
 			routes,
