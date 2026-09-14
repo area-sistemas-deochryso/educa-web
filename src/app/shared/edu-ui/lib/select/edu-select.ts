@@ -42,6 +42,8 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 	{ originX: 'start', originY: 'top', overlayX: 'start', overlayY: 'bottom', offsetY: -4 },
 ];
 
+let nextInstanceId = 0;
+
 @Component({
 	selector: 'edu-select',
 	standalone: true,
@@ -58,13 +60,15 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 		<div
 			class="edu-select"
 			[eduPtRoot]="$safeNavigationMigration(pt()?.root)"
-			[class.edu-select--disabled]="disabled()"
+			[class.edu-select--disabled]="isFormDisabled()"
 			[class.edu-select--loading]="loading()"
 			role="combobox"
 			aria-haspopup="listbox"
 			[attr.aria-expanded]="isOpen()"
 			[attr.aria-busy]="loading()"
-			[attr.tabindex]="disabled() ? -1 : 0"
+			[attr.aria-controls]="listboxId"
+			[attr.aria-activedescendant]="activeOptionId()"
+			[attr.tabindex]="isFormDisabled() ? -1 : 0"
 			(click)="toggle($event)"
 			(keydown)="onTriggerKeydown($event)"
 		>
@@ -89,7 +93,7 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 					{{ selectedLabel() ?? placeholder() ?? '' }}
 				</span>
 			}
-			@if (showClear() && hasValue() && !disabled() && !loading()) {
+			@if (showClear() && hasValue() && !isFormDisabled() && !loading()) {
 				<button
 					type="button"
 					class="edu-select__clear"
@@ -119,7 +123,7 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 						/>
 					</div>
 				}
-				<ul class="edu-select-panel__list" role="listbox" (keydown)="onListKeydown($event)">
+				<ul class="edu-select-panel__list" role="listbox" [attr.id]="listboxId" (keydown)="onListKeydown($event)">
 					@if (group()) {
 						@for (g of filteredGroups(); track $index) {
 							<li class="edu-select-panel__group-label" role="presentation">
@@ -133,6 +137,7 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 									"
 									[class.edu-select-panel__option--selected]="isSelected(opt)"
 									role="option"
+									[attr.id]="optionId(optionIndex(opt))"
 									[attr.aria-selected]="isSelected(opt)"
 									(click)="selectOption(opt)"
 								>
@@ -156,6 +161,7 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 								"
 								[class.edu-select-panel__option--selected]="isSelected(opt)"
 								role="option"
+								[attr.id]="optionId(optionIndex(opt))"
 								[attr.aria-selected]="isSelected(opt)"
 								(click)="selectOption(opt)"
 							>
@@ -210,6 +216,13 @@ export class EduSelect implements ControlValueAccessor, OnDestroy {
 	private readonly nav = new SelectListNav();
 
 	protected readonly activeIndex = this.nav.activeIndex;
+	protected readonly listboxId = `edu-select-${nextInstanceId++}-listbox`;
+	protected readonly activeOptionId = computed(() =>
+		this.activeIndex() >= 0 ? this.optionId(this.activeIndex()) : null,
+	);
+
+	private readonly cvaDisabled = signal(false);
+	protected readonly isFormDisabled = computed(() => this.disabled() || this.cvaDisabled());
 
 	protected readonly hasValue = computed(
 		() => this.value() !== null && this.value() !== undefined,
@@ -268,6 +281,10 @@ export class EduSelect implements ControlValueAccessor, OnDestroy {
 		this.onTouched = fn;
 	}
 
+	setDisabledState(isDisabled: boolean): void {
+		this.cvaDisabled.set(isDisabled);
+	}
+
 	protected resolveLabel(opt: unknown): string {
 		return resolveOptionLabel(opt, this.optionLabel());
 	}
@@ -276,12 +293,16 @@ export class EduSelect implements ControlValueAccessor, OnDestroy {
 		return this.flatOptions().indexOf(opt);
 	}
 
+	protected optionId(index: number): string {
+		return `${this.listboxId}-option-${index}`;
+	}
+
 	protected isSelected(opt: unknown): boolean {
 		return resolveOptionValue(opt, this.optionValue()) === this.value();
 	}
 
 	protected toggle(event: Event): void {
-		if (this.disabled() || this.loading()) {
+		if (this.isFormDisabled() || this.loading()) {
 			return;
 		}
 		if (this.handle.isOpen) {
@@ -309,12 +330,16 @@ export class EduSelect implements ControlValueAccessor, OnDestroy {
 		if (this.loading()) {
 			return;
 		}
-		if (event.key === 'ArrowDown' || event.key === 'Enter' || event.key === ' ') {
-			event.preventDefault();
-			if (!this.handle.isOpen) {
+		if (!this.handle.isOpen) {
+			if (event.key === 'ArrowDown' || event.key === 'Enter' || event.key === ' ') {
+				event.preventDefault();
 				this.open(event.currentTarget as HTMLElement);
 			}
+			return;
 		}
+		// El listbox vive en un overlay portado a <body> — no es ancestro DOM del trigger,
+		// así que su (keydown) nunca recibe eventos mientras el foco queda en el trigger.
+		this.onListKeydown(event);
 	}
 
 	protected onListKeydown(event: KeyboardEvent): void {

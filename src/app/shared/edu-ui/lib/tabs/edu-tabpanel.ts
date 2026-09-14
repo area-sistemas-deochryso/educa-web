@@ -7,7 +7,12 @@ import { EduTabsService, type EduTabValue } from './edu-tabs.service';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
 		@if (active()) {
-			<div class="edu-tabpanel" role="tabpanel">
+			<div
+				class="edu-tabpanel"
+				role="tabpanel"
+				[attr.id]="panelId()"
+				[attr.aria-labelledby]="tabId()"
+			>
 				<ng-content></ng-content>
 			</div>
 		}
@@ -20,4 +25,12 @@ export class EduTabPanel {
 	private readonly service = inject(EduTabsService);
 
 	protected readonly active = computed(() => this.service.active() === this.value());
+
+	protected panelId(): string {
+		return this.service.panelId(this.value());
+	}
+
+	protected tabId(): string {
+		return this.service.tabId(this.value());
+	}
 }

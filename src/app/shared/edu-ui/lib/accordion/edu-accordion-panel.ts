@@ -9,7 +9,12 @@ import { EduAccordionService } from './edu-accordion.service';
 		<div class="edu-accordion-panel" [class.edu-accordion-panel--expanded]="expanded()">
 			<ng-content select="edu-accordion-header"></ng-content>
 			@if (expanded()) {
-				<div class="edu-accordion-panel__content" role="region">
+				<div
+					class="edu-accordion-panel__content"
+					role="region"
+					[attr.id]="panelId()"
+					[attr.aria-labelledby]="headerId()"
+				>
 					<ng-content></ng-content>
 				</div>
 			}
@@ -26,5 +31,13 @@ export class EduAccordionPanel {
 
 	toggle(): void {
 		this.service.toggle(this.value());
+	}
+
+	headerId(): string {
+		return this.service.headerId(this.value());
+	}
+
+	panelId(): string {
+		return this.service.panelId(this.value());
 	}
 }

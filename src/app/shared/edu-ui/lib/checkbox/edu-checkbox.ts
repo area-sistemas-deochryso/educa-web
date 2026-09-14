@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, forwardRef, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, forwardRef, input, signal } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { EduPassThrough, EduPtRoot } from '../passthrough/edu-pt-root';
 
@@ -15,7 +15,7 @@ import { EduPassThrough, EduPtRoot } from '../passthrough/edu-pt-root';
 		},
 	],
 	template: `
-		<label class="edu-checkbox" [class.edu-checkbox--disabled]="disabled()">
+		<label class="edu-checkbox" [class.edu-checkbox--disabled]="isFormDisabled()">
 			<button
 				type="button"
 				role="checkbox"
@@ -23,7 +23,7 @@ import { EduPassThrough, EduPtRoot } from '../passthrough/edu-pt-root';
 				[attr.id]="inputId()"
 				[attr.aria-checked]="checked()"
 				[class.edu-checkbox__box--checked]="checked()"
-				[disabled]="disabled()"
+				[disabled]="isFormDisabled()"
 				[eduPtRoot]="$safeNavigationMigration(pt()?.root)"
 				(click)="toggle()"
 			>
@@ -55,6 +55,8 @@ export class EduCheckbox implements ControlValueAccessor {
 	readonly pt = input<EduPassThrough>();
 
 	protected readonly checked = signal(false);
+	private readonly cvaDisabled = signal(false);
+	protected readonly isFormDisabled = computed(() => this.disabled() || this.cvaDisabled());
 
 	private onChange: (value: boolean) => void = () => {};
 	private onTouched: () => void = () => {};
@@ -71,8 +73,12 @@ export class EduCheckbox implements ControlValueAccessor {
 		this.onTouched = fn;
 	}
 
+	setDisabledState(isDisabled: boolean): void {
+		this.cvaDisabled.set(isDisabled);
+	}
+
 	toggle(): void {
-		if (this.disabled()) {
+		if (this.isFormDisabled()) {
 			return;
 		}
 		this.checked.set(!this.checked());

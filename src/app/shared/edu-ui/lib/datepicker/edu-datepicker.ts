@@ -57,11 +57,11 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 		@if (!inline()) {
 			<div
 				class="edu-datepicker"
-				[class.edu-datepicker--disabled]="disabled()"
+				[class.edu-datepicker--disabled]="isFormDisabled()"
 				role="combobox"
 				aria-haspopup="dialog"
 				[attr.aria-expanded]="isOpen()"
-				[attr.tabindex]="isInputReadonly() && !disabled() ? 0 : -1"
+				[attr.tabindex]="isInputReadonly() && !isFormDisabled() ? 0 : -1"
 				[eduPtRoot]="$safeNavigationMigration(pt()?.root)"
 				(click)="onWrapperClick($event)"
 				(keydown)="onTriggerKeydown($event)"
@@ -72,14 +72,14 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 					[readOnly]="isInputReadonly()"
 					[placeholder]="placeholder() ?? ''"
 					[value]="inputValue()"
-					[disabled]="disabled()"
-					[attr.tabindex]="isInputReadonly() || disabled() ? -1 : 0"
+					[disabled]="isFormDisabled()"
+					[attr.tabindex]="isInputReadonly() || isFormDisabled() ? -1 : 0"
 					(focus)="onInputFocus()"
 					(input)="onInputChange($event)"
 					(blur)="onInputBlur()"
 					(keydown.enter)="onInputEnter($event)"
 				/>
-				@if (showClear() && hasValue() && !disabled()) {
+				@if (showClear() && hasValue() && !isFormDisabled()) {
 					<button
 						type="button"
 						class="edu-datepicker__clear"
@@ -134,7 +134,7 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 								[class.edu-datepicker-panel__day--selected]="isSelected(cell.date)"
 								[class.edu-datepicker-panel__day--in-range]="isInRange(cell.date)"
 								[class.edu-datepicker-panel__day--today]="isToday(cell.date)"
-								[disabled]="isDisabled(cell.date)"
+								[disabled]="isDisabled(cell.date) || isFormDisabled()"
 								(click)="selectDate(cell.date)"
 							>
 								{{ cell.date.getDate() }}
@@ -303,6 +303,9 @@ export class EduDatePicker implements ControlValueAccessor, OnDestroy {
 	protected readonly inputValue = computed(() => this.draftText() ?? this.displayLabel());
 	protected readonly hasValue = computed(() => this.selectedDates().length > 0);
 
+	private readonly cvaDisabled = signal(false);
+	protected readonly isFormDisabled = computed(() => this.disabled() || this.cvaDisabled());
+
 	private onChange: (value: Date | Date[] | null) => void = () => {};
 	private onTouched: () => void = () => {};
 
@@ -324,12 +327,16 @@ export class EduDatePicker implements ControlValueAccessor, OnDestroy {
 		this.onTouched = fn;
 	}
 
+	setDisabledState(isDisabled: boolean): void {
+		this.cvaDisabled.set(isDisabled);
+	}
+
 	protected isOpen(): boolean {
 		return this.handle.isOpen;
 	}
 
 	protected toggle(event: Event): void {
-		if (this.disabled()) {
+		if (this.isFormDisabled()) {
 			return;
 		}
 		if (this.handle.isOpen) {

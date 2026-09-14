@@ -2,6 +2,8 @@ import { Directive, ElementRef, OnDestroy, Renderer2, inject, input } from '@ang
 
 export type EduTooltipPosition = 'top' | 'bottom' | 'left' | 'right';
 
+let nextTooltipId = 0;
+
 export interface EduTooltipOptions {
 	showDelay?: number;
 }
@@ -31,6 +33,7 @@ export class EduTooltip implements OnDestroy {
 
 	private readonly host = inject(ElementRef<HTMLElement>);
 	private readonly renderer = inject(Renderer2);
+	private readonly tooltipId = `edu-tooltip-${nextTooltipId++}`;
 	private tooltipEl: HTMLElement | null = null;
 	private showTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
@@ -64,6 +67,7 @@ export class EduTooltip implements OnDestroy {
 		if (this.tooltipEl) {
 			this.renderer.removeChild(document.body, this.tooltipEl);
 			this.tooltipEl = null;
+			this.renderer.removeAttribute(this.host.nativeElement, 'aria-describedby');
 		}
 	}
 
@@ -74,9 +78,12 @@ export class EduTooltip implements OnDestroy {
 	private render(text: string): void {
 		const el = this.renderer.createElement('div') as HTMLElement;
 		this.renderer.addClass(el, 'edu-tooltip');
+		this.renderer.setAttribute(el, 'role', 'tooltip');
+		this.renderer.setAttribute(el, 'id', this.tooltipId);
 		this.renderer.setProperty(el, 'textContent', text);
 		this.renderer.appendChild(document.body, el);
 		this.tooltipEl = el;
+		this.renderer.setAttribute(this.host.nativeElement, 'aria-describedby', this.tooltipId);
 		this.position();
 	}
 

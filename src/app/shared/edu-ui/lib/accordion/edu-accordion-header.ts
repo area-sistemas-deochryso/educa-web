@@ -6,7 +6,14 @@ import { EduAccordionPanel } from './edu-accordion-panel';
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
-		<button type="button" class="edu-accordion-header" [attr.aria-expanded]="expanded()" (click)="panel.toggle()">
+		<button
+			type="button"
+			class="edu-accordion-header"
+			[attr.id]="headerId()"
+			[attr.aria-expanded]="expanded()"
+			[attr.aria-controls]="panelId()"
+			(click)="panel.toggle()"
+		>
 			<ng-content></ng-content>
 			<i class="edu-accordion-header__icon" [class.edu-accordion-header__icon--expanded]="expanded()"></i>
 		</button>
@@ -17,4 +24,12 @@ export class EduAccordionHeader {
 	protected readonly panel = inject(EduAccordionPanel);
 
 	protected readonly expanded = computed(() => this.panel.expanded());
+
+	protected headerId(): string {
+		return this.panel.headerId();
+	}
+
+	protected panelId(): string {
+		return this.panel.panelId();
+	}
 }

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, forwardRef, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, forwardRef, input, output, signal } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 const LOCALE_PARTS = new Intl.NumberFormat(undefined, { useGrouping: true }).formatToParts(1234.5);
@@ -29,7 +29,7 @@ export interface EduInputNumberInputEvent {
 				type="text"
 				inputmode="decimal"
 				[value]="text()"
-				[disabled]="disabled()"
+				[disabled]="isFormDisabled()"
 				[placeholder]="placeholder()"
 				[style]="inputStyle()"
 				(input)="handleInput($event)"
@@ -39,10 +39,10 @@ export interface EduInputNumberInputEvent {
 			/>
 			@if (showButtons()) {
 				<div class="edu-input-number__buttons">
-					<button type="button" class="edu-input-number__button" tabindex="-1" [disabled]="disabled()" (click)="applyStep(1)">
+					<button type="button" class="edu-input-number__button" tabindex="-1" [disabled]="isFormDisabled()" (click)="applyStep(1)">
 						<i class="pi pi-angle-up"></i>
 					</button>
-					<button type="button" class="edu-input-number__button" tabindex="-1" [disabled]="disabled()" (click)="applyStep(-1)">
+					<button type="button" class="edu-input-number__button" tabindex="-1" [disabled]="isFormDisabled()" (click)="applyStep(-1)">
 						<i class="pi pi-angle-down"></i>
 					</button>
 				</div>
@@ -69,6 +69,8 @@ export class EduInputNumber implements ControlValueAccessor {
 	readonly onBlur = output<FocusEvent>();
 
 	protected readonly text = signal('');
+	private readonly cvaDisabled = signal(false);
+	protected readonly isFormDisabled = computed(() => this.disabled() || this.cvaDisabled());
 
 	private value: number | null = null;
 	private onChange: (value: number | null) => void = () => {};
@@ -85,6 +87,10 @@ export class EduInputNumber implements ControlValueAccessor {
 
 	registerOnTouched(fn: () => void): void {
 		this.onTouched = fn;
+	}
+
+	setDisabledState(isDisabled: boolean): void {
+		this.cvaDisabled.set(isDisabled);
 	}
 
 	protected handleInput(event: Event): void {
@@ -109,7 +115,7 @@ export class EduInputNumber implements ControlValueAccessor {
 	}
 
 	protected applyStep(direction: 1 | -1): void {
-		if (this.disabled()) {
+		if (this.isFormDisabled()) {
 			return;
 		}
 		const base = this.value ?? 0;

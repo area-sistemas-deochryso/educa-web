@@ -44,7 +44,7 @@ function scoreStrength(value: string): EduPasswordStrength {
 				[class.edu-password__input--mask]="toggleMask()"
 				[type]="masked() ? 'password' : 'text'"
 				[value]="value()"
-				[disabled]="disabled()"
+				[disabled]="isFormDisabled()"
 				[placeholder]="placeholder()"
 				[style]="inputStyle()"
 				(input)="onInput($event)"
@@ -52,7 +52,7 @@ function scoreStrength(value: string): EduPasswordStrength {
 				(blur)="onBlur()"
 			/>
 			@if (toggleMask()) {
-				<button type="button" class="edu-password__toggle" tabindex="-1" [disabled]="disabled()" (click)="masked.set(!masked())">
+				<button type="button" class="edu-password__toggle" tabindex="-1" [disabled]="isFormDisabled()" (click)="masked.set(!masked())">
 					<i [class]="masked() ? 'pi pi-eye' : 'pi pi-eye-slash'"></i>
 				</button>
 			}
@@ -79,6 +79,8 @@ export class EduPassword implements ControlValueAccessor {
 	protected readonly masked = signal(true);
 	protected readonly showFeedback = signal(false);
 	protected readonly strength = computed(() => scoreStrength(this.value()));
+	private readonly cvaDisabled = signal(false);
+	protected readonly isFormDisabled = computed(() => this.disabled() || this.cvaDisabled());
 
 	private onChange: (value: string) => void = () => {};
 	private onTouched: () => void = () => {};
@@ -93,6 +95,10 @@ export class EduPassword implements ControlValueAccessor {
 
 	registerOnTouched(fn: () => void): void {
 		this.onTouched = fn;
+	}
+
+	setDisabledState(isDisabled: boolean): void {
+		this.cvaDisabled.set(isDisabled);
 	}
 
 	protected onInput(event: Event): void {

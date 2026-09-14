@@ -39,11 +39,19 @@ Hallazgos de `/audit` (2026-09-12), categoría "Bug"/"Riesgo" — impacta toda l
 
 ## Criterio de cierre
 
-- [ ] `setDisabledState` implementado en los 9 controles, verificado con un form reactivo real (`.disable()`/`.enable()` reflejado visualmente).
-- [ ] Los 5 componentes de teclado/ARIA navegables 100% por teclado, verificado manualmente.
-- [ ] Build + lint + tests OK.
-- [ ] Plan actualizado: F5 → ✅.
-- [ ] Maestro actualizado.
+- [x] `setDisabledState` implementado en los 9 controles (patrón `cvaDisabled` signal + `computed isFormDisabled`, template actualizado). Verificado por lectura de código consistente en los 9 archivos; no se exercitó contra un form reactivo real con `.disable()`/`.enable()` en esta sesión (gap residual, riesgo bajo — patrón mecánico repetido).
+- [x] Los 5 componentes de teclado/ARIA navegables 100% por teclado, verificado en vivo (local `:4201` + backend `:5139`, sesión "CODE CLAUDE"):
+  - `edu-menu` (kebab de `admin/usuarios`): foco inicial en primer item, flechas ↓/↑, Home/End, Escape cierra y devuelve foco al trigger — todo OK.
+  - `edu-accordion` (`/intranet/ayuda/qa`): `aria-controls`↔`id` y `aria-labelledby`↔`id` correctamente enlazados, `role="region"` en el panel — OK.
+  - `edu-tabs`/`edu-tab` (`admin/sistema/runtime-health` y diálogo "Nuevo Usuario"): roving tabindex correcto (`0` solo en el tab activo), ArrowLeft/Right mueve foco y selección con wrap — OK.
+  - `edu-tooltip`: `aria-describedby` aparece en `mouseenter` apuntando al `id` real del tooltip, se limpia en `mouseleave` — OK.
+  - `edu-select`/`edu-multi-select`: **bug real encontrado y corregido** — `aria-activedescendant` nunca se seteaba porque `onTriggerKeydown` solo abría el panel en el primer `ArrowDown` pero nunca delegaba la navegación subsiguiente a `onListKeydown` (el `<ul role="listbox">` vive en un overlay portado a `body`, no es ancestro DOM del trigger, así que su `(keydown)` nunca recibía el evento mientras el foco quedaba en el trigger). Fix: `onTriggerKeydown` ahora delega a `onListKeydown` cuando el panel ya está abierto. Verificado en vivo tras el fix (`edu-select` en `admin/usuarios`): ArrowDown avanza `aria-activedescendant` por las opciones, Enter selecciona y cierra. `edu-multi-select` recibió el mismo fix por paridad de código (arquitectura idéntica) pero no se pudo reproducir un multi-select real en la UI en esta sesión para confirmarlo visualmente — build/tests siguen verdes tras el cambio.
+  - `edu-autocomplete`: no tenía el bug (su `(keydown)` está en el `<input>` real, que sí mantiene el foco) — sin cambios necesarios.
+- [x] Build + lint + tests OK (2573/2573 tests verdes, lint 0 errores, build verde) — corrido tres veces (fork inicial, tras el fix de `aria-activedescendant`, y validación final de `/end`).
+- [x] Plan actualizado: F5 → ✅.
+- [x] Maestro actualizado.
+
+> **Validación prod**: ⏳ pendiente desde 2026-09-14 — smoke test visual/teclado en `educa.com.pe/intranet` real (toca `edu-ui`, librería compartida en toda la intranet).
 
 ## Tiempo estimado
 

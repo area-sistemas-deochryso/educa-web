@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, forwardRef, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, forwardRef, input, signal } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { EduPassThrough, EduPtRoot } from '../passthrough/edu-pt-root';
 
@@ -19,14 +19,14 @@ import { EduPassThrough, EduPtRoot } from '../passthrough/edu-pt-root';
 			class="edu-select-button"
 			role="group"
 			[eduPtRoot]="$safeNavigationMigration(pt()?.root)"
-			[class.edu-select-button--disabled]="disabled()"
+			[class.edu-select-button--disabled]="isFormDisabled()"
 		>
 			@for (opt of options(); track $index) {
 				<button
 					type="button"
 					class="edu-select-button__option"
 					[class.edu-select-button__option--selected]="isSelected(opt)"
-					[disabled]="disabled()"
+					[disabled]="isFormDisabled()"
 					(click)="select(opt)"
 				>
 					<span class="edu-select-button__label">{{ getOptionLabel(opt) }}</span>
@@ -45,6 +45,8 @@ export class EduSelectButton implements ControlValueAccessor {
 	readonly pt = input<EduPassThrough>();
 
 	protected readonly value = signal<unknown>(null);
+	private readonly cvaDisabled = signal(false);
+	protected readonly isFormDisabled = computed(() => this.disabled() || this.cvaDisabled());
 
 	private onChange: (value: unknown) => void = () => {};
 	private onTouched: () => void = () => {};
@@ -59,6 +61,10 @@ export class EduSelectButton implements ControlValueAccessor {
 
 	registerOnTouched(fn: () => void): void {
 		this.onTouched = fn;
+	}
+
+	setDisabledState(isDisabled: boolean): void {
+		this.cvaDisabled.set(isDisabled);
 	}
 
 	protected getOptionLabel(opt: unknown): unknown {
@@ -80,7 +86,7 @@ export class EduSelectButton implements ControlValueAccessor {
 	}
 
 	protected select(opt: unknown): void {
-		if (this.disabled()) {
+		if (this.isFormDisabled()) {
 			return;
 		}
 		if (this.isSelected(opt)) {

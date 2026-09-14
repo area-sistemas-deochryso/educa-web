@@ -34,6 +34,8 @@ export interface EduAutoCompleteSelectEvent<T = unknown> {
 	value: T;
 }
 
+let nextInstanceId = 0;
+
 const PANEL_POSITIONS: ConnectedPosition[] = [
 	{ originX: 'start', originY: 'bottom', overlayX: 'start', overlayY: 'top', offsetY: 4 },
 	{ originX: 'start', originY: 'top', overlayX: 'start', overlayY: 'bottom', offsetY: -4 },
@@ -64,9 +66,11 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 				role="combobox"
 				aria-haspopup="listbox"
 				[attr.aria-expanded]="isOpen()"
+				[attr.aria-controls]="listboxId"
+				[attr.aria-activedescendant]="activeOptionId()"
 				[attr.maxlength]="maxlength()"
 				[value]="query()"
-				[disabled]="disabled()"
+				[disabled]="isFormDisabled()"
 				[placeholder]="placeholder()"
 				[style]="inputStyle()"
 				(input)="onInput($event)"
@@ -79,7 +83,7 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 					type="button"
 					class="edu-autocomplete__dropdown"
 					tabindex="-1"
-					[disabled]="disabled()"
+					[disabled]="isFormDisabled()"
 					(mousedown)="onDropdownMousedown($event)"
 				>
 					<i class="pi pi-chevron-down"></i>
@@ -89,7 +93,7 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 
 		<ng-template #overlayTemplate>
 			<div class="edu-autocomplete-panel" [style]="panelStyle()">
-				<ul class="edu-autocomplete-panel__list" role="listbox">
+				<ul class="edu-autocomplete-panel__list" role="listbox" [attr.id]="listboxId">
 					@for (opt of suggestions(); track $index) {
 						<li
 							class="edu-autocomplete-panel__option"
@@ -97,6 +101,7 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 								$index === activeIndex()
 							"
 							role="option"
+							[attr.id]="optionId($index)"
 							[attr.aria-selected]="$index === activeIndex()"
 							(mousedown)="onOptionMousedown($event, opt)"
 						>
@@ -181,12 +186,23 @@ export class EduAutoComplete<T = unknown> implements ControlValueAccessor, OnDes
 	private readonly nav = new SelectListNav();
 
 	protected readonly activeIndex = this.nav.activeIndex;
+	protected readonly listboxId = `edu-autocomplete-${nextInstanceId++}-listbox`;
+	protected readonly activeOptionId = computed(() =>
+		this.activeIndex() >= 0 ? this.optionId(this.activeIndex()) : null,
+	);
+
+	private readonly cvaDisabled = signal(false);
+	protected readonly isFormDisabled = computed(() => this.disabled() || this.cvaDisabled());
 
 	private onChange: (value: unknown) => void = () => {};
 	private onTouched: () => void = () => {};
 
 	protected isOpen(): boolean {
 		return this.handle.isOpen;
+	}
+
+	protected optionId(index: number): string {
+		return `${this.listboxId}-option-${index}`;
 	}
 
 	ngOnDestroy(): void {
@@ -210,6 +226,10 @@ export class EduAutoComplete<T = unknown> implements ControlValueAccessor, OnDes
 
 	registerOnTouched(fn: () => void): void {
 		this.onTouched = fn;
+	}
+
+	setDisabledState(isDisabled: boolean): void {
+		this.cvaDisabled.set(isDisabled);
 	}
 
 	protected resolveLabel(opt: unknown): string {
@@ -243,7 +263,7 @@ export class EduAutoComplete<T = unknown> implements ControlValueAccessor, OnDes
 	}
 
 	protected onFocus(event: Event): void {
-		if (this.disabled()) {
+		if (this.isFormDisabled()) {
 			return;
 		}
 		if (this.query().length >= this.minLength()) {
@@ -263,7 +283,7 @@ export class EduAutoComplete<T = unknown> implements ControlValueAccessor, OnDes
 
 	protected onDropdownMousedown(event: Event): void {
 		event.preventDefault();
-		if (this.disabled()) return;
+		if (this.isFormDisabled()) return;
 		if (this.handle.isOpen) {
 			this.close();
 		} else {

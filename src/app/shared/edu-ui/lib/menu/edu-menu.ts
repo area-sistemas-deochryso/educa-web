@@ -2,7 +2,17 @@ import { FocusTrapFactory } from '@angular/cdk/a11y';
 import { ConnectedPosition, Overlay } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
 import { NgTemplateOutlet } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnDestroy, TemplateRef, ViewContainerRef, inject, input, viewChild } from '@angular/core';
+import {
+	ChangeDetectionStrategy,
+	Component,
+	OnDestroy,
+	TemplateRef,
+	ViewContainerRef,
+	inject,
+	input,
+	signal,
+	viewChild,
+} from '@angular/core';
 import { EduOverlayHandle } from '../overlay/edu-overlay-handle';
 
 export interface EduMenuItemCommandEvent {
@@ -28,9 +38,15 @@ const POPUP_POSITIONS: ConnectedPosition[] = [
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
 		<ng-template #menuList>
-			<ul class="edu-menu" role="menu">
+			<ul class="edu-menu" role="menu" (keydown)="onMenuKeydown($event)">
 				@for (item of model(); track $index) {
-					<li class="edu-menu__item" role="menuitem" (click)="onItemClick($event, item)">
+					<li
+						class="edu-menu__item"
+						role="menuitem"
+						[attr.tabindex]="$index === activeIndex() ? 0 : -1"
+						(focus)="activeIndex.set($index)"
+						(click)="onItemClick($event, item)"
+					>
 						@if (item.icon) {
 							<i class="edu-menu__icon" [class]="item.icon"></i>
 						}
@@ -55,6 +71,8 @@ export class EduMenu implements OnDestroy {
 	readonly popup = input(false);
 	readonly appendTo = input<'body'>('body');
 
+	protected readonly activeIndex = signal(0);
+
 	private readonly overlayTemplateRef = viewChild<TemplateRef<unknown>>('overlayTemplate');
 	private readonly viewContainerRef = inject(ViewContainerRef);
 	private readonly overlay = inject(Overlay);
@@ -70,6 +88,7 @@ export class EduMenu implements OnDestroy {
 			this.close();
 			return;
 		}
+		this.activeIndex.set(0);
 		this.open(event.currentTarget as HTMLElement);
 	}
 
@@ -81,6 +100,47 @@ export class EduMenu implements OnDestroy {
 		item.command?.({ originalEvent: event, item });
 		if (this.popup()) {
 			this.close();
+		}
+	}
+
+	protected onMenuKeydown(event: KeyboardEvent): void {
+		const items = this.model();
+		const length = items.length;
+		if (length === 0) {
+			return;
+		}
+		const ul = event.currentTarget as HTMLElement;
+		const focusIndex = (index: number): void => {
+			this.activeIndex.set(index);
+			(ul.children[index] as HTMLElement | undefined)?.focus();
+		};
+		switch (event.key) {
+			case 'ArrowDown':
+				event.preventDefault();
+				focusIndex((this.activeIndex() + 1) % length);
+				break;
+			case 'ArrowUp':
+				event.preventDefault();
+				focusIndex((this.activeIndex() - 1 + length) % length);
+				break;
+			case 'Home':
+				event.preventDefault();
+				focusIndex(0);
+				break;
+			case 'End':
+				event.preventDefault();
+				focusIndex(length - 1);
+				break;
+			case 'Enter':
+			case ' ':
+				event.preventDefault();
+				this.onItemClick(event, items[this.activeIndex()]);
+				break;
+			case 'Escape':
+				if (this.popup()) {
+					this.close();
+				}
+				break;
 		}
 	}
 

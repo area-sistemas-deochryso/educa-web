@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, forwardRef, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, forwardRef, input, signal } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({
@@ -20,7 +20,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 			[attr.id]="inputId()"
 			[attr.aria-checked]="checked()"
 			[class.edu-toggle--checked]="checked()"
-			[disabled]="disabled()"
+			[disabled]="isFormDisabled()"
 			(click)="toggle()"
 		>
 			<span class="edu-toggle__handle"></span>
@@ -33,6 +33,8 @@ export class EduToggle implements ControlValueAccessor {
 	readonly inputId = input<string>();
 
 	protected readonly checked = signal(false);
+	private readonly cvaDisabled = signal(false);
+	protected readonly isFormDisabled = computed(() => this.disabled() || this.cvaDisabled());
 
 	private onChange: (value: boolean) => void = () => {};
 	private onTouched: () => void = () => {};
@@ -49,8 +51,12 @@ export class EduToggle implements ControlValueAccessor {
 		this.onTouched = fn;
 	}
 
+	setDisabledState(isDisabled: boolean): void {
+		this.cvaDisabled.set(isDisabled);
+	}
+
 	toggle(): void {
-		if (this.disabled()) {
+		if (this.isFormDisabled()) {
 			return;
 		}
 		this.checked.set(!this.checked());
