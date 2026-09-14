@@ -31,19 +31,19 @@ El codebase tiene una base moderna sólida: 100% standalone, 100% control flow n
 | F2 | Seguridad — exposición de password en `users/` | Riesgo | 🟡 FE ✅ awaiting-prod · BE handoff pendiente ([664](../chats/awaiting-prod/664-audit-f2-seguridad-password-plaintext-users.md), `Educa.API` brief [667](../../Educa.API/.claude/chats/open/667-be-handoff-audit-fe-664-password-plaintext.md)) |
 | F3 | Condiciones de carrera por fetches sin cancelación (~9 facades) | Bug/Riesgo | ✅ FE cerrado, awaiting-prod [665](../chats/awaiting-prod/665-audit-f3-race-conditions-fetches-sin-cancelacion.md) |
 | F4 | Bugs funcionales puntuales independientes (9 fixes acotados) | Bug | [666](../chats/open/666-audit-f4-bugs-funcionales-puntuales.md) |
-| F5 | `edu-ui`: accesibilidad teclado/ARIA (tabs, accordion, menu, tooltip, combobox) + `setDisabledState` faltante en 9 controles CVA | Riesgo | backlog |
-| F6 | Decidir y aplicar configuración zoneless explícita en `app.config.ts` (paridad con `test-setup.ts`) | Regla violada | backlog |
-| F7 | Sitio público: formulario de contacto sale de la SPA (Formspree nativo) + meta tags dinámicos por ruta ausentes (SEO) | Bug/Riesgo | backlog |
-| F8 | Performance: `@defer` ausente transversal + bug de lazy-loading barrel en `intranet.routes.ts` (profesor/estudiante) + leak Three.js campus 3D + `monitoreo-hub-badges` 10 llamadas paralelas | Performance | backlog |
-| F9 | Consolidar duplicación de código: mensajería estudiante/profesor, niveles públicos ×3, componentes de asistencia por rol | Observación | backlog |
-| F10 | Capa de datos: adapters con lógica de negocio filtrada, violación de layering `shared→features`, cast `as never` en `vistas.facade.ts` | Regla violada | backlog |
-| F11 | Inconsistencias transversales menores: alias `@env`/`@config`, `CommonModule` sin uso, naming `severity`/`size` en `edu-ui`, `DestroyRef` de servicios root sin efecto real | Inconsistencia | backlog |
-| F12 | Riesgos menores de seguridad/UX: login rate-limit solo en memoria, `campus-admin` sin `rowVersion`/409, videollamadas sin manejo de expiración de token JaaS | Riesgo | backlog |
+| F5 | `edu-ui`: accesibilidad teclado/ARIA (tabs, accordion, menu, tooltip, combobox) + `setDisabledState` faltante en 9 controles CVA | Riesgo | [679](../chats/open/679-audit-f5-edu-ui-accesibilidad-setdisabledstate.md) |
+| F6 | Decidir y aplicar configuración zoneless explícita en `app.config.ts` (paridad con `test-setup.ts`) | Regla violada | [680](../chats/open/680-audit-f6-zoneless-config-explicita.md) |
+| F7 | Sitio público: formulario de contacto sale de la SPA (Formspree nativo) + meta tags dinámicos por ruta ausentes (SEO) | Bug/Riesgo | [681](../chats/open/681-audit-f7-sitio-publico-contacto-seo.md) |
+| F8 | Performance: `@defer` ausente transversal + bug de lazy-loading barrel en `intranet.routes.ts` (profesor/estudiante) + leak Three.js campus 3D + `monitoreo-hub-badges` 10 llamadas paralelas | Performance | [682](../chats/open/682-audit-f8-performance-defer-lazy-loading-leaks.md) |
+| F9 | Consolidar duplicación de código: mensajería estudiante/profesor, niveles públicos ×3, componentes de asistencia por rol | Observación | [683](../chats/open/683-audit-f9-consolidar-duplicacion-codigo.md) |
+| F10 | Capa de datos: adapters con lógica de negocio filtrada, violación de layering `shared→features`, cast `as never` en `vistas.facade.ts` | Regla violada | [684](../chats/open/684-audit-f10-capa-datos-layering-vistas-facade.md) |
+| F11 | Inconsistencias transversales menores: alias `@env`/`@config`, `CommonModule` sin uso, naming `severity`/`size` en `edu-ui`, `DestroyRef` de servicios root sin efecto real | Inconsistencia | [685](../chats/open/685-audit-f11-inconsistencias-transversales-menores.md) |
+| F12 | Riesgos menores de seguridad/UX: login rate-limit solo en memoria, `campus-admin` sin `rowVersion`/409, videollamadas sin manejo de expiración de token JaaS | Riesgo | [686](../chats/open/686-audit-f12-riesgos-menores-seguridad-ux.md) |
 
 ## Done-when
 
 - [ ] F1-F4 cerrados y verificados.
-- [ ] F5-F12 promovidos a brief cuando corresponda (respetando el soft cap de `chats/open/` ≤5) o descartados explícitamente con justificación.
+- [ ] F5-F12: briefs 679-686 generados 2026-09-12 a pedido explícito del usuario, superando el soft cap de `chats/open/` ≤5 (excepción documentada en `backlog-hygiene.md` para fases de audit deliberadamente pesadas) — cerrados y verificados.
 - [ ] Plan y maestro sincronizados en cada cierre de fase.
 
 ## Fuera de scope
