@@ -2,7 +2,7 @@
 
 > **Repo destino**: `educa-web`
 > **Plan**: [`audit-angular22-ts6-2026-09-12.md`](../../plan/audit-angular22-ts6-2026-09-12.md) (Fase F6)
-> **Creado**: 2026-09-12 · **Estado**: ⏳ pendiente arrancar.
+> **Creado**: 2026-09-12 · **Estado**: ✅ cerrado 2026-09-14.
 > **MODO SUGERIDO**: `/investigate` primero (confirmar comportamiento real) → `/execute`
 > **touches**:
 >   - `src/app/app.config.ts`
@@ -32,13 +32,25 @@ Hallazgo de `/audit` (2026-09-12), categoría "Regla violada" — `test-setup.ts
 
 ## Criterio de cierre
 
-- [ ] Investigación completa: comportamiento real confirmado.
-- [ ] `provideZonelessChangeDetection()` agregado a `app.config.ts` (o divergencia real documentada y resuelta si la había).
-- [ ] Código que dependía implícitamente de zone.js corregido (usar `markForCheck()`/signals en vez de `detectChanges()` manual donde corresponda).
-- [ ] Build + lint + tests OK.
-- [ ] Plan actualizado: F6 → ✅.
-- [ ] Maestro actualizado.
+- [x] Investigación completa: comportamiento real confirmado.
+- [x] `provideZonelessChangeDetection()` agregado a `app.config.ts` (o divergencia real documentada y resuelta si la había).
+- [x] Código que dependía implícitamente de zone.js corregido (usar `markForCheck()`/signals en vez de `detectChanges()` manual donde corresponda).
+- [x] Build + lint + tests OK.
+- [x] Plan actualizado: F6 → ✅.
+- [x] Maestro actualizado.
 
 ## Tiempo estimado
 
 ~1h30.
+
+## Cierre 2026-09-14
+
+**Investigación**: sin divergencia real test↔prod. `zone.js` no es dependencia (`package.json`), no está en `polyfills` de `angular.json` (el array ni existe), y no aparece en `node_modules` ni transitivamente tras `bun install` limpio. La app ya corría zoneless de facto — `test-setup.ts` solo hacía explícita una intención que `app.config.ts` dejaba implícita.
+
+**Fix**:
+- `app.config.ts`: agregado `provideZonelessChangeDetection()` (heredado por `app.config.server.ts` vía `mergeApplicationConfig`, sin cambios ahí).
+- `counter-section.ts`/`.html`: `displayedCount` pasó de field plano + `cdr.detectChanges()` manual (imperativo, en RAF) a `signal()`, alineando con el patrón `markForCheck()` ya usado en `hero-section.ts` y `testimonials-section.ts`. Barrido de `detectChanges()`/`markForCheck()` en código no-spec confirmó que estos eran los únicos 3 archivos con el patrón, y solo `counter-section.ts` estaba desalineado.
+
+**Validación**: lint 0 errores · build verde (warnings NG8113 preexistentes, no relacionados) · 2574/2574 tests verdes.
+
+**Commit**: `ce8ae856` en `chat/680-audit-f6-zoneless-config-explicita`.
