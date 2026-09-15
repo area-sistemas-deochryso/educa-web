@@ -4,7 +4,10 @@ import { Observable } from 'rxjs';
 
 import { environment } from '@config/environment';
 
-import { DiagnosticoCorreosDiaDto } from '../models/correos-dia.models';
+import {
+	DiagnosticoCorreosDiaDto,
+	ReencolarAsistenciaResponseDto,
+} from '../models/correos-dia.models';
 
 @Injectable({ providedIn: 'root' })
 export class CorreosDiaService {
@@ -25,6 +28,15 @@ export class CorreosDiaService {
 		return this.http.get<DiagnosticoCorreosDiaDto>(
 			`${this.baseUrl}/diagnostico-correos-dia`,
 			{ params },
+		);
+	}
+	// #endregion
+
+	// #region Comandos (POST)
+	reencolar(asistenciaIds: number[]): Observable<ReencolarAsistenciaResponseDto> {
+		return this.http.post<ReencolarAsistenciaResponseDto>(
+			`${this.baseUrl}/diagnostico-correos-dia/reencolar`,
+			{ asistenciaIds },
 		);
 	}
 	// #endregion

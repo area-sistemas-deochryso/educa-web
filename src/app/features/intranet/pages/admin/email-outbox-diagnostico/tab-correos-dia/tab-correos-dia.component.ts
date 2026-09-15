@@ -10,8 +10,9 @@ import { CorreosDiaResumenComponent } from './components/correos-dia-resumen/cor
 import { EntradasConCorreoTableComponent } from './components/entradas-con-correo-table/entradas-con-correo-table.component';
 import { EntradasSinCorreoTableComponent } from './components/entradas-sin-correo-table/entradas-sin-correo-table.component';
 import { EstudiantesSinCorreoTableComponent } from './components/estudiantes-sin-correo-table/estudiantes-sin-correo-table.component';
+import { EntradaSinCorreoEnviado } from './models/correos-dia.models';
 import { CorreosDiaFacade } from './services';
-import { EduTab, EduTabPanel, EduTabs } from '@edu-ui';
+import { EduConfirmationService, EduConfirmDialog, EduTab, EduTabPanel, EduTabs } from '@edu-ui';
 
 const LISTA_SIMPLE_COLUMNS: SkeletonColumnDef[] = [
 	{ width: '110px', cellType: 'text' },
@@ -45,7 +46,8 @@ const ENVIADOS_COLUMNS: SkeletonColumnDef[] = [
 @Component({
 	selector: 'app-tab-correos-dia',
 	standalone: true,
-	imports: [StatsSkeletonComponent, TableSkeletonComponent, CorreosDiaHeaderComponent, CorreosDiaResumenComponent, EstudiantesSinCorreoTableComponent, ApoderadosBlacklisteadosTableComponent, EntradasSinCorreoTableComponent, EntradasConCorreoTableComponent, AttendanceGapTileComponent, EduTab, EduTabPanel, EduTabs],
+	imports: [StatsSkeletonComponent, TableSkeletonComponent, CorreosDiaHeaderComponent, CorreosDiaResumenComponent, EstudiantesSinCorreoTableComponent, ApoderadosBlacklisteadosTableComponent, EntradasSinCorreoTableComponent, EntradasConCorreoTableComponent, AttendanceGapTileComponent, EduTab, EduTabPanel, EduTabs, EduConfirmDialog],
+	providers: [EduConfirmationService],
 	templateUrl: './tab-correos-dia.component.html',
 	styleUrl: './tab-correos-dia.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -53,6 +55,7 @@ const ENVIADOS_COLUMNS: SkeletonColumnDef[] = [
 export class TabCorreosDiaComponent {
 	// #region Dependencias
 	private facade = inject(CorreosDiaFacade);
+	private confirmationService = inject(EduConfirmationService);
 	// #endregion
 
 	// #region Estado
@@ -77,6 +80,34 @@ export class TabCorreosDiaComponent {
 
 	onFechaChange(fecha: string | null): void {
 		this.facade.setFecha(fecha);
+	}
+
+	onReencolarUno(row: EntradaSinCorreoEnviado): void {
+		this.confirmationService.confirm({
+			header: 'Reencolar correo',
+			message: `¿Reencolar el correo de "${row.nombreCompleto}"?`,
+			acceptLabel: 'Reencolar',
+			rejectLabel: 'Cancelar',
+			acceptButtonStyleClass: 'p-button-warning',
+			rejectButtonStyleClass: 'p-button-text',
+			icon: 'pi pi-refresh',
+			accept: () => this.facade.reencolar([row.asistenciaId]),
+		});
+	}
+
+	onReencolarTodos(rows: EntradaSinCorreoEnviado[]): void {
+		if (rows.length === 0) return;
+
+		this.confirmationService.confirm({
+			header: 'Reencolar todos',
+			message: `¿Reencolar ${rows.length} correo(s) sin enviar? Se respetan blacklist/cuarentena — no se duplican los que ya salieron.`,
+			acceptLabel: `Reencolar ${rows.length}`,
+			rejectLabel: 'Cancelar',
+			acceptButtonStyleClass: 'p-button-warning',
+			rejectButtonStyleClass: 'p-button-text',
+			icon: 'pi pi-refresh',
+			accept: () => this.facade.reencolar(rows.map((r) => r.asistenciaId)),
+		});
 	}
 	// #endregion
 }

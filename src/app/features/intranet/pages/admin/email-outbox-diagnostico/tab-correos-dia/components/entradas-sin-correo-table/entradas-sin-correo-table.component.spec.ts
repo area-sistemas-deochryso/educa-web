@@ -70,4 +70,50 @@ describe('EntradasSinCorreoTableComponent', () => {
 		expect(text).toContain('***9012');
 		expect(text).toContain('LOPEZ, LUIS');
 	});
+
+	it('isReencolable solo es true para SIN_RASTRO y FALLIDO', () => {
+		componentRef.setInput('data', []);
+		fixture.detectChanges();
+
+		expect(component.isReencolable('SIN_RASTRO')).toBe(true);
+		expect(component.isReencolable('FALLIDO')).toBe(true);
+		expect(component.isReencolable('SIN_CORREO')).toBe(false);
+		expect(component.isReencolable('BLACKLISTED')).toBe(false);
+		expect(component.isReencolable('PENDIENTE')).toBe(false);
+	});
+
+	it('filasReencolables filtra solo SIN_RASTRO/FALLIDO, excluyendo el resto', () => {
+		const sinRastro = makeEntrada({ asistenciaId: 1, razon: 'SIN_RASTRO' });
+		const fallido = makeEntrada({ asistenciaId: 2, razon: 'FALLIDO' });
+		const sinCorreo = makeEntrada({ asistenciaId: 3, razon: 'SIN_CORREO' });
+		componentRef.setInput('data', [sinRastro, fallido, sinCorreo]);
+		fixture.detectChanges();
+
+		expect(component.filasReencolables()).toEqual([sinRastro, fallido]);
+	});
+
+	it('onReencolarUno emite la fila recibida', () => {
+		componentRef.setInput('data', []);
+		fixture.detectChanges();
+		const row = makeEntrada({ asistenciaId: 42, razon: 'SIN_RASTRO' });
+		const emitted: unknown[] = [];
+		component.reencolarUno.subscribe((r) => emitted.push(r));
+
+		component.onReencolarUno(row);
+
+		expect(emitted).toEqual([row]);
+	});
+
+	it('onReencolarTodos emite solo las filas elegibles', () => {
+		const sinRastro = makeEntrada({ asistenciaId: 1, razon: 'SIN_RASTRO' });
+		const sinCorreo = makeEntrada({ asistenciaId: 2, razon: 'SIN_CORREO' });
+		componentRef.setInput('data', [sinRastro, sinCorreo]);
+		fixture.detectChanges();
+		const emitted: unknown[] = [];
+		component.reencolarTodos.subscribe((r) => emitted.push(r));
+
+		component.onReencolarTodos();
+
+		expect(emitted).toEqual([[sinRastro]]);
+	});
 });

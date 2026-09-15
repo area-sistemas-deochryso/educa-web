@@ -92,3 +92,32 @@ export type CorreosDiaErrorCode =
 	| 'SEDE_ID_INVALIDO';
 
 // #endregion
+
+// #region Reencolado manual de gaps (SIN_RASTRO / FALLIDO)
+
+export const REENCOLAR_RESULTADOS = [
+	'ENCOLADO',
+	'YA_EXISTIA',
+	'BLACKLISTED',
+	'CUARENTENA',
+	'DOMINIO_PAUSADO',
+	'FORMATO_INVALIDO',
+	'SIN_CORREO_APODERADO',
+	'FUERA_DE_ALCANCE',
+	'NO_ENCONTRADO',
+] as const;
+export type ReencolarResultadoCodigo = (typeof REENCOLAR_RESULTADOS)[number];
+
+export interface ReencolarAsistenciaItemResultadoDto {
+	asistenciaId: number;
+	resultado: ReencolarResultadoCodigo;
+	outboxId: number | null;
+}
+
+export interface ReencolarAsistenciaResponseDto {
+	encolados: number;
+	rechazados: number;
+	detalle: ReencolarAsistenciaItemResultadoDto[];
+}
+
+// #endregion

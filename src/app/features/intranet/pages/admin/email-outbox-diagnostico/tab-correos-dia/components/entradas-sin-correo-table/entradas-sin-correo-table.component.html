@@ -1,10 +1,23 @@
 <section class="table-section" aria-label="Entradas sin correo enviado">
 	<header class="section-header">
-		<h3>Entradas sin correo enviado</h3>
-		<span class="section-subtitle">
-			Lista completa con razón tipada — responde "marcaron N y salieron M, ¿quiénes
-			son los que faltan?"
-		</span>
+		<div>
+			<h3>Entradas sin correo enviado</h3>
+			<span class="section-subtitle">
+				Lista completa con razón tipada — responde "marcaron N y salieron M, ¿quiénes
+				son los que faltan?"
+			</span>
+		</div>
+		@if (filasReencolables().length > 0) {
+			<edu-button
+				label="Reencolar todos ({{ filasReencolables().length }})"
+				icon="pi pi-refresh"
+				size="small"
+				severity="warn"
+				eduTooltip="Reencola SIN_RASTRO y FALLIDO — no toca SIN_CORREO ni BLACKLISTED"
+				eduTooltipPosition="top"
+				(click)="onReencolarTodos()"
+			/>
+		}
 	</header>
 
 	<edu-table
@@ -24,6 +37,7 @@
 				<th class="label-uppercase col-hora">Entrada</th>
 				<th class="label-uppercase col-razon">Razón</th>
 				<th class="label-uppercase col-tipofallo">Tipo fallo</th>
+				<th class="label-uppercase col-actions">Acciones</th>
 			</tr>
 		</ng-template>
 		<ng-template #body let-row>
@@ -46,11 +60,26 @@
 						<span class="muted">—</span>
 					}
 				</td>
+				<td class="col-actions">
+					@if (isReencolable(row.razon)) {
+						<edu-button
+							icon="pi pi-refresh"
+							[text]="true"
+							size="small"
+							eduTooltip="Reencolar este correo"
+							eduTooltipPosition="top"
+							(click)="onReencolarUno(row)"
+							[pt]="{ root: { 'aria-label': 'Reencolar correo de ' + row.nombreCompleto } }"
+						/>
+					} @else {
+						<span class="muted">—</span>
+					}
+				</td>
 			</tr>
 		</ng-template>
 		<ng-template #emptymessage>
 			<tr>
-				<td colspan="6" class="empty-message">
+				<td colspan="7" class="empty-message">
 					<div class="empty-state">
 						<i class="pi pi-check-circle"></i>
 						<p>Sin gap — todas las entradas generaron correo exitoso</p>

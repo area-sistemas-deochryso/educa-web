@@ -86,6 +86,40 @@ export class CorreosDiaFacade {
 		this.store.setSedeId(sedeId);
 		this.loadData();
 	}
+
+	/**
+	 * Reencolado manual de gaps SIN_RASTRO/FALLIDO. Refresca la data al terminar
+	 * (exitoso o no) para que el panel refleje el estado real del outbox — el
+	 * BE es la fuente de verdad, no el conteo optimista del toast.
+	 */
+	reencolar(asistenciaIds: number[]): void {
+		if (asistenciaIds.length === 0) return;
+
+		this.api.reencolar(asistenciaIds).subscribe({
+			next: (resultado) => {
+				logger.tagged(LOG_TAG, 'info', 'reencolar_result', resultado);
+
+				if (resultado.encolados > 0) {
+					const detalle =
+						resultado.rechazados > 0
+							? `${resultado.encolados} correo(s) encolado(s) — ${resultado.rechazados} no elegibles (ver detalle)`
+							: `${resultado.encolados} correo(s) encolado(s) para reenvío`;
+					this.errorHandler.showSuccess('Reencolado', detalle);
+				} else {
+					this.errorHandler.showWarning(
+						'Reencolado',
+						'Ningún caso se pudo reencolar — ya estaban enviados, sin correo de apoderado o blacklisteados.',
+					);
+				}
+
+				this.refresh();
+			},
+			error: (err: unknown) => {
+				logger.tagged(LOG_TAG, 'error', 'reencolar_error', err);
+				this.errorHandler.showError('Reencolado', 'No se pudo reencolar. Intenta nuevamente.');
+			},
+		});
+	}
 	// #endregion
 
 	// #region Error mapping

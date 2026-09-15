@@ -1,6 +1,14 @@
 @use '../../../table-section' as *;
 
 :host .table-section {
+	// * Override local — el header base es block; esta tabla suma el botón "Reencolar todos".
+	.section-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 1rem;
+	}
+
 	.cell-tipofallo {
 		font-family: monospace;
 		font-size: 0.75rem;

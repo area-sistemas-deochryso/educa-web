@@ -71,7 +71,11 @@
 			@if (vm().loading && !hasData()) {
 				<app-table-skeleton [columns]="entradasColumns" [rows]="8" />
 			} @else if (hasData()) {
-				<app-entradas-sin-correo-table [data]="vm().entradasSinCorreoEnviado" />
+				<app-entradas-sin-correo-table
+					[data]="vm().entradasSinCorreoEnviado"
+					(reencolarUno)="onReencolarUno($event)"
+					(reencolarTodos)="onReencolarTodos($event)"
+				/>
 			}
 		</edu-tabpanel>
 
@@ -106,6 +110,8 @@
 				<app-attendance-gap-tile [data]="vm().attendanceGaps" />
 			}
 		</edu-tabpanel>
-	
+
 </edu-tabs>
 <!-- #endregion -->
+
+<edu-confirm-dialog />

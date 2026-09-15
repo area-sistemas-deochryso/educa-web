@@ -40,6 +40,7 @@ function makeDto(overrides: Partial<DiagnosticoCorreosDiaDto> = {}): Diagnostico
 function createMockApi() {
 	return {
 		obtenerDiagnostico: vi.fn().mockReturnValue(of(makeDto())),
+		reencolar: vi.fn(),
 	};
 }
 
@@ -177,5 +178,53 @@ describe('CorreosDiaFacade', () => {
 		facade.refresh();
 
 		expect(api.obtenerDiagnostico).toHaveBeenCalledWith('2026-04-15', null);
+	});
+
+	describe('reencolar', () => {
+		it('no llama al API si la lista de ids está vacía', () => {
+			facade.reencolar([]);
+
+			expect(api.reencolar).not.toHaveBeenCalled();
+		});
+
+		it('encolados > 0: muestra toast de éxito y refresca', () => {
+			api.reencolar.mockReturnValueOnce(
+				of({ encolados: 2, rechazados: 0, detalle: [] }),
+			);
+
+			facade.reencolar([1, 2]);
+
+			expect(api.reencolar).toHaveBeenCalledWith([1, 2]);
+			expect(errorHandler.showSuccess).toHaveBeenCalledWith(
+				'Reencolado',
+				expect.stringContaining('2 correo(s) encolado(s)'),
+			);
+			// loadData() vuelve a pegarle al diagnóstico tras reencolar.
+			expect(api.obtenerDiagnostico).toHaveBeenCalled();
+		});
+
+		it('encolados=0 y rechazados>0: muestra warning en vez de éxito', () => {
+			api.reencolar.mockReturnValueOnce(
+				of({ encolados: 0, rechazados: 3, detalle: [] }),
+			);
+
+			facade.reencolar([1, 2, 3]);
+
+			expect(errorHandler.showWarning).toHaveBeenCalled();
+			expect(errorHandler.showSuccess).not.toHaveBeenCalled();
+		});
+
+		it('error del API: muestra toast de error y no refresca', () => {
+			api.reencolar.mockReturnValueOnce(throwError(() => new Error('boom')));
+			api.obtenerDiagnostico.mockClear();
+
+			facade.reencolar([1]);
+
+			expect(errorHandler.showError).toHaveBeenCalledWith(
+				'Reencolado',
+				expect.stringContaining('No se pudo reencolar'),
+			);
+			expect(api.obtenerDiagnostico).not.toHaveBeenCalled();
+		});
 	});
 });
