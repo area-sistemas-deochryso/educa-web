@@ -3,7 +3,7 @@ import { DOCUMENT } from '@angular/common';
 import { DestroyRef, Injectable, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Meta } from '@angular/platform-browser';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs';
 import { logger } from '@core/helpers';
 
@@ -22,7 +22,6 @@ const DEFAULT_OG_IMAGE = `${SITE_URL}/images/logo.avif`;
 @Injectable({ providedIn: 'root' })
 export class PublicSeoService {
 	private readonly router = inject(Router);
-	private readonly route = inject(ActivatedRoute);
 	private readonly meta = inject(Meta);
 	private readonly document = inject(DOCUMENT);
 	private readonly destroyRef = inject(DestroyRef);
@@ -59,11 +58,15 @@ export class PublicSeoService {
 	}
 
 	private deepestRouteData(): PublicSeoMeta | null {
-		let current = this.route.root;
+		// * routerState.snapshot es un árbol de ActivatedRouteSnapshot ya resuelto de forma
+		// síncrona — a diferencia de this.route (ActivatedRoute), no depende de que el nodo
+		// del componente actual ya tenga su propio snapshot asignado en este punto del ciclo
+		// de construcción (evita TypeError: Cannot read properties of undefined (reading 'data')).
+		let current = this.router.routerState.snapshot.root;
 		while (current.firstChild) {
 			current = current.firstChild;
 		}
-		return (current.snapshot.data['seo'] as PublicSeoMeta | undefined) ?? null;
+		return (current.data['seo'] as PublicSeoMeta | undefined) ?? null;
 	}
 
 	private updateCanonicalLink(href: string): void {

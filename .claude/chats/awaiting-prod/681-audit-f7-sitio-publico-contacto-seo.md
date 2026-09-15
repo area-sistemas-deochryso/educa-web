@@ -2,7 +2,8 @@
 
 > **Repo destino**: `educa-web`
 > **Plan**: [`audit-angular22-ts6-2026-09-12.md`](../../plan/audit-angular22-ts6-2026-09-12.md) (Fase F7)
-> **Creado**: 2026-09-12 · **Estado**: ⏳ pendiente arrancar.
+> **Creado**: 2026-09-12 · **Estado**: ✅ cerrado localmente (2026-09-15).
+> **Validación prod**: ⏳ pendiente desde 2026-09-15 — depende del merge de brief backend 681-B (`chat/681-B-endpoint-contacto`) a `main` de Educa.API.
 > **MODO SUGERIDO**: `/design` corto (decidir manejo del form) → `/execute`
 > **touches**:
 >   - `src/app/features/public/contact/contact.html`, `contact.ts`
@@ -31,12 +32,12 @@ Hallazgos de `/audit` (2026-09-12), categorías "Bug"/"Riesgo" — el formulario
 
 ## Criterio de cierre
 
-- [ ] Punto 1: decisión de diseño confirmada, formulario funciona sin salir de la SPA, feedback de éxito/error visible in-app.
-- [ ] Punto 2: `required` agregado o justificado.
-- [ ] Punto 3: las 9 páginas públicas tienen `description`/OG/`canonical` propios, verificado inspeccionando el DOM renderizado (SSR) de cada ruta.
-- [ ] Build + lint + tests OK.
-- [ ] Plan actualizado: F7 → ✅.
-- [ ] Maestro actualizado.
+- [x] Punto 1: decisión de diseño confirmada, formulario funciona sin salir de la SPA, feedback de éxito/error visible in-app.
+- [x] Punto 2: `required` agregado (ver `contact.html`).
+- [x] Punto 3: las 9 páginas públicas tienen `description`/OG/`canonical` propios, verificado inspeccionando el DOM renderizado de cada ruta (validación manual en navegador, ver hallazgo abajo).
+- [x] Build + lint + tests OK.
+- [x] Plan actualizado: F7 → ✅.
+- [x] Maestro actualizado.
 
 ## Bloqueo arquitectónico (resuelto)
 
@@ -45,15 +46,23 @@ Hallazgos de `/audit` (2026-09-12), categorías "Bug"/"Riesgo" — el formulario
 - Todas 9 rutas públicas tienen `data.seo` con description, og:title, canonical
 - Validación: lint ✅, TypeScript build ✅
 
-⏳ **Contacto (Punto 1)** — BLOQUEADO por brief 681-B (backend):
+✅ **Contacto (Punto 1)** — DESBLOQUEADO, brief 681-B ya cerrado en Educa.API:
 - Arquitectura elegida: POST `/api/Contacto` (endpoint backend, no Formspree)
-- FE side **listo**: `ContactComponent`, `ContactApiService`, template con form reactivo
-- BE side **pendiente**: POST `/api/Contacto` controller + DTO en Educa.API
-- Archivos FE (contacto) están uncommitted, esperan merge de 681-B
-- Referencia cruzada: [`educa-coord/chats/open/681-B-...md`](../../../../educa-coord/chats/open/) (por crear)
+- FE side: `ContactComponent`, `ContactApiService`, template con form reactivo — validado end-to-end
+- BE side: `ContactoController` + `ContactoRequestDto` + `ContactoEmailNotifier` — cerrado en branch `chat/681-B-endpoint-contacto` de Educa.API (**no mergeada a `main` de Educa.API todavía** — pendiente de un chat aparte, one-repo-one-chat)
 
-**Coordinación**: 681-B closes → 681 FE resumes con end-to-end validation → ambos merge.
+## Hallazgo durante validación end-to-end (fix aplicado en este mismo brief)
+
+Al levantar el FE (`ng serve`) + BE (branch `chat/681-B-endpoint-contacto` local) para validar el punto 1, se encontró que **todas** las rutas públicas — no solo `/contacto` — rompían en runtime con pantalla en blanco + toast "Error de aplicación". Causa raíz: `PublicSeoService.deepestRouteData()` (commit `6e34d903`, punto 3 de este mismo brief) leía `this.route.root` (`ActivatedRoute`, inyectado desde `MainLayoutComponent`) y accedía a `current.snapshot.data`, pero `snapshot` podía ser `undefined` en el momento de construcción del servicio (carrera de timing agravada por el zoneless de brief 680). `TypeError: Cannot read properties of undefined (reading 'data')`.
+
+**Fix**: `deepestRouteData()` ahora usa `this.router.routerState.snapshot.root` (árbol de `ActivatedRouteSnapshot`, síncrono y siempre resuelto) en vez de `this.route` (se eliminó la inyección de `ActivatedRoute`, ya sin uso). Se agregó `public-seo.service.spec.ts` (regresión) cubriendo navegación con y sin `data.seo`.
+
+Validado en navegador tras el fix: home renderiza, `/contacto` renderiza, título de pestaña correcto por ruta, formulario de contacto enviado end-to-end vía UI real (`POST /api/Contacto` → 200, outbox encoló el correo, mensaje "¡Gracias! Tu mensaje fue enviado...' visible in-app).
+
+## Pendiente fuera de este chat (no bloquea cierre de 681)
+
+- Mergear `chat/681-B-endpoint-contacto` a `main` de Educa.API (chat aparte en ese repo, one-repo-one-chat).
 
 ## Tiempo estimado
 
-~2h30 (SEO ✅; contacto validación pend. 681-B).
+~2h30 (SEO + contacto: completos, con fix de regresión encontrado en validación E2E).
