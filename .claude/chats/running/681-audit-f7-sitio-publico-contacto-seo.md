@@ -38,6 +38,22 @@ Hallazgos de `/audit` (2026-09-12), categorías "Bug"/"Riesgo" — el formulario
 - [ ] Plan actualizado: F7 → ✅.
 - [ ] Maestro actualizado.
 
+## Bloqueo arquitectónico (resuelto)
+
+✅ **SEO (Puntos 2-3)** — COMPLETO y commiteado:
+- `PublicSeoService`: suscribe a `NavigationEnd`, lee `route.data['seo']`, actualiza Meta tags dinámicos + canonical
+- Todas 9 rutas públicas tienen `data.seo` con description, og:title, canonical
+- Validación: lint ✅, TypeScript build ✅
+
+⏳ **Contacto (Punto 1)** — BLOQUEADO por brief 681-B (backend):
+- Arquitectura elegida: POST `/api/Contacto` (endpoint backend, no Formspree)
+- FE side **listo**: `ContactComponent`, `ContactApiService`, template con form reactivo
+- BE side **pendiente**: POST `/api/Contacto` controller + DTO en Educa.API
+- Archivos FE (contacto) están uncommitted, esperan merge de 681-B
+- Referencia cruzada: [`educa-coord/chats/open/681-B-...md`](../../../../educa-coord/chats/open/) (por crear)
+
+**Coordinación**: 681-B closes → 681 FE resumes con end-to-end validation → ambos merge.
+
 ## Tiempo estimado
 
-~2h30.
+~2h30 (SEO ✅; contacto validación pend. 681-B).
