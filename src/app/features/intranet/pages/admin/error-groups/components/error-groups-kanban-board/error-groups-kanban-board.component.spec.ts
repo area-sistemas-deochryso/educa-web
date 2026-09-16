@@ -121,4 +121,57 @@ describe('ErrorGroupsKanbanBoardComponent', () => {
 		const estados = component.columns().map((c) => c.estado);
 		expect(estados).toEqual(['NUEVO', 'VISTO', 'EN_PROGRESO']);
 	});
+
+	describe('onDrop — guarda contra transición de estado inválida', () => {
+		function makeDropEvent(group: ErrorGroupLista | undefined): { item: { data: ErrorGroupLista | undefined } } {
+			return { item: { data: group } };
+		}
+
+		it('rechaza el drop cuando la transición no está en ESTADO_TRANSITIONS_MAP (RESUELTO -> VISTO)', () => {
+			const spy = vi.fn();
+			componentRef.setInput('groups', []);
+			component.cardDropped.subscribe(spy);
+			fixture.detectChanges();
+
+			const group = makeGroup(1, 'RESUELTO');
+			component.onDrop(makeDropEvent(group) as never, 'VISTO');
+
+			expect(spy).not.toHaveBeenCalled();
+		});
+
+		it('emite cardDropped cuando la transición es válida', () => {
+			const spy = vi.fn();
+			componentRef.setInput('groups', []);
+			component.cardDropped.subscribe(spy);
+			fixture.detectChanges();
+
+			const group = makeGroup(1, 'NUEVO');
+			component.onDrop(makeDropEvent(group) as never, 'VISTO');
+
+			expect(spy).toHaveBeenCalledWith({ group, fromEstado: 'NUEVO', toEstado: 'VISTO' });
+		});
+
+		it('no emite nada cuando el drop es a la misma columna (toEstado === estado actual)', () => {
+			const spy = vi.fn();
+			componentRef.setInput('groups', []);
+			component.cardDropped.subscribe(spy);
+			fixture.detectChanges();
+
+			const group = makeGroup(1, 'NUEVO');
+			component.onDrop(makeDropEvent(group) as never, 'NUEVO');
+
+			expect(spy).not.toHaveBeenCalled();
+		});
+
+		it('no emite nada cuando el drag no trae data', () => {
+			const spy = vi.fn();
+			componentRef.setInput('groups', []);
+			component.cardDropped.subscribe(spy);
+			fixture.detectChanges();
+
+			component.onDrop(makeDropEvent(undefined) as never, 'VISTO');
+
+			expect(spy).not.toHaveBeenCalled();
+		});
+	});
 });

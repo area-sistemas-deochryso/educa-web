@@ -151,6 +151,44 @@ describe('FaqAdminFacade', () => {
 
 		expect(facade.faqs()[0].capabilityId).toBeNull();
 	});
+
+	it('crear() con error de servidor no agrega el FAQ y muestra error, sin romper el listado existente', () => {
+		facade.load();
+		httpMock.expectOne(FAQ_ADMIN_API).flush([faq({ id: 1 })]);
+
+		const request: CrearFaqRequest = {
+			pregunta: 'Otra',
+			respuesta: 'x',
+			categoria: null,
+			capabilityId: null,
+			wizard: null,
+		};
+		const onSuccess = vi.fn();
+
+		facade.crear(request, onSuccess);
+		const cfg = captureConfig();
+		cfg.onError(new HttpErrorResponse({ status: 500 }));
+
+		expect(facade.faqs()).toHaveLength(1);
+		expect(facade.saving()).toBe(false);
+		expect(errorHandler.showError).toHaveBeenCalled();
+		expect(onSuccess).not.toHaveBeenCalled();
+	});
+
+	it('crear() con error 403 muestra el mensaje de permiso específico', () => {
+		const request: CrearFaqRequest = {
+			pregunta: 'x', respuesta: 'y', categoria: null, capabilityId: null, wizard: null,
+		};
+
+		facade.crear(request, vi.fn());
+		const cfg = captureConfig();
+		cfg.onError(new HttpErrorResponse({ status: 403 }));
+
+		expect(errorHandler.showError).toHaveBeenCalledWith(
+			'No se pudo crear',
+			'No tienes permiso para administrar FAQ.',
+		);
+	});
 	// #endregion
 
 	// #region Actualizar — reemplazo en bloque del wizard
@@ -207,6 +245,20 @@ describe('FaqAdminFacade', () => {
 		expect(errorHandler.showWarning).toHaveBeenCalled();
 		httpMock.expectOne(FAQ_ADMIN_API).flush([]);
 	});
+
+	it('actualizar() con error genérico (no 409) muestra error y NO recarga el listado', () => {
+		const request: ActualizarFaqRequest = {
+			pregunta: 'x', respuesta: 'y', categoria: null, capabilityId: null, wizard: null, rowVersion: 'AAAA',
+		};
+
+		facade.actualizar(1, request, vi.fn());
+		const cfg = captureConfig();
+		cfg.onError(new HttpErrorResponse({ status: 500 }));
+
+		expect(errorHandler.showError).toHaveBeenCalled();
+		expect(errorHandler.showWarning).not.toHaveBeenCalled();
+		httpMock.expectNone(FAQ_ADMIN_API);
+	});
 	// #endregion
 
 	// #region Eliminar
@@ -221,6 +273,20 @@ describe('FaqAdminFacade', () => {
 		cfg.onCommit(undefined);
 
 		expect(facade.faqs().map((f) => f.id)).toEqual([2]);
+	});
+
+	it('eliminar() con error de servidor mantiene el FAQ en el listado y muestra error', () => {
+		facade.load();
+		httpMock.expectOne(FAQ_ADMIN_API).flush([faq({ id: 1 }), faq({ id: 2 })]);
+
+		const onSuccess = vi.fn();
+		facade.eliminar(faq({ id: 1 }), onSuccess);
+		const cfg = captureConfig();
+		cfg.onError(new HttpErrorResponse({ status: 500 }));
+
+		expect(facade.faqs().map((f) => f.id)).toEqual([1, 2]);
+		expect(errorHandler.showError).toHaveBeenCalled();
+		expect(onSuccess).not.toHaveBeenCalled();
 	});
 	// #endregion
 });

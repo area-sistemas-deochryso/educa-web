@@ -28,10 +28,20 @@ Hallazgos de `/audit` (2026-09-16), categoría **Riesgo** — lógica de negocio
 
 ## Criterio de cierre
 
-- [ ] Los 4 puntos cubiertos.
-- [ ] Build + lint + tests OK.
-- [ ] Plan actualizado: F4 → ✅.
-- [ ] Maestro actualizado.
+- [x] Los 4 puntos cubiertos.
+- [x] Build + lint + tests OK.
+- [x] Plan actualizado: F4 → ✅.
+- [x] Maestro actualizado.
+
+## Cierre
+
+- `calificacion.utils.spec.ts`: 4 tests nuevos para `recalcularPromedios()` (notas null/undefined ignoradas, rango de semana límite inclusive, agregado "General", periodo sin notas → null).
+- `horario-import.config.spec.ts`: 4 tests para `validateImportRowRango` (fuera de franja operativa, duración >4h, rango válido; documentado que "hora fin antes de inicio" se guarda en el caller — `horarios-import-dialog.component.ts` — no en esta función) + 4 tests para `markIntraBatchConflicts` (solape mismo salón/día, sin solape, salones distintos, filas ya inválidas excluidas del chequeo cruzado).
+- `error-groups-kanban-board.component.spec.ts`: 4 tests nuevos para `onDrop()` (transición inválida rechazada, transición válida emite, mismo estado no emite, sin data no emite).
+- `change-group-status-dialog.component.spec.ts`: 3 tests nuevos para `onConfirm()` (sin grupo no emite, sin estado seleccionado no emite, verificación de que `estadoOptions` nunca expone destinos inválidos).
+- `cursos.facade.spec.ts`: 4 tests nuevos de rollback (create/update/toggle/delete) siguiendo el patrón WAL de `ticket-bandeja.facade.spec.ts` (apply optimista + rollback + onError).
+- `faq-admin.facade.spec.ts`: 5 tests nuevos de error path (crear 500/403, actualizar error genérico no-409, eliminar 500) — antes solo el 409 de `actualizar()` estaba cubierto.
+- Total: 90/90 tests verdes en los 6 specs tocados (24 tests nuevos). Lint y `tsc --noEmit` limpios.
 
 ## Tiempo estimado
 

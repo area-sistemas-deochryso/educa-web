@@ -263,6 +263,68 @@ describe('CursosFacade', () => {
 	});
 	// #endregion
 
+	// #region WAL operations — rollback on error
+	describe('WAL rollback on error', () => {
+		function useErrorWal(): void {
+			wal.execute.mockImplementation(
+				(config: { optimistic?: { apply: () => void; rollback: () => void }; onError?: (err: unknown) => void }) => {
+					config.optimistic?.apply();
+					config.optimistic?.rollback();
+					config.onError?.(new Error('network error'));
+				},
+			);
+			store.setItems(mockCursos);
+			store.setEstadisticas(mockStats);
+		}
+
+		it('rolls back create: dialog stays reflecting the optimistic close but item is not persisted', () => {
+			useErrorWal();
+			facade.openNewDialog();
+			store.setFormData({ nombre: 'Nueva', estado: true });
+
+			facade.saveCurso();
+
+			// El item nunca se agregó al store (create no aplica optimistic en items, solo cierra dialog).
+			expect(store.items()).toEqual(mockCursos);
+			expect(store.saving()).toBe(false);
+		});
+
+		it('rolls back update: restaura el snapshot original del item tras error', () => {
+			useErrorWal();
+			store.setGrados(mockGrados);
+			facade.openEditDialog(mockCursos[0]);
+			store.setFormData({ nombre: 'Mat Updated', estado: true });
+
+			facade.saveCurso();
+
+			// Tras apply+rollback, el nombre vuelve al original (snapshot pre-optimistic).
+			expect(store.items()[0].nombre).toBe('Matemática');
+			expect(store.saving()).toBe(false);
+		});
+
+		it('rolls back toggleEstado: restaura estado y contadores originales tras error', () => {
+			useErrorWal();
+
+			facade.toggleEstado(mockCursos[0]); // estado true → false (optimistic) → rollback → true
+
+			expect(store.items()[0].estado).toBe(true);
+			expect(store.estadisticas()?.cursosActivos).toBe(1);
+			expect(store.estadisticas()?.cursosInactivos).toBe(1);
+		});
+
+		it('rolls back delete: restaura el estado activo del curso tras error', () => {
+			useErrorWal();
+
+			facade.delete(mockCursos[0]); // soft-delete optimistic (estado→false) → rollback → estado true
+
+			const c1 = store.items().find((c) => c.id === 1);
+			expect(c1?.estado).toBe(true);
+			expect(store.estadisticas()?.cursosActivos).toBe(1);
+			expect(store.estadisticas()?.cursosInactivos).toBe(1);
+		});
+	});
+	// #endregion
+
 	// #region Form commands
 	describe('form commands', () => {
 		it('should delegate addGrado/removeGrado to store', () => {

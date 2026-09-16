@@ -102,6 +102,38 @@ describe('ChangeGroupStatusDialogComponent', () => {
 		});
 	});
 
+	describe('onConfirm — guarda contra transición de estado inválida', () => {
+		it('no emite confirmStatus si no hay grupo (group=null)', () => {
+			componentRef.setInput('group', null);
+			fixture.detectChanges();
+			const spy = vi.fn();
+			component.confirmStatus.subscribe(spy);
+			component.onConfirm();
+			expect(spy).not.toHaveBeenCalled();
+		});
+
+		it('no emite confirmStatus si no se seleccionó un estado destino', () => {
+			componentRef.setInput('group', makeGroup('NUEVO'));
+			fixture.detectChanges();
+			const spy = vi.fn();
+			component.confirmStatus.subscribe(spy);
+			component.onConfirm();
+			expect(spy).not.toHaveBeenCalled();
+		});
+
+		it('un estado destino fuera de ESTADO_TRANSITIONS_MAP nunca es alcanzable vía estadoOptions', () => {
+			// El select solo lista destinos válidos — RESUELTO -> [NUEVO] no incluye
+			// VISTO/EN_PROGRESO/IGNORADO, así que onEstadoChange('VISTO') vía UI real
+			// es inalcanzable. Verificamos la superficie expuesta al usuario.
+			componentRef.setInput('group', makeGroup('RESUELTO'));
+			fixture.detectChanges();
+			const values = component.estadoOptions().map((o) => o.value);
+			expect(values).not.toContain('VISTO');
+			expect(values).not.toContain('EN_PROGRESO');
+			expect(values).not.toContain('IGNORADO');
+		});
+	});
+
 	it('reset al abrir el dialog (visible true)', () => {
 		componentRef.setInput('group', makeGroup('NUEVO'));
 		componentRef.setInput('visible', false);
