@@ -141,7 +141,11 @@ describe('PermissionsRolesFacade', () => {
 			facade.saveCapabilities();
 
 			expect(wal.execute).toHaveBeenCalledWith(
-				expect.objectContaining({ operation: 'UPDATE' }),
+				expect.objectContaining({
+					operation: 'UPDATE',
+					resourceId: mockMatrixRows[0].rolId,
+					payload: { capabilityIds: mockMatrixRows[0].capabilityIds },
+				}),
 			);
 		});
 

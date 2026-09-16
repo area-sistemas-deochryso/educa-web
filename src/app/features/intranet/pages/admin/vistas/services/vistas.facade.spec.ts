@@ -127,7 +127,14 @@ describe('VistasFacade', () => {
 			facade.saveCapability();
 
 			expect(wal.execute).toHaveBeenCalledWith(
-				expect.objectContaining({ operation: 'CREATE' }),
+				expect.objectContaining({
+					operation: 'CREATE',
+					payload: expect.objectContaining({
+						codigo: 'NEW_CAP',
+						nombre: 'New',
+						modulo: 'admin',
+					}),
+				}),
 			);
 		});
 
@@ -137,7 +144,14 @@ describe('VistasFacade', () => {
 			facade.saveCapability();
 
 			expect(wal.execute).toHaveBeenCalledWith(
-				expect.objectContaining({ operation: 'UPDATE' }),
+				expect.objectContaining({
+					operation: 'UPDATE',
+					resourceId: mockItems[0].id,
+					payload: expect.objectContaining({
+						nombre: mockItems[0].nombre,
+						modulo: mockItems[0].modulo,
+					}),
+				}),
 			);
 		});
 	});

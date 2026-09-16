@@ -93,10 +93,18 @@ describe('SyncRangeDialogComponent', () => {
 		});
 
 		it('exactly 366 days is valid', () => {
-			component.fechaInicio.set(new Date('2026-01-01'));
-			component.fechaFin.set(new Date('2026-12-31'));
-			expect(component.rangeDays()).toBe(365);
+			component.fechaInicio.set(new Date('2028-01-01'));
+			component.fechaFin.set(new Date('2028-12-31'));
+			expect(component.rangeDays()).toBe(366);
 			expect(component.isValid()).toBe(true);
+		});
+
+		it('367 days is invalid', () => {
+			component.fechaInicio.set(new Date('2028-01-01'));
+			component.fechaFin.set(new Date('2029-01-01'));
+			expect(component.rangeDays()).toBe(367);
+			expect(component.rangeError()).toContain('366');
+			expect(component.isValid()).toBe(false);
 		});
 
 		it('invalid when todosUsuarios off and no person selected', () => {

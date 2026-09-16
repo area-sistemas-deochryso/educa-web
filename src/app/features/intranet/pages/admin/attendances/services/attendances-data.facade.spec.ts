@@ -3,7 +3,7 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpErrorResponse } from '@angular/common/http';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { of, throwError } from 'rxjs';
+import { of, Subject, throwError } from 'rxjs';
 
 import { ErrorHandlerService, WalCrossTabRefetchService } from '@core/services';
 import { CrossChexSyncStatusService } from '@core/services/signalr';
@@ -171,9 +171,15 @@ describe('AttendancesDataFacade', () => {
 		});
 
 		it('sets syncing to true before call completes', () => {
-			api.sincronizarDesdeCrossChex.mockReturnValue(of({ jobId: 'job', estado: 'QUEUED' }));
+			const jobSubject = new Subject<{ jobId: string; estado: string }>();
+			api.sincronizarDesdeCrossChex.mockReturnValue(jobSubject);
+
 			facade.sincronizarDesdeCrossChex();
-			expect(api.sincronizarDesdeCrossChex).toHaveBeenCalled();
+			expect(store.syncing()).toBe(true);
+
+			jobSubject.next({ jobId: 'job', estado: 'QUEUED' });
+			jobSubject.complete();
+			expect(store.syncing()).toBe(false);
 		});
 
 		it('on 409 Conflict re-subscribes to active jobId', () => {
