@@ -129,9 +129,11 @@ describe('RateLimitEventsFacade', () => {
 	});
 
 	it('exportarCsv llama al service con el filtro actual', () => {
+		const filter = store.filter();
 		facade.exportarCsv();
 
 		expect(api.exportarCsv).toHaveBeenCalledTimes(1);
+		expect(api.exportarCsv).toHaveBeenCalledWith(filter);
 	});
 
 	it('openDetail abre el drawer con el item seleccionado', () => {

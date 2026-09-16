@@ -105,13 +105,21 @@ describe('NotificacionesAdminFacade', () => {
 			expect(store.loading()).toBe(false);
 		});
 
-		it('should call API on load', () => {
-			api.listar.mockReturnValue(throwError(() => new Error('fail')));
-			api.getEstadisticas.mockReturnValue(throwError(() => new Error('fail')));
-			facade.loadAll();
+		it('should set error state and notify on load failure', async () => {
+			vi.useFakeTimers();
+			try {
+				api.listar.mockReturnValue(throwError(() => new Error('fail')));
+				api.getEstadisticas.mockReturnValue(throwError(() => new Error('fail')));
+				facade.loadAll();
 
-			expect(api.listar).toHaveBeenCalled();
-			expect(api.getEstadisticas).toHaveBeenCalled();
+				// withRetry reintenta con backoff antes de propagar el error final.
+				await vi.advanceTimersByTimeAsync(30_000);
+
+				expect(errorHandler.showError).toHaveBeenCalled();
+				expect(store.error()).toBeTruthy();
+			} finally {
+				vi.useRealTimers();
+			}
 		});
 	});
 	// #endregion

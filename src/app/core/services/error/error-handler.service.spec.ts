@@ -199,11 +199,20 @@ describe('ErrorHandlerService', () => {
 	// #region Deduplication
 	describe('notification deduplication', () => {
 		it('should deduplicate identical notifications within 5s', () => {
-			service.showError('Error', 'Same message');
-			service.showError('Error', 'Same message');
+			vi.useFakeTimers();
+			try {
+				service.showError('Error', 'Same message');
+				service.clearNotification();
 
-			// Should still only show one notification (deduped)
-			expect(service.currentNotification()?.detail).toBe('Same message');
+				service.showError('Error', 'Same message');
+				expect(service.currentNotification()).toBeNull(); // deduped, no la vuelve a mostrar
+
+				vi.advanceTimersByTime(5_001);
+				service.showError('Error', 'Same message');
+				expect(service.currentNotification()?.detail).toBe('Same message'); // pasó la ventana, se vuelve a mostrar
+			} finally {
+				vi.useRealTimers();
+			}
 		});
 	});
 	// #endregion

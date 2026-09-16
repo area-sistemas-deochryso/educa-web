@@ -174,12 +174,13 @@ describe('AdminHealthPermissionsFacade', () => {
 			expect(api.getSintomas).not.toHaveBeenCalled();
 		});
 
-		it('en error setea loading=false', () => {
+		it('en error setea loading=false y loadError=true', () => {
 			api.getResumen.mockReturnValue(throwError(() => new Error('fail')));
 
 			facade.loadResumen(1);
 
 			expect(store.loading()).toBe(false);
+			expect(store.loadError()).toBe(true);
 		});
 
 		it('no recarga si ya está loading', () => {
