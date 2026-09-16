@@ -1,0 +1,30 @@
+# Line endings — LF en disco siempre. Editores modernos (VSCode, JetBrains) lo manejan sin drama en Windows.
+* text=auto eol=lf
+*.sh         text eol=lf
+
+# Binarios — sin diff inútil, sin conversión de line endings
+*.png        binary
+*.jpg        binary
+*.jpeg       binary
+*.webp       binary
+*.avif       binary
+*.gif        binary
+*.ico        binary
+*.pdf        binary
+*.mp3        binary
+*.woff       binary
+*.woff2      binary
+*.ttf        binary
+*.otf        binary
+
+# Lockfiles — generated, GitHub los colapsa en PR diffs y los saca del lenguaje
+package-lock.json  linguist-generated
+bun.lock           linguist-generated
+deno.lock          linguist-generated
+
+# Export-ignore — no entran al tarball de `git archive` / "Source code (zip)" de releases
+.gitattributes     export-ignore
+.gitignore         export-ignore
+.github/           export-ignore
+.claude/           export-ignore
+.vscode/           export-ignore
