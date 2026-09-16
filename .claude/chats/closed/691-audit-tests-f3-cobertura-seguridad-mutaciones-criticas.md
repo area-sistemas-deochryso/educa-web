@@ -2,7 +2,7 @@
 
 > **Repo destino**: `educa-web`
 > **Plan**: [`audit-tests-frontend-2026-09-16.md`](../../plan/audit-tests-frontend-2026-09-16.md) (Fase F3)
-> **Creado**: 2026-09-16 · **Estado**: ⏳ pendiente arrancar.
+> **Creado**: 2026-09-16 · **Estado**: ✅ cerrado 2026-09-16.
 > **MODO SUGERIDO**: `/execute`
 > **touches**: `features/intranet/pages/admin/permissions-users/services/`, `features/public/contact/`, `features/intranet/pages/profesor/final-classrooms/services/`, `features/intranet/pages/profesor/classrooms/services/grupos.facade.spec.ts`, `features/intranet/pages/profesor/services/profesor.facade.spec.ts`
 
@@ -38,3 +38,15 @@ Hallazgos de `/audit` (2026-09-16), categoría **Riesgo** — mutaciones de segu
 ## Tiempo estimado
 
 ~3h.
+
+## Cierre
+
+- Spec nuevo `permisos-usuarios-data.facade.spec.ts` (6 tests): payload exacto `{ grants, denies }`, éxito, `onSettled`, rollback+reapertura de dialog en error WAL, guard sin usuario/rol.
+- `contact.spec.ts`: 2 → 12 tests (validación required/email, submit éxito/error, estado `error`, guard doble-submit, botón deshabilitado, render de alert).
+- `profesor-final-salones.facade.spec.ts`: `aprobarEstudiante` + `aprobarMasivo` (el método real se llama `aprobarMasivo`, no `aprobacionMasiva` como decía este brief — corregido). Confirmado contra el código: usan `consistencyLevel: 'server-confirmed'`, sin optimistic apply/rollback — no hay rollback WAL que testear en estos dos métodos.
+- `grupos.facade.spec.ts`: cobertura de `actualizarGrupo`, `eliminarGrupo`, `asignarEstudiantes`, `removerEstudiante`, `configurarMaxEstudiantes` (happy + rollback donde aplica + guard de `contenidoId`).
+- `profesor.facade.spec.ts`: cobertura de `saveNotaSalon` (dispatcher de `calificarLote`/`eliminarNotaEstudiante`), payload correcto, rollback a nota previa, guards.
+- **Hallazgo fuera de scope**: `dropEstudiante` en `grupos.facade.ts` también muta vía WAL sin test — no estaba en la lista del brief, queda como follow-up no bloqueante.
+- Lint 0 errores · Build OK · 2633/2633 tests verdes.
+- Commit `50be1d81` en `chat/691-audit-tests-f3-cobertura-seguridad-mutaciones-criticas`, pendiente `/wt-merge`.
+- Sin validación post-deploy requerida (solo tests, sin cambio de comportamiento en prod).

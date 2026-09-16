@@ -28,7 +28,7 @@ La suite de 261 specs es sólida en general: sin tests deshabilitados (`it.skip`
 |---|---|---|---|
 | F1 | ✅ INV-CONTRACT03 estaba desactualizado, no el código — `wal.service.spec.ts` y `WalService.append()` están correctos (ver brief) | Bug/Regla violada → doc stale | ✅ [689](../chats/closed/689-audit-tests-f1-inv-contract03-wal-casing.md) |
 | F2 | Bugs de aserción: 7 specs cuyo assert no verifica lo que el nombre promete (facades admin, error-handler, sync-range-dialog) | Bug | ✅ [690](../chats/running/690-audit-tests-f2-bugs-asserts-debiles.md) |
-| F3 | Cobertura de mutaciones críticas de seguridad/aprobación sin test (permisos por usuario sin spec, aprobación de salones, grupos+rollback, contacto público) | Riesgo | ⏳ [691](../chats/open/691-audit-tests-f3-cobertura-seguridad-mutaciones-criticas.md) |
+| F3 | Cobertura de mutaciones críticas de seguridad/aprobación sin test (permisos por usuario sin spec, aprobación de salones, grupos+rollback, contacto público) | Riesgo | ✅ [691](../chats/closed/691-audit-tests-f3-cobertura-seguridad-mutaciones-criticas.md) |
 | F4 | Cobertura de lógica de negocio educativa sin test (recálculo de notas, anti-solapamiento de horarios, transición de estado inválida, rollback optimista cursos/faq) | Riesgo | ⏳ [692](../chats/open/692-audit-tests-f4-cobertura-logica-negocio.md) |
 | F5 | Gaps de infra WAL/integration (timers, `httpMock.verify()`, wal-leader, notifications.service, storage-security, session-coordinator) | Riesgo | ⏳ [693](../chats/open/693-audit-tests-f5-infra-wal-integration-gaps.md) |
 | F6 | Inconsistencias transversales: asserts débiles puntuales, tests tautológicos, orden de invocación no verificado | Inconsistencia | ⏳ [694](../chats/open/694-audit-tests-f6-inconsistencias-transversales.md) |
