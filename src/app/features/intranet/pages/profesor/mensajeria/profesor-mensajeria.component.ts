@@ -1,66 +1,16 @@
 import { Component, ChangeDetectionStrategy, computed, inject, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
-import { PageHeaderComponent } from '@intranet-shared/components';
 import { ProfesorFacade } from '../services/profesor.facade';
 import { SalonMensajeriaFacade } from '@features/intranet/pages/cross-role/mensajeria/services/mensajeria.facade';
-import { SalonMensajeriaTabComponent } from '@features/intranet/pages/cross-role/mensajeria/components/mensajeria-tab/mensajeria-tab.component';
-import { EduSpinner } from '@edu-ui';
+import { MensajeriaPageComponent } from '@features/intranet/pages/cross-role/mensajeria/components/mensajeria-page/mensajeria-page.component';
 
 @Component({
 	selector: 'app-profesor-mensajeria',
 	standalone: true,
-	imports: [CommonModule, EduSpinner, PageHeaderComponent, SalonMensajeriaTabComponent],
+	imports: [MensajeriaPageComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	styles: `
-		:host {
-			display: block;
-			height: calc(100vh - 120px);
-			height: calc(100dvh - 120px);
-		}
-		.page-container {
-			height: 100%;
-			display: flex;
-			flex-direction: column;
-			padding: 0.75rem;
-		}
-		.tab-wrapper {
-			flex: 1;
-			min-height: 0;
-			display: flex;
-			flex-direction: column;
-		}
-		@media (max-width: 767px) {
-			:host {
-				height: calc(100vh - 100px);
-				height: calc(100dvh - 100px);
-			}
-			.page-container {
-				padding: 0.5rem;
-			}
-		}
-	`,
 	template: `
-		<app-page-header icon="pi pi-envelope" title="Mensajería" />
-		<div class="page-container">
-
-			@if (loading()) {
-				<div class="flex justify-content-center p-5">
-					<edu-spinner strokeWidth="4" />
-				</div>
-			} @else if (cursoOptions().length === 0) {
-				<div class="flex flex-column align-items-center p-5 text-color-secondary">
-					<i class="pi pi-envelope text-4xl mb-3"></i>
-					<p>No tienes cursos asignados</p>
-				</div>
-			} @else {
-				<div class="tab-wrapper">
-					<app-salon-mensajeria-tab
-						[cursoOptions]="cursoOptions()"
-					/>
-				</div>
-			}
-		</div>
+		<app-mensajeria-page [loading]="loading()" [cursoOptions]="cursoOptions()" />
 	`,
 })
 export class ProfesorMensajeriaComponent implements OnInit, OnDestroy {

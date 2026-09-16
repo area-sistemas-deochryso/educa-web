@@ -11,7 +11,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { finalize } from 'rxjs';
+import { finalize, map } from 'rxjs';
 
 import { AttendanceLegendStatsComponent } from '@features/intranet/components/attendance/attendance-legend-stats/attendance-legend-stats.component';
 import {
@@ -43,6 +43,7 @@ import { formatDateLocalIso } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
 
 import { MonthSearchState } from '../month-search-state';
+import { AttendanceDirectorPersonaLoader } from './attendance-director-persona-loader';
 import { EduButton, EduInputText, EduTooltip } from '@edu-ui';
 
 const TIPO_LABELS: Record<string, string> = {
@@ -62,6 +63,9 @@ const TIPO_LABELS: Record<string, string> = {
 })
 export class AttendanceDirectorStaffComponent implements OnInit {
 	@Input({ required: true }) tipoPersona!: string;
+	// * Override opcional para tipos de persona cuya fuente de datos no es
+	//   AsistenciaStaffApiService (ej. asistentes-admin, endpoint distinto).
+	@Input() loader?: AttendanceDirectorPersonaLoader;
 
 	private api = inject(AsistenciaStaffApiService);
 	private dataService = inject(AttendanceDataService);
@@ -75,7 +79,7 @@ export class AttendanceDirectorStaffComponent implements OnInit {
 	readonly fechaDia = signal<Date>(new Date());
 
 	// #region Modo día
-	readonly staffDia = signal<AsistenciaAsistenteAdminDto[]>([]);
+	readonly personasDiaRaw = signal<AsistenciaAsistenteAdminDto[]>([]);
 	readonly estadisticasDia = signal<EstadisticasAsistenciaDia>({
 		total: 0,
 		asistio: 0,
@@ -85,7 +89,7 @@ export class AttendanceDirectorStaffComponent implements OnInit {
 		pendiente: 0,
 	});
 	readonly personasDia = computed<PersonaAsistencia[]>(() =>
-		this.staffDia().map(asistenteAdminToPersonaAsistencia),
+		this.personasDiaRaw().map(asistenteAdminToPersonaAsistencia),
 	);
 	readonly legendStats = computed(() => {
 		if (this.viewMode() !== VIEW_MODE.Mes) return this.estadisticasDia();
@@ -95,14 +99,14 @@ export class AttendanceDirectorStaffComponent implements OnInit {
 	// #endregion
 
 	// #region Modo mes
-	readonly staffMes = signal<AsistenciaAsistenteAdminDto[]>([]);
+	readonly personasMes = signal<AsistenciaAsistenteAdminDto[]>([]);
 	readonly selectedPersonId = signal<number | null>(null);
 	readonly selectedPerson = computed(() => {
 		const id = this.selectedPersonId();
-		return this.staffMes().find((p) => p.asistenteAdminId === id) ?? null;
+		return this.personasMes().find((p) => p.asistenteAdminId === id) ?? null;
 	});
 	readonly peopleAsHijos = computed<HijoApoderado[]>(() =>
-		this.staffMes().map((p) => ({
+		this.personasMes().map((p) => ({
 			estudianteId: p.asistenteAdminId,
 			dni: p.dni,
 			nombreCompleto: p.nombreCompleto,
@@ -256,15 +260,20 @@ export class AttendanceDirectorStaffComponent implements OnInit {
 	// #region Carga — modo día
 	private loadDia(): void {
 		this.loading.set(true);
-		this.api
-			.obtenerAsistenciaDiaStaffDirector(this.tipoPersona, this.fechaDia())
+		const dia$ = this.loader
+			? this.loader.dia(this.fechaDia())
+			: this.api
+					.obtenerAsistenciaDiaStaffDirector(this.tipoPersona, this.fechaDia())
+					.pipe(map((resp) => ({ personas: resp.staff, estadisticas: resp.estadisticas })));
+
+		dia$
 			.pipe(
 				takeUntilDestroyed(this.destroyRef),
 				finalize(() => this.loading.set(false)),
 			)
 			.subscribe({
 				next: (resp) => {
-					this.staffDia.set(resp.staff);
+					this.personasDiaRaw.set(resp.personas);
 					this.estadisticasDia.set(resp.estadisticas);
 				},
 				error: (err) => this.errorHandler.handleHttpError(err),
@@ -279,16 +288,19 @@ export class AttendanceDirectorStaffComponent implements OnInit {
 		const fechaFin = new Date(selectedYear, selectedMonth, 0);
 
 		this.loading.set(true);
-		this.api
-			.listarStaff(this.tipoPersona, fechaInicio, fechaFin)
+		const mes$ = this.loader
+			? this.loader.mes(fechaInicio, fechaFin)
+			: this.api.listarStaff(this.tipoPersona, fechaInicio, fechaFin);
+
+		mes$
 			.pipe(
 				takeUntilDestroyed(this.destroyRef),
 				finalize(() => this.loading.set(false)),
 			)
 			.subscribe({
-				next: (staff) => {
-					this.staffMes.set(staff);
-					if (staff.length > 0) {
+				next: (personas) => {
+					this.personasMes.set(personas);
+					if (personas.length > 0) {
 						this.restoreSelectedPerson();
 						this.updateTablasMes();
 					} else {
@@ -305,8 +317,8 @@ export class AttendanceDirectorStaffComponent implements OnInit {
 
 	private restoreSelectedPerson(): void {
 		const id = this.selectedPersonId();
-		if (id !== null && this.staffMes().some((p) => p.asistenteAdminId === id)) return;
-		const first = this.staffMes()[0];
+		if (id !== null && this.personasMes().some((p) => p.asistenteAdminId === id)) return;
+		const first = this.personasMes()[0];
 		if (first) this.selectedPersonId.set(first.asistenteAdminId);
 	}
 

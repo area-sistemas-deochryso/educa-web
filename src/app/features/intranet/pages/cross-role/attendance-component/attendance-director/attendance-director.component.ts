@@ -1,12 +1,14 @@
-import { ChangeDetectionStrategy, Component, computed, ViewChild, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, ViewChild, signal } from '@angular/core';
+import { map } from 'rxjs';
 
 import { ViewMode } from '@features/intranet/components/attendance/attendance-header/attendance-header.component';
 import { TipoPersona } from '@data/models';
+import { AsistenciaAsistenteAdminApiService } from '@intranet-shared/services';
 
-import { AttendanceDirectorAsistentesAdminComponent } from './asistentes-admin/attendance-director-asistentes-admin.component';
 import { AttendanceDirectorEstudiantesComponent } from './estudiantes/attendance-director-estudiantes.component';
 import { AttendanceDirectorProfesoresComponent } from './profesores/attendance-director-profesores.component';
 import { AttendanceDirectorStaffComponent } from './staff/attendance-director-staff.component';
+import { AttendanceDirectorPersonaLoader } from './staff/attendance-director-persona-loader';
 import { AttendanceDashboardComponent } from '@features/intranet/components/attendance/attendance-dashboard/attendance-dashboard.component';
 
 type SubMenu = 'estudiantes' | 'profesores' | 'asistentes-admin' | 'coordinadores' | 'promotores' | 'directores' | 'administradores';
@@ -37,7 +39,6 @@ const SUBMENU_TO_TIPO: Record<SubMenu, TipoPersona> = {
 	imports: [
 		AttendanceDirectorEstudiantesComponent,
 		AttendanceDirectorProfesoresComponent,
-		AttendanceDirectorAsistentesAdminComponent,
 		AttendanceDirectorStaffComponent,
 		AttendanceDashboardComponent,
 	],
@@ -46,14 +47,27 @@ const SUBMENU_TO_TIPO: Record<SubMenu, TipoPersona> = {
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AttendanceDirectorComponent {
+	private readonly asistentesAdminApi = inject(AsistenciaAsistenteAdminApiService);
+
+	// * AttendanceDirectorStaffComponent no consulta AsistenciaStaffApiService acá —
+	//   asistentes-admin vive en un endpoint/servicio propio (ver 683 F9, caso 3).
+	readonly asistentesAdminLoader: AttendanceDirectorPersonaLoader = {
+		dia: (fecha) =>
+			this.asistentesAdminApi
+				.obtenerAsistenciaDiaAsistentesAdminDirector(fecha)
+				.pipe(map((resp) => ({ personas: resp.asistentesAdmin, estadisticas: resp.estadisticas }))),
+		mes: (fechaInicio, fechaFin) =>
+			this.asistentesAdminApi.listarAsistentesAdmin(fechaInicio, fechaFin),
+	};
+
 	@ViewChild(AttendanceDirectorEstudiantesComponent)
 	estudiantesComponent?: AttendanceDirectorEstudiantesComponent;
 
 	@ViewChild(AttendanceDirectorProfesoresComponent)
 	profesoresComponent?: AttendanceDirectorProfesoresComponent;
 
-	@ViewChild(AttendanceDirectorAsistentesAdminComponent)
-	asistentesAdminComponent?: AttendanceDirectorAsistentesAdminComponent;
+	@ViewChild('asistentesAdminStaff')
+	asistentesAdminComponent?: AttendanceDirectorStaffComponent;
 
 	@ViewChild('coordinadoresStaff')
 	coordinadoresComponent?: AttendanceDirectorStaffComponent;

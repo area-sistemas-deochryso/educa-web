@@ -69,7 +69,7 @@
 	@if (!tableReady()) {
 		<app-attendance-table-skeleton />
 		<app-attendance-table-skeleton />
-	} @else if (staffMes().length > 0 && selectedPerson() && hasMonthData()) {
+	} @else if (personasMes().length > 0 && selectedPerson() && hasMonthData()) {
 		<app-attendance-heatmap
 			[table]="ingresos()"
 			icon="pi pi-sign-in"

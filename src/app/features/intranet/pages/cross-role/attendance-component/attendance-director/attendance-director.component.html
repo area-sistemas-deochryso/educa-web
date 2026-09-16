@@ -13,7 +13,11 @@
 		<app-attendance-director-profesores />
 	}
 	@case ('asistentes-admin') {
-		<app-attendance-director-asistentes-admin />
+		<app-attendance-director-staff
+			#asistentesAdminStaff
+			tipoPersona="A"
+			[loader]="asistentesAdminLoader"
+		/>
 	}
 	@case ('coordinadores') {
 		<app-attendance-director-staff #coordinadoresStaff tipoPersona="C" />

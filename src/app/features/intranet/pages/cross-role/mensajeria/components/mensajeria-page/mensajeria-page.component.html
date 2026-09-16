@@ -1,0 +1,20 @@
+<app-page-header icon="pi pi-envelope" title="Mensajería" />
+<div class="page-container">
+
+	@if (loading()) {
+		<div class="flex justify-content-center p-5">
+			<edu-spinner strokeWidth="4" />
+		</div>
+	} @else if (cursoOptions().length === 0) {
+		<div class="flex flex-column align-items-center p-5 text-color-secondary">
+			<i class="pi pi-envelope text-4xl mb-3"></i>
+			<p>No tienes cursos asignados</p>
+		</div>
+	} @else {
+		<div class="tab-wrapper">
+			<app-salon-mensajeria-tab
+				[cursoOptions]="cursoOptions()"
+			/>
+		</div>
+	}
+</div>
