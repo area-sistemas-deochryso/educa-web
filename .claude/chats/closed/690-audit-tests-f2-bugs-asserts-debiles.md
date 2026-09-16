@@ -31,10 +31,24 @@ Hallazgos de `/audit` (2026-09-16), categoría **Bug** — 7 hallazgos independi
 
 ## Criterio de cierre
 
-- [ ] Los 7 puntos corregidos.
-- [ ] Build + lint + tests OK.
-- [ ] Plan actualizado: F2 → ✅.
-- [ ] Maestro actualizado.
+- [x] Los 7 puntos corregidos.
+- [x] Build + lint + tests OK (lint sin errores; 129/129 tests de los 9 specs tocados en verde; build sin errores).
+- [x] Plan actualizado: F2 → ✅.
+- [x] Maestro actualizado.
+
+## Resultado
+
+Los 7 hallazgos se corrigieron en el worktree `chat/690-audit-tests-f2-bugs-asserts-debiles`:
+
+1. `attendances-data.facade.spec.ts` — reemplazado `of(...)` síncrono por `Subject` para poder verificar `syncing()===true` antes de resolver.
+2. `sync-range-dialog.component.spec.ts` — corregido el caso "366 días" (usaba fechas que daban 365) con un año bisiesto real, y agregado el caso 367 inválido.
+3. `error-handler.service.spec.ts` — usando `vi.useFakeTimers()`, se verifica que la segunda notificación idéntica dentro de 5s se dedupe y que después de 5s se vuelve a mostrar.
+4. `permisos-roles.facade.spec.ts` y `vistas.facade.spec.ts` — agregado assert sobre `resourceId`/`payload` completo enviado a WAL (no solo `operation`).
+5. `eventos-calendario.facade.spec.ts` y `notificaciones-admin.facade.spec.ts` — usando fake timers para avanzar el backoff de `withRetry`, se verifica que `errorHandler.showError` y `store.setError`/`store.error()` se ejecutan tras el fallo.
+6. `admin-health-permissions.facade.spec.ts` — agregado assert de `store.loadError()===true` tras el error.
+7. `rate-limit-events.facade.spec.ts` — agregado `toHaveBeenCalledWith(filter)` en `exportarCsv`.
+
+Validación: lint verde, 129/129 tests (de los 9 specs tocados) en verde, build de producción sin errores.
 
 ## Tiempo estimado
 
