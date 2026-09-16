@@ -6,7 +6,7 @@ import { of } from 'rxjs';
 
 import { ProfesorFacade } from './profesor.facade';
 import { ProfesorStore, ProfesorSalonConEstudiantes } from './profesor.store';
-import { ErrorHandlerService } from '@core/services';
+import { ErrorHandlerService, WalFacadeHelper, WalCrossTabRefetchService } from '@core/services';
 import { ProfesorApiService } from './profesor-api.service';
 import { UserProfileService } from '@core/services/user';
 import { ViewAsContextService } from '@core/services/view-as';
@@ -48,6 +48,14 @@ function createMockViewAsContext(active: { entityId: number; rol: string } | nul
 function createMockSmartNotif() {
 	return { saveHorarioSnapshot: vi.fn(), saveCalificacionSnapshot: vi.fn(), saveActividadSnapshot: vi.fn() };
 }
+
+function createMockWal() {
+	return {
+		execute: vi.fn((config: { onCommit?: (data?: never) => void; optimistic?: { apply: () => void } }) => {
+			config.optimistic?.apply();
+		}),
+	};
+}
 // #endregion
 
 // #region Tests
@@ -56,10 +64,12 @@ describe('ProfesorFacade', () => {
 	let store: ProfesorStore;
 	let api: ReturnType<typeof createMockApi>;
 	let errorHandler: { showError: ReturnType<typeof vi.fn> };
+	let wal: ReturnType<typeof createMockWal>;
 
 	beforeEach(() => {
 		api = createMockApi();
 		errorHandler = { showError: vi.fn(), showSuccess: vi.fn() } as never;
+		wal = createMockWal();
 
 		TestBed.configureTestingModule({
 			providers: [
@@ -70,6 +80,8 @@ describe('ProfesorFacade', () => {
 				{ provide: ViewAsContextService, useValue: createMockViewAsContext() },
 				{ provide: ErrorHandlerService, useValue: errorHandler },
 				{ provide: SmartNotificationService, useValue: createMockSmartNotif() },
+				{ provide: WalFacadeHelper, useValue: wal },
+				{ provide: WalCrossTabRefetchService, useValue: { subscribe: vi.fn() } },
 			],
 		});
 
@@ -185,6 +197,77 @@ describe('ProfesorFacade', () => {
 		it('should set notas vista', () => {
 			facade.setNotasVista('periodo');
 			expect(store.notasVistaActual()).toBe('periodo');
+		});
+	});
+	// #endregion
+
+	// #region saveNotaSalon
+	describe('saveNotaSalon', () => {
+		const mockSalon: ProfesorSalonConEstudiantes = {
+			salonId: 100, salonDescripcion: '1A', cursos: [], esTutor: false,
+			cantidadEstudiantes: 0, estudiantes: [],
+		};
+
+		beforeEach(() => {
+			store.openSalonDialog(mockSalon);
+			store.setNotasCursoId(10);
+			store.setNotasSalon({
+				evaluaciones: [],
+				periodos: [],
+				estudiantes: [{ estudianteId: 200, estudianteNombre: 'Ana', notas: [] }],
+			} as never);
+		});
+
+		it('should call WAL execute with calificarLote payload when nota is provided', () => {
+			facade.saveNotaSalon(5, 200, 17);
+
+			expect(wal.execute).toHaveBeenCalledWith(
+				expect.objectContaining({
+					operation: 'UPDATE',
+					resourceType: 'calificacionSalon',
+					resourceId: 5,
+					method: 'POST',
+					payload: { notas: [{ estudianteId: 200, nota: 17, observacion: null }] },
+				}),
+			);
+			expect(store.getNotaEstudiante(200, 5)).toBe(17);
+		});
+
+		it('should call WAL execute with DELETE when nota is null', () => {
+			facade.saveNotaSalon(5, 200, null);
+
+			expect(wal.execute).toHaveBeenCalledWith(
+				expect.objectContaining({
+					operation: 'DELETE',
+					resourceType: 'calificacionSalon',
+					resourceId: 5,
+					method: 'DELETE',
+					payload: null,
+				}),
+			);
+			expect(store.getNotaEstudiante(200, 5)).toBeNull();
+		});
+
+		it('should rollback to the previous nota on error', () => {
+			store.updateNotaEstudiante(200, 5, 12);
+			wal.execute.mockImplementationOnce((config: { onError?: (err: unknown) => void; optimistic?: { apply: () => void; rollback: () => void } }) => {
+				config.optimistic?.apply();
+				config.optimistic?.rollback();
+				config.onError?.(new Error('fail'));
+			});
+
+			facade.saveNotaSalon(5, 200, 18);
+
+			expect(store.getNotaEstudiante(200, 5)).toBe(12);
+			expect(errorHandler.showError).toHaveBeenCalled();
+		});
+
+		it('should not call WAL execute without selectedSalon or notasCursoId', () => {
+			facade.closeSalonDialog();
+
+			facade.saveNotaSalon(5, 200, 17);
+
+			expect(wal.execute).not.toHaveBeenCalled();
 		});
 	});
 	// #endregion

@@ -111,6 +111,117 @@ describe('GruposFacade', () => {
 
 			expect(wal.execute).not.toHaveBeenCalled();
 		});
+
+		it('should call WAL execute for actualizarGrupo with correct payload', () => {
+			facade.actualizarGrupo(1, { nombre: 'Renombrado' });
+
+			expect(wal.execute).toHaveBeenCalledWith(
+				expect.objectContaining({
+					operation: 'UPDATE',
+					resourceType: 'grupoContenido',
+					resourceId: 1,
+					payload: { nombre: 'Renombrado' },
+				}),
+			);
+			expect(store.grupos()[0].nombre).toBe('Renombrado');
+		});
+
+		it('should rollback actualizarGrupo to previous nombre on error', () => {
+			api.actualizarGrupo.mockReturnValue(of({ mensaje: 'ok' }));
+			wal.execute.mockImplementationOnce((config: { onError?: (err: unknown) => void; optimistic?: { apply: () => void; rollback: () => void } }) => {
+				config.optimistic?.apply();
+				config.optimistic?.rollback();
+				config.onError?.(new Error('fail'));
+			});
+
+			facade.actualizarGrupo(1, { nombre: 'Fallido' });
+
+			expect(store.grupos()[0].nombre).toBe('Grupo A');
+			expect(store.saving()).toBe(false);
+		});
+
+		it('should call WAL execute for eliminarGrupo and remove it optimistically', () => {
+			facade.eliminarGrupo(1);
+
+			expect(wal.execute).toHaveBeenCalledWith(
+				expect.objectContaining({ operation: 'DELETE', resourceType: 'grupoContenido', resourceId: 1 }),
+			);
+			expect(store.grupos()).toHaveLength(0);
+		});
+
+		it('should rollback eliminarGrupo restoring the snapshot on error', () => {
+			wal.execute.mockImplementationOnce((config: { onError?: (err: unknown) => void; optimistic?: { apply: () => void; rollback: () => void } }) => {
+				config.optimistic?.apply();
+				config.optimistic?.rollback();
+				config.onError?.(new Error('fail'));
+			});
+
+			facade.eliminarGrupo(1);
+
+			expect(store.grupos()).toHaveLength(1);
+			expect(store.grupos()[0].id).toBe(1);
+		});
+
+		it('should call WAL execute for asignarEstudiantes with correct payload', () => {
+			const dto = { estudianteIds: [100] };
+			facade.asignarEstudiantes(1, dto);
+
+			expect(wal.execute).toHaveBeenCalledWith(
+				expect.objectContaining({ operation: 'UPDATE', resourceType: 'grupoContenido', resourceId: 1, payload: dto }),
+			);
+		});
+
+		it('should refetch grupos on asignarEstudiantes commit', () => {
+			wal.execute.mockImplementationOnce((config: { onCommit?: () => void; optimistic?: { apply: () => void } }) => {
+				config.optimistic?.apply();
+				config.onCommit?.();
+			});
+
+			facade.asignarEstudiantes(1, { estudianteIds: [100] });
+
+			expect(api.getGrupos).toHaveBeenCalledWith(50);
+		});
+
+		it('should call WAL execute for removerEstudiante with DELETE on the estudiante endpoint', () => {
+			facade.removerEstudiante(1, 100);
+
+			expect(wal.execute).toHaveBeenCalledWith(
+				expect.objectContaining({ operation: 'UPDATE', resourceType: 'grupoContenido', method: 'DELETE', resourceId: 1 }),
+			);
+		});
+
+		it('should call WAL execute for configurarMaxEstudiantes with correct payload', () => {
+			facade.configurarMaxEstudiantes(10);
+
+			expect(wal.execute).toHaveBeenCalledWith(
+				expect.objectContaining({
+					operation: 'UPDATE',
+					resourceType: 'grupoContenido',
+					resourceId: 50,
+					payload: { maxEstudiantesPorGrupo: 10 },
+				}),
+			);
+			expect(store.maxEstudiantesPorGrupo()).toBe(10);
+		});
+
+		it('should rollback configurarMaxEstudiantes to previous max on error', () => {
+			wal.execute.mockImplementationOnce((config: { onError?: (err: unknown) => void; optimistic?: { apply: () => void; rollback: () => void } }) => {
+				config.optimistic?.apply();
+				config.optimistic?.rollback();
+				config.onError?.(new Error('fail'));
+			});
+
+			facade.configurarMaxEstudiantes(10);
+
+			expect(store.maxEstudiantesPorGrupo()).toBe(5);
+		});
+
+		it('should not configure max estudiantes without contenidoId', () => {
+			store.setContenidoId(null);
+			facade.configurarMaxEstudiantes(10);
+
+			expect(wal.execute).not.toHaveBeenCalled();
+		});
 	});
 	// #endregion
 
