@@ -52,7 +52,7 @@ import {
 	readAutoOpenQueryParams,
 } from './helpers/auto-open-from-query.helper';
 import { EduConfirmDialog, EduConfirmationService, EduTab } from '@edu-ui';
-import { resolveModoAsignacion } from '@data/models';
+import { resolveModoAsignacion } from '@data/adapters';
 
 const USUARIOS_MIGRAR_CONTRASENAS_MANAGE = 'USUARIOS_MIGRAR_CONTRASENAS_MANAGE';
 

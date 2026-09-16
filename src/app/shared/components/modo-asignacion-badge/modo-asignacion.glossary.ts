@@ -1,4 +1,4 @@
-import type { ModoAsignacion } from '@data/models';
+import type { ModoAsignacion } from '@data/adapters';
 
 // #region Implementation
 /**

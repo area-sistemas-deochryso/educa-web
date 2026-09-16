@@ -107,26 +107,7 @@ export interface MiAsistenciaResolucionDto {
 // #endregion
 
 // #region Solicitud de justificación (autoservicio estudiante)
-export type EstadoSolicitudJustificacion = 'PENDIENTE' | 'APROBADA' | 'RECHAZADA';
-
-export interface SolicitudJustificacionAsistenciaDto {
-	id: number;
-	asistenciaCursoId: number;
-	horarioId: number;
-	cursoNombre: string;
-	salonDescripcion: string;
-	fecha: string;
-	estudianteId: number;
-	estudianteNombre: string;
-	estado: EstadoSolicitudJustificacion;
-	comentario: string | null;
-	documentoUrl: string | null;
-	documentoNombre: string | null;
-	motivoRechazo: string | null;
-	resueltoPorRol: string | null;
-	fechaResolucion: string | null;
-	fechaSolicitud: string;
-}
+export type { SolicitudJustificacionAsistenciaDto, EstadoSolicitudJustificacion } from '@data/models';
 
 export interface JustificarInasistenciaContext {
 	asistenciaCursoId: number;

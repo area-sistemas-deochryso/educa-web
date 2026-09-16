@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { environment } from '@env/environment';
-import { SolicitudJustificacionAsistenciaDto } from '@features/intranet/pages/estudiante/models';
+import { SolicitudJustificacionAsistenciaDto } from '@data/models';
 
 /**
  * Gateway de la bandeja de aprobación (Profesor + roles administrativos),

@@ -12,7 +12,7 @@ import {
 	type FacadeErrorHandler,
 } from '@core/helpers';
 import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@app/shared/constants';
-import { resolveModoAsignacion } from '@data/models';
+import { resolveModoAsignacion } from '@data/adapters';
 import { UsuarioDetalle, UsuarioLista } from '../models';
 import { UsersService } from './usuarios.service';
 import { UsersStore } from './usuarios.store';

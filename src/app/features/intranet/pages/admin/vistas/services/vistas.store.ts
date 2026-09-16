@@ -6,7 +6,7 @@ import { capitalize } from '@core/helpers';
 import { withAllOption, SelectOption } from '@shared/models';
 
 // #region Interfaces
-interface CapabilityForm {
+export interface CapabilityForm {
 	codigo: string;
 	nombre: string;
 	modulo: string;

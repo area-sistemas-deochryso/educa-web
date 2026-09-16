@@ -13,9 +13,15 @@ export interface GradeClassification {
  * Cada escala define cómo clasificar, formatear y validar notas
  * dentro de sus propios límites y reglas.
  *
- * Hoy soportamos vigesimal (0-20) y literal (AD/A/B/C).
- * Si mañana se necesita centesimal (0-100) o percentil,
- * basta con implementar esta interfaz.
+ * Excepción documentada a "adapters/ solo mapea API↔dominio": las clases de
+ * `grade/` implementan Strategy pattern — cada escala es una estrategia de
+ * dominio completa (umbrales de aprobación incluidos), no un simple mapper.
+ * Se agrupan acá porque comparten el mismo punto de entrada (`grade-scale.factory.ts`)
+ * y el mismo contrato (`GradeScale`).
+ *
+ * Hoy soportamos vigesimal (0-20) y literal (AD/A/B/C). Si mañana se necesita
+ * centesimal (0-100) o percentil, basta con implementar esta interfaz —
+ * no agregar la escala hasta tener un caller real.
  */
 export interface GradeScale {
 	/** Nota mínima posible en esta escala */
@@ -40,12 +46,5 @@ export const VIGESIMAL_DEFAULTS = {
 	min: 0,
 	max: 20,
 	passingGrade: 11,
-	excellentRatio: 1.27,
-} as const;
-
-export const CENTESIMAL_DEFAULTS = {
-	min: 0,
-	max: 100,
-	passingGrade: 55,
 	excellentRatio: 1.27,
 } as const;
