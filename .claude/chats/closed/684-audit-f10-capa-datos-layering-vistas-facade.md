@@ -2,7 +2,7 @@
 
 > **Repo destino**: `educa-web`
 > **Plan**: [`audit-angular22-ts6-2026-09-12.md`](../../plan/audit-angular22-ts6-2026-09-12.md) (Fase F10)
-> **Creado**: 2026-09-12 · **Estado**: ⏳ pendiente arrancar.
+> **Creado**: 2026-09-12 · **Estado**: ✅ completo (2026-09-16, worktree `chat/684-audit-f10-capa-datos-layering-vistas-facade`).
 > **MODO SUGERIDO**: `/execute`
 > **touches**:
 >   - `src/app/data/models/classroom.models.ts`
@@ -33,13 +33,13 @@ Hallazgos de `/audit` (2026-09-12), categoría "Regla violada" — 4 hallazgos d
 
 ## Criterio de cierre
 
-- [ ] Punto 1: lógica de negocio movida fuera de `models/`, confirmado contra el BE si el umbral puede divergir.
-- [ ] Punto 2: adapters documentados como Strategy pattern o movidos a `domain/`; duplicado sin uso eliminado o justificado.
-- [ ] Punto 3: layering corregido, `shared/services` ya no importa desde `features/pages`.
-- [ ] Punto 4: cast `as never` reemplazado por genérico tipado.
-- [ ] Build + lint + tests OK.
-- [ ] Plan actualizado: F10 → ✅.
-- [ ] Maestro actualizado.
+- [x] Punto 1: `resolveModoAsignacion`/`ModoAsignacion` movidos a `data/adapters/academico/modo-asignacion.adapter.ts`. Confirmado contra `ModoAsignacionResolver.cs` (Educa.API): mismo umbral (7) hardcodeado en ambos lados, no viene de config remota — sin riesgo de drift por API, queda documentado con comentario cruzado.
+- [x] Punto 2: `grade/*.adapter.ts` documentados como excepción explícita de Strategy pattern en el docstring de `GradeScale`. `CentesimalScale` (duplicado byte-a-byte de `VigesimalScale`, sin caller real — `grade-scale.factory.ts` solo instancia `VigesimalScale`/`LiteralScale`) eliminado junto con `CENTESIMAL_DEFAULTS`.
+- [x] Punto 3: `SolicitudJustificacionAsistenciaDto`/`EstadoSolicitudJustificacion` movidos a `@data/models/attendance.models.ts` (los consumía tanto `estudiante/` como la bandeja `cross-role/`, no eran exclusivos de una página). `justificacion-asistencia-bandeja-api.service.ts` (shared) ahora importa directo de `@data/models`; `estudiante/models` re-exporta para no romper sus propios callers.
+- [x] Punto 4: cast `as never` reemplazado por `updateFormField<K extends keyof CapabilityForm>(field: K, value: CapabilityForm[K])` — exportado `CapabilityForm` desde `vistas.store.ts`.
+- [x] Build + lint + tests OK — lint limpio, build sin errores TS (solo warnings preexistentes no relacionados), test suite 261 archivos / 2593 tests en verde (1 test flaky por timeout en frío tras reinstalar deps del worktree, pasa aislado y en la corrida completa posterior).
+- [x] Plan actualizado: F10 → ✅.
+- [x] Maestro actualizado.
 
 ## Tiempo estimado
 
