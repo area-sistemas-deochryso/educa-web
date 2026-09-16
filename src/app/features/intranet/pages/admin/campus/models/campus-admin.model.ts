@@ -9,6 +9,7 @@ export interface CampusPisoDto {
 	cantidadNodos: number;
 	cantidadAristas: number;
 	cantidadBloqueos: number;
+	rowVersion: string;
 }
 
 export interface CampusNodoDto {
@@ -25,6 +26,7 @@ export interface CampusNodoDto {
 	rotation: number;
 	metadataJson: string | null;
 	estado: boolean;
+	rowVersion: string;
 }
 
 export interface CampusAristaDto {
@@ -45,6 +47,7 @@ export interface CampusBloqueoDto {
 	height: number;
 	motivo: string | null;
 	estado: boolean;
+	rowVersion: string;
 }
 
 export interface CampusConexionVerticalDto {
@@ -94,6 +97,7 @@ export interface ActualizarPisoDto {
 	nombre: string;
 	orden: number;
 	alturaMetros: number;
+	rowVersion: string;
 }
 
 export interface CrearNodoDto {
@@ -119,6 +123,7 @@ export interface ActualizarNodoDto {
 	height: number;
 	rotation: number;
 	metadataJson: string | null;
+	rowVersion: string;
 }
 
 export interface CrearAristaDto {
@@ -148,6 +153,7 @@ export interface ActualizarBloqueoDto {
 	width: number;
 	height: number;
 	motivo: string | null;
+	rowVersion: string;
 }
 
 export interface CrearConexionVerticalDto {

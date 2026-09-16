@@ -14,21 +14,32 @@ import {
 } from '@angular/core';
 
 import { logger, resolveErrorMessage } from '@core/helpers';
+import { ErrorHandlerService } from '@core/services';
 import { VideoconferenciasFacade } from '../../services/videoconferencias.facade';
 import {
 	JitsiApi,
 	MODERATOR_TOOLBAR_BUTTONS,
 	PARTICIPANT_TOOLBAR_BUTTONS,
 	ParticipantInfo,
+	addParticipant,
+	buildJitsiOptions,
 	countStaff,
 	countTeachers,
+	decodeJwtExp,
 	normalizeName,
+	reconcileParticipantRoles,
+	removeParticipant,
+	renameParticipant,
+	setParticipantModerator,
 } from './jitsi-api.types';
 import { EduButton, EduSpinner } from '@edu-ui';
 
 // #endregion
 
 declare const JitsiMeetExternalAPI: new (domain: string, options: Record<string, unknown>) => JitsiApi;
+
+/** Avisar (con opción de reconectar) 5 min antes de que expire el JWT de JaaS. */
+const EXPIRY_WARNING_MARGIN_MS = 5 * 60 * 1000;
 
 @Component({
 	selector: 'app-videoconferencia-sala',
@@ -42,6 +53,7 @@ export class VideoconferenciaSalaComponent implements OnInit, OnDestroy {
 	// #region Dependencias
 	private readonly facade = inject(VideoconferenciasFacade);
 	private readonly hostEl = inject(ElementRef);
+	private readonly errorHandler = inject(ErrorHandlerService);
 	// #endregion
 
 	// #region Inputs
@@ -61,6 +73,7 @@ export class VideoconferenciaSalaComponent implements OnInit, OnDestroy {
 	readonly syncingParticipants = signal(false);
 
 	private jitsiApi: JitsiApi | null = null;
+	private expiryWarningTimer: ReturnType<typeof setTimeout> | null = null;
 	// #endregion
 
 	// #region Participantes
@@ -154,31 +167,65 @@ export class VideoconferenciaSalaComponent implements OnInit, OnDestroy {
 
 		const preFetched = this.preFetchedToken();
 		if (preFetched) {
-			if (!preFetched.appId) {
-				this.errorMsg.set('Servicio de videoconferencia no configurado');
-				this.connecting.set(false);
-				return;
-			}
-			this.connectingStep.set('script');
-			this.loadJitsiScript(preFetched.appId, preFetched.jwt);
+			this.onTokenObtained(preFetched.appId, preFetched.jwt);
 			return;
 		}
 
 		this.facade.getJaaSToken(this.roomName()).subscribe({
-			next: (response) => {
-				if (!response.appId) {
-					this.errorMsg.set('Servicio de videoconferencia no configurado');
-					this.connecting.set(false);
-					return;
-				}
-				this.connectingStep.set('script');
-				this.loadJitsiScript(response.appId, response.jwt);
-			},
+			next: (response) => this.onTokenObtained(response.appId, response.jwt),
 			error: (err) => {
 				// Cubre la carrera "el estado mostrado en la tarjeta quedó desactualizado" (ej. el
 				// profesor deshabilitó la sala mientras el estudiante tenía la tarjeta abierta): el
 				// mensaje refleja el errorCode real del gate en vez de un genérico.
 				this.errorMsg.set(resolveErrorMessage(err, 'No se pudo obtener acceso a la sala'));
+				this.connecting.set(false);
+			},
+		});
+	}
+
+	/** Camino común tras obtener token (fetch inicial, excepción del moderador o reconexión). */
+	private onTokenObtained(appId: string, jwt: string): void {
+		if (!appId) {
+			this.errorMsg.set('Servicio de videoconferencia no configurado');
+			this.connecting.set(false);
+			return;
+		}
+		this.connectingStep.set('script');
+		this.scheduleExpiryWarning(jwt);
+		this.loadJitsiScript(appId, jwt);
+	}
+
+	/** Avisa antes de que expire el JWT (BE lo dimensiona al fin de la clase + margen) con opción de reconectar. */
+	private scheduleExpiryWarning(jwt: string): void {
+		this.clearExpiryTimer();
+
+		const exp = decodeJwtExp(jwt);
+		if (!exp) return;
+
+		const msUntilWarning = exp * 1000 - Date.now() - EXPIRY_WARNING_MARGIN_MS;
+		if (msUntilWarning <= 0) return;
+
+		this.expiryWarningTimer = setTimeout(() => {
+			this.errorHandler.showWarning(
+				'Sesión por expirar',
+				'La videollamada va a desconectarse en unos minutos por vencimiento de la sesión. Reconectá para seguir sin cortes.',
+				15000,
+				{ label: 'Reconectar', callback: () => this.reconnect() },
+			);
+		}, msUntilWarning);
+	}
+
+	/** Obtiene un JWT nuevo y reinicia Jitsi en el mismo contenedor, sin recargar la página. */
+	private reconnect(): void {
+		this.connecting.set(true);
+		this.connectingStep.set('auth');
+		this.errorMsg.set(null);
+		this.disposeJitsi();
+
+		this.facade.getJaaSToken(this.roomName()).subscribe({
+			next: (response) => this.onTokenObtained(response.appId, response.jwt),
+			error: (err) => {
+				this.errorMsg.set(resolveErrorMessage(err, 'No se pudo reconectar a la sala'));
 				this.connecting.set(false);
 			},
 		});
@@ -219,37 +266,15 @@ export class VideoconferenciaSalaComponent implements OnInit, OnDestroy {
 		const toolbarButtons = this.facade.isModerator() ? MODERATOR_TOOLBAR_BUTTONS : PARTICIPANT_TOOLBAR_BUTTONS;
 
 		try {
-			// JaaS requiere roomName con formato: appId/roomName
-			this.jitsiApi = new JitsiMeetExternalAPI('8x8.vc', {
-				roomName: `${appId}/${this.roomName()}`,
+			this.jitsiApi = new JitsiMeetExternalAPI('8x8.vc', buildJitsiOptions({
+				appId,
+				roomName: this.roomName(),
 				parentNode: container,
 				jwt,
-				width: '100%',
-				height: '100%',
-				lang: 'es',
-				userInfo: {
-					displayName: this.facade.displayName() || 'Participante',
-				},
-				configOverwrite: {
-					startWithAudioMuted: true,
-					startWithVideoMuted: true,
-					prejoinPageEnabled: false,
-					disableDeepLinking: true,
-					toolbarButtons,
-					enableClosePage: false,
-					hideConferenceSubject: false,
-					subject: this.cursoNombre(),
-				},
-				interfaceConfigOverwrite: {
-					SHOW_JITSI_WATERMARK: false,
-					SHOW_WATERMARK_FOR_GUESTS: false,
-					SHOW_BRAND_WATERMARK: false,
-					SHOW_CHROME_EXTENSION_BANNER: false,
-					MOBILE_APP_PROMO: false,
-					TOOLBAR_ALWAYS_VISIBLE: true,
-					DEFAULT_BACKGROUND: '#1a1a2e',
-				},
-			});
+				displayName: this.facade.displayName() || '',
+				cursoNombre: this.cursoNombre(),
+				toolbarButtons,
+			}));
 
 			this.setupJitsiEvents();
 
@@ -286,47 +311,27 @@ export class VideoconferenciaSalaComponent implements OnInit, OnDestroy {
 		// Tracking de participantes remotos
 		this.jitsiApi.addEventListener('participantJoined', (data: unknown) => {
 			const { id, displayName } = data as { id: string; displayName: string };
-			this._participants.update((map) => {
-				const next = new Map(map);
-				next.set(id, { displayName: displayName || '', isModerator: false });
-				return next;
-			});
+			this._participants.update((map) => addParticipant(map, id, displayName));
 			// Re-sync diferido: displayName puede llegar vacío y resolverse con un getParticipantsInfo posterior
 			this.syncParticipantRoles(800);
 		});
 
 		this.jitsiApi.addEventListener('participantLeft', (data: unknown) => {
 			const { id } = data as { id: string };
-			this._participants.update((map) => {
-				const next = new Map(map);
-				next.delete(id);
-				return next;
-			});
+			this._participants.update((map) => removeParticipant(map, id));
 		});
 
 		// Jitsi emite role change cuando el JWT otorga moderator
 		this.jitsiApi.addEventListener('participantRoleChanged', (data: unknown) => {
 			const { id, role } = data as { id: string; role: string };
-			this._participants.update((map) => {
-				const current = map.get(id);
-				if (!current) return map;
-				const next = new Map(map);
-				next.set(id, { ...current, isModerator: role === 'moderator' });
-				return next;
-			});
+			this._participants.update((map) => setParticipantModerator(map, id, role === 'moderator'));
 		});
 
 		// Cubre el caso de displayName tardío o renombrado
 		this.jitsiApi.addEventListener('displayNameChange', (data: unknown) => {
 			const { id, displayname } = data as { id: string; displayname: string };
 			if (!id || !displayname) return;
-			this._participants.update((map) => {
-				const current = map.get(id);
-				if (!current) return map;
-				const next = new Map(map);
-				next.set(id, { ...current, displayName: displayname });
-				return next;
-			});
+			this._participants.update((map) => renameParticipant(map, id, displayname));
 		});
 	}
 
@@ -339,23 +344,8 @@ export class VideoconferenciaSalaComponent implements OnInit, OnDestroy {
 		const doSync = (): void => {
 			try {
 				// getParticipantsInfo() del IframeAPI de Jitsi es sincrono — retorna Array, no Promise.
-				// SOLO reconciliamos entries ya conocidas (alta y baja vienen exclusivamente de
-				// participantJoined / participantLeft). El participantId de Jitsi puede tener
-				// formato distinto entre el evento (short id) y getParticipantsInfo() (JID full),
-				// así que agregar entries nuevas desde acá duplicaría participantes.
-				const participants = this.jitsiApi?.getParticipantsInfo() ?? [];
-				this._participants.update((map) => {
-					const next = new Map(map);
-					for (const p of participants) {
-						const current = next.get(p.participantId);
-						if (!current) continue;
-						next.set(p.participantId, {
-							displayName: p.displayName || current.displayName,
-							isModerator: p.role === 'moderator',
-						});
-					}
-					return next;
-				});
+				const info = this.jitsiApi?.getParticipantsInfo() ?? [];
+				this._participants.update((map) => reconcileParticipantRoles(info, map));
 			} catch {
 				// Silencioso: el conteo seguirá basándose en los eventos
 			} finally {
@@ -371,6 +361,8 @@ export class VideoconferenciaSalaComponent implements OnInit, OnDestroy {
 	}
 
 	private disposeJitsi(): void {
+		this.clearExpiryTimer();
+
 		if (this.jitsiApi) {
 			try {
 				this.jitsiApi.dispose();
@@ -379,6 +371,12 @@ export class VideoconferenciaSalaComponent implements OnInit, OnDestroy {
 			}
 			this.jitsiApi = null;
 		}
+	}
+
+	private clearExpiryTimer(): void {
+		if (!this.expiryWarningTimer) return;
+		clearTimeout(this.expiryWarningTimer);
+		this.expiryWarningTimer = null;
 	}
 	// #endregion
 }

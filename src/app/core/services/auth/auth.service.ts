@@ -34,6 +34,11 @@ export class AuthService {
 	// #region Reactive state
 	private readonly _isAuthenticated = signal(this.storage.hasUserInfo());
 	private readonly _currentUser = signal<AuthUser | null>(this.storage.getUser());
+	/**
+	 * Contador de intentos en memoria — es solo UX (mensaje temprano + gate visual), no protección real:
+	 * se resetea con F5 y no persiste entre pestañas. La protección real es del backend
+	 * (`[EnableRateLimiting("login")]` en `AuthController`, 60 intentos/min por IP).
+	 */
 	private readonly _loginAttempts = signal(0);
 	/**
 	 * Dimensiones de salud de sede en estado Crítico para la sede del usuario

@@ -1,6 +1,6 @@
 import { DestroyRef, inject, Injectable } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { catchError, EMPTY, map, Observable, of, Subject, switchMap } from 'rxjs';
+import { catchError, map, of, Subject, switchMap } from 'rxjs';
 
 import { facadeErrorHandler, type FacadeErrorHandler, withRetry } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
@@ -17,24 +17,19 @@ import {
 } from '../models';
 import { CampusAdminApiService } from './campus-admin-api.service';
 import { CampusAdminStore } from './campus-admin.store';
-
-interface CrudOptions<T> {
-	apiCall: Observable<T>;
-	onSuccess: (result: T) => void;
-	errorMsg: string;
-	onError?: () => void;
-	saving?: boolean;
-}
+import { createCrudExecutor } from './campus-admin-crud.util';
 
 @Injectable({ providedIn: 'root' })
 export class CampusAdminFacade {
 	private api = inject(CampusAdminApiService);
 	private store = inject(CampusAdminStore);
 	private destroyRef = inject(DestroyRef);
+	private errorHandler = inject(ErrorHandlerService);
 	private errHandler: FacadeErrorHandler = facadeErrorHandler({
 		tag: 'CampusAdminFacade',
-		errorHandler: inject(ErrorHandlerService),
+		errorHandler: this.errorHandler,
 	});
+	private executeCrud = createCrudExecutor(this.destroyRef, (v) => this.store.setSaving(v), this.errHandler);
 
 	// #region Exponer estado del store
 
@@ -48,29 +43,15 @@ export class CampusAdminFacade {
 
 	// #region Ejecución genérica
 
-	/**
-	 * Ejecuta una operación CRUD con manejo uniforme de saving, error y cleanup.
-	 * La orquestación (qué hacer) vive en cada método público.
-	 * La ejecución (cómo hacerlo) vive aquí.
-	 */
-	private executeCrud<T>({ apiCall, onSuccess, errorMsg, onError, saving = true }: CrudOptions<T>): void {
-		if (saving) this.store.setSaving(true);
-
-		apiCall
-			.pipe(
-				catchError((err) => {
-					this.errHandler.handle(err, errorMsg.replace('No se pudo ', ''), () => {
-						if (saving) this.store.setSaving(false);
-						onError?.();
-					});
-					return EMPTY;
-				}),
-				takeUntilDestroyed(this.destroyRef),
-			)
-			.subscribe((result) => {
-				onSuccess(result);
-				if (saving) this.store.setSaving(false);
-			});
+	/** Reacción común a un 409 (RowVersion stale): avisa y refresca el piso completo en vez de reintentar a ciegas. */
+	private onPisoMutationConflict(entidad: string, onBeforeReload?: () => void): void {
+		this.errorHandler.showWarning(
+			`${entidad} modificado por otro administrador`,
+			`El ${entidad.toLowerCase()} cambió mientras lo editabas. Se refrescó el piso con el valor actual.`,
+		);
+		onBeforeReload?.();
+		const pisoId = this.store.selectedPisoId();
+		if (pisoId !== null) this.loadPisoCompleto(pisoId);
 	}
 
 	// #endregion
@@ -176,8 +157,16 @@ export class CampusAdminFacade {
 	actualizarPiso(id: number, dto: ActualizarPisoDto): void {
 		this.executeCrud({
 			apiCall: this.api.actualizarPiso(id, dto),
-			onSuccess: () => { this.store.updatePiso(id, dto); this.store.closePisoDialog(); },
+			onSuccess: (rowVersion) => { this.store.updatePiso(id, { ...dto, rowVersion }); this.store.closePisoDialog(); },
 			errorMsg: 'No se pudo actualizar el piso',
+			onConflict: () => {
+				this.errorHandler.showWarning(
+					'Piso modificado por otro administrador',
+					'El piso cambió mientras lo editabas. Se refrescó con el valor actual.',
+				);
+				this.store.closePisoDialog();
+				this.loadPisos();
+			},
 		});
 	}
 
@@ -205,8 +194,9 @@ export class CampusAdminFacade {
 	actualizarNodo(id: number, dto: ActualizarNodoDto): void {
 		this.executeCrud({
 			apiCall: this.api.actualizarNodo(id, dto),
-			onSuccess: () => { this.store.updateNodo(id, dto); this.store.closeNodeDialog(); },
+			onSuccess: (rowVersion) => { this.store.updateNodo(id, { ...dto, rowVersion }); this.store.closeNodeDialog(); },
 			errorMsg: 'No se pudo actualizar el nodo',
+			onConflict: () => this.onPisoMutationConflict('Nodo', () => this.store.closeNodeDialog()),
 		});
 	}
 
@@ -228,9 +218,14 @@ export class CampusAdminFacade {
 				height: nodo.height,
 				rotation: nodo.rotation,
 				metadataJson: nodo.metadataJson,
+				rowVersion: nodo.rowVersion,
 			}),
-			onSuccess: () => {},
+			onSuccess: (rowVersion) => this.store.updateNodo(id, { rowVersion }),
 			onError: () => this.store.updateNodo(id, { x: nodo.x, y: nodo.y }),
+			onConflict: () => {
+				this.store.updateNodo(id, { x: nodo.x, y: nodo.y });
+				this.onPisoMutationConflict('Nodo');
+			},
 			errorMsg: 'No se pudo mover el nodo',
 			saving: false,
 		});
@@ -281,8 +276,9 @@ export class CampusAdminFacade {
 	actualizarBloqueo(id: number, dto: ActualizarBloqueoDto): void {
 		this.executeCrud({
 			apiCall: this.api.actualizarBloqueo(id, dto),
-			onSuccess: () => { this.store.updateBloqueo(id, dto); this.store.closeBloqueoDialog(); },
+			onSuccess: (rowVersion) => { this.store.updateBloqueo(id, { ...dto, rowVersion }); this.store.closeBloqueoDialog(); },
 			errorMsg: 'No se pudo actualizar el bloqueo',
+			onConflict: () => this.onPisoMutationConflict('Bloqueo', () => this.store.closeBloqueoDialog()),
 		});
 	}
 
@@ -300,9 +296,14 @@ export class CampusAdminFacade {
 				width: bloqueo.width,
 				height: bloqueo.height,
 				motivo: bloqueo.motivo,
+				rowVersion: bloqueo.rowVersion,
 			}),
-			onSuccess: () => {},
+			onSuccess: (rowVersion) => this.store.updateBloqueo(id, { rowVersion }),
 			onError: () => this.store.updateBloqueo(id, { x: bloqueo.x, y: bloqueo.y }),
+			onConflict: () => {
+				this.store.updateBloqueo(id, { x: bloqueo.x, y: bloqueo.y });
+				this.onPisoMutationConflict('Bloqueo');
+			},
 			errorMsg: 'No se pudo mover el bloqueo',
 			saving: false,
 		});

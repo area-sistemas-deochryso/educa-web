@@ -50,8 +50,9 @@ export class CampusAdminApiService {
 		return this.http.post<CampusPisoDto>(`${this.apiUrl}/pisos`, dto);
 	}
 
-	actualizarPiso(id: number, dto: ActualizarPisoDto): Observable<void> {
-		return this.http.put<void>(`${this.apiUrl}/pisos/${id}`, dto);
+	/** Retorna el nuevo `rowVersion` del piso — la FE lo necesita para la próxima edición. */
+	actualizarPiso(id: number, dto: ActualizarPisoDto): Observable<string> {
+		return this.http.put<string>(`${this.apiUrl}/pisos/${id}`, dto);
 	}
 
 	toggleEstadoPiso(id: number): Observable<void> {
@@ -66,8 +67,9 @@ export class CampusAdminApiService {
 		return this.http.post<CampusNodoDto>(`${this.apiUrl}/nodos`, dto);
 	}
 
-	actualizarNodo(id: number, dto: ActualizarNodoDto): Observable<void> {
-		return this.http.put<void>(`${this.apiUrl}/nodos/${id}`, dto);
+	/** Retorna el nuevo `rowVersion` del nodo — la FE lo necesita para la próxima edición. */
+	actualizarNodo(id: number, dto: ActualizarNodoDto): Observable<string> {
+		return this.http.put<string>(`${this.apiUrl}/nodos/${id}`, dto);
 	}
 
 	eliminarNodo(id: number): Observable<void> {
@@ -98,8 +100,9 @@ export class CampusAdminApiService {
 		return this.http.post<CampusBloqueoDto>(`${this.apiUrl}/bloqueos`, dto);
 	}
 
-	actualizarBloqueo(id: number, dto: ActualizarBloqueoDto): Observable<void> {
-		return this.http.put<void>(`${this.apiUrl}/bloqueos/${id}`, dto);
+	/** Retorna el nuevo `rowVersion` del bloqueo — la FE lo necesita para la próxima edición. */
+	actualizarBloqueo(id: number, dto: ActualizarBloqueoDto): Observable<string> {
+		return this.http.put<string>(`${this.apiUrl}/bloqueos/${id}`, dto);
 	}
 
 	eliminarBloqueo(id: number): Observable<void> {

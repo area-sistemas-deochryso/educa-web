@@ -185,17 +185,20 @@ export class CampusComponent implements OnInit {
 	}
 
 	savePiso(): void {
-		const dto = {
-			nombre: this.pisoFormNombre(),
-			orden: this.pisoFormOrden(),
-			alturaMetros: this.pisoFormAltura(),
-		};
-
 		const editing = this.vm().editingPiso;
 		if (editing) {
-			this.facade.actualizarPiso(editing.id, dto);
+			this.facade.actualizarPiso(editing.id, {
+				nombre: this.pisoFormNombre(),
+				orden: this.pisoFormOrden(),
+				alturaMetros: this.pisoFormAltura(),
+				rowVersion: editing.rowVersion,
+			});
 		} else {
-			this.facade.crearPiso(dto);
+			this.facade.crearPiso({
+				nombre: this.pisoFormNombre(),
+				orden: this.pisoFormOrden(),
+				alturaMetros: this.pisoFormAltura(),
+			});
 		}
 	}
 
@@ -236,6 +239,7 @@ export class CampusComponent implements OnInit {
 			height: this.nodeFormHeight(),
 			rotation: editing.rotation,
 			metadataJson: editing.metadataJson,
+			rowVersion: editing.rowVersion,
 		});
 	}
 
@@ -270,6 +274,7 @@ export class CampusComponent implements OnInit {
 			width: this.bloqueoFormWidth(),
 			height: this.bloqueoFormHeight(),
 			motivo: this.bloqueoFormMotivo().trim() || null,
+			rowVersion: editing.rowVersion,
 		});
 	}
 
