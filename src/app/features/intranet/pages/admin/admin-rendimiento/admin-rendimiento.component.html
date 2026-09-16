@@ -24,7 +24,11 @@
 			<!-- #region Cursos, ordenados por desvío -->
 			<section class="admin-rendimiento-page__cursos">
 				@for (curso of vm().cursos; track curso.cursoContenidoId) {
-					<app-admin-rendimiento-curso-card [curso]="curso" />
+					@defer (on viewport) {
+						<app-admin-rendimiento-curso-card [curso]="curso" />
+					} @placeholder {
+						<div style="height: 280px;"></div>
+					}
 				}
 			</section>
 			<!-- #endregion -->

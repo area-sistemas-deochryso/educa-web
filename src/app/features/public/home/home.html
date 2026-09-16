@@ -2,10 +2,35 @@
 <!-- * Landing page sections. -->
 <main>
 	<app-hero-section />
-	<app-about-section />
-	<app-courses-section />
-	<app-counter-section />
-	<app-testimonials-section />
-	<app-cta-section />
+
+	@defer (on viewport) {
+		<app-about-section />
+	} @placeholder {
+		<div style="height: 400px;"></div>
+	}
+
+	@defer (on viewport) {
+		<app-courses-section />
+	} @placeholder {
+		<div style="height: 400px;"></div>
+	}
+
+	@defer (on viewport) {
+		<app-counter-section />
+	} @placeholder {
+		<div style="height: 200px;"></div>
+	}
+
+	@defer (on viewport) {
+		<app-testimonials-section />
+	} @placeholder {
+		<div style="height: 400px;"></div>
+	}
+
+	@defer (on viewport) {
+		<app-cta-section />
+	} @placeholder {
+		<div style="height: 200px;"></div>
+	}
 </main>
 <!-- #endregion -->

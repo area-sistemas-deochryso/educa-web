@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- Razón: builder de escena 3D del campus, un único método `buildScene()` orquesta suelo/paredes/corredores/escaleras; fraccionarlo en más archivos por sección diluiría el flujo secuencial que documenta cómo se arma la escena. El dispose() de F8 (P682) sumó lo justo para no leakear GPU en cada rebuild. */
 import { inject, Injectable } from '@angular/core';
 import * as THREE from 'three';
 import type { CampusNode, CampusEdge } from '@features/intranet/pages/cross-role/campus-navigation/models';
@@ -15,9 +16,10 @@ export class CampusSceneBuilderService {
 	private readonly collision = inject(CampusCollisionService);
 
 	buildScene(scene: THREE.Scene, nodes: CampusNode[], edges: CampusEdge[]): WorldData {
-		// Limpiar meshes previos
+		// Limpiar meshes previos — dispose() explícito antes de remover, sino cada
+		// rebuild deja geometrías/materiales huérfanos en GPU (leak de memoria de video).
 		const toRemove = scene.children.filter((c) => c.userData['managed']);
-		toRemove.forEach((c) => scene.remove(c));
+		toRemove.forEach((c) => { c.traverse((obj) => this.disposeObject(obj)); scene.remove(c); });
 
 		const nodeMap      = new Map(nodes.map((n) => [n.id, n]));
 		const edgeSegs:    EdgeSeg[]    = [];
@@ -247,6 +249,21 @@ export class CampusSceneBuilderService {
 	}
 
 	// #region Helpers privados
+
+	// THREE.Sprite reusa una geometry estática compartida entre todas las instancias
+	// (Sprite._geometry) — nunca disposearla, rompería el resto de sprites de la app.
+	private disposeObject(obj: THREE.Object3D): void {
+		if (obj instanceof THREE.Mesh) obj.geometry?.dispose();
+		if (!(obj instanceof THREE.Mesh) && !(obj instanceof THREE.Sprite)) return;
+		const material = obj.material;
+		if (Array.isArray(material)) material.forEach((m) => this.disposeMaterial(m));
+		else if (material) this.disposeMaterial(material);
+	}
+
+	private disposeMaterial(material: THREE.Material): void {
+		if ('map' in material && material.map instanceof THREE.Texture) material.map.dispose();
+		material.dispose();
+	}
 
 	private addWindowDetails(
 		cx: number, cz: number, fy: number, hw: number, hh: number,

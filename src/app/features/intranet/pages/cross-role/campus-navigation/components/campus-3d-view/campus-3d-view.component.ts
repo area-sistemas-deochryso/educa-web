@@ -110,6 +110,9 @@ export class Campus3dViewComponent implements AfterViewInit, OnDestroy {
 	// #region Estado compartido
 	private readonly player = new PlayerState();
 	private world: WorldData = { edgeSegs: [], stairZones: [], roomBoxes: [], labelEntries: [], nodeMap: new Map() };
+	// Dedupe por referencia — evita rebuild si el effect() corre (Angular garantiza
+	// al menos 1 run) con los mismos nodes/edges que ya construyó ngAfterViewInit.
+	private lastBuiltNodes: CampusNode[] | null = null; private lastBuiltEdges: CampusEdge[] | null = null;
 	// #endregion
 
 	// #region Input state
@@ -134,7 +137,9 @@ export class Campus3dViewComponent implements AfterViewInit, OnDestroy {
 		effect(() => {
 			const nodes = this.nodes();
 			const edges = this.edges();
-			if (nodes.length > 0 && this.scene) {
+			const alreadyBuilt = nodes === this.lastBuiltNodes && edges === this.lastBuiltEdges;
+			if (nodes.length > 0 && this.scene && !alreadyBuilt) {
+				this.lastBuiltNodes = nodes; this.lastBuiltEdges = edges;
 				this.world = this.sceneBuilder.buildScene(this.scene, nodes, edges);
 				this.playerService.placePlayerAtStart(this.player, nodes, this.startNodeId(), this.destinationNodeId());
 				this.currentFloor.set(this.player.playerFloor);
@@ -158,6 +163,7 @@ export class Campus3dViewComponent implements AfterViewInit, OnDestroy {
 		const nodes = this.nodes();
 		const edges = this.edges();
 		if (nodes.length > 0) {
+			this.lastBuiltNodes = nodes; this.lastBuiltEdges = edges;
 			this.world = this.sceneBuilder.buildScene(this.scene, nodes, edges);
 			this.playerService.placePlayerAtStart(this.player, nodes, this.startNodeId(), this.destinationNodeId());
 			this.currentFloor.set(this.player.playerFloor);

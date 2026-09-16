@@ -29,49 +29,65 @@ const PROFESOR_ROUTES_RAW: Route[] = [
 	{
 		path: 'profesor/asistencia',
 		loadComponent: () =>
-			import('./pages/profesor').then((m) => m.TeacherAttendanceComponent),
+			import('./pages/profesor/attendance/teacher-attendance.component').then(
+				(m) => m.TeacherAttendanceComponent,
+			),
 		title: 'Intranet - Asistencia',
 	},
 	{
 		path: 'profesor/calificaciones',
 		loadComponent: () =>
-			import('./pages/profesor').then((m) => m.TeacherGradesComponent),
+			import('./pages/profesor/grades/profesor-calificaciones.component').then(
+				(m) => m.TeacherGradesComponent,
+			),
 		title: 'Intranet - Calificaciones',
 	},
 	{
 		path: 'profesor/cursos',
 		loadComponent: () =>
-			import('./pages/profesor').then((m) => m.ProfesorCursosComponent),
+			import('./pages/profesor/cursos/profesor-cursos.component').then(
+				(m) => m.ProfesorCursosComponent,
+			),
 		title: 'Intranet - Mis Cursos',
 	},
 	{
 		path: 'profesor/final-salones',
 		loadComponent: () =>
-			import('./pages/profesor').then((m) => m.TeacherFinalClassroomsComponent),
+			import('./pages/profesor/final-classrooms/profesor-final-salones.component').then(
+				(m) => m.TeacherFinalClassroomsComponent,
+			),
 		title: 'Intranet - Gestión de Salones',
 	},
 	{
 		path: 'profesor/foro',
 		loadComponent: () =>
-			import('./pages/profesor').then((m) => m.ProfesorForoComponent),
+			import('./pages/profesor/foro/profesor-foro.component').then(
+				(m) => m.ProfesorForoComponent,
+			),
 		title: 'Intranet - Foro',
 	},
 	{
 		path: 'profesor/horarios',
 		loadComponent: () =>
-			import('./pages/profesor').then((m) => m.TeacherSchedulesComponent),
+			import('./pages/profesor/schedules/profesor-horarios.component').then(
+				(m) => m.TeacherSchedulesComponent,
+			),
 		title: 'Intranet - Mi Horario',
 	},
 	{
 		path: 'profesor/mensajeria',
 		loadComponent: () =>
-			import('./pages/profesor').then((m) => m.ProfesorMensajeriaComponent),
+			import('./pages/profesor/mensajeria/profesor-mensajeria.component').then(
+				(m) => m.ProfesorMensajeriaComponent,
+			),
 		title: 'Intranet - Mensajería',
 	},
 	{
 		path: 'profesor/salones',
 		loadComponent: () =>
-			import('./pages/profesor').then((m) => m.TeacherClassroomsComponent),
+			import('./pages/profesor/classrooms/profesor-salones.component').then(
+				(m) => m.TeacherClassroomsComponent,
+			),
 		title: 'Intranet - Mis Salones',
 	},
 ];
@@ -81,49 +97,65 @@ const ESTUDIANTE_ROUTES_RAW: Route[] = [
 	{
 		path: 'estudiante/asistencia',
 		loadComponent: () =>
-			import('./pages/estudiante').then((m) => m.StudentAttendanceComponent),
+			import('./pages/estudiante/attendance/student-attendance.component').then(
+				(m) => m.StudentAttendanceComponent,
+			),
 		title: 'Intranet - Mi Asistencia',
 	},
 	{
 		path: 'estudiante/cursos',
 		loadComponent: () =>
-			import('./pages/estudiante').then((m) => m.EstudianteCursosComponent),
+			import('./pages/estudiante/cursos/estudiante-cursos.component').then(
+				(m) => m.EstudianteCursosComponent,
+			),
 		title: 'Intranet - Mis Cursos',
 	},
 	{
 		path: 'estudiante/foro',
 		loadComponent: () =>
-			import('./pages/estudiante').then((m) => m.EstudianteForoComponent),
+			import('./pages/estudiante/foro/estudiante-foro.component').then(
+				(m) => m.EstudianteForoComponent,
+			),
 		title: 'Intranet - Anuncios',
 	},
 	{
 		path: 'estudiante/horarios',
 		loadComponent: () =>
-			import('./pages/estudiante').then((m) => m.StudentSchedulesComponent),
+			import('./pages/estudiante/schedules/estudiante-horarios.component').then(
+				(m) => m.StudentSchedulesComponent,
+			),
 		title: 'Intranet - Mi Horario',
 	},
 	{
 		path: 'estudiante/mensajeria',
 		loadComponent: () =>
-			import('./pages/estudiante').then((m) => m.EstudianteMensajeriaComponent),
+			import('./pages/estudiante/mensajeria/estudiante-mensajeria.component').then(
+				(m) => m.EstudianteMensajeriaComponent,
+			),
 		title: 'Intranet - Mensajería',
 	},
 	{
 		path: 'estudiante/notas',
 		loadComponent: () =>
-			import('./pages/estudiante').then((m) => m.EstudianteNotasComponent),
+			import('./pages/estudiante/notas/estudiante-notas.component').then(
+				(m) => m.EstudianteNotasComponent,
+			),
 		title: 'Intranet - Mis Calificaciones',
 	},
 	{
 		path: 'estudiante/rendimiento',
 		loadComponent: () =>
-			import('./pages/estudiante').then((m) => m.EstudianteRendimientoComponent),
+			import('./pages/estudiante/rendimiento/estudiante-rendimiento.component').then(
+				(m) => m.EstudianteRendimientoComponent,
+			),
 		title: 'Intranet - Mi Rendimiento',
 	},
 	{
 		path: 'estudiante/salones',
 		loadComponent: () =>
-			import('./pages/estudiante').then((m) => m.StudentClassroomsComponent),
+			import('./pages/estudiante/classrooms/estudiante-salones.component').then(
+				(m) => m.StudentClassroomsComponent,
+			),
 		title: 'Intranet - Mis Salones',
 	},
 ];

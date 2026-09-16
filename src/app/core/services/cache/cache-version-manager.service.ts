@@ -45,30 +45,33 @@ export class CacheVersionManagerService {
 		logger.log('[CacheVersionManager] Iniciando verificación de versiones...');
 
 		const storedVersions = this.getStoredVersions();
-		const modulesInvalidated: string[] = [];
-		let totalEntriesInvalidated = 0;
 
-		// Comparar cada módulo
+		// Detectar módulos a invalidar antes de disparar las invalidaciones —
+		// se corren en paralelo con Promise.all en vez de await secuencial en el loop,
+		// que serializaba el arranque de la app por cada módulo con versión cambiada.
+		const toInvalidate: { module: string; moduleKey: CacheModule }[] = [];
 		for (const [module, currentVersion] of Object.entries(CACHE_VERSIONS)) {
 			const moduleKey = module as CacheModule;
 			const storedVersion = storedVersions[moduleKey];
 
-			// Si la versión cambió → invalidar cache de ese módulo
 			if (storedVersion && storedVersion !== currentVersion) {
 				logger.log(
 					`[CacheVersionManager] Módulo "${module}" cambió: ${storedVersion} → ${currentVersion}`
 				);
-
-				const pattern = MODULE_URL_PATTERNS[moduleKey];
-				const count = await this.swService.invalidateCacheByPattern(pattern);
-
-				totalEntriesInvalidated += count;
-				modulesInvalidated.push(module);
+				toInvalidate.push({ module, moduleKey });
 			} else if (!storedVersion) {
 				// Primera vez que se ejecuta → solo guardar versión sin invalidar
 				logger.log(`[CacheVersionManager] Módulo "${module}" inicializado en v${currentVersion}`);
 			}
 		}
+
+		const counts = await Promise.all(
+			toInvalidate.map(({ moduleKey }) =>
+				this.swService.invalidateCacheByPattern(MODULE_URL_PATTERNS[moduleKey]),
+			),
+		);
+		const modulesInvalidated = toInvalidate.map(({ module }) => module);
+		const totalEntriesInvalidated = counts.reduce((sum, count) => sum + count, 0);
 
 		// Guardar las nuevas versiones
 		this.saveVersions(CACHE_VERSIONS);
