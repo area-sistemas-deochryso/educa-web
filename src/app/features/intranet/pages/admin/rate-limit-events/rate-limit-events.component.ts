@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -22,7 +21,6 @@ import type { EduTableLazyLoadEvent } from '@edu-ui';
 	selector: 'app-rate-limit-events',
 	standalone: true,
 	imports: [
-		CommonModule,
 		EduButton,
 		EduToast,
 		PageHeaderComponent,

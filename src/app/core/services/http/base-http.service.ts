@@ -2,7 +2,7 @@
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { environment } from '@env/environment';
+import { environment } from '@config/environment';
 
 // #endregion
 // #region Implementation

@@ -1,5 +1,4 @@
 import { Component, ChangeDetectionStrategy, inject, effect, signal, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { PageHeaderComponent, PeriodToggleComponent } from '@intranet-shared/components';
@@ -18,7 +17,6 @@ import { EduSpinner, EduTag, EduTooltip } from '@edu-ui';
 	selector: 'app-teacher-classrooms',
 	standalone: true,
 	imports: [
-		CommonModule,
 		EduTag,
 		EduTooltip,
 		EduSpinner,

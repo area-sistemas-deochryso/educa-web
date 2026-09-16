@@ -59,7 +59,7 @@
 .edu-toast__item[data-severity='success'] { border-color: var(--eduui-green-200); }
 .edu-toast__item[data-severity='info'] { border-color: var(--eduui-sky-200); }
 .edu-toast__item[data-severity='warn'] { border-color: var(--eduui-yellow-200); }
-.edu-toast__item[data-severity='error'] { border-color: var(--eduui-red-200); }
+.edu-toast__item[data-severity='danger'] { border-color: var(--eduui-red-200); }
 
 .edu-toast__icon {
 	flex-shrink: 0;
@@ -69,7 +69,7 @@
 .edu-toast__item[data-severity='success'] .edu-toast__icon { color: var(--eduui-green-600); }
 .edu-toast__item[data-severity='info'] .edu-toast__icon { color: var(--eduui-sky-600); }
 .edu-toast__item[data-severity='warn'] .edu-toast__icon { color: var(--eduui-yellow-600); }
-.edu-toast__item[data-severity='error'] .edu-toast__icon { color: var(--eduui-red-600); }
+.edu-toast__item[data-severity='danger'] .edu-toast__icon { color: var(--eduui-red-600); }
 
 .edu-toast__content {
 	flex: 1;
@@ -110,10 +110,10 @@
 	.edu-toast__item[data-severity='success'] { border-color: color-mix(in srgb, var(--eduui-green-700), transparent 64%); }
 	.edu-toast__item[data-severity='info'] { border-color: color-mix(in srgb, var(--eduui-sky-700), transparent 64%); }
 	.edu-toast__item[data-severity='warn'] { border-color: color-mix(in srgb, var(--eduui-yellow-700), transparent 64%); }
-	.edu-toast__item[data-severity='error'] { border-color: color-mix(in srgb, var(--eduui-red-700), transparent 64%); }
+	.edu-toast__item[data-severity='danger'] { border-color: color-mix(in srgb, var(--eduui-red-700), transparent 64%); }
 
 	.edu-toast__item[data-severity='success'] .edu-toast__icon { color: var(--eduui-green-500); }
 	.edu-toast__item[data-severity='info'] .edu-toast__icon { color: var(--eduui-sky-500); }
 	.edu-toast__item[data-severity='warn'] .edu-toast__icon { color: var(--eduui-yellow-500); }
-	.edu-toast__item[data-severity='error'] .edu-toast__icon { color: var(--eduui-red-500); }
+	.edu-toast__item[data-severity='danger'] .edu-toast__icon { color: var(--eduui-red-500); }
 }

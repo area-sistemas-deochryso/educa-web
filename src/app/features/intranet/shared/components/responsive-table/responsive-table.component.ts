@@ -10,7 +10,6 @@ import {
 	signal,
 } from '@angular/core';
 
-import { CommonModule } from '@angular/common';
 import { EduPaginator } from '@edu-ui';
 
 // #endregion
@@ -19,7 +18,7 @@ import { EduPaginator } from '@edu-ui';
 @Component({
 	selector: 'app-responsive-table',
 	standalone: true,
-	imports: [CommonModule, EduPaginator],
+	imports: [EduPaginator],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './responsive-table.component.html',
 	styleUrl: './responsive-table.component.scss',

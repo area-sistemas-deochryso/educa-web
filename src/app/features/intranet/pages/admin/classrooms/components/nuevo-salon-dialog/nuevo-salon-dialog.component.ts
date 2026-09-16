@@ -1,5 +1,4 @@
 import { Component, ChangeDetectionStrategy, inject, input, output, signal, computed, effect } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { GradosService } from '@features/intranet/pages/admin/cursos/services';
@@ -11,7 +10,7 @@ import { EduButton, EduDialog, EduInputNumber, EduSelect } from '@edu-ui';
 @Component({
 	selector: 'app-nuevo-salon-dialog',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduDialog, EduButton, EduSelect, EduInputNumber],
+	imports: [FormsModule, EduDialog, EduButton, EduSelect, EduInputNumber],
 	templateUrl: './nuevo-salon-dialog.component.html',
 	styleUrl: './nuevo-salon-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

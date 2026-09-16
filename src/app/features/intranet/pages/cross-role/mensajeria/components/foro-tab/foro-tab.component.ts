@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, inject, input, signal, computed, effect } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GrupoContenidoDto } from '@features/intranet/pages/profesor/models';
 import { CrearConversacionDto } from '@data/models';
@@ -10,7 +10,7 @@ import { EduButton, EduInputText, EduMultiSelect, EduSelect, EduSpinner, EduTag 
 @Component({
 	selector: 'app-salon-foro-tab',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduButton, EduInputText, EduMultiSelect, EduSelect, EduTag, EduSpinner],
+	imports: [DatePipe, FormsModule, EduButton, EduInputText, EduMultiSelect, EduSelect, EduTag, EduSpinner],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './foro-tab.component.html',
 	styleUrl: './foro-tab.component.scss',

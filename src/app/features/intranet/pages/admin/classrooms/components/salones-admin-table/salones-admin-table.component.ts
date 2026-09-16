@@ -1,5 +1,4 @@
 import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
 import { type ModoAsignacion, resolveModoAsignacion } from '@data/adapters';
 import { ModoAsignacionBadgeComponent } from '@shared/components';
@@ -9,7 +8,7 @@ import { EduButton, EduSortableColumn, EduTable, EduTag, EduTooltip } from '@edu
 @Component({
 	selector: 'app-classrooms-admin-table',
 	standalone: true,
-	imports: [CommonModule, EduTable, EduButton, EduTag, ModoAsignacionBadgeComponent, EduTooltip, EduSortableColumn],
+	imports: [EduTable, EduButton, EduTag, ModoAsignacionBadgeComponent, EduTooltip, EduSortableColumn],
 	templateUrl: './salones-admin-table.component.html',
 	styleUrl: './salones-admin-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

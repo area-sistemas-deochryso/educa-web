@@ -1,5 +1,4 @@
 import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
 import { HealthJustificationDto } from '@features/intranet/pages/profesor/models';
 import { EduButton, EduSkeleton, EduTable, EduTag, EduTooltip } from '@edu-ui';
@@ -7,7 +6,7 @@ import { EduButton, EduSkeleton, EduTable, EduTag, EduTooltip } from '@edu-ui';
 @Component({
 	selector: 'app-health-justification-list',
 	standalone: true,
-	imports: [CommonModule, EduTable, EduButton, EduTag, EduTooltip, EduSkeleton],
+	imports: [EduTable, EduButton, EduTag, EduTooltip, EduSkeleton],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
 		@if (loading()) {

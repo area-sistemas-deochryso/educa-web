@@ -13,7 +13,6 @@ import {
 	OnDestroy,
 } from '@angular/core';
 import { VOICE_COMMANDS, VoiceCommandCategory } from '@core/services/speech';
-import { CommonModule } from '@angular/common';
 import { VoiceRecognitionService, KeyboardShortcutsService } from '@core/services';
 import { logger } from '@core/helpers';
 
@@ -23,7 +22,7 @@ import { logger } from '@core/helpers';
 	selector: 'app-voice-button',
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [CommonModule],
+	imports: [],
 	templateUrl: './voice-button.component.html',
 	styleUrl: './voice-button.component.scss',
 })

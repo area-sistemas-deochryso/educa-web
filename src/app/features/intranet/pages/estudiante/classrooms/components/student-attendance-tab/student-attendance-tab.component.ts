@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, input, output, computed, OnInit, effect } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { NivelEducativo } from '@core/helpers';
@@ -30,7 +30,7 @@ export type JustificacionCellState =
 @Component({
 	selector: 'app-student-attendance-tab',
 	standalone: true,
-	imports: [EduTable, CommonModule, FormsModule, EduSortableColumn, EduTag, EduSelect, EduButton, EduTooltip, JustificarInasistenciaDialogComponent, ErrorStateComponent],
+	imports: [DatePipe, EduTable, FormsModule, EduSortableColumn, EduTag, EduSelect, EduButton, EduTooltip, JustificarInasistenciaDialogComponent, ErrorStateComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './student-attendance-tab.component.html',
 	styleUrl: './student-attendance-tab.component.scss',

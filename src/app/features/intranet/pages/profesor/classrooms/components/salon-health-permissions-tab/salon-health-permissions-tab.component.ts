@@ -1,5 +1,4 @@
 import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import {
 	HealthExitPermissionDto,
 	HealthJustificationDto,
@@ -16,7 +15,7 @@ import { EduButton, EduConfirmDialog, EduConfirmationService, EduTooltip } from 
 @Component({
 	selector: 'app-salon-health-permissions-tab',
 	standalone: true,
-	imports: [CommonModule, EduButton, EduTooltip, EduConfirmDialog, HealthExitListComponent, HealthJustificationListComponent, HealthExitDialogComponent, HealthJustificationDialogComponent],
+	imports: [EduButton, EduTooltip, EduConfirmDialog, HealthExitListComponent, HealthJustificationListComponent, HealthExitDialogComponent, HealthJustificationDialogComponent],
 	providers: [EduConfirmationService],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `

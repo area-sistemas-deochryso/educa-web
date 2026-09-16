@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, computed, effect, input, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { DatePipe } from '@angular/common';
 
 import {
 	EstudianteMisNotasDto,
@@ -24,7 +24,7 @@ interface PeriodoGroup {
 @Component({
 	selector: 'app-notas-curso-card',
 	standalone: true,
-	imports: [CommonModule, EduTag, EduAccordion, EduAccordionHeader, EduAccordionPanel],
+	imports: [DatePipe, EduTag, EduAccordion, EduAccordionHeader, EduAccordionPanel],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './notas-curso-card.component.html',
 	styleUrl: './notas-curso-card.component.scss',

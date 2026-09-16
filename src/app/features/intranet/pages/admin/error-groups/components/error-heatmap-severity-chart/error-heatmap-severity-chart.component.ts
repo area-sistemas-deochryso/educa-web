@@ -9,7 +9,6 @@ import {
 	output,
 	viewChild,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { Chart, ChartEvent, registerables } from 'chart.js';
 
 import { ErrorSeveridad, HeatmapCalendarCell } from '../../models';
@@ -74,7 +73,7 @@ function formatAxisTick(dateIso: string): string {
 @Component({
 	selector: 'app-error-heatmap-severity-chart',
 	standalone: true,
-	imports: [CommonModule],
+	imports: [],
 	templateUrl: './error-heatmap-severity-chart.component.html',
 	styleUrl: './error-heatmap-severity-chart.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

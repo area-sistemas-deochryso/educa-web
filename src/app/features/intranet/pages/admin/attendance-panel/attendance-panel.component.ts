@@ -1,6 +1,5 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
@@ -29,7 +28,7 @@ const CAPABILITY_SEDE_CRUZADA = 'ASISTENCIA_ADMIN';
 @Component({
 	selector: 'app-attendance-panel',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduSelect, EduSelectButton, EduDatePicker, StatsSkeletonComponent, AttendancePanelKpiTileComponent, AttendancePanelBreakdownComponent, AttendancePanelChartDiaComponent, AttendancePanelChartLineComponent, AttendancePanelChartHeatmapComponent],
+	imports: [FormsModule, EduSelect, EduSelectButton, EduDatePicker, StatsSkeletonComponent, AttendancePanelKpiTileComponent, AttendancePanelBreakdownComponent, AttendancePanelChartDiaComponent, AttendancePanelChartLineComponent, AttendancePanelChartHeatmapComponent],
 	templateUrl: './attendance-panel.component.html',
 	styleUrl: './attendance-panel.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

@@ -1,5 +1,4 @@
 import { Component, ChangeDetectionStrategy, input, output, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
 import { CursoContenidoSemanaDto } from '@features/intranet/pages/profesor/models';
 import { FormatFileSizePipe } from '@intranet-shared/pipes';
@@ -8,7 +7,7 @@ import { EduDialog } from '@edu-ui';
 @Component({
 	selector: 'app-archivos-summary-dialog',
 	standalone: true,
-	imports: [CommonModule, EduDialog, FormatFileSizePipe],
+	imports: [EduDialog, FormatFileSizePipe],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './archivos-summary-dialog.component.html',
 	styleUrl: './archivos-summary-dialog.component.scss',

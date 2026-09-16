@@ -1,6 +1,5 @@
 // #region Imports
 import { Component, ChangeDetectionStrategy, inject, OnInit, computed, signal, viewChild, DestroyRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs/operators';
 import { FormsModule } from '@angular/forms';
@@ -20,7 +19,6 @@ import { EduButton, EduSpinner, EduTag, EduToggle, EduTooltip } from '@edu-ui';
 	selector: 'app-videoconferencias',
 	standalone: true,
 	imports: [
-		CommonModule,
 		FormsModule,
 		EduButton,
 		EduTag,

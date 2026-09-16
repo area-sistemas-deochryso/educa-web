@@ -1,5 +1,4 @@
 import { Component, ChangeDetectionStrategy, input, output, signal, computed, OnChanges } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import {
@@ -25,7 +24,7 @@ interface LiteralRow {
 @Component({
 	selector: 'app-config-grade-dialog',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduDialog, EduButton, EduSelect, EduInputNumber, EduInputText, EduCheckbox, EduDivider],
+	imports: [FormsModule, EduDialog, EduButton, EduSelect, EduInputNumber, EduInputText, EduCheckbox, EduDivider],
 	templateUrl: './config-calificacion-dialog.component.html',
 	styleUrl: './config-calificacion-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

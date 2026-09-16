@@ -1,6 +1,5 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
 import { ExcelService } from '@core/services';
 import { RolService } from '@core/services/roles';
@@ -18,7 +17,7 @@ type DialogStep = 'upload' | 'preview' | 'result';
 @Component({
 	selector: 'app-usuarios-import-dialog',
 	standalone: true,
-	imports: [CommonModule, EduButton, EduDialog, EduSpinner, EduTable, EduTag, EduTemplate],
+	imports: [EduButton, EduDialog, EduSpinner, EduTable, EduTag, EduTemplate],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './usuarios-import-dialog.component.html',
 	styleUrl: './usuarios-import-dialog.component.scss',

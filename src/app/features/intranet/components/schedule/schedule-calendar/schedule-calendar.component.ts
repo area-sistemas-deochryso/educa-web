@@ -1,7 +1,6 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
 
-import { CommonModule } from '@angular/common';
 import { EduMenu, EduMenuItem, EduTooltip } from '@edu-ui';
 
 // #endregion
@@ -20,7 +19,7 @@ export interface CalendarDay {
 
 @Component({
 	selector: 'app-schedule-calendar',
-	imports: [CommonModule, EduMenu, EduTooltip],
+	imports: [EduMenu, EduTooltip],
 	templateUrl: './schedule-calendar.component.html',
 	styleUrl: './schedule-calendar.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

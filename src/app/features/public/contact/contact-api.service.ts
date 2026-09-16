@@ -1,7 +1,7 @@
 // #region Imports
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { environment } from '@env/environment';
+import { environment } from '@config/environment';
 import { firstValueFrom } from 'rxjs';
 
 import type { ContactoRequest } from './contact.model';

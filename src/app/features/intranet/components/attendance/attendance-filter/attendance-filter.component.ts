@@ -1,6 +1,5 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, input, output, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EduSelect } from '@edu-ui';
 
@@ -34,7 +33,7 @@ const SECCIONES: SeccionOption[] = [
 @Component({
 	selector: 'app-attendance-filter',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduSelect],
+	imports: [FormsModule, EduSelect],
 	templateUrl: './attendance-filter.component.html',
 	styleUrl: './attendance-filter.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

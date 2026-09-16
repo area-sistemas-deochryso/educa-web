@@ -1,5 +1,4 @@
 import { Component, ChangeDetectionStrategy, input, computed, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { EstudianteMisNotasDto } from '@features/intranet/pages/estudiante/models';
@@ -9,7 +8,7 @@ import { EduSelect } from '@edu-ui';
 @Component({
 	selector: 'app-estudiante-notas-salon-tab',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduSelect, NotasCursoCardComponent],
+	imports: [FormsModule, EduSelect, NotasCursoCardComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
 		<!-- #region Curso selector -->

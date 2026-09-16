@@ -139,7 +139,7 @@ export class UserInfoDialogComponent {
 				error: (err: unknown) => {
 					const mensaje = extractErrorMessage(err, 'No se pudo actualizar la contraseña');
 					this.messageService.add({
-						severity: 'error',
+						severity: 'danger',
 						summary: 'Error',
 						detail: mensaje,
 						life: 5000,

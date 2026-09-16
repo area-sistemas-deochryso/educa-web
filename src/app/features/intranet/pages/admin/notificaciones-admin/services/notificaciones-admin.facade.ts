@@ -4,7 +4,7 @@ import { forkJoin } from 'rxjs';
 
 import { logger, withRetry, getEstadoToggleDeltas, getEstadoRollbackDeltas, resolveErrorMessage } from '@core/helpers';
 import { ErrorHandlerService, SwService, WalFacadeHelper, WalCrossTabRefetchService } from '@core/services';
-import { environment } from '@env/environment';
+import { environment } from '@config/environment';
 import {
 	NotificacionLista,
 	CrearNotificacionRequest,

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 
 import {
@@ -12,7 +12,7 @@ import { EduButton, EduTable, EduTag, EduTemplate, EduTooltip } from '@edu-ui';
 @Component({
 	selector: 'app-correlation-errors-section',
 	standalone: true,
-	imports: [CommonModule, DatePipe, RouterLink, EduButton, EduTable, EduTag, EduTooltip, EduTemplate],
+	imports: [DatePipe, RouterLink, EduButton, EduTable, EduTag, EduTooltip, EduTemplate],
 	templateUrl: './correlation-errors-section.component.html',
 	styleUrl: './correlation-errors-section.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

@@ -7,7 +7,6 @@ import {
 	output,
 	signal,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import {
@@ -39,7 +38,7 @@ interface EstadoOption {
 	selector: 'app-change-group-status-dialog',
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [CommonModule, FormsModule, EduButton, EduDialog, EduInputText, EduSelect, EduTag, EduTextarea],
+	imports: [FormsModule, EduButton, EduDialog, EduInputText, EduSelect, EduTag, EduTextarea],
 	templateUrl: './change-group-status-dialog.component.html',
 	styleUrl: './change-group-status-dialog.component.scss',
 })

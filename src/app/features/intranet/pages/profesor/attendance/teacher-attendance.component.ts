@@ -8,7 +8,6 @@ import {
 	OnInit,
 	OnDestroy,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
@@ -23,7 +22,7 @@ import { EduSpinner, EduTab, EduTabPanel, EduTabs } from '@edu-ui';
 @Component({
 	selector: 'app-teacher-attendance',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduSpinner, AttendanceRegistrationPanelComponent, AttendanceSummaryPanelComponent, PageHeaderComponent, PickerGridComponent, EduTab, EduTabPanel, EduTabs],
+	imports: [FormsModule, EduSpinner, AttendanceRegistrationPanelComponent, AttendanceSummaryPanelComponent, PageHeaderComponent, PickerGridComponent, EduTab, EduTabPanel, EduTabs],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	styles: `
 		:host {

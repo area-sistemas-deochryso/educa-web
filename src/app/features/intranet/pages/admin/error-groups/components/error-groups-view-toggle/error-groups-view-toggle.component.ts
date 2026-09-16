@@ -8,7 +8,6 @@ import {
 	output,
 	signal,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { ErrorGroupsViewMode, StorageService } from '@core/services/storage';
@@ -28,7 +27,7 @@ interface ToggleOption {
 	selector: 'app-error-groups-view-toggle',
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [CommonModule, FormsModule, EduSelectButton],
+	imports: [FormsModule, EduSelectButton],
 	templateUrl: './error-groups-view-toggle.component.html',
 	styleUrl: './error-groups-view-toggle.component.scss',
 })

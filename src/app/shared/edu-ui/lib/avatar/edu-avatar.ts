@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
+/** Escala de dimensión de imagen/iniciales, no comparable con `EduButtonSize` — ese ajusta densidad de control. */
 export type EduAvatarSize = 'normal' | 'large' | 'xlarge';
 export type EduAvatarShape = 'square' | 'circle';
 export type EduAvatarVariant = 'neutral' | 'brand';

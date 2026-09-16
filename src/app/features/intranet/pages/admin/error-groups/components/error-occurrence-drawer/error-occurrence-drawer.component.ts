@@ -10,7 +10,7 @@ import {
 	output,
 	signal,
 } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -60,7 +60,7 @@ import { EduDrawer, EduTab, EduTabPanel, EduTabs, EduTag, EduTooltip } from '@ed
 	selector: 'app-error-occurrence-drawer',
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [CommonModule, DatePipe, RouterLink, EduDrawer, EduTag, EduTooltip, CorrelationIdPillComponent, EduTab, EduTabPanel, EduTabs],
+	imports: [DatePipe, RouterLink, EduDrawer, EduTag, EduTooltip, CorrelationIdPillComponent, EduTab, EduTabPanel, EduTabs],
 	templateUrl: './error-occurrence-drawer.component.html',
 	styleUrl: './error-occurrence-drawer.component.scss',
 })

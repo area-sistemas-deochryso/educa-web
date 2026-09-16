@@ -1,5 +1,4 @@
 import { Component, ChangeDetectionStrategy, inject, input, output, signal, computed, effect } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CdkDropList, CdkDrag, CdkDragHandle, CdkDragDrop } from '@intranet-shared/directives/drag-drop';
 import { ErrorHandlerService } from '@core/services';
@@ -22,7 +21,7 @@ interface DropListData {
 @Component({
 	selector: 'app-salon-grupos-tab',
 	standalone: true,
-	imports: [CommonModule, FormsModule, CdkDropList, CdkDrag, CdkDragHandle, EduButton, EduInputText, EduSelect, EduTag, EduTooltip, EduDialog, EduConfirmDialog, EduSkeleton, EduCheckbox],
+	imports: [FormsModule, CdkDropList, CdkDrag, CdkDragHandle, EduButton, EduInputText, EduSelect, EduTag, EduTooltip, EduDialog, EduConfirmDialog, EduSkeleton, EduCheckbox],
 	providers: [EduConfirmationService],
 	templateUrl: './salon-grupos-tab.component.html',
 	styleUrl: './salon-grupos-tab.component.scss',

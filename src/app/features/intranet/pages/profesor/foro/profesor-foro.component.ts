@@ -7,7 +7,6 @@ import {
 	OnInit,
 	OnDestroy,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { PageHeaderComponent, PickerGridComponent } from '@intranet-shared/components';
@@ -23,7 +22,6 @@ import { EduSpinner } from '@edu-ui';
 	selector: 'app-profesor-foro',
 	standalone: true,
 	imports: [
-		CommonModule,
 		FormsModule,
 		EduSpinner,
 		PageHeaderComponent,

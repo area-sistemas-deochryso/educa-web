@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, OnInit, output, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
 import { firstValueFrom } from 'rxjs';
 import { EstadisticasMultiRolDia, TipoPersona } from '@data/models';
@@ -30,7 +29,7 @@ export interface RoleChip {
 @Component({
 	selector: 'app-attendance-dashboard',
 	standalone: true,
-	imports: [CommonModule, EduTooltip, EduSkeleton],
+	imports: [EduTooltip, EduSkeleton],
 	templateUrl: './attendance-dashboard.component.html',
 	styleUrl: './attendance-dashboard.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

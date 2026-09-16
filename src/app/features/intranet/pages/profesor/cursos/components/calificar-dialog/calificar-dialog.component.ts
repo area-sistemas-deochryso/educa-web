@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, input, output, signal, computed, effect } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
 	CalificacionConNotasDto,
@@ -30,8 +30,7 @@ import { EduButton, EduDialog, EduInputNumber, EduInputText, EduSelect, EduTable
 @Component({
 	selector: 'app-calificar-dialog',
 	standalone: true,
-	imports: [
-		CommonModule,
+	imports: [DatePipe, 
 		FormsModule,
 		EduDialog,
 		EduButton,

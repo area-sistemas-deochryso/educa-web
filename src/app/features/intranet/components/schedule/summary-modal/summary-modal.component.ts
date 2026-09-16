@@ -1,6 +1,5 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import {
 	CourseSummary,
 	getCourseSummaries,
@@ -13,7 +12,7 @@ import type { EduMenuItem } from '@edu-ui';
 // #region Implementation
 @Component({
 	selector: 'app-summary-modal',
-	imports: [CommonModule, EduDialog, EduMenu],
+	imports: [EduDialog, EduMenu],
 	templateUrl: './summary-modal.component.html',
 	styleUrl: './summary-modal.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

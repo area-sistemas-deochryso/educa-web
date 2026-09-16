@@ -1,6 +1,5 @@
 import { Component, ChangeDetectionStrategy, inject, OnInit, computed } from '@angular/core';
 import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { PageHeaderComponent, PeriodToggleComponent, KpiStatsComponent, type KpiStatItem } from '@intranet-shared/components';
@@ -24,7 +23,6 @@ import { EduButton, EduInputNumber, EduMessageService, EduTab, EduTabPanel, EduT
 	selector: 'app-classrooms-admin',
 	standalone: true,
 	imports: [
-		CommonModule,
 		FormsModule,
 		EduTabs, EduTab, EduTabPanel,
 		EduButton,

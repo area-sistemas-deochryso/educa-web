@@ -1,5 +1,4 @@
 import { Component, ChangeDetectionStrategy, input, output, computed, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
 import { EstudianteAsistencia } from '@intranet-shared/services';
 import {
@@ -27,7 +26,6 @@ import { EduDialog, EduTab, EduTabPanel, EduTabs } from '@edu-ui';
 	selector: 'app-classroom-detail-dialog',
 	standalone: true,
 	imports: [
-		CommonModule,
 		EduDialog,
 		EduTabs, EduTab, EduTabPanel,
 		ModoAsignacionBadgeComponent,

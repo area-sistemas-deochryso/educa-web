@@ -1,6 +1,5 @@
 // #region Imports
 import { Component, ChangeDetectionStrategy, input, output, computed, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { environment } from '@config/environment';
 import { detectarNivel } from '@core/helpers';
 import {
@@ -21,7 +20,6 @@ import { EduButton, EduDialog, EduTab, EduTabPanel, EduTabs, EduTooltip } from '
 	selector: 'app-estudiante-salon-dialog',
 	standalone: true,
 	imports: [
-		CommonModule,
 		EduDialog,
 		EduTabs, EduTab, EduTabPanel,
 		EduButton,

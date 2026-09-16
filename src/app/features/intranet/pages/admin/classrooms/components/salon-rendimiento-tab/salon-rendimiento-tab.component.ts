@@ -1,5 +1,4 @@
 import { Component, ChangeDetectionStrategy, input, output, computed, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { HorarioResponseDto, ReporteRendimientoEstudiantesDto, RendimientoEstudianteDto } from '@data/models';
@@ -11,7 +10,7 @@ const UMBRAL_RIESGO = 0;
 @Component({
 	selector: 'app-classroom-rendimiento-tab',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduTable, EduSelect, EduTag, EduTooltip],
+	imports: [FormsModule, EduTable, EduSelect, EduTag, EduTooltip],
 	templateUrl: './salon-rendimiento-tab.component.html',
 	styleUrl: './salon-rendimiento-tab.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

@@ -1,6 +1,5 @@
 /* eslint-disable max-lines -- Razón: orquesta 8 sub-diálogos hijos (semana, tarea, archivos, tareas, student-files, task-submissions, evaluación, calificar, periodos) + course switcher (P108 F3); ya estaba a 286/300 líneas contadas antes de este cambio. Descomponerlo en subcomponentes de handlers es un refactor propio, fuera de alcance de este brief. */
 import { Component, ChangeDetectionStrategy, inject, signal, computed, output } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { CursoContenidoDataFacade } from '../../services/curso-contenido-data.facade';
 import { CursoContenidoCrudFacade } from '../../services/curso-contenido-crud.facade';
@@ -35,7 +34,6 @@ import { EduButton, EduConfirmDialog, EduConfirmationService, EduDialog, EduTab,
 	selector: 'app-curso-content-dialog',
 	standalone: true,
 	imports: [
-		CommonModule,
 		EduDialog,
 		EduButton,
 		EduTooltip,

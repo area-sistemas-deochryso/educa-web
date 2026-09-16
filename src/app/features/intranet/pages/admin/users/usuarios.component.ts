@@ -3,7 +3,6 @@
 import { AfterViewInit, ChangeDetectionStrategy, Component, DestroyRef, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
 
 import {
 	UsersCrudFacade,
@@ -40,7 +39,7 @@ import {
 	buildDuplicateNameMessage,
 	buildToggleUsuarioMessage,
 } from '@app/shared/constants';
-import { environment } from '@env/environment';
+import { environment } from '@config/environment';
 import { logger } from '@core/helpers';
 import { ErrorStateComponent } from '@shared/components';
 import { ExcelService, UserPermissionsService } from '@core/services';
@@ -61,7 +60,7 @@ const USUARIOS_MIGRAR_CONTRASENAS_MANAGE = 'USUARIOS_MIGRAR_CONTRASENAS_MANAGE';
 @Component({
 	selector: 'app-users',
 	standalone: true,
-	imports: [CommonModule, EduConfirmDialog, UsersHeaderComponent, UsersStatsComponent, UsersStatsSkeletonComponent, UsersFiltersComponent, UsersTableComponent, UsersTableSkeletonComponent, UserFormDialogComponent, UsersImportDialogComponent, UsersValidationDialogComponent, UserDetailDrawerComponent, ErrorStateComponent, EduTab],
+	imports: [EduConfirmDialog, UsersHeaderComponent, UsersStatsComponent, UsersStatsSkeletonComponent, UsersFiltersComponent, UsersTableComponent, UsersTableSkeletonComponent, UserFormDialogComponent, UsersImportDialogComponent, UsersValidationDialogComponent, UserDetailDrawerComponent, ErrorStateComponent, EduTab],
 	providers: [EduConfirmationService],
 	templateUrl: './usuarios.component.html',
 	styleUrl: './usuarios.component.scss',

@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
 
 import { PageHeaderComponent, KpiStatsComponent, type KpiStatItem } from '@intranet-shared/components';
 
@@ -12,7 +11,7 @@ import { EduButton, EduCheckbox, EduDialog, EduDrawer, EduInputText, EduTab, Edu
 @Component({
 	selector: 'app-permissions-roles',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduTable, EduButton, EduDialog, EduTooltip, EduTag, EduInputText, EduCheckbox, EduDrawer, EduTabs, EduTab, EduTabPanel, PageHeaderComponent, KpiStatsComponent, VistasComponent],
+	imports: [FormsModule, EduTable, EduButton, EduDialog, EduTooltip, EduTag, EduInputText, EduCheckbox, EduDrawer, EduTabs, EduTab, EduTabPanel, PageHeaderComponent, KpiStatsComponent, VistasComponent],
 	templateUrl: './permisos-roles.component.html',
 	styleUrl: './permisos-roles.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

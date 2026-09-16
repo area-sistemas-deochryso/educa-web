@@ -1,5 +1,4 @@
 import { Component, ChangeDetectionStrategy, input, output, computed, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { environment } from '@config/environment';
 import { ProfesorSalonConEstudiantes } from '@features/intranet/pages/profesor/models';
 import { ClassroomGradesTabComponent } from '../salon-notas-tab/salon-notas-tab.component';
@@ -25,7 +24,6 @@ import { EduButton, EduDialog, EduTab, EduTabPanel, EduTabs, EduTag, EduTooltip 
 	selector: 'app-salon-estudiantes-dialog',
 	standalone: true,
 	imports: [
-		CommonModule,
 		EduDialog,
 		EduTabs, EduTab, EduTabPanel,
 		EduTag,

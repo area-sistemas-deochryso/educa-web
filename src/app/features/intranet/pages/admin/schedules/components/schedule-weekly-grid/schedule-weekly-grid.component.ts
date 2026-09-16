@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import type {
@@ -24,7 +23,7 @@ const COMPRESS_PREF_KEY = 'educaweb.schedule-weekly-grid.compressEmptyHours';
 @Component({
   selector: 'app-schedule-weekly-grid',
   standalone: true,
-  imports: [CommonModule, FormsModule, EduButton, EduTooltip, EduToggle],
+  imports: [FormsModule, EduButton, EduTooltip, EduToggle],
   templateUrl: './schedule-weekly-grid.component.html',
   styleUrl: './schedule-weekly-grid.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

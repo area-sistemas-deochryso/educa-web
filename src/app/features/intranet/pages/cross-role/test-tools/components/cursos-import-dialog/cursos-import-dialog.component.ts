@@ -1,6 +1,5 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
 import { ExcelService } from '@core/services';
 import { logger } from '@core/helpers';
@@ -22,7 +21,7 @@ type DialogStep = 'upload' | 'preview' | 'result';
 @Component({
 	selector: 'app-cursos-import-dialog',
 	standalone: true,
-	imports: [CommonModule, EduButton, EduDialog, EduSpinner, EduTable, EduTag, EduTemplate],
+	imports: [EduButton, EduDialog, EduSpinner, EduTable, EduTag, EduTemplate],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './cursos-import-dialog.component.html',
 	styleUrl: './cursos-import-dialog.component.scss',

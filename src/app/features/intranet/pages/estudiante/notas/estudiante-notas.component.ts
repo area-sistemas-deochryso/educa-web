@@ -1,5 +1,4 @@
 import { Component, ChangeDetectionStrategy, inject, input, computed, effect, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { PageHeaderComponent, PickerGridComponent, EmptyStateComponent } from '@intranet-shared/components';
@@ -12,7 +11,7 @@ import { EduButton, EduCard, EduTag, EduTooltip } from '@edu-ui';
 @Component({
 	selector: 'app-estudiante-notas',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduButton, EduTag, EduCard, EduTooltip, PageHeaderComponent, PickerGridComponent, EmptyStateComponent, SkeletonLoaderComponent, NotasCursoCardComponent, SimuladorNotasComponent],
+	imports: [FormsModule, EduButton, EduTag, EduCard, EduTooltip, PageHeaderComponent, PickerGridComponent, EmptyStateComponent, SkeletonLoaderComponent, NotasCursoCardComponent, SimuladorNotasComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './estudiante-notas.component.html',
 	styleUrl: './estudiante-notas.component.scss',

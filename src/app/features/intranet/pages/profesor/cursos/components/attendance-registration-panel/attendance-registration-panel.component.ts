@@ -1,5 +1,4 @@
 import { Component, ChangeDetectionStrategy, input, output, computed, effect, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import {
@@ -16,7 +15,7 @@ import { EduButton, EduConfirmDialog, EduConfirmationService, EduDatePicker, Edu
 @Component({
 	selector: 'app-attendance-registration-panel',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduButton, EduDatePicker, EduTag, EduInputText, EduTooltip, EduConfirmDialog, SkeletonLoaderComponent],
+	imports: [FormsModule, EduButton, EduDatePicker, EduTag, EduInputText, EduTooltip, EduConfirmDialog, SkeletonLoaderComponent],
 	providers: [EduConfirmationService],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './attendance-registration-panel.component.html',

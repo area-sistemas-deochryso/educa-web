@@ -1,6 +1,5 @@
 // #region Imports
 import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { EduButton, EduDialog, EduInputNumber } from '@edu-ui';
@@ -10,7 +9,7 @@ import { EduButton, EduDialog, EduInputNumber } from '@edu-ui';
 @Component({
 	selector: 'app-curso-builder-dialog',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduDialog, EduButton, EduInputNumber],
+	imports: [FormsModule, EduDialog, EduButton, EduInputNumber],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
 		<edu-dialog

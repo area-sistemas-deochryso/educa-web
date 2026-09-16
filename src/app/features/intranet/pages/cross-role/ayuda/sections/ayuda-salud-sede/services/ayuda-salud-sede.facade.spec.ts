@@ -4,7 +4,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { environment } from '@env/environment';
+import { environment } from '@config/environment';
 import { WalFacadeHelper } from '@core/services/wal';
 import { EstadoSaludSedeDto } from '@features/intranet/pages/cross-role/ayuda/sections/ayuda-salud-sede/models/salud-sede.models';
 import { AyudaSaludSedeFacade } from './ayuda-salud-sede.facade';

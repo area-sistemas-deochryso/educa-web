@@ -5,7 +5,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { HttpErrorResponse } from '@angular/common/http';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { environment } from '@env/environment';
+import { environment } from '@config/environment';
 import { ErrorHandlerService } from '@core/services/error';
 import { WalFacadeHelper } from '@core/services/wal';
 

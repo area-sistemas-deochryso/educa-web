@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, computed, input, output } from '@angular/core';
-import { CommonModule, SlicePipe } from '@angular/common';
+import { SlicePipe, DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
 import { FormsModule } from '@angular/forms';
@@ -37,7 +37,7 @@ interface SemanaColumnsGroup {
 @Component({
 	selector: 'app-classroom-grades-tab',
 	standalone: true,
-	imports: [CommonModule, SlicePipe, RouterLink, EduTable, EduTag, EduSelect, FormsModule, EduSelectButton, EduSkeleton, EduButton, EduTooltip, ErrorStateComponent],
+	imports: [DecimalPipe, SlicePipe, RouterLink, EduTable, EduTag, EduSelect, FormsModule, EduSelectButton, EduSkeleton, EduButton, EduTooltip, ErrorStateComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './salon-notas-tab.component.html',
 	styleUrl: './salon-notas-tab.component.scss',

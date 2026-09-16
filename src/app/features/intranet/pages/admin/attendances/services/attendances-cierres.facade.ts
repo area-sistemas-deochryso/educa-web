@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 
 import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
 import { facadeErrorHandler, type FacadeErrorHandler } from '@core/helpers';
-import { environment } from '@env/environment';
+import { environment } from '@config/environment';
 import {
 	CrearCierreMensualRequest,
 	RevertirCierreMensualRequest,

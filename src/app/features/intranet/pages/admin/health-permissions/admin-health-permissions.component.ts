@@ -1,5 +1,4 @@
 import { Component, ChangeDetectionStrategy, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PageHeaderComponent, PickerGridComponent } from '@intranet-shared/components';
 
@@ -13,7 +12,7 @@ import { EduButton, EduSpinner } from '@edu-ui';
 @Component({
 	selector: 'app-admin-health-permissions',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduButton, EduSpinner, PageHeaderComponent, PickerGridComponent, SalonHealthPermissionsTabComponent],
+	imports: [FormsModule, EduButton, EduSpinner, PageHeaderComponent, PickerGridComponent, SalonHealthPermissionsTabComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
 		<app-page-header icon="pi pi-heart" title="Permisos de Salud" subtitle="Administra los permisos de salud registrados por estudiante" />

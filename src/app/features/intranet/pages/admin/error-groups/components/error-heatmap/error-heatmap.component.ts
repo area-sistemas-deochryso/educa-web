@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { HeatmapCalendarCell, HeatmapCell } from '../../models';
@@ -28,7 +28,6 @@ export interface HeatmapPeriodOption {
 	selector: 'app-error-heatmap',
 	standalone: true,
 	imports: [
-		CommonModule,
 		DatePipe,
 		FormsModule,
 		EduButton,

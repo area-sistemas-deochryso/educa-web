@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } 
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { firstValueFrom, map } from 'rxjs';
-import { CommonModule } from '@angular/common';
+import { DatePipe } from '@angular/common';
 
 import { logger } from '@core/helpers';
 import { EmailOutboxLista } from '@data/models';
@@ -20,7 +20,7 @@ interface StudentIdentity {
 @Component({
 	selector: 'app-student-gap-profile',
 	standalone: true,
-	imports: [CommonModule, EduButton, EduTable, EduTag, EduSkeleton, RouterLink],
+	imports: [DatePipe, EduButton, EduTable, EduTag, EduSkeleton, RouterLink],
 	templateUrl: './student-gap-profile.component.html',
 	styleUrl: './student-gap-profile.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

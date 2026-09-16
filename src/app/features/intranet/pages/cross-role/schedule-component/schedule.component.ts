@@ -1,6 +1,5 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, OnInit, OnDestroy, inject, DestroyRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ScheduleCalendarComponent } from '@features/intranet/components/schedule/schedule-calendar/schedule-calendar.component';
@@ -17,7 +16,6 @@ import { ScheduleModalsState } from '@core/services/storage';
 	selector: 'app-schedule',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [
-		CommonModule,
 		ScheduleCalendarComponent,
 		ScheduleModalComponent,
 		SummaryModalComponent,

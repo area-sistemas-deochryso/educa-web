@@ -1,5 +1,4 @@
 import { Component, ChangeDetectionStrategy, input } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
 import { SalonMensajeriaTabComponent } from '../mensajeria-tab/mensajeria-tab.component';
 import { PageHeaderComponent } from '@intranet-shared/components';
@@ -13,7 +12,7 @@ export interface MensajeriaCursoOption {
 @Component({
 	selector: 'app-mensajeria-page',
 	standalone: true,
-	imports: [CommonModule, EduSpinner, PageHeaderComponent, SalonMensajeriaTabComponent],
+	imports: [EduSpinner, PageHeaderComponent, SalonMensajeriaTabComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	styleUrl: './mensajeria-page.component.scss',
 	templateUrl: './mensajeria-page.component.html',

@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, input, output, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { DatePipe } from '@angular/common';
 
 import { CursoContenidoSemanaDto } from '@features/intranet/pages/profesor/models';
 import { EduDialog } from '@edu-ui';
@@ -7,7 +7,7 @@ import { EduDialog } from '@edu-ui';
 @Component({
 	selector: 'app-tareas-summary-dialog',
 	standalone: true,
-	imports: [CommonModule, EduDialog],
+	imports: [DatePipe, EduDialog],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './tareas-summary-dialog.component.html',
 	styleUrl: './tareas-summary-dialog.component.scss',

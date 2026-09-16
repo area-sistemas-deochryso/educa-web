@@ -12,7 +12,6 @@ import {
 	computed,
 	HostListener,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
 import { logger, resolveErrorMessage } from '@core/helpers';
 import { VideoconferenciasFacade } from '../../services/videoconferencias.facade';
@@ -34,7 +33,7 @@ declare const JitsiMeetExternalAPI: new (domain: string, options: Record<string,
 @Component({
 	selector: 'app-videoconferencia-sala',
 	standalone: true,
-	imports: [CommonModule, EduButton, EduSpinner],
+	imports: [EduButton, EduSpinner],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './videoconferencia-sala.component.html',
 	styleUrl: './videoconferencia-sala.component.scss',

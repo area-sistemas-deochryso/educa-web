@@ -1,6 +1,6 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -31,8 +31,7 @@ interface EstadoOption {
 	selector: 'app-feedback-reports',
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [
-		CommonModule,
+	imports: [DatePipe, 
 		FormsModule,
 		EduTable,
 		EduTag,

@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, input, output, computed, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { HorarioResponseDto, SalonNotasResumenDto, ConfiguracionCalificacionListDto } from '@data/models';
@@ -9,7 +9,7 @@ import { EduSelect, EduTable, EduTooltip } from '@edu-ui';
 @Component({
 	selector: 'app-classroom-grades-tab',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduTable, EduSelect, EduTooltip],
+	imports: [DecimalPipe, FormsModule, EduTable, EduSelect, EduTooltip],
 	templateUrl: './salon-notas-tab.component.html',
 	styleUrl: './salon-notas-tab.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

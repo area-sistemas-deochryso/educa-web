@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { LowerCasePipe } from '@angular/common';
 import { EduButton, EduMessage } from '@edu-ui';
 
 export interface DependencyCheck {
@@ -13,7 +13,7 @@ export interface DependencyCheck {
 @Component({
 	selector: 'app-dependency-guidance',
 	standalone: true,
-	imports: [CommonModule, EduButton, EduMessage],
+	imports: [LowerCasePipe, EduButton, EduMessage],
 	templateUrl: './dependency-guidance.component.html',
 	styleUrl: './dependency-guidance.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

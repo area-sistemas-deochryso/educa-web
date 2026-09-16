@@ -5,7 +5,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { ComponentFixture } from '@angular/core/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { environment } from '@env/environment';
+import { environment } from '@config/environment';
 import { AyudaTicketComponent } from './ayuda-ticket.component';
 // #endregion
 

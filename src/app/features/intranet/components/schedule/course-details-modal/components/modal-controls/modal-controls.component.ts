@@ -1,7 +1,6 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
-import { CommonModule } from '@angular/common';
 import { EduTooltip } from '@edu-ui';
 
 // #endregion
@@ -10,7 +9,7 @@ import { EduTooltip } from '@edu-ui';
 	selector: 'app-modal-controls',
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [CommonModule, EduTooltip],
+	imports: [EduTooltip],
 	templateUrl: './modal-controls.component.html',
 	styleUrls: ['./modal-controls.component.scss'],
 })

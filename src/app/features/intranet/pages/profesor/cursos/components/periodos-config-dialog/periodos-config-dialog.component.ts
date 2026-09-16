@@ -1,5 +1,4 @@
 import { Component, ChangeDetectionStrategy, input, output, signal, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 
@@ -9,7 +8,7 @@ import { EduButton, EduDialog, EduInputNumber, EduInputText, EduTooltip } from '
 @Component({
 	selector: 'app-periodos-config-dialog',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduDialog, EduButton, EduInputText, EduInputNumber, EduTooltip],
+	imports: [FormsModule, EduDialog, EduButton, EduInputText, EduInputNumber, EduTooltip],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './periodos-config-dialog.component.html',
 	styleUrl: './periodos-config-dialog.component.scss',

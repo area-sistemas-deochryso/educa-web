@@ -1,5 +1,4 @@
 // #region Imports
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
@@ -28,7 +27,7 @@ interface CapabilityOption {
 @Component({
 	selector: 'app-faq-admin-form-dialog',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduButton, EduDialog, EduInputText, EduSelect, EduTextarea, EduTooltip],
+	imports: [FormsModule, EduButton, EduDialog, EduInputText, EduSelect, EduTextarea, EduTooltip],
 	templateUrl: './faq-admin-form-dialog.component.html',
 	styleUrl: './faq-admin-form-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

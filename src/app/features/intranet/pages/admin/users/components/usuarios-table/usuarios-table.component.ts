@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { UsuarioLista } from '../../services';
 import { RoleTab } from '../../models';
 import { UiMappingService } from '@intranet-shared/services';
@@ -11,7 +11,7 @@ import type { EduTableLazyLoadEvent } from '@edu-ui';
 @Component({
 	selector: 'app-users-table',
 	standalone: true,
-	imports: [CommonModule, EduTable, EduButton, EduDialog, EduTag, EduTooltip, TableLoadingDirective, FullNamePipe, EduSortableColumn],
+	imports: [DatePipe, EduTable, EduButton, EduDialog, EduTag, EduTooltip, TableLoadingDirective, FullNamePipe, EduSortableColumn],
 	templateUrl: './usuarios-table.component.html',
 	styleUrl: './usuarios-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

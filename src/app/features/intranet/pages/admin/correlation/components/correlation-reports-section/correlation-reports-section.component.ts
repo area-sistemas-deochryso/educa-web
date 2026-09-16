@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 
 import {
@@ -12,7 +12,7 @@ import { EduButton, EduTable, EduTag, EduTemplate, EduTooltip } from '@edu-ui';
 @Component({
 	selector: 'app-correlation-reports-section',
 	standalone: true,
-	imports: [CommonModule, DatePipe, RouterLink, EduButton, EduTable, EduTag, EduTooltip, EduTemplate],
+	imports: [DatePipe, RouterLink, EduButton, EduTable, EduTag, EduTooltip, EduTemplate],
 	templateUrl: './correlation-reports-section.component.html',
 	styleUrl: './correlation-reports-section.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

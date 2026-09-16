@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 
 import { CorrelationIdPillComponent } from '@intranet-shared/components';
 
@@ -11,7 +11,6 @@ import type { EduTableLazyLoadEvent } from '@edu-ui';
 	selector: 'app-rate-limit-table',
 	standalone: true,
 	imports: [
-		CommonModule,
 		DatePipe,
 		EduButton,
 		EduTable,

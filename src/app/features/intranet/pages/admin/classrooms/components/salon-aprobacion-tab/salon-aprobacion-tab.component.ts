@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, input, output, computed, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 
 
@@ -21,7 +21,7 @@ const PROMEDIO_MAX = 20;
 @Component({
 	selector: 'app-classroom-approval-tab',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduTable, EduButton, EduTag, EduCheckbox, EduTooltip],
+	imports: [FormsModule, EduTable, EduButton, EduTag, EduCheckbox, EduTooltip],
 	templateUrl: './salon-aprobacion-tab.component.html',
 	styleUrl: './salon-aprobacion-tab.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

@@ -1,6 +1,5 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { AttachmentsModalComponent } from './attachments-modal/attachments-modal.component';
 import { TasksModalComponent } from './tasks-modal/tasks-modal.component';
 import { SubmissionsModalComponent } from './submissions-modal/submissions-modal.component';
@@ -40,7 +39,7 @@ export interface CourseDetails {
 
 @Component({
 	selector: 'app-course-details-modal',
-	imports: [CommonModule, EduDialog, EduTooltip, AttachmentsModalComponent, TasksModalComponent, SubmissionsModalComponent, ModalControlsComponent, WeekSearchBoxComponent, WeekAccordionItemComponent, EvaluationsAccordionComponent, StudentCardComponent, CourseSearchComponent, SidebarLinksComponent, MemberListComponent, EduSelect],
+	imports: [EduDialog, EduTooltip, AttachmentsModalComponent, TasksModalComponent, SubmissionsModalComponent, ModalControlsComponent, WeekSearchBoxComponent, WeekAccordionItemComponent, EvaluationsAccordionComponent, StudentCardComponent, CourseSearchComponent, SidebarLinksComponent, MemberListComponent, EduSelect],
 	templateUrl: './course-details-modal.component.html',
 	styleUrl: './course-details-modal.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

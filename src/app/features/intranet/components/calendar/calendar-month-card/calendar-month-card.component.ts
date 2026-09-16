@@ -1,13 +1,12 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { CalendarDay, CalendarMonth } from '@features/intranet/pages/cross-role/calendary-component/calendar.types';
 
 // #endregion
 // #region Implementation
 @Component({
 	selector: 'app-calendar-month-card',
-	imports: [CommonModule],
+	imports: [],
 	templateUrl: './calendar-month-card.component.html',
 	styleUrl: './calendar-month-card.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

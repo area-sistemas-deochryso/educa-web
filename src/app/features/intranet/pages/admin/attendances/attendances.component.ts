@@ -3,7 +3,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { logger } from '@core/helpers';
 import { ErrorStateComponent } from '@shared/components';
@@ -44,8 +44,7 @@ import { EduButton, EduCheckbox, EduConfirmDialog, EduConfirmationService, EduDa
 @Component({
 	selector: 'app-attendances-admin',
 	standalone: true,
-	imports: [
-		CommonModule,
+	imports: [DatePipe, 
 		FormsModule,
 		EduButton,
 		EduDatePicker,
@@ -218,7 +217,7 @@ export class AttendancesComponent implements OnInit {
 					void this.syncService.stopTracking();
 				} else if (status.estado === 'FAILED') {
 					this.messageService.add({
-						severity: 'error',
+						severity: 'danger',
 						summary: 'Error al sincronizar',
 						detail: status.error ?? status.mensaje ?? 'Falló la sincronización CrossChex',
 						life: 7000,
@@ -326,7 +325,7 @@ export class AttendancesComponent implements OnInit {
 	private dispatchSync(fechaLabel: string): void {
 		this.dataFacade.sincronizarDesdeCrossChex((err) => {
 			this.messageService.add({
-				severity: 'error',
+				severity: 'danger',
 				summary: 'Error al sincronizar',
 				detail: `No se pudo iniciar el sync del ${fechaLabel}.`,
 				life: 5000,
@@ -355,7 +354,7 @@ export class AttendancesComponent implements OnInit {
 			error: (err) => {
 				logger.error('[CrossChex Pagination] Error', err);
 				this.messageService.add({
-					severity: 'error',
+					severity: 'danger',
 					summary: 'Debug pagination error',
 					detail: err?.message ?? 'Error desconocido',
 				});
@@ -375,7 +374,7 @@ export class AttendancesComponent implements OnInit {
 					{ fechaInicio: payload.fechaInicio, fechaFin: payload.fechaFin, dnis: payload.dnis },
 					(err) => {
 						this.messageService.add({
-							severity: 'error',
+							severity: 'danger',
 							summary: 'Error al sincronizar rango',
 							detail: 'No se pudo iniciar la sincronización del rango.',
 							life: 5000,

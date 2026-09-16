@@ -1,7 +1,6 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
-import { CommonModule } from '@angular/common';
 import { WeekContentRowComponent } from '../week-content-row/week-content-row.component';
 
 // #endregion
@@ -30,7 +29,7 @@ export interface WeekData {
 	selector: 'app-week-accordion-item',
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [CommonModule, WeekContentRowComponent],
+	imports: [WeekContentRowComponent],
 	templateUrl: './week-accordion-item.component.html',
 	styleUrls: ['./week-accordion-item.component.scss'],
 })

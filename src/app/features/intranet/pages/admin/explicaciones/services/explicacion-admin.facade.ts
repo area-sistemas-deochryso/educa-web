@@ -4,7 +4,7 @@ import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, of } from 'rxjs';
 
-import { environment } from '@env/environment';
+import { environment } from '@config/environment';
 import { logger } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services/error';
 import { WalFacadeHelper } from '@core/services/wal';
