@@ -1,5 +1,5 @@
 // #region Imports
-import { CommonModule } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
@@ -40,7 +40,7 @@ const ESTADO_SEVERITY: Record<TicketEstado, 'warn' | 'info' | 'success'> = {
 @Component({
 	selector: 'app-ayuda-ticket',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduSelect, EduTextarea, EduButton, EduSpinner, EduTable, EduTag, EduToast, ErrorStateComponent, EduTemplate],
+	imports: [DatePipe, FormsModule, EduSelect, EduTextarea, EduButton, EduSpinner, EduTable, EduTag, EduToast, ErrorStateComponent, EduTemplate],
 	providers: [AyudaTicketFacade, EduMessageService],
 	templateUrl: './ayuda-ticket.component.html',
 	styleUrl: './ayuda-ticket.component.scss',
@@ -133,7 +133,7 @@ export class AyudaTicketComponent implements OnInit {
 			this.resetForm();
 		} else {
 			this.messageService.add({
-				severity: 'error',
+				severity: 'danger',
 				summary: 'Error',
 				detail: 'No se pudo crear el ticket. Intenta de nuevo más tarde.',
 				life: 4000,

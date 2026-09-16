@@ -1,6 +1,5 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { SeasonalNotification } from '@core/services';
 import { DismissedCardComponent } from '../dismissed-card/dismissed-card.component';
 import { NotificationsPanelContext } from '../../notifications-panel.context';
@@ -10,7 +9,7 @@ import { NotificationsPanelContext } from '../../notifications-panel.context';
 @Component({
 	selector: 'app-dismissed-section',
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [CommonModule, DismissedCardComponent],
+	imports: [DismissedCardComponent],
 	templateUrl: './dismissed-section.component.html',
 	styleUrl: './dismissed-section.component.scss',
 })

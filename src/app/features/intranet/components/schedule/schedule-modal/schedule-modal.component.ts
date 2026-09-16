@@ -1,6 +1,5 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import {
 	CourseSchedule,
 	getCourseSchedules,
@@ -12,7 +11,7 @@ import type { EduMenuItem } from '@edu-ui';
 // #region Implementation
 @Component({
 	selector: 'app-schedule-modal',
-	imports: [CommonModule, EduDialog, EduMenu],
+	imports: [EduDialog, EduMenu],
 	templateUrl: './schedule-modal.component.html',
 	styleUrl: './schedule-modal.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

@@ -1,7 +1,6 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
-import { CommonModule } from '@angular/common';
 
 // #endregion
 // #region Implementation
@@ -19,7 +18,7 @@ export interface Evaluation {
 	selector: 'app-evaluations-accordion',
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [CommonModule],
+	imports: [],
 	templateUrl: './evaluations-accordion.component.html',
 	styleUrls: ['./evaluations-accordion.component.scss'],
 })

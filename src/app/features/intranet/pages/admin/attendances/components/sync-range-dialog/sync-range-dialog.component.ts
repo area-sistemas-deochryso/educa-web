@@ -7,7 +7,6 @@ import {
 	output,
 	signal,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { AttendancesAdminStore, PersonaParaSeleccion } from '../../services';
@@ -24,7 +23,7 @@ export interface SyncRangePayload {
 @Component({
 	selector: 'app-sync-range-dialog',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduButton, EduDatePicker, EduDialog, EduMultiSelect, EduToggle],
+	imports: [FormsModule, EduButton, EduDatePicker, EduDialog, EduMultiSelect, EduToggle],
 	templateUrl: './sync-range-dialog.component.html',
 	styleUrl: './sync-range-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

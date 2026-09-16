@@ -1,6 +1,5 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
 import { ExcelService } from '@core/services';
 import { logger } from '@core/helpers';
@@ -24,7 +23,7 @@ function isCompleteRow(
 @Component({
 	selector: 'app-salones-import-dialog',
 	standalone: true,
-	imports: [CommonModule, EduButton, EduDialog, EduSpinner, EduTable, EduTag, EduTemplate],
+	imports: [EduButton, EduDialog, EduSpinner, EduTable, EduTag, EduTemplate],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './salones-import-dialog.component.html',
 	styleUrl: './salones-import-dialog.component.scss',

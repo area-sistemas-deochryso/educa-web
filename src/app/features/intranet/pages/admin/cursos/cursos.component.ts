@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
 
 import { UiMappingService } from '@intranet-shared/services';
 import { PageHeaderComponent, KpiStatsComponent, type KpiStatItem } from '@intranet-shared/components';
@@ -15,7 +14,7 @@ import { EduButton, EduConfirmDialog, EduConfirmationService, EduDialog, EduInpu
 @Component({
 	selector: 'app-cursos',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduTable, EduButton, EduDialog, EduTooltip, EduTag, EduInputText, EduSelect, EduToggle, EduConfirmDialog, PageHeaderComponent, KpiStatsComponent, EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleIconPipe, EstadoToggleLabelPipe, EduSortableColumn],
+	imports: [FormsModule, EduTable, EduButton, EduDialog, EduTooltip, EduTag, EduInputText, EduSelect, EduToggle, EduConfirmDialog, PageHeaderComponent, KpiStatsComponent, EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleIconPipe, EstadoToggleLabelPipe, EduSortableColumn],
 	providers: [EduConfirmationService],
 	templateUrl: './cursos.component.html',
 	styleUrl: './cursos.component.scss',

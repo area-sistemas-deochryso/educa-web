@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, input, output, signal, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { JustificarInasistenciaContext } from '@features/intranet/pages/estudiante/models';
 import { EduButton, EduDialog, EduFileUpload, EduMessage, EduTextarea } from '@edu-ui';
@@ -10,7 +10,7 @@ const ACCEPTED_TYPES = '.pdf,.jpg,.jpeg,.png,.webp';
 @Component({
 	selector: 'app-justificar-inasistencia-dialog',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduDialog, EduFileUpload, EduTextarea, EduButton, EduMessage],
+	imports: [DatePipe, FormsModule, EduDialog, EduFileUpload, EduTextarea, EduButton, EduMessage],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
 		<edu-dialog

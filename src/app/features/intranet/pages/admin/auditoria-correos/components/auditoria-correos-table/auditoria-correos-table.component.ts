@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
 import {
@@ -13,7 +12,7 @@ import { EduButton, EduTable, EduTag, EduTooltip } from '@edu-ui';
 @Component({
 	selector: 'app-auditoria-correos-table',
 	standalone: true,
-	imports: [CommonModule, EduButton, RouterLink, EduTable, EduTag, EduTooltip],
+	imports: [EduButton, RouterLink, EduTable, EduTag, EduTooltip],
 	templateUrl: './auditoria-correos-table.component.html',
 	styleUrl: './auditoria-correos-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

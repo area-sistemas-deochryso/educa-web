@@ -27,7 +27,7 @@ import { logger } from '@core/helpers';
 import { HttpClient } from '@angular/common/http';
 // eslint-disable-next-line layer-enforcement/imports-error -- DEBT: xrepo-50-F3a
 import { PaginatedResponse } from '@shared/models';
-import { environment } from '@env/environment';
+import { environment } from '@config/environment';
 
 /**
  * Permissions API gateway for vistas, roles, and user permissions.

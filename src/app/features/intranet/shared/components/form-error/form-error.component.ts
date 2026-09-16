@@ -3,7 +3,6 @@ import { ChangeDetectionStrategy, Component, DestroyRef, Input, OnInit, inject, 
 import { ValidationMessageConfig, getValidationMessage } from '@intranet-shared/validators';
 
 import { AbstractControl } from '@angular/forms';
-import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 // #endregion
@@ -11,7 +10,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 @Component({
 	selector: 'app-form-error',
 	standalone: true,
-	imports: [CommonModule],
+	imports: [],
 	templateUrl: './form-error.component.html',
 	styleUrls: ['./form-error.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush,

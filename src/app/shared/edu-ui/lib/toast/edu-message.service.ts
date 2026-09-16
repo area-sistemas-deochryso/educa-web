@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 
-export type EduToastSeverity = 'success' | 'info' | 'warn' | 'error';
+export type EduToastSeverity = 'success' | 'info' | 'warn' | 'danger';
 
 export interface EduToastMessageOptions {
 	severity: EduToastSeverity;

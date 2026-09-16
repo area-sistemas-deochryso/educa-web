@@ -6,7 +6,7 @@ import {
 	input,
 	output,
 } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 
 import {
 	ErrorGroupLista,
@@ -28,7 +28,7 @@ import { EduTag, EduTooltip } from '@edu-ui';
 	selector: 'app-error-group-card',
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [CommonModule, DatePipe, EduTag, EduTooltip, ErrorOccurrenceTimelineComponent],
+	imports: [DatePipe, EduTag, EduTooltip, ErrorOccurrenceTimelineComponent],
 	templateUrl: './error-group-card.component.html',
 	styleUrl: './error-group-card.component.scss',
 	host: {

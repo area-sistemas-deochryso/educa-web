@@ -2,7 +2,7 @@
    deuda de tamaño es preexistente (kanban + tabla + eventos + heatmap + trend en un componente),
    no introducida por el borrado/selección múltiple agregado acá. Split queda fuera de alcance. */
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, effect, inject, signal } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -63,7 +63,7 @@ const VIEW_MODE_VOLUME_THRESHOLD = 40;
 @Component({
 	selector: 'app-error-groups',
 	standalone: true,
-	imports: [CommonModule, DatePipe, FormsModule, EduButton, EduCheckbox, EduConfirmDialog, EduDialog, EduIconField, EduInputIcon, EduInputNumber, EduInputText, EduPaginator, EduSelect, EduTable, EduTag, EduTooltip, ErrorOccurrenceTimelineComponent, PageHeaderComponent, KpiStatsComponent, TableSkeletonComponent, ErrorGroupDetailDrawerComponent, ErrorOccurrenceDrawerComponent, ChangeGroupStatusDialogComponent, ErrorGroupsKanbanBoardComponent, ErrorGroupsViewToggleComponent, ErrorHeatmapComponent, ErrorParetoChartComponent, HubContextBannerComponent],
+	imports: [DatePipe, FormsModule, EduButton, EduCheckbox, EduConfirmDialog, EduDialog, EduIconField, EduInputIcon, EduInputNumber, EduInputText, EduPaginator, EduSelect, EduTable, EduTag, EduTooltip, ErrorOccurrenceTimelineComponent, PageHeaderComponent, KpiStatsComponent, TableSkeletonComponent, ErrorGroupDetailDrawerComponent, ErrorOccurrenceDrawerComponent, ChangeGroupStatusDialogComponent, ErrorGroupsKanbanBoardComponent, ErrorGroupsViewToggleComponent, ErrorHeatmapComponent, ErrorParetoChartComponent, HubContextBannerComponent],
 	templateUrl: './error-groups.component.html',
 	styleUrl: './error-groups.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

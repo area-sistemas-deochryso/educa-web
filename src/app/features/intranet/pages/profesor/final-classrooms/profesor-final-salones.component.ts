@@ -1,5 +1,4 @@
 import { Component, ChangeDetectionStrategy, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 
@@ -15,7 +14,6 @@ import { EduButton, EduInputNumber, EduMessageService, EduTab, EduTabPanel, EduT
 	selector: 'app-teacher-final-classrooms',
 	standalone: true,
 	imports: [
-		CommonModule,
 		FormsModule,
 		EduTabs, EduTab, EduTabPanel,
 		EduButton,

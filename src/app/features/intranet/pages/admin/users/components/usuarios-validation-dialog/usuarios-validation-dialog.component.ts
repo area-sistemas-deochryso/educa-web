@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EduButton, EduDialog, EduInputText, EduSelect, EduTable, EduTag, EduTooltip } from '@edu-ui';
 
@@ -22,7 +21,7 @@ export interface ErrorFilterOption {
 @Component({
 	selector: 'app-users-validation-dialog',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduButton, EduDialog, EduInputText, EduSelect, EduTable, EduTag, EduTooltip],
+	imports: [FormsModule, EduButton, EduDialog, EduInputText, EduSelect, EduTable, EduTag, EduTooltip],
 	templateUrl: './usuarios-validation-dialog.component.html',
 	styleUrl: './usuarios-validation-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

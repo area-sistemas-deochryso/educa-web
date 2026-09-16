@@ -1,5 +1,4 @@
 import { Component, ChangeDetectionStrategy, input, output, signal, OnChanges } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { StudentForHealthDto, SymptomDto } from '@features/intranet/pages/profesor/models';
@@ -8,7 +7,7 @@ import { EduButton, EduDialog, EduMultiSelect, EduSelect, EduTextarea } from '@e
 @Component({
 	selector: 'app-health-exit-dialog',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduDialog, EduSelect, EduMultiSelect, EduTextarea, EduButton],
+	imports: [FormsModule, EduDialog, EduSelect, EduMultiSelect, EduTextarea, EduButton],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
 		<edu-dialog

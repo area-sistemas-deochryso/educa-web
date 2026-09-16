@@ -1,6 +1,5 @@
 // #region Imports
 import { Component, ChangeDetectionStrategy, input, output, OnChanges, SimpleChanges } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { toLocalIso } from '@core/helpers';
 import { CursoContenidoTareaDto, CrearTareaRequest, ActualizarTareaRequest } from '@features/intranet/pages/profesor/models';
@@ -12,7 +11,6 @@ import { EduButton, EduDatePicker, EduDialog, EduInputText, EduTextarea, EduTogg
 	selector: 'app-tarea-dialog',
 	standalone: true,
 	imports: [
-		CommonModule,
 		FormsModule,
 		EduDialog,
 		EduButton,

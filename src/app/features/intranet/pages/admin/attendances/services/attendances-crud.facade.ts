@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
 import { facadeErrorHandler, toLocalIso, type FacadeErrorHandler } from '@core/helpers';
-import { environment } from '@env/environment';
+import { environment } from '@config/environment';
 import {
 	CrearAsistenciaCompletaRequest,
 	CrearEntradaManualRequest,

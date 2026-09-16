@@ -1,18 +1,25 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
 
-import { CommonModule } from '@angular/common';
 import { ErrorHandlerService } from '@core/services/error';
-import type { ErrorNotificationAction } from '@core/services/error';
+import type { ErrorNotificationAction, ErrorSeverity } from '@core/services/error';
 import { EduButton, EduMessageService, EduTemplate, EduToast } from '@edu-ui';
+import type { EduToastSeverity } from '@edu-ui';
 
 // #endregion
 // #region Implementation
+const ERROR_SEVERITY_TO_TOAST_SEVERITY: Record<ErrorSeverity, EduToastSeverity> = {
+	info: 'info',
+	success: 'success',
+	warn: 'warn',
+	error: 'danger',
+};
+
 @Component({
 	selector: 'app-toast-container',
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [CommonModule, EduToast, EduButton, EduTemplate],
+	imports: [EduToast, EduButton, EduTemplate],
 	providers: [EduMessageService],
 	templateUrl: './toast-container.component.html',
 })
@@ -27,7 +34,7 @@ export class ToastContainerComponent {
 			const notification = this.errorHandler.currentNotification();
 			if (notification) {
 				this.messageService.add({
-					severity: notification.severity,
+					severity: ERROR_SEVERITY_TO_TOAST_SEVERITY[notification.severity],
 					summary: notification.summary,
 					detail: notification.detail,
 					life: notification.life ?? 5000,

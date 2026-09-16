@@ -9,7 +9,6 @@ import {
 	effect,
 	signal,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter, take } from 'rxjs';
@@ -28,7 +27,6 @@ import { EduSpinner, EduTag, EduTooltip } from '@edu-ui';
 	selector: 'app-profesor-cursos',
 	standalone: true,
 	imports: [
-		CommonModule,
 		EduTag,
 		EduTooltip,
 		EduSpinner,

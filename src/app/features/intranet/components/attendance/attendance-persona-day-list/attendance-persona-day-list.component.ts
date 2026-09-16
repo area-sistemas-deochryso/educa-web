@@ -8,7 +8,7 @@ import {
 	signal,
 	ViewChild,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { SlicePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
 	AttendanceStatus,
@@ -48,8 +48,7 @@ export interface JustificacionPersonaEvent {
 @Component({
 	selector: 'app-attendance-persona-day-list',
 	standalone: true,
-	imports: [
-		CommonModule,
+	imports: [SlicePipe, 
 		FormsModule,
 		EduTable,
 		TableSkeletonComponent,

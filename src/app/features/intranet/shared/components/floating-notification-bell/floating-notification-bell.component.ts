@@ -1,6 +1,5 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, inject, OnInit, OnDestroy, HostListener, signal, effect } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { NotificationPriority, KeyboardShortcutsService } from '@core/services';
 
 import {
@@ -44,7 +43,6 @@ const PRIORITY_LEGEND: PriorityInfo[] = [
 	selector: 'app-floating-notification-bell',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [
-		CommonModule,
 		EduToast,
 		NotificationBellButtonComponent,
 		NotificationsPanelComponent,
@@ -127,7 +125,7 @@ export class FloatingNotificationBellComponent implements OnInit, OnDestroy {
 		this.context.playSound();
 
 		const severityMap: Record<NotificationPriority, EduToastSeverity> = {
-			urgent: 'error',
+			urgent: 'danger',
 			high: 'warn',
 			medium: 'info',
 			low: 'success',

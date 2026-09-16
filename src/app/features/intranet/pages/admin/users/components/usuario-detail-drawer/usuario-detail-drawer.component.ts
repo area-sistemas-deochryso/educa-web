@@ -1,6 +1,6 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, inject, input, output } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { UsuarioDetalle } from '../../services';
 import { UiMappingService } from '@intranet-shared/services';
 import { EstadoLabelPipe, EstadoSeverityPipe } from '@intranet-shared/pipes';
@@ -16,7 +16,7 @@ import { EduButton, EduDrawer, EduTag } from '@edu-ui';
 @Component({
 	selector: 'app-user-detail-drawer',
 	standalone: true,
-	imports: [CommonModule, EduDrawer, EduButton, EduTag, EstadoLabelPipe, EstadoSeverityPipe, FullNamePipe],
+	imports: [DatePipe, EduDrawer, EduButton, EduTag, EstadoLabelPipe, EstadoSeverityPipe, FullNamePipe],
 	templateUrl: './usuario-detail-drawer.component.html',
 	styleUrl: './usuario-detail-drawer.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

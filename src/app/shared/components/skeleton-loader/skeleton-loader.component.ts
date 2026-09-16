@@ -1,7 +1,6 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
-import { CommonModule } from '@angular/common';
 
 /**
  * Componente presentacional para skeleton screens
@@ -12,7 +11,7 @@ import { CommonModule } from '@angular/common';
 @Component({
 	selector: 'app-skeleton-loader',
 	standalone: true,
-	imports: [CommonModule],
+	imports: [],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './skeleton-loader.component.html',
 	styleUrls: ['./skeleton-loader.component.scss'],

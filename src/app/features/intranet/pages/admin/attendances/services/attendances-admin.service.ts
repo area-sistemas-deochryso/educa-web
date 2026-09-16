@@ -20,7 +20,7 @@ import { Observable } from 'rxjs';
 
 import { ApiResponse } from '@shared/models';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '@env/environment';
+import { environment } from '@config/environment';
 import { CrossChexSyncAceptadoDto } from '@core/services/signalr';
 
 // #endregion

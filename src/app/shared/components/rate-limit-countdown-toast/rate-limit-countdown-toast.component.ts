@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
 import { RateLimitCountdownService } from '@core/services/rate-limit-countdown';
 
@@ -13,7 +12,7 @@ import { RateLimitCountdownService } from '@core/services/rate-limit-countdown';
 @Component({
 	selector: 'app-rate-limit-countdown-toast',
 	standalone: true,
-	imports: [CommonModule],
+	imports: [],
 	templateUrl: './rate-limit-countdown-toast.component.html',
 	styleUrl: './rate-limit-countdown-toast.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

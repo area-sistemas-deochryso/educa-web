@@ -2,7 +2,6 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, effect, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
-import { CommonModule } from '@angular/common';
 import { type DependencyCheck, DependencyGuidanceComponent } from '@shared/components';
 
 import { FormsModule } from '@angular/forms';
@@ -38,7 +37,7 @@ import { EduButton, EduCheckbox, EduConfirmDialog, EduConfirmationService, EduDi
 @Component({
 	selector: 'app-schedules',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduButton, EduCheckbox, EduConfirmDialog, EduDialog, EduSelect, EduTag, EduTooltip, ScheduleDetailDrawerComponent, SchedulesCoursePickerComponent, SchedulesFormDialogComponent, SchedulesImportDialogComponent, SchedulesStatsSkeletonComponent, ScheduleGridLayoutComponent, ScheduleGlobalViewComponent, PageHeaderComponent, PeriodToggleComponent, KpiStatsComponent, DependencyGuidanceComponent],
+	imports: [FormsModule, EduButton, EduCheckbox, EduConfirmDialog, EduDialog, EduSelect, EduTag, EduTooltip, ScheduleDetailDrawerComponent, SchedulesCoursePickerComponent, SchedulesFormDialogComponent, SchedulesImportDialogComponent, SchedulesStatsSkeletonComponent, ScheduleGridLayoutComponent, ScheduleGlobalViewComponent, PageHeaderComponent, PeriodToggleComponent, KpiStatsComponent, DependencyGuidanceComponent],
 	templateUrl: './horarios.component.html',
 	styleUrl: './horarios.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

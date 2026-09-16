@@ -18,7 +18,6 @@ import {
 	LoginRoleSelectorComponent,
 	RolOption,
 } from '@intranet-shared/components/login';
-import { CommonModule } from '@angular/common';
 import { FormErrorComponent } from '@intranet-shared/components/form-error';
 
 import { Router } from '@angular/router';
@@ -35,7 +34,6 @@ import { EduInputText, EduSelect, EduToggle, EduTooltip } from '@edu-ui';
 	selector: 'app-login-intranet',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [
-		CommonModule,
 		ReactiveFormsModule,
 		EduInputText,
 		EduToggle,

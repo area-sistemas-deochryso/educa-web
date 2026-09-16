@@ -1,6 +1,5 @@
 // #region Imports
 import { Component, ChangeDetectionStrategy, input, output, OnChanges, SimpleChanges } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CursoContenidoSemanaDto, ActualizarSemanaRequest } from '@features/intranet/pages/profesor/models';
 import { EduButton, EduDialog, EduInputText, EduTextarea } from '@edu-ui';
@@ -10,7 +9,7 @@ import { EduButton, EduDialog, EduInputText, EduTextarea } from '@edu-ui';
 @Component({
 	selector: 'app-semana-edit-dialog',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduDialog, EduButton, EduInputText, EduTextarea],
+	imports: [FormsModule, EduDialog, EduButton, EduInputText, EduTextarea],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
 		<edu-dialog

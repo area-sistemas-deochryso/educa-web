@@ -4,7 +4,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { environment } from '@env/environment';
+import { environment } from '@config/environment';
 import { CrearTicketDto, TicketDto, TicketTipoDto } from '@features/intranet/pages/cross-role/ayuda/models/ticket.models';
 import { AyudaTicketFacade } from './ayuda-ticket.facade';
 // #endregion

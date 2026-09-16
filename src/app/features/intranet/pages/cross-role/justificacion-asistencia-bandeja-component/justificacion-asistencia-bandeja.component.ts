@@ -1,6 +1,6 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { UserPermissionsService } from '@core/services';
@@ -47,7 +47,7 @@ const ESTADO_LABEL: Record<EstadoSolicitudJustificacion, string> = {
 @Component({
 	selector: 'app-justificacion-asistencia-bandeja',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduButton, EduConfirmDialog, EduDialog, EduSpinner, EduSelect, EduTable, EduTag, EduTextarea, ErrorStateComponent],
+	imports: [DatePipe, FormsModule, EduButton, EduConfirmDialog, EduDialog, EduSpinner, EduSelect, EduTable, EduTag, EduTextarea, ErrorStateComponent],
 	providers: [JustificacionAsistenciaBandejaFacade, EduConfirmationService],
 	templateUrl: './justificacion-asistencia-bandeja.component.html',
 	styleUrl: './justificacion-asistencia-bandeja.component.scss',

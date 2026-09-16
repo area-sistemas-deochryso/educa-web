@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, inject, signal, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FormatFileSizePipe } from '@intranet-shared/pipes';
@@ -15,8 +15,7 @@ import { EduAccordion, EduAccordionHeader, EduAccordionPanel, EduButton, EduConf
 @Component({
 	selector: 'app-curso-content-readonly-dialog',
 	standalone: true,
-	imports: [
-		CommonModule,
+	imports: [DatePipe, 
 		FormsModule,
 		EduDialog,
 		EduAccordion, EduAccordionHeader, EduAccordionPanel,

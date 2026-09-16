@@ -1,5 +1,4 @@
 import { Component, ChangeDetectionStrategy, computed, input, output, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
 import { FormsModule } from '@angular/forms';
 
@@ -34,7 +33,7 @@ interface EvaluacionRow {
 @Component({
 	selector: 'app-salon-notas-estudiante-tab',
 	standalone: true,
-	imports: [CommonModule, EduTable, EduTag, EduSelect, FormsModule, EduSkeleton, EduButton, EduInputText, ErrorStateComponent, EduTooltip],
+	imports: [EduTable, EduTag, EduSelect, FormsModule, EduSkeleton, EduButton, EduInputText, ErrorStateComponent, EduTooltip],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './salon-notas-estudiante-tab.component.html',
 	styleUrl: './salon-notas-estudiante-tab.component.scss',

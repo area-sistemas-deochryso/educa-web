@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
 import type {
   EmptySlotClickEvent,
@@ -12,7 +11,7 @@ import { ScheduleWeeklyGridComponent } from '../schedule-weekly-grid/schedule-we
 @Component({
   selector: 'app-schedule-grid-layout',
   standalone: true,
-  imports: [CommonModule, ScheduleEntityListComponent, ScheduleWeeklyGridComponent],
+  imports: [ScheduleEntityListComponent, ScheduleWeeklyGridComponent],
   templateUrl: './schedule-grid-layout.component.html',
   styleUrl: './schedule-grid-layout.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

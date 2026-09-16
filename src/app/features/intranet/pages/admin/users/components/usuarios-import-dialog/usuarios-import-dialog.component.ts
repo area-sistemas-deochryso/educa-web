@@ -1,6 +1,5 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ExcelService } from '@core/services';
 import { safeLookup } from '@app/shared/utils';
@@ -27,7 +26,7 @@ interface GradoGroup {
 @Component({
 	selector: 'app-users-import-dialog',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduButton, EduDialog, EduSpinner, EduSelect, EduTable, EduTag, EduAccordion, EduAccordionPanel, EduAccordionHeader, EduTemplate],
+	imports: [FormsModule, EduButton, EduDialog, EduSpinner, EduSelect, EduTable, EduTag, EduAccordion, EduAccordionPanel, EduAccordionHeader, EduTemplate],
 	templateUrl: './usuarios-import-dialog.component.html',
 	styleUrl: './usuarios-import-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

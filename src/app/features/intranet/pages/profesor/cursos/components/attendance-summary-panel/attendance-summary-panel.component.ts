@@ -1,5 +1,4 @@
 import { Component, ChangeDetectionStrategy, input, output, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { AsistenciaCursoResumenDto } from '@features/intranet/pages/profesor/models';
@@ -10,7 +9,7 @@ import { EduButton, EduDatePicker, EduTable, EduTag } from '@edu-ui';
 @Component({
 	selector: 'app-attendance-summary-panel',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduButton, EduDatePicker, EduTable, EduTag, ErrorStateComponent, TableSkeletonComponent],
+	imports: [FormsModule, EduButton, EduDatePicker, EduTable, EduTag, ErrorStateComponent, TableSkeletonComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './attendance-summary-panel.component.html',
 	styleUrl: './attendance-summary-panel.component.scss',

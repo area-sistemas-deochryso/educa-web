@@ -1,6 +1,5 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { getGradeClass as getGradeClassFn } from '@intranet-shared/services/calificacion-config';
 import { EduDialog } from '@edu-ui';
@@ -33,7 +32,7 @@ export interface CourseGrades {
 
 @Component({
 	selector: 'app-grades-modal',
-	imports: [CommonModule, FormsModule, EduDialog],
+	imports: [FormsModule, EduDialog],
 	templateUrl: './grades-modal.component.html',
 	styleUrl: './grades-modal.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

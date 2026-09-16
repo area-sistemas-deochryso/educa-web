@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, inject, input, signal, computed, effect } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { CrearConversacionDto } from '@data/models';
@@ -24,7 +24,7 @@ const AVATAR_COLORS = [
 @Component({
 	selector: 'app-salon-mensajeria-tab',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduButton, EduInputText, EduDialog, EduSelect, EduTag, EduSpinner],
+	imports: [DatePipe, FormsModule, EduButton, EduInputText, EduDialog, EduSelect, EduTag, EduSpinner],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './mensajeria-tab.component.html',
 	styleUrl: './mensajeria-tab.component.scss',

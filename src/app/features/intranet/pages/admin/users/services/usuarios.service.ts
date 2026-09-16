@@ -15,7 +15,7 @@ import { Observable } from 'rxjs';
 import { ApiResponse } from '@shared/models';
 import { HttpClient } from '@angular/common/http';
 import { PaginatedResponse } from '@shared/models';
-import { environment } from '@env/environment';
+import { environment } from '@config/environment';
 
 // #endregion
 // #region Implementation

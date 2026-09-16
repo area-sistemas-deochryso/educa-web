@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 
 import {
@@ -19,7 +19,7 @@ import { EduButton, EduTag, EduTooltip } from '@edu-ui';
 @Component({
 	selector: 'app-correlation-timeline-section',
 	standalone: true,
-	imports: [CommonModule, DatePipe, EduButton, EduTag, EduTooltip],
+	imports: [DatePipe, EduButton, EduTag, EduTooltip],
 	templateUrl: './correlation-timeline-section.component.html',
 	styleUrl: './correlation-timeline-section.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

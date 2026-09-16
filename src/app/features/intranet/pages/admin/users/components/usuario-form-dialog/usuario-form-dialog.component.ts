@@ -32,7 +32,6 @@ import { generatePassword } from '@core/helpers';
 import { rolRequiereSalon, rolPermiteEsTutor, canEditPassword } from '@shared/models';
 import { RolService } from '@core/services/roles';
 
-import { CommonModule } from '@angular/common';
 import { FormFieldErrorComponent } from '@intranet-shared/components';
 import { FormsModule } from '@angular/forms';
 import { UppercaseInputDirective } from '@intranet-shared/directives';
@@ -57,7 +56,6 @@ export interface FormValidationErrors {
 	selector: 'app-user-form-dialog',
 	standalone: true,
 	imports: [
-		CommonModule,
 		FormsModule,
 		EduDialog,
 		EduButton,

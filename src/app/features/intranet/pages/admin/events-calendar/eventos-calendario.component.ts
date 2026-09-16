@@ -1,6 +1,6 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PageHeaderComponent, KpiStatsComponent, type KpiStatItem } from '@intranet-shared/components';
 import { EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleLabelPipe } from '@intranet-shared/pipes';
@@ -17,8 +17,7 @@ import { EduButton, EduConfirmDialog, EduConfirmationService, EduDatePicker, Edu
 	selector: 'app-events-calendar',
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [
-		CommonModule,
+	imports: [DatePipe, 
 		FormsModule,
 		EduTable,
 		EduButton,

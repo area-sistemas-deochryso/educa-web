@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, input, output, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { DatePipe } from '@angular/common';
 
 import {
 	CalificacionConNotasDto,
@@ -16,7 +16,7 @@ import { EduButton, EduTag, EduTooltip } from '@edu-ui';
 @Component({
 	selector: 'app-calificaciones-panel',
 	standalone: true,
-	imports: [CommonModule, EduButton, EduTooltip, EduTag, SkeletonLoaderComponent, PluralizePipe],
+	imports: [DatePipe, EduButton, EduTooltip, EduTag, SkeletonLoaderComponent, PluralizePipe],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './calificaciones-panel.component.html',
 	styleUrl: './calificaciones-panel.component.scss',

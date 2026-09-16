@@ -10,7 +10,7 @@ import {
 	resolveErrorMessage,
 } from '@core/helpers';
 import { ErrorHandlerService, SwService, WalFacadeHelper, WalCrossTabRefetchService } from '@core/services';
-import { environment } from '@env/environment';
+import { environment } from '@config/environment';
 import {
 	EventoCalendarioLista,
 	CrearEventoCalendarioRequest,

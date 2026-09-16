@@ -1,5 +1,4 @@
 import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import {
@@ -15,7 +14,7 @@ import { EduButton, EduDrawer, EduInputNumber, EduTag } from '@edu-ui';
 @Component({
 	selector: 'app-simulador-notas',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduDrawer, EduInputNumber, EduButton, EduTag],
+	imports: [FormsModule, EduDrawer, EduInputNumber, EduButton, EduTag],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './simulador-notas.component.html',
 	styleUrl: './simulador-notas.component.scss',

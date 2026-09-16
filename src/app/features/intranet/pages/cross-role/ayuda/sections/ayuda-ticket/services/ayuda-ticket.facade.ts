@@ -5,7 +5,7 @@ import { catchError, of } from 'rxjs';
 
 import { logger } from '@core/helpers';
 import { WalFacadeHelper } from '@core/services';
-import { environment } from '@env/environment';
+import { environment } from '@config/environment';
 
 import { CrearTicketDto, TicketDto, TicketTipoDto } from '@features/intranet/pages/cross-role/ayuda/models/ticket.models';
 import { TicketService } from '@features/intranet/pages/cross-role/ayuda/services/ticket.service';

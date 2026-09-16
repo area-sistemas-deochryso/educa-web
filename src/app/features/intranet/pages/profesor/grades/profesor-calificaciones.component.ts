@@ -8,7 +8,6 @@ import {
 	OnDestroy,
 	DestroyRef,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -35,7 +34,6 @@ import { EduConfirmationService, EduConfirmDialog } from '@edu-ui';
 	selector: 'app-teacher-grades',
 	standalone: true,
 	imports: [
-		CommonModule,
 		FormsModule,
 		EduConfirmDialog,
 		PageHeaderComponent,

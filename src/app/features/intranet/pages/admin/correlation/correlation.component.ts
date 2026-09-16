@@ -1,6 +1,7 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
+
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -35,7 +36,7 @@ import { EduButton, EduTooltip } from '@edu-ui';
 @Component({
 	selector: 'app-correlation',
 	standalone: true,
-	imports: [CommonModule, DatePipe, EduButton, EduTooltip, PageHeaderComponent, CorrelationTimelineSectionComponent, CorrelationErrorsSectionComponent, CorrelationRateLimitSectionComponent, CorrelationReportsSectionComponent, CorrelationEmailsSectionComponent, CorrelationIdPillComponent],
+	imports: [DatePipe, EduButton, EduTooltip, PageHeaderComponent, CorrelationTimelineSectionComponent, CorrelationErrorsSectionComponent, CorrelationRateLimitSectionComponent, CorrelationReportsSectionComponent, CorrelationEmailsSectionComponent, CorrelationIdPillComponent],
 	templateUrl: './correlation.component.html',
 	styleUrl: './correlation.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

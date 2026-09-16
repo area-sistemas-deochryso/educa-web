@@ -1,5 +1,4 @@
 import { Component, ChangeDetectionStrategy, input, output, signal, computed, OnChanges } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { StudentForHealthDto, DateValidationResult } from '@features/intranet/pages/profesor/models';
 import { EduButton, EduDatePicker, EduDialog, EduFileUpload, EduSelect, EduTag, EduTextarea } from '@edu-ui';
@@ -8,7 +7,7 @@ import { EduButton, EduDatePicker, EduDialog, EduFileUpload, EduSelect, EduTag, 
 	selector: 'app-health-justification-dialog',
 	standalone: true,
 	imports: [
-		CommonModule, FormsModule, EduDialog, EduSelect, EduDatePicker,
+		FormsModule, EduDialog, EduSelect, EduDatePicker,
 		EduFileUpload, EduTextarea, EduButton, EduTag],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `

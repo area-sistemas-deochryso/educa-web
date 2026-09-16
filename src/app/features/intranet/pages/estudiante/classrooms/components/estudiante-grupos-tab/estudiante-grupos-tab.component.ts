@@ -1,5 +1,4 @@
 import { Component, ChangeDetectionStrategy, input, output, computed, effect, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { GruposResumenDto, GrupoContenidoDto } from '@features/intranet/pages/estudiante/models';
@@ -9,7 +8,7 @@ import { EduSelect, EduTag } from '@edu-ui';
 @Component({
 	selector: 'app-estudiante-grupos-tab',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduSelect, EduTag],
+	imports: [FormsModule, EduSelect, EduTag],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './estudiante-grupos-tab.component.html',
 	styleUrl: './estudiante-grupos-tab.component.scss',

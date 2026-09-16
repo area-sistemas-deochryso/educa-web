@@ -9,7 +9,7 @@ const SEVERITY_ICON: Record<EduToastMessage['severity'], string> = {
 	success: 'pi pi-check-circle',
 	info: 'pi pi-info-circle',
 	warn: 'pi pi-exclamation-triangle',
-	error: 'pi pi-times-circle',
+	danger: 'pi pi-times-circle',
 };
 
 /**

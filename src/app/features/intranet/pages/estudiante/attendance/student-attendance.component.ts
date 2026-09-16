@@ -8,7 +8,8 @@ import {
 	OnInit,
 	DestroyRef,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { DatePipe } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -42,7 +43,7 @@ type JustificacionCellState =
 @Component({
 	selector: 'app-student-attendance',
 	standalone: true,
-	imports: [CommonModule, FormsModule, EduSelect, EduTag, EduTable, EduSpinner, EduButton, EduTooltip, PageHeaderComponent, JustificarInasistenciaDialogComponent, ErrorStateComponent],
+	imports: [DatePipe, FormsModule, EduSelect, EduTag, EduTable, EduSpinner, EduButton, EduTooltip, PageHeaderComponent, JustificarInasistenciaDialogComponent, ErrorStateComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './student-attendance.component.html',
 	styleUrl: './student-attendance.component.scss',

@@ -8,7 +8,7 @@ import {
 	signal,
 	ViewChild,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { SlicePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EstudianteAsistencia, EstadisticasAsistenciaDia } from '@data/models';
 import { ResponsiveTableComponent, TableSkeletonComponent } from '@intranet-shared/components';
@@ -42,8 +42,7 @@ export interface JustificacionEvent {
 @Component({
 	selector: 'app-attendance-day-list',
 	standalone: true,
-	imports: [
-		CommonModule,
+	imports: [SlicePipe, 
 		FormsModule,
 		EduTable,
 		TableSkeletonComponent,

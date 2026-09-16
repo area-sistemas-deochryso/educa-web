@@ -5,7 +5,7 @@ import {
 	input,
 	output,
 } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 
 import {
 	ESTADO_LABEL_MAP,
@@ -50,7 +50,7 @@ interface DrawerVm {
 	selector: 'app-error-group-detail-drawer',
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [CommonModule, DatePipe, EduButton, EduDrawer, EduPaginator, EduTable, EduTag, EduTooltip, EduTab, EduTabPanel, EduTabs],
+	imports: [DatePipe, EduButton, EduDrawer, EduPaginator, EduTable, EduTag, EduTooltip, EduTab, EduTabPanel, EduTabs],
 	templateUrl: './error-group-detail-drawer.component.html',
 	styleUrl: './error-group-detail-drawer.component.scss',
 })

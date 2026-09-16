@@ -1,5 +1,4 @@
 import { Component, ChangeDetectionStrategy, inject, OnInit, DestroyRef, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter, take } from 'rxjs';
@@ -18,7 +17,6 @@ const DAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Vierne
 	selector: 'app-estudiante-cursos',
 	standalone: true,
 	imports: [
-		CommonModule,
 		EduTag,
 		EduTooltip,
 		SkeletonLoaderComponent,

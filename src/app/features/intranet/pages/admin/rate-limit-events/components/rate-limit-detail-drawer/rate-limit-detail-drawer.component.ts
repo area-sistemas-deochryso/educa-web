@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, input, output } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 
 import { logger } from '@core/helpers';
@@ -11,7 +11,7 @@ import { EduButton, EduDrawer, EduMessageService, EduTag, EduTooltip } from '@ed
 @Component({
 	selector: 'app-rate-limit-detail-drawer',
 	standalone: true,
-	imports: [CommonModule, DatePipe, EduButton, EduDrawer, EduTag, EduTooltip, CorrelationIdPillComponent],
+	imports: [DatePipe, EduButton, EduDrawer, EduTag, EduTooltip, CorrelationIdPillComponent],
 	templateUrl: './rate-limit-detail-drawer.component.html',
 	styleUrl: './rate-limit-detail-drawer.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

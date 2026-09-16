@@ -8,7 +8,6 @@ import {
 	output,
 	signal,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { CrossChexSyncStatusService } from '@core/services/signalr';
 import { EduButton, EduProgressBar } from '@edu-ui';
 
@@ -29,7 +28,7 @@ const DEFAULT_DELAY_S = 16;
 @Component({
 	selector: 'app-crosschex-sync-banner',
 	standalone: true,
-	imports: [CommonModule, EduButton, EduProgressBar],
+	imports: [EduButton, EduProgressBar],
 	templateUrl: './crosschex-sync-banner.component.html',
 	styleUrl: './crosschex-sync-banner.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

@@ -1,7 +1,6 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router } from '@angular/router';
 import { CdkDragEnd, DragDropModule } from '@angular/cdk/drag-drop';
 import { filter, map } from 'rxjs';
@@ -34,7 +33,7 @@ interface FabAction {
 	selector: 'app-intranet-fab-menu',
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [CommonModule, DragDropModule],
+	imports: [DragDropModule],
 	template: `
 		@if (visible()) {
 			<div

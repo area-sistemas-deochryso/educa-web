@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
 
 import type { CapabilityCatalogItem } from '@core/services';
 import { createClientPaging } from '@shared/utils';
@@ -12,7 +11,6 @@ import { EduButton, EduConfirmDialog, EduConfirmationService, EduDialog, EduInpu
 	selector: 'app-vistas',
 	standalone: true,
 	imports: [
-		CommonModule,
 		FormsModule,
 		EduTable,
 		EduButton,

@@ -1,5 +1,4 @@
 import { Component, ChangeDetectionStrategy, computed, inject, signal, OnInit, OnDestroy, DestroyRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
 import { PageHeaderComponent } from '@intranet-shared/components';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -14,7 +13,7 @@ import { EduSpinner } from '@edu-ui';
 @Component({
 	selector: 'app-estudiante-foro',
 	standalone: true,
-	imports: [CommonModule, EduSpinner, PageHeaderComponent, SalonForoTabComponent],
+	imports: [EduSpinner, PageHeaderComponent, SalonForoTabComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	styles: `
 		:host {

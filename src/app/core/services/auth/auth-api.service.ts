@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { EMPTY, Observable, catchError, of } from 'rxjs';
 
-import { environment } from '@env/environment';
+import { environment } from '@config/environment';
 import { logger } from '@core/helpers';
 import { CambiarContrasenaRequest, LoginRequest, LoginResponse, StoredSession, UserProfile } from './auth.models';
 

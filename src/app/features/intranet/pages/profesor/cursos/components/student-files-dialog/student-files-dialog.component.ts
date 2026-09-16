@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, input, output, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { DatePipe } from '@angular/common';
 
 
 import { SemanaEstudianteArchivosDto, CalificacionConNotasDto } from '@features/intranet/pages/profesor/models';
@@ -12,7 +12,7 @@ import { EduButton, EduDialog, EduTag, EduTooltip } from '@edu-ui';
 @Component({
 	selector: 'app-student-files-dialog',
 	standalone: true,
-	imports: [CommonModule, EduDialog, EduButton, EduTooltip, EduTag, SkeletonLoaderComponent, FormatFileSizePipe],
+	imports: [DatePipe, EduDialog, EduButton, EduTooltip, EduTag, SkeletonLoaderComponent, FormatFileSizePipe],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './student-files-dialog.component.html',
 	styleUrl: './student-files-dialog.component.scss',

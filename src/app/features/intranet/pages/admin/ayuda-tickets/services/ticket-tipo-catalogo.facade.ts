@@ -7,7 +7,7 @@ import { catchError, of } from 'rxjs';
 import { logger } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services/error';
 import { WalFacadeHelper } from '@core/services';
-import { environment } from '@env/environment';
+import { environment } from '@config/environment';
 
 import { TicketTipoAdminDto } from '../models/ticket-admin.models';
 import { TicketAdminService } from './ticket-admin.service';

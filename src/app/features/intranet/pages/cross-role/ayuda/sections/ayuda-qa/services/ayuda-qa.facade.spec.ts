@@ -4,7 +4,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { environment } from '@env/environment';
+import { environment } from '@config/environment';
 import { FaqDto } from '@features/intranet/pages/cross-role/ayuda/models/faq.models';
 import { AyudaQaFacade } from './ayuda-qa.facade';
 // #endregion

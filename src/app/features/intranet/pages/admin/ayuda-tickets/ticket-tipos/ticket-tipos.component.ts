@@ -1,6 +1,5 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { UserPermissionsService } from '@core/services';
@@ -20,7 +19,7 @@ const AYUDA_TICKET_API_MANAGE = 'AYUDA_TICKET_API_MANAGE';
 @Component({
 	selector: 'app-ticket-tipos',
 	standalone: true,
-	imports: [EduTable, CommonModule, FormsModule, EduButton, EduDialog, EduInputText, EduSpinner, EduSortableColumn, EduTag, EduToggle],
+	imports: [EduTable, FormsModule, EduButton, EduDialog, EduInputText, EduSpinner, EduSortableColumn, EduTag, EduToggle],
 	providers: [TicketTipoCatalogoFacade],
 	templateUrl: './ticket-tipos.component.html',
 	styleUrl: './ticket-tipos.component.scss',

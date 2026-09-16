@@ -1,6 +1,5 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
 // #endregion
 // #region Implementation
@@ -8,7 +7,7 @@ import { CommonModule } from '@angular/common';
 	selector: 'app-login-button',
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [CommonModule],
+	imports: [],
 	templateUrl: './login-button.component.html',
 	styleUrl: './login-button.component.scss',
 })

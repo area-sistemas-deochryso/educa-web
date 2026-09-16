@@ -7,7 +7,7 @@ import { catchError, of } from 'rxjs';
 import { logger } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services/error';
 import { WalFacadeHelper } from '@core/services';
-import { environment } from '@env/environment';
+import { environment } from '@config/environment';
 import { SolicitudJustificacionAsistenciaDto } from '@features/intranet/pages/estudiante/models';
 
 import { JustificacionAsistenciaBandejaApiService } from '@intranet-shared/services/justificacion-asistencia/justificacion-asistencia-bandeja-api.service';

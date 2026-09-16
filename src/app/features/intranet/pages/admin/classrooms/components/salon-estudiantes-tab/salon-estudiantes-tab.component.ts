@@ -1,5 +1,4 @@
 import { Component, ChangeDetectionStrategy, inject, input, signal, effect } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { EstudianteDisponibleDto, MOTIVOS_RETIRO } from '../../models';
@@ -16,7 +15,6 @@ export interface SalonOption {
 	selector: 'app-classroom-students-tab',
 	standalone: true,
 	imports: [
-		CommonModule,
 		FormsModule,
 		EduTable,
 		EduButton,

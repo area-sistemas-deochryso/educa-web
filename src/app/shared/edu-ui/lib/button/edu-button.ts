@@ -11,6 +11,7 @@ export type EduButtonSeverity =
 	| 'help'
 	| 'contrast';
 
+/** Densidad de control (padding/font-size), no comparable con `EduAvatarSize` — ese escala una imagen circular. */
 export type EduButtonSize = 'xs' | 'small' | 'large';
 export type EduButtonIconPos = 'left' | 'right';
 export type EduButtonType = 'button' | 'submit';

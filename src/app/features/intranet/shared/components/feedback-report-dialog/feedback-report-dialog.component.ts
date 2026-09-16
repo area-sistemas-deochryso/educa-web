@@ -1,6 +1,5 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 
@@ -19,7 +18,7 @@ import { EduButton, EduCheckbox, EduDialog, EduMessage, EduSelect, EduTextarea }
 	selector: 'app-feedback-report-dialog',
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [CommonModule, FormsModule, EduDialog, EduButton, EduCheckbox, EduSelect, EduTextarea, EduMessage],
+	imports: [FormsModule, EduDialog, EduButton, EduCheckbox, EduSelect, EduTextarea, EduMessage],
 	templateUrl: './feedback-report-dialog.component.html',
 	styleUrl: './feedback-report-dialog.component.scss',
 })
