@@ -11,12 +11,12 @@ import {
 import { searchMatchAny } from '@core/helpers';
 import { environment } from '@config';
 
-import { VistasStore } from './vistas.store';
+import { VistasStore, type CapabilityForm } from './vistas.store';
 
 interface CapabilityStats { total: number; totalModulos: number; modulos: string[] }
 
 @Injectable({ providedIn: 'root' })
-export class VistasFacade extends BaseCrudFacade<CapabilityCatalogItem, { codigo: string; nombre: string; modulo: string; descripcion: string; ruta: string }, CapabilityStats> {
+export class VistasFacade extends BaseCrudFacade<CapabilityCatalogItem, CapabilityForm, CapabilityStats> {
 	private readonly api = inject(PermissionsService);
 	protected readonly store = inject(VistasStore);
 	protected readonly config: BaseCrudFacadeConfig = {
@@ -120,8 +120,8 @@ export class VistasFacade extends BaseCrudFacade<CapabilityCatalogItem, { codigo
 		this.store.openDialog();
 	}
 
-	updateFormField(field: 'codigo' | 'nombre' | 'modulo' | 'descripcion' | 'ruta', value: string): void {
-		this.store.updateFormField(field, value as never);
+	updateFormField<K extends keyof CapabilityForm>(field: K, value: CapabilityForm[K]): void {
+		this.store.updateFormField(field, value);
 	}
 	// #endregion
 

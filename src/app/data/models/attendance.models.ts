@@ -328,3 +328,31 @@ export interface EstadisticasMultiRolDia {
 }
 
 // #endregion
+
+// #region Solicitud de justificación de inasistencia
+export type EstadoSolicitudJustificacion = 'PENDIENTE' | 'APROBADA' | 'RECHAZADA';
+
+/**
+ * Consumida tanto por el autoservicio del estudiante como por la bandeja
+ * de aprobación (Profesor + roles administrativos) — vive en `data/models`
+ * porque no es exclusiva de ninguna página.
+ */
+export interface SolicitudJustificacionAsistenciaDto {
+	id: number;
+	asistenciaCursoId: number;
+	horarioId: number;
+	cursoNombre: string;
+	salonDescripcion: string;
+	fecha: string;
+	estudianteId: number;
+	estudianteNombre: string;
+	estado: EstadoSolicitudJustificacion;
+	comentario: string | null;
+	documentoUrl: string | null;
+	documentoNombre: string | null;
+	motivoRechazo: string | null;
+	resueltoPorRol: string | null;
+	fechaResolucion: string | null;
+	fechaSolicitud: string;
+}
+// #endregion

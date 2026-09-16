@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, computed, effect, input, output, si
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import type { ModoAsignacion } from '@data/models';
+import type { ModoAsignacion } from '@data/adapters';
 import { ModoAsignacionBadgeComponent } from '@shared/components';
 import type { HorarioDetalleResponseDto, EstudianteHorarioDto } from '../../models/horario.interface';
 import { EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleIconPipe, EstadoToggleLabelPipe } from '@intranet-shared/pipes';

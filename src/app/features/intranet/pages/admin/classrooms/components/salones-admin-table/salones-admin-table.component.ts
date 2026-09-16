@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { type ModoAsignacion, resolveModoAsignacion } from '@data/models';
+import { type ModoAsignacion, resolveModoAsignacion } from '@data/adapters';
 import { ModoAsignacionBadgeComponent } from '@shared/components';
 import { SalonAdminListDto, PeriodoCierreEstado } from '../../models';
 import { EduButton, EduSortableColumn, EduTable, EduTag, EduTooltip } from '@edu-ui';

@@ -1,7 +1,7 @@
 // #region Imports
 import { SalonListDto } from '@features/intranet/pages/admin/schedules/models/salon.interface';
 import { esSeccionDeVerano } from '@shared/models';
-import { type ModoAsignacion, resolveModoAsignacion } from '@data/models';
+import { type ModoAsignacion, resolveModoAsignacion } from '@data/adapters';
 import { SalonAsignacion } from '../../services';
 
 // #endregion

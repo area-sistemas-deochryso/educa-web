@@ -2,7 +2,7 @@ import { UserProfileService } from '@core/services';
 import { SalonListDto } from '@features/intranet/pages/admin/schedules/models/salon.interface';
 import { CursoListaDto } from '@features/intranet/pages/admin/schedules/models/curso.interface';
 import { type ProfesorCursoListaDto } from '@data/models';
-import { resolveModoAsignacion } from '@data/models';
+import { resolveModoAsignacion } from '@data/adapters';
 import { ModoAsignacionBadgeComponent, getModoAsignacionTooltip } from '@shared/components';
 import {
 	ActualizarUsuarioRequest,

@@ -1,6 +1,7 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 
-import { type ModoAsignacion, type ProfesorCursoListaDto, resolveModoAsignacion } from '@data/models';
+import { type ProfesorCursoListaDto } from '@data/models';
+import { type ModoAsignacion, resolveModoAsignacion } from '@data/adapters';
 import { esVerano, filtrarPorPeriodoAcademico, periodoActual } from '@shared/models';
 import { CursoListaDto, CursoOption, CursosPorNivel } from '../models/curso.interface';
 import {

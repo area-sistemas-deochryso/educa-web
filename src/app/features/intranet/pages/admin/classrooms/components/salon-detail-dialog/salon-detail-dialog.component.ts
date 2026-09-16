@@ -6,8 +6,8 @@ import {
 	HorarioResponseDto,
 	SalonNotasResumenDto,
 	ReporteRendimientoEstudiantesDto,
-	resolveModoAsignacion,
 } from '@data/models';
+import { resolveModoAsignacion } from '@data/adapters';
 import { ModoAsignacionBadgeComponent } from '@shared/components';
 
 import {
