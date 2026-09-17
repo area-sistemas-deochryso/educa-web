@@ -3,6 +3,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { testProviders } from '@test';
 import { HomeComponent } from './home.component';
+import { QuickAccessLayoutService } from '@intranet-shared/services/quick-access-layout.service';
 import { StorageService } from '@core/services';
 import { FeatureFlagsFacade } from '@core/services/feature-flags';
 import { UserPermissionsService } from '@core/services/permissions';
@@ -15,6 +16,10 @@ describe('HomeComponent (Intranet)', () => {
 	let component: HomeComponent;
 	let fixture: ComponentFixture<HomeComponent>;
 	let storageServiceMock: Partial<StorageService>;
+	let userPermisosMock: {
+		tienePermiso: ReturnType<typeof vi.fn>;
+		hasCapability: ReturnType<typeof vi.fn>;
+	};
 	let userProfileMock: {
 		isDirector: WritableSignal<boolean>;
 		isAsistenteAdministrativo: WritableSignal<boolean>;
@@ -39,9 +44,11 @@ describe('HomeComponent (Intranet)', () => {
 			isEnabled: vi.fn().mockReturnValue(false),
 		};
 
-		const userPermisosMock = {
+		const userPermisosMockLocal = {
 			tienePermiso: vi.fn().mockReturnValue(false),
+			hasCapability: vi.fn().mockReturnValue(false),
 		};
+		userPermisosMock = userPermisosMockLocal;
 
 		const isDirector = signal(false);
 		const isAsistenteAdministrativo = signal(false);
@@ -82,8 +89,9 @@ describe('HomeComponent (Intranet)', () => {
 		expect(component).toBeTruthy();
 	});
 
-	it('should render without errors', () => {
-		expect(fixture.nativeElement).toBeTruthy();
+	it('should render the welcome title in the DOM', () => {
+		fixture.detectChanges();
+		expect(fixture.nativeElement.textContent).toContain('Bienvenido a tu Intranet');
 	});
 
 	it('should return default welcome message when no user', () => {
@@ -104,9 +112,30 @@ describe('HomeComponent (Intranet)', () => {
 		expect(component.welcomeTitle()).toBe('Bienvenido, Juan Pérez');
 	});
 
-	it('should have resolvedSlots as array', () => {
-		expect(component.resolvedSlots()).toBeDefined();
-		expect(Array.isArray(component.resolvedSlots())).toBe(true);
+	it('should resolve no slots when the user has no pinned shortcuts', () => {
+		// Layout vacío hasta que el usuario marque accesos con el buscador Ctrl+K.
+		expect(component.resolvedSlots()).toEqual([]);
+	});
+
+	it('should resolve a pinned shortcut the user has capability for', () => {
+		userPermisosMock.hasCapability.mockReturnValue(true);
+		TestBed.inject(QuickAccessLayoutService).addItem('/intranet/estudiante/cursos');
+
+		const slots = component.resolvedSlots();
+		expect(slots).toHaveLength(1);
+		expect(slots[0]).toMatchObject({
+			kind: 'item',
+			route: '/intranet/estudiante/cursos',
+			label: 'Mis Cursos',
+			capability: 'CURSOS_ESTUDIANTE_PAGE_API_VIEW',
+		});
+	});
+
+	it('should filter out pinned shortcuts the user has no capability for', () => {
+		userPermisosMock.hasCapability.mockReturnValue(false);
+		TestBed.inject(QuickAccessLayoutService).addItem('/intranet/estudiante/cursos');
+
+		expect(component.resolvedSlots()).toEqual([]);
 	});
 
 	describe('showAttendanceWidget gate', () => {

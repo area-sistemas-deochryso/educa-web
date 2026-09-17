@@ -168,6 +168,14 @@ describe('StorageService', () => {
 
 			expect(preferencesMock.clearAttendancePreferences).toHaveBeenCalled();
 		});
+
+		it('should clear schedule modals state on clearAll (real sessionStorage)', () => {
+			sessionStorage.setItem('educa_schedule_modals', JSON.stringify({ schedule: true }));
+
+			service.clearAll();
+
+			expect(sessionStorage.getItem('educa_schedule_modals')).toBeNull();
+		});
 	});
 	// #endregion
 });

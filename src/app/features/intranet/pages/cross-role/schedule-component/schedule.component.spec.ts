@@ -42,8 +42,11 @@ describe('ScheduleComponent', () => {
 		expect(component).toBeTruthy();
 	});
 
-	it('should render without errors', () => {
-		expect(fixture.nativeElement).toBeTruthy();
+	it('should render the schedule container with its calendar', () => {
+		fixture.detectChanges();
+		const container: HTMLElement | null = fixture.nativeElement.querySelector('.schedule-container');
+		expect(container).not.toBeNull();
+		expect(container?.querySelector('app-schedule-calendar')).not.toBeNull();
 	});
 
 	it('should have all modals closed initially', () => {

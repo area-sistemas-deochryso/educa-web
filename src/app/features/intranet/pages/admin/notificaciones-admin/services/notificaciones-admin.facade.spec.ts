@@ -154,6 +154,49 @@ describe('NotificacionesAdminFacade', () => {
 
 			expect(store.estadisticas()?.inactivas).toBe(1);
 		});
+
+		it('should rollback stats and show error on failure', () => {
+			facade.create();
+			wal.fail(new Error('fail'));
+
+			expect(errorHandler.showError).toHaveBeenCalled();
+			expect(store.estadisticas()?.total).toBe(mockStats.total);
+			expect(store.estadisticas()?.activas).toBe(mockStats.activas);
+			expect(store.estadisticas()?.inactivas).toBe(mockStats.inactivas);
+		});
+	});
+	// #endregion
+
+	// #region update
+	describe('update', () => {
+		beforeEach(() => {
+			store.setItems(mockItems);
+			facade.openEditDialog(mockItems[0]);
+			store.setFormData({ ...store.formData(), titulo: 'Updated' });
+		});
+
+		it('should execute WAL and update item optimistically', () => {
+			facade.update();
+
+			expect(wal.execute).toHaveBeenCalledTimes(1);
+			expect(wal.last().operation).toBe('UPDATE');
+			expect(store.items()[0].titulo).toBe('Updated');
+			expect(store.dialogVisible()).toBe(false);
+		});
+
+		it('should do nothing without selected item', () => {
+			store.setSelectedItem(null);
+			facade.update();
+			expect(wal.execute).not.toHaveBeenCalled();
+		});
+
+		it('should rollback item and show error on failure', () => {
+			facade.update();
+			wal.fail(new Error('fail'));
+
+			expect(store.items()[0].titulo).toBe(mockItems[0].titulo);
+			expect(errorHandler.showError).toHaveBeenCalled();
+		});
 	});
 	// #endregion
 
@@ -170,6 +213,16 @@ describe('NotificacionesAdminFacade', () => {
 			expect(store.items()[0].estado).toBe(false);
 			expect(store.estadisticas()?.activas).toBe(0);
 			expect(store.estadisticas()?.inactivas).toBe(1);
+		});
+
+		it('should rollback toggle and show error on failure', () => {
+			facade.toggleEstado(mockItems[0]);
+			wal.fail(new Error('fail'));
+
+			expect(store.items()[0].estado).toBe(true);
+			expect(store.estadisticas()?.activas).toBe(mockStats.activas);
+			expect(store.estadisticas()?.inactivas).toBe(mockStats.inactivas);
+			expect(errorHandler.showError).toHaveBeenCalled();
 		});
 	});
 	// #endregion
@@ -192,6 +245,17 @@ describe('NotificacionesAdminFacade', () => {
 			expect(store.estadisticas()?.total).toBe(mockStats.total);
 			expect(store.estadisticas()?.activas).toBe(mockStats.activas - 1);
 			expect(store.estadisticas()?.inactivas).toBe(mockStats.inactivas + 1);
+		});
+
+		it('should rollback soft-delete and show error on failure', () => {
+			facade.delete(mockItems[0]);
+			wal.fail(new Error('fail'));
+
+			expect(store.items()[0].estado).toBe(true);
+			expect(store.estadisticas()?.total).toBe(mockStats.total);
+			expect(store.estadisticas()?.activas).toBe(mockStats.activas);
+			expect(store.estadisticas()?.inactivas).toBe(mockStats.inactivas);
+			expect(errorHandler.showError).toHaveBeenCalled();
 		});
 	});
 	// #endregion

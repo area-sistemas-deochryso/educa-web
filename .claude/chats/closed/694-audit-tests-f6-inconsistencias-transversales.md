@@ -2,7 +2,7 @@
 
 > **Repo destino**: `educa-web`
 > **Plan**: [`audit-tests-frontend-2026-09-16.md`](../../plan/audit-tests-frontend-2026-09-16.md) (Fase F6)
-> **Creado**: 2026-09-16 · **Estado**: ⏳ pendiente arrancar.
+> **Creado**: 2026-09-16 · **Estado**: ✅ cerrado 2026-09-17.
 > **MODO SUGERIDO**: `/execute`
 > **touches**: `home.component.spec.ts`, `calendary.component.spec.ts`, `schedule.component.spec.ts`, `notificaciones-admin.facade.spec.ts`, `wal-facade-helper.service.spec.ts`, `storage.service.spec.ts`, `mapa-envio-tab.component.spec.ts`, `error-recovery.integration.spec.ts`
 
@@ -31,10 +31,21 @@ Hallazgos de `/audit` (2026-09-16), categoría **Inconsistencia** — bajo riesg
 
 ## Criterio de cierre
 
-- [ ] Los 7 puntos resueltos.
-- [ ] Build + lint + tests OK.
-- [ ] Plan actualizado: F6 → ✅.
-- [ ] Maestro actualizado.
+- [x] Los 7 puntos resueltos.
+- [x] Build + lint + tests OK.
+- [x] Plan actualizado: F6 → ✅.
+- [x] Maestro actualizado.
+
+## Cierre (2026-09-17)
+
+- Punto 1: `resolvedSlots` con contenido real (vacío por defecto, item resuelto con capability, filtrado sin capability vía `addItem` real — el layout service es singleton por TestBed, recrear el componente no sirve).
+- Punto 2: renders redundantes convertidos a asserts DOM (welcome en home, 12 month-cards en calendary, container+calendar en schedule).
+- Punto 3: batería rollback `notificaciones-admin` (create/update/toggle/delete con `wal.fail()` + cobertura `update()` inexistente), espejo del gemelo `eventos-calendario`.
+- Punto 4: orden real apply→append capturado con array de llamadas.
+- Punto 5: `clearAll` con sessionStorage real en `storage.service.spec.ts`.
+- Punto 6: el handler de `DeferFailStatusUpdated` vive en `EmailMonitoreoFacade.startHub` (el componente solo consume 2/3 eventos para toasts) — spec nuevo `email-monitoreo.facade.spec.ts` que emite el subject y verifica el reload. Desvío documentado del `touches[]` (agrega `services/email-monitoreo.facade.spec.ts`, sin cambios en prod).
+- Punto 7: traceId en `context` + fuera de `message` en 409 (documenta el comportamiento real), errorCode exacto desde `httpDetails.body`.
+- Total: 90/90 verdes en los 8 specs tocados. Lint 0 errores, `tsc --noEmit` limpio.
 
 ## Tiempo estimado
 

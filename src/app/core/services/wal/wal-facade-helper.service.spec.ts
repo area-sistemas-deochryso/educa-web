@@ -120,6 +120,23 @@ describe('WalFacadeHelper', () => {
 			expect(walMock.append).toHaveBeenCalled();
 		});
 
+		it('should invoke optimistic.apply strictly before WAL append (call order)', async () => {
+			const order: string[] = [];
+			const config = createConfig();
+			(config.optimistic.apply as ReturnType<typeof vi.fn>).mockImplementation(() => {
+				order.push('apply');
+			});
+			(walMock.append as ReturnType<typeof vi.fn>).mockImplementation(() => {
+				order.push('append');
+				return Promise.resolve(mockEntry);
+			});
+
+			await helper.execute(config);
+
+			// Sin comparar el orden, el test pasaría aunque apply corriera después del append.
+			expect(order).toEqual(['apply', 'append']);
+		});
+
 		it('should append entry to WAL with correct params', async () => {
 			const config = createConfig();
 

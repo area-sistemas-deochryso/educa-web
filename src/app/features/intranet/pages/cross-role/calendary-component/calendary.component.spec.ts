@@ -34,8 +34,10 @@ describe('CalendaryComponent', () => {
 		expect(component).toBeTruthy();
 	});
 
-	it('should render without errors', () => {
-		expect(fixture.nativeElement).toBeTruthy();
+	it('should render one month card per month of the calendar', () => {
+		fixture.detectChanges();
+		const cards = fixture.nativeElement.querySelectorAll('app-calendar-month-card');
+		expect(cards.length).toBe(12);
 	});
 
 	it('should initialize with current year', () => {

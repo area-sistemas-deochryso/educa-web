@@ -187,5 +187,11 @@ describe('Error Recovery Integration', () => {
 		expect(errorHandler.hasErrors()).toBe(true);
 		const lastError = errorHandler.lastError();
 		expect(lastError).toBeDefined();
+		// traceId viaja en el context (solo status >= 500 lo refleja en `message`).
+		expect(lastError?.context?.['traceId']).toBe('trace-xyz');
+		expect(lastError?.message).not.toContain('trace-xyz');
+		// errorCode se preserva en el body capturado en httpDetails.
+		const details = lastError?.context?.['httpDetails'] as { body?: { errorCode?: string } };
+		expect(details?.body?.errorCode).toBe('CONCURRENCY_CONFLICT');
 	});
 });
