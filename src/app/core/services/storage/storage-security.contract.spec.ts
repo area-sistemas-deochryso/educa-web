@@ -144,8 +144,13 @@ describe('StorageService — Security Contracts', () => {
 			service.clearAll();
 
 			// Real sensitive state is gone — a toHaveBeenCalledTimes-only assert
-			// would pass even if the keys survived. (educa_last_notif_check is a
-			// benign timestamp refreshed on next checkNotifications — out of scope.)
+			// would pass even if the keys survived.
+			// Nota verificada 2026-09-17: `educa_last_notif_check` sobrevive a
+			// clearAll() y está bien así — (1) nada lo lee (write-only desde
+			// `NotificationsService.applyNotifications`, se refresca en cada
+			// check) y (2) `clearAll()` no tiene callers en prod (el logout usa
+			// `clearAuth()`+`clearPermisos()`); además vive en sessionStorage
+			// (muere con el tab). Sin cambio en prod.
 			expect(sessionStorage.getItem('educa_schedule_modals')).toBeNull();
 			expect(localStorage.getItem('educa_dismissed_notifications')).toBeNull();
 			expect(localStorage.getItem('educa_read_notifications')).toBeNull();
