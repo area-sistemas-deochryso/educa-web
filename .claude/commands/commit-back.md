@@ -6,7 +6,7 @@ Crear commit en el repo **backend** (Educa.API).
 2. Ejecutar `git log --oneline -5` para ver el estilo de commits recientes
 3. Analizar los cambios y redactar un mensaje de commit siguiendo Conventional Commits
 4. Agregar archivos relevantes (NO usar `git add .` — agregar por nombre)
-5. Crear el commit con Co-Authored-By
+5. Crear el commit SIN `Co-Authored-By` (prohibido)
 
 **Repo**: `c:\Users\Asus Ryzen 9\EducaWeb\Educa.API\Educa.API` (raíz del repo git)
 **Rama**: `master`
