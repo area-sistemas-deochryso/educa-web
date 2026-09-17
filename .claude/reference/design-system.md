@@ -4,45 +4,33 @@
 >
 > **Regla de oro**: todas las overrides y utilidades globales del design system viven en `src/styles.scss`. **NO** duplicar per-component salvo excepciones justificadas.
 
-Este archivo es la fuente de verdad para overrides de PrimeNG y utilidades de CSS que aplican a toda la intranet, y para las pautas estructurales recomendadas por componente (B1-B13). Está organizado en dos capas:
+Este archivo es la fuente de verdad para overrides de edu-ui y utilidades de CSS que aplican a toda la intranet, y para las pautas estructurales recomendadas por componente (B1-B13). Está organizado en dos capas:
 
 | Capa | Cubre | Secciones |
 |---|---|---|
-| **Globales (A)** — overrides y utilidades en `src/styles.scss` | Qué pinta PrimeNG "solo" sin escribir SCSS en el componente | 1-5 |
+| **Globales (A)** — overrides y utilidades en `src/styles.scss` | Qué pinta edu-ui "solo" sin escribir SCSS en el componente | 1-5 |
 | **Pautas recomendadas (B)** — estructura, clases y ejemplos canónicos | Cómo armar un componente nuevo para que encaje con el estándar | 6 (B1-B13) |
-| **Tokens de color (D)** — variables CSS del tema PrimeNG Aura usadas como fuente de verdad | Qué variable usar en lugar de hex literal | 7 |
+| **Tokens de color (D)** — variables extraídas del preset Aura (sin runtime PrimeNG) usadas como fuente de verdad | Qué variable usar en lugar de hex literal | 7 |
 
-Cuando aparezca un patrón nuevo que se repite en 3+ páginas, decidir en qué capa vive: si es visualmente invariable (background, color, border-color de PrimeNG) → A en `styles.scss`. Si es estructural o requiere clases semánticas (layout de filtros, anatomía de stat card, acciones de fila) → B como pauta.
+Cuando aparezca un patrón nuevo que se repite en 3+ páginas, decidir en qué capa vive: si es visualmente invariable (background, color, border-color de edu-ui) → A en `styles.scss`. Si es estructural o requiere clases semánticas (layout de filtros, anatomía de stat card, acciones de fila) → B como pauta.
 
 ---
 
 ## 1. Transparencia global (tablas, paginadores, stat-cards)
 
-> **Todas las `p-table`, `p-paginator` y `.stat-card` del proyecto tienen fondo transparente por defecto.**
-> Cubierto globalmente en `src/styles.scss` — **NO requiere override per-component**.
+> **Todas las `edu-table`, `edu-paginator` y `.stat-card` del proyecto tienen fondo transparente por defecto.**
+> Tablas y paginador lo traen en-componente (edu-ui); `.stat-card` se cubre globalmente en `src/styles.scss` — **NO requiere override per-component**.
 
-El intranet usa `--intranet-background-color: #eeeeee` como base. Cualquier elemento con fondo blanco (default de PrimeNG o `var(--surface-card)`) rompe la consistencia visual. El override global garantiza que todo respete `--surface-ground`.
+El intranet usa `--intranet-background-color: #eeeeee` como base. Cualquier elemento con fondo blanco (o `var(--surface-card)`) rompe la consistencia visual. La transparencia de tablas/paginador vive en `edu-table.scss` / `edu-paginator.scss`; el global de `styles.scss` solo conserva `.stat-card`.
 
 ### Tablas y paginador
 
-```scss
-.p-datatable .p-datatable-table,
-.p-datatable .p-datatable-thead > tr > th,
-.p-datatable .p-datatable-tbody > tr,
-.p-datatable .p-datatable-tbody > tr > td,
-.p-datatable .p-datatable-tfoot > tr > td,
-.p-datatable .p-datatable-paginator-top,
-.p-datatable .p-datatable-paginator-bottom,
-.p-paginator {
-	background: transparent !important;
-}
-```
+Sin bloque global — `edu-table` y `edu-paginator` renderizan transparente por defecto (ver `shared/edu-ui/lib/table/edu-table.scss`, `lib/paginator/edu-paginator.scss`). El antiguo bloque `.p-datatable/.p-paginator` se eliminó con la migración PrimeNG → edu-ui (P79): no quedaba ningún selector `.p-*` en `styles.scss`.
 
 Cubre:
 
-- Todas las partes internas de `p-table` (table, thead, tbody, tfoot, tr, td, th)
-- Paginator embebido en la tabla (`.p-datatable-paginator-*`)
-- Paginator standalone (`<p-paginator>` fuera de la tabla)
+- Todas las partes internas de `edu-table` (table, thead, tbody, tfoot, tr, td, th)
+- Paginator standalone (`<edu-paginator>` fuera de la tabla)
 
 ### Stat cards
 
@@ -58,73 +46,31 @@ Cubre cualquier card con la clase `.stat-card` — las variantes (`stat-new`, `s
 
 ## 2. Reset de inputs y selects — intranet (A2)
 
-> **Los `p-inputtext` y `p-select` dentro de `<app-intranet-layout>` llevan fondo transparente, texto `--text-color`, borde `--surface-300` y focus con ring `--text-color` (no `--primary-color`).**
-> Cubierto globalmente en `src/styles.scss` — **NO requiere override per-component** en la intranet.
+> **Los `edu-input-text`, `edu-select` y `edu-textarea` traen su theming en-componente (tokens `--eduui-form-field-*`): fondo, texto, borde y focus ring ya vienen del componente. No hay reset global.**
+> No existe bloque `app-intranet-layout` en `src/styles.scss` — se eliminó con la migración PrimeNG → edu-ui (P79). **NO agregar overrides per-component** que imiten el reset viejo.
 
-```scss
-app-intranet-layout {
-	.p-inputtext,
-	.p-select {
-		background: transparent;
-		color: var(--text-color);
-		border-color: var(--surface-300);
+**Scope**: los fields de edu-ui se ven igual dentro y fuera de la intranet. Los formularios del portal público usan los mismos componentes.
 
-		&::placeholder {
-			color: var(--text-color-secondary);
-		}
+**Focus**: el ring usa tokens edu-ui, no `--primary-color` — evita el ring celeste del ex-tema Aura, que sobre fondo claro pierde contraste (ver `reference/a11y.md`).
 
-		&:enabled:focus {
-			border-color: var(--text-color);
-			box-shadow: 0 0 0 1px var(--text-color);
-		}
-	}
-
-	.p-select-label,
-	.p-select-dropdown {
-		color: var(--text-color);
-	}
-}
-```
-
-**Scope**: `app-intranet-layout` — no afecta formularios del portal público (contacto, landing, etc.).
-
-**Focus**: `--text-color` en lugar de `--primary-color` — evita el ring celeste del tema Aura, que sobre fondo claro pierde contraste (ver `reference/a11y.md`).
-
-**Supersede**: el override global de esta sección §2 (A2) **reemplaza** el patrón per-component que vivía en `esta misma sección §2 (A2)` (archivo borrado 2026-05-12). Antes había que repetir `:host ::ng-deep { .p-inputtext, .p-select { background: transparent; ... } }` en cada `.scss` de la intranet; ahora basta con el override global de A2 y todos los inputs/selects dentro de `app-intranet-layout` heredan el reset. Al tocar un componente con el override local viejo, eliminarlo para no duplicar.
+**Supersede**: el reset global de esta sección §2 (A2) **ya no existe**. Si al tocar un componente encontrás el override local viejo (`:host ::ng-deep { .p-inputtext, .p-select { ... } }`), eliminarlo: apunta a selectores que ya no existen y no hace nada.
 
 ---
 
 ## 3. Botones text/outlined — intranet (A3)
 
-> **Los `p-button-text` y `p-button-outlined` dentro de `<app-intranet-layout>` usan `--text-color` y `--surface-300` en lugar del primary del tema. Hover con `--surface-100`.**
+> **Las variantes text/outlined son props de `edu-button` (`[text]`, `[outlined]`), no clases globales. Se combinan con `severity` (`primary|secondary|success|info|warn|danger|help|contrast`) y los estados hover/active vienen en-componente.**
 
-```scss
-app-intranet-layout {
-	.p-button.p-button-text {
-		color: var(--text-color);
-
-		&:enabled:hover {
-			background: var(--surface-100);
-			color: var(--text-color);
-		}
-	}
-
-	.p-button.p-button-outlined {
-		color: var(--text-color);
-		border-color: var(--surface-300);
-
-		&:enabled:hover {
-			background: var(--surface-100);
-			color: var(--text-color);
-			border-color: var(--surface-300);
-		}
-	}
-}
+```html
+<edu-button label="Cancelar" severity="secondary" [text]="true" (click)="onCancel()" />
+<edu-button label="Exportar" severity="secondary" [outlined]="true" (click)="onExport()" />
 ```
 
-**Scope**: `app-intranet-layout` — los CTAs del portal público conservan el color primary del tema.
+No existe bloque `app-intranet-layout` en `src/styles.scss` — se eliminó con la migración PrimeNG → edu-ui (P79).
 
-**Modificadores semánticos** (`p-button-danger`, `p-button-success`, `p-button-info`, etc.) siguen funcionando sobre estos — PrimeNG aplica los semánticos con mayor especificidad cuando se combinan con `p-button-text/outlined`.
+**Scope**: los CTAs del portal público usan los mismos props con `severity="primary"`.
+
+**Modificadores semánticos** (`severity="danger"`, `"success"`, `"info"`, etc.) se combinan con `[text]`/`[outlined]` — edu-ui resuelve la especificidad en-componente (`edu-button.scss`: `.edu-button--text` / `.edu-button--outlined` por severidad).
 
 ---
 
@@ -151,26 +97,14 @@ Utility opt-in para labels UPPERCASE del estándar (headers de tabla, labels de 
 
 ---
 
-## 5. Botón `p-button-success` — texto blanco (A5)
+## 5. Botón `severity="success"` — texto blanco (A5)
 
-> **Todos los `p-button-success` dentro de `app-intranet-layout` llevan `color: var(--white-color)` por defecto.**
-> Cubierto globalmente en `src/styles.scss` — **NO** usar `style="color: white"` inline en los componentes.
+> **`edu-button` con `severity="success"` lleva texto blanco en-componente (`edu-button.scss`).**
+> **NO** usar `style="color: white"` inline en los componentes — y ya no existe override global que lo resuelva (se eliminó con la migración PrimeNG → edu-ui, P79).
 
-```scss
-app-intranet-layout {
-	.p-button.p-button-success {
-		color: var(--white-color);
+**Origen**: el ex-tema PrimeNG Aura no garantizaba texto blanco en `p-button-success` y cada consumidor lo resolvía inline (Plan 20 F4.2, 2026-04-17). En edu-ui el blanco vive en el componente, así que el inline simplemente dejó de hacer falta.
 
-		&:enabled:hover {
-			color: var(--white-color);
-		}
-	}
-}
-```
-
-**Origen**: El tema PrimeNG Aura no garantiza texto blanco en `p-button-success`. Históricamente cada consumidor aplicaba `style="color: white"` inline en el template. El override global centraliza la decisión y elimina el inline en todas las páginas (ver Plan 20 F4.2, 2026-04-17).
-
-**Scope**: `app-intranet-layout` — no afecta CTAs del portal público.
+**Scope**: intranet y portal público — el blanco por severidad es del componente, no del layout.
 
 ---
 
@@ -287,10 +221,10 @@ Usar el componente shared `<app-page-header>`. Layout canónico: **icono a la iz
 >
 	<div class="header-actions">
 		<!-- Botones contextuales de la página -->
-		<button pButton icon="pi pi-refresh" class="p-button-text p-button-sm btn-icon" ... />
+		<edu-button icon="pi pi-refresh" [text]="true" size="small" eduTooltip="Recargar" ... />
 		<span class="action-divider"></span>
-		<button pButton icon="pi pi-download" label="Exportar" class="p-button-outlined p-button-sm" ... />
-		<button pButton icon="pi pi-user-plus" label="Nuevo" class="p-button-success p-button-sm" ... />
+		<edu-button icon="pi pi-download" label="Exportar" [outlined]="true" size="small" ... />
+		<edu-button icon="pi pi-user-plus" label="Nuevo" severity="success" size="small" ... />
 	</div>
 </app-page-header>
 ```
@@ -348,11 +282,11 @@ Anatomía: **content-left (label + valor + sublabel) + icon-right (48×48, borde
 
 ### B4 · Tabla
 
-Wrapper `.table-section` con **border, sin background** (sección 1 ya hace transparente la tabla interna). Headers **UPPERCASE 0.8rem + letter-spacing 0.5px**. Rows inactivas con `opacity: 0.5` + `background: var(--surface-100)`. Row-hover con `var(--surface-100)`.
+Wrapper `.table-section` con **border, sin background** (`edu-table` ya es transparente por dentro — sección 1). Headers **UPPERCASE 0.8rem + letter-spacing 0.5px**. Rows inactivas con `opacity: 0.5` + `background: var(--surface-100)`. Row-hover con `var(--surface-100)`.
 
 ```html
 <section class="table-section" appTableLoading [loading]="loading()" [minHeightPx]="420">
-	<p-table
+	<edu-table
 		[value]="items()"
 		[lazy]="true"
 		[paginator]="true"
@@ -363,12 +297,11 @@ Wrapper `.table-section` con **border, sin background** (sección 1 ya hace tran
 		[showCurrentPageReport]="true"
 		currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
 		(onLazyLoad)="onLazyLoad($event)"
-		class="p-datatable-sm"
 	>
 		<ng-template #header>
 			<tr>
-				<th style="width: 80px" pSortableColumn="id">ID <p-sortIcon field="id" /></th>
-				<th pSortableColumn="nombreCompleto">NOMBRE <p-sortIcon field="nombreCompleto" /></th>
+				<th style="width: 80px" eduSortableColumn="id">ID</th>
+				<th eduSortableColumn="nombreCompleto">NOMBRE</th>
 				<!-- ... -->
 				<th style="width: 140px">ACCIONES</th>
 			</tr>
@@ -391,7 +324,7 @@ Wrapper `.table-section` con **border, sin background** (sección 1 ya hace tran
 				</td>
 			</tr>
 		</ng-template>
-	</p-table>
+	</edu-table>
 </section>
 ```
 
@@ -403,39 +336,12 @@ Wrapper `.table-section` con **border, sin background** (sección 1 ya hace tran
 	overflow: hidden;
 }
 
-:host ::ng-deep {
-	.p-datatable {
-		.p-datatable-thead > tr > th {
-			font-weight: 600;
-			font-size: 0.8rem;
-			text-transform: uppercase;
-			letter-spacing: 0.5px;
-			color: var(--text-color);
-			border-color: var(--surface-300);
-		}
-
-		.p-datatable-tbody > tr {
-			> td {
-				vertical-align: middle;
-				color: var(--text-color);
-				border-color: var(--surface-300);
-			}
-
-			&:hover > td { background: var(--surface-100); }
-
-			&.row-inactive {
-				opacity: 0.5;
-				> td { background: var(--surface-100); }
-				&:hover > td { opacity: 1; background: var(--surface-200); }
-			}
-		}
-
-		.p-paginator {
-			padding: 1rem;
-			border-top: 1px solid var(--surface-300);
-			// background ya transparente por el global
-		}
-	}
+// Internos (thead, celdas, hover, paginador) vienen themeados de edu-table —
+// no hay ::ng-deep en páginas (cero usos en features/). Solo estados propios:
+tr.row-inactive {
+	opacity: 0.5;
+	> td { background: var(--surface-100); }
+	&:hover > td { opacity: 1; background: var(--surface-200); }
 }
 ```
 
@@ -445,42 +351,43 @@ Wrapper `.table-section` con **border, sin background** (sección 1 ya hace tran
 
 ### B5 · Row actions (triplet ver / editar / toggle)
 
-Tres botones icon-only `p-button-rounded p-button-text`, centrados. Severities:
+Tres botones icon-only `[rounded]` + `[text]`, centrados. Severities (`EduButtonSeverity`: `primary|secondary|success|info|warn|danger|help|contrast`):
 
 | Acción | Severity | Icon |
 |---|---|---|
-| **Ver** | `p-button-secondary` | `pi pi-eye` |
-| **Editar** | `p-button-info` | `pi pi-pencil` |
-| **Toggle estado** (dinámico) | `p-button-warning` si activo / `p-button-success` si inactivo | dinámico vía pipe |
+| **Ver** | `severity="secondary"` | `pi pi-eye` |
+| **Editar** | `severity="info"` | `pi pi-pencil` |
+| **Toggle estado** (dinámico) | `severity="warn"` si activo / `severity="success"` si inactivo | dinámico vía pipe |
 
 ```html
 <div class="actions">
-	<button
-		pButton
+	<edu-button
 		icon="pi pi-eye"
-		class="p-button-rounded p-button-text p-button-secondary"
-		pTooltip="Ver detalles"
+		[rounded]="true"
+		[text]="true"
+		severity="secondary"
+		eduTooltip="Ver detalles"
 		(click)="onViewDetail(item)"
 		[pt]="{ root: { 'aria-label': 'Ver detalles' } }"
-	></button>
-	<button
-		pButton
+	/>
+	<edu-button
 		icon="pi pi-pencil"
-		class="p-button-rounded p-button-text p-button-info"
-		pTooltip="Editar"
+		[rounded]="true"
+		[text]="true"
+		severity="info"
+		eduTooltip="Editar"
 		(click)="onEdit(item)"
 		[pt]="{ root: { 'aria-label': 'Editar' } }"
-	></button>
-	<button
-		pButton
+	/>
+	<edu-button
 		[icon]="item.estado | estadoToggleIcon"
-		class="p-button-rounded p-button-text"
-		[class.p-button-warning]="item.estado"
-		[class.p-button-success]="!item.estado"
-		[pTooltip]="item.estado | estadoToggleLabel"
+		[rounded]="true"
+		[text]="true"
+		[severity]="item.estado ? 'warn' : 'success'"
+		[eduTooltip]="item.estado | estadoToggleLabel"
 		(click)="onToggleEstado(item)"
 		[pt]="{ root: { 'aria-label': item.estado | estadoToggleLabel } }"
-	></button>
+	/>
 </div>
 ```
 
@@ -492,7 +399,7 @@ Tres botones icon-only `p-button-rounded p-button-text`, centrados. Severities:
 }
 ```
 
-**Requisito de accesibilidad**: los 3 botones son icon-only, así que `pTooltip` NO basta — siempre incluir `[pt]="{ root: { 'aria-label': '...' } }"` (ver `reference/a11y.md`).
+**Requisito de accesibilidad**: los 3 botones son icon-only, así que `eduTooltip` NO basta — siempre incluir `[pt]="{ root: { 'aria-label': '...' } }"` (ver `reference/a11y.md`).
 
 **Pipes estándar** disponibles en `@intranet-shared/pipes`: `estadoLabel`, `estadoSeverity`, `estadoToggleIcon`, `estadoToggleLabel`. Reusar antes de crear nuevos.
 
@@ -508,7 +415,7 @@ Flex horizontal con **search-box (relative, icono absolute dentro) + filter-drop
 		<i class="pi pi-search"></i>
 		<input
 			type="text"
-			pInputText
+			eduInputText
 			placeholder="Buscar por ID, nombre, DNI o correo..."
 			[ngModel]="searchTerm()"
 			(ngModelChange)="onSearchChange($event)"
@@ -516,18 +423,19 @@ Flex horizontal con **search-box (relative, icono absolute dentro) + filter-drop
 	</div>
 
 	<div class="filter-dropdowns">
-		<p-select [options]="opts.rolesOptions" [ngModel]="filterRol()" (ngModelChange)="..." placeholder="Rol" appendTo="body" />
-		<p-select [options]="opts.estadoOptions" [ngModel]="filterEstado()" (ngModelChange)="..." placeholder="Estado" appendTo="body" />
+		<edu-select [options]="opts.rolesOptions" optionLabel="label" optionValue="value" [ngModel]="filterRol()" (ngModelChange)="..." placeholder="Rol" appendTo="body" />
+		<edu-select [options]="opts.estadoOptions" optionLabel="label" optionValue="value" [ngModel]="filterEstado()" (ngModelChange)="..." placeholder="Estado" appendTo="body" />
 	</div>
 
-	<button
-		pButton
+	<edu-button
 		icon="pi pi-filter-slash"
-		class="p-button-text p-button-sm btn-clear"
-		pTooltip="Limpiar filtros"
+		[text]="true"
+		size="small"
+		eduTooltip="Limpiar filtros"
 		(click)="onClearFilters()"
 		[pt]="{ root: { 'aria-label': 'Limpiar filtros' } }"
-	></button>
+		class="btn-clear"
+	/>
 </div>
 ```
 
@@ -593,17 +501,17 @@ Flex horizontal con **search-box (relative, icono absolute dentro) + filter-drop
 
 ### B7 · Botones canónicos por rol semántico
 
-| Rol | Clase | Uso | Ejemplo |
+| Rol | Props | Uso | Ejemplo |
 |---|---|---|---|
-| **Primary** (acción principal de la página) | `p-button-success` | Guardar, Nuevo, Crear | Botón "Nuevo" del header, "Guardar" de dialog |
-| **Secondary** (acción secundaria) | `p-button-outlined` | Exportar, Importar, Validar | Botones de exportar/importar, "Validar Datos" |
-| **Destructive** | `p-button-danger p-button-outlined` | Eliminar, Descartar | Confirmaciones de borrado |
-| **Clear / Close** | `p-button-text` | Cancelar, Cerrar, Limpiar | Cancelar de dialog, cerrar drawer, clear filters |
-| **Icon-only utility** | `p-button-text` + `btn-icon` | Refresh, acciones de row | Refresh del header, actions triplet (B5) |
+| **Primary** (acción principal de la página) | `severity="success"` | Guardar, Nuevo, Crear | Botón "Nuevo" del header, "Guardar" de dialog |
+| **Secondary** (acción secundaria) | `[outlined]="true"` | Exportar, Importar, Validar | Botones de exportar/importar, "Validar Datos" |
+| **Destructive** | `severity="danger" [outlined]="true"` | Eliminar, Descartar | Confirmaciones de borrado |
+| **Clear / Close** | `[text]="true"` | Cancelar, Cerrar, Limpiar | Cancelar de dialog, cerrar drawer, clear filters |
+| **Icon-only utility** | `[text]="true"` + `btn-icon` | Refresh, acciones de row | Refresh del header, actions triplet (B5) |
 
-**Size estándar**: `p-button-sm` en header y filtros, tamaño default en dialogs.
+**Size estándar**: `size="small"` en header y filtros, tamaño default en dialogs.
 
-**Texto blanco en `p-button-success`**: se aplica globalmente en `styles.scss` dentro de `app-intranet-layout` (ver sección A5). **NO** usar `style="color: white"` inline en los componentes — el global ya lo resuelve.
+**Texto blanco en `severity="success"`**: viene en-componente en `edu-button` (ver sección A5). **NO** usar `style="color: white"` inline en los componentes.
 
 ---
 
@@ -612,7 +520,7 @@ Flex horizontal con **search-box (relative, icono absolute dentro) + filter-drop
 Estructura canónica: **header tipado según modo + content con `.form-grid` de 2 columnas + footer con botones alineados a la derecha**.
 
 ```html
-<p-dialog
+<edu-dialog
 	[visible]="visible()"
 	(visibleChange)="onVisibleChange($event)"
 	[header]="isEditing() ? 'Editar Usuario' : 'Nuevo Usuario'"
@@ -620,21 +528,22 @@ Estructura canónica: **header tipado según modo + content con `.form-grid` de 
 	[style]="{ width: '600px' }"
 	[draggable]="false"
 	[resizable]="false"
-	class="edit-usuario-dialog"
+	appendTo="body"
+	styleClass="edit-usuario-dialog"
 >
 	<div class="dialog-content">
 		<div class="form-grid">
 			<div class="field full-width">
 				<label for="rol">Rol *</label>
-				<p-select ... />
+				<edu-select ... />
 			</div>
 			<div class="field">
 				<label for="nombres">Nombres *</label>
-				<input id="nombres" pInputText ... />
+				<input id="nombres" eduInputText ... />
 			</div>
 			<div class="field">
 				<label for="apellidos">Apellidos *</label>
-				<input id="apellidos" pInputText ... />
+				<input id="apellidos" eduInputText ... />
 			</div>
 			<!-- ... -->
 		</div>
@@ -642,26 +551,24 @@ Estructura canónica: **header tipado según modo + content con `.form-grid` de 
 
 	<ng-template #footer>
 		<div class="dialog-footer">
-			<button
-				pButton
+			<edu-button
 				label="Cancelar"
 				icon="pi pi-times"
-				class="p-button-text"
+				[text]="true"
 				(click)="onCancel()"
 				[pt]="{ root: { 'aria-label': 'Cancelar' } }"
-			></button>
-			<button
-				pButton
+			/>
+			<edu-button
 				label="Guardar"
 				icon="pi pi-check"
-				class="p-button-success"
+				severity="success"
 				(click)="onSave()"
 				[disabled]="!isFormValid() || loading()"
 				[pt]="{ root: { 'aria-label': 'Guardar' } }"
-			></button>
+			/>
 		</div>
 	</ng-template>
-</p-dialog>
+</edu-dialog>
 ```
 
 ```scss
@@ -695,32 +602,25 @@ Estructura canónica: **header tipado según modo + content con `.form-grid` de 
 	display: flex;
 	justify-content: flex-end;
 	gap: 0.5rem;
-	// p-button-success ya lleva color blanco por el global en styles.scss (A5)
+	// severity="success" ya lleva texto blanco en-componente (A5)
 }
 
 @media (max-width: 768px) {
 	.dialog-content .form-grid { grid-template-columns: 1fr; }
 }
 ```
-
-**Header/Content/Footer con fondo del tema** (deben empatar con `--surface-ground`):
+**Header/Content/Footer con fondo del tema**: `edu-dialog` trae fondo de contenido propio (`--eduui-content-background`); para empatar con `--surface-ground`, estilar por clase plana sobre `styleClass` (cero `::ng-deep` con edu-* en features):
 
 ```scss
-:host ::ng-deep .edit-usuario-dialog {
-	.p-dialog-header,
-	.p-dialog-content,
-	.p-dialog-footer {
-		background: var(--surface-ground);
-		color: var(--text-color);
-	}
-	.p-dialog-header { border-bottom: 1px solid var(--surface-300); }
-	.p-dialog-footer { border-top: 1px solid var(--surface-300); }
+.edit-usuario-dialog {
+	.edu-dialog-header { border-bottom: 1px solid var(--surface-300); }
+	.edu-dialog-footer { border-top: 1px solid var(--surface-300); }
 }
 ```
 
-**Regla de DialogsSync**: NUNCA poner el `<p-dialog>` dentro de `@if`. Siempre en el DOM con `[visible]` + `(visibleChange)`. Ver `reference/dialogs-sync.md`.
+**Regla de DialogsSync**: NUNCA poner el `<edu-dialog>` dentro de `@if`. Siempre en el DOM con `[visible]` + `(visibleChange)`. Ver `reference/dialogs-sync.md`.
 
-**Fields obligatorios marcados con `*` en el label** (convención de UX, no una regla de PrimeNG).
+**Fields obligatorios marcados con `*` en el label** (convención de UX, no una regla de un vendor).
 
 ---
 
@@ -731,7 +631,7 @@ Banners de información, advertencia o éxito (migración pending, preview de fe
 ```html
 <div class="migration-banner">
 	<span><i class="pi pi-info-circle"></i> Hay contraseñas en texto plano que pueden migrarse.</span>
-	<button pButton label="Migrar" icon="pi pi-shield" class="p-button-warning p-button-sm" ... />
+	<edu-button label="Migrar" icon="pi pi-shield" severity="warn" size="small" ... />
 </div>
 
 <div class="migration-banner migration-success">
@@ -781,17 +681,18 @@ Banners de información, advertencia o éxito (migración pending, preview de fe
 
 ### B10 · Drawer detalle (right-side)
 
-`p-drawer` right, **width 450px**. Avatar circle 80px arriba, name 1.25rem/600 centrado, tag de rol, luego **info list en `--surface-50`** con items `flex space-between`. Footer con botones Cerrar (text) + Editar (primary).
+`edu-drawer` right, **width 450px**. Avatar circle 80px arriba, name 1.25rem/600 centrado, tag de rol, luego **info list en `--surface-50`** con items `flex space-between`. Footer con botones Cerrar (text) + Editar (primary).
 
 ```html
-<p-drawer
+<edu-drawer
 	[visible]="visible()"
 	(visibleChange)="onVisibleChange($event)"
 	position="right"
 	[style]="{ width: '450px' }"
 	[modal]="true"
+	header="Detalles del Usuario"
 >
-	<ng-template pTemplate="header">
+	<ng-template #header>
 		<div class="drawer-header">
 			<span>Detalles del Usuario</span>
 		</div>
@@ -827,11 +728,11 @@ Banners de información, advertencia o éxito (migración pending, preview de fe
 		</div>
 
 		<div class="drawer-footer">
-			<button pButton label="Cerrar" icon="pi pi-times" class="p-button-text" (click)="onClose()" [pt]="{ root: { 'aria-label': 'Cerrar' } }" />
-			<button pButton label="Editar" icon="pi pi-pencil" class="p-button-primary" (click)="onEdit()" [pt]="{ root: { 'aria-label': 'Editar' } }" />
+			<edu-button label="Cerrar" icon="pi pi-times" [text]="true" (click)="onClose()" [pt]="{ root: { 'aria-label': 'Cerrar' } }" />
+			<edu-button label="Editar" icon="pi pi-pencil" severity="primary" (click)="onEdit()" [pt]="{ root: { 'aria-label': 'Editar' } }" />
 		</div>
 	}
-</p-drawer>
+</edu-drawer>
 ```
 
 ```scss
@@ -892,19 +793,9 @@ Banners de información, advertencia o éxito (migración pending, preview de fe
 	border-top: 1px solid var(--surface-200);
 	margin-top: 1.5rem;
 }
-
-:host ::ng-deep .p-drawer {
-	.p-drawer-content {
-		padding: 1.5rem;
-		background: var(--surface-ground);
-	}
-	.p-drawer-header {
-		background: var(--surface-ground);
-		color: var(--text-color);
-		border-bottom: 1px solid var(--surface-300);
-	}
-}
 ```
+
+// Sin `::ng-deep`: `edu-drawer` trae su theming en-componente (cero usos de `::ng-deep` con edu-* en features/) — acá solo layout propio (`.detail-content`, `.drawer-footer`).
 
 **Cuándo usar drawer vs dialog**:
 
@@ -963,7 +854,7 @@ readonly isDev = !environment.production;
 	<div class="dev-migration-panel">
 		<h3><i class="pi pi-wrench"></i> Migración de contraseñas pendiente</h3>
 		<p>Hay N contraseñas en texto plano que pueden migrarse al campo encriptado.</p>
-		<button pButton label="Ejecutar migración" class="p-button-warning p-button-sm" (click)="onMigrar()" />
+		<edu-button label="Ejecutar migración" severity="warn" size="small" (click)="onMigrar()" />
 	</div>
 }
 ```
@@ -976,11 +867,11 @@ readonly isDev = !environment.production;
 
 La intranet usa **dos idiomas de navegación por secciones**, cada uno reservado para un propósito distinto. No son intercambiables — mezclarlos o usarlos sin criterio es lo que Case 5 de la auditoría de diseño (2026-08-03) marcó como inconsistencia.
 
-**Tabs con subrayado verde (`p-tabs`/`p-tablist`/`p-tab`)** — usar cuando las secciones son **la misma vista, filtrada distinto** (mismo dataset, mismo layout, cambia el subconjunto o el modo). Ejemplos: Tickets (Bandeja / Tipos), Permisos (Por Rol / Catálogo), Asistencias (Gestión / Reportes / Panel).
+**Tabs con subrayado verde (`edu-tabs`/`edu-tab`)** — usar cuando las secciones son **la misma vista, filtrada distinto** (mismo dataset, mismo layout, cambia el subconjunto o el modo). Ejemplos: Tickets (Bandeja / Tipos), Permisos (Por Rol / Catálogo), Asistencias (Gestión / Reportes / Panel).
 
 **Segmented control de fondo sólido** — reservado para cuando las secciones son **visualizaciones de naturaleza distinta de los mismos datos** (no un filtro, una representación distinta: tabla vs. kanban vs. heatmap). Única instancia hoy: Monitoreo > Incidencias > Errores (Kanban / Tabla / Eventos / Heatmap / Priorización). Forzar esas 5 vistas a tabs les quitaría expresividad — la excepción es intencional, no accidental.
 
-**Orden obligatorio: `<app-page-header>` va ANTES de `p-tabs`, siempre, a nivel del componente shell — nunca dentro de cada tab-panel.** Si cada pestaña necesita acciones propias (un date-picker, un buscador), esas acciones van en un toolbar propio dentro del tab-panel, o se proyectan condicionalmente en el `header-actions` del shell — pero el `<app-page-header>` (ícono + H1 + subtítulo) no se duplica por pestaña. Ver `TicketAdminComponent`/`PermissionsRolesComponent` como referencia tras el fix de Case 5.
+**Orden obligatorio: `<app-page-header>` va ANTES de `edu-tabs`, siempre, a nivel del componente shell — nunca dentro de cada tab-panel.** Si cada pestaña necesita acciones propias (un date-picker, un buscador), esas acciones van en un toolbar propio dentro del tab-panel, o se proyectan condicionalmente en el `header-actions` del shell — pero el `<app-page-header>` (ícono + H1 + subtítulo) no se duplica por pestaña. Ver `TicketAdminComponent`/`PermissionsRolesComponent` como referencia tras el fix de Case 5.
 
 ---
 
@@ -992,7 +883,7 @@ Case 10 de la auditoría de diseño (2026-08-03) encontró que varias pantallas 
 
 ```html
 @if (vm().loading) {
-	<p-progressSpinner />
+	<edu-spinner />
 } @else if (vm().items.length === 0) {
 	<app-empty-state icon="pi pi-book" title="Mis Cursos" message="No tienes cursos asignados" />
 } @else {
@@ -1001,7 +892,7 @@ Case 10 de la auditoría de diseño (2026-08-03) encontró que varias pantallas 
 }
 ```
 
-No usar para estados vacíos DENTRO de una pantalla que ya tiene su propio `<app-page-header>` fijo (p. ej. una tabla vacía bajo un header que no depende de los datos) — ahí el `#emptymessage` de `p-table` o un div simple siguen siendo correctos. `app-empty-state` es específicamente para cuando la ausencia de datos reemplazaba la pantalla completa, header incluido.
+No usar para estados vacíos DENTRO de una pantalla que ya tiene su propio `<app-page-header>` fijo (p. ej. una tabla vacía bajo un header que no depende de los datos) — ahí el `#emptymessage` de `edu-table` o un div simple siguen siendo correctos. `app-empty-state` es específicamente para cuando la ausencia de datos reemplazaba la pantalla completa, header incluido.
 
 ---
 
@@ -1095,14 +986,16 @@ grep -rn 'style="color: white' src/ --include="*.html"
 ## ❌ NO hacer
 
 ```scss
-// ❌ INCORRECTO - duplica lo que ya hace el global
-::ng-deep .p-datatable {
-	background: transparent;
-	.p-datatable-table { background: transparent; }
-	// ...
+// ❌ INCORRECTO - duplica lo que ya trae edu-table en-componente
+:host ::ng-deep {
+	edu-table {
+		background: transparent;
+		// ...
+	}
 }
 
-// ❌ INCORRECTO - override per-component de inputs/selects en la intranet
+// ❌ INCORRECTO - override per-component de inputs/selects (el reset global ya no existe;
+// los fields traen theming propio; esto además apunta a selectores muertos si usa .p-*)
 :host ::ng-deep {
 	.p-inputtext {
 		background: transparent;
@@ -1121,7 +1014,7 @@ grep -rn 'style="color: white' src/ --include="*.html"
 
 ## ✅ SÍ hacer
 
-- Confiar en los globales — basta usar `<p-table>`, `<p-select>`, `p-button-text`, `class="stat-card"`, `class="label-uppercase"` dentro de la intranet y funciona.
+- Confiar en los componentes — basta usar `<edu-table>`, `<edu-select>`, `<edu-button [text]="true">`, `class="stat-card"`, `class="label-uppercase"` dentro de la intranet y funciona.
 - Para variantes de color de stat-card, modificar `border` y `color`, no `background`:
 
 ```scss
@@ -1144,7 +1037,7 @@ grep -rn 'style="color: white' src/ --include="*.html"
 
 ## ⚠️ Cuidado con wrappers
 
-El override global cubre `p-table`, `p-paginator` y `.stat-card`, pero **NO** contenedores custom (`section`, `div`) que los envuelvan. Si ves fondo blanco detrás de estos elementos, revisa el padre:
+La transparencia en-componente cubre `edu-table`, `edu-paginator` y el global `.stat-card`, pero **NO** contenedores custom (`section`, `div`) que los envuelvan. Si ves fondo blanco detrás de estos elementos, revisa el padre:
 
 ```scss
 // ❌ INCORRECTO — el wrapper rompe la transparencia visualmente
@@ -1170,7 +1063,7 @@ Si una tabla/card/input específica requiere fondo propio (ej: enfatizar un pane
 
 ```scss
 // Motivo: panel de KPIs destacado en dashboard de dirección
-:host ::ng-deep .p-datatable {
+:host ::ng-deep edu-table {
 	background: var(--surface-card) !important;
 }
 ```
@@ -1200,6 +1093,7 @@ No abrir excepciones nuevas para "componentes con animación" o "páginas comple
 - **Fase 4 (2026-04-17, Design System F4)** — Agregada sección 5 (A5: `p-button-success` con texto blanco global) + sección 8 (D: Tokens de color con mapa canónico). Migrados ~30 archivos de admin/shared/cross-role/profesor/estudiante: `#e24c4c → var(--red-500)`, `#dc2626 → var(--red-600)`, `#1e40af → var(--blue-800)`. Eliminado `style="color: white"` inline en `usuarios-header`. Excepciones justificadas documentadas (Sass color functions, Canvas API, avatar palettes). Deuda C1/C4 resuelta, C3 resuelta con token; C2 resuelta en todas las rutas migrables.
 - **Fase 5 (2026-08-03, Design System F5, Case 5 de la auditoría)** — Agregado B12 (tabs vs. segmented control): documenta como regla intencional los dos idiomas de navegación (tabs = filtrar la misma vista, segmented control = visualización alternativa — reservado a Monitoreo > Incidencias > Errores) y fija el orden `<app-page-header>` antes de `p-tabs`, a nivel del shell. Corregido el orden invertido (header duplicado dentro de cada tab-panel) en `TicketAdminComponent` (Bandeja/Tipos) y `PermissionsRolesComponent` (Por Rol/Catálogo — `VistasComponent` perdió su `<app-page-header>` propio, el botón "Refrescar" se movió al toolbar de filtros).
 - **Fase 5 (2026-08-03, Design System F5, Case 10 de la auditoría)** — Agregado B13 (estado vacío nunca sin encabezado) y creado el componente compartido `<app-empty-state>` (`shared/components/empty-state`), que envuelve `<app-page-header>` internamente. Migrados `ProfesorCursosComponent` y `EstudianteCursosComponent` (ambos perdían el header completo en la rama de "sin cursos asignados").
+- **Fase 6 (2026-09-17, brief 658)** — Migración PrimeNG → edu-ui del propio doc: `p-table/p-select/p-dialog/p-drawer/pButton/pInputText` → `edu-table/edu-select/edu-dialog/edu-drawer/edu-button` + `input eduInputText`; variantes por clase (`p-button-text/outlined/success`, `p-button-sm`) → props (`[text]/[outlined]/severity/size`); bloques `::ng-deep .p-*` eliminados (cero usos de `::ng-deep` con edu-* en features/ — los internos vienen themeados en-componente); bloques globales `.p-datatable/.p-inputtext/.p-button` de §1-§3/§5 marcados como eliminados de `styles.scss` (P79). §8 Tokens intacto (shim `--p-*` intencional).
 
 Overrides existentes son redundantes con los globales pero no rompen nada — se pueden limpiar incrementalmente al tocar cada archivo.
 
@@ -1208,15 +1102,15 @@ Overrides existentes son redundantes con los globales pero no rompen nada — se
 ## Buscar overrides redundantes (cleanup gradual)
 
 ```bash
-# Tablas con override local redundante
-grep -rn "p-datatable" src/ --include="*.scss" | grep -v "styles.scss"
+# Tablas con override local redundante (incluye restos p-* muertos)
+grep -rn "p-datatable\|edu-table" src/ --include="*.scss" | grep -v "styles.scss"
 
 # Stat-cards con background explícito
 grep -rn "stat-card" src/ --include="*.scss" | grep -i "background"
 
-# Inputs/selects con el patrón de reset ahora global (dentro de intranet)
-grep -rn "p-inputtext\|p-select" src/app/features/intranet --include="*.scss" | grep -v "styles.scss"
+# Inputs/selects con patrón de reset viejo (los selectores .p-* ya no existen)
+grep -rn "p-inputtext\|p-select\|eduInputText\|edu-select" src/app/features/intranet --include="*.scss" | grep -v "styles.scss"
 
 # Botones text/outlined con overrides de color local
-grep -rn "p-button-text\|p-button-outlined" src/app/features/intranet --include="*.scss" | grep -i "color:"
+grep -rn "p-button-text\|p-button-outlined\|\[text\]\|\[outlined\]" src/app/features/intranet --include="*.scss" | grep -i "color:"
 ```
