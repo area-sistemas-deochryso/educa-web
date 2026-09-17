@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { SessionCoordinatorService, SessionMessage } from './session-coordinator.service';
 import { AuthService, AuthUser } from '@core/services/auth';
+import { logger } from '@core/helpers';
 // #endregion
 
 // #region Mock BroadcastChannel controllable
@@ -189,6 +190,47 @@ describe('SessionCoordinatorService', () => {
 			channels[0].fire({ type: 'login', entityId: 10, rol: 'Director' });
 
 			expect(received).toHaveLength(1);
+		});
+
+		it('emite el warning distintivo al detectar login con usuario distinto', () => {
+			const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => {});
+			try {
+				authMock.currentUser = {
+					rol: 'Estudiante',
+					nombreCompleto: 'Alice',
+					entityId: 1,
+					sedeId: 1,
+				};
+
+				service.setup();
+				channels[0].fire({ type: 'login', entityId: 2, rol: 'Profesor' });
+
+				// Sin este assert el test pasaría igual aunque se borre la rama del warn.
+				expect(warnSpy).toHaveBeenCalledWith(
+					'[SessionCoordinator] Otro tab inició sesión con un usuario diferente',
+				);
+			} finally {
+				warnSpy.mockRestore();
+			}
+		});
+
+		it('no emite warning cuando el login es del mismo usuario', () => {
+			const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => {});
+			try {
+				authMock.currentUser = {
+					rol: 'Profesor',
+					nombreCompleto: 'Bob',
+					entityId: 5,
+					sedeId: 1,
+				};
+
+				service.setup();
+				channels[0].fire({ type: 'login', entityId: 5, rol: 'Profesor' });
+
+				expect(warnSpy).not.toHaveBeenCalled();
+			} finally {
+				warnSpy.mockRestore();
+			}
 		});
 	});
 	// #endregion

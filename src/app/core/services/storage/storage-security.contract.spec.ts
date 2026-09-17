@@ -49,6 +49,7 @@ function createMocks() {
 		} as Partial<PreferencesStorageService>,
 		notificationStorage: {
 			clearAll: vi.fn(),
+			clearNotifications: vi.fn(),
 		} as Partial<NotificationStorageService>,
 	};
 }
@@ -122,6 +123,37 @@ describe('StorageService — Security Contracts', () => {
 			service.setUser(user, false);
 
 			expect(mocks.session.setUser).toHaveBeenCalledWith(user, false);
+		});
+	});
+	// #endregion
+
+	// #region INV: clearAll removes sensitive state for real (not just call counts)
+	describe('INV: clearAll removes sensitive state for real', () => {
+		it('should wipe sessionStorage/localStorage keys AND delegate to sub-storages', () => {
+			// Seed real browser state (no mocks for the direct-storage paths).
+			service.setScheduleModalsState({ schedule: true });
+			localStorage.setItem(
+				'educa_dismissed_notifications',
+				JSON.stringify({ ids: ['x'], date: '2026-09-16T10:00:00.000Z' }),
+			);
+			localStorage.setItem(
+				'educa_read_notifications',
+				JSON.stringify({ ids: ['y'], date: '2026-09-16T10:00:00.000Z' }),
+			);
+
+			service.clearAll();
+
+			// Real sensitive state is gone — a toHaveBeenCalledTimes-only assert
+			// would pass even if the keys survived. (educa_last_notif_check is a
+			// benign timestamp refreshed on next checkNotifications — out of scope.)
+			expect(sessionStorage.getItem('educa_schedule_modals')).toBeNull();
+			expect(localStorage.getItem('educa_dismissed_notifications')).toBeNull();
+			expect(localStorage.getItem('educa_read_notifications')).toBeNull();
+			// Delegation still holds.
+			expect(mocks.session.clearAuth).toHaveBeenCalledTimes(1);
+			expect(mocks.session.clearPermisos).toHaveBeenCalledTimes(1);
+			expect(mocks.notificationStorage.clearNotifications).toHaveBeenCalledTimes(1);
+			expect(mocks.preferences.clearAttendancePreferences).toHaveBeenCalledTimes(1);
 		});
 	});
 	// #endregion

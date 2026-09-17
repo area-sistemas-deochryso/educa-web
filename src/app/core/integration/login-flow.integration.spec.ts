@@ -56,7 +56,9 @@ describe('Login Flow Integration', () => {
 	});
 
 	afterEach(() => {
-		httpMock.match(() => true).forEach((r) => r.flush(null));
+		// verify() en vez de flush-all: cualquier request inesperada/duplicada
+		// (warmup, logout, reintentos) falla el test en vez de absorberse.
+		httpMock.verify();
 	});
 
 	it('should authenticate, store user, and update state on successful login', () => {

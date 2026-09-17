@@ -104,4 +104,59 @@ describe('WalLeaderService', () => {
 		tab.destroy();
 		expect(tab.service.isLeader).toBe(false);
 	});
+
+	it('becomes leader immediately when BroadcastChannel is unavailable (single-tab fallback)', () => {
+		(globalThis as { BroadcastChannel?: unknown }).BroadcastChannel = undefined;
+		const tab = createTab('dddddddd-0000-0000-0000-000000000000');
+
+		tab.service.start();
+
+		expect(tab.service.isLeader).toBe(true);
+		tab.destroy();
+	});
+
+	it('follower takes over via RELEASE when the leader tab closes', () => {
+		const tabA = createTab('aaaaaaaa-0000-0000-0000-000000000000');
+		tabA.service.start();
+		vi.advanceTimersByTime(300);
+		expect(tabA.service.isLeader).toBe(true);
+
+		const tabB = createTab('bbbbbbbb-0000-0000-0000-000000000000');
+		tabB.service.start();
+		vi.advanceTimersByTime(3_000);
+		expect(tabB.service.isLeader).toBe(false);
+
+		// Leader closes → teardown broadcasts RELEASE → follower claims.
+		tabA.destroy();
+		expect(tabA.service.isLeader).toBe(false);
+		vi.advanceTimersByTime(400);
+		expect(tabB.service.isLeader).toBe(true);
+
+		tabB.destroy();
+	});
+
+	it('follower claims leadership when the leader goes silent (heartbeat timeout, no RELEASE)', () => {
+		const tabA = createTab('aaaaaaaa-0000-0000-0000-000000000000');
+		tabA.service.start();
+		vi.advanceTimersByTime(300);
+		expect(tabA.service.isLeader).toBe(true);
+
+		const tabB = createTab('bbbbbbbb-0000-0000-0000-000000000000');
+		tabB.service.start();
+		vi.advanceTimersByTime(3_000);
+		expect(tabB.service.isLeader).toBe(false);
+
+		// Simulate a dead leader that never sent RELEASE: partition tabB so it
+		// stops receiving heartbeats (last one seen ~t=3000ms).
+		const tabBChannel = FakeChannel.instances[1];
+		tabBChannel.close();
+
+		// leaderCheck fires every 9000ms; first check after partition sees
+		// elapsed < timeout, the next one past it claims leadership.
+		vi.advanceTimersByTime(16_000);
+		expect(tabB.service.isLeader).toBe(true);
+
+		tabA.destroy();
+		tabB.destroy();
+	});
 });

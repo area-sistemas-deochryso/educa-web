@@ -799,4 +799,20 @@ describe('WalSyncEngine', () => {
 	it('SYNC_INTERVAL_MS is configured', () => {
 		expect(WAL_DEFAULTS.SYNC_INTERVAL_MS).toBeGreaterThan(0);
 	});
+
+	// Periodic timer: processRetryable() fires on every SYNC_INTERVAL_MS tick.
+	it('periodic timer triggers processRetryable on each SYNC_INTERVAL_MS tick', async () => {
+		// Fake timers BEFORE setup: el interval se programa durante init().
+		vi.useFakeTimers();
+		const { mocks } = setupEngine({ online: true, pendingQueue: [[], [], []] });
+		await flushAsync();
+		mocks.wal.recoverInFlight.mockClear();
+		mocks.wal.getRetryableEntries.mockClear();
+
+		await vi.advanceTimersByTimeAsync(WAL_DEFAULTS.SYNC_INTERVAL_MS);
+		expect(mocks.wal.recoverInFlight).toHaveBeenCalledTimes(1);
+
+		await vi.advanceTimersByTimeAsync(WAL_DEFAULTS.SYNC_INTERVAL_MS);
+		expect(mocks.wal.recoverInFlight).toHaveBeenCalledTimes(2);
+	});
 });

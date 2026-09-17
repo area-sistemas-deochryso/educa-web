@@ -2,7 +2,7 @@
 
 > **Repo destino**: `educa-web`
 > **Plan**: [`audit-tests-frontend-2026-09-16.md`](../../plan/audit-tests-frontend-2026-09-16.md) (Fase F5)
-> **Creado**: 2026-09-16 · **Estado**: ⏳ pendiente arrancar.
+> **Creado**: 2026-09-16 · **Estado**: ✅ cerrado 2026-09-17.
 > **MODO SUGERIDO**: `/execute`
 > **touches**: `core/integration/*.spec.ts`, `core/services/wal/{wal-leader,wal-sync-engine}.service.spec.ts`, `core/services/notifications/notifications.service.spec.ts`, `core/services/storage/storage-security.contract.spec.ts`, `core/services/session/session-coordinator.service.spec.ts`
 
@@ -31,10 +31,21 @@ Hallazgos de `/audit` (2026-09-16), categoría **Riesgo** — gaps de infraestru
 
 ## Criterio de cierre
 
-- [ ] Los 7 puntos cubiertos.
-- [ ] Build + lint + tests OK.
-- [ ] Plan actualizado: F5 → ✅.
-- [ ] Maestro actualizado.
+- [x] Los 7 puntos cubiertos.
+- [x] Build + lint + tests OK.
+- [x] Plan actualizado: F5 → ✅.
+- [x] Maestro actualizado.
+
+## Cierre (2026-09-17)
+
+- Punto 2 primero como pedía el pre-work: `verify()` reveló 2 requests ocultas — `POST /api/sistema/errors` (reporter fire-and-forget, mockeado como sink con spec propio) y `POST /api/Auth/logout` real en guard-permisos (ahora flusheado explícito). login-flow sin requests ocultas (6/6 directo).
+- Punto 1: asserts 401 duros (`toHaveLength(1)` en refresh + retry) + `resetErrorInterceptorState()` en beforeEach.
+- Punto 3: fallback sin BroadcastChannel, takeover por timeout sin RELEASE (partición de canal), propagación RELEASE en destroy.
+- Punto 4: tick periódico dispara `processRetryable` 1×/2× con `advanceTimersByTimeAsync` (fake timers antes del setup).
+- Punto 5: `notifications.service.spec.ts` 8→15 tests (api/sound/smart mockeados; checkNotifications ordenado+computeds+sonido, fallback error, dismiss/restore round-trip con re-check, SW PUSH_RECEIVED/NOTIFICATION_CLICKED con flag flip + stub).
+- Punto 6: `clearAll` verifica estado real (schedule/localStorage); mock alineado a `clearNotifications` (antes `clearAll`, inexistente — `clearAll()` real hubiera lanzado). Hallazgo documentado: `educa_last_notif_check` benigno sobrevive al cleanup.
+- Punto 7: spy sobre `logger.warn` + caso negativo mismo-usuario.
+- Total: 97/97 verdes en los 8 specs tocados. Lint 0 errores, `tsc --noEmit` limpio.
 
 ## Tiempo estimado
 

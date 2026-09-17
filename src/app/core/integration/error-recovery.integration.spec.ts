@@ -5,8 +5,8 @@ import { provideRouter } from '@angular/router';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-import { errorInterceptor } from '@core/interceptors/error/error.interceptor';
-import { ErrorHandlerService } from '@core/services/error';
+import { errorInterceptor, resetErrorInterceptorState } from '@core/interceptors/error/error.interceptor';
+import { ErrorHandlerService, ErrorReporterService } from '@core/services/error';
 import { ForceLogoutSignal } from '@core/services/session';
 
 describe('Error Recovery Integration', () => {
@@ -15,12 +15,18 @@ describe('Error Recovery Integration', () => {
 	let errorHandler: ErrorHandlerService;
 
 	beforeEach(() => {
+		// El interceptor guarda lock de refresh a nivel módulo — aislar cada test.
+		resetErrorInterceptorState();
 		TestBed.configureTestingModule({
 			providers: [
 				provideZonelessChangeDetection(),
 				provideRouter([]),
 				provideHttpClient(withInterceptors([errorInterceptor])),
 				provideHttpClientTesting(),
+				// El reporter dispara POST /api/sistema/errors fire-and-forget por
+				// cada error — tiene spec propio dedicado, acá se mockea como sink
+				// para que verify() solo observe requests de la app bajo test.
+				{ provide: ErrorReporterService, useValue: { reportHttpError: vi.fn(), resetOnLogout: vi.fn() } },
 			],
 		});
 
@@ -30,7 +36,9 @@ describe('Error Recovery Integration', () => {
 	});
 
 	afterEach(() => {
-		httpMock.match(() => true).forEach((r) => r.flush(null));
+		// verify() en vez de flush-all: cualquier request inesperada/duplicada
+		// falla el test en vez de absorberse silenciosamente.
+		httpMock.verify();
 	});
 
 	it('should pass through successful responses without errors', () => {
@@ -77,19 +85,19 @@ describe('Error Recovery Integration', () => {
 		// Original request returns 401
 		httpMock.expectOne('/api/protected').flush(null, { status: 401, statusText: 'Unauthorized' });
 
-		// Interceptor should attempt refresh
+		// Interceptor MUST attempt refresh — si no hay request de refresh, el
+		// test falla duro en vez de saltarse el assert (falso negativo).
 		const refreshReq = httpMock.match((r) => r.url.includes('/refresh'));
-		if (refreshReq.length > 0) {
-			// Refresh succeeds
-			refreshReq[0].flush({});
+		expect(refreshReq).toHaveLength(1);
 
-			// Retried request
-			const retryReq = httpMock.match('/api/protected');
-			if (retryReq.length > 0) {
-				retryReq[0].flush({ data: 'recovered' });
-				expect(retried).toBe(true);
-			}
-		}
+		// Refresh succeeds
+		refreshReq[0].flush({});
+
+		// Retried request MUST be issued
+		const retryReq = httpMock.match('/api/protected');
+		expect(retryReq).toHaveLength(1);
+		retryReq[0].flush({ data: 'recovered' });
+		expect(retried).toBe(true);
 	});
 
 	it('should force logout when 401 refresh fails', () => {
@@ -101,10 +109,9 @@ describe('Error Recovery Integration', () => {
 		httpMock.expectOne('/api/protected').flush(null, { status: 401, statusText: 'Unauthorized' });
 
 		const refreshReq = httpMock.match((r) => r.url.includes('/refresh'));
-		if (refreshReq.length > 0) {
-			refreshReq[0].flush(null, { status: 401, statusText: 'Unauthorized' });
-			expect(forceLogout.emit).toHaveBeenCalled();
-		}
+		expect(refreshReq).toHaveLength(1);
+		refreshReq[0].flush(null, { status: 401, statusText: 'Unauthorized' });
+		expect(forceLogout.emit).toHaveBeenCalled();
 	});
 
 	it('should skip error toast for requests with X-Skip-Error-Toast header', () => {

@@ -56,7 +56,9 @@ describe('Guard + Permisos Integration', () => {
 	});
 
 	afterEach(() => {
-		httpMock.match(() => true).forEach((r) => r.flush(null));
+		// verify() en vez de flush-all: los guards no disparan HTTP — si algún
+		// día lo hacen, el test lo revela en vez de absorberlo.
+		httpMock.verify();
 	});
 
 	it('should redirect to login when not authenticated', async () => {
@@ -105,6 +107,9 @@ describe('Guard + Permisos Integration', () => {
 		await router.navigateByUrl('/intranet/admin/usuarios');
 
 		expect(authService.logout).toHaveBeenCalled();
+		// logout() real dispara POST /api/Auth/logout (el spy no mockea la
+		// implementación) — flushearlo explícito en vez de absorberlo en afterEach.
+		httpMock.expectOne((r) => r.url.includes('/api/Auth/logout')).flush(null);
 		expect(router.url).toBe('/intranet/login');
 	});
 
