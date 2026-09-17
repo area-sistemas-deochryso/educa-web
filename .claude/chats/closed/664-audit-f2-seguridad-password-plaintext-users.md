@@ -3,7 +3,7 @@
 > **Repo destino**: `educa-web` (posible contraparte BE si el endpoint de detalle de usuario devuelve la password — confirmar con `/investigate` antes de fix).
 > **Plan**: [`audit-angular22-ts6-2026-09-12.md`](../../plan/audit-angular22-ts6-2026-09-12.md) (Fase F2)
 > **Creado**: 2026-09-12 · **Estado**: ✅ FE cerrado (lint/build/test verdes).
-> **Validación prod**: ⏳ pendiente desde 2026-09-12 — smoke test del form de alta/edición de usuario con password manual (verificar que ya no fuerza mayúscula y las 5 reglas son alcanzables) y con password autogenerada (debe pasar las 5 reglas). Los botones "Migrar Contraseñas" y "Exportar" quedan ocultos en prod hasta que `Educa.API` siembre las capabilities (brief 667) — comportamiento esperado, no verificar ahí.
+> **Validación prod**: ✅ verificada 2026-09-17 — smoke del form con password manual y autogenerada OK.
 > **MODO SUGERIDO**: `/investigate` primero (confirmar si el BE devuelve la password en el detalle) → `/execute`
 > **touches**:
 >   - `src/app/features/intranet/pages/admin/users/usuarios.store.ts`

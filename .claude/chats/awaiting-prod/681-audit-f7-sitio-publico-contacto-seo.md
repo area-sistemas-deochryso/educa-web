@@ -3,7 +3,7 @@
 > **Repo destino**: `educa-web`
 > **Plan**: [`audit-angular22-ts6-2026-09-12.md`](../../plan/audit-angular22-ts6-2026-09-12.md) (Fase F7)
 > **Creado**: 2026-09-12 · **Estado**: ✅ cerrado localmente (2026-09-15).
-> **Validación prod**: ⏳ pendiente desde 2026-09-15 — depende del merge de brief backend 681-B (`chat/681-B-endpoint-contacto`) a `main` de Educa.API.
+> **Validación prod**: ⏳ pendiente desde 2026-09-15 — ~~depende del merge de brief backend 681-B~~ ✅ 681-B mergeado a `main` de Educa.API (`828f294`, verificado 2026-09-17) — falta smoke en prod (form contacto + SEO).
 > **MODO SUGERIDO**: `/design` corto (decidir manejo del form) → `/execute`
 > **touches**:
 >   - `src/app/features/public/contact/contact.html`, `contact.ts`

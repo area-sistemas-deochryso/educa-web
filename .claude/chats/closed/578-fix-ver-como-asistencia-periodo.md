@@ -1,6 +1,6 @@
 > **Repo destino**: `educa-web` (frontend, branch `main`) — confirmado en investigación: F1 solo `educa-web`; el hallazgo BE derivado (F2, `Educa.API`) queda documentado en el plan cross-repo para un chat futuro.
 > **Plan**: 104 (coord) · **Fase**: F1 · **Creado**: 2026-08-21 · **Estado**: ✅ cerrado 2026-08-28 (worktree `chat/578-fix-ver-como-asistencia-periodo`).
-> **Validación prod**: ⏳ pendiente desde 2026-08-28.
+> **Validación prod**: ✅ verificada 2026-09-17.
 
 ---
 

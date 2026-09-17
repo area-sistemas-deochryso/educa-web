@@ -4,6 +4,7 @@
 > **Plan**: [`audit-angular22-ts6-2026-09-12.md`](../../plan/audit-angular22-ts6-2026-09-12.md) (Fase F3)
 > **Creado**: 2026-09-12 · **Estado**: ✅ cerrado localmente.
 > **Validación prod**: ⏳ pendiente desde 2026-09-12 — verificación visual del punto 3 (`campus-admin`) se hizo en local contra `TestConnection`, falta confirmar en `educa.com.pe/intranet` real.
+> **Nota 2026-09-17**: no se pudo forzar una race condition en prod tras el deploy — estado incierto, sin evidencia de falla ni de éxito. Sigue pendiente.
 > **MODO SUGERIDO**: `/execute`
 > **touches**:
 >   - `src/app/features/intranet/pages/admin/correlation/services/correlation.facade.ts`

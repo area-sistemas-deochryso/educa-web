@@ -2,7 +2,7 @@
 
 > **Origen**: `Educa.API` chat 687 · commit `2eab6905` · 2026-09-14
 > **MODO SUGERIDO**: `/execute` (cambio acotado, contrato ya confirmado del lado BE)
-> **Validación prod**: ⏳ pendiente desde 2026-09-14 (post `/wt-merge` + deploy)
+> **Validación prod**: ✅ verificada 2026-09-17 (post deploy).
 
 ## CONTEXTO DEL CAMBIO
 

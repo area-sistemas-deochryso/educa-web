@@ -3,6 +3,7 @@
 > **Repo destino**: `educa-web`
 > **Plan**: [`audit-angular22-ts6-2026-09-12.md`](../../plan/audit-angular22-ts6-2026-09-12.md) (Fase F5)
 > **Creado**: 2026-09-12 · **Estado**: ⏳ pendiente arrancar.
+> **Validación prod**: ✅ verificada 2026-09-17 — smoke visual/teclado en prod real OK.
 > **MODO SUGERIDO**: `/execute`
 > **touches**:
 >   - `src/app/shared/edu-ui/lib/**/edu-checkbox.ts`, `edu-toggle.ts`, `edu-select-button.ts`, `edu-input-number.ts`, `edu-password.ts`, `edu-autocomplete.ts`, `edu-select.ts`, `edu-multi-select.ts`, `edu-datepicker.ts` (CVA)
