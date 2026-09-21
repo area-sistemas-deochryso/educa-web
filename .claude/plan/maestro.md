@@ -87,7 +87,7 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub F3-F6), *
 | Pos | Key | Plan | Próximo paso concreto | Gate |
 |---|---|---|---|---|
 | 4 | P15 | Release ops | F3-F5 (post-deploy + rollback + runbook) — puntero coord | libre |
-| 12 | F-SW01 | Bundle stale post-deploy | Banner "nueva versión disponible" vía `SwService.updateAvailable$` — [detalle](../tasks/sw-bundle-stale-detection.md) | libre |
+| 12 | F-SW01 | Bundle stale post-deploy | ✅ A (banner `SwService.updateAvailable$`) + B (`MonitoreoHubBadgesFacade` refetch en `cacheUpdated$`) — [detalle](../tasks/sw-bundle-stale-detection.md) | cerrado |
 | 13 | BAudit2 | Audit F1 | ✅ Bugs críticos de fugas/reliability — brief [663](../chats/closed/663-audit-f1-bugs-criticos-fugas-reliability.md) | cerrado |
 | 14 | BAudit2 | Audit F2 | ✅ FE cerrado (seguridad password plaintext `users/`) — brief [664](../chats/awaiting-prod/664-audit-f2-seguridad-password-plaintext-users.md), BE handoff pendiente (`Educa.API` brief 667) | ⏸️ awaiting-prod |
 | 15 | BAudit2 | Audit F3 | ✅ FE cerrado (race conditions en fetches, ~9 facades) — brief [665](../chats/awaiting-prod/665-audit-f3-race-conditions-fetches-sin-cancelacion.md), verificado en local contra `TestConnection` | ⏸️ awaiting-prod |

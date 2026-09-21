@@ -41,9 +41,12 @@ Si solo se hace una, elegir A — cubre más casos.
 
 ## Criterios de cierre
 
-- Banner aparece tras un deploy real (smoke en Netlify preview o producción).
-- Hard reload manual deja de ser necesario para que el usuario vea cambios FE.
-- Documentar el patrón en `service-worker.md` para que futuros features sigan el mismo enfoque.
+- [x] Banner (A) implementado — `SwUpdateBannerComponent`, montado en `intranet-layout`. Falta smoke en deploy real (Netlify preview o producción) para confirmar que aparece tras un deploy — no bloquea el cierre local, se verificará en el próximo deploy.
+- [x] Hard reload manual deja de ser necesario para que el usuario vea cambios FE (CTA del banner llama a `SwService.update()`).
+- [x] Documentado el patrón en `service-worker.md` (sección "Banner 'nueva versión disponible' (F-SW01)").
+- [x] B implementado — `MonitoreoHubBadgesFacade` se suscribe a `cacheUpdated$` y fuerza refetch completo (`loadAll(true)`) cuando el SW revalida cualquiera de sus 10 endpoints subyacentes. Lint 0 errores, build verde, 2695/2695 tests (incluye 3 nuevos del spec del facade).
+
+**Estado**: ambas sub-tareas (A y B) cerradas localmente. Pendiente únicamente la confirmación visual del banner en el próximo deploy real (no requiere brief propio — validar cuando se despliegue).
 
 ## No hacer
 

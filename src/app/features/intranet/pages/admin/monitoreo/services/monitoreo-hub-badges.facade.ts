@@ -1,9 +1,11 @@
 // #region Imports
-import { Injectable, computed, inject, signal } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
+import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { filter, firstValueFrom } from 'rxjs';
 
 import { logger } from '@core/helpers';
 import { FeedbackReportService } from '@core/services/feedback';
+import { SwService } from '@core/services/sw';
 import { ErrorGroupsService } from '@features/intranet/pages/admin/error-groups/services';
 import { EmailMonitoreoApiService } from '@features/intranet/pages/admin/email-outbox-dashboard-dia/services/email-monitoreo.api.service';
 import { DeferFailStatus, EmailOutboxApiService } from '@features/intranet/pages/admin/email-outbox-shared';
@@ -25,6 +27,16 @@ const LOG_TAG = 'MonitoreoHubBadgesFacade';
 /** TTL del cache en memoria — el hub se visita esporádico, 60s alcanza. */
 const CACHE_TTL_MS = 60_000;
 
+/** Endpoints que alimentan `runLoad()` — un `cacheUpdated$` de cualquiera fuerza refetch (F-SW01 B). */
+const RELEVANT_ENDPOINTS = [
+	'/email-outbox/estadisticas',
+	'/email-outbox/defer-fail-status',
+	'/email-outbox/monitoreo/candidatos-blacklist',
+	'/error-groups/count',
+	'/reportes-usuario/estadisticas',
+	'/rate-limit-events/stats',
+];
+
 /**
  * Carga en paralelo las 6 métricas resumen de cada sub-link del hub Monitoreo.
  * Cada fetch es fail-safe (INV-S07): si uno falla, el resto sigue.
@@ -39,6 +51,8 @@ export class MonitoreoHubBadgesFacade {
 	private readonly errorGroups = inject(ErrorGroupsService);
 	private readonly feedback = inject(FeedbackReportService);
 	private readonly rateLimit = inject(RateLimitEventsService);
+	private readonly sw = inject(SwService);
+	private readonly destroyRef = inject(DestroyRef);
 	// #endregion
 
 	// #region Estado
@@ -51,6 +65,10 @@ export class MonitoreoHubBadgesFacade {
 	private lastLoadAt = 0;
 	private inflight: Promise<void> | null = null;
 	// #endregion
+
+	constructor() {
+		this.setupCacheRefresh();
+	}
 
 	// #region Comandos
 	/** Carga las 6 métricas en paralelo. Cache 60s para evitar refetch en navegación. */
@@ -68,6 +86,22 @@ export class MonitoreoHubBadgesFacade {
 
 	refresh(): Promise<void> {
 		return this.loadAll(true);
+	}
+	// #endregion
+
+	// #region Refresh por SW cache update (F-SW01 B)
+	/**
+	 * El hub es solo lectura y sus badges son derivados de 10 requests en paralelo —
+	 * no se puede aplicar `event.data` de un solo endpoint revalidado como hace
+	 * `UsersDataFacade`. Se fuerza refetch completo en su lugar.
+	 */
+	private setupCacheRefresh(): void {
+		this.sw.cacheUpdated$
+			.pipe(
+				filter((event) => RELEVANT_ENDPOINTS.some((endpoint) => event.url.includes(endpoint))),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe(() => this.loadAll(true));
 	}
 	// #endregion
 
