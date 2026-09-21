@@ -103,9 +103,13 @@ export class UserFormDialogComponent {
 	// #endregion
 
 	// #region Estado local
-	readonly rolesSelectOptions = computed(() =>
-		this.rolService.all().map((r) => ({ label: r.nombre, value: r.nombre })),
-	);
+	readonly rolesSelectOptions = computed(() => {
+		const puedeAsignarAdministrador = this.userProfile.userRole() === 'Administrador';
+		return this.rolService
+			.all()
+			.filter((r) => puedeAsignarAdministrador || r.nombre !== 'Administrador')
+			.map((r) => ({ label: r.nombre, value: r.nombre }));
+	});
 	readonly activeFormTab = signal<string>('datos');
 
 	readonly _gradoSeleccionado = signal<string | null>(null);
