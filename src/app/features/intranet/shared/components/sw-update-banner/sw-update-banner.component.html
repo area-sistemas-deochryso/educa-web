@@ -1,0 +1,26 @@
+<!-- #region Template -->
+@if (showBanner()) {
+	<div class="sw-update-banner" role="status" aria-live="polite">
+		<div class="sw-update-banner__content">
+			<i
+				class="pi pi-refresh sw-update-banner__icon"
+				aria-hidden="true"
+			></i>
+			<span>
+				<strong>Nueva versión disponible</strong> — recargá para ver los
+				últimos cambios.
+			</span>
+		</div>
+		<div class="sw-update-banner__actions">
+			<edu-button
+				type="button"
+				label="Recargar para actualizar"
+				icon="pi pi-refresh"
+				[outlined]="true"
+				size="small"
+				(click)="onReload()"
+			/>
+		</div>
+	</div>
+}
+<!-- #endregion -->
