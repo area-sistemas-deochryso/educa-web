@@ -3,7 +3,7 @@
 > **Repo destino**: `educa-web` (punto 3 puede requerir contraparte BE — confirmar en pre-work).
 > **Plan**: [`audit-angular22-ts6-2026-09-12.md`](../../plan/audit-angular22-ts6-2026-09-12.md) (Fase F12)
 > **Creado**: 2026-09-12 · **Estado**: ✅ implementado, validado (build/lint/tests).
-> **Validación prod**: ⏳ pendiente desde 2026-09-16 — QA manual con 2 sesiones de browser editando el mismo piso en `campus-admin` (punto 2, verificación del 409/rowVersion).
+> **Validación prod**: ✅ verificada 2026-09-21 — QA manual con 2 sesiones de browser editando el mismo piso en `campus-admin` (punto 2, verificación del 409/rowVersion). Reproducido 2 veces: `PUT /api/campus/pisos/2` → 409, `GET /api/campus/pisos` → 200 (refetch), toast "Piso modificado por otro administrador" visible. Estado final en BBDD conservó el valor de la escritura exitosa, sin "last write wins".
 > **MODO SUGERIDO**: `/execute` (punto 3: `/investigate` corto primero)
 > **touches**:
 >   - `src/app/features/intranet/pages/login/login-intranet.component.ts`, `src/app/core/services/auth/auth.service.ts`
@@ -33,11 +33,11 @@ Hallazgos de `/audit` (2026-09-12), categoría "Riesgo" — 3 hallazgos de menor
 ## Criterio de cierre
 
 - [x] Punto 1: `/investigate` confirmó que `AuthController.Login`/`MobileLogin` ya tienen `[EnableRateLimiting("login")]` (60/min por IP, `RateLimitingExtensions.cs:56`). El gate cliente (`_loginAttempts`) es solo UX — se documentó explícitamente con un comentario en `auth.service.ts` (no se necesita persistencia, la protección real es del BE).
-- [x] Punto 2: `rowVersion`+409 implementado en `campus-admin` (Piso/Nodo/Bloqueo) replicando el patrón de `ayuda-tickets` (BE: `ConcurrencyExtensions.SetOriginalRowVersion` + DTOs con `RowVersion`; FE: DTOs/facade envían `rowVersion` y manejan 409 con aviso + refresh). **Pendiente**: verificación manual con 2 sesiones editando el mismo piso simultáneamente (no se hizo browser QA en este chat).
+- [x] Punto 2: `rowVersion`+409 implementado en `campus-admin` (Piso/Nodo/Bloqueo) replicando el patrón de `ayuda-tickets` (BE: `ConcurrencyExtensions.SetOriginalRowVersion` + DTOs con `RowVersion`; FE: DTOs/facade envían `rowVersion` y manejan 409 con aviso + refresh). Verificado manualmente con 2 sesiones editando el mismo piso simultáneamente (2026-09-21) — ver "Validación prod" arriba.
 - [x] Punto 3: `/investigate` mostró que el BE ya dimensiona el `exp` del JWT al fin de la clase + margen (no 24h fijo como asumía el hallazgo original — ya no requiere endpoint de refresh nuevo, no hay handoff a `Educa.API`). Se agregó aviso proactivo + reconexión client-side en `VideoconferenciaSalaComponent` (`scheduleExpiryWarning`/`reconnect`).
 - [x] Build + lint + tests OK (BE: build limpio, 2431/2431 tests · FE: `ng lint` limpio, `ng build --configuration production` limpio, 95/95 tests de las suites tocadas).
-- [ ] Plan actualizado: F12 → ✅ (cierra el plan completo de 12 fases).
-- [ ] Maestro actualizado.
+- [x] Plan actualizado: F12 → ✅ (cierra el plan completo de 12 fases).
+- [x] Maestro actualizado.
 
 ## Tiempo estimado
 
