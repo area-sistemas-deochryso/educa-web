@@ -1,0 +1,41 @@
+// #region F-SW01 — sw-update banner (info, B9)
+.sw-update-banner {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	// Mismo padding horizontal que .intranet-content (banner es full-bleed) —
+	// evita el desfase de alineación con el título/breadcrumb de cada pantalla.
+	padding: 0.6rem 2rem;
+	background: color-mix(in srgb, var(--blue-500) 15%, transparent);
+	border-bottom: 1px solid var(--blue-500);
+	color: var(--text-color);
+	font-size: 0.875rem;
+
+	&__content {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		flex: 1;
+	}
+
+	&__icon {
+		font-size: 1.1rem;
+		color: var(--blue-800);
+		flex-shrink: 0;
+	}
+
+	&__actions {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		flex-shrink: 0;
+	}
+}
+
+@media screen and (max-width: 840px) {
+	.sw-update-banner {
+		padding: 0.6rem 1rem;
+	}
+}
+// #endregion

@@ -193,6 +193,25 @@ swService.invalidateCacheByPattern(pattern)       // Invalidar por patrón (reto
 swService.update()                                // Actualizar SW y recargar
 ```
 
+## Banner "nueva versión disponible" (F-SW01)
+
+`updateAvailable$` se emite cuando el navegador instala un SW nuevo pero el tab sigue corriendo el bundle viejo (típico tras un deploy con la pestaña abierta). El patrón consumidor vive en `SwUpdateBannerComponent` (`@intranet-shared/components/sw-update-banner`), montado una sola vez en `intranet-layout.component.html` junto al resto de banners globales (`wal-migration-banner`, `salud-sede-banner`, `view-as-banner`).
+
+```typescript
+private readonly updateAvailable = toSignal(this.sw.updateAvailable$, { initialValue: false });
+readonly showBanner = computed(() => this.updateAvailable() && environment.production);
+
+onReload(): Promise<void> {
+  return this.sw.update(); // SKIP_WAITING + reload
+}
+```
+
+Puntos del patrón, para reusarlo si aparece otro caso similar:
+
+- **No-dismissible, sin auto-reload**: el CTA "Recargar para actualizar" es la única forma de aplicar la actualización — un reload automático perdería estado de formularios sin avisar.
+- **Gate por `environment.production`, no `isDevMode()`**: `isDevMode()` no es confiable en Angular 22 + esbuild. El gate usa el flag de build-time para no mostrar el banner mientras se itera en dev local (el SW ya está activo en dev por la razón descrita arriba, así que sin este gate el banner sería ruido constante).
+- **No agrega polling**: `updateAvailable$` ya emite solo cuando el browser detecta el SW nuevo vía el evento `updatefound` nativo — no hace falta chequear manualmente.
+
 ### Ejemplo: Invalidar cache después de cambio backend
 
 ```typescript
