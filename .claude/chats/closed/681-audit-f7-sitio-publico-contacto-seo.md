@@ -4,7 +4,12 @@
 > **Plan**: [`audit-angular22-ts6-2026-09-12.md`](../../plan/audit-angular22-ts6-2026-09-12.md) (Fase F7)
 > **Creado**: 2026-09-12 · **Estado**: ✅ cerrado localmente (2026-09-15).
 > **Validación prod**: ⏳ pendiente desde 2026-09-15 — ~~depende del merge de brief backend 681-B~~ ✅ 681-B mergeado a `main` de Educa.API (`828f294`, verificado 2026-09-17) — falta smoke en prod (form contacto + SEO).
-> **Cierre sin verificación post-deploy (2026-09-22)**: movido a `closed/` por decisión explícita del usuario, sin correr el smoke test en prod. El bloqueo real (681-B backend) sí está confirmado resuelto (merge `828f2946` en `main` de `Educa.API`, endpoint `POST /api/Contacto` presente en código). Riesgo residual: el formulario de contacto y los meta tags SEO nunca se probaron contra `educa.com.pe` real.
+> **Smoke test post-deploy completado (2026-09-22)**: ejecutado contra `https://educa.com.pe/contacto` real vía browser automation.
+> - Página carga sin romper la SPA, título dinámico correcto ("Educa.com.pe - Contacto") → confirma que `PublicSeoService` funciona en prod.
+> - Formulario completado con datos de prueba (nombre "SMOKE TEST - Brief 681", correo `educa.com175@hotmail.com`, mensaje marcado como smoke test) y enviado con el botón "Contáctenos".
+> - Resultado: mensaje in-app "¡Gracias! Tu mensaje fue enviado, te responderemos a la brevedad." — sin navegación fuera de la SPA, confirmando que el punto 1 (POST `/api/Contacto` vía backend propio) funciona end-to-end en producción.
+> - Sin errores de consola detectados.
+> - Riesgo residual menor: no se confirmó la recepción real del correo en el buzón (`educa.com175@hotmail.com`) ni se inspeccionaron manualmente los meta tags OG de las otras 8 rutas públicas — solo se validó `/contacto`. El mecanismo (`PublicSeoService`) es compartido por las 9 rutas y ya tenía cobertura de tests unitarios (`public-seo.service.spec.ts`).
 > **MODO SUGERIDO**: `/design` corto (decidir manejo del form) → `/execute`
 > **touches**:
 >   - `src/app/features/public/contact/contact.html`, `contact.ts`
