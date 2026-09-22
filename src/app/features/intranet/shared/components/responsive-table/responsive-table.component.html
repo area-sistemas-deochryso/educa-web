@@ -1,7 +1,8 @@
+<div style="background:orange;color:white;font-weight:bold;padding:4px;">CAMBIO 2 — static:true — desktopView: {{ desktopView ? 'RESUELTO' : 'undefined' }} / mobileCard: {{ mobileCard ? 'RESUELTO' : 'undefined' }}</div>
 <!-- #region Desktop view -->
 <div class="rt-desktop">
-	@if (desktopView()) {
-		<ng-container *ngTemplateOutlet="desktopView()" />
+	@if (desktopView) {
+		<ng-container *ngTemplateOutlet="desktopView" />
 	}
 </div>
 <!-- #endregion -->
@@ -17,9 +18,9 @@
 		<div class="rt-card-list">
 			@for (item of paginatedItems(); track $index) {
 				<div class="rt-card">
-					@if (mobileCard()) {
+					@if (mobileCard) {
 						<ng-container
-							*ngTemplateOutlet="mobileCard(); context: { $implicit: item }"
+							*ngTemplateOutlet="mobileCard; context: { $implicit: item }"
 						/>
 					}
 				</div>

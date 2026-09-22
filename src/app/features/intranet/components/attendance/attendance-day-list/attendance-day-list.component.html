@@ -91,126 +91,73 @@
 } @else if (estudiantesDelDia().length === 0 || !hasDayData()) {
 	<app-empty-state message="No hay registros de asistencia para esta fecha." />
 } @else {
-	<app-responsive-table
-		[value]="filteredEstudiantes()"
-		[paginator]="false"
-		emptyMessage="No hay registros de asistencia"
-		emptyIcon="pi pi-users"
-		ariaLabel="Lista de asistencia del día"
-	>
-		<!-- #region Desktop: tabla estándar -->
-		<ng-template #desktopView>
-			<edu-table [value]="filteredEstudiantes()" class="p-datatable-sm asistencia-table">
-				<ng-template #header>
-					<tr>
-						<th style="width: 50px">#</th>
-						<th>Estudiante</th>
-						<th style="width: 100px" class="text-center">Entrada</th>
-						<th style="width: 100px" class="text-center">Salida</th>
-						<th style="width: 80px" class="text-center">Estado</th>
-					</tr>
-				</ng-template>
-				<ng-template #body let-estudiante let-i="rowIndex">
-					<tr
-						[class.row-clickable]="allowJustify() && estudiante.puedeJustificar"
-						[eduTooltip]="
-							allowJustify() && estudiante.puedeJustificar
-								? estudiante.esJustificado
-									? 'Clic para editar/quitar justificación'
-									: 'Clic para justificar'
-								: ''
-						"
-						eduTooltipPosition="top"
-						[tooltipOptions]="{ showDelay: 300 }"
-						(click)="onEstudianteClick(estudiante)"
-					>
-						<td class="row-number">{{ i + 1 }}</td>
-						<td>
-							<div class="estudiante-info">
-								<span class="nombre">{{ estudiante.nombreCompleto }}</span>
-								<span class="dni">DNI: {{ estudiante.dni }}</span>
-								@if (estudiante.observacion) {
-									<span
-										class="observacion"
-										eduTooltip="{{ estudiante.observacion }}"
-										eduTooltipPosition="top"
-									>
-										<i class="pi pi-info-circle"></i>
-										{{ estudiante.observacion | slice: 0 : 30
-										}}{{ estudiante.observacion.length > 30 ? '...' : '' }}
-									</span>
-								}
-							</div>
-						</td>
-						<td class="text-center">
-							<span class="hora" [class.hora-empty]="!estudiante.horaEntrada">
-								@if (estudiante.horaEntrada) {
-									<i class="pi pi-sign-in"></i>
-								}
-								{{ estudiante.horaEntrada | formatTime }}
-							</span>
-						</td>
-						<td class="text-center">
-							<span class="hora" [class.hora-empty]="!estudiante.horaSalida">
-								@if (estudiante.horaSalida) {
-									<i class="pi pi-sign-out"></i>
-								}
-								{{ estudiante.horaSalida | formatTime }}
-							</span>
-						</td>
-						<td class="text-center">
-							<span class="estado-box" [class]="getStatusClass(estudiante.estadoCodigo)">
-								{{ estudiante.estadoCodigo }}
-							</span>
-						</td>
-					</tr>
-				</ng-template>
-			</edu-table>
+	<!-- FIX #3: Tabla directa sin responsive-table (pragmático) -->
+	<edu-table [value]="filteredEstudiantes()" class="p-datatable-sm asistencia-table">
+		<ng-template #header>
+			<tr>
+				<th style="width: 50px">#</th>
+				<th>Estudiante</th>
+				<th style="width: 100px" class="text-center">Entrada</th>
+				<th style="width: 100px" class="text-center">Salida</th>
+				<th style="width: 80px" class="text-center">Estado</th>
+			</tr>
 		</ng-template>
-		<!-- #endregion -->
-
-		<!-- #region Mobile: card por estudiante -->
-		<ng-template #mobileCard let-estudiante>
-			<div
-				class="mobile-card-inner"
+		<ng-template #body let-estudiante let-i="rowIndex">
+			<tr
 				[class.row-clickable]="allowJustify() && estudiante.puedeJustificar"
+				[eduTooltip]="
+					allowJustify() && estudiante.puedeJustificar
+						? estudiante.esJustificado
+							? 'Clic para editar/quitar justificación'
+							: 'Clic para justificar'
+						: ''
+				"
+				eduTooltipPosition="top"
+				[tooltipOptions]="{ showDelay: 300 }"
 				(click)="onEstudianteClick(estudiante)"
 			>
-				<div class="rt-card__title mobile-card-title">
+				<td class="row-number">{{ i + 1 }}</td>
+				<td>
 					<div class="estudiante-info">
 						<span class="nombre">{{ estudiante.nombreCompleto }}</span>
 						<span class="dni">DNI: {{ estudiante.dni }}</span>
+						@if (estudiante.observacion) {
+							<span
+								class="observacion"
+								eduTooltip="{{ estudiante.observacion }}"
+								eduTooltipPosition="top"
+							>
+								<i class="pi pi-info-circle"></i>
+								{{ estudiante.observacion | slice: 0 : 30
+								}}{{ estudiante.observacion.length > 30 ? '...' : '' }}
+							</span>
+						}
 					</div>
+				</td>
+				<td class="text-center">
+					<span class="hora" [class.hora-empty]="!estudiante.horaEntrada">
+						@if (estudiante.horaEntrada) {
+							<i class="pi pi-sign-in"></i>
+						}
+						{{ estudiante.horaEntrada | formatTime }}
+					</span>
+				</td>
+				<td class="text-center">
+					<span class="hora" [class.hora-empty]="!estudiante.horaSalida">
+						@if (estudiante.horaSalida) {
+							<i class="pi pi-sign-out"></i>
+						}
+						{{ estudiante.horaSalida | formatTime }}
+					</span>
+				</td>
+				<td class="text-center">
 					<span class="estado-box" [class]="getStatusClass(estudiante.estadoCodigo)">
 						{{ estudiante.estadoCodigo }}
 					</span>
-				</div>
-
-				<div class="rt-card__field">
-					<span class="rt-card__label"><i class="pi pi-sign-in"></i> Entrada</span>
-					<span class="hora" [class.hora-empty]="!estudiante.horaEntrada">
-						{{ estudiante.horaEntrada | formatTime }}
-					</span>
-				</div>
-				<div class="rt-card__field">
-					<span class="rt-card__label"><i class="pi pi-sign-out"></i> Salida</span>
-					<span class="hora" [class.hora-empty]="!estudiante.horaSalida">
-						{{ estudiante.horaSalida | formatTime }}
-					</span>
-				</div>
-
-				@if (estudiante.observacion) {
-					<div class="rt-card__field mobile-card-observacion">
-						<span class="observacion">
-							<i class="pi pi-info-circle"></i>
-							{{ estudiante.observacion }}
-						</span>
-					</div>
-				}
-			</div>
+				</td>
+			</tr>
 		</ng-template>
-		<!-- #endregion -->
-	</app-responsive-table>
+	</edu-table>
 }
 <!-- #endregion -->
 
