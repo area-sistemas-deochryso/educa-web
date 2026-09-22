@@ -236,9 +236,9 @@ HAVING COUNT(*) > 1;
 ### Horarios con profesor inactivo
 
 ```sql
-SELECT h.HOR_CodID, h.HOR_PRO_CodID, p.PRO_Estado
+SELECT h.HOR_CodID, h.HOR_ProfesorCodID, p.PRO_Estado
 FROM Horario h
-INNER JOIN Profesor p ON h.HOR_PRO_CodID = p.PRO_CodID
+INNER JOIN Profesor p ON h.HOR_ProfesorCodID = p.PRO_CodID
 WHERE h.HOR_Estado = 1 AND p.PRO_Estado = 0;
 -- Esperado: 0 filas (INV-AS04 previene esto)
 ```
