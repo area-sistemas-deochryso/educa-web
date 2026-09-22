@@ -47,3 +47,7 @@ A definir en `/design` — el rework del editor (soporte táctil de un canvas SV
 **Verificado en vivo**: layout responsive confirmado con el método de iframe 375px (`.campus-admin` en columna, panel `max-height: 200px`, editor ocupa el resto).
 
 **NO verificado en vivo**: interacción táctil real sobre el canvas (pan/pinch/drag de nodos). Bloqueador: el usuario de prueba en TestConnection (`CODE CLAUDE Administrador`) no tiene `SedeId` asignado → `GET /api/campus/pisos` devuelve 400 `INVALID_OPERATION` (`CampusController.cs:53`) → sin pisos cargados, `app-campus-editor` no renderiza el SVG. Es un problema de datos de la cuenta de prueba, no del código de este brief. Pendiente: QA en vivo con una cuenta que tenga sede asignada, en dispositivo/viewport táctil real (o emulación touch de Chrome DevTools).
+
+## Cierre sin verificación post-deploy (2026-09-22)
+
+Movido de `awaiting-prod/` a `closed/` por decisión explícita del usuario, sin pasar por `/verify`. La feature vive detrás del feature flag `campusNavigation` (apagado en prod), así que no era verificable en `educa.com.pe/intranet` a la fecha de este cierre. Riesgo residual: la interacción táctil (pan/pinch/drag) nunca fue confirmada en dispositivo/viewport real — solo el layout responsive vía iframe. Si se activa el flag en el futuro y aparecen bugs de gestos táctiles, este es el punto de partida.

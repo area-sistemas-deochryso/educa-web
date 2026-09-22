@@ -5,6 +5,7 @@
 > **Creado**: 2026-09-12 · **Estado**: ✅ cerrado localmente.
 > **Validación prod**: ⏳ pendiente desde 2026-09-12 — verificación visual del punto 3 (`campus-admin`) se hizo en local contra `TestConnection`, falta confirmar en `educa.com.pe/intranet` real.
 > **Nota 2026-09-17**: no se pudo forzar una race condition en prod tras el deploy — estado incierto, sin evidencia de falla ni de éxito. Sigue pendiente.
+> **Cierre sin verificación post-deploy (2026-09-22)**: movido a `closed/` por decisión explícita del usuario, sin pasar por `/verify`. Estado real seguía "incierto" al momento del cierre — el fix (patrón `switchMap`) está validado por código y por tests, pero nunca se confirmó ni se refutó una race condition real en prod. Riesgo residual: si reaparece un síntoma de datos stale en alguno de los 9 facades tocados, revisar acá primero.
 > **MODO SUGERIDO**: `/execute`
 > **touches**:
 >   - `src/app/features/intranet/pages/admin/correlation/services/correlation.facade.ts`
