@@ -4,6 +4,7 @@
 > **Plan**: [`audit-angular22-ts6-2026-09-12.md`](../../plan/audit-angular22-ts6-2026-09-12.md) (Fase F7)
 > **Creado**: 2026-09-12 · **Estado**: ✅ cerrado localmente (2026-09-15).
 > **Validación prod**: ⏳ pendiente desde 2026-09-15 — ~~depende del merge de brief backend 681-B~~ ✅ 681-B mergeado a `main` de Educa.API (`828f294`, verificado 2026-09-17) — falta smoke en prod (form contacto + SEO).
+> **Cierre sin verificación post-deploy (2026-09-22)**: movido a `closed/` por decisión explícita del usuario, sin correr el smoke test en prod. El bloqueo real (681-B backend) sí está confirmado resuelto (merge `828f2946` en `main` de `Educa.API`, endpoint `POST /api/Contacto` presente en código). Riesgo residual: el formulario de contacto y los meta tags SEO nunca se probaron contra `educa.com.pe` real.
 > **MODO SUGERIDO**: `/design` corto (decidir manejo del form) → `/execute`
 > **touches**:
 >   - `src/app/features/public/contact/contact.html`, `contact.ts`
