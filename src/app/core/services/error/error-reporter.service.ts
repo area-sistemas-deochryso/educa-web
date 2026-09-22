@@ -171,7 +171,7 @@ export class ErrorReporterService {
 		const breadcrumbs = this.activityTracker.getBreadcrumbs(opts.breadcrumbCount);
 		return {
 			correlationId: opts.correlationId, origen: opts.origen,
-			mensaje: opts.mensaje, stackTrace: opts.stackTrace,
+			mensaje: opts.mensaje.substring(0, 500), stackTrace: opts.stackTrace,
 			url: opts.url, httpMethod: opts.httpMethod,
 			httpStatus: opts.httpStatus, errorCode: opts.errorCode,
 			severidad: opts.severidad,
