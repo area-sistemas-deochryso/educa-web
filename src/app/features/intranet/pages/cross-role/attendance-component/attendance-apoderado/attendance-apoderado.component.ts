@@ -48,7 +48,7 @@ export class AttendanceApoderadoComponent implements OnInit {
 	});
 
 	/**
-	 * Plan 27 · INV-C11: `true` si el hijo seleccionado tiene `GRA_Orden < 8`.
+	 * Plan 27 · INV-C11: `true` si el hijo seleccionado tiene `GRA_Orden < 5`.
 	 * Reemplaza las tablas por el aviso "aún no usa asistencia biométrica".
 	 */
 	readonly selectedHijoFueraDeAlcance = computed(() => {

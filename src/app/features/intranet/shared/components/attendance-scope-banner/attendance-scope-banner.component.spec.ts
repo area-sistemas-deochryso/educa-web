@@ -24,10 +24,10 @@ describe('AttendanceScopeBannerComponent', () => {
 		expect(fixture.componentInstance).toBeTruthy();
 	});
 
-	it('renderiza el filtro temporal y menciona "5to Primaria en adelante"', () => {
+	it('renderiza el filtro temporal y menciona "2do Primaria en adelante"', () => {
 		const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
 		expect(text).toContain('Filtro temporal activo');
-		expect(text).toContain('5to Primaria en adelante');
+		expect(text).toContain('2do Primaria en adelante');
 		expect(text).toContain('CrossChex');
 	});
 

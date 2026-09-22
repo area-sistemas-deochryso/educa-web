@@ -38,10 +38,10 @@ describe('AttendanceScopeStudentNoticeComponent', () => {
 		expect(text).toContain('Juan Pérez aún no usa asistencia biométrica');
 	});
 
-	it('explica el criterio (5to Primaria en adelante)', () => {
+	it('explica el criterio (2do Primaria en adelante)', () => {
 		fixture.detectChanges();
 		const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
-		expect(text).toContain('5to Primaria');
+		expect(text).toContain('2do Primaria');
 	});
 
 	it('a11y: tiene role="note"', () => {

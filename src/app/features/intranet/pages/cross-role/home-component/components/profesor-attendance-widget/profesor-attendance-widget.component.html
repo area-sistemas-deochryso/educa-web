@@ -79,7 +79,7 @@
 				}
 
 				@if (salonFueraAlcance()) {
-					<!-- Plan 27 · INV-C11 — Salón con GRA_Orden < 8: sin data biométrica -->
+					<!-- Plan 27 · INV-C11 — Salón con GRA_Orden < 5: sin data biométrica -->
 					<app-attendance-scope-student-notice [nombre]="salonLabel()" />
 				} @else if (stats(); as s) {
 					<div class="widget-body">

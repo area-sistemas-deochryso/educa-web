@@ -5,7 +5,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 /**
  * Plan 27 · INV-C11 — Banner informativo estático para páginas admin de asistencia.
  * Explica por qué ciertos grados no tienen asistencia diaria biométrica
- * (umbral `GRA_Orden >= 8`, es decir 5to Primaria en adelante).
+ * (umbral `GRA_Orden >= 5`, es decir 2do Primaria en adelante).
  *
  * Design system §9 — banner azul con `color-mix()`, texto `--text-color`.
  * a11y — `role="note"` + icono con `aria-hidden="true"`.

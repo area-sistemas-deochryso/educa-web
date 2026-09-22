@@ -32,11 +32,11 @@ const salonTutor: SalonProfesor = {
 
 const salonTutorFueraAlcance: SalonProfesor = {
 	salonId: 2,
-	grado: '3ro Primaria',
-	gradoCodigo: '3',
-	graOrden: 6,
+	grado: '1ro Primaria',
+	gradoCodigo: '1',
+	graOrden: 4,
 	seccion: 'A',
-	nombreSalon: '3ro Primaria A',
+	nombreSalon: '1ro Primaria A',
 	anio: 2026,
 	esTutor: true,
 	totalEstudiantes: 22,
@@ -136,7 +136,7 @@ describe('ProfesorAttendanceWidgetComponent', () => {
 	});
 
 	describe('Plan 27 · INV-C11 — salón tutor fuera de alcance', () => {
-		it('should flag salonFueraAlcance=true when tutor salon has graOrden < 8', async () => {
+		it('should flag salonFueraAlcance=true when tutor salon has graOrden < 5', async () => {
 			attendanceMock.getSalonesProfesor.mockReturnValue(of([salonTutorFueraAlcance]));
 			attendanceMock.getAsistenciaDia.mockReturnValue(of(asistenciaDia));
 			profesorApiMock.obtenerMiAsistenciaDia.mockReturnValue(of(miDto));
@@ -145,10 +145,10 @@ describe('ProfesorAttendanceWidgetComponent', () => {
 
 			expect(component.hasSalonData()).toBe(true);
 			expect(component.salonFueraAlcance()).toBe(true);
-			expect(component.salonLabel()).toBe('3ro Primaria A');
+			expect(component.salonLabel()).toBe('1ro Primaria A');
 		});
 
-		it('should flag salonFueraAlcance=false when tutor salon has graOrden >= 8', async () => {
+		it('should flag salonFueraAlcance=false when tutor salon has graOrden >= 5', async () => {
 			attendanceMock.getSalonesProfesor.mockReturnValue(of([salonTutor]));
 			attendanceMock.getAsistenciaDia.mockReturnValue(of(asistenciaDia));
 			profesorApiMock.obtenerMiAsistenciaDia.mockReturnValue(of(miDto));

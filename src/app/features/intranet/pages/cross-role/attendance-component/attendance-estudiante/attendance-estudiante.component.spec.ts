@@ -153,17 +153,17 @@ describe('AttendanceEstudianteComponent', () => {
 
 	// #region Plan 27 · INV-C11 — Fuera de alcance biométrico
 
-	it('INV-C11: fueraDeAlcance es true cuando el BE devuelve graOrden < 8', () => {
+	it('INV-C11: fueraDeAlcance es true cuando el BE devuelve graOrden < 5', () => {
 		asistenciaServiceMock.getMisAsistencias = vi
 			.fn()
-			.mockReturnValue(of({ detalle: [], conteoEstados: {}, graOrden: 6 }));
+			.mockReturnValue(of({ detalle: [], conteoEstados: {}, graOrden: 4 }));
 
 		component.ngOnInit();
-		expect(component.graOrden()).toBe(6);
+		expect(component.graOrden()).toBe(4);
 		expect(component.fueraDeAlcance()).toBe(true);
 	});
 
-	it('INV-C11: fueraDeAlcance es false cuando el BE devuelve graOrden >= 8', () => {
+	it('INV-C11: fueraDeAlcance es false cuando el BE devuelve graOrden >= 5', () => {
 		asistenciaServiceMock.getMisAsistencias = vi
 			.fn()
 			.mockReturnValue(of({ detalle: [], conteoEstados: {}, graOrden: 10 }));

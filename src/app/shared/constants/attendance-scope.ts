@@ -2,13 +2,13 @@
 
 /**
  * Plan 27 · INV-C11. Grados con `GRA_Orden >= UMBRAL_GRADO_ASISTENCIA_DIARIA`
- * (5to Primaria en adelante) usan asistencia diaria biométrica vía CrossChex.
+ * (2do Primaria en adelante) usan asistencia diaria biométrica vía CrossChex.
  * Los grados inferiores están temporalmente fuera del alcance.
  *
  * Mirror del backend: `Educa.API.Constants.Asistencias.AsistenciaGrados.UmbralGradoAsistenciaDiaria`.
  * Si cambia en BE, actualizar aquí en el mismo despliegue.
  */
-export const UMBRAL_GRADO_ASISTENCIA_DIARIA = 8;
+export const UMBRAL_GRADO_ASISTENCIA_DIARIA = 5;
 
 /**
  * Catálogo canónico de grados → `GRA_Orden`. Mirror de la tabla `Grado` en BD

@@ -43,10 +43,10 @@ const mockHijosMixtos: HijoApoderado[] = [
 		estudianteId: 10,
 		dni: '10000001',
 		nombreCompleto: 'Pepe Gómez',
-		grado: '3ro Primaria',
+		grado: '1ro Primaria',
 		seccion: 'A',
 		relacion: 'Hijo',
-		graOrden: 6, // < 8 → fuera de alcance
+		graOrden: 4, // < 5 → fuera de alcance
 	},
 	{
 		estudianteId: 11,
@@ -55,7 +55,7 @@ const mockHijosMixtos: HijoApoderado[] = [
 		grado: '1ro Secundaria',
 		seccion: 'A',
 		relacion: 'Hija',
-		graOrden: 10, // >= 8 → dentro de alcance
+		graOrden: 10, // >= 5 → dentro de alcance
 	},
 ];
 
@@ -167,16 +167,16 @@ describe('AttendanceApoderadoComponent', () => {
 
 	// #region Plan 27 · INV-C11 — Fuera de alcance biométrico
 
-	it('INV-C11: selectedHijoFueraDeAlcance es true cuando el hijo tiene graOrden < 8', () => {
+	it('INV-C11: selectedHijoFueraDeAlcance es true cuando el hijo tiene graOrden < 5', () => {
 		asistenciaServiceMock.getHijos = vi.fn().mockReturnValue(of(mockHijosMixtos));
 
 		component.ngOnInit();
-		// Default: primer hijo (graOrden = 6 → fuera de alcance)
+		// Default: primer hijo (graOrden = 4 → fuera de alcance)
 		expect(component.selectedHijoId()).toBe(10);
 		expect(component.selectedHijoFueraDeAlcance()).toBe(true);
 	});
 
-	it('INV-C11: selectedHijoFueraDeAlcance es false cuando el hijo tiene graOrden >= 8', () => {
+	it('INV-C11: selectedHijoFueraDeAlcance es false cuando el hijo tiene graOrden >= 5', () => {
 		asistenciaServiceMock.getHijos = vi.fn().mockReturnValue(of(mockHijosMixtos));
 
 		component.ngOnInit();

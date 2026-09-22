@@ -11,8 +11,8 @@ import {
 
 describe('attendance-scope — Plan 27 · INV-C11', () => {
 	describe('UMBRAL_GRADO_ASISTENCIA_DIARIA', () => {
-		it('mirror del BE: el umbral es 8 (5to Primaria en adelante)', () => {
-			expect(UMBRAL_GRADO_ASISTENCIA_DIARIA).toBe(8);
+		it('mirror del BE: el umbral es 5 (2do Primaria en adelante)', () => {
+			expect(UMBRAL_GRADO_ASISTENCIA_DIARIA).toBe(5);
 		});
 	});
 
@@ -21,7 +21,7 @@ describe('attendance-scope — Plan 27 · INV-C11', () => {
 			expect(Object.keys(GRADO_ORDEN_MAP)).toHaveLength(14);
 		});
 
-		it('mapea correctamente los grados del umbral (5to Primaria = 8)', () => {
+		it('mapea correctamente los grados alrededor del umbral (5to Primaria = 8)', () => {
 			expect(GRADO_ORDEN_MAP['5to Primaria']).toBe(8);
 			expect(GRADO_ORDEN_MAP['4to Primaria']).toBe(7);
 		});
@@ -49,19 +49,19 @@ describe('attendance-scope — Plan 27 · INV-C11', () => {
 	});
 
 	describe('esGradoAsistenciaDiaria', () => {
-		it('true para orden numérico >= 8 (5to Primaria)', () => {
-			expect(esGradoAsistenciaDiaria(8)).toBe(true);
+		it('true para orden numérico >= 5 (2do Primaria)', () => {
+			expect(esGradoAsistenciaDiaria(5)).toBe(true);
 			expect(esGradoAsistenciaDiaria(14)).toBe(true);
 		});
 
-		it('false para orden numérico < 8 (menor que 5to Primaria)', () => {
-			expect(esGradoAsistenciaDiaria(7)).toBe(false);
+		it('false para orden numérico < 5 (menor que 2do Primaria)', () => {
+			expect(esGradoAsistenciaDiaria(4)).toBe(false);
 			expect(esGradoAsistenciaDiaria(1)).toBe(false);
 		});
 
 		it('acepta nombre canónico y resuelve el orden', () => {
-			expect(esGradoAsistenciaDiaria('5to Primaria')).toBe(true);
-			expect(esGradoAsistenciaDiaria('4to Primaria')).toBe(false);
+			expect(esGradoAsistenciaDiaria('2do Primaria')).toBe(true);
+			expect(esGradoAsistenciaDiaria('1ro Primaria')).toBe(false);
 			expect(esGradoAsistenciaDiaria('1ro Secundaria')).toBe(true);
 		});
 

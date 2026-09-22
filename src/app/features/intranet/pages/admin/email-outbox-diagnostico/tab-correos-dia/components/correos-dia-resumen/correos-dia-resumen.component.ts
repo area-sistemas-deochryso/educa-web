@@ -15,7 +15,7 @@ const GENERAL_CARDS: StatCardDef[] = [
 	{
 		key: 'entradasMarcadas',
 		label: 'Entradas marcadas',
-		// Universo INV-C11: 5to Primaria en adelante.
+		// Universo INV-C11: 2do Primaria en adelante.
 		sublabel: 'estudiantes con biométrico habilitado',
 		icon: 'pi pi-sign-in',
 		variant: 'info',

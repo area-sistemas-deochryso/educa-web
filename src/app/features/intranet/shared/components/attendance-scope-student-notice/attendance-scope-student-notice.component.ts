@@ -4,7 +4,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
 /**
  * Plan 27 · INV-C11 — Mensaje por-alumno cuando el estudiante consultado tiene
- * `GRA_Orden < 8` (fuera del alcance de asistencia biométrica diaria).
+ * `GRA_Orden < 5` (fuera del alcance de asistencia biométrica diaria).
  *
  * Reemplaza el listado de asistencias en:
  * - `/intranet/mi-asistencia` (estudiante)

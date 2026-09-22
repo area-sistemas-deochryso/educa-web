@@ -103,7 +103,7 @@ export class AttendanceProfesorEstudiantesComponent implements OnInit {
 			|| null;
 	});
 	/**
-	 * Plan 27 · INV-C11 — true cuando el salón seleccionado tiene `GRA_Orden < 8`
+	 * Plan 27 · INV-C11 — true cuando el salón seleccionado tiene `GRA_Orden < 5`
 	 * (fuera del alcance del CrossChex). El template renderiza el notice en lugar
 	 * de la tabla/día para evitar mostrar listas vacías con métricas contaminadas.
 	 */

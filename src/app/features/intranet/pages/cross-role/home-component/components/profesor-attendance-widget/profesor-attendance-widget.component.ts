@@ -67,7 +67,7 @@ export class ProfesorAttendanceWidgetComponent implements OnInit {
 	});
 
 	/**
-	 * Plan 27 · INV-C11 — true cuando el salón tutor del profesor tiene `GRA_Orden < 8`.
+	 * Plan 27 · INV-C11 — true cuando el salón tutor del profesor tiene `GRA_Orden < 5`.
 	 * En ese caso el widget muestra el notice en lugar de las barras de asistencia,
 	 * que saldrían en cero porque el webhook descarta las marcaciones.
 	 */
