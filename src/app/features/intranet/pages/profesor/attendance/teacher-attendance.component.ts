@@ -88,7 +88,7 @@ import { EduSpinner, EduTab, EduTabPanel, EduTabs } from '@edu-ui';
 		<div class="asistencia-container">
 			<app-page-header
 				icon="pi pi-check-square"
-				title="Asistencia"
+				title="Mi Asistencia"
 				subtitle="Registra la asistencia diaria de tus cursos y revisa el resumen histórico"
 			/>
 

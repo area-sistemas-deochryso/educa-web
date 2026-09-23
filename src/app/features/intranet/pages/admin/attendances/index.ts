@@ -1,1 +1,1 @@
-export * from './attendances.component';
+export * from './attendances-shell/attendances-shell.component';

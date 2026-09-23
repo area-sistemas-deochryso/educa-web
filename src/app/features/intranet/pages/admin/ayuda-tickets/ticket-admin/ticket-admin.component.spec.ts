@@ -3,32 +3,42 @@ import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideRouter } from '@angular/router';
-import { ActivatedRoute, convertToParamMap } from '@angular/router';
-import { BehaviorSubject } from 'rxjs';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Subject } from 'rxjs';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { UserPermissionsService } from '@core/services';
-
-import { TicketAdminComponent } from './ticket-admin.component';
+import { TicketAdminShellComponent } from './ticket-admin.component';
 // #endregion
 
-describe('TicketAdminComponent', () => {
-	let queryParamMap$: BehaviorSubject<ReturnType<typeof convertToParamMap>>;
+describe('TicketAdminShellComponent', () => {
+	let routerEvents$: Subject<unknown>;
+	let navigateSpy: ReturnType<typeof vi.fn>;
 
-	function setup(hasCapability: boolean, initialTab?: string) {
-		queryParamMap$ = new BehaviorSubject(convertToParamMap(initialTab ? { tab: initialTab } : {}));
+	function setup(firstChildSegment?: string) {
+		routerEvents$ = new Subject();
+		navigateSpy = vi.fn();
 
 		TestBed.configureTestingModule({
 			providers: [
 				provideHttpClient(),
 				provideHttpClientTesting(),
 				provideRouter([]),
-				{ provide: UserPermissionsService, useValue: { hasCapability: () => hasCapability } },
-				{ provide: ActivatedRoute, useValue: { queryParamMap: queryParamMap$ } },
+				{
+					provide: ActivatedRoute,
+					useValue: {
+						firstChild: firstChildSegment
+							? { snapshot: { url: [{ path: firstChildSegment }] } }
+							: undefined,
+					},
+				},
+				{
+					provide: Router,
+					useValue: { events: routerEvents$.asObservable(), navigate: navigateSpy },
+				},
 			],
 		});
 
-		const fixture = TestBed.createComponent(TicketAdminComponent);
+		const fixture = TestBed.createComponent(TicketAdminShellComponent);
 		const component = fixture.componentInstance;
 		fixture.detectChanges();
 		return { component };
@@ -38,25 +48,25 @@ describe('TicketAdminComponent', () => {
 		TestBed.resetTestingModule();
 	});
 
-	it('con AYUDA_TICKET_API_MANAGE, permite el acceso y arranca en el tab bandeja', () => {
-		const { component } = setup(true);
-		expect(component.canAccess).toBe(true);
+	it('sin ruta hija activa, arranca en el tab bandeja por default', () => {
+		const { component } = setup();
 		expect(component.activeTab()).toBe('bandeja');
 	});
 
-	it('sin AYUDA_TICKET_API_MANAGE, bloquea el acceso a ambas vistas', () => {
-		const { component } = setup(false);
-		expect(component.canAccess).toBe(false);
-	});
-
-	it('el queryParam ?tab=tipos activa el tab de catálogo', () => {
-		const { component } = setup(true, 'tipos');
+	it('detecta el tab tipos cuando la ruta hija activa es /tipos', () => {
+		const { component } = setup('tipos');
 		expect(component.activeTab()).toBe('tipos');
 	});
 
-	it('onTabChange() ignora un value undefined', () => {
-		const { component } = setup(true);
+	it('onTabChange() ignora un value undefined y no navega', () => {
+		const { component } = setup();
 		component.onTabChange(undefined);
-		expect(component.activeTab()).toBe('bandeja');
+		expect(navigateSpy).not.toHaveBeenCalled();
+	});
+
+	it('onTabChange() navega al segmento elegido, relativo a la ruta activa', () => {
+		const { component } = setup();
+		component.onTabChange('tipos');
+		expect(navigateSpy).toHaveBeenCalledWith(['tipos'], { relativeTo: expect.anything() });
 	});
 });

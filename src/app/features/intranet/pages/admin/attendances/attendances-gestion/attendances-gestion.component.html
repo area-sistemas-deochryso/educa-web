@@ -1,36 +1,7 @@
-<app-page-header
-	icon="pi pi-calendar"
-	title="Asistencias"
-	subtitle="Gestión y reportes de asistencia diaria"
-/>
-
-<!-- Plan 27 · INV-C11: banner de scope del filtro biométrico -->
-<app-attendance-scope-banner />
-
-<!-- #region Tabs -->
-<edu-tabs [value]="activeTab()" (valueChange)="onTabChange($event)" data-info-anchor="admin-asistencia-tabs">
-	
-		<edu-tab value="gestion">
-			<i class="pi pi-cog mr-2"></i>
-			Gestión
-		</edu-tab>
-		<edu-tab value="reportes">
-			<i class="pi pi-chart-bar mr-2"></i>
-			Reportes
-		</edu-tab>
-		<edu-tab value="panel">
-			<i class="pi pi-th-large mr-2"></i>
-			Panel
-		</edu-tab>
-	
-
-	<!-- Tab: Gestión -->
-	<edu-tabpanel value="gestion">
-
 <!-- #region Header -->
 <div class="header">
 	<div class="header-left">
-		<h2>Gestión de Asistencias</h2>
+		<h2>Editar registros de asistencia</h2>
 		<span class="subtitle">Registro y corrección formal de asistencia diaria</span>
 		<!-- P10 F3 (DEP-4): estado pasivo del job automático CrossChex, distinto del banner de sync manual -->
 		<app-crosschex-integration-status-badge />
@@ -641,35 +612,6 @@
 <!-- #region Confirm dialog + Toast -->
 <edu-confirm-dialog (onHide)="onConfirmDialogHide()" />
 <edu-toast position="top-right" />
-<!-- #endregion -->
-
-	</edu-tabpanel>
-
-	<!-- Tab: Reportes -->
-	<edu-tabpanel value="reportes">
-		<div class="reportes-panel-link">
-			<edu-button
-				icon="pi pi-th-large"
-				label="Ver resumen en Panel"
-				[outlined]="true"
-				size="small"
-				severity="secondary"
-				(click)="irAPanel()"
-				[pt]="{
-					root: {
-						'aria-label': 'Ver resumen en el tab Panel',
-					},
-				}"
-			/>
-		</div>
-		<app-attendance-reports />
-	</edu-tabpanel>
-
-	<!-- Tab: Panel -->
-	<edu-tabpanel value="panel">
-		<app-attendance-panel />
-	</edu-tabpanel>
-</edu-tabs>
 <!-- #endregion -->
 
 <!-- Dialog: Sync rango -->

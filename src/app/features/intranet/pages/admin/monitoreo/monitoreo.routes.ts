@@ -22,7 +22,7 @@ const CORREOS_TAB_ROUTES: Record<string, TabRouteConfig> = {
 	dashboard: {
 		loadComponent: () =>
 			import('../email-outbox-dashboard-dia').then((m) => m.EmailOutboxDashboardDiaComponent),
-		title: 'Intranet - Dashboard de Correos',
+		title: 'Intranet - Dashboard del día',
 	},
 	diagnostico: {
 		loadComponent: () =>
@@ -32,7 +32,7 @@ const CORREOS_TAB_ROUTES: Record<string, TabRouteConfig> = {
 	auditoria: {
 		loadComponent: () =>
 			import('../auditoria-correos').then((m) => m.AuditoriaCorreosComponent),
-		title: 'Intranet - Validación de Datos',
+		title: 'Intranet - Validación de datos',
 	},
 	blacklist: {
 		loadComponent: () =>
@@ -53,14 +53,14 @@ const CORREOS_TAB_ROUTES: Record<string, TabRouteConfig> = {
 			import('../email-outbox/components/domain-pauses-tab/domain-pauses-tab.component').then(
 				(m) => m.DomainPausesTabComponent,
 			),
-		title: 'Intranet - Dominios Pausados',
+		title: 'Intranet - Dominios pausados',
 	},
 	'defer-events': {
 		loadComponent: () =>
 			import('../email-outbox/components/defer-events-tab/defer-events-tab.component').then(
 				(m) => m.DeferEventsTabComponent,
 			),
-		title: 'Intranet - Eventos Defer',
+		title: 'Intranet - Eventos defer',
 	},
 };
 

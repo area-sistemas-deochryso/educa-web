@@ -66,22 +66,28 @@ Items con el mismo `group.label` dentro de un módulo se renderizan como dropdow
 | Estudiante | Mensajes | Foro, Mensajería |
 | Estudiante | — (suelto) | Calendario, Videoconferencias |
 | Profesor | Mi Aula | Mis Cursos, Mis Salones, Mi Horario |
-| Profesor | Mi Seguimiento | Mis Calificaciones, Mi Asistencia, Notas y Asistencia |
+| Profesor | Mi Seguimiento | Mis Calificaciones, Mi Asistencia, Resumen de Salones |
 | Profesor | Mensajes | Foro, Mensajería |
 | Profesor | — (suelto) | Calendario, Videoconferencias |
 | Administrador | Académico | Cursos, Salones, Horarios |
-| Administrador | Asistencia | Gestión, Reportes, Permisos Salud, Asistencia diaria |
+| Administrador | Asistencia | Editar registros, Reportes, Panel, Permisos Salud, Justificaciones, Asistencia diaria |
+| Administrador | Ayuda | Bandeja de Tickets, Tipos de Ticket, FAQ, Modo informativo |
 | Administrador | Calendario | Eventos, Notificaciones, Calendario |
 | Administrador | Gestión | Usuarios |
 | Administrador | Permisos | Por Rol, Por Usuario |
 | Administrador | Diagnóstico | Salud del runtime, Diagnóstico de BD |
-| Administrador | Herramientas | Campus, Test k6 |
+| Administrador | Herramientas | Campus, Prueba k6 |
 | Administrador | — (suelto) | Monitoreo, Videoconferencias |
 | Apoderado | — (todo suelto) | Cursos, Horarios, Notificaciones, Asistencia diaria, Calendario |
 
 ### Cuándo agrupar / no agrupar / naming
 
 Sin cambios respecto al criterio previo: agrupar cuando 2+ items comparten entidad, función de rol o dominio conceptual; label del grupo = concepto que agrupa (no repetir el nombre del módulo).
+
+**Capitalización**: ítems nuevos en sentence case (solo primera palabra en mayúscula),
+salvo nombres propios/siglas/términos técnicos establecidos (k6, BD, FAQ, Rate Limit).
+Labels legacy en Title Case (Mis Cursos, Mi Horario, etc.) quedan como deuda técnica
+aceptada — no forzar el rename salvo que se toque ese ítem por otro motivo.
 
 ---
 

@@ -116,7 +116,7 @@ export class AttendanceComponent implements AfterViewInit {
 
 	/** Drill-down al panel administrativo de asistencias (solo visible con `ASISTENCIA_ADMIN_PAGE_VIEW`). */
 	irAPanelAdmin(): void {
-		void this.router.navigate(['/intranet/admin/asistencias'], { queryParams: { tab: 'panel' } });
+		void this.router.navigate(['/intranet/admin/asistencias/panel']);
 	}
 }
 // #endregion

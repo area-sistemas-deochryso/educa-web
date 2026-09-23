@@ -177,9 +177,8 @@ export class AttendanceDirectorStaffComponent implements OnInit {
 	}
 
 	onEditarEnAdminDia(persona: PersonaAsistenciaDia): void {
-		this.router.navigate(['/intranet/admin/asistencias'], {
+		this.router.navigate(['/intranet/admin/asistencias/gestion'], {
 			queryParams: {
-				tab: 'gestion',
 				tipoPersona: this.tipoPersona,
 				dni: persona.dni,
 				fecha: formatDateLocalIso(this.fechaDia()),
@@ -202,23 +201,18 @@ export class AttendanceDirectorStaffComponent implements OnInit {
 	}
 
 	navigateToGestion(): void {
-		this.router.navigate(['/intranet/admin/asistencias'], {
-			queryParams: { tab: 'gestion' },
-		});
+		this.router.navigate(['/intranet/admin/asistencias/gestion']);
 	}
 
 	navigateToReportes(): void {
-		this.router.navigate(['/intranet/admin/asistencias'], {
-			queryParams: { tab: 'reportes' },
-		});
+		this.router.navigate(['/intranet/admin/asistencias/reportes']);
 	}
 
 	onEditarEnAdminMes(): void {
 		const person = this.selectedPerson();
 		if (!person) return;
-		this.router.navigate(['/intranet/admin/asistencias'], {
+		this.router.navigate(['/intranet/admin/asistencias/gestion'], {
 			queryParams: {
-				tab: 'gestion',
 				tipoPersona: this.tipoPersona,
 				dni: person.dni,
 			},

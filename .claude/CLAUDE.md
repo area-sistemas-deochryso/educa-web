@@ -59,6 +59,7 @@ Cada línea: `- ruta/archivo.md — <trigger>`. Leé el archivo cuando el trigge
 
 - [.claude/reference/domain-modeling.md](reference/domain-modeling.md) — definís interface/DTO/tipo de dominio y necesitás decidir capa (data/shared/feature/component), convenciones de naming, patrón `const + type`. Para reemplazo de primitivas genéricas (`string`/`number` → tipo del dominio) ver `reference/semantic-types.md`
 - [.claude/reference/permissions.md](reference/permissions.md) — tocás guards / `permisosService` / roles / vistas / jurisdicción admin
+- [.claude/reference/route-permission-sharing.md](reference/route-permission-sharing.md) — agregás una ruta hija que NO necesita capability propia (comparte autorización con un ancestro ya seedeado) vía `data.permissionPath` — cuándo usarlo vs cuándo pedir una `CAP_Ruta` nueva en Educa.API
 
 ### UI / edu-ui / estilos
 

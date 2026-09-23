@@ -127,19 +127,19 @@ export const MENU_ITEMS: MenuItemDef[] = [
 	// (capability de datos que valida el propio endpoint), mismo patrón que
 	// `ASISTENCIA_ADMIN_PAGE_VIEW` (página) vs `ASISTENCIA`/`ASISTENCIA_ADMIN` (datos).
 	{ route: '/intranet/admin/rendimiento', label: 'Rendimiento', icon: 'pi pi-chart-line', capability: 'RENDIMIENTO_ADMIN_PAGE_VIEW', modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Académico', icon: 'pi pi-graduation-cap' }, preview: 'bar-chart', description: 'Rendimiento académico institucional por curso, resaltando desvíos' },
-	{ route: '/intranet/admin/asistencias', label: 'Gestión', icon: 'pi pi-cog', capability: 'ASISTENCIA_ADMIN_PAGE_VIEW', modulo: 'administrador', soloParaRol: ADMIN_ROLES, queryParams: { tab: 'gestion' }, group: { label: 'Asistencia', icon: 'pi pi-clock' }, subgroup: [{ label: 'Admin', icon: 'pi pi-cog' }, { label: 'Asistencias', icon: 'pi pi-clock' }], preview: 'attendance', description: 'Editar y corregir registros de asistencia' },
-	{ route: '/intranet/admin/asistencias', label: 'Reportes', icon: 'pi pi-chart-bar', capability: 'ASISTENCIA_ADMIN_PAGE_VIEW', modulo: 'administrador', soloParaRol: ADMIN_ROLES, queryParams: { tab: 'reportes' }, group: { label: 'Asistencia', icon: 'pi pi-clock' }, subgroup: [{ label: 'Admin', icon: 'pi pi-cog' }, { label: 'Asistencias', icon: 'pi pi-clock' }], preview: 'admin-table', description: 'Estadísticas y exportación de asistencia' },
-	{ route: '/intranet/admin/asistencias', label: 'Panel', icon: 'pi pi-th-large', capability: 'ASISTENCIA_ADMIN_PAGE_VIEW', modulo: 'administrador', soloParaRol: ADMIN_ROLES, queryParams: { tab: 'panel' }, group: { label: 'Asistencia', icon: 'pi pi-clock' }, subgroup: [{ label: 'Admin', icon: 'pi pi-cog' }, { label: 'Asistencias', icon: 'pi pi-clock' }], preview: 'admin-table', description: 'Panel administrativo con estadísticas por sede y rango de fechas' },
+	{ route: '/intranet/admin/asistencias/gestion', label: 'Editar registros', icon: 'pi pi-cog', capability: 'ASISTENCIA_ADMIN_PAGE_VIEW', modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Asistencia', icon: 'pi pi-clock' }, subgroup: [{ label: 'Admin', icon: 'pi pi-cog' }, { label: 'Asistencias', icon: 'pi pi-clock' }], preview: 'attendance', description: 'Editar y corregir registros de asistencia' },
+	{ route: '/intranet/admin/asistencias/reportes', label: 'Reportes', icon: 'pi pi-chart-bar', capability: 'ASISTENCIA_ADMIN_PAGE_VIEW', modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Asistencia', icon: 'pi pi-clock' }, subgroup: [{ label: 'Admin', icon: 'pi pi-cog' }, { label: 'Asistencias', icon: 'pi pi-clock' }], preview: 'admin-table', description: 'Estadísticas y exportación de asistencia' },
+	{ route: '/intranet/admin/asistencias/panel', label: 'Panel', icon: 'pi pi-th-large', capability: 'ASISTENCIA_ADMIN_PAGE_VIEW', modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Asistencia', icon: 'pi pi-clock' }, subgroup: [{ label: 'Admin', icon: 'pi pi-cog' }, { label: 'Asistencias', icon: 'pi pi-clock' }], preview: 'admin-table', description: 'Panel administrativo con estadísticas por sede y rango de fechas' },
 	{ route: '/intranet/admin/permisos-salud', label: 'Permisos Salud', icon: 'pi pi-heart', capability: 'PERMISOS_SALUD_PAGE_VIEW', modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Asistencia', icon: 'pi pi-clock' }, subgroup: [{ label: 'Admin', icon: 'pi pi-cog' }], preview: 'admin-table', description: 'Permisos de salida y justificaciones médicas' },
 	// Plan 101 F4 — misma ruta que la entrada profesor de arriba (soloParaRol distingue).
 	{ route: '/intranet/justificacion-asistencia', label: 'Justificaciones', icon: 'pi pi-file-check', capability: 'JUSTIFICACION_ASISTENCIA_API_APPROVE', modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Asistencia', icon: 'pi pi-clock' }, subgroup: [{ label: 'Admin', icon: 'pi pi-cog' }], preview: 'admin-table', description: 'Bandeja de aprobación de justificaciones de inasistencia (Secundaria)' },
 	{ route: '/intranet/admin/eventos-calendario', label: 'Eventos', icon: 'pi pi-calendar-plus', capability: 'EVENTOS_CALENDARIO_API_MANAGE', modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Calendario', icon: 'pi pi-calendar' }, preview: 'admin-table', description: 'Gestionar eventos del calendario' },
 	{ route: '/intranet/admin/notificaciones', label: 'Notificaciones', icon: 'pi pi-bell', capability: 'NOTIFICACIONES_API_SEND', modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Calendario', icon: 'pi pi-calendar' }, preview: 'admin-notif', description: 'Enviar avisos a la comunidad' },
-	{ route: '/intranet/admin/usuarios', label: 'Usuarios', icon: 'pi pi-user-edit', capability: 'USUARIOS_API_MANAGE', modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Gestión', icon: 'pi pi-cog' }, preview: 'admin-table', description: 'Gestionar cuentas de usuarios' },
+	{ route: '/intranet/admin/usuarios', label: 'Usuarios', icon: 'pi pi-user-edit', capability: 'USUARIOS_API_MANAGE', modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Académico', icon: 'pi pi-graduation-cap' }, preview: 'admin-table', description: 'Gestionar cuentas de usuarios' },
 	{ route: '/intranet/admin/permisos/roles', label: 'Por Rol', icon: 'pi pi-id-card', capability: 'PERMISOS_ROL_API_MANAGE', modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Permisos', icon: 'pi pi-lock' }, preview: 'admin-table', description: 'Gestionar permisos por rol' },
 	{ route: '/intranet/admin/permisos/usuarios', label: 'Por Usuario', icon: 'pi pi-users', capability: 'PERMISOS_USUARIO_API_MANAGE', modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Permisos', icon: 'pi pi-lock' }, preview: 'admin-table', description: 'Gestionar permisos por usuario' },
-	{ route: '/intranet/admin/ayuda/faq', label: 'FAQ (Ayuda)', icon: 'pi pi-question-circle', capability: 'AYUDA_FAQ_API_MANAGE', modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Gestión', icon: 'pi pi-cog' }, preview: 'admin-table', description: 'Administrar preguntas frecuentes y wizards del panel de ayuda' },
-	{ route: '/intranet/admin/explicaciones', label: 'Modo informativo', icon: 'pi pi-info-circle', capability: 'EXPLICACIONES_API_MANAGE', modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Gestión', icon: 'pi pi-cog' }, preview: 'admin-table', description: 'Administrar el contenido explicativo del modo informativo' },
+	{ route: '/intranet/admin/ayuda/faq', label: 'FAQ', icon: 'pi pi-question-circle', capability: 'AYUDA_FAQ_API_MANAGE', modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Ayuda', icon: 'pi pi-question-circle' }, preview: 'admin-table', description: 'Administrar preguntas frecuentes y wizards del panel de ayuda' },
+	{ route: '/intranet/admin/explicaciones', label: 'Modo informativo', icon: 'pi pi-info-circle', capability: 'EXPLICACIONES_API_MANAGE', modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Ayuda', icon: 'pi pi-question-circle' }, preview: 'admin-table', description: 'Administrar el contenido explicativo del modo informativo' },
 	// Monitoreo — hub con 3 dominios (Correos/Incidencias/Seguridad, ver monitoreo-hub.catalog.ts).
 	// "Resumen" es la landing del hub (tarjetas de los 3 dominios); cada dominio es un subgrupo
 	// con sus páginas propias, para que el menú/búsqueda lleguen directo sin pasar por el hub.
@@ -161,11 +161,12 @@ export const MENU_ITEMS: MenuItemDef[] = [
 	{ route: '/intranet/admin/campus', label: 'Campus', icon: 'pi pi-map', capability: 'CAMPUS_API_MANAGE', modulo: 'administrador', soloParaRol: ADMIN_ROLES, featureFlag: 'campusNavigation', group: { label: 'Herramientas', icon: 'pi pi-wrench' }, preview: 'campus-map', description: 'Navegar el campus virtual' },
 	// xrepo-panel-ayuda-intranet F7b — gate por AYUDA_TICKET_API_MANAGE (capability propia del
 	// dominio Ticket, distinta de INTRANET que gatea la sección pública `/intranet/ayuda`).
-	// Misma ruta con `tab` por queryParam (no 2 rutas hijas) — ver nota en
-	// `intranet.routes.ts`: la capability tiene una sola `CAP_Ruta` seedeada en BE.
-	{ route: '/intranet/admin/ayuda/tickets', label: 'Bandeja de Tickets', icon: 'pi pi-inbox', capability: 'AYUDA_TICKET_API_MANAGE', modulo: 'administrador', soloParaRol: ADMIN_ROLES, queryParams: { tab: 'bandeja' }, group: { label: 'Ayuda', icon: 'pi pi-question-circle' }, preview: 'admin-table', description: 'Gestionar tickets de soporte de los usuarios' },
-	{ route: '/intranet/admin/ayuda/tickets', label: 'Tipos de Ticket', icon: 'pi pi-tags', capability: 'AYUDA_TICKET_API_MANAGE', modulo: 'administrador', soloParaRol: ADMIN_ROLES, queryParams: { tab: 'tipos' }, group: { label: 'Ayuda', icon: 'pi pi-question-circle' }, preview: 'admin-table', description: 'Administrar el catálogo de tipos de problema' },
-	{ route: '/intranet/ctest-k6', label: 'Test k6', icon: 'pi pi-bolt', capability: 'HERRAMIENTAS_TEST_PAGE_VIEW', modulo: 'administrador', soloParaRol: ADMIN_ROLES, featureFlag: 'ctestK6', group: { label: 'Herramientas', icon: 'pi pi-wrench' }, preview: 'load-test', description: 'Herramienta de testing de carga' },
+	// Rutas hijas reales que heredan la capability vía `data.permissionPath` (piloto de
+	// `.claude/reference/route-permission-sharing.md`) — reemplaza el patrón previo de
+	// `tab` por queryParam sobre una única ruta.
+	{ route: '/intranet/admin/ayuda/tickets/bandeja', label: 'Bandeja de Tickets', icon: 'pi pi-inbox', capability: 'AYUDA_TICKET_API_MANAGE', modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Ayuda', icon: 'pi pi-question-circle' }, preview: 'admin-table', description: 'Gestionar tickets de soporte de los usuarios' },
+	{ route: '/intranet/admin/ayuda/tickets/tipos', label: 'Tipos de Ticket', icon: 'pi pi-tags', capability: 'AYUDA_TICKET_API_MANAGE', modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Ayuda', icon: 'pi pi-question-circle' }, preview: 'admin-table', description: 'Administrar el catálogo de tipos de problema' },
+	{ route: '/intranet/ctest-k6', label: 'Prueba k6', icon: 'pi pi-bolt', capability: 'HERRAMIENTAS_TEST_PAGE_VIEW', modulo: 'administrador', soloParaRol: ADMIN_ROLES, featureFlag: 'ctestK6', group: { label: 'Herramientas', icon: 'pi pi-wrench' }, preview: 'load-test', description: 'Herramienta de testing de carga' },
 	// Compartido (duplicado, ver §1 brief 444) — capability sin dueño de rol fijo
 	{ route: '/intranet/asistencia', label: 'Asistencia diaria', icon: 'pi pi-check-square', capability: 'ASISTENCIA', modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Asistencia', icon: 'pi pi-clock' }, preview: 'attendance', description: 'Control de asistencia diaria' },
 	{ route: '/intranet/calendario', label: 'Calendario', icon: 'pi pi-calendar', capability: 'CALENDARIO_PAGE_USE', modulo: 'administrador', soloParaRol: ADMIN_ROLES, featureFlag: 'calendario', group: { label: 'Calendario', icon: 'pi pi-calendar' }, preview: 'calendar', description: 'Calendario de eventos y actividades' },
@@ -191,9 +192,9 @@ export const MENU_ITEMS: MenuItemDef[] = [
  * Solo cubre los casos detectados en las auditorías 417-F6 y 466; roles/ítems no listados usan el label base.
  */
 const LABEL_OVERRIDE_POR_ROL: Partial<Record<string, Partial<Record<UserRole, string>>>> = {
-	Gestión: {
-		'Asistente Administrativo': 'Gestión (secretaría)',
-		'Coordinador Académico': 'Gestión (académica)',
+	'Editar registros': {
+		'Asistente Administrativo': 'Editar registros (secretaría)',
+		'Coordinador Académico': 'Editar registros (académica)',
 	},
 	Reportes: {
 		'Asistente Administrativo': 'Reportes (secretaría)',
@@ -283,12 +284,12 @@ function queryParamsMatchUrl(item: MenuItemDef, searchParams: URLSearchParams): 
  * mismo `route` — sin esto, siempre se resolvería el primero declarado en `MENU_ITEMS`,
  * independientemente del módulo activo del usuario).
  *
- * Brief 512 — páginas con tabs por queryParam (ej. `admin/asistencias`, `admin/ayuda/tickets`)
- * declaran VARIOS `MenuItemDef` con el MISMO `route` y distinto `queryParams.tab`. Matchear
- * solo por `route` (longitud) deja el desempate en "el primero declarado" sin importar el
- * `?tab=` real de la URL — el breadcrumb quedaba pegado al primer tab siempre. Ahora, ante un
- * empate de longitud de `route`, se prioriza el item cuyo `queryParams` matchea la query string
- * de la URL activa.
+ * Brief 512 — páginas con tabs por queryParam declaraban VARIOS `MenuItemDef` con el MISMO
+ * `route` y distinto `queryParams.tab`; matchear solo por `route` (longitud) dejaba el
+ * desempate en "el primero declarado" sin importar el `?tab=` real de la URL. Desde B1/D
+ * (piloto en `admin/ayuda/tickets`, luego `admin/asistencias`) ambos módulos usan rutas hijas
+ * reales en vez de queryParams, así que el desempate por `route` alcanza — el fallback de
+ * `queryParams` queda para cualquier página que aún use el patrón viejo.
  */
 export function findMenuItemDefByUrl(url: string, moduloId?: ModuloId): MenuItemDef | undefined {
 	const [path, queryString] = url.split('?');

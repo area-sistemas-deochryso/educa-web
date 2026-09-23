@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { TableSkeletonComponent } from '@intranet-shared/components/table-skeleton/table-skeleton.component';
 import { StatsSkeletonComponent } from '@intranet-shared/components/stats-skeleton/stats-skeleton.component';
@@ -45,6 +45,7 @@ export class AttendanceReportsComponent implements OnInit {
 	// #region Dependencias
 	private readonly facade = inject(AttendanceReportsFacade);
 	private readonly route = inject(ActivatedRoute);
+	private readonly router = inject(Router);
 	private readonly destroyRef = inject(DestroyRef);
 	// #endregion
 
@@ -77,7 +78,7 @@ export class AttendanceReportsComponent implements OnInit {
 
 	/**
 	 * Drill-down desde `AttendancePanelComponent`: `?tab=reportes&tipoPersona=<tipo>&rango=<rango>`.
-	 * Igual que en `AttendancesComponent`, queda suscripto a `queryParamMap` (no solo el valor
+	 * Igual que en `AttendancesGestionComponent`, queda suscripto a `queryParamMap` (no solo el valor
 	 * inicial) para soportar navegaciones repetidas al mismo tab con distintos filtros.
 	 */
 	private applyQueryParams(): void {
@@ -134,6 +135,17 @@ export class AttendanceReportsComponent implements OnInit {
 
 	onExportExcel(): void {
 		this.facade.exportarExcel();
+	}
+	// #endregion
+
+	// #region Event handlers — drill-down
+	/**
+	 * B1 — este componente solo se usa como tab "Reportes" del shell de Asistencias admin
+	 * (`AttendancesShellComponent`), así que el botón de drill-down al tab Panel vive acá
+	 * directamente en vez de en un wrapper del shell.
+	 */
+	irAPanel(): void {
+		void this.router.navigate(['../panel'], { relativeTo: this.route });
 	}
 	// #endregion
 }

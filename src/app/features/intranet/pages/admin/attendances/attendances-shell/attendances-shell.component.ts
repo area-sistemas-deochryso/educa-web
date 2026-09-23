@@ -5,38 +5,37 @@ import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/ro
 import { filter, map } from 'rxjs/operators';
 
 import { PageHeaderComponent } from '@intranet-shared/components';
+import { AttendanceScopeBannerComponent } from '@intranet-shared/components/attendance-scope-banner';
 import { EduTab, EduTabs } from '@edu-ui';
 // #endregion
 
 interface ShellTab {
-	value: 'bandeja' | 'tipos';
+	value: 'gestion' | 'reportes' | 'panel';
 	label: string;
 	icon: string;
 }
 
 const TABS: ShellTab[] = [
-	{ value: 'bandeja', label: 'Bandeja', icon: 'pi pi-inbox' },
-	{ value: 'tipos', label: 'Tipos de ticket', icon: 'pi pi-tags' },
+	{ value: 'gestion', label: 'Editar registros', icon: 'pi pi-cog' },
+	{ value: 'reportes', label: 'Reportes', icon: 'pi pi-chart-bar' },
+	{ value: 'panel', label: 'Panel', icon: 'pi pi-th-large' },
 ];
 
 /**
- * Shell de las 2 vistas admin del dominio Ticket (bandeja + catálogo de tipos), ahora
- * rutas hijas reales (`bandeja`/`tipos`) en vez de tabs por queryParam — piloto de la
- * convención `data.permissionPath` (`.claude/reference/route-permission-sharing.md`).
- * Ambas heredan `AYUDA_TICKET_API_MANAGE` (única `CAP_Ruta` seedeada:
- * `intranet/admin/ayuda/tickets`) vía `permissionPath` en `intranet.routes.ts` —
- * mismo mecanismo que `AyudaShellComponent`. Gate de capability real vive en cada
- * child (`TicketBandejaComponent`/`TicketTiposComponent`), este shell es solo UI.
+ * Shell de las 3 vistas admin de Asistencias (gestión + reportes + panel), ahora rutas
+ * hijas reales (`gestion`/`reportes`/`panel`) en vez de tabs por queryParam — mismo patrón
+ * que `TicketAdminShellComponent` (`.claude/reference/route-permission-sharing.md`).
+ * Todas heredan `permissionPath: 'intranet/admin/asistencias'` desde `intranet.routes.ts`.
  */
 @Component({
-	selector: 'app-ticket-admin',
+	selector: 'app-attendances-shell',
 	standalone: true,
-	imports: [RouterOutlet, EduTab, EduTabs, PageHeaderComponent],
-	templateUrl: './ticket-admin.component.html',
-	styleUrl: './ticket-admin.component.scss',
+	imports: [RouterOutlet, EduTab, EduTabs, PageHeaderComponent, AttendanceScopeBannerComponent],
+	templateUrl: './attendances-shell.component.html',
+	styleUrl: './attendances-shell.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TicketAdminShellComponent {
+export class AttendancesShellComponent {
 	private readonly route = inject(ActivatedRoute);
 	private readonly router = inject(Router);
 
@@ -56,6 +55,6 @@ export class TicketAdminShellComponent {
 	}
 
 	private resolveActiveTab(): string {
-		return this.route.firstChild?.snapshot?.url?.[0]?.path ?? 'bandeja';
+		return this.route.firstChild?.snapshot?.url?.[0]?.path ?? 'gestion';
 	}
 }

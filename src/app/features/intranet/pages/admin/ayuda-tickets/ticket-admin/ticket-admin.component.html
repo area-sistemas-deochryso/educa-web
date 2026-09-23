@@ -1,31 +1,18 @@
-@if (!canAccess) {
-	<div class="empty-state">
-		<i class="pi pi-lock text-3xl mb-2"></i>
-		<p>No tenés permiso para acceder a la administración de tickets.</p>
-	</div>
-} @else {
-	<app-page-header
-		icon="pi pi-inbox"
-		title="Tickets de soporte"
-		subtitle="Bandeja de tickets recibidos y catálogo de tipos de problema"
-	/>
+<app-page-header
+	icon="pi pi-inbox"
+	title="Tickets de soporte"
+	subtitle="Bandeja de tickets recibidos y catálogo de tipos de problema"
+/>
 
-	<edu-tabs [value]="activeTab()" (valueChange)="onTabChange($event)" data-info-anchor="admin-tickets-tabs">
-		
-			<edu-tab value="bandeja">
-				<i class="pi pi-inbox mr-2"></i>
-				Bandeja
-			</edu-tab>
-			<edu-tab value="tipos">
-				<i class="pi pi-tags mr-2"></i>
-				Tipos de ticket
-			</edu-tab>
-		
-	</edu-tabs>
+<edu-tabs [value]="activeTab()" (valueChange)="onTabChange($event)" data-info-anchor="admin-tickets-tabs">
 
-	@if (activeTab() === 'bandeja') {
-		<app-ticket-bandeja />
-	} @else {
-		<app-ticket-tipos />
-	}
-}
+		@for (tab of tabs; track tab.value) {
+			<edu-tab [value]="tab.value">
+				<i [class]="tab.icon + ' mr-2'"></i>
+				{{ tab.label }}
+			</edu-tab>
+		}
+
+</edu-tabs>
+
+<router-outlet />

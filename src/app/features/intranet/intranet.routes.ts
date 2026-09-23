@@ -32,7 +32,7 @@ const PROFESOR_ROUTES_RAW: Route[] = [
 			import('./pages/profesor/attendance/teacher-attendance.component').then(
 				(m) => m.TeacherAttendanceComponent,
 			),
-		title: 'Intranet - Asistencia',
+		title: 'Intranet - Mi Asistencia',
 	},
 	{
 		path: 'profesor/calificaciones',
@@ -48,7 +48,7 @@ const PROFESOR_ROUTES_RAW: Route[] = [
 			import('./pages/profesor/cursos/profesor-cursos.component').then(
 				(m) => m.ProfesorCursosComponent,
 			),
-		title: 'Intranet - Mis Cursos',
+		title: 'Intranet - Mis Cursos (Profesor)',
 	},
 	{
 		path: 'profesor/final-salones',
@@ -56,7 +56,7 @@ const PROFESOR_ROUTES_RAW: Route[] = [
 			import('./pages/profesor/final-classrooms/profesor-final-salones.component').then(
 				(m) => m.TeacherFinalClassroomsComponent,
 			),
-		title: 'Intranet - Gestión de Salones',
+		title: 'Intranet - Resumen de Salones',
 	},
 	{
 		path: 'profesor/foro',
@@ -72,7 +72,7 @@ const PROFESOR_ROUTES_RAW: Route[] = [
 			import('./pages/profesor/schedules/profesor-horarios.component').then(
 				(m) => m.TeacherSchedulesComponent,
 			),
-		title: 'Intranet - Mi Horario',
+		title: 'Intranet - Mi Horario (Profesor)',
 	},
 	{
 		path: 'profesor/mensajeria',
@@ -80,7 +80,7 @@ const PROFESOR_ROUTES_RAW: Route[] = [
 			import('./pages/profesor/mensajeria/profesor-mensajeria.component').then(
 				(m) => m.ProfesorMensajeriaComponent,
 			),
-		title: 'Intranet - Mensajería',
+		title: 'Intranet - Mensajería (Profesor)',
 	},
 	{
 		path: 'profesor/salones',
@@ -88,7 +88,7 @@ const PROFESOR_ROUTES_RAW: Route[] = [
 			import('./pages/profesor/classrooms/profesor-salones.component').then(
 				(m) => m.TeacherClassroomsComponent,
 			),
-		title: 'Intranet - Mis Salones',
+		title: 'Intranet - Mis Salones (Profesor)',
 	},
 ];
 const PROFESOR_ROUTES: Route[] = withViewAsGate('Profesor', PROFESOR_ROUTES_RAW);
@@ -108,7 +108,7 @@ const ESTUDIANTE_ROUTES_RAW: Route[] = [
 			import('./pages/estudiante/cursos/estudiante-cursos.component').then(
 				(m) => m.EstudianteCursosComponent,
 			),
-		title: 'Intranet - Mis Cursos',
+		title: 'Intranet - Mis Cursos (Estudiante)',
 	},
 	{
 		path: 'estudiante/foro',
@@ -124,7 +124,7 @@ const ESTUDIANTE_ROUTES_RAW: Route[] = [
 			import('./pages/estudiante/schedules/estudiante-horarios.component').then(
 				(m) => m.StudentSchedulesComponent,
 			),
-		title: 'Intranet - Mi Horario',
+		title: 'Intranet - Mi Horario (Estudiante)',
 	},
 	{
 		path: 'estudiante/mensajeria',
@@ -132,7 +132,7 @@ const ESTUDIANTE_ROUTES_RAW: Route[] = [
 			import('./pages/estudiante/mensajeria/estudiante-mensajeria.component').then(
 				(m) => m.EstudianteMensajeriaComponent,
 			),
-		title: 'Intranet - Mensajería',
+		title: 'Intranet - Mensajería (Estudiante)',
 	},
 	{
 		path: 'estudiante/notas',
@@ -156,7 +156,7 @@ const ESTUDIANTE_ROUTES_RAW: Route[] = [
 			import('./pages/estudiante/classrooms/estudiante-salones.component').then(
 				(m) => m.StudentClassroomsComponent,
 			),
-		title: 'Intranet - Mis Salones',
+		title: 'Intranet - Mis Salones (Estudiante)',
 	},
 ];
 const ESTUDIANTE_ROUTES: Route[] = withViewAsGate('Estudiante', ESTUDIANTE_ROUTES_RAW);
@@ -232,7 +232,7 @@ const experimentalRoutes: Route[] = [
 					path: 'ctest-k6',
 					loadComponent: () =>
 						import('./pages/cross-role/ctest-k6').then((m) => m.CTestK6Component),
-					title: 'Intranet - Test k6',
+					title: 'Intranet - Prueba k6',
 				},
 			]
 		: []),
@@ -344,7 +344,7 @@ export const INTRANET_ROUTES: Routes = [
 					import('./pages/cross-role/attendance-component/attendance.component').then(
 						(m) => m.AttendanceComponent,
 					),
-				title: 'Intranet - Asistencia',
+				title: 'Intranet - Asistencias',
 			},
 			{
 				// Bandeja de aprobación de justificaciones de inasistencia (Plan 101 F4).
@@ -411,7 +411,7 @@ export const INTRANET_ROUTES: Routes = [
 				path: 'admin/usuarios',
 				loadComponent: () =>
 					import('./pages/admin/users').then((m) => m.UsersComponent),
-				title: 'Intranet - Gestión de Usuarios',
+				title: 'Intranet - Administración de Usuarios',
 			},
 			{
 				// Panel de ayuda — administración de FAQ (xrepo-panel-ayuda-intranet F7b,
@@ -438,7 +438,7 @@ export const INTRANET_ROUTES: Routes = [
 				path: 'admin/cursos',
 				loadComponent: () =>
 					import('./pages/admin/cursos').then((m) => m.CursosComponent),
-				title: 'Intranet - Gestión de Cursos',
+				title: 'Intranet - Administración de Cursos',
 			},
 			{
 				path: 'admin/horarios',
@@ -452,10 +452,16 @@ export const INTRANET_ROUTES: Routes = [
 					import('./pages/admin/classrooms').then((m) => m.ClassroomsAdminComponent),
 				title: 'Intranet - Gestión de Salones',
 			},
+			// B1 (Opción B) — mismo mecanismo que `admin/ayuda/tickets`: shell con `data.permissionPath`
+			// + `loadChildren` a rutas hijas reales (`gestion`/`reportes`/`panel`), reemplazando el
+			// patrón previo de tabs por queryParam (`.claude/reference/route-permission-sharing.md`).
 			{
 				path: 'admin/asistencias',
 				loadComponent: () =>
-					import('./pages/admin/attendances').then((m) => m.AttendancesComponent),
+					import('./pages/admin/attendances').then((m) => m.AttendancesShellComponent),
+				loadChildren: () =>
+					import('./pages/admin/attendances/attendances.routes').then((m) => m.default),
+				data: { permissionPath: 'intranet/admin/asistencias' },
 				title: 'Intranet - Gestión de Asistencias',
 			},
 			{
@@ -496,20 +502,23 @@ export const INTRANET_ROUTES: Routes = [
 				redirectTo: 'admin/permisos/roles',
 				pathMatch: 'full' as const,
 			},
-			// xrepo-panel-ayuda-intranet F7b — bandeja de tickets + catálogo de tipos,
-			// contraparte admin de la sección Ticket pública (F5, `intranet/ayuda`).
-			// Ruta única (tabs por queryParam, mismo patrón que `admin/asistencias`):
-			// la capability `AYUDA_TICKET_API_MANAGE` tiene una sola `CAP_Ruta` seedeada
-			// (`intranet/admin/ayuda/tickets`) contra la que hace match exacto el
-			// `permissionsGuard` — 2 rutas hijas hubieran requerido 2 capabilities,
-			// fuera de alcance (F7a reusa la misma capability a propósito).
+			// xrepo-panel-ayuda-intranet F7b — bandeja de tickets + catálogo de tipos, contraparte
+			// admin de la sección Ticket pública (F5, `intranet/ayuda`). Piloto de la convención
+			// `data.permissionPath` (ver `.claude/reference/route-permission-sharing.md`): las 2
+			// rutas hijas reales (`bandeja`/`tipos`) heredan la autorización de este shell — mismo
+			// mecanismo que `ayuda` arriba — reusando la ÚNICA `CAP_Ruta` seedeada para
+			// `AYUDA_TICKET_API_MANAGE` (`intranet/admin/ayuda/tickets`) sin pedir un segundo seed
+			// en Educa.API. Reemplaza el patrón previo de tabs por queryParam.
 			{
 				path: 'admin/ayuda/tickets',
 				loadComponent: () =>
 					import('./pages/admin/ayuda-tickets/ticket-admin/ticket-admin.component').then(
-						(m) => m.TicketAdminComponent,
+						(m) => m.TicketAdminShellComponent,
 					),
-				title: 'Intranet - Administración de Tickets',
+				loadChildren: () =>
+					import('./pages/admin/ayuda-tickets/ticket-admin.routes').then((m) => m.default),
+				data: { permissionPath: 'intranet/admin/ayuda/tickets' },
+				title: 'Intranet - Tickets de soporte',
 			},
 			// Plan 35 — Submódulo "Monitoreo" reagrupado en hub + 3 dominios.
 			// Las 7 rutas viejas (email-outbox, trazabilidad-errores, reportes-usuario,

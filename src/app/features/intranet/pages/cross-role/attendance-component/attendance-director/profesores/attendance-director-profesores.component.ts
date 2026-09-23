@@ -276,9 +276,8 @@ export class AttendanceDirectorProfesoresComponent implements OnInit {
 	 * edite la asistencia formal sin perder contexto (Plan 23 Chat 5).
 	 */
 	onEditarEnAdminDia(persona: PersonaAsistenciaDia): void {
-		this.router.navigate(['/intranet/admin/asistencias'], {
+		this.router.navigate(['/intranet/admin/asistencias/gestion'], {
 			queryParams: {
-				tab: 'gestion',
 				tipoPersona: 'P',
 				dni: persona.dni,
 				fecha: formatDateLocalIso(this.fechaDia()),
@@ -305,23 +304,18 @@ export class AttendanceDirectorProfesoresComponent implements OnInit {
 	}
 
 	navigateToGestion(): void {
-		this.router.navigate(['/intranet/admin/asistencias'], {
-			queryParams: { tab: 'gestion' },
-		});
+		this.router.navigate(['/intranet/admin/asistencias/gestion']);
 	}
 
 	navigateToReportes(): void {
-		this.router.navigate(['/intranet/admin/asistencias'], {
-			queryParams: { tab: 'reportes' },
-		});
+		this.router.navigate(['/intranet/admin/asistencias/reportes']);
 	}
 
 	onEditarEnAdminMes(): void {
 		const profesor = this.selectedProfesor();
 		if (!profesor) return;
-		this.router.navigate(['/intranet/admin/asistencias'], {
+		this.router.navigate(['/intranet/admin/asistencias/gestion'], {
 			queryParams: {
-				tab: 'gestion',
 				tipoPersona: 'P',
 				dni: profesor.dni,
 			},

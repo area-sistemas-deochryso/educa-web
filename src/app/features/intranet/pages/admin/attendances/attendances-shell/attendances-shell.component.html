@@ -1,0 +1,21 @@
+<app-page-header
+	icon="pi pi-calendar"
+	title="Asistencias"
+	subtitle="Gestión y reportes de asistencia diaria"
+/>
+
+<!-- Plan 27 · INV-C11: banner de scope del filtro biométrico -->
+<app-attendance-scope-banner />
+
+<edu-tabs [value]="activeTab()" (valueChange)="onTabChange($event)" data-info-anchor="admin-asistencia-tabs">
+
+		@for (tab of tabs; track tab.value) {
+			<edu-tab [value]="tab.value">
+				<i [class]="tab.icon + ' mr-2'"></i>
+				{{ tab.label }}
+			</edu-tab>
+		}
+
+</edu-tabs>
+
+<router-outlet />

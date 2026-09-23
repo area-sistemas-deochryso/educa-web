@@ -1,8 +1,8 @@
 /**
  * Helpers para los query params del cross-link desde `AttendanceDirectorComponent`
- * hacia `/intranet/admin/asistencias` (Plan 23 Chat 5).
+ * hacia `/intranet/admin/asistencias/gestion` (Plan 23 Chat 5).
  *
- * Parámetros soportados: `tab`, `tipoPersona`, `dni`, `fecha` (YYYY-MM-DD).
+ * Parámetros soportados: `tipoPersona`, `dni`, `fecha` (YYYY-MM-DD).
  */
 
 /** Valida formato YYYY-MM-DD con componentes numéricos existentes (incluye año bisiesto). */

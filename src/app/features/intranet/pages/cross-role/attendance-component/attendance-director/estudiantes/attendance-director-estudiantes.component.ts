@@ -291,15 +291,11 @@ export class AttendanceDirectorEstudiantesComponent implements OnInit {
 	});
 
 	navigateToGestion(): void {
-		this.router.navigate(['/intranet/admin/asistencias'], {
-			queryParams: { tab: 'gestion' },
-		});
+		this.router.navigate(['/intranet/admin/asistencias/gestion']);
 	}
 
 	navigateToReportes(): void {
-		this.router.navigate(['/intranet/admin/asistencias'], {
-			queryParams: { tab: 'reportes' },
-		});
+		this.router.navigate(['/intranet/admin/asistencias/reportes']);
 	}
 
 	togglePdfMenu(event: Event): void {
@@ -309,9 +305,8 @@ export class AttendanceDirectorEstudiantesComponent implements OnInit {
 	onEditarEnAdminMes(): void {
 		const estudiante = this.view.selectedEstudiante();
 		if (!estudiante) return;
-		this.router.navigate(['/intranet/admin/asistencias'], {
+		this.router.navigate(['/intranet/admin/asistencias/gestion'], {
 			queryParams: {
-				tab: 'gestion',
 				tipoPersona: 'E',
 				dni: estudiante.dni,
 			},

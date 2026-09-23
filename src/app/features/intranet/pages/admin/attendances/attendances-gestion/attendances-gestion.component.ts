@@ -1,4 +1,4 @@
-/* eslint-disable max-lines -- Razón: orchestrador del módulo admin de asistencias (filtros + tabs + form CRUD + cierres mensuales + sync CrossChex + queryParams cross-link). 8 dominios coordinados; partir aumenta indirección sin reducir complejidad real. */
+/* eslint-disable max-lines -- Razón: orchestrador del tab Gestión de asistencias (filtros + form CRUD + cierres mensuales + sync CrossChex). 8 dominios coordinados; partir aumenta indirección sin reducir complejidad real. */
 // #region Imports
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -8,14 +8,11 @@ import { FormsModule } from '@angular/forms';
 import { logger } from '@core/helpers';
 import { ErrorStateComponent } from '@shared/components';
 import { createClientPaging } from '@shared/utils';
-import { SkeletonColumnDef, TableSkeletonComponent, StatsSkeletonComponent, PageHeaderComponent, KpiStatsComponent, type KpiStatItem } from '@intranet-shared/components';
-import { AttendanceScopeBannerComponent } from '@intranet-shared/components/attendance-scope-banner';
-import { AttendanceReportsComponent } from '../../cross-role/attendance-reports';
-import { AttendancePanelComponent } from '../attendance-panel';
+import { SkeletonColumnDef, TableSkeletonComponent, StatsSkeletonComponent, KpiStatsComponent, type KpiStatItem } from '@intranet-shared/components';
 import { CrossChexSyncStatusService } from '@core/services/signalr';
-import { CrossChexSyncBannerComponent } from './components/crosschex-sync-banner';
-import { CrossChexIntegrationStatusBadgeComponent } from './components/crosschex-integration-status-badge';
-import { SyncRangeDialogComponent, SyncRangePayload } from './components/sync-range-dialog';
+import { CrossChexSyncBannerComponent } from '../components/crosschex-sync-banner';
+import { CrossChexIntegrationStatusBadgeComponent } from '../components/crosschex-integration-status-badge';
+import { SyncRangeDialogComponent, SyncRangePayload } from '../components/sync-range-dialog';
 
 import {
 	AttendancesAdminService,
@@ -37,14 +34,14 @@ import {
 	origenSeverity,
 	tipoPersonaLabel,
 	formatFechaIso,
-} from './services';
-import { EduButton, EduCheckbox, EduConfirmDialog, EduConfirmationService, EduDatePicker, EduDialog, EduIconField, EduInputIcon, EduInputText, EduMessageService, EduSelect, EduSelectButton, EduTab, EduTabPanel, EduTable, EduTabs, EduTag, EduToast, EduTooltip } from '@edu-ui';
+} from '../services';
+import { EduButton, EduCheckbox, EduConfirmDialog, EduConfirmationService, EduDatePicker, EduDialog, EduIconField, EduInputIcon, EduInputText, EduMessageService, EduSelect, EduSelectButton, EduTable, EduTag, EduToast, EduTooltip } from '@edu-ui';
 // #endregion
 
 @Component({
-	selector: 'app-attendances-admin',
+	selector: 'app-attendances-gestion',
 	standalone: true,
-	imports: [DatePipe, 
+	imports: [DatePipe,
 		FormsModule,
 		EduButton,
 		EduDatePicker,
@@ -63,23 +60,16 @@ import { EduButton, EduCheckbox, EduConfirmDialog, EduConfirmationService, EduDa
 		TableSkeletonComponent,
 		StatsSkeletonComponent,
 		KpiStatsComponent,
-		EduTabs,
-		EduTab,
-		EduTabPanel,
-		AttendanceScopeBannerComponent,
-		AttendanceReportsComponent,
-		AttendancePanelComponent,
 		CrossChexSyncBannerComponent,
 		CrossChexIntegrationStatusBadgeComponent,
 		SyncRangeDialogComponent,
-		PageHeaderComponent,
 		ErrorStateComponent],
 	providers: [EduConfirmationService, EduMessageService],
-	templateUrl: './attendances.component.html',
-	styleUrl: './attendances.component.scss',
+	templateUrl: './attendances-gestion.component.html',
+	styleUrl: './attendances-gestion.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AttendancesComponent implements OnInit {
+export class AttendancesGestionComponent implements OnInit {
 	// #region Dependencias
 	private adminApi = inject(AttendancesAdminService);
 	protected dataFacade = inject(AttendancesDataFacade);
@@ -128,7 +118,6 @@ export class AttendancesComponent implements OnInit {
 	// #endregion
 
 	// #region Estado local
-	readonly activeTab = signal<string>('gestion');
 	readonly fechaCalendar = signal<Date>(new Date());
 	readonly tipoOptions = signal<{ label: string; value: TipoOperacionAsistencia }[]>([
 		{ label: 'Solo entrada', value: 'entrada' },
@@ -226,21 +215,8 @@ export class AttendancesComponent implements OnInit {
 			});
 	}
 
-	/**
-	 * Brief 512 — `<p-tabs [value]="activeTab()">` era un binding de solo lectura: PrimeNG
-	 * maneja el cambio de tab internamente (el panel se actualiza visualmente) pero sin
-	 * `(valueChange)` nunca se notificaba al componente, así que la URL (`?tab=...`) y el
-	 * signal `activeTab` quedaban stale — sin bookmark posible y F5 siempre volvía a "gestion".
-	 * Mismo patrón que `TicketAdminComponent.onTabChange`: navega con el nuevo `tab` en
-	 * queryParams; `subscribeToQueryParams` recibe el cambio y sincroniza `activeTab`.
-	 */
-	onTabChange(value: string | number | undefined): void {
-		if (value === undefined) return;
-		void this.router.navigate([], { relativeTo: this.route, queryParams: { tab: String(value) } });
-	}
-
-	// Cross-link desde `AttendanceDirectorComponent` tab profesores (Plan 23 Chat 5).
-	// Query params soportados: `tab`, `tipoPersona`, `dni`, `fecha` (YYYY-MM-DD).
+	// Cross-link desde `AttendanceDirectorComponent` (Plan 23 Chat 5) y B1 (rutas hijas reales).
+	// Query params soportados: `tipoPersona`, `dni`, `fecha` (YYYY-MM-DD).
 	//
 	// Aplica los params al store y dispara UN solo `loadData()` al final con
 	// todos los filtros ya seteados (fecha + tipoPersona + search). Sin el
@@ -250,9 +226,6 @@ export class AttendancesComponent implements OnInit {
 		this.route.queryParamMap
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe((params) => {
-				const tab = params.get('tab');
-				if (tab === 'gestion' || tab === 'reportes' || tab === 'panel') this.activeTab.set(tab);
-
 				const fecha = params.get('fecha');
 				if (fecha && isValidDateIso(fecha)) {
 					this.fechaCalendar.set(parseIsoDate(fecha));
@@ -290,9 +263,9 @@ export class AttendancesComponent implements OnInit {
 	// #endregion
 
 	// #region Event handlers — drill-down
-	/** Mirror inverso de `AttendancePanelComponent.irAGestion/irAReportes` — vuelve al tab Panel. */
+	/** Navega al tab hermano Panel (B1: ruta hija real en vez de queryParam `tab`). */
 	irAPanel(): void {
-		void this.router.navigate([], { queryParams: { tab: 'panel' } });
+		void this.router.navigate(['../panel'], { relativeTo: this.route });
 	}
 
 	// #endregion
@@ -330,7 +303,7 @@ export class AttendancesComponent implements OnInit {
 				detail: `No se pudo iniciar el sync del ${fechaLabel}.`,
 				life: 5000,
 			});
-			logger.error('[AttendancesComponent] Sync dispatch error', err);
+			logger.error('[AttendancesGestionComponent] Sync dispatch error', err);
 		});
 	}
 
@@ -379,7 +352,7 @@ export class AttendancesComponent implements OnInit {
 							detail: 'No se pudo iniciar la sincronización del rango.',
 							life: 5000,
 						});
-						logger.error('[AttendancesComponent] Sync range dispatch error', err);
+						logger.error('[AttendancesGestionComponent] Sync range dispatch error', err);
 					},
 				);
 			},
@@ -541,7 +514,7 @@ export class AttendancesComponent implements OnInit {
 
 	// #endregion
 
-	// #region Helpers de template — delegan a funciones puras en ./services
+	// #region Helpers de template — delegan a funciones puras en ../services
 	readonly getEstadoSeverity = estadoSeverity;
 	readonly getOrigenLabel = origenLabel;
 	readonly getOrigenSeverity = origenSeverity;

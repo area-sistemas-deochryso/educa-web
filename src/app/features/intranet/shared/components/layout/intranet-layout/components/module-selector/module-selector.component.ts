@@ -242,10 +242,10 @@ export class ModuleSelectorComponent {
 	 * Check if a result corresponds to the page the user is currently on.
 	 * Matches by exact path or as a prefix of the current URL (e.g.
 	 * `/intranet/admin/monitoreo` highlights when on `/.../monitoreo/correos/bandeja`).
-	 * Items que comparten route pero difieren en `queryParams` (ej. Gestión/Reportes/Panel de
-	 * asistencias, todas en `/intranet/admin/asistencias?tab=...`) solo matchean si además el
-	 * `tab` (u otro queryParam declarado) coincide con el de la URL actual -- sin esto, las 3
-	 * quedaban resaltadas a la vez porque el path por sí solo no las distingue.
+	 * Items que comparten route pero difieren en `queryParams` (patrón viejo de tabs-por-tab,
+	 * ya no usado por asistencias/tickets tras B1/D) solo matchean si además el queryParam
+	 * declarado coincide con el de la URL actual -- fallback para cualquier página que aún
+	 * use ese patrón.
 	 */
 	isCurrentRoute(result: SearchResult): boolean {
 		const [path, queryString] = this.currentUrl().split('?');

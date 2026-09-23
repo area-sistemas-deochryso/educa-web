@@ -1,3 +1,21 @@
+<!-- #region Drill-down a Panel -->
+<div class="reportes-panel-link">
+	<edu-button
+		icon="pi pi-th-large"
+		label="Ver resumen en Panel"
+		[outlined]="true"
+		size="small"
+		severity="secondary"
+		(click)="irAPanel()"
+		[pt]="{
+			root: {
+				'aria-label': 'Ver resumen en el tab Panel',
+			},
+		}"
+	/>
+</div>
+<!-- #endregion -->
+
 <!-- #region Header -->
 <div class="page-header">
 	<h2>Reportes de Asistencia</h2>

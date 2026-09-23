@@ -1,7 +1,7 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { UserPermissionsService } from '@core/services/permissions';
 import { StatsSkeletonComponent } from '@intranet-shared/components';
@@ -38,6 +38,7 @@ export class AttendancePanelComponent implements OnInit {
 	private readonly facade = inject(AttendancePanelFacade);
 	private readonly userPermisos = inject(UserPermissionsService);
 	private readonly router = inject(Router);
+	private readonly route = inject(ActivatedRoute);
 	// #endregion
 
 	// #region Estado del facade
@@ -93,16 +94,17 @@ export class AttendancePanelComponent implements OnInit {
 	/** KPI tile → tab Gestión, con la fecha del día si el rango activo es Día. */
 	irAGestion(): void {
 		const filters = this.vm().filters;
-		const queryParams: Record<string, string> = { tab: 'gestion' };
+		const queryParams: Record<string, string> = {};
 		if (filters.rango === 'dia') queryParams['fecha'] = formatDateLocalIso(filters.fecha);
-		void this.router.navigate([], { queryParams });
+		void this.router.navigate(['../gestion'], { relativeTo: this.route, queryParams });
 	}
 
 	/** Breakdown bar → tab Reportes, filtrado al tipo de persona y rango elegidos. */
 	irAReportes(item: AttendancePanelBreakdownItem): void {
 		const filters = this.vm().filters;
-		void this.router.navigate([], {
-			queryParams: { tab: 'reportes', tipoPersona: item.tipoPersona, rango: filters.rango },
+		void this.router.navigate(['../reportes'], {
+			relativeTo: this.route,
+			queryParams: { tipoPersona: item.tipoPersona, rango: filters.rango },
 		});
 	}
 	// #endregion
