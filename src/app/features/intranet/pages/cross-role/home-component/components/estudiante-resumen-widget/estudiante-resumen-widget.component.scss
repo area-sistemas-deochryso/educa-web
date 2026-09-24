@@ -1,0 +1,134 @@
+// #region Host
+:host {
+	display: block;
+	padding: 0 2rem;
+	margin-bottom: 1.5rem;
+}
+// #endregion
+
+// #region Card
+.widget-card {
+	background: var(--surface-card);
+	border: 1px solid var(--surface-border);
+	border-radius: 12px;
+	padding: 1.25rem 1.5rem;
+}
+// #endregion
+
+// #region Header
+.widget-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 1rem;
+}
+
+.widget-title {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+
+	i {
+		color: var(--intranet-accent-color-blue, #253470);
+		font-size: 1.1rem;
+	}
+	h3 {
+		margin: 0;
+		font-size: 1rem;
+		font-weight: 600;
+		color: var(--text-color);
+	}
+}
+// #endregion
+
+// #region Section header + divider
+.section-title {
+	margin: 0 0 0.75rem;
+	font-size: 0.8rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	color: var(--text-color-secondary);
+}
+
+.section-divider {
+	height: 1px;
+	background: var(--surface-300);
+	margin: 1rem 0;
+}
+// #endregion
+
+// #region Rows
+.proxima-clase-row,
+.nota-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+}
+
+.proxima-clase-info,
+.nota-info {
+	display: flex;
+	flex-direction: column;
+	gap: 0.15rem;
+	min-width: 0;
+}
+
+.curso-label {
+	font-size: 0.9rem;
+	font-weight: 600;
+	color: var(--text-color);
+}
+
+.salon-label,
+.titulo-label {
+	font-size: 0.8rem;
+	color: var(--text-color-secondary);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.cuando-badge {
+	font-size: 0.8rem;
+	font-weight: 700;
+	color: var(--intranet-accent-color-blue, #253470);
+	background: color-mix(in srgb, var(--intranet-accent-color-blue, #253470) 12%, transparent);
+	padding: 0.3rem 0.75rem;
+	border-radius: 6px;
+	white-space: nowrap;
+}
+
+.nota-badge {
+	font-size: 1.1rem;
+	font-weight: 700;
+	color: var(--green-600);
+	background: color-mix(in srgb, var(--green-500) 15%, transparent);
+	padding: 0.2rem 0.75rem;
+	border-radius: 6px;
+	text-decoration: none;
+
+	&:hover {
+		text-decoration: underline;
+	}
+}
+// #endregion
+
+// #region Empty & skeleton
+.widget-empty {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.5rem 0;
+	color: var(--text-color-secondary);
+	font-size: 0.85rem;
+}
+
+.widget-skeleton {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	min-height: 160px;
+}
+// #endregion

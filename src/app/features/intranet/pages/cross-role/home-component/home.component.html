@@ -10,6 +10,15 @@
 		<app-profesor-attendance-widget />
 	}
 
+	@if (showEstudianteWidgets()) {
+		<app-estudiante-attendance-widget />
+		<app-estudiante-resumen-widget />
+	}
+
+	@if (showHorarioHoyWidget()) {
+		<app-horario-hoy-widget />
+	}
+
 	@if (showQuickAccess()) {
 		<section class="quick-access">
 			<div class="quick-access-header">

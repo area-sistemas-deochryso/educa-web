@@ -35,6 +35,8 @@ export class UserProfileService {
 
 	readonly isProfesor = computed(() => this.rol()?.nombre === 'Profesor');
 
+	readonly isEstudiante = computed(() => this.rol()?.nombre === 'Estudiante');
+
 	/**
 	 * Roles con panel administrativo pero sin obligación de marcar asistencia
 	 * (Administrador queda afuera a propósito: no tiene obligación de marcar

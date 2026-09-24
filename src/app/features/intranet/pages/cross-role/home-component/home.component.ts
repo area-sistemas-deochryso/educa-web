@@ -13,6 +13,9 @@ import { QuickAccessSize } from '@data/models';
 import { WelcomeSectionComponent } from '@features/intranet/components/welcome-section/welcome-section';
 import { AttendanceSummaryWidgetComponent } from './components/attendance-summary-widget/attendance-summary-widget.component';
 import { ProfesorAttendanceWidgetComponent } from './components/profesor-attendance-widget/profesor-attendance-widget.component';
+import { EstudianteAttendanceWidgetComponent } from './components/estudiante-attendance-widget/estudiante-attendance-widget.component';
+import { EstudianteResumenWidgetComponent } from './components/estudiante-resumen-widget/estudiante-resumen-widget.component';
+import { HorarioHoyWidgetComponent } from './components/horario-hoy-widget/horario-hoy-widget.component';
 
 // #endregion
 // #region Implementation
@@ -25,6 +28,9 @@ import { ProfesorAttendanceWidgetComponent } from './components/profesor-attenda
 		WelcomeSectionComponent,
 		AttendanceSummaryWidgetComponent,
 		ProfesorAttendanceWidgetComponent,
+		EstudianteAttendanceWidgetComponent,
+		EstudianteResumenWidgetComponent,
+		HorarioHoyWidgetComponent,
 		CdkDropList,
 		CdkDrag,
 		CdkDragHandle,
@@ -46,6 +52,10 @@ export class HomeComponent {
 	// Los 4 roles administrativos comparten el mismo summary agregado del colegio.
 	readonly showAttendanceWidget = computed(() => this.userProfile.isAdministrativo());
 	readonly showProfesorWidget = computed(() => this.userProfile.isProfesor());
+	readonly showEstudianteWidgets = computed(() => this.userProfile.isEstudiante());
+	readonly showHorarioHoyWidget = computed(
+		() => this.userProfile.isProfesor() || this.userProfile.isEstudiante(),
+	);
 	readonly showQuickAccess = computed(() => this.flags.isEnabled('quickAccess'));
 
 	readonly editMode = signal(false);

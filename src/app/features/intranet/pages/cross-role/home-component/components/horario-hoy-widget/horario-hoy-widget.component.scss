@@ -1,0 +1,104 @@
+// #region Host
+:host {
+	display: block;
+	padding: 0 2rem;
+	margin-bottom: 1.5rem;
+}
+// #endregion
+
+// #region Card
+.widget-card {
+	background: var(--surface-card);
+	border: 1px solid var(--surface-border);
+	border-radius: 12px;
+	padding: 1.25rem 1.5rem;
+}
+// #endregion
+
+// #region Header
+.widget-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 1rem;
+}
+
+.widget-title {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+
+	i {
+		color: var(--intranet-accent-color-blue, #253470);
+		font-size: 1.1rem;
+	}
+	h3 {
+		margin: 0;
+		font-size: 1rem;
+		font-weight: 600;
+		color: var(--text-color);
+	}
+}
+// #endregion
+
+// #region Lista
+.horario-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.horario-item {
+	display: grid;
+	grid-template-columns: 110px 1fr auto;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 0.5rem 0.75rem;
+	background: var(--surface-100, #f5f5f5);
+	border-left: 4px solid var(--intranet-accent-color-blue, #253470);
+	border-radius: 6px;
+}
+
+.horario-hora {
+	font-size: 0.8rem;
+	font-weight: 600;
+	color: var(--text-color-secondary);
+	font-variant-numeric: tabular-nums;
+}
+
+.horario-curso {
+	font-size: 0.9rem;
+	font-weight: 600;
+	color: var(--text-color);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.horario-salon {
+	font-size: 0.8rem;
+	color: var(--text-color-secondary);
+	white-space: nowrap;
+}
+// #endregion
+
+// #region Empty & skeleton
+.widget-empty {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.5rem 0;
+	color: var(--text-color-secondary);
+	font-size: 0.85rem;
+}
+
+.widget-skeleton {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	min-height: 100px;
+}
+// #endregion

@@ -1,0 +1,32 @@
+<!-- #region Template -->
+<div class="widget-card">
+	<div class="widget-header">
+		<div class="widget-title">
+			<i class="pi pi-clock"></i>
+			<h3>Mi Horario de Hoy</h3>
+		</div>
+	</div>
+
+	@if (loading()) {
+		<div class="widget-skeleton">
+			<app-skeleton-loader variant="rect" width="100%" height="40px" />
+			<app-skeleton-loader variant="rect" width="100%" height="40px" />
+		</div>
+	} @else if (hasBloques()) {
+		<ul class="horario-list">
+			@for (bloque of bloquesHoy(); track bloque.id) {
+				<li class="horario-item" [style.borderLeftColor]="bloque.color">
+					<span class="horario-hora">{{ bloque.horaInicio }} - {{ bloque.horaFin }}</span>
+					<span class="horario-curso">{{ bloque.cursoNombre }}</span>
+					<span class="horario-salon">{{ bloque.salonDescripcion }}</span>
+				</li>
+			}
+		</ul>
+	} @else {
+		<div class="widget-empty">
+			<i class="pi pi-info-circle"></i>
+			<span>Sin clases hoy</span>
+		</div>
+	}
+</div>
+<!-- #endregion -->
