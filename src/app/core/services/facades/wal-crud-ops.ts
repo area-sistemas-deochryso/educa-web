@@ -6,8 +6,7 @@ import {
 import type { ErrorHandlerService } from '@core/services/error';
 import type { WalFacadeHelper, WalConsistencyLevel } from '@core/services/wal';
 import type { BaseCrudStore } from '@core/store';
-// eslint-disable-next-line layer-enforcement/imports-error -- DEBT: xrepo-50-F3a
-import type { HasId } from '@shared/interfaces';
+import type { HasId } from '@data/models';
 import type { HasEstado } from './base-crud.facade.types';
 
 // #region Config types

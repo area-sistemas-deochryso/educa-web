@@ -6,10 +6,8 @@ import {
 	logger, withRetry, getEstadoToggleDeltas, resolveErrorMessage,
 	facadeErrorHandler, type FacadeErrorHandler,
 } from '@core/helpers';
-// eslint-disable-next-line layer-enforcement/imports-error -- DEBT: xrepo-50-F3a
-import { HasId } from '@shared/interfaces';
-// eslint-disable-next-line layer-enforcement/imports-error -- DEBT: xrepo-50-F3a
-import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@shared/constants';
+import { HasId } from '@data/models';
+import { CORE_UI_MESSAGES } from '@core/constants';
 import { ActivityTrackerService, ErrorHandlerService } from '@core/services/error';
 import { SwService } from '@core/services/sw';
 import { WalFacadeHelper, WalCrossTabRefetchService } from '@core/services/wal';
@@ -121,7 +119,7 @@ export abstract class BaseCrudFacade<
 				error: (err) => {
 					logger.error(`${this.config.tag}: Error al cargar:`, err);
 					const message = resolveErrorMessage(err, this.config.loadErrorMessage);
-					this.errorHandler.showError(UI_SUMMARIES.error, message);
+					this.errorHandler.showError(CORE_UI_MESSAGES.error, message);
 					this.store.setError(message);
 					this.store.setLoading(false);
 				},
@@ -188,8 +186,8 @@ export abstract class BaseCrudFacade<
 				error: (err) => {
 					logger.error(`${this.config.tag}: Error al refrescar:`, err);
 					this.errorHandler.showError(
-						UI_SUMMARIES.error,
-						resolveErrorMessage(err, UI_ADMIN_ERROR_DETAILS.refreshData),
+						CORE_UI_MESSAGES.error,
+						resolveErrorMessage(err, CORE_UI_MESSAGES.refreshDataError),
 					);
 					if (!silent) {
 						this.store.setLoading(false);
@@ -218,8 +216,8 @@ export abstract class BaseCrudFacade<
 				error: (err) => {
 					logger.error(`${this.config.tag}: Error al refrescar estadísticas:`, err);
 					this.errorHandler.showError(
-						UI_SUMMARIES.error,
-						resolveErrorMessage(err, UI_ADMIN_ERROR_DETAILS.refreshData),
+						CORE_UI_MESSAGES.error,
+						resolveErrorMessage(err, CORE_UI_MESSAGES.refreshDataError),
 					);
 				},
 			});

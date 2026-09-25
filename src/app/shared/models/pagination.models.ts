@@ -6,14 +6,6 @@ export interface PaginationState {
 	total: number;
 }
 
-/** Respuesta paginada de la API */
-export interface PaginatedResponse<T> {
-	data: T[];
-	total: number;
-	page: number;
-	pageSize: number;
-	totalPages: number;
-	hasNextPage: boolean;
-	hasPreviousPage: boolean;
-}
+// PaginatedResponse vive en @data (contrato de shape de datos, no de UI) — reexportado acá por compat.
+export type { PaginatedResponse } from '@data/models';
 // #endregion
