@@ -20,4 +20,5 @@ export * from './error-policy';
 export * from './problem-details.adapter';
 export * from './estado.utils';
 export * from './jwt.utils';
+export * from './api-schema-versions';
 // #endregion

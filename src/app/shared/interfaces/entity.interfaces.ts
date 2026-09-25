@@ -1,8 +1,7 @@
 // #region Entity Interfaces
-/** Entidad identificable por id numérico */
-export interface HasId {
-	id: number;
-}
+// HasId vive en @data (contrato de shape de datos, no de UI) — reexportado acá por compat.
+import type { HasId } from '@data/models';
+export type { HasId };
 
 /** Entidad con estado activo/inactivo (boolean) */
 export interface HasEstadoBoolean {

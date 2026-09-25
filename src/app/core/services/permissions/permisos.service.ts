@@ -19,14 +19,11 @@ import {
 	Vista,
 	VistasEstadisticas,
 } from './permisos.models';
-// eslint-disable-next-line layer-enforcement/imports-error -- DEBT: xrepo-50-F3a
-import { ApiResponse } from '@shared/models';
+import { ApiResponse, PaginatedResponse } from '@data/models';
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, map, of } from 'rxjs';
 import { logger } from '@core/helpers';
 import { HttpClient } from '@angular/common/http';
-// eslint-disable-next-line layer-enforcement/imports-error -- DEBT: xrepo-50-F3a
-import { PaginatedResponse } from '@shared/models';
 import { environment } from '@config/environment';
 
 /**
