@@ -1,13 +1,13 @@
 // #region Imports
 import { ActivatedRoute } from '@angular/router';
-
-import { BadgeLevel } from '../models/monitoreo-hub-badges.models';
 // #endregion
 
 // #region Types
+type ContextLevel = 'warn' | 'critical';
+
 export interface HubContext {
 	fromHub: boolean;
-	level: BadgeLevel | null;
+	level: ContextLevel | null;
 }
 // #endregion
 
@@ -21,7 +21,7 @@ export function readHubContext(route: ActivatedRoute): HubContext {
 	return { fromHub, level };
 }
 
-function isValidLevel(value: string | null): value is BadgeLevel {
+function isValidLevel(value: string | null): value is ContextLevel {
 	return value === 'warn' || value === 'critical';
 }
 // #endregion

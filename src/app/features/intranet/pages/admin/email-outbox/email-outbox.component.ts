@@ -23,7 +23,7 @@ import {
 	CandidatoBlacklistDetectadoEvent,
 } from '@features/intranet/pages/admin/email-outbox-shared';
 
-import { HubContextBannerComponent, readHubContext } from '../monitoreo/shared';
+import { HubContextBannerComponent, readHubContext } from '../hub-context-shared';
 import { EmailOutboxDataFacade, EmailOutboxUiFacade } from './services';
 import { EmailOutboxHeaderComponent } from './components/email-outbox-header/email-outbox-header.component';
 import { EmailOutboxStatsComponent } from './components/email-outbox-stats/email-outbox-stats.component';

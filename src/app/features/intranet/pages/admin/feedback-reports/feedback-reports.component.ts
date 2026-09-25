@@ -15,7 +15,7 @@ import {
 import { PageHeaderComponent } from '@intranet-shared/components';
 import { CorrelationIdPillComponent } from '@intranet-shared/components';
 
-import { HubContextBannerComponent, readHubContext } from '../monitoreo/shared';
+import { HubContextBannerComponent, readHubContext } from '../hub-context-shared';
 import { FeedbackReportsFacade } from './services';
 import { EduButton, EduConfirmDialog, EduConfirmationService, EduDatePicker, EduDrawer, EduInputText, EduSelect, EduTable, EduTag, EduTemplate, EduTextarea, EduTooltip } from '@edu-ui';
 import type { EduTableLazyLoadEvent } from '@edu-ui';

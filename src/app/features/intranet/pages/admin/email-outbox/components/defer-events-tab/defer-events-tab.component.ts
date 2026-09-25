@@ -15,7 +15,7 @@ import { DecimalPipe } from '@angular/common';
 import { DeferEventTipo } from '@data/models';
 import { MiniSparklineComponent } from '@intranet-shared/components';
 
-import { HubContextBannerComponent, readHubContext } from '@features/intranet/pages/admin/monitoreo/shared';
+import { HubContextBannerComponent, readHubContext } from '@features/intranet/pages/admin/hub-context-shared';
 import { EmailDeferEventDataFacade } from '../../services';
 import { trendSummary, TrendSummary } from '../../utils/trend-summary';
 import { DeferEventItemComponent } from '../defer-event-item/defer-event-item.component';

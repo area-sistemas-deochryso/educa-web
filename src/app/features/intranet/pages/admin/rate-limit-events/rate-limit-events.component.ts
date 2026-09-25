@@ -12,7 +12,7 @@ import { RateLimitDetailDrawerComponent } from './components/rate-limit-detail-d
 import { RateLimitFiltersComponent } from './components/rate-limit-filters';
 import { RateLimitStatsComponent } from './components/rate-limit-stats';
 import { RateLimitTableComponent } from './components/rate-limit-table';
-import { HubContextBannerComponent, readHubContext } from '../monitoreo/shared';
+import { HubContextBannerComponent, readHubContext } from '../hub-context-shared';
 import { RateLimitEventFiltro, RateLimitEventListaDto } from './models';
 import { RateLimitEventsFacade } from './services';
 import { EduButton, EduMessageService, EduToast } from '@edu-ui';
