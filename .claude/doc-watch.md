@@ -72,6 +72,6 @@
 
 ## Deuda documentada
 
-- Los globs son primera pasada por lectura del contenido del doc, no validados exhaustivamente contra cada archivo real del repo (mismo criterio que F4/652). Se refinan orgánicamente cuando F5 (`/end` integration, pendiente) dispare el chequeo de "dead glob".
+- Los globs son primera pasada por lectura del contenido del doc, no validados exhaustivamente contra cada archivo real del repo (mismo criterio que F4/652). Se refinan orgánicamente ahora que F5 (`/end` integration, `educa-coord` brief 705, 2026-09-23) dispara el chequeo de "dead glob" en cada cierre que matchea alguna fila.
 - `reference/lazy-rendering.md` documenta `<app-lazy-content>` como selector; no se encontró ningún componente con ese selector en `src/` al momento del bootstrap (2026-09-11) — posible glob muerto o patrón aún no implementado. Queda para que F5/F6 lo confirme en vez de asumir en este chat mecánico.
 - `rules/backend.md` vive en este repo pero describe código de `Educa.API` (timeouts, `CancellationToken`) — no tiene glob local útil; si se quiere watch, corresponde al registro cross-repo de `educa-coord`, no a este.
