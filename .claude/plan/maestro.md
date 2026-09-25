@@ -13,7 +13,7 @@
 | F8 | Design Patterns Backend | Incremental | Al tocar módulos |
 | F9 | Design Patterns Frontend | Incremental | Al tocar módulos |
 | xP41 | → Correlation Hub (coord) | F3-F6 ⏳ backlog tibio | BE only; no toca este repo |
-| xP50 | FE cohesion & coupling refactor (coord) | F3a Cat A ✅ · F3a Cat B ⏳ (needs design) · F3b ⏳ backlog tibio | Service move + email consolidation |
+| xP50 | FE cohesion & coupling refactor (coord) | F3a Cat A ✅ · F3a Cat B ✅ (2026-09-25) · F3b ⏳ backlog tibio | Service move + email consolidation |
 <!-- INDEX:END -->
 
 ---
@@ -29,15 +29,15 @@
 | F8 | Design Patterns Backend | Incremental |
 | F9 | Design Patterns Frontend | Incremental |
 | xP41 | Correlation Hub (coord) | BE only |
-| xP50 | FE cohesion & coupling refactor (coord) | Needs design: F3a Cat B + F3b |
+| xP50 | FE cohesion & coupling refactor (coord) | F3a Cat B ✅ (2026-09-25) · Needs design: F3b |
 
 ---
 
 ## 📋 Cola priorizada
 
-**Cola vacía** — todos los planes Tier 0 (BAudit2, BAudit3) cerraron en 2026-09-22. Siguientes candidatos:
+**Cola vacía** — todos los planes Tier 0 (BAudit2, BAudit3) cerraron en 2026-09-22. `xP50 F3a Cat B` cerró 2026-09-25. Siguientes candidatos:
 
-1. **xP50 F3a Cat B** (FE cohesion) — needs design, puntero `educa-coord`
+1. **xP50 F3b** (email admin consolidation) — needs design, puntero `educa-coord`
 2. **xP41 F3-F6** (Correlation Hub) — BE only, puntero `educa-coord`
 3. **F1 F4.4-F4.5** (INV-T*, INV-M* tests) — bloqueado por Plan 2/B BE
 4. **F5** (Consolidación FE) — bloqueado por Plan 4 BE
