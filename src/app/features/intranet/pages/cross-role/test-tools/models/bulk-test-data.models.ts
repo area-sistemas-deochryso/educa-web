@@ -38,6 +38,18 @@ export interface CrearUsuarioDto {
 	correo?: string;
 }
 
+export interface CrearMatriculaDto {
+	estudianteId: number;
+	salonId: number;
+}
+
+export interface CrearNotaDto {
+	calificacionId: number;
+	estudianteId: number;
+	nota: number;
+	observacion?: string;
+}
+
 /**
  * Resultado de borrado masivo de datos de prueba (P107 F4) — mismo shape que
  * CreacionMasivaResponseDto para errores por fila (acá, id del registro).

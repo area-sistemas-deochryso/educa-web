@@ -8,6 +8,8 @@ import {
 	BorradoMasivoResponseDto,
 	CreacionMasivaResponseDto,
 	CrearCursoDto,
+	CrearMatriculaDto,
+	CrearNotaDto,
 	CrearSalonDto,
 	CrearUsuarioDto,
 } from '../models';
@@ -64,6 +66,34 @@ export class BulkTestDataApiService {
 			`${this.baseUrl}/api/sistema/usuarios/prueba/lote`,
 			{ usuarios },
 		);
+	}
+
+	generarMatriculas(cantidad: number): Observable<CreacionMasivaResponseDto> {
+		return this.http.post<CreacionMasivaResponseDto>(
+			`${this.baseUrl}/api/sistema/salones/prueba/matriculas/generar`,
+			{ cantidad },
+		);
+	}
+
+	loteMatriculas(matriculas: CrearMatriculaDto[]): Observable<CreacionMasivaResponseDto> {
+		return this.http.post<CreacionMasivaResponseDto>(
+			`${this.baseUrl}/api/sistema/salones/prueba/matriculas/lote`,
+			{ matriculas },
+		);
+	}
+
+	// Calificaciones NO sigue la convención `api/sistema/` — CalificacionController usa
+	// [Route("api/[controller]")] (confirmado contra el código C# del brief BE 710).
+	generarCalificaciones(cantidad: number): Observable<CreacionMasivaResponseDto> {
+		return this.http.post<CreacionMasivaResponseDto>(`${this.baseUrl}/api/Calificacion/prueba/generar`, {
+			cantidad,
+		});
+	}
+
+	loteCalificaciones(notas: CrearNotaDto[]): Observable<CreacionMasivaResponseDto> {
+		return this.http.post<CreacionMasivaResponseDto>(`${this.baseUrl}/api/Calificacion/prueba/lote`, {
+			notas,
+		});
 	}
 
 	eliminarSalonesPrueba(): Observable<BorradoMasivoResponseDto> {

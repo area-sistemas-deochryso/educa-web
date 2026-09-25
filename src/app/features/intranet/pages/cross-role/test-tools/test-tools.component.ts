@@ -9,6 +9,8 @@ import { CrosschexTriggerFormComponent } from './components/crosschex-trigger-fo
 import { SalonesBulkCreateComponent } from './components/salones-bulk-create/salones-bulk-create.component';
 import { CursosBulkCreateComponent } from './components/cursos-bulk-create/cursos-bulk-create.component';
 import { UsuariosBulkCreateComponent } from './components/usuarios-bulk-create/usuarios-bulk-create.component';
+import { MatriculasBulkCreateComponent } from './components/matriculas-bulk-create/matriculas-bulk-create.component';
+import { CalificacionesBulkCreateComponent } from './components/calificaciones-bulk-create/calificaciones-bulk-create.component';
 
 // #endregion
 // #region Component
@@ -21,6 +23,8 @@ import { UsuariosBulkCreateComponent } from './components/usuarios-bulk-create/u
 		SalonesBulkCreateComponent,
 		CursosBulkCreateComponent,
 		UsuariosBulkCreateComponent,
+		MatriculasBulkCreateComponent,
+		CalificacionesBulkCreateComponent,
 		EduButton,
 	],
 	templateUrl: './test-tools.component.html',

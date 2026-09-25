@@ -11,6 +11,8 @@ import {
 	BorradoMasivoResponseDto,
 	CreacionMasivaResponseDto,
 	CrearCursoDto,
+	CrearMatriculaDto,
+	CrearNotaDto,
 	CrearSalonDto,
 	CrearUsuarioDto,
 } from '../models';
@@ -44,6 +46,22 @@ export class BulkTestDataFacade {
 
 	loteUsuarios(usuarios: CrearUsuarioDto[]): Observable<CreacionMasivaResponseDto> {
 		return this.api.loteUsuarios(usuarios).pipe(this.resultPipe('usuarios'));
+	}
+
+	generarMatriculas(cantidad: number): Observable<CreacionMasivaResponseDto> {
+		return this.api.generarMatriculas(cantidad).pipe(this.resultPipe('matrículas'));
+	}
+
+	loteMatriculas(matriculas: CrearMatriculaDto[]): Observable<CreacionMasivaResponseDto> {
+		return this.api.loteMatriculas(matriculas).pipe(this.resultPipe('matrículas'));
+	}
+
+	generarCalificaciones(cantidad: number): Observable<CreacionMasivaResponseDto> {
+		return this.api.generarCalificaciones(cantidad).pipe(this.resultPipe('calificaciones'));
+	}
+
+	loteCalificaciones(notas: CrearNotaDto[]): Observable<CreacionMasivaResponseDto> {
+		return this.api.loteCalificaciones(notas).pipe(this.resultPipe('calificaciones'));
 	}
 
 	eliminarSalonesPrueba(): Observable<BorradoMasivoResponseDto> {
