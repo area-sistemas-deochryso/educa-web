@@ -26,6 +26,7 @@ describe('HomeComponent (Intranet)', () => {
 		isPromotor: WritableSignal<boolean>;
 		isCoordinadorAcademico: WritableSignal<boolean>;
 		isProfesor: WritableSignal<boolean>;
+		isEstudiante: WritableSignal<boolean>;
 		isAdministrativo: Signal<boolean>;
 	};
 
@@ -60,6 +61,7 @@ describe('HomeComponent (Intranet)', () => {
 			isPromotor,
 			isCoordinadorAcademico,
 			isProfesor: signal(false),
+			isEstudiante: signal(false),
 			isAdministrativo: computed(
 				() =>
 					isDirector() ||
