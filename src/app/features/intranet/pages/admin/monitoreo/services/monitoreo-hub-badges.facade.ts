@@ -7,7 +7,7 @@ import { logger } from '@core/helpers';
 import { FeedbackReportService } from '@core/services/feedback';
 import { SwService } from '@core/services/sw';
 import { ErrorGroupsService } from '@features/intranet/pages/admin/error-groups/services';
-import { EmailMonitoreoApiService } from '@features/intranet/pages/admin/email-outbox-dashboard-dia/services/email-monitoreo.api.service';
+import { EmailMonitoreoApiService } from '@features/intranet/pages/admin/email-outbox-dashboard-dia/services';
 import { DeferFailStatus, EmailOutboxApiService } from '@features/intranet/pages/admin/email-outbox-shared';
 import { RateLimitEventsService } from '@features/intranet/pages/admin/rate-limit-events/services';
 

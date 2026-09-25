@@ -11,7 +11,7 @@ import { ErrorGroupsViewMode, StorageService } from '@core/services/storage';
 import { PageHeaderComponent, KpiStatsComponent, type KpiStatItem } from '@intranet-shared/components';
 import { TableSkeletonComponent } from '@intranet-shared/components/table-skeleton';
 
-import { HubContextBannerComponent, readHubContext } from '../monitoreo/shared';
+import { HubContextBannerComponent, readHubContext } from '../hub-context-shared';
 
 import { ChangeGroupStatusDialogComponent } from './components/change-group-status-dialog';
 import { ErrorGroupDetailDrawerComponent } from './components/error-group-detail-drawer';
