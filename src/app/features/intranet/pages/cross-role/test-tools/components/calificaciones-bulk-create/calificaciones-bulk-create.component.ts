@@ -5,9 +5,10 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { EduButton } from '@edu-ui';
 
 import { BulkGenerateFormComponent } from '../bulk-generate-form/bulk-generate-form.component';
+import { BulkDeleteActionComponent } from '../bulk-delete-action/bulk-delete-action.component';
 import { CalificacionesImportDialogComponent } from '../calificaciones-import-dialog/calificaciones-import-dialog.component';
 import { BulkTestDataFacade } from '../../services';
-import { CreacionMasivaResponseDto, CrearNotaDto } from '../../models';
+import { BorradoMasivoResponseDto, CreacionMasivaResponseDto, CrearNotaDto } from '../../models';
 
 // #endregion
 // #region Implementation
@@ -15,13 +16,12 @@ import { CreacionMasivaResponseDto, CrearNotaDto } from '../../models';
  * Panel de creación masiva de Calificaciones (notas) de prueba (P107 F5) — combina generación
  * sintética (BulkGenerateFormComponent genérico, endpoint solo pide `cantidad`, el backend crea
  * la evaluación si no existe una válida) con importación de lote desde archivo
- * (CalificacionesImportDialogComponent). Sin borrado masivo — F6 (brief 713/712) todavía no
- * implementó el endpoint de delete.
+ * (CalificacionesImportDialogComponent) y borrado masivo (BulkDeleteActionComponent, P107 F6).
  */
 @Component({
 	selector: 'app-calificaciones-bulk-create',
 	standalone: true,
-	imports: [BulkGenerateFormComponent, CalificacionesImportDialogComponent, EduButton],
+	imports: [BulkGenerateFormComponent, CalificacionesImportDialogComponent, BulkDeleteActionComponent, EduButton],
 	templateUrl: './calificaciones-bulk-create.component.html',
 	styleUrl: './calificaciones-bulk-create.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -36,6 +36,9 @@ export class CalificacionesBulkCreateComponent {
 	readonly importDialogVisible = signal(false);
 	readonly importing = signal(false);
 	readonly importResult = signal<CreacionMasivaResponseDto | null>(null);
+
+	readonly deleting = signal(false);
+	readonly deleteResult = signal<BorradoMasivoResponseDto | null>(null);
 
 	onGenerar(cantidad: number): void {
 		this.generating.set(true);
@@ -74,6 +77,22 @@ export class CalificacionesBulkCreateComponent {
 				},
 				error: () => {
 					this.importing.set(false);
+				},
+			});
+	}
+
+	onEliminarPrueba(): void {
+		this.deleting.set(true);
+		this.facade
+			.eliminarCalificacionesPrueba()
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (result) => {
+					this.deleteResult.set(result);
+					this.deleting.set(false);
+				},
+				error: () => {
+					this.deleting.set(false);
 				},
 			});
 	}

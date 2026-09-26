@@ -76,6 +76,14 @@ export class BulkTestDataFacade {
 		return this.api.eliminarUsuariosPrueba().pipe(this.deletePipe('usuarios'));
 	}
 
+	eliminarMatriculasPrueba(): Observable<BorradoMasivoResponseDto> {
+		return this.api.eliminarMatriculasPrueba().pipe(this.deletePipe('matrículas'));
+	}
+
+	eliminarCalificacionesPrueba(): Observable<BorradoMasivoResponseDto> {
+		return this.api.eliminarCalificacionesPrueba().pipe(this.deletePipe('calificaciones'));
+	}
+
 	private resultPipe(entidadLabel: string): OperatorFunction<CreacionMasivaResponseDto, CreacionMasivaResponseDto> {
 		return pipe(
 			tap((response: CreacionMasivaResponseDto) => {

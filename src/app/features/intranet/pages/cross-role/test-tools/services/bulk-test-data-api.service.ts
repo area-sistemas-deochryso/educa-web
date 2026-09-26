@@ -107,5 +107,16 @@ export class BulkTestDataApiService {
 	eliminarUsuariosPrueba(): Observable<BorradoMasivoResponseDto> {
 		return this.http.delete<BorradoMasivoResponseDto>(`${this.baseUrl}/api/sistema/usuarios/prueba/eliminar`);
 	}
+
+	eliminarMatriculasPrueba(): Observable<BorradoMasivoResponseDto> {
+		return this.http.delete<BorradoMasivoResponseDto>(
+			`${this.baseUrl}/api/sistema/salones/prueba/matriculas/eliminar`,
+		);
+	}
+
+	// Ver nota de generarCalificaciones — CalificacionController no sigue la convención `api/sistema/`.
+	eliminarCalificacionesPrueba(): Observable<BorradoMasivoResponseDto> {
+		return this.http.delete<BorradoMasivoResponseDto>(`${this.baseUrl}/api/Calificacion/prueba/eliminar`);
+	}
 }
 // #endregion
