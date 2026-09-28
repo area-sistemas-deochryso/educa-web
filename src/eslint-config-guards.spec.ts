@@ -1,5 +1,5 @@
 // #region Imports
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { ESLint, type Linter } from 'eslint';
 import { resolve } from 'node:path';
 
@@ -10,6 +10,13 @@ import { resolve } from 'node:path';
 // Verifican que las reglas clave siguen aplicadas tras el fix G10:
 // un cambio accidental en el flat config que saque `layer-enforcement/*` o
 // `no-restricted-imports` de un scope haría fallar estos tests en CI.
+
+// `configFor()` paga un cold-start de I/O/parsing en su primera invocación
+// (resolver eslint.config.js + plugins). Bajo contención de recursos en la
+// suite completa (miles de tests en paralelo) puede superar el testTimeout
+// default (5000ms) — confirmado en P77 F6 (brief 719). Se sube el timeout
+// solo para este archivo, sin tocar el resto de la suite.
+vi.setConfig({ testTimeout: 15000 });
 
 const PROJECT_ROOT = resolve(__dirname, '..');
 const eslint = new ESLint({ cwd: PROJECT_ROOT });
