@@ -531,6 +531,18 @@ export const INTRANET_ROUTES: Routes = [
 			},
 			...MONITOREO_LEGACY_REDIRECTS,
 			{
+				// Plan 41 F5 (brief 720) — búsqueda full-text de correlation ids.
+				// Ruta literal, debe listarse antes de `:id` para que el routing la
+				// resuelva por precedencia (segmento literal > parámetro). Reusa el
+				// mismo permissionPath que el hub de detalle — misma capability BE
+				// (CORRELATION_LOGS) — sin necesidad de sembrar un CAP_Ruta nuevo.
+				path: 'admin/correlation/buscar',
+				loadComponent: () =>
+					import('./pages/admin/correlation/search').then((m) => m.CorrelationSearchComponent),
+				data: { permissionPath: 'intranet/admin/monitoreo/incidencias/errores' },
+				title: 'Intranet - Buscar correlación',
+			},
+			{
 				// Plan 32 Chat 4 — Hub central que cruza los 4 tipos de telemetría que
 				// comparten un correlation id. Deep-link only (sin entrada de menú).
 				// Reusa el permiso de error-logs vía data.permissionPath porque la ruta

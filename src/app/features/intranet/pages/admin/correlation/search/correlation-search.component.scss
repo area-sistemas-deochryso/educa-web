@@ -1,0 +1,108 @@
+// #region Form
+.search-form {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+	gap: 0.75rem 1rem;
+	margin-bottom: 1rem;
+	padding: 1rem;
+	background: transparent;
+	border-radius: 10px;
+	border: 1px solid var(--surface-300);
+}
+
+.field {
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
+	min-width: 0;
+
+	&--query {
+		grid-column: span 2;
+	}
+
+	&--actions {
+		flex-direction: row;
+		align-items: flex-end;
+		gap: 0.5rem;
+	}
+
+	label {
+		color: var(--text-color-secondary);
+	}
+
+	p-iconfield,
+	p-datepicker {
+		width: 100%;
+	}
+}
+
+@media (max-width: 640px) {
+	.search-form {
+		grid-template-columns: 1fr;
+	}
+
+	.field--query {
+		grid-column: auto;
+	}
+}
+// #endregion
+
+// #region Hints y estados
+.search-hint {
+	margin: 0 0 1rem;
+	font-size: 0.85rem;
+
+	&--error {
+		color: var(--red-600);
+	}
+}
+
+.search-loading,
+.search-error,
+.search-empty {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 3rem 1.5rem;
+	text-align: center;
+	color: var(--text-color-secondary);
+
+	i {
+		font-size: 2rem;
+	}
+
+	p {
+		margin: 0;
+	}
+}
+
+.search-error i {
+	color: var(--red-600);
+}
+// #endregion
+
+// #region Resultados
+.search-results {
+	margin-top: 1rem;
+	padding: 1rem 1.25rem;
+	border: 1px solid var(--surface-300);
+	border-radius: 10px;
+	background: transparent;
+
+	&__title {
+		margin: 0 0 0.75rem;
+		font-size: 0.8rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+		color: var(--text-color-secondary);
+	}
+
+	&__list {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+	}
+}
+// #endregion

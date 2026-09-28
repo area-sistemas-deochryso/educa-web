@@ -200,3 +200,16 @@ export const TIMELINE_KIND_LABEL_MAP: Record<TimelineEventKind, string> = {
 	outbox: 'Correo',
 };
 // #endregion
+
+// #region Search (Plan 41 F5)
+/**
+ * Filtros de `GET /api/sistema/correlation/search`. `dni` son los últimos 4
+ * dígitos (mismo criterio que la resolución de related ids del hub).
+ */
+export interface CorrelationSearchFiltro {
+	query: string;
+	dni?: string | null;
+	desde?: string | null;
+	hasta?: string | null;
+}
+// #endregion

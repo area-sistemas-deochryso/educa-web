@@ -1,0 +1,123 @@
+<app-page-header
+	icon="pi pi-search"
+	title="Buscar correlación"
+	subtitle="Encontrá un correlation id por contenido: mensaje de error, descripción de feedback o asunto/error de un correo"
+/>
+
+<form class="search-form" (ngSubmit)="onSearch()">
+	<div class="field field--query">
+		<label class="label-uppercase" for="search-query">Búsqueda</label>
+		<edu-icon-field>
+			<edu-input-icon styleClass="pi pi-search" />
+			<input
+				id="search-query"
+				eduInputText
+				type="text"
+				data-info-anchor="admin-correlation-search-query-input"
+				placeholder="Parte del mensaje, descripción o asunto..."
+				[ngModel]="query()"
+				(ngModelChange)="query.set($event)"
+				name="query"
+			/>
+		</edu-icon-field>
+	</div>
+
+	<div class="field">
+		<label class="label-uppercase" for="search-dni">DNI (últimos 4)</label>
+		<input
+			id="search-dni"
+			eduInputText
+			type="text"
+			maxlength="4"
+			inputmode="numeric"
+			data-info-anchor="admin-correlation-search-dni-input"
+			placeholder="1234"
+			[ngModel]="dni()"
+			(ngModelChange)="dni.set($event)"
+			name="dni"
+		/>
+	</div>
+
+	<div class="field">
+		<label class="label-uppercase">Desde</label>
+		<edu-datepicker
+			placeholder="dd/mm/yyyy"
+			dateFormat="yy-mm-dd"
+			[showIcon]="true"
+			appendTo="body"
+			data-info-anchor="admin-correlation-search-desde-datepicker"
+			[ngModel]="desde()"
+			(ngModelChange)="desde.set($event)"
+			name="desde"
+			[showClear]="true"
+		/>
+	</div>
+
+	<div class="field">
+		<label class="label-uppercase">Hasta</label>
+		<edu-datepicker
+			placeholder="dd/mm/yyyy"
+			dateFormat="yy-mm-dd"
+			[showIcon]="true"
+			appendTo="body"
+			data-info-anchor="admin-correlation-search-hasta-datepicker"
+			[ngModel]="hasta()"
+			(ngModelChange)="hasta.set($event)"
+			name="hasta"
+			[showClear]="true"
+		/>
+	</div>
+
+	<div class="field field--actions">
+		<edu-button
+			type="submit"
+			label="Buscar"
+			icon="pi pi-search"
+			[disabled]="loading() || !!validationError() || query().trim().length === 0"
+			[loading]="loading()"
+			data-info-anchor="admin-correlation-search-submit"
+		/>
+		<edu-button
+			type="button"
+			label="Limpiar"
+			icon="pi pi-filter-slash"
+			[text]="true"
+			(click)="onClear()"
+			data-info-anchor="admin-correlation-search-clear"
+		/>
+	</div>
+</form>
+
+@if (validationError()) {
+	<p class="search-hint search-hint--error" role="alert">{{ validationError() }}</p>
+}
+
+@if (loading()) {
+	<div class="search-loading">
+		<i class="pi pi-spinner pi-spin"></i>
+		<p>Buscando…</p>
+	</div>
+} @else if (error()) {
+	<div class="search-error">
+		<i class="pi pi-exclamation-triangle"></i>
+		<p>{{ error() }}</p>
+	</div>
+} @else if (results() !== null) {
+	@if (results()!.length === 0) {
+		<div class="search-empty">
+			<i class="pi pi-info-circle"></i>
+			<p>Sin resultados para esta búsqueda.</p>
+		</div>
+	} @else {
+		<section class="search-results" aria-labelledby="search-results-title">
+			<h3 id="search-results-title" class="search-results__title">
+				{{ results()!.length }} correlation id(s) encontrados
+			</h3>
+			<div class="search-results__list">
+				@for (id of results(); track id) {
+					<app-correlation-id-pill [id]="id" />
+				}
+			</div>
+		</section>
+	}
+}

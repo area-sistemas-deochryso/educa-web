@@ -23,6 +23,15 @@
 	<div class="header-actions">
 		<app-error-groups-view-toggle [activeMode]="viewMode()" (modeChange)="onViewModeChange($event)" />
 		<edu-button
+			icon="pi pi-search"
+			label="Buscar correlación"
+			[outlined]="true"
+			size="small"
+			(click)="onGoToCorrelationSearch()"
+			data-info-anchor="admin-error-groups-correlation-search-btn"
+			eduTooltip="Buscar un correlation id por contenido"
+		/>
+		<edu-button
 			icon="pi pi-download"
 			label="Exportar CSV"
 			[outlined]="true"

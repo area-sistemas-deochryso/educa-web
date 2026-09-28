@@ -256,6 +256,10 @@ export class ErrorGroupsComponent implements OnInit {
 	onRefresh(): void {
 		this.dataFacade.refresh();
 	}
+	/** Plan 41 F5 (brief 720) — entrada al hub de búsqueda de correlation ids. */
+	onGoToCorrelationSearch(): void {
+		void this.router.navigate(['/intranet/admin/correlation/buscar']);
+	}
 	onExportGrupos(): void {
 		this.dataFacade.exportarGrupos();
 	}
