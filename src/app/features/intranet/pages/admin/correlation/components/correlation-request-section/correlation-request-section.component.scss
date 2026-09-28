@@ -1,0 +1,40 @@
+@use '../shared-section.scss';
+
+.correlation-request-section {
+	&__row {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 0.5rem 0;
+	}
+
+	&__route {
+		max-width: 320px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	&__duration {
+		font-weight: 600;
+	}
+
+	&__meta {
+		color: var(--edu-text-muted, #6b7280);
+		font-size: 0.85rem;
+	}
+
+	&__p95 {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+		margin: 0.25rem 0 0;
+		font-size: 0.85rem;
+		color: var(--edu-text-muted, #6b7280);
+
+		&--over {
+			color: var(--edu-severity-warn, #b45309);
+		}
+	}
+}

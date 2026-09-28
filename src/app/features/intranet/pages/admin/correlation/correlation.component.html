@@ -146,6 +146,8 @@
 		</div>
 	}
 
+	<app-correlation-request-section [metric]="vm().snapshot?.requestMetric ?? null" />
+
 	@if (viewMode() === 'timeline') {
 		<app-correlation-timeline-section [events]="vm().timelineEvents" />
 	} @else {

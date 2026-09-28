@@ -32,10 +32,12 @@ export const requestTraceInterceptor: HttpInterceptorFn = (req, next) => {
 	const activityTracker = inject(ActivityTrackerService);
 	const errorReporter = inject(ErrorReporterService);
 
-	// Always send X-Request-Id for backend correlation (prod + dev)
+	// Always send X-Request-Id for backend correlation (prod + dev).
+	// Plan 41 F3 — X-Platform identifica el origen del request para el
+	// lifecycle persistido en RequestLifecycleLog (hub de correlación).
 	const requestId = generateRequestId();
 	const tracedReq = req.clone({
-		setHeaders: { 'X-Request-Id': requestId },
+		setHeaders: { 'X-Request-Id': requestId, 'X-Platform': 'WEB' },
 	});
 
 	// Skip tracking requestIds for the feedback endpoint itself — when the user

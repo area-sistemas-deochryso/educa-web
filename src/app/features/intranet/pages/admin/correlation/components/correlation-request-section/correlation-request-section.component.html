@@ -1,0 +1,46 @@
+<section class="correlation-section correlation-request-section">
+	<header class="correlation-section__header">
+		<div class="correlation-section__title">
+			<i class="pi pi-bolt"></i>
+			<h3>Request</h3>
+		</div>
+	</header>
+
+	@if (!hasMetric()) {
+		<div class="correlation-section__empty">
+			<i class="pi pi-info-circle"></i>
+			<p>Request no registrado para este correlation id.</p>
+		</div>
+	} @else if (metric(); as m) {
+		<div class="correlation-request-section__row">
+			<span class="cell-mono">{{ m.httpMethod }}</span>
+			<span class="cell-mono correlation-request-section__route" [eduTooltip]="m.route" eduTooltipPosition="top">
+				{{ m.route }}
+			</span>
+			<edu-tag [value]="'' + m.statusCode" [severity]="getStatusSeverity(m.statusCode)" />
+			<span class="correlation-request-section__duration">{{ m.durationMs | number: '1.0-0' }} ms</span>
+			<span class="correlation-request-section__meta">{{ m.fecha | date: 'dd/MM/yyyy HH:mm:ss' }}</span>
+			@if (m.usuarioDniMasked) {
+				<span class="correlation-request-section__meta">
+					{{ m.usuarioDniMasked }}{{ m.usuarioRol ? ' · ' + m.usuarioRol : '' }}
+				</span>
+			}
+			@if (m.plataforma) {
+				<span class="correlation-request-section__meta">{{ m.plataforma }}</span>
+			}
+		</div>
+
+		@if (comparison(); as c) {
+			<p class="correlation-request-section__p95" [class.correlation-request-section__p95--over]="c.overP95">
+				<i class="pi" [class.pi-arrow-up]="c.overP95" [class.pi-arrow-down]="!c.overP95"></i>
+				{{ c.overP95 ? 'Por encima' : 'Por debajo' }} del p95 de la ruta
+				({{ m.routeP95Ms | number: '1.0-0' }} ms) en {{ c.delta | number: '1.0-0' }} ms.
+			</p>
+		} @else {
+			<p class="correlation-request-section__p95">
+				<i class="pi pi-info-circle"></i>
+				Sin dato reciente de p95 para esta ruta.
+			</p>
+		}
+	}
+</section>

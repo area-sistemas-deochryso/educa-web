@@ -80,6 +80,23 @@ export interface CorrelationEmailOutboxDto {
 }
 
 /**
+ * Plan 41 F3 — lifecycle HTTP persistido del request correlacionado, cuando existe
+ * (solo se persiste para requests con status >= 400). `routeP95Ms` es "best effort"
+ * (tracker en memoria, ventana de 5 min) — `null` si la ruta no tuvo tráfico reciente.
+ */
+export interface CorrelationRequestMetricDto {
+	route: string;
+	httpMethod: string;
+	statusCode: number;
+	durationMs: number;
+	usuarioDniMasked: string | null;
+	usuarioRol: string | null;
+	plataforma: string | null;
+	fecha: string;
+	routeP95Ms: number | null;
+}
+
+/**
  * Snapshot agregado de los 4 tipos de evento que comparten un CorrelationId.
  * Cada lista es independiente — el BE deja vacía la sección que falle (INV-S07)
  * y devuelve las 4 igualmente. Cap defensivo de 100 filas por sección.
@@ -99,6 +116,14 @@ export interface CorrelationSnapshot {
 	 * pre-Plan 41 F2.
 	 */
 	relatedCorrelationIds?: string[];
+	/**
+	 * Plan 41 F3 — lifecycle HTTP persistido del request, o `null` si no hay
+	 * registro (request exitoso, o correlación pre-deploy de esta fase). El
+	 * hub muestra la sección siempre, con un aviso explícito de "no registrado"
+	 * cuando es `null` — nunca oculta la sección. Opcional para compatibilidad
+	 * con BEs pre-Plan 41 F3.
+	 */
+	requestMetric?: CorrelationRequestMetricDto | null;
 }
 // #endregion
 
