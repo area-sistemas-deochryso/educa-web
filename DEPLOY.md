@@ -295,6 +295,24 @@ Ver `@.claude/rules/feature-flags.md` para el catalogo completo.
 
 ---
 
+## 5b. Monitoreo Basico de Performance
+
+No hace falta Datadog. Hace falta saber si una query paso de 200ms a 5s.
+
+### Que ya existe (verificado, P15 F5)
+
+- **`RequestMetricsMiddleware`** (`Educa.API/Middleware/RequestMetricsMiddleware.cs`) mide duracion y errores de cada request `/api/*` y los registra en `RequestPercentileTracker` (ventana deslizante de 5 min, por endpoint) y en `AppMetrics` (OpenTelemetry).
+- **Destino consultable**: en produccion, `AppMetrics` se exporta a Application Insights via Azure Monitor (`ObservabilityExtensions.AddObservability`, activo si `ApplicationInsights:ConnectionString` esta configurado). Ademas, un snapshot periodico (p50/p95/p99, threadpool, GC) se persiste en la tabla `RuntimeHealthSnapshot` (SQL, consultable directo).
+- **Dashboard de endpoints lentos**: `GET /api/sistema/runtime-health/slow-requests?top=10` (`RuntimeHealthController`) expone el top-N por p95 via `RequestPercentileTracker.GetTopEndpoints`. Consumido por la pagina admin `/intranet/admin/sistema/runtime-health` (componente `slow-requests-table`) — ya es un dashboard visual, no solo una query.
+
+### Practica de revision (F5.3)
+
+- **Cadencia**: revisar `/intranet/admin/sistema/runtime-health` (seccion "Endpoints lentos" + alertas) **1x por semana**, los primeros meses tras cada release grande.
+- **Que mirar**: endpoints en el top-10 con p95 fuera de lo esperado para esa ruta, y cualquier alerta de saturacion (`GetAlerts`) sin resolver.
+- **Accion**: si un endpoint aparece consistentemente lento semana a semana (no un pico puntual), abrir un chat de `/investigate` sobre ese endpoint especifico — no es un ticket automatico, es criterio manual.
+
+---
+
 ## 6. Notas Importantes
 
 ### Service Worker (cache)
