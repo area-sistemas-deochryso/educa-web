@@ -38,6 +38,16 @@
 	gap: 0.5rem;
 }
 
+.contact-filter {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	font-size: 0.875rem;
+	color: var(--text-color);
+	cursor: pointer;
+	white-space: nowrap;
+}
+
 .btn-clear {
 	margin-left: auto;
 	opacity: 0.5;

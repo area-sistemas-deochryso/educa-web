@@ -54,6 +54,7 @@ export class UsersService {
 		salonId?: number,
 		sortField?: string | null,
 		sortOrder?: 'asc' | 'desc' | null,
+		sinCorreoApoderado?: boolean,
 	): Observable<PaginatedResponse<UsuarioLista>> {
 		const params: Record<string, string> = {
 			page: page.toString(),
@@ -65,6 +66,7 @@ export class UsersService {
 		if (salonId) params['salonId'] = salonId.toString();
 		if (sortField) params['sortField'] = sortField;
 		if (sortOrder) params['sortOrder'] = sortOrder;
+		if (sinCorreoApoderado) params['sinCorreoApoderado'] = 'true';
 
 		return this.http.get<PaginatedResponse<UsuarioLista>>(`${this.apiUrl}/listar`, { params });
 	}

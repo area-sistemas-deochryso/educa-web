@@ -88,6 +88,7 @@ export class UsersDataFacade {
 		const salonId = this.store.filterSalonId() ?? undefined;
 		const sortField = this.store.sortField();
 		const sortOrder = this.store.sortOrder();
+		const sinCorreoApoderado = this.store.filterSinCorreoApoderado() || undefined;
 		const itemsRequestId = this.beginItemsRequest();
 
 		forkJoin({
@@ -112,7 +113,7 @@ export class UsersDataFacade {
 					return of([] as SedeSimpleDto[]);
 				}),
 			),
-			usuarios: this.usuariosService.listarUsuariosPaginado(page, pageSize, rol, estado, search, salonId, sortField, sortOrder).pipe(
+			usuarios: this.usuariosService.listarUsuariosPaginado(page, pageSize, rol, estado, search, salonId, sortField, sortOrder, sinCorreoApoderado).pipe(
 				withRetry({ tag: 'UsuariosDataFacade:loadUsuarios' }),
 				catchError((err) => {
 					this.errHandler.handle(err, 'cargar usuarios');
@@ -187,6 +188,7 @@ export class UsersDataFacade {
 			profesores: 'Profesor',
 		};
 		this.store.setFilterRol(tab ? (rolMap[tab] ?? null) : null);
+		if (tab !== 'estudiantes') this.store.setFilterSinCorreoApoderado(false);
 		this.store.setPage(1);
 		this.refreshUsuariosOnly();
 	}
@@ -205,6 +207,12 @@ export class UsersDataFacade {
 
 	setFilterSalonId(salonId: number | null): void {
 		this.store.setFilterSalonId(salonId);
+		this.store.setPage(1);
+		this.refreshUsuariosOnly();
+	}
+
+	setFilterSinCorreoApoderado(value: boolean): void {
+		this.store.setFilterSinCorreoApoderado(value);
 		this.store.setPage(1);
 		this.refreshUsuariosOnly();
 	}
@@ -234,10 +242,11 @@ export class UsersDataFacade {
 		const salonId = this.store.filterSalonId() ?? undefined;
 		const sortField = this.store.sortField();
 		const sortOrder = this.store.sortOrder();
+		const sinCorreoApoderado = this.store.filterSinCorreoApoderado() || undefined;
 		const itemsRequestId = this.beginItemsRequest();
 
 		this.usuariosService
-			.listarUsuariosPaginado(page, pageSize, rol, estado, search, salonId, sortField, sortOrder)
+			.listarUsuariosPaginado(page, pageSize, rol, estado, search, salonId, sortField, sortOrder, sinCorreoApoderado)
 			.pipe(
 				withRetry({ tag: 'UsuariosDataFacade:refreshUsuariosOnly' }),
 				catchError((err) => {
@@ -332,10 +341,11 @@ export class UsersDataFacade {
 					const salonId = this.store.filterSalonId() ?? undefined;
 					const sortField = this.store.sortField();
 					const sortOrder = this.store.sortOrder();
+					const sinCorreoApoderado = this.store.filterSinCorreoApoderado() || undefined;
 					const itemsRequestId = this.beginItemsRequest();
 
 					return this.usuariosService
-						.listarUsuariosPaginado(page, pageSize, rol, estado, search || undefined, salonId, sortField, sortOrder)
+						.listarUsuariosPaginado(page, pageSize, rol, estado, search || undefined, salonId, sortField, sortOrder, sinCorreoApoderado)
 						.pipe(
 							withRetry({ tag: 'UsuariosDataFacade:searchUsuarios' }),
 							catchError((err) => {

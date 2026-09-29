@@ -49,12 +49,14 @@
 		[searchTerm]="vm().searchTerm"
 		[filterEstado]="vm().filterEstado"
 		[filterSalonId]="vm().filterSalonId"
+		[filterSinCorreoApoderado]="vm().filterSinCorreoApoderado"
 		[salones]="vm().salonesFilter"
 		[options]="filterOptions"
 		[activeTab]="vm().activeTab"
 		(searchChange)="onSearchChange($event)"
 		(filterEstadoChange)="onFilterEstadoChange($event)"
 		(filterSalonIdChange)="onFilterSalonIdChange($event)"
+		(filterSinCorreoApoderadoChange)="onFilterSinCorreoApoderadoChange($event)"
 		(clearFilters)="onClearFilters()"
 	/>
 

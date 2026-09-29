@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, input, output, si
 import { DatePipe } from '@angular/common';
 import { UsuarioLista } from '../../services';
 import { RoleTab } from '../../models';
+import { hasMissingGuardianEmail, MISSING_GUARDIAN_EMAIL_LABEL } from '../../helpers/usuario-contact.utils';
 import { UiMappingService } from '@intranet-shared/services';
 import { FullNamePipe } from '@shared/pipes';
 import { TableLoadingDirective } from '@intranet-shared/directives';
@@ -63,6 +64,9 @@ export class UsersTableComponent {
 		}
 		return { inicial, primaria, secundaria };
 	});
+
+	readonly missingGuardianEmailLabel = MISSING_GUARDIAN_EMAIL_LABEL;
+	readonly hasMissingGuardianEmail = hasMissingGuardianEmail;
 
 	private initialLoadDone = false;
 

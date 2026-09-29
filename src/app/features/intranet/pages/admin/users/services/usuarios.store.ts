@@ -27,6 +27,17 @@ import {
 
 type UsuarioFormData = Partial<CrearUsuarioRequest & ActualizarUsuarioRequest>;
 
+const DEFAULT_FORM_DATA: UsuarioFormData = {
+	dni: '',
+	nombres: '',
+	apellidos: '',
+	contrasena: '',
+	rol: undefined,
+	estado: true,
+	salonId: undefined,
+	salones: undefined,
+};
+
 /**
  * Store para gestión de usuarios.
  * Extiende BaseCrudStore para items, loading, error, dialog, pagination, filtros base.
@@ -38,29 +49,11 @@ export class UsersStore extends BaseCrudStore<UsuarioLista, UsuarioFormData, Usu
 	private log = this.debug.dbg('STORE:Usuarios');
 
 	constructor() {
-		super({
-			dni: '',
-			nombres: '',
-			apellidos: '',
-			contrasena: '',
-			rol: undefined,
-			estado: true,
-			salonId: undefined,
-			salones: undefined,
-		});
+		super({ ...DEFAULT_FORM_DATA });
 	}
 
 	protected override getDefaultFormData(): UsuarioFormData {
-		return {
-			dni: '',
-			nombres: '',
-			apellidos: '',
-			contrasena: '',
-			rol: undefined,
-			estado: true,
-			salonId: undefined,
-			salones: undefined,
-		};
+		return { ...DEFAULT_FORM_DATA };
 	}
 
 	// #region Estado privado — Feature-specific
@@ -80,6 +73,7 @@ export class UsersStore extends BaseCrudStore<UsuarioLista, UsuarioFormData, Usu
 	private readonly _selectedUsuario = signal<UsuarioDetalle | null>(null);
 	private readonly _filterRol = signal<string | null>(null);
 	private readonly _filterSalonId = signal<number | null>(null);
+	private readonly _filterSinCorreoApoderado = signal(false);
 	private readonly _refreshCounter = signal(0);
 	private readonly _activeTab = signal<RoleTab>(null);
 	private readonly _sortField = signal<string | null>(null);
@@ -105,6 +99,7 @@ export class UsersStore extends BaseCrudStore<UsuarioLista, UsuarioFormData, Usu
 	readonly selectedUsuario = this._selectedUsuario.asReadonly();
 	readonly filterRol = this._filterRol.asReadonly();
 	readonly filterSalonId = this._filterSalonId.asReadonly();
+	readonly filterSinCorreoApoderado = this._filterSinCorreoApoderado.asReadonly();
 	readonly refreshCounter = this._refreshCounter.asReadonly();
 	readonly activeTab = this._activeTab.asReadonly();
 	readonly sortField = this._sortField.asReadonly();
@@ -170,6 +165,7 @@ export class UsersStore extends BaseCrudStore<UsuarioLista, UsuarioFormData, Usu
 		filterRol: this._filterRol(),
 		filterEstado: this.filterEstado() as boolean | null,
 		filterSalonId: this._filterSalonId(),
+		filterSinCorreoApoderado: this._filterSinCorreoApoderado(),
 		activeTab: this._activeTab(),
 		sortField: this._sortField(),
 		sortOrder: this._sortOrder(),
@@ -222,6 +218,10 @@ export class UsersStore extends BaseCrudStore<UsuarioLista, UsuarioFormData, Usu
 
 	setFilterSalonId(salonId: number | null): void {
 		this._filterSalonId.set(salonId);
+	}
+
+	setFilterSinCorreoApoderado(value: boolean): void {
+		this._filterSinCorreoApoderado.set(value);
 	}
 
 	setActiveTab(tab: RoleTab): void {
@@ -304,6 +304,7 @@ export class UsersStore extends BaseCrudStore<UsuarioLista, UsuarioFormData, Usu
 	protected override onClearFiltros(): void {
 		this._filterRol.set(null);
 		this._filterSalonId.set(null);
+		this._filterSinCorreoApoderado.set(false);
 	}
 	// #endregion
 

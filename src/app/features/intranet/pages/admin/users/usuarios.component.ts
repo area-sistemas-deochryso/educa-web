@@ -173,6 +173,10 @@ export class UsersComponent implements AfterViewInit {
 		this.dataFacade.setFilterSalonId(value);
 	}
 
+	onFilterSinCorreoApoderadoChange(value: boolean): void {
+		this.dataFacade.setFilterSinCorreoApoderado(value);
+	}
+
 	onClearFilters(): void { this.dataFacade.clearFilters(); }
 	onLazyLoad(event: { page: number; pageSize: number; sortField: string | null; sortOrder: 'asc' | 'desc' | null }): void {
 		this.dataFacade.loadPage(event.page, event.pageSize, event.sortField, event.sortOrder);

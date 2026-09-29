@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { periodoActual, filtrarPorPeriodoAcademico } from '@shared/models';
 import { SalonListDto } from '@features/intranet/pages/admin/schedules/models/salon.interface';
 import { RoleTab } from '../../models';
-import { EduButton, EduInputText, EduSelect, EduTooltip } from '@edu-ui';
+import { EduButton, EduCheckbox, EduInputText, EduSelect, EduTooltip } from '@edu-ui';
 
 export interface FilterOptions {
 	estadoOptions: { label: string; value: boolean | null }[];
@@ -12,7 +12,7 @@ export interface FilterOptions {
 @Component({
 	selector: 'app-users-filters',
 	standalone: true,
-	imports: [FormsModule, EduButton, EduInputText, EduSelect, EduTooltip],
+	imports: [FormsModule, EduButton, EduCheckbox, EduInputText, EduSelect, EduTooltip],
 	templateUrl: './usuarios-filters.component.html',
 	styleUrl: './usuarios-filters.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -21,6 +21,7 @@ export class UsersFiltersComponent {
 	readonly searchTerm = input.required<string>();
 	readonly filterEstado = input.required<boolean | null>();
 	readonly filterSalonId = input.required<number | null>();
+	readonly filterSinCorreoApoderado = input<boolean>(false);
 	readonly salones = input.required<SalonListDto[]>();
 	readonly options = input.required<FilterOptions>();
 	readonly activeTab = input<RoleTab>(null);
@@ -28,6 +29,7 @@ export class UsersFiltersComponent {
 	readonly searchChange = output<string>();
 	readonly filterEstadoChange = output<boolean | null>();
 	readonly filterSalonIdChange = output<number | null>();
+	readonly filterSinCorreoApoderadoChange = output<boolean>();
 	readonly clearFilters = output<void>();
 
 	private readonly periodo = periodoActual();
@@ -36,6 +38,8 @@ export class UsersFiltersComponent {
 		const tab = this.activeTab();
 		return tab !== 'admin';
 	});
+
+	readonly showContactFilter = computed(() => this.activeTab() === 'estudiantes');
 
 	readonly salonOptions = computed(() => {
 		const salonesFiltrados = filtrarPorPeriodoAcademico(
@@ -55,7 +59,10 @@ export class UsersFiltersComponent {
 	});
 
 	readonly hasActiveFilters = computed(() =>
-		this.filterEstado() !== null || this.filterSalonId() !== null || this.searchTerm() !== '',
+		this.filterEstado() !== null ||
+		this.filterSalonId() !== null ||
+		this.filterSinCorreoApoderado() ||
+		this.searchTerm() !== '',
 	);
 
 	onSearchChange(value: string): void {
@@ -68,6 +75,10 @@ export class UsersFiltersComponent {
 
 	onFilterSalonIdChange(value: number | null): void {
 		this.filterSalonIdChange.emit(value);
+	}
+
+	onFilterSinCorreoApoderadoChange(value: boolean): void {
+		this.filterSinCorreoApoderadoChange.emit(value);
 	}
 
 	onClearFilters(): void {

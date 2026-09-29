@@ -36,6 +36,19 @@
 				data-info-anchor="admin-users-salon-filter"
 			/>
 		}
+
+		@if (showContactFilter()) {
+			<label class="contact-filter" for="filter-sin-correo-apoderado">
+				<edu-checkbox
+					inputId="filter-sin-correo-apoderado"
+					[binary]="true"
+					[ngModel]="filterSinCorreoApoderado()"
+					(ngModelChange)="onFilterSinCorreoApoderadoChange($event)"
+					data-info-anchor="admin-users-missing-contact-filter"
+				/>
+				<span>Contacto incompleto</span>
+			</label>
+		}
 	</div>
 
 	@if (hasActiveFilters()) {

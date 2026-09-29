@@ -61,6 +61,16 @@
 								@if (hasMultipleSalones(usuario)) {
 									<i class="pi pi-building salon-hint"></i>
 								}
+								@if (hasMissingGuardianEmail(usuario)) {
+									<i
+										class="pi pi-exclamation-triangle missing-contact-hint"
+										role="img"
+										[attr.aria-label]="missingGuardianEmailLabel"
+										[eduTooltip]="missingGuardianEmailLabel"
+										eduTooltipPosition="top"
+										data-info-anchor="admin-users-missing-guardian-email"
+									></i>
+								}
 							</span>
 							@if (usuario.correo) {
 								<span class="user-email">{{ usuario.correo }}</span>
