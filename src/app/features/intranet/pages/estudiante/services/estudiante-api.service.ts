@@ -12,6 +12,7 @@ import {
 	EstudianteTareaArchivoDto,
 	RegistrarEstudianteTareaArchivoRequest,
 	EstudianteMisNotasDto,
+	TareaPorVencerDto,
 	MiAsistenciaCursoResumenDto,
 	MiAsistenciaResolucionDto,
 	GruposResumenDto,
@@ -71,6 +72,10 @@ export class EstudianteApiService {
 
 	getMisNotasCurso(contenidoId: number): Observable<EstudianteMisNotasDto> {
 		return this.http.get<EstudianteMisNotasDto>(`${this.baseUrl}/mis-notas/${contenidoId}`);
+	}
+
+	getMisTareasPorVencer(): Observable<TareaPorVencerDto[]> {
+		return this.http.get<TareaPorVencerDto[]>(`${this.baseUrl}/mis-tareas-por-vencer`);
 	}
 
 	getServerTime(): Observable<string | null> {

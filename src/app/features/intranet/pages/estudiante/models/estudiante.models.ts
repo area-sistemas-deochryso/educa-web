@@ -115,3 +115,14 @@ export interface JustificarInasistenciaContext {
 	motivoRechazoAnterior: string | null;
 }
 // #endregion
+
+// #region Plazos de Inicio
+/** Tarea pendiente con `fechaLimite` en los próximos 7 días (widget de Inicio). */
+export interface TareaPorVencerDto {
+	tareaId: number;
+	titulo: string;
+	cursoNombre: string;
+	fechaLimite: string;
+	horarioId: number;
+}
+// #endregion

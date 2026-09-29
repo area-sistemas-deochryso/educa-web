@@ -18,6 +18,7 @@ import {
 	RegistrarTareaArchivoRequest,
 	EstudianteTareaArchivosGroupDto,
 	CalificacionConNotasDto,
+	EvaluacionPorCongelarseDto,
 	CrearCalificacionDto,
 	CalificarLoteDto,
 	ActualizarNotaDto,
@@ -136,6 +137,10 @@ export class ProfesorCursosApiService {
 	// #endregion
 
 	// #region Calificaciones
+	getEvaluacionesPorCongelarse(): Observable<EvaluacionPorCongelarseDto[]> {
+		return this.http.get<EvaluacionPorCongelarseDto[]>(`${this.calificacionUrl}/por-congelarse`);
+	}
+
 	getCalificaciones(contenidoId: number): Observable<CalificacionConNotasDto[]> {
 		return this.http.get<CalificacionConNotasDto[]>(
 			`${this.calificacionUrl}/contenido/${contenidoId}`,

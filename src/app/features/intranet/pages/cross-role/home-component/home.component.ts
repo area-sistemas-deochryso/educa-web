@@ -16,6 +16,7 @@ import { ProfesorAttendanceWidgetComponent } from './components/profesor-attenda
 import { EstudianteAttendanceWidgetComponent } from './components/estudiante-attendance-widget/estudiante-attendance-widget.component';
 import { EstudianteResumenWidgetComponent } from './components/estudiante-resumen-widget/estudiante-resumen-widget.component';
 import { HorarioHoyWidgetComponent } from './components/horario-hoy-widget/horario-hoy-widget.component';
+import { PlazosWidgetComponent } from './components/plazos-widget/plazos-widget.component';
 
 // #endregion
 // #region Implementation
@@ -31,6 +32,7 @@ import { HorarioHoyWidgetComponent } from './components/horario-hoy-widget/horar
 		EstudianteAttendanceWidgetComponent,
 		EstudianteResumenWidgetComponent,
 		HorarioHoyWidgetComponent,
+		PlazosWidgetComponent,
 		CdkDropList,
 		CdkDrag,
 		CdkDragHandle,

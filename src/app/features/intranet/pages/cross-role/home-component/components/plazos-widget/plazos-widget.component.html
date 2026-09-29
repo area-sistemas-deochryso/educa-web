@@ -1,0 +1,36 @@
+<!-- #region Template -->
+@if (loading()) {
+	<div class="widget-card">
+		<div class="widget-skeleton">
+			<app-skeleton-loader variant="rect" width="40%" height="16px" />
+			<app-skeleton-loader variant="rect" width="100%" height="40px" />
+		</div>
+	</div>
+} @else if (items().length > 0) {
+	<div class="widget-card">
+		<div class="widget-header">
+			<div class="widget-title">
+				<i [class]="icon()"></i>
+				<h3>{{ title() }}</h3>
+			</div>
+			<a class="widget-link" [routerLink]="detailRoute()">Ver cursos</a>
+		</div>
+
+		<ul class="plazos-list">
+			@for (item of items(); track item.key) {
+				<li class="plazo-row">
+					<div class="plazo-info">
+						<span class="plazo-titulo">{{ item.titulo }}</span>
+						<span class="plazo-curso">{{ item.cursoNombre }}</span>
+					</div>
+					<span class="plazo-badge" [class]="'plazo-badge--' + urgencia(item)">{{ label(item) }}</span>
+				</li>
+			}
+		</ul>
+
+		@if (hiddenCount() > 0) {
+			<p class="plazos-more">y {{ hiddenCount() }} más</p>
+		}
+	</div>
+}
+<!-- #endregion -->
