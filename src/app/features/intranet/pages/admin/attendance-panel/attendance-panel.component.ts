@@ -15,6 +15,7 @@ import { AttendancePanelChartDiaComponent } from './components/attendance-panel-
 import { AttendancePanelChartLineComponent } from './components/attendance-panel-chart-line/attendance-panel-chart-line.component';
 import { AttendancePanelChartHeatmapComponent } from './components/attendance-panel-chart-heatmap/attendance-panel-chart-heatmap.component';
 import { AttendancePanelFacade } from './services';
+import { getFutureNotice } from './utils/future-period.util';
 import type { AttendancePanelBreakdownItem } from './models';
 import { EduDatePicker, EduSelect, EduSelectButton } from '@edu-ui';
 // #endregion
@@ -28,7 +29,18 @@ const CAPABILITY_SEDE_CRUZADA = 'ASISTENCIA_ADMIN';
 @Component({
 	selector: 'app-attendance-panel',
 	standalone: true,
-	imports: [FormsModule, EduSelect, EduSelectButton, EduDatePicker, StatsSkeletonComponent, AttendancePanelKpiTileComponent, AttendancePanelBreakdownComponent, AttendancePanelChartDiaComponent, AttendancePanelChartLineComponent, AttendancePanelChartHeatmapComponent],
+	imports: [
+		FormsModule,
+		EduSelect,
+		EduSelectButton,
+		EduDatePicker,
+		StatsSkeletonComponent,
+		AttendancePanelKpiTileComponent,
+		AttendancePanelBreakdownComponent,
+		AttendancePanelChartDiaComponent,
+		AttendancePanelChartLineComponent,
+		AttendancePanelChartHeatmapComponent,
+	],
 	templateUrl: './attendance-panel.component.html',
 	styleUrl: './attendance-panel.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -49,7 +61,8 @@ export class AttendancePanelComponent implements OnInit {
 	readonly rangoOptions: { label: string; value: RangoTipo }[] = [
 		{ label: 'Día', value: 'dia' },
 		{ label: 'Semana', value: 'semana' },
-		{ label: 'Mes', value: 'mes' }];
+		{ label: 'Mes', value: 'mes' },
+	];
 	// #endregion
 
 	// #region Computed
@@ -64,7 +77,21 @@ export class AttendancePanelComponent implements OnInit {
 		return !this.userPermisos.hasCapability(CAPABILITY_SEDE_CRUZADA);
 	});
 
-	readonly sedeOptions = computed(() => this.vm().sedes.map((s) => ({ label: s.nombre, value: s.id })));
+	/** Aviso cuando el periodo Semana/Mes incluye días futuros: faltan datos por tiempo, no por error. */
+	readonly futureNoticeText = computed(() => {
+		const { rango, fecha } = this.vm().filters;
+		const notice = getFutureNotice(rango, fecha, new Date());
+		if (!notice) return null;
+		if (notice.kind === 'total')
+			return 'Este periodo aún no comienza; no hay datos que mostrar.';
+		const dd = String(notice.until.getDate()).padStart(2, '0');
+		const mm = String(notice.until.getMonth() + 1).padStart(2, '0');
+		return `Los datos llegan hasta hoy (${dd}/${mm}); el resto del periodo aún no ocurrió.`;
+	});
+
+	readonly sedeOptions = computed(() =>
+		this.vm().sedes.map((s) => ({ label: s.nombre, value: s.id })),
+	);
 	// #endregion
 
 	// #region Lifecycle
