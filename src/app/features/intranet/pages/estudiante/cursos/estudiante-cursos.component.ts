@@ -9,7 +9,7 @@ import { EstudianteCursosFacade } from '../services/estudiante-cursos.facade';
 import { CursoContentReadonlyDialogComponent } from './components/curso-content-readonly-dialog/curso-content-readonly-dialog.component';
 import { HorarioProfesorDto } from '../models';
 import { SkeletonLoaderComponent } from '@shared/components';
-import { EduTag, EduTooltip } from '@edu-ui';
+import { EduButton, EduTag, EduTooltip } from '@edu-ui';
 
 const DAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
 
@@ -17,6 +17,7 @@ const DAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Vierne
 	selector: 'app-estudiante-cursos',
 	standalone: true,
 	imports: [
+		EduButton,
 		EduTag,
 		EduTooltip,
 		SkeletonLoaderComponent,
@@ -88,9 +89,7 @@ const DAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Vierne
 			<app-empty-state icon="pi pi-book" title="Mis Cursos" message="No tienes cursos asignados" />
 		} @else {
 			<app-page-header icon="pi pi-book" title="Mis Cursos">
-				<a routerLink="/intranet/estudiante/horarios" data-info-anchor="estudiante-cursos-ver-horario" class="text-sm no-underline text-primary flex align-items-center gap-1">
-					<i class="pi pi-calendar"></i> Ver horario
-				</a>
+				<edu-button label="Ver horario" icon="pi pi-calendar" size="small" [outlined]="true" data-info-anchor="estudiante-cursos-ver-horario" (click)="onVerHorario()" />
 			</app-page-header>
 
 			<div class="p-4 pt-0">
@@ -168,6 +167,10 @@ export class EstudianteCursosComponent implements OnInit {
 
 	onVerContenido(horario: HorarioProfesorDto): void {
 		this.facade.loadContenido(horario.id);
+	}
+
+	onVerHorario(): void {
+		this.router.navigate(['/intranet/estudiante/horarios']);
 	}
 
 	private handleHorarioQueryParam(): void {
