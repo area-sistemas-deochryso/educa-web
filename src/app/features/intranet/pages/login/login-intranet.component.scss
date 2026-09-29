@@ -120,6 +120,26 @@ app-login-role-selector:focus-within .login-field__icon {
 	letter-spacing: 0.06em;
 	font-weight: 600;
 }
+
+.sessions-scroll {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	/* ~3,5 tarjetas: la cuarta cortada a la mitad avisa que hay más sesiones. */
+	max-height: 15.5rem;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	scroll-snap-type: y proximity;
+	scrollbar-width: thin;
+	/* Evita recortar el box-shadow del hover de la tarjeta. */
+	padding: 4px;
+	margin: -4px;
+
+	.session-card {
+		flex-shrink: 0;
+		scroll-snap-align: start;
+	}
+}
 // #endregion
 
 // #region Session Card with Hover Actions
@@ -132,7 +152,9 @@ app-login-role-selector:focus-within .login-field__icon {
 	border-radius: 10px;
 	border: 1px solid var(--surface-border);
 	background: var(--surface-card);
-	transition: border-color 0.2s, box-shadow 0.2s;
+	transition:
+		border-color 0.2s,
+		box-shadow 0.2s;
 
 	&:hover {
 		border-color: var(--accent-interactive);
@@ -150,7 +172,9 @@ app-login-role-selector:focus-within .login-field__icon {
 	   el nombre/rol de la sesión — suben a opacidad completa en hover. */
 	opacity: 0.45;
 	transform: translateX(6px);
-	transition: opacity 0.25s ease, transform 0.25s ease;
+	transition:
+		opacity 0.25s ease,
+		transform 0.25s ease;
 
 	.session-card:hover & {
 		opacity: 1;
@@ -170,7 +194,10 @@ app-login-role-selector:focus-within .login-field__icon {
 	color: var(--text-color-secondary);
 	cursor: pointer;
 	font-size: 0.9rem;
-	transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+	transition:
+		background-color 0.15s,
+		color 0.15s,
+		border-color 0.15s;
 
 	&:disabled {
 		opacity: 0.5;

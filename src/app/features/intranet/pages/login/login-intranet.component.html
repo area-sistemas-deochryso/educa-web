@@ -9,41 +9,52 @@
 			<div class="stored-sessions">
 				<p class="sessions-label">Sesiones guardadas</p>
 
-				@for (session of storedSessions(); track session.sessionId) {
-					<div class="session-card">
-						<span class="session-avatar">{{ session.nombreCompleto | initials }}</span>
-						<span class="session-info">
-							<span class="session-name" [title]="session.nombreCompleto">{{ session.nombreCompleto }}</span>
-							<span class="session-role">{{ session.rol }}</span>
-						</span>
-						<!-- Actions: visible on hover -->
-						<div class="session-actions">
-							<button
-								type="button"
-								class="action-btn action-login"
-								aria-label="Iniciar sesión"
-								eduTooltip="Iniciar sesión"
-								eduTooltipPosition="top"
-								[disabled]="isLoading()"
-								(click)="quickLogin(session)"
-								appTrackClick="Login: quick-login sesión guardada"
-							>
-								<i class="pi pi-sign-in"></i>
-							</button>
-							<button
-								type="button"
-								class="action-btn action-remove"
-								aria-label="Cerrar sesión"
-								eduTooltip="Cerrar sesión"
-								eduTooltipPosition="top"
-								[disabled]="isLoading()"
-								(click)="removeSession($event, session)"
-							>
-								<i class="pi pi-times"></i>
-							</button>
+				<div
+					class="sessions-scroll"
+					role="region"
+					aria-label="Lista de sesiones guardadas"
+					tabindex="0"
+				>
+					@for (session of storedSessions(); track session.sessionId) {
+						<div class="session-card">
+							<span class="session-avatar">{{
+								session.nombreCompleto | initials
+							}}</span>
+							<span class="session-info">
+								<span class="session-name" [title]="session.nombreCompleto">{{
+									session.nombreCompleto
+								}}</span>
+								<span class="session-role">{{ session.rol }}</span>
+							</span>
+							<!-- Actions: visible on hover -->
+							<div class="session-actions">
+								<button
+									type="button"
+									class="action-btn action-login"
+									aria-label="Iniciar sesión"
+									eduTooltip="Iniciar sesión"
+									eduTooltipPosition="top"
+									[disabled]="isLoading()"
+									(click)="quickLogin(session)"
+									appTrackClick="Login: quick-login sesión guardada"
+								>
+									<i class="pi pi-sign-in"></i>
+								</button>
+								<button
+									type="button"
+									class="action-btn action-remove"
+									aria-label="Cerrar sesión"
+									eduTooltip="Cerrar sesión"
+									eduTooltipPosition="top"
+									[disabled]="isLoading()"
+									(click)="removeSession($event, session)"
+								>
+									<i class="pi pi-times"></i>
+								</button>
+							</div>
 						</div>
-					</div>
-				}
+					}
+				</div>
 
 				<button type="button" class="use-other-account" (click)="showForm()">
 					<i class="pi pi-user-plus"></i>
@@ -58,8 +69,13 @@
 
 		<!-- #region Login Form -->
 		@if (storedSessions().length === 0 || showLoginForm()) {
-			<form class="login-form" [formGroup]="loginForm" (ngSubmit)="onLogin()" autocomplete="on"
-				appTrackSubmit="Login: enviar formulario">
+			<form
+				class="login-form"
+				[formGroup]="loginForm"
+				(ngSubmit)="onLogin()"
+				autocomplete="on"
+				appTrackSubmit="Login: enviar formulario"
+			>
 				<!-- ! Error summary -->
 				<app-login-error-message [message]="errorMessage()" [show]="showError()" />
 
