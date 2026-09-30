@@ -2,6 +2,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 // eslint-disable-next-line layer-enforcement/imports-error -- DEBT: xrepo-87 F443
 import { UI_ERROR_CODES } from '@shared/constants';
 
+import { parseProblemDetails } from './problem-details.adapter';
+
 /**
  * Resuelve el mensaje de error priorizando `errorCode` del backend contra
  * `UI_ERROR_CODES`. Si el backend no manda `errorCode` o no está catalogado,
@@ -22,7 +24,9 @@ export function resolveErrorMessage(err: unknown, fallback: string): string {
 
 /**
  * Extrae un mensaje legible de un error HTTP o genérico.
- * Busca en orden: err.error.mensaje, err.error.message, err.message, fallback.
+ * Busca en orden: `detail` (ProblemDetails, vía `parseProblemDetails`, que también
+ * cubre `message`/`mensaje` legacy), `errors` como array de strings (BusinessRuleException),
+ * `errors` como diccionario (ValidationProblemDetails), err.message, fallback.
  *
  * @example
  * catch (err) {
@@ -32,18 +36,15 @@ export function resolveErrorMessage(err: unknown, fallback: string): string {
  */
 export function extractErrorMessage(err: unknown, fallback = 'Error desconocido'): string {
 	if (err instanceof HttpErrorResponse) {
-		// ApiResponse: mensaje / message
-		if (err.error?.mensaje) return err.error.mensaje;
-		if (err.error?.message) return err.error.message;
+		const { detail, validationErrors } = parseProblemDetails(err);
+		if (detail) return detail;
+
+		// BusinessRuleException: { errors: ["msg", ...] }
+		const errors = err.error?.errors;
+		if (Array.isArray(errors) && typeof errors[0] === 'string' && errors[0]) return errors[0];
 
 		// ASP.NET Core ValidationProblemDetails: { errors: { fieldName: ["msg"] } }
-		const validationErrors = err.error?.errors;
-		if (validationErrors && typeof validationErrors === 'object') {
-			const firstField = Object.values(validationErrors as Record<string, unknown>)[0];
-			if (Array.isArray(firstField) && firstField.length > 0 && typeof firstField[0] === 'string') {
-				return firstField[0];
-			}
-		}
+		if (validationErrors) return Object.values(validationErrors)[0][0];
 
 		return err.message || fallback;
 	}

@@ -30,6 +30,37 @@ describe('extractErrorMessage', () => {
 
 	// #endregion
 
+	// #region ProblemDetails format
+
+	it('returns detail from RFC 7807 ProblemDetails', () => {
+		const err = new HttpErrorResponse({
+			error: { title: 'Unauthorized', status: 401, detail: 'Credenciales incorrectas' },
+			status: 401,
+		});
+
+		expect(extractErrorMessage(err)).toBe('Credenciales incorrectas');
+	});
+
+	it('prefers detail over errors array from BusinessRuleException', () => {
+		const err = new HttpErrorResponse({
+			error: { detail: 'Regla de negocio violada', errors: ['Detalle uno'], status: 422 },
+			status: 422,
+		});
+
+		expect(extractErrorMessage(err)).toBe('Regla de negocio violada');
+	});
+
+	it('returns first string of errors array when detail is missing', () => {
+		const err = new HttpErrorResponse({
+			error: { errors: ['El salón ya tiene un horario en esa franja'], status: 422 },
+			status: 422,
+		});
+
+		expect(extractErrorMessage(err)).toBe('El salón ya tiene un horario en esa franja');
+	});
+
+	// #endregion
+
 	// #region ValidationProblemDetails format
 
 	it('returns first field first message from ValidationProblemDetails', () => {

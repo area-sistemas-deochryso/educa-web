@@ -1,5 +1,6 @@
 // * Tests for AuthService login/logout behavior (cookie-based auth).
 // #region Imports
+import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { of, throwError } from 'rxjs';
@@ -8,6 +9,7 @@ import { AuthService } from './auth.service';
 import { AuthApiService } from './auth-api.service';
 import { StorageService } from '../storage';
 import { AuthUser, LoginResponse, StoredSession } from './auth.models';
+import { UI_AUTH_MESSAGES } from '@app/shared/constants';
 
 // #endregion
 
@@ -129,6 +131,32 @@ describe('AuthService', () => {
 			});
 
 			expect(service.loginAttempts).toBe(1);
+		});
+
+		it('should surface ProblemDetails detail from a 401', () => {
+			apiMock.login = vi.fn().mockReturnValue(
+				throwError(
+					() =>
+						new HttpErrorResponse({
+							status: 401,
+							error: { title: 'Unauthorized', status: 401, detail: 'DNI o contraseña incorrectos' },
+						}),
+				),
+			);
+
+			let mensaje: string | undefined;
+			service.login('12345678', 'wrong', 'Estudiante').subscribe((response) => (mensaje = response.mensaje));
+
+			expect(mensaje).toBe('DNI o contraseña incorrectos');
+		});
+
+		it('should fall back to generic login error when error has no detail', () => {
+			apiMock.login = vi.fn().mockReturnValue(throwError(() => new HttpErrorResponse({ status: 500 })));
+
+			let mensaje: string | undefined;
+			service.login('12345678', 'wrong', 'Estudiante').subscribe((response) => (mensaje = response.mensaje));
+
+			expect(mensaje).toBe(UI_AUTH_MESSAGES.loginError);
 		});
 
 		it('should block after 3 failed attempts', () => {

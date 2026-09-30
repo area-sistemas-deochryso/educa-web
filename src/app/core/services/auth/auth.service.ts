@@ -1,5 +1,6 @@
 // #region Imports
 import { AuthUser, CambiarContrasenaRequest, LoginResponse, StoredSession, UserRole } from './auth.models';
+import { HttpErrorResponse } from '@angular/common/http';
 import { EMPTY, Observable, catchError, firstValueFrom, map, of, tap, timeout } from 'rxjs';
 import { Injectable, inject, signal } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
@@ -11,7 +12,7 @@ import { ActivityTrackerService } from '../error/activity-tracker.service';
 import { ErrorReporterService } from '../error/error-reporter.service';
 import { AuthApiService } from './auth-api.service';
 import { StorageService } from '../storage';
-import { logger, Duration } from '@core/helpers';
+import { logger, Duration, parseProblemDetails } from '@core/helpers';
 import { resetErrorInterceptorState } from '@core/interceptors/error/error.interceptor';
 import { resetRateLimitState } from '@core/interceptors/rate-limit/rate-limit.interceptor';
 import { UI_AUTH_MESSAGES } from '@app/shared/constants';
@@ -103,7 +104,9 @@ export class AuthService {
 					nombreCompleto: '',
 					entityId: 0,
 					sedeId: 0,
-					mensaje: error.error?.mensaje || UI_AUTH_MESSAGES.loginError,
+					mensaje:
+						(error instanceof HttpErrorResponse ? parseProblemDetails(error).detail : null) ||
+						UI_AUTH_MESSAGES.loginError,
 				});
 			}),
 		);

@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 
-import { type ErrorPolicy, DEFAULT_ERROR_POLICY } from '@core/helpers';
+import { type ErrorPolicy, DEFAULT_ERROR_POLICY, parseProblemDetails } from '@core/helpers';
 import { UI_SUMMARIES } from '@app/shared/constants';
 
 /**
@@ -15,7 +15,7 @@ export const HORARIO_ERROR_POLICY: ErrorPolicy = {
 			return DEFAULT_ERROR_POLICY.resolveSummary(err);
 		}
 
-		const message = (err.error?.message ?? '') as string;
+		const message = parseProblemDetails(err).detail ?? '';
 		const errorCode = (err.error?.errorCode ?? '') as string;
 
 		// No students available in salon
