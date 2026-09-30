@@ -48,7 +48,6 @@ export class ResponsiveTableComponent {
 	// #endregion
 
 	// #region Template refs (content projection)
-	// FIX-CANDIDATE-2: static: true — resuelve templates antes de change detection (OnPush)
 	@ContentChild('desktopView', { read: TemplateRef, static: true }) desktopView?: TemplateRef<unknown>;
 	@ContentChild('mobileCard', { read: TemplateRef, static: true }) mobileCard?: TemplateRef<unknown>;
 	// #endregion
