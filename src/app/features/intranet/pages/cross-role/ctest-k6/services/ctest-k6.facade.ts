@@ -2,7 +2,7 @@ import { Injectable, inject, computed, DestroyRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { logger, extractErrorMessage } from '@core/helpers';
+import { logger, extractBackendMessage } from '@core/helpers';
 
 import { CTestK6Store } from './ctest-k6.store';
 import {
@@ -163,7 +163,7 @@ export class CTestK6Facade {
 					logger.log(`[CTestK6] Login exitoso: ${credential.rol} (${dni})`);
 				},
 				error: (err: unknown) => {
-					const mensaje = extractErrorMessage(err, 'Error de autenticación');
+					const mensaje = extractBackendMessage(err) ?? 'Error de autenticación';
 					this.store.setLoginError(mensaje);
 					this.store.setLoginLoading(false);
 					logger.warn('[CTestK6] Login fallido:', mensaje);

@@ -2,7 +2,7 @@
 import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { BlobStorageService, ErrorHandlerService, WalFacadeHelper } from '@core/services';
-import { logger, extractErrorMessage, facadeErrorHandler } from '@core/helpers';
+import { logger, extractBackendMessage, facadeErrorHandler } from '@core/helpers';
 import { environment } from '@config';
 import { ProfesorApiService } from '@features/intranet/pages/profesor/services/profesor-api.service';
 import type {
@@ -132,7 +132,7 @@ export class AttachmentsModalFacade {
 					this.store.setUploading(false);
 					this.store.setUploadProgress(0);
 
-					const errorMsg = extractErrorMessage(error, UI_GENERIC_MESSAGES.unknownError);
+					const errorMsg = extractBackendMessage(error) ?? UI_GENERIC_MESSAGES.unknownError;
 					this.store.setError(errorMsg);
 					this.errorHandler.showError(
 						UI_SUMMARIES.error,

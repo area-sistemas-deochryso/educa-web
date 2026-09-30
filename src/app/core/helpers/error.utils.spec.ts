@@ -4,7 +4,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { describe, expect, it } from 'vitest';
 
-import { extractErrorMessage } from './error.utils';
+import { extractBackendMessage, extractErrorMessage } from './error.utils';
 // #endregion
 
 describe('extractErrorMessage', () => {
@@ -106,10 +106,10 @@ describe('extractErrorMessage', () => {
 		expect(extractErrorMessage(undefined)).toBe('Error desconocido');
 	});
 
-	it('returns non-empty string for HttpErrorResponse with no backend message', () => {
-		// Angular always sets err.message on HttpErrorResponse; fallback is not reachable for HTTP errors
+	it('falls back to Angular err.message for HttpErrorResponse with no backend message', () => {
+		// Compat: extractErrorMessage keeps err.message as last resort; use extractBackendMessage to skip it
 		const err = new HttpErrorResponse({ error: { success: false }, status: 400 });
-		expect(extractErrorMessage(err, 'custom fallback')).toBeTruthy();
+		expect(extractErrorMessage(err, 'custom fallback')).toBe(err.message);
 	});
 
 	// #endregion
@@ -126,4 +126,25 @@ describe('extractErrorMessage', () => {
 	});
 
 	// #endregion
+});
+
+describe('extractBackendMessage', () => {
+	it('returns detail from ProblemDetails', () => {
+		const err = new HttpErrorResponse({ error: { detail: 'Ya existe' }, status: 409 });
+		expect(extractBackendMessage(err)).toBe('Ya existe');
+	});
+
+	it('returns first string of errors array', () => {
+		const err = new HttpErrorResponse({ error: { errors: ['Regla violada'] }, status: 400 });
+		expect(extractBackendMessage(err)).toBe('Regla violada');
+	});
+
+	it('returns null when backend sent no curated message (ignores Angular err.message)', () => {
+		const err = new HttpErrorResponse({ error: { success: false }, status: 500 });
+		expect(extractBackendMessage(err)).toBeNull();
+	});
+
+	it('returns null for non-HttpErrorResponse', () => {
+		expect(extractBackendMessage(new Error('boom'))).toBeNull();
+	});
 });

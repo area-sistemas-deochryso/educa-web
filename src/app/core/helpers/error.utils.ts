@@ -23,10 +23,32 @@ export function resolveErrorMessage(err: unknown, fallback: string): string {
 }
 
 /**
- * Extrae un mensaje legible de un error HTTP o genérico.
+ * Extrae solo el mensaje curado por el backend de un `HttpErrorResponse`, ignorando
+ * el `err.message` técnico que Angular siempre setea ("Http failure response for …").
  * Busca en orden: `detail` (ProblemDetails, vía `parseProblemDetails`, que también
  * cubre `message`/`mensaje` legacy), `errors` como array de strings (BusinessRuleException),
- * `errors` como diccionario (ValidationProblemDetails), err.message, fallback.
+ * `errors` como diccionario (ValidationProblemDetails). Devuelve `null` si no hay ninguno.
+ */
+export function extractBackendMessage(err: unknown): string | null {
+	if (!(err instanceof HttpErrorResponse)) return null;
+
+	const { detail, validationErrors } = parseProblemDetails(err);
+	if (detail) return detail;
+
+	// BusinessRuleException: { errors: ["msg", ...] }
+	const errors = err.error?.errors;
+	if (Array.isArray(errors) && typeof errors[0] === 'string' && errors[0]) return errors[0];
+
+	// ASP.NET Core ValidationProblemDetails: { errors: { fieldName: ["msg"] } }
+	if (validationErrors) return Object.values(validationErrors)[0][0];
+
+	return null;
+}
+
+/**
+ * Extrae un mensaje legible de un error HTTP o genérico.
+ * Para `HttpErrorResponse` prioriza el mensaje del backend (`extractBackendMessage`),
+ * luego err.message (texto técnico de Angular, por compatibilidad), luego fallback.
  *
  * @example
  * catch (err) {
@@ -36,17 +58,7 @@ export function resolveErrorMessage(err: unknown, fallback: string): string {
  */
 export function extractErrorMessage(err: unknown, fallback = 'Error desconocido'): string {
 	if (err instanceof HttpErrorResponse) {
-		const { detail, validationErrors } = parseProblemDetails(err);
-		if (detail) return detail;
-
-		// BusinessRuleException: { errors: ["msg", ...] }
-		const errors = err.error?.errors;
-		if (Array.isArray(errors) && typeof errors[0] === 'string' && errors[0]) return errors[0];
-
-		// ASP.NET Core ValidationProblemDetails: { errors: { fieldName: ["msg"] } }
-		if (validationErrors) return Object.values(validationErrors)[0][0];
-
-		return err.message || fallback;
+		return extractBackendMessage(err) ?? (err.message || fallback);
 	}
 
 	if (err instanceof Error) {

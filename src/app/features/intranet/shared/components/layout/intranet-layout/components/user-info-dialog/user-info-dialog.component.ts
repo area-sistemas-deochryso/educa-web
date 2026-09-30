@@ -14,7 +14,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '@core/services';
 import { UserProfileService } from '@core/services';
-import { extractErrorMessage } from '@core/helpers';
+import { extractBackendMessage } from '@core/helpers';
 import { EduAvatar, EduButton, EduDialog, EduInputText, EduMessageService, EduTab, EduTabPanel, EduTabs, EduTag } from '@edu-ui';
 
 // #endregion
@@ -137,7 +137,7 @@ export class UserInfoDialogComponent {
 					this.visibleChange.emit(false);
 				},
 				error: (err: unknown) => {
-					const mensaje = extractErrorMessage(err, 'No se pudo actualizar la contraseña');
+					const mensaje = extractBackendMessage(err) ?? 'No se pudo actualizar la contraseña';
 					this.messageService.add({
 						severity: 'danger',
 						summary: 'Error',

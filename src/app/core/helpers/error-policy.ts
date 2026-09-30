@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { ErrorHandlerService } from '@core/services/error';
 import { UI_ERROR_CODE_ACTIONS, UI_ERROR_CODES, UI_SUMMARIES } from '@app/shared/constants';
 import { logger } from './logs/logger';
-import { extractErrorMessage } from './error.utils';
+import { extractBackendMessage } from './error.utils';
 import { parseProblemDetails } from './problem-details.adapter';
 
 // #region Types
@@ -75,7 +75,7 @@ export const DEFAULT_ERROR_POLICY: ErrorPolicy = {
 			}
 
 			// 2. Mensaje directo del backend
-			const backendMsg = extractErrorMessage(err, '');
+			const backendMsg = extractBackendMessage(err);
 			if (backendMsg) {
 				return backendMsg;
 			}
