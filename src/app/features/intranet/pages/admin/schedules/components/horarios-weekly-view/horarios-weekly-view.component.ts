@@ -1,4 +1,5 @@
 // #region Imports
+import { darkenColor } from '@intranet-shared/config/curso-colors';
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 
@@ -68,7 +69,7 @@ export class SchedulesWeeklyViewComponent {
         top: `${topPx}px`,
         height: `${heightPx}px`,
         background: block.color,
-        borderLeft: `4px solid ${this.darkenColor(block.color)}`,
+        borderLeft: `4px solid ${darkenColor(block.color)}`,
       });
     }
     return map;
@@ -108,16 +109,6 @@ export class SchedulesWeeklyViewComponent {
 
   trackByBlockId(_index: number, block: HorarioWeeklyBlock): number {
     return block.horario.id;
-  }
-
-  // * Private helpers
-  private darkenColor(hex: string): string {
-    // Oscurecer el color para el borde
-    const num = parseInt(hex.replace('#', ''), 16);
-    const r = Math.max(0, (num >> 16) - 40);
-    const g = Math.max(0, ((num >> 8) & 0x00ff) - 40);
-    const b = Math.max(0, (num & 0x0000ff) - 40);
-    return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`;
   }
 }
 // #endregion

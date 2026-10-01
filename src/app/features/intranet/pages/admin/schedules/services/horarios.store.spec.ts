@@ -9,6 +9,7 @@ import { SchedulesFilterStore } from './horarios-filter.store';
 import { SchedulesOptionsStore } from './horarios-options.store';
 import { AuthStore } from '@core/store';
 import { StorageService } from '@core/services/storage';
+import { ThemeService } from '@core/services/theme';
 
 // #endregion
 
@@ -62,6 +63,7 @@ describe('SchedulesStore', () => {
 				SchedulesOptionsStore,
 				AuthStore,
 				{ provide: StorageService, useValue: mockStorageService },
+				{ provide: ThemeService, useValue: { isDarkMode: () => false } },
 			],
 		});
 		store = TestBed.inject(SchedulesStore);

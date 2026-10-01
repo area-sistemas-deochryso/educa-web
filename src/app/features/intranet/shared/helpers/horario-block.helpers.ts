@@ -1,5 +1,5 @@
 import { HorarioProfesorDto } from '@features/intranet/pages/profesor/models';
-import { cursoColorFor } from '@intranet-shared/config/curso-colors';
+import { cursoColorFor, darkenColor } from '@intranet-shared/config/curso-colors';
 
 // #region Types
 export interface HorarioBlock {
@@ -25,20 +25,11 @@ const HORA_INICIO_DIA = 7 * 60; // 07:00 en minutos
 const PX_PER_HOUR = 60;
 // #endregion
 
-// #region Color helpers
-function darkenColor(hex: string): string {
-	const num = parseInt(hex.replace('#', ''), 16);
-	const r = Math.max(0, (num >> 16) - 40);
-	const g = Math.max(0, ((num >> 8) & 0x00ff) - 40);
-	const b = Math.max(0, (num & 0x0000ff) - 40);
-	return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`;
-}
-// #endregion
-
 // #region Block builder
 export function buildBlocks(
 	horarios: HorarioProfesorDto[],
 	estudiantesPorSalon: Map<number, number>,
+	dark = false,
 ): HorarioBlock[] {
 	return horarios.map((h) => {
 		const [hi, mi] = h.horaInicio.split(':').map(Number);
@@ -47,7 +38,7 @@ export function buildBlocks(
 		const endMin = hf * 60 + mf;
 		const duration = endMin - startMin;
 		const offset = startMin - HORA_INICIO_DIA;
-		const color = cursoColorFor(h.cursoId);
+		const color = cursoColorFor(h.cursoId, dark);
 		const borderColor = darkenColor(color);
 		const topPx = (offset / 60) * PX_PER_HOUR;
 		const heightPx = (duration / 60) * PX_PER_HOUR;

@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 
 import { PageHeaderComponent } from '@intranet-shared/components';
+import { ThemeService } from '@core/services/theme';
 import { environment } from '@config/environment';
 import { ProfesorFacade } from '../services/profesor.facade';
 import {
@@ -31,6 +32,7 @@ export class TeacherSchedulesComponent implements OnInit {
 	private readonly facade = inject(ProfesorFacade);
 	private readonly router = inject(Router);
 	private readonly destroyRef = inject(DestroyRef);
+	private readonly theme = inject(ThemeService);
 
 	// #endregion
 	// #region Estado
@@ -46,7 +48,7 @@ export class TeacherSchedulesComponent implements OnInit {
 	});
 
 	readonly weeklyBlocks = computed<HorarioBlock[]>(() =>
-		buildBlocks(this.vm().horarios, this.estudiantesPorSalon()),
+		buildBlocks(this.vm().horarios, this.estudiantesPorSalon(), this.theme.isDarkMode()),
 	);
 
 	readonly blocksByDay = computed<Map<number, HorarioBlock[]>>(() => {

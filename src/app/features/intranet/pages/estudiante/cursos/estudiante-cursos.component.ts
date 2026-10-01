@@ -5,6 +5,7 @@ import { filter, take } from 'rxjs';
 
 import { PageHeaderComponent, EmptyStateComponent } from '@intranet-shared/components';
 import { buildCursoColorMap } from '@intranet-shared/config/curso-colors';
+import { ThemeService } from '@core/services/theme';
 import { EstudianteCursosFacade } from '../services/estudiante-cursos.facade';
 import { CursoContentReadonlyDialogComponent } from './components/curso-content-readonly-dialog/curso-content-readonly-dialog.component';
 import { HorarioProfesorDto } from '../models';
@@ -150,10 +151,11 @@ export class EstudianteCursosComponent implements OnInit {
 	private readonly route = inject(ActivatedRoute);
 	private readonly router = inject(Router);
 	private readonly destroyRef = inject(DestroyRef);
+	private readonly theme = inject(ThemeService);
 
 	readonly vm = this.facade.vm;
 
-	readonly colorMap = computed(() => buildCursoColorMap(this.vm().horarios));
+	readonly colorMap = computed(() => buildCursoColorMap(this.vm().horarios, this.theme.isDarkMode()));
 
 	readonly todayCourses = computed(() => {
 		const todayName = DAY_NAMES[new Date().getDay()];

@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal,
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, of, Observable } from 'rxjs';
 import { logger } from '@core/helpers';
+import { ThemeService } from '@core/services/theme';
 import { UserProfileService } from '@core/services/user';
 import { ProfesorApiService } from '@features/intranet/pages/profesor/services';
 import { EstudianteApiService } from '@features/intranet/pages/estudiante/services';
@@ -26,14 +27,21 @@ export class HorarioHoyWidgetComponent implements OnInit {
 	private profesorApi = inject(ProfesorApiService);
 	private estudianteApi = inject(EstudianteApiService);
 	private destroyRef = inject(DestroyRef);
+	private theme = inject(ThemeService);
 	// #endregion
 
 	// #region Estado
 	readonly loading = signal(true);
-	readonly bloquesHoy = signal<HorarioBlock[]>([]);
+	private readonly horarios = signal<HorarioProfesorDto[]>([]);
 	// #endregion
 
 	// #region Computed
+	readonly bloquesHoy = computed<HorarioBlock[]>(() => {
+		const hoy = todayDia(new Date());
+		return buildBlocks(this.horarios(), new Map(), this.theme.isDarkMode())
+			.filter((b) => b.dia === hoy)
+			.sort((a, b) => a.horaInicio.localeCompare(b.horaInicio));
+	});
 	readonly hasBloques = computed(() => this.bloquesHoy().length > 0);
 	// #endregion
 
@@ -52,11 +60,7 @@ export class HorarioHoyWidgetComponent implements OnInit {
 				takeUntilDestroyed(this.destroyRef),
 			)
 			.subscribe((horarios) => {
-				const hoy = todayDia(new Date());
-				const bloques = buildBlocks(horarios, new Map())
-					.filter((b) => b.dia === hoy)
-					.sort((a, b) => a.horaInicio.localeCompare(b.horaInicio));
-				this.bloquesHoy.set(bloques);
+				this.horarios.set(horarios);
 				this.loading.set(false);
 			});
 	}

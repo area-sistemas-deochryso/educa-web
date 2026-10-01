@@ -1,3 +1,4 @@
+import { darkenColor as darkenCursoColor } from '@intranet-shared/config/curso-colors';
 import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
@@ -214,11 +215,5 @@ export class ScheduleWeeklyGridComponent {
     });
   }
 
-  darkenColor(hex: string): string {
-    const num = parseInt(hex.replace('#', ''), 16);
-    const r = Math.max(0, (num >> 16) - 40);
-    const g = Math.max(0, ((num >> 8) & 0x00ff) - 40);
-    const b = Math.max(0, (num & 0x0000ff) - 40);
-    return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`;
-  }
+  readonly darkenColor = darkenCursoColor;
 }

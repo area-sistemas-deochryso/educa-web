@@ -8,7 +8,8 @@ import { SkeletonLoaderComponent } from '@shared/components';
 import { StudentSchedulesFacade } from './services/estudiante-horarios.facade';
 import { EstudianteFacade } from '../services/estudiante.facade';
 import { HorarioProfesorDto } from '../models';
-import { cursoColorFor } from '@intranet-shared/config/curso-colors';
+import { cursoColorFor, darkenColor } from '@intranet-shared/config/curso-colors';
+import { ThemeService } from '@core/services/theme';
 import { EduTooltip } from '@edu-ui';
 
 // #endregion
@@ -40,18 +41,10 @@ interface CountdownInfo {
 
 // #endregion
 // #region Helpers
-function darkenColor(hex: string): string {
-	const num = parseInt(hex.replace('#', ''), 16);
-	const r = Math.max(0, (num >> 16) - 40);
-	const g = Math.max(0, ((num >> 8) & 0x00ff) - 40);
-	const b = Math.max(0, (num & 0x0000ff) - 40);
-	return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`;
-}
-
 const HORA_INICIO_DIA = 7 * 60;
 const PX_PER_HOUR = 60;
 
-function buildBlocks(horarios: HorarioProfesorDto[]): HorarioBlock[] {
+function buildBlocks(horarios: HorarioProfesorDto[], dark: boolean): HorarioBlock[] {
 	return horarios.map((h) => {
 		const [hi, mi] = h.horaInicio.split(':').map(Number);
 		const [hf, mf] = h.horaFin.split(':').map(Number);
@@ -59,7 +52,7 @@ function buildBlocks(horarios: HorarioProfesorDto[]): HorarioBlock[] {
 		const endMin = hf * 60 + mf;
 		const duration = endMin - startMin;
 		const offset = startMin - HORA_INICIO_DIA;
-		const color = cursoColorFor(h.cursoId);
+		const color = cursoColorFor(h.cursoId, dark);
 		const borderColor = darkenColor(color);
 		const topPx = (offset / 60) * PX_PER_HOUR;
 		const heightPx = (duration / 60) * PX_PER_HOUR;
@@ -173,6 +166,7 @@ export class StudentSchedulesComponent implements OnInit {
 	private readonly api = inject(EstudianteFacade);
 	private readonly router = inject(Router);
 	private readonly destroyRef = inject(DestroyRef);
+	private readonly theme = inject(ThemeService);
 
 	// #endregion
 	// #region Estado
@@ -180,7 +174,7 @@ export class StudentSchedulesComponent implements OnInit {
 	readonly skeletonColumns = Array(6);
 
 	readonly weeklyBlocks = computed<HorarioBlock[]>(() =>
-		buildBlocks(this.vm().horarios),
+		buildBlocks(this.vm().horarios, this.theme.isDarkMode()),
 	);
 
 	readonly blocksByDay = computed<Map<number, HorarioBlock[]>>(() => {

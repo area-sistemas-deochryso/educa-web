@@ -1,4 +1,6 @@
-import { computed, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
+
+import { ThemeService } from '@core/services/theme';
 
 import {
 	type DiaSemana,
@@ -11,6 +13,8 @@ import { buildWeeklyBlocks } from '../helpers/horario-time.utils';
 
 @Injectable({ providedIn: 'root' })
 export class SchedulesFilterStore {
+	private readonly theme = inject(ThemeService);
+
 	// #region Estado privado
 	private readonly _filtroSalonId = signal<number | null>(null);
 	private readonly _filtroProfesorId = signal<number | null>(null);
@@ -153,7 +157,7 @@ export class SchedulesFilterStore {
 		return horarios;
 	});
 
-	readonly entityWeeklyBlocks = computed(() => buildWeeklyBlocks(this.entityFilteredHorarios()));
+	readonly entityWeeklyBlocks = computed(() => buildWeeklyBlocks(this.entityFilteredHorarios(), this.theme.isDarkMode()));
 
 	/** Context salon ID for pre-filling creation form from empty slot clicks. */
 	readonly contextSalonId = computed(() => {
@@ -163,7 +167,7 @@ export class SchedulesFilterStore {
 	// #endregion
 
 	// #region Computed - Legacy compatibility
-	readonly horariosSemanales = computed(() => buildWeeklyBlocks(this.horariosFiltrados()));
+	readonly horariosSemanales = computed(() => buildWeeklyBlocks(this.horariosFiltrados(), this.theme.isDarkMode()));
 
 	readonly vistaSemanalHabilitada = computed(() => this._selectedEntityId() !== null);
 

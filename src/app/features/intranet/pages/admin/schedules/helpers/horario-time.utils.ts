@@ -24,11 +24,11 @@ export function calcularPosicionVertical(horaInicio: string): number {
  * Construye los bloques semanales para la vista de calendario.
  * Asigna un color por curso de forma determinística.
  */
-export function buildWeeklyBlocks(horarios: HorarioResponseDto[]): HorarioWeeklyBlock[] {
+export function buildWeeklyBlocks(horarios: HorarioResponseDto[], dark = false): HorarioWeeklyBlock[] {
 	return horarios.map((horario) => ({
 		horario,
 		dia: horario.diaSemana,
-		color: cursoColorFor(horario.cursoId),
+		color: cursoColorFor(horario.cursoId, dark),
 		duracionMinutos: calcularDuracionMinutos(horario.horaInicio, horario.horaFin),
 		posicionVertical: calcularPosicionVertical(horario.horaInicio),
 	}));

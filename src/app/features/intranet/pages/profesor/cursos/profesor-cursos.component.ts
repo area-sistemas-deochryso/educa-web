@@ -15,6 +15,7 @@ import { filter, take } from 'rxjs';
 import { PageHeaderComponent, EmptyStateComponent } from '@intranet-shared/components';
 import { PluralizePipe } from '@intranet-shared/pipes';
 import { buildCursoColorMap } from '@intranet-shared/config/curso-colors';
+import { ThemeService } from '@core/services/theme';
 import { ProfesorFacade } from '../services/profesor.facade';
 import { CursoContenidoDataFacade } from './services/curso-contenido-data.facade';
 import { CursoContenidoUiFacade } from './services/curso-contenido-ui.facade';
@@ -139,6 +140,7 @@ import { EduSpinner, EduTag, EduTooltip } from '@edu-ui';
 })
 export class ProfesorCursosComponent implements OnInit, OnDestroy {
 	private readonly facade = inject(ProfesorFacade);
+	private readonly theme = inject(ThemeService);
 	private readonly contenidoDataFacade = inject(CursoContenidoDataFacade);
 	private readonly contenidoUiFacade = inject(CursoContenidoUiFacade);
 	private readonly route = inject(ActivatedRoute);
@@ -148,7 +150,7 @@ export class ProfesorCursosComponent implements OnInit, OnDestroy {
 	readonly vm = this.facade.vm;
 	readonly contenidoVm = this.contenidoDataFacade.vm;
 
-	readonly colorMap = computed(() => buildCursoColorMap(this.vm().horarios));
+	readonly colorMap = computed(() => buildCursoColorMap(this.vm().horarios, this.theme.isDarkMode()));
 
 	private static readonly VALID_RETURN_TARGETS = new Set(['horarios', 'salones']);
 	private returnTo: string | null = null;

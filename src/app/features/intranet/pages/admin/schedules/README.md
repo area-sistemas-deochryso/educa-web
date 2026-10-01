@@ -14,7 +14,7 @@ Módulo CRUD completo para la gestión de horarios escolares con vista semanal i
 - ✅ `HorarioFormData` - Datos del wizard (3 pasos)
 - ✅ `HorarioWeeklyBlock` - Bloques para vista semanal con colores
 - ✅ `HorariosEstadisticas` - Métricas del dashboard
-- ✅ Constantes: `DIAS_SEMANA`, `CURSO_COLORS`
+- ✅ Constantes: `DIAS_SEMANA` (el color por curso vive en `@intranet-shared/config/curso-colors`: `cursoColorFor(cursoId, dark)`)
 
 ### 2. **API Service** (`services/horarios-api.service.ts`)
 Gateway puro de I/O con todos los endpoints:
