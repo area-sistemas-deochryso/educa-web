@@ -5,12 +5,13 @@ import { CursoContenidoDataFacade } from '../../services/curso-contenido-data.fa
 import { CursoContenidoCrudFacade } from '../../services/curso-contenido-crud.facade';
 import { CursoContenidoUiFacade } from '../../services/curso-contenido-ui.facade';
 import { CursoContenidoSemanaDto, CursoContenidoTareaDto } from '@features/intranet/pages/profesor/models';
-import { FormatFileSizePipe } from '@intranet-shared/pipes';
-import { EduAccordion, EduAccordionHeader, EduAccordionPanel, EduButton, EduConfirmationService, EduTooltip } from '@edu-ui';
+import { ErrorHandlerService } from '@core/services';
+import { FileRowComponent, UPLOAD_ACCEPT, UPLOAD_LIMITS, validateUploadFile } from '@shared/components';
+import { EduAccordion, EduAccordionHeader, EduAccordionPanel, EduButton, EduConfirmationService, EduFileUpload, type EduFileUploadSelectEvent, EduTooltip } from '@edu-ui';
 @Component({
 	selector: 'app-semanas-accordion',
 	standalone: true,
-	imports: [DatePipe, FormsModule, EduButton, EduAccordion, EduAccordionHeader, EduAccordionPanel, EduTooltip, FormatFileSizePipe],
+	imports: [DatePipe, FormsModule, EduButton, EduAccordion, EduAccordionHeader, EduAccordionPanel, EduTooltip, EduFileUpload, FileRowComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './semanas-accordion.component.html',
 	styleUrl: './semanas-accordion.component.scss',
@@ -21,6 +22,9 @@ export class SemanasAccordionComponent {
 	private readonly crudFacade = inject(CursoContenidoCrudFacade);
 	private readonly uiFacade = inject(CursoContenidoUiFacade);
 	private readonly confirmationService = inject(EduConfirmationService);
+	private readonly errorHandler = inject(ErrorHandlerService);
+	readonly uploadAccept = UPLOAD_ACCEPT;
+	readonly uploadMaxBytes = UPLOAD_LIMITS.maxFileSizeBytes;
 	// #endregion
 
 	// #region Estado del facade
@@ -80,13 +84,11 @@ export class SemanasAccordionComponent {
 	// #endregion
 
 	// #region Archivo actions
-	onNativeFileSelect(event: Event, semanaId: number): void {
-		const input = event.target as HTMLInputElement;
-		const file = input.files?.[0];
+	onFilesSelected(event: EduFileUploadSelectEvent, semanaId: number): void {
+		const file = this.pickValidFile(event);
 		if (file) {
 			this.crudFacade.uploadArchivo(semanaId, file);
 		}
-		input.value = '';
 	}
 
 	onDeleteArchivo(semanaId: number, archivoId: number, nombreArchivo: string): void {
@@ -109,13 +111,11 @@ export class SemanasAccordionComponent {
 	// #endregion
 
 	// #region Tarea archivo actions
-	onNativeTareaFileSelect(event: Event, semanaId: number, tareaId: number): void {
-		const input = event.target as HTMLInputElement;
-		const file = input.files?.[0];
+	onTareaFilesSelected(event: EduFileUploadSelectEvent, semanaId: number, tareaId: number): void {
+		const file = this.pickValidFile(event);
 		if (file) {
 			this.crudFacade.uploadTareaArchivo(semanaId, tareaId, file);
 		}
-		input.value = '';
 	}
 
 	onDeleteTareaArchivo(semanaId: number, tareaId: number, archivoId: number, nombreArchivo: string): void {
@@ -166,26 +166,15 @@ export class SemanasAccordionComponent {
 	// #endregion
 
 	// #region Helpers
-	getFileIcon(tipoArchivo: string | null): string {
-		if (!tipoArchivo) return 'pi pi-file';
-		if (tipoArchivo.includes('pdf')) return 'pi pi-file-pdf';
-		if (tipoArchivo.includes('image')) return 'pi pi-image';
-		if (tipoArchivo.includes('video')) return 'pi pi-video';
-		if (tipoArchivo.includes('excel') || tipoArchivo.includes('sheet')) return 'pi pi-file-excel';
-		if (tipoArchivo.includes('presentation') || tipoArchivo.includes('powerpoint')) return 'pi pi-file';
-		if (tipoArchivo.includes('word') || tipoArchivo.includes('document')) return 'pi pi-file-word';
-		return 'pi pi-file';
-	}
-
-	getFileIconClass(tipoArchivo: string | null): string {
-		if (!tipoArchivo) return 'generic';
-		if (tipoArchivo.includes('pdf')) return 'pdf';
-		if (tipoArchivo.includes('image')) return 'image';
-		if (tipoArchivo.includes('video')) return 'video';
-		if (tipoArchivo.includes('excel') || tipoArchivo.includes('sheet')) return 'excel';
-		if (tipoArchivo.includes('presentation') || tipoArchivo.includes('powerpoint')) return 'ppt';
-		if (tipoArchivo.includes('word') || tipoArchivo.includes('document')) return 'word';
-		return 'generic';
+	private pickValidFile(event: EduFileUploadSelectEvent): File | null {
+		const file = event.files[0] ?? null;
+		if (!file) return null;
+		const error = validateUploadFile(file);
+		if (error) {
+			this.errorHandler.showWarning('Archivo no válido', error);
+			return null;
+		}
+		return file;
 	}
 	// #endregion
 }

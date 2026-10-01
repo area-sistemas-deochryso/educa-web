@@ -81,25 +81,15 @@
 							@if (estudiante.archivos.length > 0) {
 								<div class="student-files">
 									@for (archivo of estudiante.archivos; track archivo.id) {
-										<div
-											class="file-row clickable"
+										<app-file-row
 											data-info-anchor="profesor-submissions-archivo-abrir"
-											(click)="openArchivo(archivo.urlArchivo)"
+											[name]="archivo.nombreArchivo"
+											[mimeType]="archivo.tipoArchivo"
+											[sizeBytes]="archivo.tamanoBytes"
+											(open)="openArchivo(archivo.urlArchivo)"
 										>
-											<div class="file-icon">
-												<i class="pi pi-file"></i>
-											</div>
-											<div class="file-info">
-												<span class="file-name">{{ archivo.nombreArchivo }}</span>
-												<span class="file-meta">
-													@if (archivo.tamanoBytes) {
-														{{ archivo.tamanoBytes | formatFileSize }} ·
-													}
-													{{ archivo.fechaReg | date: 'dd/MM/yyyy HH:mm' }}
-												</span>
-											</div>
-											<i class="pi pi-external-link file-open-icon"></i>
-										</div>
+											<span actions class="file-date">{{ archivo.fechaReg | date: 'dd/MM/yyyy HH:mm' }}</span>
+										</app-file-row>
 									}
 								</div>
 							}

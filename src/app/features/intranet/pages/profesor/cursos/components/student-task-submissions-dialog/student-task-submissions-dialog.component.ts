@@ -1,14 +1,13 @@
 import { Component, ChangeDetectionStrategy, input, output, computed } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { EstudianteTareaArchivosGroupDto, CursoContenidoTareaDto } from '@features/intranet/pages/profesor/models';
-import { FormatFileSizePipe } from '@intranet-shared/pipes';
-import { SkeletonLoaderComponent } from '@shared/components';
+import { FileRowComponent, SkeletonLoaderComponent } from '@shared/components';
 import { EduButton, EduDialog, EduTag, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-student-task-submissions-dialog',
 	standalone: true,
-	imports: [DatePipe, EduDialog, EduButton, EduTooltip, EduTag, SkeletonLoaderComponent, FormatFileSizePipe],
+	imports: [DatePipe, EduDialog, EduButton, EduTooltip, EduTag, SkeletonLoaderComponent, FileRowComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './student-task-submissions-dialog.component.html',
 	styleUrl: './student-task-submissions-dialog.component.scss',

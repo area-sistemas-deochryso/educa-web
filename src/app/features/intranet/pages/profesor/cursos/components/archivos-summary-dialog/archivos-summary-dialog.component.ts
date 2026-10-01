@@ -1,13 +1,13 @@
 import { Component, ChangeDetectionStrategy, input, output, computed } from '@angular/core';
 
 import { CursoContenidoSemanaDto } from '@features/intranet/pages/profesor/models';
-import { FormatFileSizePipe } from '@intranet-shared/pipes';
+import { FileRowComponent } from '@shared/components';
 import { EduDialog } from '@edu-ui';
 
 @Component({
 	selector: 'app-archivos-summary-dialog',
 	standalone: true,
-	imports: [EduDialog, FormatFileSizePipe],
+	imports: [EduDialog, FileRowComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './archivos-summary-dialog.component.html',
 	styleUrl: './archivos-summary-dialog.component.scss',
@@ -28,27 +28,4 @@ export class ArchivosSummaryDialogComponent {
 	openArchivo(url: string): void {
 		window.open(url, '_blank');
 	}
-
-	getFileIcon(tipoArchivo: string | null): string {
-		if (!tipoArchivo) return 'pi pi-file';
-		if (tipoArchivo.includes('pdf')) return 'pi pi-file-pdf';
-		if (tipoArchivo.includes('image')) return 'pi pi-image';
-		if (tipoArchivo.includes('video')) return 'pi pi-video';
-		if (tipoArchivo.includes('excel') || tipoArchivo.includes('sheet')) return 'pi pi-file-excel';
-		if (tipoArchivo.includes('presentation') || tipoArchivo.includes('powerpoint')) return 'pi pi-file';
-		if (tipoArchivo.includes('word') || tipoArchivo.includes('document')) return 'pi pi-file-word';
-		return 'pi pi-file';
-	}
-
-	getFileIconClass(tipoArchivo: string | null): string {
-		if (!tipoArchivo) return 'generic';
-		if (tipoArchivo.includes('pdf')) return 'pdf';
-		if (tipoArchivo.includes('image')) return 'image';
-		if (tipoArchivo.includes('video')) return 'video';
-		if (tipoArchivo.includes('excel') || tipoArchivo.includes('sheet')) return 'excel';
-		if (tipoArchivo.includes('presentation') || tipoArchivo.includes('powerpoint')) return 'ppt';
-		if (tipoArchivo.includes('word') || tipoArchivo.includes('document')) return 'word';
-		return 'generic';
-	}
-
 }

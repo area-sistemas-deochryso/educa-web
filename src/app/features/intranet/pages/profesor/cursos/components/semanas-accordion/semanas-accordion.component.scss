@@ -336,42 +336,6 @@
 		color: var(--text-color-secondary);
 	}
 
-	&.pdf {
-		background: var(--red-50);
-		border-color: var(--red-200);
-		i { color: var(--red-500); }
-	}
-
-	&.ppt {
-		background: var(--red-50);
-		border-color: var(--red-200);
-		i { color: var(--red-500); }
-	}
-
-	&.word {
-		background: var(--blue-50);
-		border-color: var(--blue-200);
-		i { color: var(--blue-500); }
-	}
-
-	&.excel {
-		background: var(--green-50);
-		border-color: var(--green-200);
-		i { color: var(--green-500); }
-	}
-
-	&.image {
-		background: var(--violet-50);
-		border-color: var(--violet-200);
-		i { color: var(--violet-500); }
-	}
-
-	&.video {
-		background: var(--orange-50);
-		border-color: var(--orange-200);
-		i { color: var(--orange-500); }
-	}
-
 	&.tarea {
 		background: var(--yellow-50);
 		border-color: var(--yellow-200);
@@ -404,19 +368,6 @@
 		gap: 0.25rem;
 	}
 
-	&.clickable {
-		cursor: pointer;
-
-		strong {
-			color: var(--text-color);
-			transition: color 0.15s;
-
-			&:hover {
-				color: var(--green-600);
-				text-decoration: underline;
-			}
-		}
-	}
 }
 
 .row-actions {
@@ -432,68 +383,10 @@
 	padding: 0.25rem 0 0.25rem 3rem;
 }
 
-.tarea-attach-link {
-	display: inline-flex;
-	align-items: center;
-	gap: 0.3rem;
-	font-size: 0.72rem;
-	color: var(--text-color-secondary);
-	cursor: pointer;
-	background: none;
-	border: none;
-	padding: 0.2rem 0.4rem;
-	margin: 0 0 0.25rem -0.4rem;
-	border-radius: 4px;
-	font-family: inherit;
-	transition: color 0.15s, background 0.15s;
-
-	i {
-		font-size: 0.7rem;
-	}
-
-	&:hover {
-		color: var(--green-600);
-		background: rgba(34, 197, 94, 0.06);
-	}
-}
-
 .tarea-archivos-list {
 	display: flex;
 	flex-direction: column;
 	gap: 0.15rem;
-}
-
-.tarea-archivo-row {
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-	padding: 0.35rem 0.25rem;
-	border-radius: 6px;
-	transition: background 0.15s;
-
-	&:hover {
-		background: var(--surface-hover, rgba(0, 0, 0, 0.015));
-	}
-
-	.row-icon.small {
-		width: 28px;
-		height: 28px;
-		border-radius: 6px;
-
-		i {
-			font-size: 0.8rem;
-		}
-	}
-
-	.row-info {
-		strong {
-			font-size: 0.75rem;
-		}
-
-		span {
-			font-size: 0.68rem;
-		}
-	}
 }
 
 // #endregion

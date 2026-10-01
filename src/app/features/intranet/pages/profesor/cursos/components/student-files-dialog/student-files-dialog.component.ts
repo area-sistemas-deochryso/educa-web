@@ -5,14 +5,13 @@ import { DatePipe } from '@angular/common';
 import { SemanaEstudianteArchivosDto, CalificacionConNotasDto } from '@features/intranet/pages/profesor/models';
 import { getNotaSeverity } from '@intranet-shared/services/calificacion-config';
 import type { ConfiguracionCalificacionListDto } from '@data/models';
-import { FormatFileSizePipe } from '@intranet-shared/pipes';
-import { SkeletonLoaderComponent } from '@shared/components';
+import { FileRowComponent, SkeletonLoaderComponent } from '@shared/components';
 import { EduButton, EduDialog, EduTag, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-student-files-dialog',
 	standalone: true,
-	imports: [DatePipe, EduDialog, EduButton, EduTooltip, EduTag, SkeletonLoaderComponent, FormatFileSizePipe],
+	imports: [DatePipe, EduDialog, EduButton, EduTooltip, EduTag, SkeletonLoaderComponent, FileRowComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './student-files-dialog.component.html',
 	styleUrl: './student-files-dialog.component.scss',

@@ -151,59 +151,10 @@
 	gap: 0.25rem;
 }
 
-.file-row {
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-	padding: 0.35rem 0.5rem;
-	border-radius: 6px;
-	transition: background 0.15s;
-
-	&.clickable {
-		cursor: pointer;
-
-		&:hover {
-			background: var(--surface-hover);
-		}
-	}
-
-	.file-icon {
-		color: var(--primary-500);
-		font-size: 0.85rem;
-		flex-shrink: 0;
-	}
-
-	.file-info {
-		flex: 1;
-		min-width: 0;
-		display: flex;
-		flex-direction: column;
-		gap: 0.1rem;
-
-		.file-name {
-			font-size: 0.85rem;
-			font-weight: 500;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
-		}
-
-		.file-meta {
-			font-size: 0.75rem;
-			color: var(--text-color-secondary);
-		}
-	}
-
-	.file-open-icon {
-		font-size: 0.75rem;
-		color: var(--text-color-secondary);
-		opacity: 0;
-		transition: opacity 0.15s;
-	}
-
-	&:hover .file-open-icon {
-		opacity: 1;
-	}
+.file-date {
+	font-size: 0.75rem;
+	color: var(--text-color-secondary);
+	white-space: nowrap;
 }
 // #endregion
 
