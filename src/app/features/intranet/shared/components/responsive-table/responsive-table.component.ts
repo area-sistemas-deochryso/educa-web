@@ -1,4 +1,5 @@
 // #region Imports
+import { NgTemplateOutlet } from '@angular/common';
 import {
 	ChangeDetectionStrategy,
 	Component,
@@ -18,7 +19,7 @@ import { EduPaginator } from '@edu-ui';
 @Component({
 	selector: 'app-responsive-table',
 	standalone: true,
-	imports: [EduPaginator],
+	imports: [EduPaginator, NgTemplateOutlet],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './responsive-table.component.html',
 	styleUrl: './responsive-table.component.scss',
