@@ -18,11 +18,11 @@ import {
 } from '@data/models';
 import { ResponsiveTableComponent, TableSkeletonComponent } from '@intranet-shared/components';
 import type { SkeletonColumnDef } from '@intranet-shared/components';
-import { FormatTimePipe } from '@intranet-shared/pipes';
+import { FormatTimePipe, InitialsPipe } from '@intranet-shared/pipes';
 import { getStatusClass } from '@features/intranet/pages/cross-role/attendance-component/config/attendance.constants';
 import { AttendanceTemporalNavComponent } from '../attendance-temporal-nav/attendance-temporal-nav.component';
 import { EmptyStateComponent } from '../empty-state/empty-state.component';
-import { EduButton, EduDialog, EduInputText, EduMenu, EduSelect, EduTable, EduTextarea, EduTooltip } from '@edu-ui';
+import { EduAvatar, EduButton, EduDialog, EduInputText, EduMenu, EduSelect, EduTable, EduTextarea, EduTooltip } from '@edu-ui';
 import type { EduMenuItem } from '@edu-ui';
 
 export interface PersonaAsistenciaDia {
@@ -48,7 +48,7 @@ export interface JustificacionPersonaEvent {
 @Component({
 	selector: 'app-attendance-persona-day-list',
 	standalone: true,
-	imports: [SlicePipe, 
+	imports: [SlicePipe, EduAvatar, InitialsPipe, 
 		FormsModule,
 		EduTable,
 		TableSkeletonComponent,

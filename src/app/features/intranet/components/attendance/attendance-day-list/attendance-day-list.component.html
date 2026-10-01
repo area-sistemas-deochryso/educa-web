@@ -179,9 +179,7 @@
 	@if (selectedEstudiante(); as estudiante) {
 		<div class="dialog-content">
 			<div class="estudiante-header">
-				<div class="avatar">
-					<i class="pi pi-user"></i>
-				</div>
+				<edu-avatar class="avatar" [label]="estudiante.nombreCompleto | initials" [rol]="'Estudiante'" shape="circle" variant="brand" size="large" />
 				<div class="info">
 					<span class="nombre">{{ estudiante.nombreCompleto }}</span>
 					<span class="dni">DNI: {{ estudiante.dni }}</span>

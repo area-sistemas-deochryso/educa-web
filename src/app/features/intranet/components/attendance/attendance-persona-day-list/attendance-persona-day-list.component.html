@@ -273,9 +273,7 @@
 	@if (selectedPersona(); as persona) {
 		<div class="dialog-content">
 			<div class="estudiante-header">
-				<div class="avatar">
-					<i class="pi pi-user"></i>
-				</div>
+				<edu-avatar class="avatar" [label]="persona.nombreCompleto | initials" [rol]="persona.tipoPersona === 'P' ? 'Profesor' : null" shape="circle" variant="brand" size="large" />
 				<div class="info">
 					<span class="nombre">{{ persona.nombreCompleto }}</span>
 					<span class="dni">DNI: {{ persona.dni }}</span>

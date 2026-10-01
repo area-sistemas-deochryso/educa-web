@@ -28,13 +28,14 @@ import { TrackClickDirective, TrackSubmitDirective } from '@shared/directives';
 import { logger } from '@core/helpers';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { UI_LOGIN_MESSAGES } from '@app/shared/constants';
-import { EduInputText, EduSelect, EduToggle, EduTooltip } from '@edu-ui';
+import { EduAvatar, EduInputText, EduSelect, EduToggle, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-login-intranet',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [
 		ReactiveFormsModule,
+		EduAvatar,
 		EduInputText,
 		EduToggle,
 		EduTooltip,

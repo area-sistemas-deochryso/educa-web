@@ -327,18 +327,6 @@ $color-pendiente: var(--attendance-pendiente);
 		background: var(--surface-50);
 		border-radius: 6px;
 
-		.avatar {
-			width: 48px;
-			height: 48px;
-			border-radius: 50%;
-			background: $color-justificado;
-			color: var(--white-color);
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			font-size: 1.25rem;
-			flex-shrink: 0;
-		}
 
 		.info {
 			display: flex;

@@ -223,20 +223,6 @@ app-login-role-selector:focus-within .login-field__icon {
 // #endregion
 
 // #region Session Info
-.session-avatar {
-	flex-shrink: 0;
-	width: 42px;
-	height: 42px;
-	border-radius: 50%;
-	background: var(--accent-interactive-light);
-	color: var(--white-color);
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	font-weight: 700;
-	font-size: 0.85rem;
-}
-
 .session-info {
 	flex: 1;
 	display: flex;

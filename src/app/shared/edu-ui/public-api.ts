@@ -34,6 +34,8 @@ export type { EduBadgeSeverity } from './lib/badge/edu-badge';
 
 export { EduAvatar } from './lib/avatar/edu-avatar';
 export type { EduAvatarSize } from './lib/avatar/edu-avatar';
+export { getAvatarRolAccent } from './lib/avatar/edu-avatar-rol';
+export type { EduAvatarRolAccent } from './lib/avatar/edu-avatar-rol';
 
 export { EduDivider } from './lib/divider/edu-divider';
 export type { EduDividerLayout } from './lib/divider/edu-divider';

@@ -4,6 +4,7 @@
 > **Repo afectado**: `educa-web`
 > **Plan**: `educa-coord/plans/xrepo/100-119/xrepo-105-backlog-ux-sesion-20260820.md` § Diseños → C
 > **Created**: 2026-10-01
+> **Validación prod**: ⏳ pendiente desde 2026-10-01
 > **MODO SUGERIDO**: `/design` (cierra 2 decisiones menores) → `/execute` → `/validate`
 > **exclusive**: `false`
 > **modules**: `infra`, `users`, `attendance`
@@ -52,3 +53,15 @@
 ## Tiempo estimado
 
 ~90-120 min.
+
+## Cierre (2026-10-01)
+
+**Decisiones**: borde + ícono-insignia desde el inicio (sin esperar test de daltonismo); Director y Administrador comparten acento (`danger`). Criterio de iniciales: **B** = primer apellido + primer nombre (formato estándar "Apellidos Nombres").
+
+**Hecho**: helper único `getPersonInitials`/`getInitialsFromParts` (`core/helpers/string.utils.ts`); `edu-avatar` con input `rol` (`edu-avatar-rol.ts`, spec por rol + desconocido → neutro); adoptado en menú de perfil, diálogo de info, login, tabla `/admin/usuarios` y diálogo de justificación de las 2 listas de asistencia. Lint 0 errores, build OK, 2767/2768 tests (1 flake de `eslint-config-guards` por carga; pasa solo).
+
+**Pendiente (por eso `awaiting-prod/`)**:
+- Verificación visual en vivo de los 5 sitios: dark mode, contraste del borde, insignia no cortada por `overflow` en celdas de tabla, tamaños `large` en login (42→48px).
+- Registrar decisiones borde+ícono y Director=Administrador en el plan P105 (`educa-coord`, cross-repo).
+- `attendance-persona-day-list`: `tipoPersona` A/C/M/D/N quedan sin rol (neutro) hasta confirmar qué roles son.
+- Límite del criterio B: 1 apellido + 2 nombres ("Perez Juan Carlos") da "PC".

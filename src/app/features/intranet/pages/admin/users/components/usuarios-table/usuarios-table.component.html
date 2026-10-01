@@ -49,7 +49,7 @@
 				</td>
 				<td>
 					<div class="user-cell">
-						<div class="user-avatar">{{ getInitials(usuario) }}</div>
+						<edu-avatar [label]="getInitials(usuario)" [rol]="usuario.rol" shape="circle" variant="brand" />
 						<div class="user-info">
 							<span
 								class="user-name"

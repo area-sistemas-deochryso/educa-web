@@ -14,7 +14,7 @@ import { RolService } from '@core/services/roles';
 // #region Mocks
 const mockUser: AuthUser = {
 	rol: 'Profesor',
-	nombreCompleto: 'Juan Carlos Pérez García',
+	nombreCompleto: 'Pérez García Juan Carlos',
 	entityId: 42,
 	sedeId: 1,
 	dni: '12345678',
@@ -98,7 +98,7 @@ describe('UserProfileService', () => {
 
 		it('should have user data', () => {
 			expect(service.userRole()).toBe('Profesor');
-			expect(service.userName()).toBe('Juan Carlos Pérez García');
+			expect(service.userName()).toBe('Pérez García Juan Carlos');
 			expect(service.entityId()).toBe(42);
 			expect(service.sedeId()).toBe(1);
 			expect(service.dni()).toBe('12345678');
@@ -110,11 +110,11 @@ describe('UserProfileService', () => {
 		});
 
 		it('should compute display name (full name)', () => {
-			expect(service.displayName()).toBe('Juan Carlos Pérez García');
+			expect(service.displayName()).toBe('Pérez García Juan Carlos');
 		});
 
 		it('should compute initials', () => {
-			expect(service.initials()).toBe('JG');
+			expect(service.initials()).toBe('PJ');
 		});
 	});
 	// #endregion

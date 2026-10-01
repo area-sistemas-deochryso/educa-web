@@ -3,16 +3,17 @@ import { DatePipe } from '@angular/common';
 import { UsuarioLista } from '../../services';
 import { RoleTab } from '../../models';
 import { hasMissingGuardianEmail, MISSING_GUARDIAN_EMAIL_LABEL } from '../../helpers/usuario-contact.utils';
+import { getInitialsFromParts } from '@core/helpers';
 import { UiMappingService } from '@intranet-shared/services';
 import { FullNamePipe } from '@shared/pipes';
 import { TableLoadingDirective } from '@intranet-shared/directives';
-import { EduButton, EduDialog, EduSortableColumn, EduTable, EduTag, EduTooltip } from '@edu-ui';
+import { EduAvatar, EduButton, EduDialog, EduSortableColumn, EduTable, EduTag, EduTooltip } from '@edu-ui';
 import type { EduTableLazyLoadEvent } from '@edu-ui';
 
 @Component({
 	selector: 'app-users-table',
 	standalone: true,
-	imports: [DatePipe, EduTable, EduButton, EduDialog, EduTag, EduTooltip, TableLoadingDirective, FullNamePipe, EduSortableColumn],
+	imports: [EduAvatar, DatePipe, EduTable, EduButton, EduDialog, EduTag, EduTooltip, TableLoadingDirective, FullNamePipe, EduSortableColumn],
 	templateUrl: './usuarios-table.component.html',
 	styleUrl: './usuarios-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -71,9 +72,7 @@ export class UsersTableComponent {
 	private initialLoadDone = false;
 
 	getInitials(usuario: UsuarioLista): string {
-		const first = usuario.nombres?.charAt(0) ?? '';
-		const last = usuario.apellidos?.charAt(0) ?? '';
-		return (first + last).toUpperCase();
+		return getInitialsFromParts(usuario.apellidos, usuario.nombres);
 	}
 
 	hasMultipleSalones(usuario: UsuarioLista): boolean {
