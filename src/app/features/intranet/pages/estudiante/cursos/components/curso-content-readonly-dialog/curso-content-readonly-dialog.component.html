@@ -161,25 +161,7 @@
 															} @else {
 																<div class="content-list">
 																	@for (archivo of semana.archivos; track archivo.id) {
-																		<div class="content-row">
-																			<div
-																				[class]="'row-icon ' + getFileIconClass(archivo.tipoArchivo)"
-																			>
-																				<i [class]="getFileIcon(archivo.tipoArchivo)"></i>
-																			</div>
-																			<div
-																				class="row-info clickable"
-																				data-info-anchor="estudiante-curso-dialog-archivo-profesor"
-																				(click)="openArchivo(archivo.urlArchivo)"
-																			>
-																				<strong>{{ archivo.nombreArchivo }}</strong>
-																				@if (archivo.tamanoBytes) {
-																					<span>{{
-																						archivo.tamanoBytes | formatFileSize
-																					}}</span>
-																				}
-																			</div>
-																		</div>
+																		<app-file-row data-info-anchor="estudiante-curso-dialog-archivo-profesor" [name]="archivo.nombreArchivo" [mimeType]="archivo.tipoArchivo" [sizeBytes]="archivo.tamanoBytes" (open)="openArchivo(archivo.urlArchivo)"></app-file-row>
 																	}
 																</div>
 															}
@@ -189,22 +171,18 @@
 														<!-- #region Mis Archivos (estudiante) -->
 														<div class="section-block">
 															<div class="section-header">
-																<button
-																	class="section-label section-action"
-																	data-info-anchor="estudiante-curso-dialog-mis-archivos-upload"
-																	type="button"
-																	(click)="studentFileInput.click()"
-																	aria-label="Subir mi archivo"
-																>
+																<div class="section-label">
 																	<i class="pi pi-upload"></i>
 																	Mis Archivos
-																	<i class="pi pi-plus action-hint"></i>
-																</button>
-																<input
-																	#studentFileInput
-																	type="file"
-																	hidden
-																	(change)="onNativeFileSelect($event, semana.id)"
+																</div>
+																<edu-file-upload
+																	data-info-anchor="estudiante-curso-dialog-mis-archivos-upload"
+																	mode="basic"
+																	chooseLabel="Subir archivo"
+																	[customUpload]="true"
+																	[accept]="uploadAccept"
+																	[maxFileSize]="uploadMaxBytes"
+																	(uploadHandler)="onFilesSelected($event, semana.id)"
 																/>
 															</div>
 
@@ -213,26 +191,8 @@
 															} @else {
 																<div class="content-list">
 																	@for (archivo of getMisArchivosSemana(semana.id); track archivo.id) {
-																		<div class="content-row">
-																			<div
-																				[class]="'row-icon ' + getFileIconClass(archivo.tipoArchivo)"
-																			>
-																				<i [class]="getFileIcon(archivo.tipoArchivo)"></i>
-																			</div>
-																			<div
-																				class="row-info clickable"
-																				data-info-anchor="estudiante-curso-dialog-mi-archivo"
-																				(click)="openArchivo(archivo.urlArchivo)"
-																			>
-																				<strong>{{ archivo.nombreArchivo }}</strong>
-																				@if (archivo.tamanoBytes) {
-																					<span>{{
-																						archivo.tamanoBytes | formatFileSize
-																					}}</span>
-																				}
-																			</div>
-																			<div class="row-actions">
-																				<edu-button
+																		<app-file-row data-info-anchor="estudiante-curso-dialog-mi-archivo" [name]="archivo.nombreArchivo" [mimeType]="archivo.tipoArchivo" [sizeBytes]="archivo.tamanoBytes" (open)="openArchivo(archivo.urlArchivo)">
+<span actions><edu-button
 																					icon="pi pi-trash"
 																					[text]="true"
 																					[rounded]="true"
@@ -247,9 +207,8 @@
 																							'aria-label': 'Eliminar archivo',
 																						},
 																					}"
-																				/>
-																			</div>
-																		</div>
+																				/></span>
+</app-file-row>
 																	}
 																</div>
 															}
@@ -300,23 +259,7 @@
 																				</div>
 																				<div class="tarea-archivos-list">
 																					@for (archivo of tarea.archivos; track archivo.id) {
-																						<div class="tarea-archivo-row">
-																							<div
-																								[class]="'row-icon small ' + getFileIconClass(archivo.tipoArchivo)"
-																							>
-																								<i [class]="getFileIcon(archivo.tipoArchivo)"></i>
-																							</div>
-																							<div
-																								class="row-info clickable"
-																								data-info-anchor="estudiante-curso-dialog-archivo-profesor"
-																								(click)="openArchivo(archivo.urlArchivo)"
-																							>
-																								<strong>{{ archivo.nombreArchivo }}</strong>
-																								@if (archivo.tamanoBytes) {
-																									<span>{{ archivo.tamanoBytes | formatFileSize }}</span>
-																								}
-																							</div>
-																						</div>
+																						<app-file-row data-info-anchor="estudiante-curso-dialog-archivo-profesor" [name]="archivo.nombreArchivo" [mimeType]="archivo.tipoArchivo" [sizeBytes]="archivo.tamanoBytes" [small]="true" (open)="openArchivo(archivo.urlArchivo)"></app-file-row>
 																					}
 																				</div>
 																			</div>
@@ -325,22 +268,15 @@
 																		<!-- Mi entrega (archivos del estudiante en la tarea) -->
 																		<div class="tarea-archivos-section student-section">
 																			<div class="tarea-section-label">
-																				<button
-																					class="tarea-attach-link"
-																					type="button"
+																				<span class="tarea-attach-label"><i class="pi pi-upload"></i> Mi entrega</span>
+																				<edu-file-upload
 																					data-info-anchor="estudiante-curso-dialog-mi-entrega-upload"
-																					(click)="tareaFileInput.click()"
-																					aria-label="Subir mi archivo de tarea"
-																				>
-																					<i class="pi pi-upload"></i>
-																					Mi entrega
-																					<i class="pi pi-plus action-hint"></i>
-																				</button>
-																				<input
-																					#tareaFileInput
-																					type="file"
-																					hidden
-																					(change)="onNativeTareaFileSelect($event, tarea.id)"
+																					mode="basic"
+																					chooseLabel="Subir archivo"
+																					[customUpload]="true"
+																					[accept]="uploadAccept"
+																					[maxFileSize]="uploadMaxBytes"
+																					(uploadHandler)="onTareaFilesSelected($event, tarea.id)"
 																				/>
 																			</div>
 																			@if (getMisTareaArchivos(tarea.id).length === 0) {
@@ -348,24 +284,8 @@
 																			} @else {
 																				<div class="tarea-archivos-list">
 																					@for (archivo of getMisTareaArchivos(tarea.id); track archivo.id) {
-																						<div class="tarea-archivo-row">
-																							<div
-																								[class]="'row-icon small ' + getFileIconClass(archivo.tipoArchivo)"
-																							>
-																								<i [class]="getFileIcon(archivo.tipoArchivo)"></i>
-																							</div>
-																							<div
-																								class="row-info clickable"
-																								data-info-anchor="estudiante-curso-dialog-mi-entrega"
-																								(click)="openArchivo(archivo.urlArchivo)"
-																							>
-																								<strong>{{ archivo.nombreArchivo }}</strong>
-																								@if (archivo.tamanoBytes) {
-																									<span>{{ archivo.tamanoBytes | formatFileSize }}</span>
-																								}
-																							</div>
-																							<div class="row-actions">
-																								<edu-button
+																						<app-file-row data-info-anchor="estudiante-curso-dialog-mi-entrega" [name]="archivo.nombreArchivo" [mimeType]="archivo.tipoArchivo" [sizeBytes]="archivo.tamanoBytes" [small]="true" (open)="openArchivo(archivo.urlArchivo)">
+<span actions><edu-button
 																									icon="pi pi-trash"
 																									[text]="true"
 																									[rounded]="true"
@@ -380,9 +300,8 @@
 																											'aria-label': 'Eliminar archivo de tarea',
 																										},
 																									}"
-																								/>
-																							</div>
-																						</div>
+																								/></span>
+</app-file-row>
 																					}
 																				</div>
 																			}

@@ -172,7 +172,7 @@ Preguntarse antes de decidir:
 
 ---
 
-## 7. Pautas recomendadas por componente (B1-B13)
+## 7. Pautas recomendadas por componente (B1-B14)
 
 > **Estándar extraído literalmente de `/intranet/admin/usuarios`.** Los ejemplos de esta sección son copy-paste-ables — si tu página nueva tiene el mismo componente, copia la estructura y adáptala.
 >
@@ -894,6 +894,29 @@ Case 10 de la auditoría de diseño (2026-08-03) encontró que varias pantallas 
 
 No usar para estados vacíos DENTRO de una pantalla que ya tiene su propio `<app-page-header>` fijo (p. ej. una tabla vacía bajo un header que no depende de los datos) — ahí el `#emptymessage` de `edu-table` o un div simple siguen siendo correctos. `app-empty-state` es específicamente para cuando la ausencia de datos reemplazaba la pantalla completa, header incluido.
 
+### B14 · Fila de archivo (`app-file-row`)
+
+Antes de brief 747 la fila ícono + nombre + tamaño estaba copiada en 5 sitios del módulo de cursos, con 3 clasificadores de tipo y 2 formateadores de tamaño distintos.
+
+**Regla**: toda lista de archivos adjuntos usa `<app-file-row>` (`shared/components/file-row`) en vez de armar la fila a mano. No definas `getFileIcon`/`getFileIconClass` locales: el tipo sale de `classifyFile` / `getFileKindMeta` y el tamaño de `formatFileSize` (`@core/helpers`, `file-type.utils.ts`), que también usan `FormatFileSizePipe` y `BlobStorageService`.
+
+```html
+<app-file-row
+	[name]="archivo.nombreArchivo"
+	[mimeType]="archivo.tipoArchivo"
+	[sizeBytes]="archivo.tamanoBytes"
+	(open)="openArchivo(archivo.urlArchivo)"
+>
+	<span actions><edu-button icon="pi pi-trash" [text]="true" severity="danger" /></span>
+</app-file-row>
+```
+
+- La fila es un `<button>` (foco por teclado); el nombre se trunca con elipsis y `eduTooltip` muestra el nombre completo. `[small]="true"` para listas anidadas (p. ej. material de una tarea).
+- `(open)` es el gancho del visor in-app (F4 del P105): hoy los consumidores hacen `window.open`.
+- Subida: `edu-file-upload` con `[accept]="UPLOAD_ACCEPT"` y `[maxFileSize]="UPLOAD_LIMITS.maxFileSizeBytes"`, y `validateUploadFile(file)` para extensión y largo de nombre (límites alineados con `FileUploadConfig.cs` del BE). Para avisar un rechazo usa `ErrorHandlerService.showWarning`, no `EduMessageService` inyectado: `ToastContainerComponent` provee su propia instancia y un toast enviado a la raíz nunca se ve.
+
+---
+
 ---
 
 ## 8. Tokens de color — Convención (D)
@@ -1094,6 +1117,8 @@ No abrir excepciones nuevas para "componentes con animación" o "páginas comple
 - **Fase 5 (2026-08-03, Design System F5, Case 5 de la auditoría)** — Agregado B12 (tabs vs. segmented control): documenta como regla intencional los dos idiomas de navegación (tabs = filtrar la misma vista, segmented control = visualización alternativa — reservado a Monitoreo > Incidencias > Errores) y fija el orden `<app-page-header>` antes de `p-tabs`, a nivel del shell. Corregido el orden invertido (header duplicado dentro de cada tab-panel) en `TicketAdminComponent` (Bandeja/Tipos) y `PermissionsRolesComponent` (Por Rol/Catálogo — `VistasComponent` perdió su `<app-page-header>` propio, el botón "Refrescar" se movió al toolbar de filtros).
 - **Fase 5 (2026-08-03, Design System F5, Case 10 de la auditoría)** — Agregado B13 (estado vacío nunca sin encabezado) y creado el componente compartido `<app-empty-state>` (`shared/components/empty-state`), que envuelve `<app-page-header>` internamente. Migrados `ProfesorCursosComponent` y `EstudianteCursosComponent` (ambos perdían el header completo en la rama de "sin cursos asignados").
 - **Fase 6 (2026-09-17, brief 658)** — Migración PrimeNG → edu-ui del propio doc: `p-table/p-select/p-dialog/p-drawer/pButton/pInputText` → `edu-table/edu-select/edu-dialog/edu-drawer/edu-button` + `input eduInputText`; variantes por clase (`p-button-text/outlined/success`, `p-button-sm`) → props (`[text]/[outlined]/severity/size`); bloques `::ng-deep .p-*` eliminados (cero usos de `::ng-deep` con edu-* en features/ — los internos vienen themeados en-componente); bloques globales `.p-datatable/.p-inputtext/.p-button` de §1-§3/§5 marcados como eliminados de `styles.scss` (P79). §8 Tokens intacto (shim `--p-*` intencional).
+
+- **Fase 7 (2026-10-01, brief 747)** — Agregado B14 (fila de archivo compartida `app-file-row`, clasificador/formateador únicos en `@core/helpers`, límites de subida). Piloto: `curso-content-readonly-dialog`; resto de sitios en F2/F3 del P105.
 
 Overrides existentes son redundantes con los globales pero no rompen nada — se pueden limpiar incrementalmente al tocar cada archivo.
 

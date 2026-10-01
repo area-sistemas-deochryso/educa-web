@@ -328,31 +328,6 @@
 			font-size: 0.75rem;
 		}
 
-		&.section-action {
-			background: none;
-			border: none;
-			cursor: pointer;
-			padding: 0.3rem 0.5rem;
-			margin: -0.3rem -0.5rem;
-			border-radius: 6px;
-			transition: background 0.15s, color 0.15s;
-			font-family: inherit;
-
-			&:hover {
-				background: rgba(34, 197, 94, 0.06);
-				color: var(--green-600);
-			}
-
-			.action-hint {
-				font-size: 0.6rem;
-				opacity: 0.4;
-				transition: opacity 0.15s;
-			}
-
-			&:hover .action-hint {
-				opacity: 0.9;
-			}
-		}
 	}
 }
 
@@ -403,42 +378,6 @@
 		color: var(--text-color-secondary);
 	}
 
-	&.pdf {
-		background: var(--red-50);
-		border-color: var(--red-200);
-		i { color: var(--red-500); }
-	}
-
-	&.ppt {
-		background: var(--red-50);
-		border-color: var(--red-200);
-		i { color: var(--red-500); }
-	}
-
-	&.word {
-		background: var(--blue-50);
-		border-color: var(--blue-200);
-		i { color: var(--blue-500); }
-	}
-
-	&.excel {
-		background: var(--green-50);
-		border-color: var(--green-200);
-		i { color: var(--green-500); }
-	}
-
-	&.image {
-		background: var(--violet-50);
-		border-color: var(--violet-200);
-		i { color: var(--violet-500); }
-	}
-
-	&.video {
-		background: var(--orange-50);
-		border-color: var(--orange-200);
-		i { color: var(--orange-500); }
-	}
-
 	&.tarea {
 		background: var(--yellow-50);
 		border-color: var(--yellow-200);
@@ -471,31 +410,11 @@
 		gap: 0.25rem;
 	}
 
-	&.clickable {
-		cursor: pointer;
-
-		strong {
-			color: var(--text-color);
-			transition: color 0.15s;
-
-			&:hover {
-				color: var(--green-600);
-				text-decoration: underline;
-			}
-		}
-	}
 }
 
 .tarea-desc {
 	font-size: 0.72rem;
 	color: var(--text-color-secondary);
-}
-
-.row-actions {
-	display: flex;
-	align-items: center;
-	gap: 0;
-	flex-shrink: 0;
 }
 
 // #endregion
@@ -529,74 +448,25 @@
 	}
 }
 
-.tarea-attach-link {
+// Etiqueta "Mi entrega"; el botón de subida lo aporta edu-file-upload
+.tarea-attach-label {
 	display: flex;
 	align-items: center;
 	gap: 0.4rem;
-	background: none;
-	border: none;
-	cursor: pointer;
-	padding: 0.2rem 0.4rem;
-	margin: -0.2rem -0.4rem;
-	border-radius: 4px;
 	font-size: 0.68rem;
 	font-weight: 600;
 	text-transform: uppercase;
 	letter-spacing: 0.04em;
 	color: var(--text-color-secondary);
-	font-family: inherit;
-	transition: background 0.15s, color 0.15s;
 
 	i {
 		font-size: 0.7rem;
-	}
-
-	.action-hint {
-		font-size: 0.55rem;
-		opacity: 0.4;
-		transition: opacity 0.15s;
-	}
-
-	&:hover {
-		background: rgba(34, 197, 94, 0.06);
-		color: var(--green-600);
-
-		.action-hint {
-			opacity: 0.9;
-		}
 	}
 }
 
 .tarea-archivos-list {
 	display: flex;
 	flex-direction: column;
-}
-
-.tarea-archivo-row {
-	display: flex;
-	align-items: center;
-	gap: 0.6rem;
-	padding: 0.35rem 0.15rem;
-	border-radius: 4px;
-	transition: background 0.15s;
-
-	&:hover {
-		background: rgba(0, 0, 0, 0.015);
-	}
-
-	& + & {
-		border-top: 1px solid var(--surface-border, #f3f4f6);
-	}
-}
-
-.row-icon.small {
-	width: 28px;
-	height: 28px;
-	border-radius: 6px;
-
-	i {
-		font-size: 0.8rem;
-	}
 }
 
 // #endregion

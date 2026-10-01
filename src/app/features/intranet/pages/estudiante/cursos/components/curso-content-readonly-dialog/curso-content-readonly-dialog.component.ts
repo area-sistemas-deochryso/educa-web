@@ -2,7 +2,8 @@ import { Component, ChangeDetectionStrategy, inject, signal, computed } from '@a
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { FormatFileSizePipe } from '@intranet-shared/pipes';
+import { ErrorHandlerService } from '@core/services';
+import { FileRowComponent, UPLOAD_ACCEPT, UPLOAD_LIMITS, validateUploadFile } from '@shared/components';
 import { EstudianteCursosFacade } from '@features/intranet/pages/estudiante/services/estudiante-cursos.facade';
 import { EstudianteArchivoDto, EstudianteTareaArchivoDto } from '@features/intranet/pages/estudiante/models';
 // eslint-disable-next-line layer-enforcement/imports-error -- Razón: summary dialogs de archivos/tareas son vistas read-only cross-role (estudiante lee contenido que profesor publica); migración a @intranet-shared diferida (ver maestro F3.5.C).
@@ -10,7 +11,7 @@ import { ArchivosSummaryDialogComponent } from '@features/intranet/pages/profeso
 // eslint-disable-next-line layer-enforcement/imports-error -- Razón: ver import anterior — mismo dialog cross-role.
 import { TareasSummaryDialogComponent } from '@features/intranet/pages/profesor/cursos/components/tareas-summary-dialog/tareas-summary-dialog.component';
 import { NotasCursoCardComponent } from '@features/intranet/pages/estudiante/notas/components/notas-curso-card/notas-curso-card.component';
-import { EduAccordion, EduAccordionHeader, EduAccordionPanel, EduButton, EduConfirmDialog, EduConfirmationService, EduDialog, EduTab, EduTabPanel, EduTabs, EduTooltip } from '@edu-ui';
+import { EduAccordion, EduAccordionHeader, EduAccordionPanel, EduButton, EduConfirmDialog, EduConfirmationService, EduDialog, EduFileUpload, type EduFileUploadSelectEvent, EduTab, EduTabPanel, EduTabs, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-curso-content-readonly-dialog',
@@ -23,7 +24,8 @@ import { EduAccordion, EduAccordionHeader, EduAccordionPanel, EduButton, EduConf
 		EduTooltip,
 		EduConfirmDialog,
 		EduTabs, EduTab, EduTabPanel,
-		FormatFileSizePipe,
+		EduFileUpload,
+		FileRowComponent,
 		ArchivosSummaryDialogComponent,
 		TareasSummaryDialogComponent,
 		NotasCursoCardComponent],
@@ -37,6 +39,9 @@ export class CursoContentReadonlyDialogComponent {
 	private readonly facade = inject(EstudianteCursosFacade);
 	private readonly confirmationService = inject(EduConfirmationService);
 	private readonly router = inject(Router);
+	private readonly errorHandler = inject(ErrorHandlerService);
+	readonly uploadAccept = UPLOAD_ACCEPT;
+	readonly uploadMaxBytes = UPLOAD_LIMITS.maxFileSizeBytes;
 	// #endregion
 
 	// #region Estado del facade
@@ -164,13 +169,11 @@ export class CursoContentReadonlyDialogComponent {
 	// #endregion
 
 	// #region Student file actions
-	onNativeFileSelect(event: Event, semanaId: number): void {
-		const input = event.target as HTMLInputElement;
-		const file = input.files?.[0];
+	onFilesSelected(event: EduFileUploadSelectEvent, semanaId: number): void {
+		const file = this.pickValidFile(event);
 		if (file) {
 			this.facade.uploadArchivo(semanaId, file);
 		}
-		input.value = '';
 	}
 
 	onDeleteMiArchivo(semanaId: number, archivo: EstudianteArchivoDto): void {
@@ -189,13 +192,11 @@ export class CursoContentReadonlyDialogComponent {
 	// #endregion
 
 	// #region Student task file actions
-	onNativeTareaFileSelect(event: Event, tareaId: number): void {
-		const input = event.target as HTMLInputElement;
-		const file = input.files?.[0];
+	onTareaFilesSelected(event: EduFileUploadSelectEvent, tareaId: number): void {
+		const file = this.pickValidFile(event);
 		if (file) {
 			this.facade.uploadTareaArchivo(tareaId, file);
 		}
-		input.value = '';
 	}
 
 	onDeleteMiTareaArchivo(tareaId: number, archivo: EstudianteTareaArchivoDto): void {
@@ -248,27 +249,15 @@ export class CursoContentReadonlyDialogComponent {
 		window.open(url, '_blank');
 	}
 
-	getFileIcon(tipoArchivo: string | null): string {
-		if (!tipoArchivo) return 'pi pi-file';
-		if (tipoArchivo.includes('pdf')) return 'pi pi-file-pdf';
-		if (tipoArchivo.includes('image')) return 'pi pi-image';
-		if (tipoArchivo.includes('video')) return 'pi pi-video';
-		if (tipoArchivo.includes('excel') || tipoArchivo.includes('sheet')) return 'pi pi-file-excel';
-		if (tipoArchivo.includes('presentation') || tipoArchivo.includes('powerpoint')) return 'pi pi-file';
-		if (tipoArchivo.includes('word') || tipoArchivo.includes('document')) return 'pi pi-file-word';
-		return 'pi pi-file';
+	private pickValidFile(event: EduFileUploadSelectEvent): File | null {
+		const file = event.files[0] ?? null;
+		if (!file) return null;
+		const error = validateUploadFile(file);
+		if (error) {
+			this.errorHandler.showWarning('Archivo no válido', error);
+			return null;
+		}
+		return file;
 	}
-
-	getFileIconClass(tipoArchivo: string | null): string {
-		if (!tipoArchivo) return 'generic';
-		if (tipoArchivo.includes('pdf')) return 'pdf';
-		if (tipoArchivo.includes('image')) return 'image';
-		if (tipoArchivo.includes('video')) return 'video';
-		if (tipoArchivo.includes('excel') || tipoArchivo.includes('sheet')) return 'excel';
-		if (tipoArchivo.includes('presentation') || tipoArchivo.includes('powerpoint')) return 'ppt';
-		if (tipoArchivo.includes('word') || tipoArchivo.includes('document')) return 'word';
-		return 'generic';
-	}
-
 	// #endregion
 }

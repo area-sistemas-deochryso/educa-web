@@ -39,13 +39,26 @@ El problema ("desordenado") es, medido: la fila ícono+nombre+tamaño está repe
 
 ## Criterio de cierre
 
-- [ ] 1 clasificador y 1 formateador; 0 copias de `getFileIcon`/`getFileIconClass` en los sitios migrados.
-- [ ] Componente de fila con spec de render (tipo, tamaño ausente, nombre largo con tooltip, tipos sin xls/ppt cubiertos).
-- [ ] Subida de cursos con `accept` y tope FE; mensaje claro si excede.
-- [ ] Sitio piloto migrado y verificado en vivo (local, BBDD de prueba, desde worktree); sin regresión de apertura (`window.open`).
-- [ ] lint + build + tests OK.
-- [ ] Briefs derivados F2, F3 y F4 materializados en `open/`.
+- [x] 1 clasificador y 1 formateador (`core/helpers/file-type.utils.ts`); 0 copias de `getFileIcon`/`getFileIconClass` en el piloto.
+- [x] Componente `app-file-row` con spec de render (tipo, tamaño ausente, nombre largo, xls/ppt cubiertos).
+- [x] Subida del piloto con `edu-file-upload`, `accept` y tope FE; mensaje claro si excede (verificado en vivo).
+- [x] Sitio piloto migrado y verificado en vivo (local, BBDD de prueba, desde worktree); sin regresión de apertura (`window.open`).
+- [x] lint + build + tests OK (2809 verdes).
+- [ ] Briefs derivados F2, F3 y F4 materializados en `open/` — **pendiente: `/next-chat` tras este cierre**.
 
 ## Tiempo estimado
 
 ~90-120 min.
+
+## Resultado (2026-10-01)
+
+- Decisión de diseño: opción B. Los helpers viven en `core/helpers` (la regla de capas prohíbe que `core` importe de `shared`) y el componente en `shared/components/file-row`, no en `edu-ui` (vendorizado de `educa-libs`: un re-sync lo habría pisado). `edu-ui` no se tocó.
+- `BlobStorageService.getFileType` queda como adaptador fino sobre `classifyFile` hasta F3 (`attachments-modal`).
+- **Hallazgo de la verificación en vivo**: `ToastContainerComponent` provee su propia `EduMessageService`; un toast enviado al servicio raíz nunca se muestra. Para avisos usar `ErrorHandlerService.showWarning`. Documentado en `design-system.md` B14.
+- Verificación en vivo: horario 26 (Ciencia · 2DO PRIMARIA A) con datos `TEST-747-*` en la BBDD de prueba. En un salón "Tutor pleno" el horario necesita 3 cosas para que el estudiante lo vea: `HorarioEstudiante` (acción "Asignar todos"), tutor del salón y profesor asignado al horario; crear el horario no genera ninguna.
+
+## Notas para F2/F3/F4 (derivados)
+
+- F2: `semanas-accordion` (profesor) sigue con `<input type=file>` nativo, sin `accept` ni tope. Migrar también archivos-summary, entregas y student-files.
+- F3: justificaciones (asistencia/salud) y `attachments-modal` del horario; retirar el adaptador de `getFileType`.
+- F4: visor in-app usando `(open)` de `app-file-row`; condicionado por el hallazgo de seguridad (URLs de blob públicas).

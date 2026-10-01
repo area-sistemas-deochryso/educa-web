@@ -7,3 +7,4 @@ export * from './rate-limit-countdown-toast';
 export * from './sections';
 export * from './layout';
 export * from './modo-asignacion-badge';
+export * from './file-row';

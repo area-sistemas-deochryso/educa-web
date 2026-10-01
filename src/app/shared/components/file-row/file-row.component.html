@@ -1,0 +1,14 @@
+<div class="file-row" [class.file-row--small]="small()">
+	<div class="file-row__icon file-row__icon--{{ meta().kind }}" aria-hidden="true">
+		<i [class]="meta().icon"></i>
+	</div>
+	<button type="button" class="file-row__info" [eduTooltip]="name()" eduTooltipPosition="top" (click)="open.emit()">
+		<strong class="file-row__name">{{ name() }}</strong>
+		@if (sizeLabel(); as size) {
+			<span class="file-row__size">{{ size }}</span>
+		}
+	</button>
+	<div class="file-row__actions">
+		<ng-content select="[actions]" />
+	</div>
+</div>

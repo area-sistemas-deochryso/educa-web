@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@config/environment';
-import { logger, FileUploadBuilder, withRetry } from '@core/helpers';
+import { logger, FileUploadBuilder, withRetry, classifyFile, formatFileSize } from '@core/helpers';
 
 // #endregion
 // #region Implementation
@@ -59,11 +59,7 @@ export class BlobStorageService {
 	 * @returns Tamaño formateado (ej: "2.4 MB")
 	 */
 	formatFileSize(bytes: number): string {
-		if (bytes === 0) return '0 Bytes';
-		const k = 1024;
-		const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-		const i = Math.floor(Math.log(bytes) / Math.log(k));
-		return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
+		return formatFileSize(bytes);
 	}
 
 	/**
@@ -72,22 +68,10 @@ export class BlobStorageService {
 	 * @returns Tipo de archivo ('pdf', 'doc', 'image', 'video', 'link')
 	 */
 	getFileType(fileName: string): 'pdf' | 'doc' | 'image' | 'video' | 'link' {
-		const extension = fileName.split('.').pop()?.toLowerCase();
-
-		const typeMap: Record<string, 'pdf' | 'doc' | 'image' | 'video' | 'link'> = {
-			pdf: 'pdf',
-			doc: 'doc',
-			docx: 'doc',
-			jpg: 'image',
-			jpeg: 'image',
-			png: 'image',
-			gif: 'image',
-			mp4: 'video',
-			avi: 'video',
-			mov: 'video',
-		};
-
-		return typeMap[extension || ''] || 'link';
+		const kind = classifyFile({ fileName });
+		if (kind === 'pdf' || kind === 'image' || kind === 'video') return kind;
+		if (kind === 'word' || kind === 'excel' || kind === 'ppt') return 'doc';
+		return 'link';
 	}
 }
 // #endregion
