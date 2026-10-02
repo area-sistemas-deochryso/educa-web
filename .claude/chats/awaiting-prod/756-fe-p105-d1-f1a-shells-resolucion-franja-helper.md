@@ -1,8 +1,9 @@
 # 756 — FE: P105 D1 F1a — Shells por rol, resolución de par y franja, selector, encabezado y helper
 
 > **Repo destino**: `educa-web` (frontend, branch `main`). Abrir el chat nuevo en este repo.
-> **Plan**: 105 · **Chat**: D1-F1a · **Creado**: 2026-10-02 · **Estado**: ⏳ pendiente arrancar
+> **Plan**: 105 · **Chat**: D1-F1a · **Creado**: 2026-10-02 · **Estado**: ✅ implementado y validado local (lint/build/test); ⏳ verificación en vivo pendiente
 > **Origen**: brief 755 (validación D1, cerrado) · diseño en brief 753
+> **Validación prod**: ⏳ pendiente desde 2026-10-02 (verificación en vivo del hub: par 24/34 y 14/25 en TEST, deep link con F5, par y franja inválidos, selector; ver sección VERIFICACIÓN EN VIVO)
 > **Plan file**: `educa-coord/plans/xrepo/100-119/xrepo-105-backlog-ux-sesion-20260820.md` § "D1 — Diseño del hub de curso"
 > **depends_on**: 752 (integrado en `main`, commit `bfbfc967`; re-confirmar al arrancar)
 > **MODO SUGERIDO**: `/investigate` corto → `/execute` → `/validate`
@@ -65,3 +66,14 @@ Dejar funcionando el **esqueleto del hub** para profesor y estudiante, sin pesta
 - Código en inglés, UI en español. Standalone + OnPush, `inject()`, `logger`, alias de imports.
 - Ante contradicción con lo documentado o con el código, detener y consultar.
 - Push a `main` de `educa-web` = deploy a prod: este chat no pushea sin autorización.
+
+## HALLAZGOS /investigate (2026-10-02, worktree `WT/educa-web/756-...`, branch `chat/756-...`)
+
+- **Worktree**: creado desde `main` @ `6820c6f0`; manifest registrado. Existe además un worktree ajeno `709-be-p107-...` (limpio, sin commits ahead, NO está en el manifest) — no tocar.
+- **752** integrado en `main` (`bfbfc967`). `educa-coord/chats/running/` vacío (sin chat cross-repo activo).
+- **Rutas**: `PROFESOR_ROUTES_RAW` / `ESTUDIANTE_ROUTES_RAW` en `intranet.routes.ts`; agregar ahí hereda `viewAsGateGuard`. `permissionPath` = `'intranet/profesor/cursos'` / `'intranet/estudiante/cursos'` (formato sin `/` inicial, igual que los precedentes).
+- **Riesgo criterio 2**: `ProfesorStore` y `EstudianteCursosStore` arrancan con `loading: false` + `horarios: []`. Un guard ingenuo ve "vacío y sin carga" en F5 y expulsa. Además `ProfesorFacade.loadData()` retorna sin tocar `loading` si `entityId` es null. → el shell lleva su propio `settled` (carga vista de verdad) y, ante duda, muestra spinner, nunca redirige.
+- **Horarios**: ambos roles usan `HorarioProfesorDto` (`id`, `cursoId`, `salonId`, `diaSemana` 1-5 = lun-vie, `horaInicio/Fin` "HH:mm", `cursoNombre`, `salonDescripcion`). Sin flag de "tiene contenido": se sonda con `getContenido(horarioId)` (`null` = sin contenido) — profesor vía `ProfesorFacade.getContenido`, estudiante vía `EstudianteApiService.getContenido`.
+- **Hora del servidor**: `WalClockService.adjustedNow` (skew por header Date) evita un fetch a `/api/ServerTime`.
+- **INV-VIEWAS01**: `EstudianteApiService.getMisHorarios` ya keyea su caché por `activeContext().entityId`; el hub no agrega caché propia.
+- **Helpers reutilizables**: `todayDia()` en `shared/helpers/horario-block.helpers.ts`. Toasts: `ErrorHandlerService.showInfo/showWarning`.

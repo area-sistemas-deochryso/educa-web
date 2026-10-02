@@ -8,7 +8,7 @@ import { UI_SUMMARIES, UI_ESTUDIANTE_ERROR_DETAILS, UI_ATTACHMENT_MESSAGES } fro
 import { SmartNotificationService, ActividadSnapshot } from '@core/services/notifications';
 import { EstudianteApiService } from './estudiante-api.service';
 import { EstudianteCursosStore } from './estudiante-cursos.store';
-import { RegistrarEstudianteArchivoRequest, RegistrarEstudianteTareaArchivoRequest } from '../models';
+import { CursoContenidoDetalleDto, RegistrarEstudianteArchivoRequest, RegistrarEstudianteTareaArchivoRequest } from '../models';
 
 const ESTUDIANTE_CURSO_URL = `${environment.apiUrl}/api/EstudianteCurso`;
 
@@ -84,6 +84,9 @@ export class EstudianteCursosFacade {
 				},
 			});
 	}
+
+	/** Lectura pura del contenido de una franja (sonda del hub de curso, sin tocar el store). */
+	getContenido = (horarioId: number): import('rxjs').Observable<CursoContenidoDetalleDto | null> => this.api.getContenido(horarioId);
 
 	/**
 	 * Lazy-load student's own files for a week (only once).

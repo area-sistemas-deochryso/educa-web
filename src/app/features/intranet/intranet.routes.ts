@@ -51,6 +51,19 @@ const PROFESOR_ROUTES_RAW: Route[] = [
 		title: 'Intranet - Mis Cursos (Profesor)',
 	},
 	{
+		// Hub de curso (P105 D1): par (curso, salón) en el path, franja en `?horarioId=`.
+		// Reusa la capability de la página de Cursos del profesor (`CURSOS_PROFESOR_PAGE_VIEW`):
+		// el hub es la vista detallada de esa misma página, no una página independiente
+		// (ver `.claude/reference/route-permission-sharing.md`, patrón "compartir").
+		path: 'profesor/cursos/:cursoId/:salonId',
+		loadComponent: () =>
+			import('./pages/profesor/cursos/curso-hub/profesor-curso-hub.component').then(
+				(m) => m.ProfesorCursoHubComponent,
+			),
+		title: 'Intranet - Curso (Profesor)',
+		data: { permissionPath: 'intranet/profesor/cursos' },
+	},
+	{
 		path: 'profesor/final-salones',
 		loadComponent: () =>
 			import('./pages/profesor/final-classrooms/profesor-final-salones.component').then(
@@ -109,6 +122,17 @@ const ESTUDIANTE_ROUTES_RAW: Route[] = [
 				(m) => m.EstudianteCursosComponent,
 			),
 		title: 'Intranet - Mis Cursos (Estudiante)',
+	},
+	{
+		// Hub de curso (P105 D1): reusa `CURSOS_ESTUDIANTE_PAGE_API_VIEW` de la página de Cursos
+		// del estudiante. Misma razón que el hub del profesor.
+		path: 'estudiante/cursos/:cursoId/:salonId',
+		loadComponent: () =>
+			import('./pages/estudiante/cursos/curso-hub/estudiante-curso-hub.component').then(
+				(m) => m.EstudianteCursoHubComponent,
+			),
+		title: 'Intranet - Curso (Estudiante)',
+		data: { permissionPath: 'intranet/estudiante/cursos' },
 	},
 	{
 		path: 'estudiante/foro',
