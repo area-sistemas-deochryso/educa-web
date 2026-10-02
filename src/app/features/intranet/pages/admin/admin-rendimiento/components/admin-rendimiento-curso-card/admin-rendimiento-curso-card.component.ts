@@ -10,6 +10,7 @@ import {
 	viewChild,
 } from '@angular/core';
 import { Chart, registerables } from 'chart.js';
+import { CursoChipComponent } from '@intranet-shared/components';
 
 import { ReporteRendimientoDto, tieneOutlier } from '../../models';
 import { EduCard } from '@edu-ui';
@@ -30,7 +31,7 @@ const COLOR_NEUTRO = '#6366f1';
 @Component({
 	selector: 'app-admin-rendimiento-curso-card',
 	standalone: true,
-	imports: [EduCard],
+	imports: [CursoChipComponent, EduCard],
 	templateUrl: './admin-rendimiento-curso-card.component.html',
 	styleUrl: './admin-rendimiento-curso-card.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

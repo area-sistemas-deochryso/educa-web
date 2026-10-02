@@ -362,6 +362,7 @@ export interface ProfesorSalonConEstudiantes extends ProfesorSalon {
 // #region Plazos de Inicio
 /** Evaluación cuya ventana de edición INV-T04 cierra en los próximos 7 días (widget de Inicio). */
 export interface EvaluacionPorCongelarseDto {
+	cursoId?: number | null;
 	evaluacionId: number;
 	titulo: string;
 	cursoNombre: string;

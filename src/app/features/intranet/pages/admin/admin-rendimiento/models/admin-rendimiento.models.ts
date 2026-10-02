@@ -14,6 +14,7 @@ export interface RendimientoPeriodoDto {
 }
 
 export interface ReporteRendimientoDto {
+	cursoId?: number | null;
 	cursoContenidoId: number;
 	cursoNombre: string;
 	salonDescripcion: string;

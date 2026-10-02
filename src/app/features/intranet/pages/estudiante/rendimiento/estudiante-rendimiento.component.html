@@ -29,7 +29,7 @@
 			@for (curso of vm().cursos; track curso.cursoContenidoId) {
 				<edu-card class="rendimiento-curso-card">
 					<div class="rendimiento-curso-header">
-						<h3>{{ curso.cursoNombre }}</h3>
+						<h3><app-curso-chip [cursoId]="curso.cursoId" [nombre]="curso.cursoNombre" /></h3>
 						<span class="text-color-secondary text-sm">{{ curso.anio }}</span>
 					</div>
 					<app-estudiante-rendimiento-chart

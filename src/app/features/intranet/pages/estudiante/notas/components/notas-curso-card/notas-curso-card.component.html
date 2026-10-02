@@ -11,7 +11,7 @@
 				></i>
 			}
 		</span>
-		<span class="hero-curso">{{ curso().cursoNombre }}</span>
+		<app-curso-chip class="hero-curso" [cursoId]="curso().cursoId" [nombre]="curso().cursoNombre" />
 		<span class="text-sm text-color-secondary">{{ curso().salonDescripcion }}</span>
 		@if (porcentajeEvaluado() < 100) {
 			<div class="hero-evaluado-note">

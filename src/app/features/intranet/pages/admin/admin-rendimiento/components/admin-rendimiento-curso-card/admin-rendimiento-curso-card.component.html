@@ -1,7 +1,7 @@
 <edu-card class="curso-card" [class.curso-card--outlier]="hasOutlier()">
 	<div class="curso-card__header">
 		<div>
-			<h3>{{ curso().cursoNombre }}</h3>
+			<h3><app-curso-chip [cursoId]="curso().cursoId" [nombre]="curso().cursoNombre" /></h3>
 			<span class="text-color-secondary text-sm">{{ curso().salonDescripcion }}</span>
 		</div>
 		@if (hasOutlier()) {

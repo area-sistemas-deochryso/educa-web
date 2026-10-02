@@ -8,6 +8,7 @@ import { UserProfileService } from '@core/services/user';
 import { EstudianteApiService } from '@features/intranet/pages/estudiante/services';
 import { ProfesorCursosApiService } from '@features/intranet/pages/profesor/services';
 import { SkeletonLoaderComponent } from '@shared/components';
+import { CursoChipComponent } from '@intranet-shared/components';
 
 // #endregion
 // #region Types
@@ -16,6 +17,7 @@ type PlazoUrgencia = 'urgent' | 'soon' | 'normal';
 interface PlazoItem {
 	key: string;
 	titulo: string;
+	cursoId: number | null;
 	cursoNombre: string;
 	fecha: string;
 	diasRestantes: number;
@@ -29,7 +31,7 @@ const MS_PER_DAY = 1000 * 60 * 60 * 24;
 @Component({
 	selector: 'app-plazos-widget',
 	standalone: true,
-	imports: [RouterLink, SkeletonLoaderComponent],
+	imports: [RouterLink, SkeletonLoaderComponent, CursoChipComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './plazos-widget.component.html',
 	styleUrl: './plazos-widget.component.scss',
@@ -85,7 +87,7 @@ export class PlazosWidgetComponent implements OnInit {
 		return this.estudianteApi.getMisTareasPorVencer().pipe(
 			map((tareas) =>
 				this.sortByFecha(
-					tareas.map((t) => this.toItem(`tarea-${t.tareaId}`, t.titulo, t.cursoNombre, t.fechaLimite)),
+					tareas.map((t) => this.toItem(`tarea-${t.tareaId}`, t.titulo, t.cursoId ?? null, t.cursoNombre, t.fechaLimite)),
 				),
 			),
 			catchError((err) => this.fallback('getMisTareasPorVencer', err)),
@@ -97,7 +99,7 @@ export class PlazosWidgetComponent implements OnInit {
 			map((evaluaciones) =>
 				this.sortByFecha(
 					evaluaciones.map((e) =>
-						this.toItem(`evaluacion-${e.evaluacionId}`, e.titulo, e.cursoNombre, e.fechaLimiteEdicion),
+						this.toItem(`evaluacion-${e.evaluacionId}`, e.titulo, e.cursoId ?? null, e.cursoNombre, e.fechaLimiteEdicion),
 					),
 				),
 			),
@@ -110,8 +112,8 @@ export class PlazosWidgetComponent implements OnInit {
 		return of([]);
 	}
 
-	private toItem(key: string, titulo: string, cursoNombre: string, fecha: string): PlazoItem {
-		return { key, titulo, cursoNombre, fecha, diasRestantes: this.diffDays(fecha) };
+	private toItem(key: string, titulo: string, cursoId: number | null, cursoNombre: string, fecha: string): PlazoItem {
+		return { key, titulo, cursoId, cursoNombre, fecha, diasRestantes: this.diffDays(fecha) };
 	}
 
 	private sortByFecha(items: PlazoItem[]): PlazoItem[] {

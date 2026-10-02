@@ -13,13 +13,14 @@ import {
 } from '@features/intranet/pages/estudiante/models/estudiante.models';
 import { formatDateISO } from '@intranet-shared/helpers';
 import { SkeletonLoaderComponent } from '@shared/components';
+import { CursoChipComponent } from '@intranet-shared/components';
 
 // #endregion
 // #region Implementation
 @Component({
 	selector: 'app-estudiante-attendance-widget',
 	standalone: true,
-	imports: [RouterLink, SkeletonLoaderComponent],
+	imports: [RouterLink, SkeletonLoaderComponent, CursoChipComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './estudiante-attendance-widget.component.html',
 	styleUrl: './estudiante-attendance-widget.component.scss',
@@ -54,6 +55,7 @@ export class EstudianteAttendanceWidgetComponent implements OnInit {
 	});
 
 	readonly cursoNombre = computed(() => this.resumen()?.cursoNombre ?? '');
+	readonly cursoId = computed(() => this.resumen()?.cursoId ?? null);
 	// #endregion
 
 	// #region Lifecycle

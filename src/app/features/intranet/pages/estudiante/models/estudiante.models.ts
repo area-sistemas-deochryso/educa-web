@@ -87,6 +87,7 @@ export interface MiAsistenciaCursoItemDto {
 }
 
 export interface MiAsistenciaCursoResumenDto {
+	cursoId?: number | null;
 	horarioId: number;
 	cursoNombre: string;
 	salonDescripcion: string;
@@ -119,6 +120,7 @@ export interface JustificarInasistenciaContext {
 // #region Plazos de Inicio
 /** Tarea pendiente con `fechaLimite` en los próximos 7 días (widget de Inicio). */
 export interface TareaPorVencerDto {
+	cursoId?: number | null;
 	tareaId: number;
 	titulo: string;
 	cursoNombre: string;

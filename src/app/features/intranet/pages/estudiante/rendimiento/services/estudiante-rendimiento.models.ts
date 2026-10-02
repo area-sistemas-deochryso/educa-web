@@ -12,6 +12,7 @@ export interface RendimientoPeriodoEstudianteDto {
 }
 
 export interface RendimientoPropioCursoDto {
+	cursoId?: number | null;
 	cursoContenidoId: number;
 	cursoNombre: string;
 	anio: number;

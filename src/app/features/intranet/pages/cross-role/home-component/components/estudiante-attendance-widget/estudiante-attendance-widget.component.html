@@ -17,7 +17,7 @@
 		</div>
 	} @else if (hasDataHoy()) {
 		<div class="mi-asistencia-row">
-			<span class="curso-label">{{ cursoNombre() }}</span>
+			<app-curso-chip class="curso-label" [cursoId]="cursoId()" [nombre]="cursoNombre()" />
 			<span class="estado-badge" [class]="estadoSeverityClass()">{{ estadoLabel() }}</span>
 		</div>
 	} @else {

@@ -121,6 +121,7 @@ export interface EstudiantePromediosDto {
 }
 
 export interface EstudianteMisNotasDto {
+  cursoId?: number | null;
   cursoContenidoId: number;
   cursoNombre: string;
   salonDescripcion: string;

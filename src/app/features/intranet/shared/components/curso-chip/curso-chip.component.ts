@@ -14,17 +14,21 @@ import { CURSO_TEXT_COLOR, cursoColorFor } from '@intranet-shared/config/curso-c
 @Component({
 	selector: 'app-curso-chip',
 	standalone: true,
-	template: `<span class="curso-chip" [style.background-color]="color()" [style.color]="textColor">{{ nombre() }}</span>`,
+	template: `<span class="curso-chip" [class.curso-chip--neutral]="color() === null" [style.background-color]="color()" [style.color]="color() ? textColor : null">{{ nombre() }}</span>`,
 	styleUrl: './curso-chip.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CursoChipComponent {
 	private readonly theme = inject(ThemeService);
 
-	readonly cursoId = input.required<number>();
+	/** `null`/`undefined` (DTO sin curso resuelto) → chip neutro sin color de curso. */
+	readonly cursoId = input<number | null | undefined>(null);
 	readonly nombre = input.required<string>();
 
 	readonly textColor = CURSO_TEXT_COLOR;
-	readonly color = computed(() => cursoColorFor(this.cursoId(), this.theme.isDarkMode()));
+	readonly color = computed(() => {
+		const id = this.cursoId();
+		return id == null ? null : cursoColorFor(id, this.theme.isDarkMode());
+	});
 }
 // #endregion
