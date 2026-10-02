@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, inject, effect, signal, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { PageHeaderComponent, PeriodToggleComponent } from '@intranet-shared/components';
+import { CursoChipComponent, PageHeaderComponent, PeriodToggleComponent } from '@intranet-shared/components';
 import { PluralizePipe } from '@intranet-shared/pipes';
 import { SalonCursoInfo, VistaPromedio, ActualizarGrupoDto, ProfesorSalonConEstudiantes } from '../models';
 import { ProfesorFacade } from '../services/profesor.facade';
@@ -20,6 +20,7 @@ import { EduSpinner, EduTag, EduTooltip } from '@edu-ui';
 		EduTag,
 		EduTooltip,
 		EduSpinner,
+		CursoChipComponent,
 		PageHeaderComponent,
 		PeriodToggleComponent,
 		PluralizePipe,

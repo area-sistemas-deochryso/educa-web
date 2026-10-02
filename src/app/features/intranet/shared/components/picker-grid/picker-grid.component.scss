@@ -68,6 +68,11 @@
 		background: color-mix(in srgb, var(--primary-color) 8%, transparent);
 	}
 
+	// Franja del curso: va después de --selected para que su borde izquierdo no se pise.
+	&--curso {
+		border-left: 4px solid var(--curso-accent);
+	}
+
 	&__label {
 		font-size: 0.95rem;
 		font-weight: 600;

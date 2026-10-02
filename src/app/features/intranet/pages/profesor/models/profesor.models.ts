@@ -332,6 +332,8 @@ export interface SalonCursoInfo {
 	nombre: string;
 	/** First horario id for this course-salon pair (used for navigation). */
 	horarioId: number;
+	/** Course id — the key of the per-course color (`cursoColorFor`). */
+	cursoId: number;
 }
 
 /**

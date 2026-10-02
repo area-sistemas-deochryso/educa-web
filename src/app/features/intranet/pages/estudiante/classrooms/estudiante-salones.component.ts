@@ -1,7 +1,12 @@
 import { Component, ChangeDetectionStrategy, inject, effect, signal, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { PageHeaderComponent, PeriodToggleComponent, EmptyStateComponent } from '@intranet-shared/components';
+import {
+	CursoChipComponent,
+	PageHeaderComponent,
+	PeriodToggleComponent,
+	EmptyStateComponent,
+} from '@intranet-shared/components';
 import { StudentClassroomsFacade } from './services/estudiante-salones.facade';
 import { EstudianteSalon, EstudianteSalonCurso, JustificarInasistenciaContext } from '../models';
 import { EstudianteSalonDialogComponent } from './components/estudiante-salon-dialog/estudiante-salon-dialog.component';
@@ -14,6 +19,7 @@ import { EduSpinner, EduTag, EduTooltip } from '@edu-ui';
 		EduTag,
 		EduTooltip,
 		EduSpinner,
+		CursoChipComponent,
 		PageHeaderComponent,
 		PeriodToggleComponent,
 		EmptyStateComponent,
@@ -70,9 +76,10 @@ import { EduSpinner, EduTag, EduTooltip } from '@edu-ui';
 
 							<div class="flex flex-wrap gap-1">
 								@for (curso of salon.cursos; track curso.cursoId) {
-									<edu-tag
-										[value]="curso.cursoNombre"
-										styleClass="tag-neutral cursor-pointer"
+									<app-curso-chip
+										[cursoId]="curso.cursoId"
+										[nombre]="curso.cursoNombre"
+										class="cursor-pointer"
 										data-info-anchor="estudiante-salones-card-curso-tag"
 										(click)="onVerCurso(curso, $event)"
 										eduTooltip="Ver contenido del curso"

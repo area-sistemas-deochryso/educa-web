@@ -7,7 +7,6 @@ import { EstudianteFacade } from '../services/estudiante.facade';
 import { SalonMensajeriaFacade } from '@features/intranet/pages/cross-role/mensajeria/services/mensajeria.facade';
 import { SalonForoTabComponent } from '@features/intranet/pages/cross-role/mensajeria/components/foro-tab/foro-tab.component';
 import { HorarioProfesorDto } from '../models/estudiante.models';
-import { toSelectOptionsFrom } from '@shared/models';
 import { EduSpinner } from '@edu-ui';
 
 @Component({
@@ -71,9 +70,9 @@ export class EstudianteForoComponent implements OnInit, OnDestroy {
 	});
 
 	readonly cursoOptions = computed(() =>
-		toSelectOptionsFrom(this.uniqueHorarios(), 'cursoNombre', 'id').sort((a, b) =>
-			a.label.localeCompare(b.label),
-		),
+		this.uniqueHorarios()
+			.map((h) => ({ label: h.cursoNombre, value: h.id, cursoId: h.cursoId }))
+			.sort((a, b) => a.label.localeCompare(b.label)),
 	);
 
 	readonly singleSalonDescripcion = computed(() => {

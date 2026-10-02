@@ -180,7 +180,7 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
 	readonly cursoOptions = computed(() => {
 		const horarios = this.facade.vm().horarios;
 		const seen = new Map<string, boolean>();
-		const options: { label: string; value: number }[] = [];
+		const options: { label: string; value: number; cursoId: number }[] = [];
 
 		for (const h of horarios) {
 			const key = `${h.cursoId}-${h.salonId}`;
@@ -189,6 +189,7 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
 				options.push({
 					label: `${h.cursoNombre} - ${h.salonDescripcion}`,
 					value: h.id,
+					cursoId: h.cursoId,
 				});
 			}
 		}

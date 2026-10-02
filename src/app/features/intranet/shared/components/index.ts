@@ -14,6 +14,7 @@ export * from './responsive-table';
 export * from './stats-skeleton';
 export * from './kpi-stats';
 export * from './picker-grid';
+export * from './curso-chip';
 export * from './table-skeleton';
 export * from './attendance-scope-banner';
 export * from './attendance-scope-student-notice';

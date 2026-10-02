@@ -1,19 +1,23 @@
 // One color per course, identical for every role, derived from cursoId only.
-// OKLCH with fixed lightness/chroma per theme: only the hue varies, so every
-// course color holds the same white text contrast and reads as one palette.
+// OKLCH with fixed chroma per theme and three lightness bands (picked by id):
+// the hue spreads the courses and the band adds a second axis, so neighbours
+// that land on close hues still differ. Every band holds white text >= 4.5:1.
 // The output is always hex — consumers (darkenColor, inline styles) rely on it.
 
 // #region Constants
 interface ThemeTone {
-	lightness: number;
+	lightnessBands: readonly number[];
 	chroma: number;
 }
 
 /** White text sits on top of the fill in both themes (`--white-color`). */
 export const CURSO_TEXT_COLOR = '#FFFFFF';
 
-const LIGHT_TONE: ThemeTone = { lightness: 0.52, chroma: 0.15 };
-const DARK_TONE: ThemeTone = { lightness: 0.5, chroma: 0.13 };
+// Top band is capped by white-text contrast (0.55 already drops to 4.6:1).
+// Measured over ids 1..48 in windows of 20: closest pair OKLab distance 0.024
+// with one band -> 0.046 with these three.
+const LIGHT_TONE: ThemeTone = { lightnessBands: [0.4, 0.47, 0.54], chroma: 0.15 };
+const DARK_TONE: ThemeTone = { lightnessBands: [0.4, 0.47, 0.54], chroma: 0.13 };
 
 const GOLDEN_RATIO_CONJUGATE = 0.6180339887498949;
 
@@ -81,7 +85,8 @@ export function cursoHueFor(cursoId: number): number {
 // of which subset of horarios is loaded or in what order they arrive.
 export function cursoColorFor(cursoId: number, dark = false): string {
 	const tone = dark ? DARK_TONE : LIGHT_TONE;
-	return oklchToHex(tone.lightness, tone.chroma, cursoHueFor(cursoId));
+	const lightness = tone.lightnessBands[Math.abs(cursoId) % tone.lightnessBands.length];
+	return oklchToHex(lightness, tone.chroma, cursoHueFor(cursoId));
 }
 
 export function darkenColor(hex: string): string {

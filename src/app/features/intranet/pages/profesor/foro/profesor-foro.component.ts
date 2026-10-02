@@ -110,7 +110,7 @@ export class ProfesorForoComponent implements OnInit, OnDestroy {
 	readonly cursoOptions = computed(() => {
 		const salon = this.selectedSalon();
 		if (!salon) return [];
-		return toSelectOptionsFrom(salon.cursos, 'nombre', 'horarioId');
+		return salon.cursos.map((c) => ({ label: c.nombre, value: c.horarioId, cursoId: c.cursoId }));
 	});
 
 	readonly estudiantesOptions = computed(() => {

@@ -44,6 +44,23 @@ function oklchHue(hex: string): number {
 	return ((Math.atan2(bb, a) * 180) / Math.PI + 360) % 360;
 }
 
+function oklab(hex: string): [number, number, number] {
+	const [r, g, b] = linearRgb(hex);
+	const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
+	const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
+	const s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+	return [
+		0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s,
+		1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s,
+		0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s,
+	];
+}
+
+function colorDistance(hexA: string, hexB: string): number {
+	const [a, b] = [oklab(hexA), oklab(hexB)];
+	return Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
+}
+
 function hueDistance(a: number, b: number): number {
 	const d = Math.abs(a - b) % 360;
 	return Math.min(d, 360 - d);
@@ -104,6 +121,25 @@ describe('curso-colors', () => {
 		// eslint-disable-next-line no-console -- measured figures are the evidence brief 745 asks to keep visible
 		console.log(`[curso-colors] tightest hue gap among any 20 consecutive ids in 1..48 = ${worst.toFixed(1)}°`);
 		expect(worst).toBeGreaterThan(0);
+	});
+
+	it.each([
+		['light', false],
+		['dark', true],
+	])('keeps 20 consecutive courses visibly apart in OKLab (%s)', (_label, dark) => {
+		// One lightness band gave 0.024 here; three bands are what lifts it.
+		let worst = Infinity;
+		for (let start = 1; start <= 48 - 19; start++) {
+			const colors = Array.from({ length: 20 }, (_, i) => cursoColorFor(start + i, dark));
+			for (let i = 0; i < colors.length; i++) {
+				for (let j = i + 1; j < colors.length; j++) {
+					worst = Math.min(worst, colorDistance(colors[i], colors[j]));
+				}
+			}
+		}
+		// eslint-disable-next-line no-console -- measured figures are the evidence brief 750 asks to keep visible
+		console.log(`[curso-colors] ${_label}: closest OKLab distance among any 20 consecutive ids = ${worst.toFixed(3)}`);
+		expect(worst).toBeGreaterThan(0.04);
 	});
 
 	it('builds one entry per distinct course', () => {

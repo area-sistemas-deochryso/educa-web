@@ -1,7 +1,9 @@
 // #region Imports
-import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ThemeService } from '@core/services/theme';
 import { EduInputText } from '@edu-ui';
+import { cursoColorFor } from '@intranet-shared/config/curso-colors';
 
 // #endregion
 
@@ -10,6 +12,8 @@ export interface PickerGridOption {
 	value: number;
 	label: string;
 	sublabel?: string;
+	/** Si viene, la card lleva una franja lateral con el color de ese curso. */
+	cursoId?: number;
 }
 // #endregion
 
@@ -36,6 +40,8 @@ export interface PickerGridOption {
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PickerGridComponent {
+	private readonly theme = inject(ThemeService);
+
 	readonly options = input.required<PickerGridOption[]>();
 	readonly selected = input<number | null>(null);
 	readonly searchPlaceholder = input('Buscar...');
@@ -59,6 +65,11 @@ export class PickerGridComponent {
 				option.label.toLowerCase().includes(query) || (option.sublabel?.toLowerCase().includes(query) ?? false),
 		);
 	});
+
+	/** Lee `isDarkMode()` desde el template: la franja reacciona al toggle de tema. */
+	accent(option: PickerGridOption): string | null {
+		return option.cursoId === undefined ? null : cursoColorFor(option.cursoId, this.theme.isDarkMode());
+	}
 
 	isSelected(option: PickerGridOption): boolean {
 		return this.selected() === option.value;

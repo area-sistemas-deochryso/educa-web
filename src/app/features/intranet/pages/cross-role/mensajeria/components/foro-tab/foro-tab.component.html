@@ -16,7 +16,14 @@
 	</div>
 } @else if (singleCursoLabel(); as label) {
 	<div class="foro-curso-selector">
-		<edu-tag [value]="salonDescripcion() ? label + ' — ' + salonDescripcion() : label" styleClass="tag-neutral" icon="pi pi-book" />
+		@if (singleCursoId(); as cursoId) {
+			<app-curso-chip [cursoId]="cursoId" [nombre]="label" />
+			@if (salonDescripcion()) {
+				<span class="foro-curso-salon">{{ salonDescripcion() }}</span>
+			}
+		} @else {
+			<edu-tag [value]="salonDescripcion() ? label + ' — ' + salonDescripcion() : label" styleClass="tag-neutral" icon="pi pi-book" />
+		}
 	</div>
 }
 <!-- #endregion -->

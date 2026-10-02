@@ -119,7 +119,7 @@ export class ProfesorStore {
 		// Agregar salones de horarios (sin duplicar cursos)
 		for (const h of horarios) {
 			const existing = salonesMap.get(h.salonId);
-			const cursoInfo: SalonCursoInfo = { nombre: h.cursoNombre, horarioId: h.id };
+			const cursoInfo: SalonCursoInfo = { nombre: h.cursoNombre, horarioId: h.id, cursoId: h.cursoId };
 
 			if (existing) {
 				if (!existing.cursos.some((c) => c.nombre === h.cursoNombre)) {

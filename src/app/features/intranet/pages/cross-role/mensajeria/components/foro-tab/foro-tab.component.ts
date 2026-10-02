@@ -4,13 +4,14 @@ import { FormsModule } from '@angular/forms';
 import { GrupoContenidoDto } from '@features/intranet/pages/profesor/models';
 import { CrearConversacionDto } from '@data/models';
 import { getInitial } from '@core/helpers';
+import { CursoChipComponent } from '@intranet-shared/components';
 import { SalonMensajeriaFacade } from '../../services/mensajeria.facade';
 import { EduButton, EduInputText, EduMultiSelect, EduSelect, EduSpinner, EduTag } from '@edu-ui';
 
 @Component({
 	selector: 'app-salon-foro-tab',
 	standalone: true,
-	imports: [DatePipe, FormsModule, EduButton, EduInputText, EduMultiSelect, EduSelect, EduTag, EduSpinner],
+	imports: [DatePipe, FormsModule, CursoChipComponent, EduButton, EduInputText, EduMultiSelect, EduSelect, EduTag, EduSpinner],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './foro-tab.component.html',
 	styleUrl: './foro-tab.component.scss',
@@ -23,7 +24,8 @@ export class SalonForoTabComponent {
 	// #region Inputs
 	readonly estudiantes = input<{ label: string; value: string }[]>([]);
 	readonly grupos = input<GrupoContenidoDto[]>([]);
-	readonly cursoOptions = input<{ label: string; value: number }[]>([]);
+	/** `cursoId` es opcional: si viene, el curso único se pinta con su color. */
+	readonly cursoOptions = input<{ label: string; value: number; cursoId?: number }[]>([]);
 	readonly readOnly = input<boolean>(false);
 	readonly salonDescripcion = input<string>('');
 	readonly estudiantesDni = input<string[]>([]);
@@ -42,6 +44,10 @@ export class SalonForoTabComponent {
 	readonly singleCursoLabel = computed(() => {
 		const options = this.cursoOptions();
 		return options.length === 1 ? options[0].label : null;
+	});
+	readonly singleCursoId = computed(() => {
+		const options = this.cursoOptions();
+		return options.length === 1 ? (options[0].cursoId ?? null) : null;
 	});
 
 	constructor() {

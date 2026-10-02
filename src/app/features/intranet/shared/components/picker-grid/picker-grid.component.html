@@ -28,6 +28,8 @@
 					type="button"
 					class="picker-card"
 					[class.picker-card--selected]="isSelected(option)"
+					[class.picker-card--curso]="option.cursoId !== undefined"
+					[style.--curso-accent]="accent(option)"
 					role="option"
 					[attr.aria-selected]="isSelected(option)"
 					(click)="select(option)"
