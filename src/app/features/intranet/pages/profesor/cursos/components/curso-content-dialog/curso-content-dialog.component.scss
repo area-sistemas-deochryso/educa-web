@@ -10,18 +10,30 @@
 // #endregion
 
 // #region Tabs header row
-.tabs-header-row {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 1rem;
+// edu-tabs only projects direct <edu-tab>/<edu-tabpanel> children, so the links
+// live in a sibling positioned over the tab row instead of inside a wrapper.
+.tabs-shell {
+	position: relative;
 }
 
 .tabs-header-links {
+	position: absolute;
+	top: 0;
+	right: 0;
+	z-index: 1;
 	display: flex;
 	align-items: center;
 	gap: 1rem;
-	flex-shrink: 0;
+	height: 2.75rem;
+	padding-left: 0.5rem;
+	background: var(--eduui-content-background, #fff);
+}
+
+// Reserve the links' space so tabs never slide underneath them.
+@media (min-width: 601px) {
+	:host ::ng-deep .edu-tabs__list {
+		padding-right: 15rem;
+	}
 }
 
 .ver-asistencia-link {
@@ -269,6 +281,14 @@
 // #endregion
 // #region Responsive
 @media (max-width: 600px) {
+	.tabs-header-links {
+		position: static;
+		height: auto;
+		padding: 0 0 0.5rem;
+		justify-content: flex-end;
+		flex-wrap: wrap;
+	}
+
 	.modal-body {
 		padding: 0.75rem 1rem 1rem;
 	}
