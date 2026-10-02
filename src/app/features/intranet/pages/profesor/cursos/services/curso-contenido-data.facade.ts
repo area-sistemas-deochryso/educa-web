@@ -1,5 +1,6 @@
 import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import type { Subscription } from 'rxjs';
 import { logger, resolveErrorMessage, withRetry, facadeErrorHandler } from '@core/helpers';
 import { ErrorHandlerService, WalFacadeHelper, WalCrossTabRefetchService } from '@core/services';
 import { UI_SUMMARIES, UI_ADMIN_ERROR_DETAILS } from '@shared/constants';
@@ -24,6 +25,7 @@ export class CursoContenidoDataFacade {
 	private readonly wal = inject(WalFacadeHelper);
 	private readonly crossTabRefetch = inject(WalCrossTabRefetchService);
 	private readonly destroyRef = inject(DestroyRef);
+	private hubLoadSub: Subscription | null = null;
 	private readonly contenidoUrl = `${environment.apiUrl}/api/CursoContenido`;
 	private readonly errHandler = facadeErrorHandler({
 		tag: 'CursoContenidoDataFacade',
@@ -141,6 +143,52 @@ export class CursoContenidoDataFacade {
 			});
 	}
 
+	/**
+	 * Load the content of a schedule for the course hub: no dialog is opened and
+	 * a newer call cancels the in-flight one (a fast slot switch must not be
+	 * ignored nor let the older response overwrite the newer one).
+	 *
+	 * @param horarioId Schedule id.
+	 * @param options.salonId SalonId del horario (lo lee CalificacionesFacade desde el store).
+	 */
+	loadContenidoForHub(horarioId: number, options?: { salonId?: number }): void {
+		this.hubLoadSub?.unsubscribe();
+		this.store.setSelectedHorarioId(horarioId);
+		if (options?.salonId != null) {
+			this.store.setSalonId(options.salonId);
+		}
+		this.store.setContenido(null);
+		this.store.setLoading(true);
+		this.store.clearError();
+
+		this.hubLoadSub = this.api
+			.getContenido(horarioId)
+			.pipe(
+				withRetry({ tag: 'CursoContenidoDataFacade:loadContenidoForHub' }),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe({
+				next: (contenido) => {
+					this.store.setContenido(contenido);
+					this.store.setLoading(false);
+				},
+				error: (err) => {
+					logger.error('CursoContenidoDataFacade: Error al cargar contenido del hub', err);
+					const message = resolveErrorMessage(err, UI_ADMIN_ERROR_DETAILS.loadContenido);
+					this.errorHandler.showError(UI_SUMMARIES.error, message);
+					this.store.setError(message);
+					this.store.setLoading(false);
+				},
+			});
+	}
+
+	/** Cancel the in-flight hub load and clear the shared store (leaving the hub). */
+	resetForHub(): void {
+		this.hubLoadSub?.unsubscribe();
+		this.hubLoadSub = null;
+		this.store.reset();
+	}
+
 	/** Refresh content using the currently selected horarioId. */
 	refreshContenido(): void {
 		const horarioId = this.store.selectedHorarioId();
@@ -194,6 +242,42 @@ export class CursoContenidoDataFacade {
 			onCommit: (contenido) => {
 				this.store.setContenido(contenido);
 				this.store.openContentDialog();
+			},
+			onError: (err) => this.errHandler.handle(err, 'crear contenido', () => this.store.setSaving(false)),
+		});
+	}
+
+	/**
+	 * Create content from the course hub. Same WAL flow as `crearContenido` but
+	 * without the modal side effects (it would leave `contentDialogVisible` on
+	 * and the Cursos page modal would pop open on the next visit).
+	 *
+	 * @param request Creation payload.
+	 * @param hooks.onApplied Optimistic apply (the hub closes its builder).
+	 * @param hooks.onRolledBack Rollback (the hub reopens its builder).
+	 */
+	crearContenidoEnHub(
+		request: CrearCursoContenidoRequest,
+		hooks?: { onApplied?: () => void; onRolledBack?: () => void },
+	): void {
+		this.wal.execute({
+			operation: 'CREATE',
+			resourceType: 'cursoContenido',
+			endpoint: this.contenidoUrl,
+			method: 'POST',
+			payload: request,
+			http$: () => this.api.crearContenido(request),
+			optimistic: {
+				apply: () => {
+					this.store.setSaving(false);
+					hooks?.onApplied?.();
+				},
+				rollback: () => hooks?.onRolledBack?.(),
+			},
+			onCommit: (contenido) => {
+				if (this.store.selectedHorarioId() === contenido.horarioId) {
+					this.store.setContenido(contenido);
+				}
 			},
 			onError: (err) => this.errHandler.handle(err, 'crear contenido', () => this.store.setSaving(false)),
 		});

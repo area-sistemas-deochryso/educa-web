@@ -10,6 +10,8 @@ import { buildCursosListCommands, type CursoHubRol } from '../../helpers/curso-h
 import { filterPairSlots, resolveSlot } from '../../helpers/curso-hub-slot.helpers';
 import { EmptyStateComponent } from '../empty-state';
 import { CursoHubHeaderComponent } from '../curso-hub-header';
+import { CursoHubTabsComponent } from '../curso-hub-tabs';
+import { CursoHubContextService } from './curso-hub-context.service';
 
 // #region Shared template
 export const CURSO_HUB_SHELL_IMPORTS = [
@@ -17,6 +19,7 @@ export const CURSO_HUB_SHELL_IMPORTS = [
 	EduSpinner,
 	EmptyStateComponent,
 	CursoHubHeaderComponent,
+	CursoHubTabsComponent,
 ];
 
 export const CURSO_HUB_SHELL_TEMPLATE = `
@@ -42,6 +45,7 @@ export const CURSO_HUB_SHELL_TEMPLATE = `
 					[selectedSlotId]="current.id"
 					(slotChange)="onSlotChange($event)"
 				/>
+				<app-curso-hub-tabs />
 				<router-outlet />
 			}
 		}
@@ -71,6 +75,7 @@ export abstract class CursoHubShellBase implements OnInit {
 	private readonly errorHandler = inject(ErrorHandlerService);
 	private readonly clock = inject(WalClockService);
 	private readonly destroyRef = inject(DestroyRef);
+	private readonly hubContext = inject(CursoHubContextService);
 	// #endregion
 
 	// #region Contrato por rol
@@ -146,6 +151,10 @@ export abstract class CursoHubShellBase implements OnInit {
 	private warnedRequest: string | null = null;
 
 	constructor() {
+		// Las pestañas hijas leen la franja resuelta por este contexto (ver `CursoHubContextService`).
+		this.hubContext.bind(this.slot);
+		this.destroyRef.onDestroy(() => this.hubContext.unbind(this.slot));
+
 		effect(() => {
 			if (this.loading()) {
 				this.sawLoading = true;
@@ -179,8 +188,8 @@ export abstract class CursoHubShellBase implements OnInit {
 	}
 
 	protected onSlotChange(horarioId: number): void {
+		// Sin `relativeTo`: navega a la URL actual (incluida la pestaña hija) cambiando solo el query.
 		void this.router.navigate([], {
-			relativeTo: this.route,
 			queryParams: { horarioId },
 			queryParamsHandling: 'merge',
 			replaceUrl: true,
@@ -204,7 +213,6 @@ export abstract class CursoHubShellBase implements OnInit {
 			'La franja indicada no corresponde a este curso. Se muestra la franja que corresponde por horario.',
 		);
 		void this.router.navigate([], {
-			relativeTo: this.route,
 			queryParams: { horarioId: null },
 			queryParamsHandling: 'merge',
 			replaceUrl: true,

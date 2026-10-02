@@ -62,6 +62,19 @@ const PROFESOR_ROUTES_RAW: Route[] = [
 			),
 		title: 'Intranet - Curso (Profesor)',
 		data: { permissionPath: 'intranet/profesor/cursos' },
+		children: [
+			// La pestaña es una ruta hija con URL propia; hereda el guard de "ver como" y el
+			// `permissionPath` del padre. El redirect conserva el query (`horarioId`).
+			{ path: '', pathMatch: 'full', redirectTo: 'contenido' },
+			{
+				path: 'contenido',
+				loadComponent: () =>
+					import('./pages/profesor/cursos/curso-hub/profesor-curso-hub-contenido.component').then(
+						(m) => m.ProfesorCursoHubContenidoComponent,
+					),
+				title: 'Intranet - Contenido del Curso (Profesor)',
+			},
+		],
 	},
 	{
 		path: 'profesor/final-salones',
@@ -133,6 +146,19 @@ const ESTUDIANTE_ROUTES_RAW: Route[] = [
 			),
 		title: 'Intranet - Curso (Estudiante)',
 		data: { permissionPath: 'intranet/estudiante/cursos' },
+		children: [
+			// La pestaña es una ruta hija con URL propia; hereda el guard de "ver como" y el
+			// `permissionPath` del padre. El redirect conserva el query (`horarioId`).
+			{ path: '', pathMatch: 'full', redirectTo: 'contenido' },
+			{
+				path: 'contenido',
+				loadComponent: () =>
+					import('./pages/estudiante/cursos/curso-hub/estudiante-curso-hub-contenido.component').then(
+						(m) => m.EstudianteCursoHubContenidoComponent,
+					),
+				title: 'Intranet - Contenido del Curso (Estudiante)',
+			},
+		],
 	},
 	{
 		path: 'estudiante/foro',

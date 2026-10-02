@@ -1,6 +1,8 @@
+/* eslint-disable max-lines -- Razón: el camino de carga del hub de curso (P105 F1b) se suma a la facade compartida con el modal; separarlo en otra facade duplicaría el store y el snapshot de notificaciones. Se absorbe al retirar el modal (F6). */
 import { Injectable, inject, DestroyRef } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import type { Subscription } from 'rxjs';
 import { environment } from '@config/environment';
 import { logger, parseProblemDetails, resolveErrorMessage, withRetry } from '@core/helpers';
 import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
@@ -25,6 +27,7 @@ export class EstudianteCursosFacade {
 	private readonly smartNotif = inject(SmartNotificationService);
 	private readonly wal = inject(WalFacadeHelper);
 	private readonly destroyRef = inject(DestroyRef);
+	private hubLoadSub: Subscription | null = null;
 	// #endregion
 
 	// #region Estado expuesto
@@ -83,6 +86,45 @@ export class EstudianteCursosFacade {
 					this.store.setContentLoading(false);
 				},
 			});
+	}
+
+	/**
+	 * Carga el contenido de una franja para el hub de curso: no abre el modal y una
+	 * carga nueva cancela la anterior (un cambio rápido de franja no se ignora ni
+	 * deja que la respuesta vieja pise a la nueva).
+	 */
+	loadContenidoForHub(horarioId: number): void {
+		this.hubLoadSub?.unsubscribe();
+		this.store.clearLoadedCaches();
+		this.store.setContenido(null);
+		this.store.setContentLoading(true);
+
+		this.hubLoadSub = this.api
+			.getContenido(horarioId)
+			.pipe(
+				withRetry({ tag: 'EstudianteCursosFacade:loadContenidoForHub' }),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe({
+				next: (contenido) => {
+					this.store.setContenido(contenido);
+					this.store.setContentLoading(false);
+					if (contenido) this.saveTareaSnapshots(contenido);
+				},
+				error: (err) => {
+					logger.error('EstudianteCursosFacade: Error al cargar contenido del hub', err);
+					this.errorHandler.showError(UI_SUMMARIES.error, resolveErrorMessage(err, UI_ESTUDIANTE_ERROR_DETAILS.loadContenido));
+					this.store.setContentLoading(false);
+				},
+			});
+	}
+
+	/** Cancela la carga en curso y limpia contenido y cachés al salir del hub. */
+	resetForHub(): void {
+		this.hubLoadSub?.unsubscribe();
+		this.hubLoadSub = null;
+		this.store.closeContentDialog();
+		this.store.setContentLoading(false);
 	}
 
 	/** Lectura pura del contenido de una franja (sonda del hub de curso, sin tocar el store). */
