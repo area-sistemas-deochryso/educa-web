@@ -1,7 +1,7 @@
 # 755 — FE: P105 D1 — Validar propuestas del hub de curso y materializar F1
 
 > **Repo destino**: `educa-web` (frontend, branch `main`). Abrir el chat nuevo en este repo.
-> **Plan**: 105 · **Chat**: D1-validación · **Creado**: 2026-10-02 · **Estado**: ⏳ pendiente arrancar
+> **Plan**: 105 · **Chat**: D1-validación · **Creado**: 2026-10-02 · **Estado**: ✅ cerrado 2026-10-02 (8 propuestas validadas; F1a materializado en brief 756)
 > **Origen**: brief 753 (diseño D1, cerrado) · commit coord `b2d1b63`
 > **Plan file**: `educa-coord/plans/xrepo/100-119/xrepo-105-backlog-ux-sesion-20260820.md` § "D1 — Diseño del hub de curso (brief 753, 2026-10-02)"
 > **depends_on**: 753 (cerrado)
