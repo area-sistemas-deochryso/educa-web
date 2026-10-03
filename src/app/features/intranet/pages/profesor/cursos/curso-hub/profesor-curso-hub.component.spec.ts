@@ -1,15 +1,17 @@
 // #region Imports
-import { Component, signal } from '@angular/core';
+import { Component, DebugElement, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { of, throwError } from 'rxjs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { EduConfirmationService } from '@edu-ui';
 import { ErrorHandlerService, WalClockService } from '@core/services';
 
 import type { HorarioProfesorDto } from '../../models';
 import { ProfesorFacade } from '../../services/profesor.facade';
+import { AttendanceCourseFacade } from '../services/attendance-course.facade';
 import { CursoContenidoDataFacade } from '../services/curso-contenido-data.facade';
 import { CursoHubCalificacionesLoader } from './curso-hub-calificaciones.loader';
 import { ProfesorCursoHubComponent } from './profesor-curso-hub.component';
@@ -55,11 +57,17 @@ describe('ProfesorCursoHubComponent', () => {
 	const errorHandler = { showInfo: vi.fn(), showWarning: vi.fn() };
 	const dataFacade = { loadContenidoForHub: vi.fn(), resetForHub: vi.fn() };
 	const calLoader = { reset: vi.fn(), ensure: vi.fn(), refresh: vi.fn() };
+	const asistenciaVm = signal<{ registroDirty: boolean; registroData: { horarioId: number } | null }>({
+		registroDirty: false,
+		registroData: null,
+	});
+	const asistenciaFacade = { vm: asistenciaVm, resetAsistencia: vi.fn() };
 
 	let router: Router;
 
 	beforeEach(() => {
 		vm.set({ horarios: [], loading: false, error: null });
+		asistenciaVm.set({ registroDirty: false, registroData: null });
 		facade.loadData.mockImplementation(() => vm.update((v) => ({ ...v, loading: true })));
 		facade.getContenido.mockReturnValue(of(null));
 
@@ -73,6 +81,7 @@ describe('ProfesorCursoHubComponent', () => {
 				{ provide: ErrorHandlerService, useValue: errorHandler },
 				{ provide: CursoContenidoDataFacade, useValue: dataFacade },
 				{ provide: CursoHubCalificacionesLoader, useValue: calLoader },
+				{ provide: AttendanceCourseFacade, useValue: asistenciaFacade },
 				{ provide: WalClockService, useValue: { adjustedNow: () => MONDAY_830 } },
 			],
 		});
@@ -289,15 +298,98 @@ describe('ProfesorCursoHubComponent', () => {
 			expect(dataFacade.resetForHub).toHaveBeenCalledOnce();
 			expect(calLoader.reset).toHaveBeenCalled();
 		});
+
+		it('clears the attendance store only when leaving the hub, not when the slot changes', async () => {
+			const harness = await openHub('/intranet/profesor/cursos/24/34?horarioId=1');
+			await finishLoad(harness, [MON_SLOT, WED_SLOT]);
+			await router.navigate([], { queryParams: { horarioId: 2 }, queryParamsHandling: 'merge' });
+			harness.detectChanges();
+			expect(asistenciaFacade.resetAsistencia).not.toHaveBeenCalled();
+
+			harness.fixture.destroy();
+
+			expect(asistenciaFacade.resetAsistencia).toHaveBeenCalledOnce();
+		});
 	});
 
-	it('shows only the tabs implemented for the profesor role', async () => {
+	describe('cambios de asistencia sin guardar', () => {
+		const clickSecondSlot = async (harness: RouterTestingHarness) => {
+			const options = harness.routeNativeElement?.querySelectorAll<HTMLButtonElement>('.edu-select-button__option');
+			options?.[1].click();
+			await harness.fixture.whenStable();
+			harness.detectChanges();
+		};
+		const confirmation = (harness: RouterTestingHarness) =>
+			(harness.routeDebugElement as DebugElement).injector.get(EduConfirmationService);
+
+		it('asks before leaving the slot and keeps the selector on the current one', async () => {
+			const harness = await openHub('/intranet/profesor/cursos/24/34?horarioId=1');
+			await finishLoad(harness, [MON_SLOT, WED_SLOT]);
+			asistenciaVm.set({ registroDirty: true, registroData: { horarioId: 1 } });
+
+			await clickSecondSlot(harness);
+
+			expect(router.url).toBe('/intranet/profesor/cursos/24/34?horarioId=1');
+			expect(confirmation(harness).confirmation()?.header).toBe('Cambios sin guardar');
+			expect(selectedLabel(harness)).toBe('Lunes 08:00 - 09:30');
+		});
+
+		it('changes the slot once the user accepts', async () => {
+			const harness = await openHub('/intranet/profesor/cursos/24/34?horarioId=1');
+			await finishLoad(harness, [MON_SLOT, WED_SLOT]);
+			asistenciaVm.set({ registroDirty: true, registroData: { horarioId: 1 } });
+			await clickSecondSlot(harness);
+
+			confirmation(harness).confirmation()?.accept?.();
+			await harness.fixture.whenStable();
+			harness.detectChanges();
+
+			expect(router.url).toBe('/intranet/profesor/cursos/24/34?horarioId=2');
+			expect(selectedLabel(harness)).toBe('Miércoles 10:00 - 11:30');
+		});
+
+		it('does not change anything when the user cancels', async () => {
+			const harness = await openHub('/intranet/profesor/cursos/24/34?horarioId=1');
+			await finishLoad(harness, [MON_SLOT, WED_SLOT]);
+			asistenciaVm.set({ registroDirty: true, registroData: { horarioId: 1 } });
+			await clickSecondSlot(harness);
+
+			confirmation(harness).close();
+			harness.detectChanges();
+
+			expect(router.url).toBe('/intranet/profesor/cursos/24/34?horarioId=1');
+			expect(selectedLabel(harness)).toBe('Lunes 08:00 - 09:30');
+		});
+
+		it('changes the slot without asking when nothing is edited', async () => {
+			const harness = await openHub('/intranet/profesor/cursos/24/34?horarioId=1');
+			await finishLoad(harness, [MON_SLOT, WED_SLOT]);
+
+			await clickSecondSlot(harness);
+
+			expect(confirmation(harness).confirmation()).toBeNull();
+			expect(router.url).toBe('/intranet/profesor/cursos/24/34?horarioId=2');
+		});
+
+		it('ignores edits that belong to another slot', async () => {
+			const harness = await openHub('/intranet/profesor/cursos/24/34?horarioId=1');
+			await finishLoad(harness, [MON_SLOT, WED_SLOT]);
+			asistenciaVm.set({ registroDirty: true, registroData: { horarioId: 2 } });
+
+			await clickSecondSlot(harness);
+
+			expect(confirmation(harness).confirmation()).toBeNull();
+			expect(router.url).toBe('/intranet/profesor/cursos/24/34?horarioId=2');
+		});
+	});
+
+	it('shows the tabs implemented for the profesor role', async () => {
 		const harness = await openHub('/intranet/profesor/cursos/24/34');
 		await finishLoad(harness, [MON_SLOT]);
 
 		const labels = Array.from(harness.routeNativeElement?.querySelectorAll('a.hub-tab') ?? []).map((a) =>
 			a.textContent?.trim(),
 		);
-		expect(labels).toEqual(['Contenido', 'Calificaciones', 'Información']);
+		expect(labels).toEqual(['Contenido', 'Calificaciones', 'Asistencia', 'Información']);
 	});
 });

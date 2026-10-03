@@ -174,6 +174,79 @@ describe('AttendanceCourseStore', () => {
 	});
 	// #endregion
 
+	// #region Unsaved changes
+	describe('registroDirty', () => {
+		it('is false right after loading the list', () => {
+			store.setRegistroData(mockRegistroData as never);
+
+			expect(store.registroDirty()).toBe(false);
+		});
+
+		it('is true after changing a student estado', () => {
+			store.setRegistroData(mockRegistroData as never);
+
+			store.updateEstudianteEstado(1, 'F');
+
+			expect(store.registroDirty()).toBe(true);
+		});
+
+		it('is true after changing a justification', () => {
+			store.setRegistroData(mockRegistroData as never);
+
+			store.updateEstudianteJustificacion(2, 'Otro motivo');
+
+			expect(store.registroDirty()).toBe(true);
+		});
+
+		it('goes back to false when the edit is reverted', () => {
+			store.setRegistroData(mockRegistroData as never);
+			store.updateEstudianteEstado(2, 'F');
+			store.updateEstudianteEstado(2, 'T');
+
+			expect(store.registroDirty()).toBe(false);
+		});
+
+		it('treats null and empty justification as the same', () => {
+			store.setRegistroData(mockRegistroData as never);
+
+			store.updateEstudianteJustificacion(1, '');
+
+			expect(store.registroDirty()).toBe(false);
+		});
+
+		it('is false again once the list is marked as saved', () => {
+			store.setRegistroData(mockRegistroData as never);
+			store.updateEstudianteEstado(1, 'F');
+
+			store.markRegistroSaved();
+
+			expect(store.registroDirty()).toBe(false);
+		});
+
+		it('is false after loading another list over an edited one', () => {
+			store.setRegistroData(mockRegistroData as never);
+			store.updateEstudianteEstado(1, 'F');
+
+			store.setRegistroData({ ...mockRegistroData, fecha: '2026-03-22' } as never);
+
+			expect(store.registroDirty()).toBe(false);
+		});
+
+		it('is false when there is no list', () => {
+			expect(store.registroDirty()).toBe(false);
+		});
+
+		it('is cleared by reset', () => {
+			store.setRegistroData(mockRegistroData as never);
+			store.updateEstudianteEstado(1, 'F');
+
+			store.reset();
+
+			expect(store.registroDirty()).toBe(false);
+		});
+	});
+	// #endregion
+
 	// #region ViewModel
 	describe('vm', () => {
 		it('should compose state', () => {

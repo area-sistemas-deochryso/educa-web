@@ -1,5 +1,6 @@
 import { Injectable, computed, signal } from '@angular/core';
 import {
+	AsistenciaCursoEstudianteDto,
 	AsistenciaCursoFechaDto,
 	AsistenciaCursoResumenDto,
 	EstadoAsistenciaCurso,
@@ -8,6 +9,8 @@ import {
 interface AsistenciaCursoState {
 	// #region Registro
 	registroData: AsistenciaCursoFechaDto | null;
+	/** Lista tal como vino del servidor (o como quedó al guardar): referencia para detectar ediciones sin guardar. */
+	registroBaseline: AsistenciaCursoEstudianteDto[];
 	registroLoading: boolean;
 	registroSaving: boolean;
 	// #endregion
@@ -20,6 +23,7 @@ interface AsistenciaCursoState {
 
 const initialState: AsistenciaCursoState = {
 	registroData: null,
+	registroBaseline: [],
 	registroLoading: false,
 	registroSaving: false,
 	resumen: null,
@@ -35,6 +39,7 @@ export class AttendanceCourseStore {
 
 	// #region Lecturas publicas
 	readonly registroData = computed(() => this._state().registroData);
+	private readonly registroBaseline = computed(() => this._state().registroBaseline);
 	readonly registroLoading = computed(() => this._state().registroLoading);
 	readonly registroSaving = computed(() => this._state().registroSaving);
 	readonly resumen = computed(() => this._state().resumen);
@@ -57,6 +62,15 @@ export class AttendanceCourseStore {
 			faltas: estudiantes.filter((e) => e.estado === 'F').length,
 		};
 	});
+
+	/** true si algún estudiante cambió de estado o justificación respecto de lo cargado/guardado. */
+	readonly registroDirty = computed(() => {
+		const baseline = new Map(this.registroBaseline().map((e) => [e.estudianteId, e]));
+		return this.registroEstudiantes().some((e) => {
+			const original = baseline.get(e.estudianteId);
+			return !original || original.estado !== e.estado || (original.justificacion || null) !== (e.justificacion || null);
+		});
+	});
 	// #endregion
 
 	// #region ViewModel
@@ -67,6 +81,7 @@ export class AttendanceCourseStore {
 		registroSaving: this.registroSaving(),
 		registroStats: this.registroStats(),
 		registroTieneRegistros: this.registroTieneRegistros(),
+		registroDirty: this.registroDirty(),
 		resumen: this.resumen(),
 		resumenLoading: this.resumenLoading(),
 		resumenError: this.resumenError(),
@@ -75,7 +90,12 @@ export class AttendanceCourseStore {
 
 	// #region Comandos de mutacion
 	setRegistroData(data: AsistenciaCursoFechaDto | null): void {
-		this._state.update((s) => ({ ...s, registroData: data }));
+		this._state.update((s) => ({ ...s, registroData: data, registroBaseline: data?.estudiantes ?? [] }));
+	}
+
+	/** Tras guardar: lo mostrado pasa a ser la nueva referencia (ya no hay ediciones pendientes). */
+	markRegistroSaved(): void {
+		this._state.update((s) => ({ ...s, registroBaseline: s.registroData?.estudiantes ?? [] }));
 	}
 
 	setRegistroLoading(loading: boolean): void {

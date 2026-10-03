@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, effect, inject, untracked } from '@angular/core';
+import { EduConfirmationService } from '@edu-ui';
 import {
 	CURSO_HUB_SHELL_IMPORTS,
 	CURSO_HUB_SHELL_TEMPLATE,
@@ -6,6 +7,7 @@ import {
 } from '@intranet-shared/components';
 import type { CursoHubRol } from '@intranet-shared/helpers';
 import { ProfesorFacade } from '../../services/profesor.facade';
+import { AttendanceCourseFacade } from '../services/attendance-course.facade';
 import { CursoContenidoDataFacade } from '../services/curso-contenido-data.facade';
 import { CursoHubCalificacionesLoader } from './curso-hub-calificaciones.loader';
 
@@ -22,6 +24,7 @@ import { CursoHubCalificacionesLoader } from './curso-hub-calificaciones.loader'
 	selector: 'app-profesor-curso-hub',
 	standalone: true,
 	imports: CURSO_HUB_SHELL_IMPORTS,
+	providers: [EduConfirmationService],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: CURSO_HUB_SHELL_TEMPLATE,
 })
@@ -29,6 +32,7 @@ export class ProfesorCursoHubComponent extends CursoHubShellBase {
 	private readonly facade = inject(ProfesorFacade);
 	private readonly dataFacade = inject(CursoContenidoDataFacade);
 	private readonly calLoader = inject(CursoHubCalificacionesLoader);
+	private readonly asistenciaFacade = inject(AttendanceCourseFacade);
 
 	protected readonly rol: CursoHubRol = 'profesor';
 	protected readonly horarios = computed(() => this.facade.vm().horarios);
@@ -55,7 +59,13 @@ export class ProfesorCursoHubComponent extends CursoHubShellBase {
 		inject(DestroyRef).onDestroy(() => {
 			this.calLoader.reset();
 			this.dataFacade.resetForHub();
+			this.asistenciaFacade.resetAsistencia();
 		});
+	}
+
+	protected override hasUnsavedChanges(): boolean {
+		const vm = this.asistenciaFacade.vm();
+		return vm.registroDirty && vm.registroData?.horarioId === this.slot()?.id;
 	}
 
 	protected loadHorarios(): void {

@@ -2,7 +2,7 @@ import { Directive, DestroyRef, OnInit, Signal, computed, effect, inject, signal
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { Observable, catchError, forkJoin, map, of } from 'rxjs';
-import { EduSpinner } from '@edu-ui';
+import { EduConfirmDialog, EduConfirmationService, EduSpinner } from '@edu-ui';
 import { ErrorHandlerService, WalClockService } from '@core/services';
 import type { HorarioProfesorDto } from '@features/intranet/pages/profesor/models';
 
@@ -17,6 +17,7 @@ import { CursoHubContextService } from './curso-hub-context.service';
 export const CURSO_HUB_SHELL_IMPORTS = [
 	RouterOutlet,
 	EduSpinner,
+	EduConfirmDialog,
 	EmptyStateComponent,
 	CursoHubHeaderComponent,
 	CursoHubTabsComponent,
@@ -43,6 +44,7 @@ export const CURSO_HUB_SHELL_TEMPLATE = `
 					[salonDescripcion]="current.salonDescripcion"
 					[slots]="pairSlots()"
 					[selectedSlotId]="current.id"
+					[resetKey]="selectionResetKey()"
 					(slotChange)="onSlotChange($event)"
 				/>
 				<app-curso-hub-tabs [tabs]="tabs()" />
@@ -50,6 +52,7 @@ export const CURSO_HUB_SHELL_TEMPLATE = `
 			}
 		}
 	}
+	<edu-confirm-dialog />
 `;
 // #endregion
 
@@ -76,6 +79,7 @@ export abstract class CursoHubShellBase implements OnInit {
 	private readonly clock = inject(WalClockService);
 	private readonly destroyRef = inject(DestroyRef);
 	private readonly hubContext = inject(CursoHubContextService);
+	private readonly confirmation = inject(EduConfirmationService);
 	// #endregion
 
 	// #region Contrato por rol
@@ -86,6 +90,10 @@ export abstract class CursoHubShellBase implements OnInit {
 	protected abstract loadHorarios(): void;
 	/** Contenido de la franja (`null` si todavía no existe). Solo se usa como sonda. */
 	protected abstract probeContenido(horarioId: number): Observable<unknown | null>;
+	/** Si hay datos del rol editados sin guardar; avisa antes de cambiar de franja. Por defecto no hay. */
+	protected hasUnsavedChanges(): boolean {
+		return false;
+	}
 	// #endregion
 
 	// #region Estado de ruta
@@ -148,6 +156,8 @@ export abstract class CursoHubShellBase implements OnInit {
 	});
 	// #endregion
 
+	/** Sube cuando se bloquea un cambio de franja, para que el selector vuelva a mostrar la franja vigente. */
+	protected readonly selectionResetKey = signal(0);
 	private redirected = false;
 	private warnedRequest: string | null = null;
 
@@ -189,6 +199,24 @@ export abstract class CursoHubShellBase implements OnInit {
 	}
 
 	protected onSlotChange(horarioId: number): void {
+		if (this.hasUnsavedChanges()) {
+			// El selector ya muestra la franja elegida: se revierte de inmediato y solo avanza si el usuario acepta
+			// (cerrar con la X o Cancelar deja todo como estaba).
+			this.selectionResetKey.update((n) => n + 1);
+			this.confirmation.confirm({
+				header: 'Cambios sin guardar',
+				message: 'Tienes cambios sin guardar. Si cambias de franja se perderán. ¿Quieres continuar?',
+				icon: 'pi pi-exclamation-triangle',
+				acceptLabel: 'Sí, cambiar de franja',
+				rejectLabel: 'Cancelar',
+				accept: () => this.navigateToSlot(horarioId),
+			});
+			return;
+		}
+		this.navigateToSlot(horarioId);
+	}
+
+	private navigateToSlot(horarioId: number): void {
 		// Sin `relativeTo`: navega a la URL actual (incluida la pestaña hija) cambiando solo el query.
 		void this.router.navigate([], {
 			queryParams: { horarioId },

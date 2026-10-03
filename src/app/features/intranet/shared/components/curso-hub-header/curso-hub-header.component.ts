@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, computed, effect, input, output, untracked, viewChild } from '@angular/core';
+import { FormsModule, NgModel } from '@angular/forms';
 import { EduSelectButton } from '@edu-ui';
 import type { HorarioProfesorDto } from '@features/intranet/pages/profesor/models';
 
@@ -54,11 +54,22 @@ export class CursoHubHeaderComponent {
 	readonly salonDescripcion = input.required<string>();
 	readonly slots = input.required<readonly HorarioProfesorDto[]>();
 	readonly selectedSlotId = input<number | null>(null);
+	/** El padre lo incrementa cuando bloquea un cambio de franja: el selector vuelve a mostrar `selectedSlotId`. */
+	readonly resetKey = input(0);
+	private readonly slotModel = viewChild(NgModel);
 
 	readonly slotChange = output<number>();
 
 	readonly subtitle = computed(() => `Salón ${this.salonDescripcion()}`);
 	readonly showSelector = computed(() => this.slots().length > 1);
+	constructor() {
+		// Un `ngModel` con el mismo valor no se re-escribe, así que el control se devuelve a mano a la franja vigente.
+		effect(() => {
+			this.resetKey();
+			untracked(() => this.slotModel()?.control.setValue(this.selectedSlotId(), { emitEvent: false }));
+		});
+	}
+
 	readonly options = computed<SlotOption[]>(() =>
 		this.slots().map((s) => ({
 			label: `${s.diaSemanaDescripcion} ${s.horaInicio} - ${s.horaFin}`,

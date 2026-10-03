@@ -75,11 +75,11 @@ describe('CursoHubTabsComponent', () => {
 });
 
 describe('cursoHubTabsFor', () => {
-	it('gives the profesor Contenido, Calificaciones and Información', () => {
-		expect(cursoHubTabsFor('profesor').map((t) => t.path)).toEqual(['contenido', 'calificaciones', 'informacion']);
+	it('gives the profesor Contenido, Calificaciones, Asistencia and Información', () => {
+		expect(cursoHubTabsFor('profesor').map((t) => t.path)).toEqual(['contenido', 'calificaciones', 'asistencia', 'informacion']);
 	});
 
-	it('gives the estudiante also the Asistencia tab', () => {
+	it('gives the estudiante the same four tabs', () => {
 		expect(cursoHubTabsFor('estudiante').map((t) => t.path)).toEqual(['contenido', 'calificaciones', 'asistencia', 'informacion']);
 	});
 

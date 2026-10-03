@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, effect, inject, untracked } from '@angular/core';
+import { EduConfirmationService } from '@edu-ui';
 import {
 	CURSO_HUB_SHELL_IMPORTS,
 	CURSO_HUB_SHELL_TEMPLATE,
@@ -19,6 +20,7 @@ import { EstudianteCursosFacade } from '../../services/estudiante-cursos.facade'
 	selector: 'app-estudiante-curso-hub',
 	standalone: true,
 	imports: CURSO_HUB_SHELL_IMPORTS,
+	providers: [EduConfirmationService],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: CURSO_HUB_SHELL_TEMPLATE,
 })

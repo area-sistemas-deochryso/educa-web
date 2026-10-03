@@ -1,5 +1,6 @@
 import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import type { Subscription } from 'rxjs';
 import { withRetry, facadeErrorHandler } from '@core/helpers';
 import { ActivityTrackerService } from '@core/services/error';
 import { ErrorHandlerService, WalFacadeHelper, WalCrossTabRefetchService } from '@core/services';
@@ -28,6 +29,12 @@ export class AttendanceCourseFacade {
 	private readonly apiUrl = `${environment.apiUrl}/api/AsistenciaCurso`;
 	// #endregion
 
+	// #region Cargas en vuelo
+	/** Una sola carga viva por tipo: la respuesta tardía de otra franja no debe pisar a la actual. */
+	private registroSub: Subscription | null = null;
+	private resumenSub: Subscription | null = null;
+	// #endregion
+
 	// #region Estado expuesto
 	readonly vm = this.store.vm;
 	// #endregion
@@ -36,9 +43,9 @@ export class AttendanceCourseFacade {
 		this.crossTabRefetch.subscribe({
 			resourceType: 'asistenciaCurso',
 			refetchItems: () => {
-				const horarioId = this.getHorarioId();
+				// La lista cargada sabe de qué franja es; el contenido puede no existir (hub) o ser de otra.
 				const data = this.store.registroData();
-				if (horarioId && data) this.loadRegistro(data.fecha, horarioId);
+				if (data) this.loadRegistro(data.fecha, data.horarioId);
 			},
 			destroyRef: this.destroyRef,
 		});
@@ -55,9 +62,10 @@ export class AttendanceCourseFacade {
 		const horarioId = overrideHorarioId ?? this.getHorarioId();
 		if (!horarioId) return;
 
+		this.registroSub?.unsubscribe();
 		this.store.setRegistroLoading(true);
 
-		this.api
+		this.registroSub = this.api
 			.getAsistenciaCursoFecha(horarioId, fecha)
 			.pipe(
 				withRetry({ tag: 'AsistenciaCursoFacade:loadRegistro' }),
@@ -79,10 +87,11 @@ export class AttendanceCourseFacade {
 		const horarioId = overrideHorarioId ?? this.getHorarioId();
 		if (!horarioId) return;
 
+		this.resumenSub?.unsubscribe();
 		this.store.setResumenLoading(true);
 		this.store.setResumenError(null);
 
-		this.api
+		this.resumenSub = this.api
 			.getAsistenciaCursoResumen(horarioId, fechaInicio, fechaFin)
 			.pipe(
 				withRetry({ tag: 'AsistenciaCursoFacade:loadResumen' }),
@@ -107,7 +116,8 @@ export class AttendanceCourseFacade {
 	registrar(overrideHorarioId?: number): void {
 		const horarioId = overrideHorarioId ?? this.getHorarioId();
 		const data = this.store.registroData();
-		if (!horarioId || !data) return;
+		// Nunca mandar la lista de otra franja a este horario (p. ej. cambio de franja con carga en vuelo).
+		if (!horarioId || !data || data.horarioId !== horarioId) return;
 
 		this.activityTracker.track('USER_ACTION', `Registrar asistencia: ${data.estudiantes.length} estudiantes`, { action: 'form_submit' });
 
@@ -140,6 +150,7 @@ export class AttendanceCourseFacade {
 			http$: () => this.api.registrarAsistenciaCurso(horarioId, dto),
 			onCommit: () => {
 				this.store.setRegistroSaving(false);
+				this.store.markRegistroSaved();
 				this.errorHandler.showSuccess(UI_SUMMARIES.success, UI_ASISTENCIA_SUCCESS_MESSAGES.registered);
 			},
 			onError: (err) => {
@@ -164,6 +175,10 @@ export class AttendanceCourseFacade {
 	}
 
 	resetAsistencia(): void {
+		this.registroSub?.unsubscribe();
+		this.resumenSub?.unsubscribe();
+		this.registroSub = null;
+		this.resumenSub = null;
 		this.store.reset();
 	}
 	// #endregion

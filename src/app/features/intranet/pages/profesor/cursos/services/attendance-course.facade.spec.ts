@@ -2,7 +2,7 @@
 // #region Imports
 import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { of } from 'rxjs';
+import { Subject, of } from 'rxjs';
 
 import { firstValueFrom } from 'rxjs';
 
@@ -111,6 +111,49 @@ describe('AttendanceCourseFacade', () => {
 	});
 	// #endregion
 
+	// #region In-flight loads
+	describe('in-flight loads', () => {
+		it('should ignore the late response of a superseded registro load', () => {
+			const slotA = new Subject<unknown>();
+			const slotB = new Subject<unknown>();
+			api.getAsistenciaCursoFecha.mockReturnValueOnce(slotA).mockReturnValueOnce(slotB);
+
+			facade.loadRegistro('2026-03-21', 1);
+			facade.loadRegistro('2026-03-21', 2);
+			slotB.next({ ...mockRegistroData, horarioId: 2 });
+			slotB.complete();
+			slotA.next({ ...mockRegistroData, horarioId: 1 });
+
+			expect(store.registroData()?.horarioId).toBe(2);
+		});
+
+		it('should ignore the late response of a superseded resumen load', () => {
+			const first = new Subject<unknown>();
+			const second = new Subject<unknown>();
+			api.getAsistenciaCursoResumen.mockReturnValueOnce(first).mockReturnValueOnce(second);
+
+			facade.loadResumen('2026-03-01', '2026-03-31', 1);
+			facade.loadResumen('2026-03-01', '2026-03-31', 2);
+			second.next({ horarioId: 2, totalClases: 4 });
+			second.complete();
+			first.next({ horarioId: 1, totalClases: 9 });
+
+			expect(store.resumen()?.horarioId).toBe(2);
+		});
+
+		it('should drop a pending load on reset', () => {
+			const pending = new Subject<unknown>();
+			api.getAsistenciaCursoFecha.mockReturnValueOnce(pending);
+			facade.loadRegistro('2026-03-21', 1);
+
+			facade.resetAsistencia();
+			pending.next(mockRegistroData);
+
+			expect(store.registroData()).toBeNull();
+		});
+	});
+	// #endregion
+
 	// #region loadResumen
 	describe('loadResumen', () => {
 		it('should load resumen', () => {
@@ -148,6 +191,24 @@ describe('AttendanceCourseFacade', () => {
 		it('should do nothing without data', () => {
 			facade.registrar(1);
 			expect(api.registrarAsistenciaCurso).not.toHaveBeenCalled();
+		});
+
+		it('should refuse to send the list of another slot to this horarioId', () => {
+			store.setRegistroData(mockRegistroData as never);
+
+			facade.registrar(2);
+
+			expect(api.registrarAsistenciaCurso).not.toHaveBeenCalled();
+		});
+
+		it('should clear the unsaved-changes flag once saved', async () => {
+			store.setRegistroData(mockRegistroData as never);
+			facade.setEstudianteEstado(1, 'F');
+			expect(store.registroDirty()).toBe(true);
+
+			facade.registrar(1);
+
+			await vi.waitFor(() => expect(store.registroDirty()).toBe(false));
 		});
 	});
 	// #endregion
