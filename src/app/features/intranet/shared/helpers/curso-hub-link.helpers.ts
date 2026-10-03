@@ -32,7 +32,7 @@ export function buildCursoHubLink(
 }
 
 /** Pestañas del hub con ruta hija (el path es el segmento de la ruta). */
-export type CursoHubTabPath = 'contenido' | 'calificaciones' | 'informacion';
+export type CursoHubTabPath = 'contenido' | 'calificaciones' | 'asistencia' | 'informacion';
 
 /** Igual que `buildCursoHubLink` pero apuntando a una pestaña concreta, conservando la franja. */
 export function buildCursoHubTabLink(

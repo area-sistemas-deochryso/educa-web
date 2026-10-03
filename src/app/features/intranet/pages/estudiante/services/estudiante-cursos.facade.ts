@@ -29,6 +29,8 @@ export class EstudianteCursosFacade {
 	private readonly destroyRef = inject(DestroyRef);
 	private hubLoadSub: Subscription | null = null;
 	private notasSub: Subscription | null = null;
+	private asistenciaSub: Subscription | null = null;
+	private asistenciaHorarioId: number | null = null;
 	// #endregion
 
 	// #region Estado expuesto
@@ -128,6 +130,9 @@ export class EstudianteCursosFacade {
 		this.hubLoadSub = null;
 		this.notasSub?.unsubscribe();
 		this.notasSub = null;
+		this.asistenciaSub?.unsubscribe();
+		this.asistenciaSub = null;
+		this.asistenciaHorarioId = null;
 		this.store.closeContentDialog();
 		this.store.setContentLoading(false);
 	}
@@ -196,6 +201,45 @@ export class EstudianteCursosFacade {
 					logger.error('EstudianteCursosFacade: Error al cargar asistencia', err);
 					this.store.setMiAsistencia(null);
 					this.store.setMiAsistenciaLoading(false);
+				},
+			});
+	}
+
+	/**
+	 * Carga la asistencia de una franja para la pestaña del hub. Depende del `horarioId`
+	 * (no del contenido: una franja sin contenido igual tiene asistencia), no repite si ya
+	 * está cargada o en vuelo para esa franja y una franja distinta cancela la carga anterior.
+	 */
+	loadMiAsistenciaForHub(horarioId: number): void {
+		if (this.store.miAsistencia()?.horarioId === horarioId || this.asistenciaHorarioId === horarioId) return;
+		this.fetchMiAsistenciaForHub(horarioId);
+	}
+
+	/** Vuelve a pedir la asistencia de la franja (ignora lo ya cargado). */
+	refreshMiAsistenciaForHub(horarioId: number): void {
+		this.fetchMiAsistenciaForHub(horarioId);
+	}
+
+	private fetchMiAsistenciaForHub(horarioId: number): void {
+		this.asistenciaSub?.unsubscribe();
+		this.asistenciaHorarioId = horarioId;
+		if (this.store.miAsistencia()?.horarioId !== horarioId) this.store.setMiAsistencia(null);
+		this.store.setMiAsistenciaLoading(true);
+
+		this.asistenciaSub = this.api
+			.getMiAsistencia(horarioId)
+			.pipe(withRetry({ tag: 'EstudianteCursosFacade:loadMiAsistenciaForHub' }), takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (resumen) => {
+					this.store.setMiAsistencia(resumen);
+					this.store.setMiAsistenciaLoading(false);
+					this.asistenciaHorarioId = null;
+				},
+				error: (err) => {
+					logger.error('EstudianteCursosFacade: Error al cargar asistencia del hub', err);
+					this.store.setMiAsistencia(null);
+					this.store.setMiAsistenciaLoading(false);
+					this.asistenciaHorarioId = null;
 				},
 			});
 	}

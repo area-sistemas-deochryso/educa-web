@@ -11,10 +11,11 @@ export interface CursoHubTab {
 	roles: readonly CursoHubRol[];
 }
 
-/** Pestañas del hub. F3–F4 agregan Asistencia y Salón. */
+/** Pestañas del hub. F4 agrega Salón; Asistencia del profesor llega en un chat aparte (F3 cubre al estudiante). */
 export const CURSO_HUB_TABS: readonly CursoHubTab[] = [
 	{ path: 'contenido', label: 'Contenido', icon: 'pi pi-book', roles: ['profesor', 'estudiante'] },
 	{ path: 'calificaciones', label: 'Calificaciones', icon: 'pi pi-chart-bar', roles: ['profesor', 'estudiante'] },
+	{ path: 'asistencia', label: 'Asistencia', icon: 'pi pi-check-square', roles: ['estudiante'] },
 	{ path: 'informacion', label: 'Información', icon: 'pi pi-info-circle', roles: ['profesor', 'estudiante'] },
 ];
 

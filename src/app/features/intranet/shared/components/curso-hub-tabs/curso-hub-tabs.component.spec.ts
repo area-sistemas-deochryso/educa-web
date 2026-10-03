@@ -79,8 +79,8 @@ describe('cursoHubTabsFor', () => {
 		expect(cursoHubTabsFor('profesor').map((t) => t.path)).toEqual(['contenido', 'calificaciones', 'informacion']);
 	});
 
-	it('lists the same tabs for the estudiante', () => {
-		expect(cursoHubTabsFor('estudiante').map((t) => t.path)).toEqual(['contenido', 'calificaciones', 'informacion']);
+	it('gives the estudiante also the Asistencia tab', () => {
+		expect(cursoHubTabsFor('estudiante').map((t) => t.path)).toEqual(['contenido', 'calificaciones', 'asistencia', 'informacion']);
 	});
 
 	it('only lists tabs registered in CURSO_HUB_TABS', () => {

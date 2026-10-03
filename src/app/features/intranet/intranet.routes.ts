@@ -183,6 +183,14 @@ const ESTUDIANTE_ROUTES_RAW: Route[] = [
 				title: 'Intranet - Calificaciones del Curso (Estudiante)',
 			},
 			{
+				path: 'asistencia',
+				loadComponent: () =>
+					import('./pages/estudiante/cursos/curso-hub/estudiante-curso-hub-asistencia.component').then(
+						(m) => m.EstudianteCursoHubAsistenciaComponent,
+					),
+				title: 'Intranet - Asistencia del Curso (Estudiante)',
+			},
+			{
 				path: 'informacion',
 				loadComponent: () =>
 					import('./pages/estudiante/cursos/curso-hub/estudiante-curso-hub-informacion.component').then(
