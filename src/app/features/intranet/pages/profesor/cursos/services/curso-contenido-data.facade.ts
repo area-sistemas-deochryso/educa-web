@@ -311,6 +311,40 @@ export class CursoContenidoDataFacade {
 		});
 	}
 
+
+	/**
+	 * Delete content from the course hub. Same WAL flow as `eliminarContenido`
+	 * but without modal side effects: the hub just shows its empty state
+	 * (`contenido = null`) and a rollback restores the previous content.
+	 *
+	 * @param contenidoId Content id.
+	 */
+	eliminarContenidoEnHub(contenidoId: number): void {
+		const snapshot = this.store.contenido();
+		this.wal.execute({
+			operation: 'DELETE',
+			resourceType: 'cursoContenido',
+			resourceId: contenidoId,
+			endpoint: `${this.contenidoUrl}/${contenidoId}`,
+			method: 'DELETE',
+			payload: null,
+			http$: () => this.api.eliminarContenido(contenidoId),
+			optimistic: {
+				apply: () => {
+					this.store.setContenido(null);
+					this.store.setSaving(false);
+				},
+				rollback: () => {
+					if (snapshot && this.store.selectedHorarioId() === snapshot.horarioId) {
+						this.store.setContenido(snapshot);
+					}
+				},
+			},
+			onCommit: () => {},
+			onError: (err) => this.errHandler.handle(err, 'eliminar contenido', () => this.store.setSaving(false)),
+		});
+	}
+
 	// #endregion
 
 	// #region Helpers privados

@@ -1,6 +1,7 @@
 // #region Imports
 import { NO_ERRORS_SCHEMA, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { Router } from '@angular/router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { CursoHubContextService } from '@intranet-shared/components';
@@ -12,7 +13,7 @@ import { ProfesorCursoHubContenidoComponent } from './profesor-curso-hub-conteni
 // #endregion
 
 // #region Fixtures
-const MON = { id: 1, salonId: 34 } as HorarioProfesorDto;
+const MON = { id: 1, cursoId: 24, salonId: 34 } as HorarioProfesorDto;
 const WED = { id: 2, salonId: 34 } as HorarioProfesorDto;
 
 const baseVm = {
@@ -78,38 +79,15 @@ describe('ProfesorCursoHubContenidoComponent', () => {
 	});
 
 	describe('carga', () => {
-		it('loads the resolved slot without the modal path', () => {
-			create();
-
-			expect(dataFacade.loadContenidoForHub).toHaveBeenCalledWith(1, { salonId: 34 });
-			expect(dataFacade.loadContenido).not.toHaveBeenCalled();
-		});
-
-		it('reloads when the slot changes', () => {
+		it('only reads the store: loading and reset belong to the hub shell', () => {
 			const fixture = create();
-
 			slot.set(WED);
 			fixture.detectChanges();
-
-			expect(dataFacade.loadContenidoForHub).toHaveBeenLastCalledWith(2, { salonId: 34 });
-			expect(dataFacade.loadContenidoForHub).toHaveBeenCalledTimes(2);
-		});
-
-		it('does not reload when the slot object is refreshed but the id is the same', () => {
-			const fixture = create();
-
-			slot.set({ ...MON });
-			fixture.detectChanges();
-
-			expect(dataFacade.loadContenidoForHub).toHaveBeenCalledTimes(1);
-		});
-
-		it('clears the shared store when leaving the tab', () => {
-			const fixture = create();
-
 			fixture.destroy();
 
-			expect(dataFacade.resetForHub).toHaveBeenCalledOnce();
+			expect(dataFacade.loadContenidoForHub).not.toHaveBeenCalled();
+			expect(dataFacade.loadContenido).not.toHaveBeenCalled();
+			expect(dataFacade.resetForHub).not.toHaveBeenCalled();
 		});
 	});
 
@@ -239,6 +217,21 @@ describe('ProfesorCursoHubContenidoComponent', () => {
 
 			hooks.onRolledBack();
 			expect(builderVisible(fixture)).toBe(true);
+		});
+	});
+
+	describe('ir a calificaciones', () => {
+		it('closes the submissions dialog and navigates to the tab keeping the slot', () => {
+			const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+			const fixture = create();
+
+			(fixture.componentInstance as unknown as { onIrACalificaciones(): void }).onIrACalificaciones();
+
+			expect(uiFacade.closeTaskSubmissionsDialog).toHaveBeenCalledOnce();
+			expect(navigate).toHaveBeenCalledWith(['/intranet', 'profesor', 'cursos', 24, 34, 'calificaciones'], {
+				queryParams: { horarioId: 1 },
+				replaceUrl: true,
+			});
 		});
 	});
 });

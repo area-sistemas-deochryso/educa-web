@@ -47,4 +47,17 @@ describe('CursoHubContextService', () => {
 
 		expect(ctx.slot()).toBe(WED);
 	});
+
+	it('builds the target of a tab for the resolved slot, keeping horarioId', () => {
+		ctx.bind(signal<HorarioProfesorDto | null>({ id: 2, cursoId: 24, salonId: 34 } as HorarioProfesorDto));
+
+		expect(ctx.tabTarget('profesor', 'calificaciones')).toEqual({
+			commands: ['/intranet', 'profesor', 'cursos', 24, 34, 'calificaciones'],
+			queryParams: { horarioId: 2 },
+		});
+	});
+
+	it('has no tab target before the shell resolved a slot', () => {
+		expect(ctx.tabTarget('profesor', 'informacion')).toBeNull();
+	});
 });

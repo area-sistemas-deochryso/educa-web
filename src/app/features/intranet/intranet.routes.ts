@@ -74,6 +74,22 @@ const PROFESOR_ROUTES_RAW: Route[] = [
 					),
 				title: 'Intranet - Contenido del Curso (Profesor)',
 			},
+			{
+				path: 'calificaciones',
+				loadComponent: () =>
+					import('./pages/profesor/cursos/curso-hub/profesor-curso-hub-calificaciones.component').then(
+						(m) => m.ProfesorCursoHubCalificacionesComponent,
+					),
+				title: 'Intranet - Calificaciones del Curso (Profesor)',
+			},
+			{
+				path: 'informacion',
+				loadComponent: () =>
+					import('./pages/profesor/cursos/curso-hub/profesor-curso-hub-informacion.component').then(
+						(m) => m.ProfesorCursoHubInformacionComponent,
+					),
+				title: 'Intranet - Información del Curso (Profesor)',
+			},
 		],
 	},
 	{

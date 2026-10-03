@@ -10,7 +10,7 @@ import { buildCursosListCommands, type CursoHubRol } from '../../helpers/curso-h
 import { filterPairSlots, resolveSlot } from '../../helpers/curso-hub-slot.helpers';
 import { EmptyStateComponent } from '../empty-state';
 import { CursoHubHeaderComponent } from '../curso-hub-header';
-import { CursoHubTabsComponent } from '../curso-hub-tabs';
+import { CursoHubTabsComponent, cursoHubTabsFor } from '../curso-hub-tabs';
 import { CursoHubContextService } from './curso-hub-context.service';
 
 // #region Shared template
@@ -45,7 +45,7 @@ export const CURSO_HUB_SHELL_TEMPLATE = `
 					[selectedSlotId]="current.id"
 					(slotChange)="onSlotChange($event)"
 				/>
-				<app-curso-hub-tabs />
+				<app-curso-hub-tabs [tabs]="tabs()" />
 				<router-outlet />
 			}
 		}
@@ -135,6 +135,7 @@ export abstract class CursoHubShellBase implements OnInit {
 	);
 
 	protected readonly slot = computed(() => this.resolution().slot);
+	protected readonly tabs = computed(() => cursoHubTabsFor(this.rol));
 
 	private readonly failed = computed(
 		() => this.settled() && !!this.loadError() && this.horarios().length === 0,

@@ -152,4 +152,46 @@ describe('CursoContenidoDataFacade — hub', () => {
 			expect(store.contenido()).toBeNull();
 		});
 	});
+
+	describe('eliminarContenidoEnHub', () => {
+		interface WalConfig {
+			resourceId: number;
+			endpoint: string;
+			optimistic: { apply: () => void; rollback: () => void };
+		}
+		const walConfig = () => wal.execute.mock.calls[0][0] as WalConfig;
+
+		beforeEach(() => facade.loadContenidoForHub(1, { salonId: 34 }));
+
+		it('empties the content optimistically without touching modal flags', () => {
+			facade.eliminarContenidoEnHub(8);
+
+			expect(walConfig().resourceId).toBe(8);
+			walConfig().optimistic.apply();
+
+			expect(store.contenido()).toBeNull();
+			expect(store.contentDialogVisible()).toBe(false);
+		});
+
+		it('restores the content on rollback when the hub is still on the same slot', () => {
+			facade.eliminarContenidoEnHub(8);
+			walConfig().optimistic.apply();
+
+			walConfig().optimistic.rollback();
+
+			expect(store.contenido()?.id).toBe(8);
+			expect(store.contentDialogVisible()).toBe(false);
+		});
+
+		it('does not resurrect the content on another slot after a rollback', () => {
+			facade.eliminarContenidoEnHub(8);
+			walConfig().optimistic.apply();
+			api.getContenido.mockReturnValue(of(contenido(11, 2)));
+			facade.loadContenidoForHub(2);
+
+			walConfig().optimistic.rollback();
+
+			expect(store.contenido()?.id).toBe(11);
+		});
+	});
 });

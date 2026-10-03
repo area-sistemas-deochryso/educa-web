@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildCursoHubLink, buildCursosListCommands } from './curso-hub-link.helpers';
+import { buildCursoHubLink, buildCursoHubTabLink, buildCursosListCommands } from './curso-hub-link.helpers';
 
 describe('buildCursoHubLink', () => {
 	const horario = { id: 77, cursoId: 24, salonId: 34 };
@@ -28,5 +28,16 @@ describe('buildCursosListCommands', () => {
 	it('points to the role Cursos list', () => {
 		expect(buildCursosListCommands('profesor')).toEqual(['/intranet', 'profesor', 'cursos']);
 		expect(buildCursosListCommands('estudiante')).toEqual(['/intranet', 'estudiante', 'cursos']);
+	});
+});
+
+describe('buildCursoHubTabLink', () => {
+	const horario = { id: 77, cursoId: 24, salonId: 34 };
+
+	it('appends the tab segment and keeps the slot query', () => {
+		expect(buildCursoHubTabLink('profesor', horario, 'calificaciones')).toEqual({
+			commands: ['/intranet', 'profesor', 'cursos', 24, 34, 'calificaciones'],
+			queryParams: { horarioId: 77 },
+		});
 	});
 });

@@ -1,17 +1,27 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import type { CursoHubRol } from '../../helpers/curso-hub-link.helpers';
 
 export interface CursoHubTab {
 	/** Segmento de la ruta hija, relativo al shell (ej. `contenido`). */
 	path: string;
 	label: string;
 	icon: string;
+	/** Roles que ya tienen esta pestaña implementada (una ruta hija existe solo para ellos). */
+	roles: readonly CursoHubRol[];
 }
 
-/** Pestañas del hub. Por ahora solo Contenido; F2–F4 agregan Calificaciones, Información, Asistencia y Salón. */
+/** Pestañas del hub. F3–F4 agregan Asistencia y Salón; el estudiante suma Calificaciones/Información en su propio chat. */
 export const CURSO_HUB_TABS: readonly CursoHubTab[] = [
-	{ path: 'contenido', label: 'Contenido', icon: 'pi pi-book' },
+	{ path: 'contenido', label: 'Contenido', icon: 'pi pi-book', roles: ['profesor', 'estudiante'] },
+	{ path: 'calificaciones', label: 'Calificaciones', icon: 'pi pi-chart-bar', roles: ['profesor'] },
+	{ path: 'informacion', label: 'Información', icon: 'pi pi-info-circle', roles: ['profesor'] },
 ];
+
+/** Pestañas visibles para un rol. */
+export function cursoHubTabsFor(rol: CursoHubRol): readonly CursoHubTab[] {
+	return CURSO_HUB_TABS.filter((tab) => tab.roles.includes(rol));
+}
 
 /**
  * Barra de pestañas del hub de curso. Cada pestaña es una ruta hija con URL

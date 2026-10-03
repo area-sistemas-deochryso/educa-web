@@ -5,7 +5,7 @@ import { Router, RouterOutlet, provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { describe, expect, it, vi } from 'vitest';
 
-import { CursoHubTabsComponent } from './curso-hub-tabs.component';
+import { CURSO_HUB_TABS, CursoHubTabsComponent, cursoHubTabsFor } from './curso-hub-tabs.component';
 // #endregion
 
 @Component({
@@ -71,5 +71,19 @@ describe('CursoHubTabsComponent', () => {
 		await harness.fixture.whenStable();
 
 		expect(navigate).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ replaceUrl: true }));
+	});
+});
+
+describe('cursoHubTabsFor', () => {
+	it('gives the profesor Contenido, Calificaciones and Información', () => {
+		expect(cursoHubTabsFor('profesor').map((t) => t.path)).toEqual(['contenido', 'calificaciones', 'informacion']);
+	});
+
+	it('keeps the estudiante on Contenido until its own tabs exist', () => {
+		expect(cursoHubTabsFor('estudiante').map((t) => t.path)).toEqual(['contenido']);
+	});
+
+	it('only lists tabs registered in CURSO_HUB_TABS', () => {
+		expect(cursoHubTabsFor('profesor').every((t) => CURSO_HUB_TABS.includes(t))).toBe(true);
 	});
 });

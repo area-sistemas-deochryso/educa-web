@@ -1,5 +1,11 @@
 import { Injectable, Signal, computed, signal } from '@angular/core';
 import type { HorarioProfesorDto } from '@features/intranet/pages/profesor/models';
+import {
+	buildCursoHubTabLink,
+	type CursoHubRol,
+	type CursoHubTabPath,
+	type CursoHubTarget,
+} from '../../helpers/curso-hub-link.helpers';
 
 /**
  * Contrato entre el shell del hub de curso y sus pestañas hijas (rutas hijas).
@@ -15,6 +21,12 @@ export class CursoHubContextService {
 
 	/** Franja resuelta por el shell; `null` mientras el shell no la resolvió o fuera del hub. */
 	readonly slot = computed(() => this.source()?.() ?? null);
+
+	/** Destino de una pestaña del hub para la franja resuelta (conserva `horarioId`); `null` si aún no hay franja. */
+	tabTarget(rol: CursoHubRol, tab: CursoHubTabPath): CursoHubTarget | null {
+		const slot = this.slot();
+		return slot ? buildCursoHubTabLink(rol, slot, tab) : null;
+	}
 
 	/** Lo llama el shell al crearse: las hijas leen la franja de forma síncrona. */
 	bind(slot: Signal<HorarioProfesorDto | null>): void {

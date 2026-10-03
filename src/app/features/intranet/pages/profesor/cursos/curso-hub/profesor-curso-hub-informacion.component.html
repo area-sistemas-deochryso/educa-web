@@ -1,0 +1,130 @@
+<div class="hub-informacion" style="padding: 1rem">
+	@if (vm().loading) {
+		<div class="flex justify-content-center p-5">
+			<edu-spinner strokeWidth="4" />
+		</div>
+	} @else if (vm().contenido; as contenido) {
+		<div class="info-grid">
+			<div class="info-card">
+				<p class="info-section-title">Información del curso</p>
+
+				<div class="info-fields-row">
+					<div class="info-field">
+						<i class="pi pi-book"></i>
+						<div>
+							<p class="info-field-label">Curso</p>
+							<p class="info-field-value">{{ contenido.cursoNombre }}</p>
+						</div>
+					</div>
+					<div class="info-field">
+						<i class="pi pi-building"></i>
+						<div>
+							<p class="info-field-label">Salón</p>
+							<p class="info-field-value">{{ contenido.salonDescripcion }}</p>
+						</div>
+					</div>
+					<div class="info-field">
+						<i class="pi pi-calendar"></i>
+						<div>
+							<p class="info-field-label">Semanas</p>
+							<p class="info-field-value">{{ contenido.numeroSemanas }} semanas</p>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="info-stats">
+				<button
+					class="stat-box files clickable"
+					type="button"
+					data-info-anchor="profesor-curso-hub-stat-box"
+					(click)="onOpenArchivosSummary()"
+					aria-label="Ver todos los archivos"
+				>
+					<i class="pi pi-paperclip"></i>
+					<div class="stat-number">{{ vm().totalArchivos }}</div>
+					<div class="stat-label">Archivos</div>
+				</button>
+				<button
+					class="stat-box tasks clickable"
+					type="button"
+					data-info-anchor="profesor-curso-hub-stat-box"
+					(click)="onOpenTareasSummary()"
+					aria-label="Ver todas las tareas"
+				>
+					<i class="pi pi-file-edit"></i>
+					<div class="stat-number">{{ vm().totalTareas }}</div>
+					<div class="stat-label">Tareas</div>
+				</button>
+				<button
+					class="stat-box students clickable"
+					type="button"
+					data-info-anchor="profesor-curso-hub-stat-box"
+					(click)="onOpenStudentFiles()"
+					aria-label="Ver archivos de estudiantes"
+				>
+					<i class="pi pi-users"></i>
+					<div class="stat-number">{{ vm().totalArchivosEstudiantes }}</div>
+					<div class="stat-label">Adjuntos Est.</div>
+				</button>
+				<button
+					class="stat-box calificaciones clickable"
+					type="button"
+					data-info-anchor="profesor-curso-hub-stat-box"
+					(click)="onIrACalificaciones()"
+					aria-label="Ir a calificaciones"
+				>
+					<i class="pi pi-chart-bar"></i>
+					<div class="stat-number">{{ calVm().loading ? '—' : calVm().totalEvaluaciones }}</div>
+					<div class="stat-label">Calificaciones</div>
+				</button>
+			</div>
+		</div>
+
+		<button
+			class="danger-link"
+			type="button"
+			data-info-anchor="profesor-curso-hub-eliminar-contenido"
+			(click)="onDeleteContenido()"
+		>
+			<i class="pi pi-trash"></i>
+			Eliminar todo el contenido
+		</button>
+	} @else if (vm().error) {
+		<app-empty-state
+			icon="pi pi-exclamation-triangle"
+			title="Información"
+			message="No se pudo cargar el contenido de esta franja. Intenta de nuevo más tarde."
+		/>
+	} @else {
+		<div class="text-center p-4" data-info-anchor="profesor-curso-hub-informacion-sin-contenido">
+			<p class="m-0 mb-2">Esta franja todavía no tiene contenido.</p>
+			<a routerLink="../contenido" queryParamsHandling="merge" [replaceUrl]="true">Ir a Contenido</a>
+		</div>
+	}
+</div>
+
+<!-- #region Diálogos (siempre en el DOM, nunca dentro de @if) -->
+<app-archivos-summary-dialog
+	[visible]="vm().archivosSummaryDialogVisible"
+	[semanas]="vm().semanas"
+	(visibleChange)="onArchivosSummaryVisibleChange($event)"
+/>
+
+<app-tareas-summary-dialog
+	[visible]="vm().tareasSummaryDialogVisible"
+	[semanas]="vm().semanas"
+	(visibleChange)="onTareasSummaryVisibleChange($event)"
+/>
+
+<app-student-files-dialog
+	[visible]="vm().studentFilesDialogVisible"
+	[data]="vm().studentFilesData"
+	[loading]="vm().studentFilesLoading"
+	[calificaciones]="calVm().calificaciones"
+	(visibleChange)="onStudentFilesVisibleChange($event)"
+	(irACalificaciones)="onIrACalificaciones()"
+/>
+
+<edu-confirm-dialog />
+<!-- #endregion -->

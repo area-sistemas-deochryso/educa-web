@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, computed, effect, inject, untracked } from '@angular/core';
 import {
 	CURSO_HUB_SHELL_IMPORTS,
 	CURSO_HUB_SHELL_TEMPLATE,
@@ -6,11 +6,17 @@ import {
 } from '@intranet-shared/components';
 import type { CursoHubRol } from '@intranet-shared/helpers';
 import { ProfesorFacade } from '../../services/profesor.facade';
+import { CursoContenidoDataFacade } from '../services/curso-contenido-data.facade';
+import { CursoHubCalificacionesLoader } from './curso-hub-calificaciones.loader';
 
 /**
  * Hub de curso del profesor: `profesor/cursos/:cursoId/:salonId?horarioId=`.
- * La resolución de par y franja vive en `CursoHubShellBase`; acá solo se
- * conecta la fuente de horarios del rol.
+ * La resolución de par y franja vive en `CursoHubShellBase`; acá se conecta la
+ * fuente de horarios del rol y se es **dueño de la carga y del reset** del
+ * contenido y las calificaciones: las pestañas solo leen los stores. Cargar
+ * desde el shell hace que un deep link a cualquier pestaña tenga datos, y
+ * resetear al destruirse (no al cambiar de pestaña) conserva el estado entre
+ * pestañas.
  */
 @Component({
 	selector: 'app-profesor-curso-hub',
@@ -21,11 +27,36 @@ import { ProfesorFacade } from '../../services/profesor.facade';
 })
 export class ProfesorCursoHubComponent extends CursoHubShellBase {
 	private readonly facade = inject(ProfesorFacade);
+	private readonly dataFacade = inject(CursoContenidoDataFacade);
+	private readonly calLoader = inject(CursoHubCalificacionesLoader);
 
 	protected readonly rol: CursoHubRol = 'profesor';
 	protected readonly horarios = computed(() => this.facade.vm().horarios);
 	protected readonly loading = computed(() => this.facade.vm().loading);
 	protected readonly loadError = computed(() => this.facade.vm().error);
+
+	constructor() {
+		super();
+
+		// La carga arranca con la franja ya resuelta (no bloquea el primer pintado del encabezado)
+		// y se repite solo si cambia el id de la franja (el objeto se re-crea al refrescar horarios).
+		const slotId = computed(() => this.slot()?.id ?? null);
+		effect(() => {
+			const id = slotId();
+			if (id === null) return;
+			const salonId = untracked(() => this.slot()?.salonId);
+			untracked(() => {
+				this.calLoader.reset();
+				this.dataFacade.loadContenidoForHub(id, { salonId });
+			});
+		});
+
+		// Salir del hub: no dejar contenido ni calificaciones de otra franja en los stores compartidos con el modal.
+		inject(DestroyRef).onDestroy(() => {
+			this.calLoader.reset();
+			this.dataFacade.resetForHub();
+		});
+	}
 
 	protected loadHorarios(): void {
 		this.facade.loadData();

@@ -85,4 +85,33 @@ describe('curso hub routes (P105 D1 F1a)', () => {
 			expect(await matched('/estudiante/cursos/24/34')).toBe('estudiante/cursos/:cursoId/:salonId');
 		});
 	});
+
+	describe('child tabs (P105 D1 F2)', () => {
+		const childPaths = (path: string) => (findRoute(path)?.children ?? []).map((c) => c.path);
+
+		it('profesor hub has Contenido, Calificaciones and Información as child routes', () => {
+			expect(childPaths('profesor/cursos/:cursoId/:salonId')).toEqual(['', 'contenido', 'calificaciones', 'informacion']);
+		});
+
+		it('estudiante hub keeps only Contenido until its own tabs land', () => {
+			expect(childPaths('estudiante/cursos/:cursoId/:salonId')).toEqual(['', 'contenido']);
+		});
+
+		it('every tab inherits authorization: no own permissionPath nor guards', () => {
+			const tabs = (findRoute('profesor/cursos/:cursoId/:salonId')?.children ?? []).filter((c) => c.path);
+			for (const tab of tabs) {
+				expect(tab.data?.['permissionPath']).toBeUndefined();
+				expect(tab.canActivate).toBeUndefined();
+				expect(tab.loadComponent).toBeTypeOf('function');
+			}
+		});
+
+		it('lazy-loads each new tab component', async () => {
+			const children = findRoute('profesor/cursos/:cursoId/:salonId')?.children ?? [];
+			for (const path of ['calificaciones', 'informacion']) {
+				const component = await children.find((c) => c.path === path)?.loadComponent?.();
+				expect(component).toBeTypeOf('function');
+			}
+		});
+	});
 });

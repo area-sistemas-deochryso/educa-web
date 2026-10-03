@@ -1,13 +1,5 @@
-import {
-	ChangeDetectionStrategy,
-	Component,
-	DestroyRef,
-	computed,
-	effect,
-	inject,
-	signal,
-	untracked,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { EduButton, EduConfirmDialog, EduConfirmationService, EduSpinner } from '@edu-ui';
 import { CursoHubContextService, EmptyStateComponent } from '@intranet-shared/components';
 import { CursoContenidoCrudFacade } from '../services/curso-contenido-crud.facade';
@@ -25,8 +17,8 @@ import type { ActualizarTareaRequest, CrearTareaRequest } from '@features/intran
  *
  * Implementación propia del hub: no importa ni modifica `curso-content-dialog`
  * (decisión de F1b: duplicación temporal hasta F6). Comparte con el modal los
- * stores/facades root, por eso carga sin abrir diálogos (`loadContenidoForHub`)
- * y limpia el store al salir.
+ * stores/facades root. La carga y el reset del store son del shell del hub
+ * (`ProfesorCursoHubComponent`): esta pestaña solo lee.
  */
 @Component({
 	selector: 'app-profesor-curso-hub-contenido',
@@ -113,7 +105,7 @@ import type { ActualizarTareaRequest, CrearTareaRequest } from '@features/intran
 			[tarea]="vm().taskSubmissionsTarea"
 			[loading]="vm().taskSubmissionsLoading"
 			(visibleChange)="onTaskSubmissionsVisibleChange($event)"
-			(irACalificaciones)="onTaskSubmissionsVisibleChange(false)"
+			(irACalificaciones)="onIrACalificaciones()"
 		/>
 
 		<app-curso-builder-dialog
@@ -133,7 +125,7 @@ export class ProfesorCursoHubContenidoComponent {
 	private readonly dataFacade = inject(CursoContenidoDataFacade);
 	private readonly crudFacade = inject(CursoContenidoCrudFacade);
 	private readonly uiFacade = inject(CursoContenidoUiFacade);
-	private readonly destroyRef = inject(DestroyRef);
+	private readonly router = inject(Router);
 	// #endregion
 
 	// #region Estado
@@ -141,22 +133,7 @@ export class ProfesorCursoHubContenidoComponent {
 	protected readonly builderVisible = signal(false);
 
 	private readonly slotId = computed(() => this.hubContext.slot()?.id ?? null);
-	private readonly salonId = computed(() => this.hubContext.slot()?.salonId);
 	// #endregion
-
-	constructor() {
-		// Cambiar de franja recarga (la carga anterior se cancela); `untracked` evita
-		// que las señales del store que lee la carga re-disparen el efecto.
-		effect(() => {
-			const id = this.slotId();
-			if (id === null) return;
-			const salonId = this.salonId();
-			untracked(() => this.dataFacade.loadContenidoForHub(id, { salonId }));
-		});
-
-		// Salir de la pestaña: no dejar contenido de otra franja ni flags de diálogo en los stores compartidos con el modal.
-		this.destroyRef.onDestroy(() => this.dataFacade.resetForHub());
-	}
 
 	// #region Semana
 	protected onSemanaEditVisibleChange(visible: boolean): void {
@@ -191,6 +168,13 @@ export class ProfesorCursoHubContenidoComponent {
 
 	protected onTaskSubmissionsVisibleChange(visible: boolean): void {
 		if (!visible) this.uiFacade.closeTaskSubmissionsDialog();
+	}
+
+	/** Cierra el diálogo de entregas y navega a Calificaciones conservando la franja. */
+	protected onIrACalificaciones(): void {
+		this.uiFacade.closeTaskSubmissionsDialog();
+		const target = this.hubContext.tabTarget('profesor', 'calificaciones');
+		if (target) void this.router.navigate(target.commands, { queryParams: target.queryParams, replaceUrl: true });
 	}
 	// #endregion
 

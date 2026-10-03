@@ -10,6 +10,8 @@ import { ErrorHandlerService, WalClockService } from '@core/services';
 
 import type { HorarioProfesorDto } from '../../models';
 import { ProfesorFacade } from '../../services/profesor.facade';
+import { CursoContenidoDataFacade } from '../services/curso-contenido-data.facade';
+import { CursoHubCalificacionesLoader } from './curso-hub-calificaciones.loader';
 import { ProfesorCursoHubComponent } from './profesor-curso-hub.component';
 // #endregion
 
@@ -51,6 +53,8 @@ describe('ProfesorCursoHubComponent', () => {
 		getContenido: vi.fn(),
 	};
 	const errorHandler = { showInfo: vi.fn(), showWarning: vi.fn() };
+	const dataFacade = { loadContenidoForHub: vi.fn(), resetForHub: vi.fn() };
+	const calLoader = { reset: vi.fn(), ensure: vi.fn(), refresh: vi.fn() };
 
 	let router: Router;
 
@@ -67,6 +71,8 @@ describe('ProfesorCursoHubComponent', () => {
 				]),
 				{ provide: ProfesorFacade, useValue: facade },
 				{ provide: ErrorHandlerService, useValue: errorHandler },
+				{ provide: CursoContenidoDataFacade, useValue: dataFacade },
+				{ provide: CursoHubCalificacionesLoader, useValue: calLoader },
 				{ provide: WalClockService, useValue: { adjustedNow: () => MONDAY_830 } },
 			],
 		});
@@ -242,5 +248,56 @@ describe('ProfesorCursoHubComponent', () => {
 		);
 		expect(router.url).toBe('/intranet/profesor/cursos/24/34?horarioId=2');
 		expect(selectedLabel(harness)).toBe('Miércoles 10:00 - 11:30');
+	});
+
+	describe('dueño de la carga del contenido', () => {
+		it('loads the resolved slot once the schedules are ready, not before', async () => {
+			const harness = await openHub('/intranet/profesor/cursos/24/34?horarioId=2');
+			expect(dataFacade.loadContenidoForHub).not.toHaveBeenCalled();
+
+			await finishLoad(harness, [MON_SLOT, WED_SLOT]);
+
+			expect(dataFacade.loadContenidoForHub).toHaveBeenCalledOnce();
+			expect(dataFacade.loadContenidoForHub).toHaveBeenCalledWith(2, { salonId: 34 });
+			expect(calLoader.reset).toHaveBeenCalled();
+		});
+
+		it('reloads and resets calificaciones when the slot changes, but not when only the slot object is refreshed', async () => {
+			const harness = await openHub('/intranet/profesor/cursos/24/34?horarioId=1');
+			await finishLoad(harness, [MON_SLOT, WED_SLOT]);
+			dataFacade.loadContenidoForHub.mockClear();
+			calLoader.reset.mockClear();
+
+			vm.update((v) => ({ ...v, horarios: [{ ...MON_SLOT }, WED_SLOT] }));
+			harness.detectChanges();
+			expect(dataFacade.loadContenidoForHub).not.toHaveBeenCalled();
+
+			await router.navigate([], { queryParams: { horarioId: 2 }, queryParamsHandling: 'merge' });
+			harness.detectChanges();
+
+			expect(dataFacade.loadContenidoForHub).toHaveBeenCalledWith(2, { salonId: 34 });
+			expect(calLoader.reset).toHaveBeenCalledOnce();
+		});
+
+		it('clears both stores only when leaving the hub', async () => {
+			const harness = await openHub('/intranet/profesor/cursos/24/34');
+			await finishLoad(harness, [MON_SLOT]);
+			dataFacade.resetForHub.mockClear();
+
+			harness.fixture.destroy();
+
+			expect(dataFacade.resetForHub).toHaveBeenCalledOnce();
+			expect(calLoader.reset).toHaveBeenCalled();
+		});
+	});
+
+	it('shows only the tabs implemented for the profesor role', async () => {
+		const harness = await openHub('/intranet/profesor/cursos/24/34');
+		await finishLoad(harness, [MON_SLOT]);
+
+		const labels = Array.from(harness.routeNativeElement?.querySelectorAll('a.hub-tab') ?? []).map((a) =>
+			a.textContent?.trim(),
+		);
+		expect(labels).toEqual(['Contenido', 'Calificaciones', 'Información']);
 	});
 });

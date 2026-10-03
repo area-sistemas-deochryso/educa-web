@@ -1,7 +1,7 @@
 /* eslint-disable max-lines -- Razón: facade de calificaciones con CRUD + carga de contenido + evaluaciones + notas. 301 líneas efectivas — 1 sobre el límite por expansión de setters. */
 import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { forkJoin } from 'rxjs';
+import { forkJoin, type Subscription } from 'rxjs';
 import { withRetry, facadeErrorHandler, detectarNivel } from '@core/helpers';
 import { ErrorHandlerService, WalFacadeHelper, WalCrossTabRefetchService } from '@core/services';
 import { CalificacionConfigService } from '@intranet-shared/services/calificacion-config';
@@ -38,6 +38,7 @@ export class CalificacionesFacade {
 		errorHandler: this.errorHandler,
 	});
 	private readonly grupoUrl = `${environment.apiUrl}/api/GrupoContenido`;
+	private hubLoadSub: Subscription | null = null;
 	// #endregion
 
 	constructor() {
@@ -59,13 +60,13 @@ export class CalificacionesFacade {
 
 	setContenidoWithSalon(contenido: CursoContenidoDetalleDto, salonId: number | null): void { this.contenidoStore.setContenido(contenido); this.contenidoStore.setSalonId(salonId); }
 
-	loadCalificaciones(contenidoId: number): void {
+	loadCalificaciones(contenidoId: number): Subscription {
 		this.store.setLoading(true);
 
 		// salonId resuelto por el caller y almacenado en contenidoStore
 		const salonId = this.contenidoStore.salonId();
 
-		forkJoin({
+		return forkJoin({
 			calificaciones: this.api.getCalificaciones(contenidoId).pipe(
 				withRetry({ tag: 'CalificacionesFacade:loadCalificaciones' }),
 			),
@@ -91,6 +92,20 @@ export class CalificacionesFacade {
 					this.store.setLoading(false);
 				}),
 			});
+	}
+
+
+	/** Carga para el hub: una llamada nueva cancela la anterior (latest-wins) para que un cambio rápido de franja no pise datos. */
+	loadCalificacionesForHub(contenidoId: number): void {
+		this.hubLoadSub?.unsubscribe();
+		this.hubLoadSub = this.loadCalificaciones(contenidoId);
+	}
+
+	/** Cancela la carga en vuelo del hub y limpia el store (salida del hub o cambio de franja). */
+	resetForHub(): void {
+		this.hubLoadSub?.unsubscribe();
+		this.hubLoadSub = null;
+		this.store.reset();
 	}
 
 	// #endregion

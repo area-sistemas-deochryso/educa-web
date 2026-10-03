@@ -31,6 +31,19 @@ export function buildCursoHubLink(
 	};
 }
 
+/** Pestañas del hub con ruta hija (el path es el segmento de la ruta). */
+export type CursoHubTabPath = 'contenido' | 'calificaciones' | 'informacion';
+
+/** Igual que `buildCursoHubLink` pero apuntando a una pestaña concreta, conservando la franja. */
+export function buildCursoHubTabLink(
+	rol: CursoHubRol,
+	horario: CursoHubHorarioRef,
+	tab: CursoHubTabPath,
+): CursoHubTarget {
+	const target = buildCursoHubLink(rol, horario);
+	return { ...target, commands: [...target.commands, tab] };
+}
+
 /** Comandos de la lista de Cursos del rol (destino del redirect por par inválido). */
 export function buildCursosListCommands(rol: CursoHubRol): string[] {
 	return ['/intranet', rol, 'cursos'];
