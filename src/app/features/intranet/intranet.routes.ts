@@ -174,6 +174,22 @@ const ESTUDIANTE_ROUTES_RAW: Route[] = [
 					),
 				title: 'Intranet - Contenido del Curso (Estudiante)',
 			},
+			{
+				path: 'calificaciones',
+				loadComponent: () =>
+					import('./pages/estudiante/cursos/curso-hub/estudiante-curso-hub-calificaciones.component').then(
+						(m) => m.EstudianteCursoHubCalificacionesComponent,
+					),
+				title: 'Intranet - Calificaciones del Curso (Estudiante)',
+			},
+			{
+				path: 'informacion',
+				loadComponent: () =>
+					import('./pages/estudiante/cursos/curso-hub/estudiante-curso-hub-informacion.component').then(
+						(m) => m.EstudianteCursoHubInformacionComponent,
+					),
+				title: 'Intranet - Información del Curso (Estudiante)',
+			},
 		],
 	},
 	{

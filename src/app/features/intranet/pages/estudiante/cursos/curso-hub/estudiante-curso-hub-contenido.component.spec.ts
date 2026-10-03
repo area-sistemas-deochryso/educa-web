@@ -83,39 +83,24 @@ describe('EstudianteCursoHubContenidoComponent', () => {
 	});
 
 	describe('carga', () => {
-		it('loads the resolved slot without the modal path', () => {
-			create();
+		it('does not load or reset the store: the hub shell owns that', () => {
+			const { fixture } = create();
 
-			expect(facade.loadContenidoForHub).toHaveBeenCalledWith(1);
+			fixture.destroy();
+
+			expect(facade.loadContenidoForHub).not.toHaveBeenCalled();
 			expect(facade.loadContenido).not.toHaveBeenCalled();
+			expect(facade.resetForHub).not.toHaveBeenCalled();
 		});
 
-		it('reloads when the slot changes and resets the local search/open panels', () => {
+		it('resets the local search/open panels when the slot changes', () => {
 			const { fixture, component } = create();
 			component.searchQuery.set('algo');
 
 			slot.set(WED);
 			fixture.detectChanges();
 
-			expect(facade.loadContenidoForHub).toHaveBeenLastCalledWith(2);
 			expect(component.searchQuery()).toBe('');
-		});
-
-		it('does not reload when the slot object is refreshed but the id is the same', () => {
-			const { fixture } = create();
-
-			slot.set({ ...MON });
-			fixture.detectChanges();
-
-			expect(facade.loadContenidoForHub).toHaveBeenCalledTimes(1);
-		});
-
-		it('clears the shared store when leaving the tab', () => {
-			const { fixture } = create();
-
-			fixture.destroy();
-
-			expect(facade.resetForHub).toHaveBeenCalledOnce();
 		});
 	});
 

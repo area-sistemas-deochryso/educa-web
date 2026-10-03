@@ -259,6 +259,11 @@ export class EstudianteCursosStore {
 		this._state.update((s) => ({ ...s, tareasSummaryDialogVisible: false }));
 	}
 
+	/** Descarta las notas del curso (cambio de franja o salida del hub). */
+	clearMisNotas(): void {
+		this._state.update((s) => ({ ...s, misNotasCurso: null, misNotasLoading: false }));
+	}
+
 	/** Clear loaded caches so content can be re-fetched on refresh. */
 	clearLoadedCaches(): void {
 		this._state.update((s) => ({

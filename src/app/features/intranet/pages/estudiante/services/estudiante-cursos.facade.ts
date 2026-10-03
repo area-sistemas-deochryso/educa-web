@@ -28,6 +28,7 @@ export class EstudianteCursosFacade {
 	private readonly wal = inject(WalFacadeHelper);
 	private readonly destroyRef = inject(DestroyRef);
 	private hubLoadSub: Subscription | null = null;
+	private notasSub: Subscription | null = null;
 	// #endregion
 
 	// #region Estado expuesto
@@ -95,6 +96,8 @@ export class EstudianteCursosFacade {
 	 */
 	loadContenidoForHub(horarioId: number): void {
 		this.hubLoadSub?.unsubscribe();
+		this.notasSub?.unsubscribe();
+		this.store.clearMisNotas();
 		this.store.clearLoadedCaches();
 		this.store.setContenido(null);
 		this.store.setContentLoading(true);
@@ -123,6 +126,8 @@ export class EstudianteCursosFacade {
 	resetForHub(): void {
 		this.hubLoadSub?.unsubscribe();
 		this.hubLoadSub = null;
+		this.notasSub?.unsubscribe();
+		this.notasSub = null;
 		this.store.closeContentDialog();
 		this.store.setContentLoading(false);
 	}
@@ -153,7 +158,7 @@ export class EstudianteCursosFacade {
 
 		this.store.setMisNotasLoading(true);
 
-		this.api
+		this.notasSub = this.api
 			.getMisNotasCurso(contenido.id)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({

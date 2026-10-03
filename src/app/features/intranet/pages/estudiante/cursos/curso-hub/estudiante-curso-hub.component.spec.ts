@@ -43,7 +43,13 @@ describe('EstudianteCursoHubComponent', () => {
 		loading: false,
 		error: null,
 	});
-	const facade = { vm, loadHorarios: vi.fn(), getContenido: vi.fn() };
+	const facade = {
+		vm,
+		loadHorarios: vi.fn(),
+		getContenido: vi.fn(),
+		loadContenidoForHub: vi.fn(),
+		resetForHub: vi.fn(),
+	};
 	const errorHandler = { showInfo: vi.fn(), showWarning: vi.fn() };
 	let router: Router;
 
@@ -110,5 +116,42 @@ describe('EstudianteCursoHubComponent', () => {
 
 		const selected = harness.routeNativeElement?.querySelector('.edu-select-button__option--selected');
 		expect(selected?.textContent?.trim()).toBe('Miércoles 10:00 - 11:30');
+	});
+
+	describe('dueño de la carga', () => {
+		// El destroy del hub del test anterior corre en el reset de TestBed, después del clearAllMocks.
+		beforeEach(() => vi.clearAllMocks());
+
+		it('loads the resolved slot without the modal path', async () => {
+			const harness = await openHub('/intranet/estudiante/cursos/24/34?horarioId=2');
+
+			await finishLoad(harness, [MON_SLOT, WED_SLOT]);
+
+			expect(facade.loadContenidoForHub).toHaveBeenCalledOnce();
+			expect(facade.loadContenidoForHub).toHaveBeenCalledWith(2);
+		});
+
+		it('reloads when the user switches slot but not when the slot object is refreshed', async () => {
+			const harness = await openHub('/intranet/estudiante/cursos/24/34?horarioId=1');
+			await finishLoad(harness, [MON_SLOT, WED_SLOT]);
+
+			await finishLoad(harness, [{ ...MON_SLOT }, WED_SLOT]);
+			expect(facade.loadContenidoForHub).toHaveBeenCalledOnce();
+
+			await router.navigateByUrl('/intranet/estudiante/cursos/24/34?horarioId=2');
+			harness.detectChanges();
+			await harness.fixture.whenStable();
+			expect(facade.loadContenidoForHub).toHaveBeenLastCalledWith(2);
+		});
+
+		it('clears the shared store only when leaving the hub', async () => {
+			const harness = await openHub('/intranet/estudiante/cursos/24/34?horarioId=1');
+			await finishLoad(harness, [MON_SLOT, WED_SLOT]);
+			expect(facade.resetForHub).not.toHaveBeenCalled();
+
+			harness.fixture.destroy();
+
+			expect(facade.resetForHub).toHaveBeenCalledOnce();
+		});
 	});
 });

@@ -11,11 +11,11 @@ export interface CursoHubTab {
 	roles: readonly CursoHubRol[];
 }
 
-/** Pestañas del hub. F3–F4 agregan Asistencia y Salón; el estudiante suma Calificaciones/Información en su propio chat. */
+/** Pestañas del hub. F3–F4 agregan Asistencia y Salón. */
 export const CURSO_HUB_TABS: readonly CursoHubTab[] = [
 	{ path: 'contenido', label: 'Contenido', icon: 'pi pi-book', roles: ['profesor', 'estudiante'] },
-	{ path: 'calificaciones', label: 'Calificaciones', icon: 'pi pi-chart-bar', roles: ['profesor'] },
-	{ path: 'informacion', label: 'Información', icon: 'pi pi-info-circle', roles: ['profesor'] },
+	{ path: 'calificaciones', label: 'Calificaciones', icon: 'pi pi-chart-bar', roles: ['profesor', 'estudiante'] },
+	{ path: 'informacion', label: 'Información', icon: 'pi pi-info-circle', roles: ['profesor', 'estudiante'] },
 ];
 
 /** Pestañas visibles para un rol. */

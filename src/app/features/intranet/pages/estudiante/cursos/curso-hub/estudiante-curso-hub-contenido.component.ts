@@ -1,7 +1,6 @@
 import {
 	ChangeDetectionStrategy,
 	Component,
-	DestroyRef,
 	computed,
 	effect,
 	inject,
@@ -33,7 +32,7 @@ import {
  * el contenido de la franja y entrega archivos/tareas.
  *
  * Implementación propia del hub (decisión de F1b: duplicación temporal hasta F6).
- * Carga sin abrir el modal (`loadContenidoForHub`) y limpia el store al salir.
+ * El shell del hub carga y limpia el store; esta pestaña solo lo lee.
  *
  * Los estilos son los del modal de solo lectura: se referencian en lugar de
  * copiarse; al retirar el modal (F6) el scss debe moverse a esta carpeta.
@@ -66,7 +65,6 @@ export class EstudianteCursoHubContenidoComponent {
 	private readonly facade = inject(EstudianteCursosFacade);
 	private readonly confirmationService = inject(EduConfirmationService);
 	private readonly errorHandler = inject(ErrorHandlerService);
-	private readonly destroyRef = inject(DestroyRef);
 	protected readonly uploadAccept = UPLOAD_ACCEPT;
 	protected readonly uploadMaxBytes = UPLOAD_LIMITS.maxFileSizeBytes;
 	// #endregion
@@ -99,19 +97,14 @@ export class EstudianteCursoHubContenidoComponent {
 	// #endregion
 
 	constructor() {
-		// Cambiar de franja recarga (la carga anterior se cancela) y reinicia la UI local de la franja anterior.
+		// El shell carga el contenido; acá solo se reinicia la UI local de la franja anterior.
 		effect(() => {
-			const id = this.slotId();
-			if (id === null) return;
+			if (this.slotId() === null) return;
 			untracked(() => {
 				this.searchQuery.set('');
 				this.openPanels.set([]);
-				this.facade.loadContenidoForHub(id);
 			});
 		});
-
-		// Salir de la pestaña: no dejar contenido de otra franja en el store compartido con el modal.
-		this.destroyRef.onDestroy(() => this.facade.resetForHub());
 	}
 
 	// #region Contenido
