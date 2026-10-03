@@ -16,6 +16,7 @@ export * from './kpi-stats';
 export * from './picker-grid';
 export * from './curso-chip';
 export * from './curso-hub-header';
+export * from './curso-hub-salon-summary';
 export * from './curso-hub-shell';
 export * from './curso-hub-tabs';
 export * from './table-skeleton';

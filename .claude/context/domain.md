@@ -13,14 +13,14 @@
 ### Profesor
 
 - Asistencia (marcar en clase), Calificaciones
-- Cursos (contenido, tareas, archivos — 16 sub-componentes). Hub por par curso+salón en `profesor/cursos/:cursoId/:salonId?horarioId=` (P105 D1, en construcción: hoy solo shell + selector de franja; los modales siguen vigentes)
+- Cursos (contenido, tareas, archivos — 16 sub-componentes). Hub por par curso+salón en `profesor/cursos/:cursoId/:salonId?horarioId=` (P105 D1, en construcción: shell + selector de franja y 5 pestañas — Contenido, Calificaciones, Asistencia, Información y Salón; los modales siguen vigentes hasta F6)
 - Horarios (ver personal), Salones, Foro, Mensajería
 - Final Salones (cierre de notas por periodo)
 
 ### Estudiante
 
 - Asistencia (ver propia), Cursos (ver inscritos), Notas
-- Hub de curso en `estudiante/cursos/:cursoId/:salonId?horarioId=` (P105 D1, en construcción, mismo shell que el profesor)
+- Hub de curso en `estudiante/cursos/:cursoId/:salonId?horarioId=` (P105 D1, en construcción, mismo shell y las mismas 5 pestañas que el profesor)
 - Horarios, Salones, Foro, Mensajería
 
 ### Apoderado

@@ -11,12 +11,13 @@ export interface CursoHubTab {
 	roles: readonly CursoHubRol[];
 }
 
-/** Pestañas del hub. F4 agrega Salón. */
+/** Pestañas del hub. Salón va al final: es la única del par (no cambia al cambiar de franja). */
 export const CURSO_HUB_TABS: readonly CursoHubTab[] = [
 	{ path: 'contenido', label: 'Contenido', icon: 'pi pi-book', roles: ['profesor', 'estudiante'] },
 	{ path: 'calificaciones', label: 'Calificaciones', icon: 'pi pi-chart-bar', roles: ['profesor', 'estudiante'] },
 	{ path: 'asistencia', label: 'Asistencia', icon: 'pi pi-check-square', roles: ['profesor', 'estudiante'] },
 	{ path: 'informacion', label: 'Información', icon: 'pi pi-info-circle', roles: ['profesor', 'estudiante'] },
+	{ path: 'salon', label: 'Salón', icon: 'pi pi-building', roles: ['profesor', 'estudiante'] },
 ];
 
 /** Pestañas visibles para un rol. */

@@ -390,6 +390,6 @@ describe('ProfesorCursoHubComponent', () => {
 		const labels = Array.from(harness.routeNativeElement?.querySelectorAll('a.hub-tab') ?? []).map((a) =>
 			a.textContent?.trim(),
 		);
-		expect(labels).toEqual(['Contenido', 'Calificaciones', 'Asistencia', 'Información']);
+		expect(labels).toEqual(['Contenido', 'Calificaciones', 'Asistencia', 'Información', 'Salón']);
 	});
 });

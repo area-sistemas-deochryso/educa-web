@@ -98,6 +98,14 @@ const PROFESOR_ROUTES_RAW: Route[] = [
 					),
 				title: 'Intranet - Información del Curso (Profesor)',
 			},
+			{
+				path: 'salon',
+				loadComponent: () =>
+					import('./pages/profesor/cursos/curso-hub/profesor-curso-hub-salon.component').then(
+						(m) => m.ProfesorCursoHubSalonComponent,
+					),
+				title: 'Intranet - Salón del Curso (Profesor)',
+			},
 		],
 	},
 	{
@@ -205,6 +213,14 @@ const ESTUDIANTE_ROUTES_RAW: Route[] = [
 						(m) => m.EstudianteCursoHubInformacionComponent,
 					),
 				title: 'Intranet - Información del Curso (Estudiante)',
+			},
+			{
+				path: 'salon',
+				loadComponent: () =>
+					import('./pages/estudiante/cursos/curso-hub/estudiante-curso-hub-salon.component').then(
+						(m) => m.EstudianteCursoHubSalonComponent,
+					),
+				title: 'Intranet - Salón del Curso (Estudiante)',
 			},
 		],
 	},
