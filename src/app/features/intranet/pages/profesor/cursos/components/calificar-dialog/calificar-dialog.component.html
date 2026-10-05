@@ -87,92 +87,16 @@
 	</div>
 	<!-- #endregion -->
 
-	<!-- #region Individual mode table -->
+	<!-- #region Individual mode -->
 	@if (!isGrupal()) {
 		@if (filteredRows().length > 0) {
-			<edu-table
-				[value]="filteredRows()"
-					dataKey="estudianteId"
-				[scrollable]="true"
-				scrollHeight="350px"
-				styleClass="p-datatable-sm"
-			>
-				<ng-template #header>
-					<tr>
-						<th style="width: 50px">#</th>
-						<th style="min-width: 200px">Estudiante</th>
-						<th style="width: 140px">Nota (0-20)</th>
-						<th style="min-width: 180px">Observación</th>
-					</tr>
-				</ng-template>
-				<ng-template #body let-row let-rowIndex="rowIndex">
-					<tr>
-						<td class="text-center text-color-secondary">{{ rowIndex + 1 }}</td>
-						<td>{{ row.estudianteNombre }}</td>
-						<td>
-							@if (row.esEditable) {
-								<div class="nota-cell">
-									@if (isLiteral()) {
-										<edu-select
-											data-info-anchor="profesor-calificar-nota-select"
-											[ngModel]="getLiteralForNota(row.nota)"
-											(ngModelChange)="updateNotaLiteral(row.estudianteId, $event)"
-											[options]="literalesOrdenados()"
-											optionLabel="letra"
-											placeholder="–"
-											[style]="{ width: '90px' }"
-										/>
-									} @else {
-										<edu-input-number
-											[ngModel]="row.nota"
-											(ngModelChange)="updateNota(row.estudianteId, $event)"
-											[min]="NOTA_MINIMA"
-											[max]="NOTA_MAXIMA"
-											[minFractionDigits]="1"
-											[maxFractionDigits]="1"
-											[step]="0.5"
-											mode="decimal"
-											[inputStyle]="{ width: '70px' }"
-										/>
-									}
-									@if (row.nota !== null && row.nota !== undefined) {
-										<edu-tag
-											[value]="row.nota.toFixed(1)"
-											[severity]="getNotaSeverity(row.nota)"
-											styleClass="nota-severity-tag"
-										/>
-									}
-								</div>
-							} @else {
-								<div class="nota-cell">
-									<edu-tag
-										[value]="row.nota !== null ? row.nota.toFixed(1) : '-'"
-										[severity]="getNotaSeverity(row.nota)"
-									/>
-									<i
-										class="pi pi-lock text-xs text-color-secondary"
-										eduTooltip="No editable (+2 meses)"
-										eduTooltipPosition="top"
-									></i>
-								</div>
-							}
-						</td>
-						<td>
-							@if (row.esEditable) {
-								<input
-									eduInputText
-									[ngModel]="row.observacion"
-									(ngModelChange)="updateObservacion(row.estudianteId, $event)"
-									placeholder="Opcional"
-									class="w-full"
-								/>
-							} @else {
-								<span class="text-sm text-color-secondary">{{ row.observacion || '-' }}</span>
-							}
-						</td>
-					</tr>
-				</ng-template>
-			</edu-table>
+			<app-calificar-individual-table
+				[rows]="filteredRows()"
+				[config]="calificacionConfig()"
+				[isLiteral]="isLiteral()"
+				[literales]="literalesOrdenados()"
+				(edited)="onEdited()"
+			/>
 		} @else {
 			<div class="empty-state">
 				<i class="pi pi-search text-4xl text-color-secondary"></i>
@@ -185,136 +109,13 @@
 	<!-- #region Group mode -->
 	@if (isGrupal()) {
 		@if (filteredGrupoRows().length > 0) {
-			<div class="grupos-calificar-list">
-				@for (grupo of filteredGrupoRows(); track grupo.grupoId) {
-					<div class="grupo-calificar-card">
-						<!-- Group header with nota input -->
-						<div class="grupo-calificar-header">
-							<div class="grupo-info">
-								<span class="grupo-nombre font-semibold">
-									<i class="pi pi-users mr-1"></i>
-									{{ grupo.grupoNombre }}
-								</span>
-								<span class="text-sm text-color-secondary">
-									{{ grupo.miembros.length }} miembros
-								</span>
-							</div>
-							<div class="grupo-nota-input">
-								@if (isLiteral()) {
-									<edu-select
-										[ngModel]="getLiteralForNota(grupo.nota)"
-										data-info-anchor="profesor-calificar-nota-select"
-										(ngModelChange)="updateGrupoNotaLiteral(grupo.grupoId, $event)"
-										[options]="literalesOrdenados()"
-										optionLabel="letra"
-										placeholder="–"
-										[style]="{ width: '90px' }"
-									/>
-								} @else {
-									<edu-input-number
-										[ngModel]="grupo.nota"
-										(ngModelChange)="updateGrupoNota(grupo.grupoId, $event)"
-										[min]="NOTA_MINIMA"
-										[max]="NOTA_MAXIMA"
-										[minFractionDigits]="1"
-										[maxFractionDigits]="1"
-										[step]="0.5"
-										mode="decimal"
-										[inputStyle]="{ width: '70px' }"
-										placeholder="Nota"
-									/>
-								}
-								@if (grupo.nota !== null && grupo.nota !== undefined) {
-									<edu-tag
-										[value]="grupo.nota.toFixed(1)"
-										[severity]="getNotaSeverity(grupo.nota)"
-										styleClass="nota-severity-tag"
-									/>
-								}
-							</div>
-						</div>
-
-						<!-- Observacion -->
-						<div class="grupo-observacion">
-							<input
-								eduInputText
-								[ngModel]="grupo.observacion"
-								(ngModelChange)="updateGrupoObservacion(grupo.grupoId, $event)"
-								placeholder="Observación (opcional)"
-								class="w-full"
-							/>
-						</div>
-
-						<!-- Members list with override editing -->
-						<div class="grupo-miembros">
-							@for (miembro of grupo.miembros; track miembro.estudianteId) {
-								<div
-									class="miembro-row"
-									[class.miembro-override]="miembro.esOverride"
-								>
-									<span class="miembro-nombre text-sm">{{ miembro.nombre }}</span>
-									<div class="miembro-actions">
-										@if (miembro.esOverride) {
-											@if (isLiteral()) {
-												<edu-select
-													data-info-anchor="profesor-calificar-nota-select"
-													[ngModel]="getLiteralForNota(miembro.overrideNota)"
-													(ngModelChange)="updateMiembroOverrideLiteral(grupo.grupoId, miembro.estudianteId, $event)"
-													[options]="literalesOrdenados()"
-													optionLabel="letra"
-													placeholder="–"
-													[style]="{ width: '80px', fontSize: '0.85rem' }"
-												/>
-											} @else {
-												<edu-input-number
-													[ngModel]="miembro.overrideNota"
-													(ngModelChange)="updateMiembroOverride(grupo.grupoId, miembro.estudianteId, $event)"
-													[min]="NOTA_MINIMA"
-													[max]="NOTA_MAXIMA"
-													[minFractionDigits]="1"
-													[maxFractionDigits]="1"
-													[step]="0.5"
-													mode="decimal"
-													[inputStyle]="{ width: '60px', fontSize: '0.85rem' }"
-												/>
-											}
-											@if (miembro.overrideNota !== null) {
-												<edu-tag
-													[value]="miembro.overrideNota!.toFixed(1)"
-													[severity]="getNotaSeverity(miembro.overrideNota)"
-													styleClass="nota-severity-tag"
-												/>
-											}
-										} @else if (miembro.notaActual !== null) {
-											<edu-tag
-												[value]="miembro.notaActual!.toFixed(1)"
-												[severity]="getNotaSeverity(miembro.notaActual)"
-												styleClass="nota-severity-tag"
-											/>
-										}
-										<edu-button
-											[icon]="miembro.esOverride ? 'pi pi-times' : 'pi pi-pencil'"
-											[rounded]="true"
-											[text]="true"
-											size="small"
-											[severity]="miembro.esOverride ? 'danger' : 'primary'"
-											data-info-anchor="profesor-calificar-toggle-override"
-											(click)="toggleMiembroOverride(grupo.grupoId, miembro.estudianteId)"
-											[pt]="{
-												root: {
-													'aria-label': miembro.esOverride ? 'Quitar nota individual' : 'Nota individual',
-												},
-											}"
-											[eduTooltip]="miembro.esOverride ? 'Quitar nota individual' : 'Asignar nota individual'"
-											eduTooltipPosition="top"
-										/>
-									</div>
-								</div>
-							}
-						</div>
-					</div>
-				}
-			</div>
+			<app-calificar-grupo-list
+				[rows]="filteredGrupoRows()"
+				[config]="calificacionConfig()"
+				[isLiteral]="isLiteral()"
+				[literales]="literalesOrdenados()"
+				(edited)="onEdited()"
+			/>
 		} @else {
 			<div class="empty-state">
 				<i class="pi pi-users text-4xl text-color-secondary"></i>

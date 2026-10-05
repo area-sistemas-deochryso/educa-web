@@ -8,38 +8,34 @@ import {
 	CalificarGruposLoteDto,
 	CalificarGrupoDto,
 	OverrideMiembroDto,
-	NOTA_MINIMA,
-	NOTA_MAXIMA,
 	GrupoContenidoDto,
 	NotaRow,
 	GrupoNotaRow,
 } from '@features/intranet/pages/profesor/models';
-import {
-	getNotaSeverity as getNotaSeverityFn,
-	convertToLiteral,
-} from '@intranet-shared/services/calificacion-config';
-import type { ConfiguracionCalificacionListDto, ConfiguracionLiteralDto } from '@data/models';
+import type { ConfiguracionCalificacionListDto } from '@data/models';
 import {
 	buildNotaRows,
 	buildGrupoNotaRows,
 	calcIndividualStats,
 	calcGrupoStats,
 } from './calificar-dialog.helpers';
-import { EduButton, EduDialog, EduInputNumber, EduInputText, EduSelect, EduTable, EduTag, EduTooltip } from '@edu-ui';
+import { CalificarIndividualTableComponent } from './components/calificar-individual-table/calificar-individual-table.component';
+import { CalificarGrupoListComponent } from './components/calificar-grupo-list/calificar-grupo-list.component';
+import { EduButton, EduDialog, EduInputText, EduTag } from '@edu-ui';
 
 @Component({
 	selector: 'app-calificar-dialog',
 	standalone: true,
-	imports: [DatePipe, 
+	imports: [
+		DatePipe,
 		FormsModule,
 		EduDialog,
 		EduButton,
-		EduInputNumber,
 		EduInputText,
-		EduSelect,
-		EduTable,
 		EduTag,
-		EduTooltip],
+		CalificarIndividualTableComponent,
+		CalificarGrupoListComponent,
+	],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './calificar-dialog.component.html',
 	styleUrl: './calificar-dialog.component.scss',
@@ -64,9 +60,8 @@ export class CalificarDialogComponent {
 	readonly notaRows = signal<NotaRow[]>([]);
 	readonly grupoNotaRows = signal<GrupoNotaRow[]>([]);
 	readonly searchQuery = signal('');
+	// Las filas se mutan en los hijos; este contador invalida stats y hasChanges.
 	private readonly _editVersion = signal(0);
-	readonly NOTA_MINIMA = NOTA_MINIMA;
-	readonly NOTA_MAXIMA = NOTA_MAXIMA;
 	// #endregion
 
 	// #region Computed
@@ -150,69 +145,8 @@ export class CalificarDialogComponent {
 		}
 	}
 
-	getLiteralForNota(nota: number | null): ConfiguracionLiteralDto | null {
-		return convertToLiteral(nota, this.calificacionConfig());
-	}
-
-	private literalMidpoint(literal: ConfiguracionLiteralDto | null): number | null {
-		if (!literal || literal.notaMinima == null || literal.notaMaxima == null) return null;
-		return Math.round(((literal.notaMinima + literal.notaMaxima) / 2) * 10) / 10;
-	}
-
-	updateNotaLiteral(estudianteId: number, literal: ConfiguracionLiteralDto | null): void {
-		this.updateNota(estudianteId, this.literalMidpoint(literal));
-	}
-
-	updateGrupoNotaLiteral(grupoId: number, literal: ConfiguracionLiteralDto | null): void {
-		this.updateGrupoNota(grupoId, this.literalMidpoint(literal));
-	}
-
-	updateMiembroOverrideLiteral(
-		grupoId: number,
-		estudianteId: number,
-		literal: ConfiguracionLiteralDto | null,
-	): void {
-		this.updateMiembroOverride(grupoId, estudianteId, this.literalMidpoint(literal));
-	}
-
-	updateNota(estudianteId: number, nota: number | null): void {
-		const row = this.notaRows().find((r) => r.estudianteId === estudianteId);
-		if (row) {
-			if (nota !== null) {
-				nota = Math.round(nota * 10) / 10;
-				nota = Math.min(Math.max(nota, NOTA_MINIMA), NOTA_MAXIMA);
-			}
-			row.nota = nota;
-			this._editVersion.update((v) => v + 1);
-		}
-	}
-
-	updateObservacion(estudianteId: number, observacion: string): void {
-		const row = this.notaRows().find((r) => r.estudianteId === estudianteId);
-		if (row) {
-			row.observacion = this.sanitizeObservacion(observacion);
-			this._editVersion.update((v) => v + 1);
-		}
-	}
-
-	updateGrupoNota(grupoId: number, nota: number | null): void {
-		const row = this.grupoNotaRows().find((r) => r.grupoId === grupoId);
-		if (row) {
-			if (nota !== null) {
-				nota = Math.round(nota * 10) / 10;
-				nota = Math.min(Math.max(nota, NOTA_MINIMA), NOTA_MAXIMA);
-			}
-			row.nota = nota;
-			this._editVersion.update((v) => v + 1);
-		}
-	}
-
-	updateGrupoObservacion(grupoId: number, observacion: string): void {
-		const row = this.grupoNotaRows().find((r) => r.grupoId === grupoId);
-		if (row) {
-			row.observacion = this.sanitizeObservacion(observacion);
-			this._editVersion.update((v) => v + 1);
-		}
+	onEdited(): void {
+		this._editVersion.update((v) => v + 1);
 	}
 
 	onSave(): void {
@@ -221,41 +155,6 @@ export class CalificarDialogComponent {
 		} else {
 			this.onSaveIndividual();
 		}
-	}
-
-	toggleMiembroOverride(grupoId: number, estudianteId: number): void {
-		const row = this.grupoNotaRows().find((r) => r.grupoId === grupoId);
-		if (!row) return;
-		const miembro = row.miembros.find((m) => m.estudianteId === estudianteId);
-		if (!miembro) return;
-
-		if (miembro.esOverride) {
-			miembro.esOverride = false;
-			miembro.overrideNota = null;
-		} else {
-			miembro.esOverride = true;
-			miembro.overrideNota = row.nota;
-		}
-		this._editVersion.update((v) => v + 1);
-	}
-
-	updateMiembroOverride(grupoId: number, estudianteId: number, nota: number | null): void {
-		const row = this.grupoNotaRows().find((r) => r.grupoId === grupoId);
-		if (!row) return;
-		const miembro = row.miembros.find((m) => m.estudianteId === estudianteId);
-		if (!miembro) return;
-
-		if (nota !== null) {
-			nota = Math.round(nota * 10) / 10;
-			nota = Math.min(Math.max(nota, NOTA_MINIMA), NOTA_MAXIMA);
-		}
-		miembro.overrideNota = nota;
-		miembro.esOverride = nota !== null;
-		this._editVersion.update((v) => v + 1);
-	}
-
-	getNotaSeverity(nota: number | null): 'success' | 'warn' | 'danger' | 'secondary' {
-		return getNotaSeverityFn(nota, this.calificacionConfig());
 	}
 	// #endregion
 
@@ -297,12 +196,6 @@ export class CalificarDialogComponent {
 
 		if (grupos.length === 0) return;
 		this.saveGrupos.emit({ grupos });
-	}
-
-	private sanitizeObservacion(observacion: string): string {
-		return observacion
-			.replace(/[^a-záéíóúüñA-ZÁÉÍÓÚÜÑ0-9\s.,;:\-()]/g, '')
-			.slice(0, 100);
 	}
 	// #endregion
 }

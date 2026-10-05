@@ -1,0 +1,83 @@
+<edu-table
+	[value]="rows()"
+	dataKey="estudianteId"
+	[scrollable]="true"
+	scrollHeight="350px"
+	styleClass="p-datatable-sm"
+>
+	<ng-template #header>
+		<tr>
+			<th style="width: 50px">#</th>
+			<th style="min-width: 200px">Estudiante</th>
+			<th style="width: 140px">Nota (0-20)</th>
+			<th style="min-width: 180px">Observación</th>
+		</tr>
+	</ng-template>
+	<ng-template #body let-row let-rowIndex="rowIndex">
+		<tr>
+			<td class="text-center text-color-secondary">{{ rowIndex + 1 }}</td>
+			<td>{{ row.estudianteNombre }}</td>
+			<td>
+				@if (row.esEditable) {
+					<div class="nota-cell">
+						@if (isLiteral()) {
+							<edu-select
+								data-info-anchor="profesor-calificar-nota-select"
+								[ngModel]="getLiteralForNota(row.nota)"
+								(ngModelChange)="updateNotaLiteral(row, $event)"
+								[options]="literales()"
+								optionLabel="letra"
+								placeholder="–"
+								[style]="{ width: '90px' }"
+							/>
+						} @else {
+							<edu-input-number
+								[ngModel]="row.nota"
+								(ngModelChange)="updateNota(row, $event)"
+								[min]="NOTA_MINIMA"
+								[max]="NOTA_MAXIMA"
+								[minFractionDigits]="1"
+								[maxFractionDigits]="1"
+								[step]="0.5"
+								mode="decimal"
+								[inputStyle]="{ width: '70px' }"
+							/>
+						}
+						@if (row.nota !== null && row.nota !== undefined) {
+							<edu-tag
+								[value]="row.nota.toFixed(1)"
+								[severity]="getNotaSeverity(row.nota)"
+								styleClass="nota-severity-tag"
+							/>
+						}
+					</div>
+				} @else {
+					<div class="nota-cell">
+						<edu-tag
+							[value]="row.nota !== null ? row.nota.toFixed(1) : '-'"
+							[severity]="getNotaSeverity(row.nota)"
+						/>
+						<i
+							class="pi pi-lock text-xs text-color-secondary"
+							eduTooltip="No editable (+2 meses)"
+							eduTooltipPosition="top"
+						></i>
+					</div>
+				}
+			</td>
+			<td>
+				@if (row.esEditable) {
+					<input
+						eduInputText
+						[ngModel]="row.observacion"
+						(ngModelChange)="updateObservacion(row, $event)"
+						placeholder="Opcional"
+						class="w-full"
+					/>
+				} @else {
+					<span class="text-sm text-color-secondary">{{ row.observacion || '-' }}</span>
+				}
+			</td>
+		</tr>
+	</ng-template>
+</edu-table>

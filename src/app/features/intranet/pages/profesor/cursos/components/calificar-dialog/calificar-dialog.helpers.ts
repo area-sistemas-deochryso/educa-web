@@ -1,13 +1,15 @@
 import {
 	CalificacionConNotasDto,
 	esNotaEditable,
+	NOTA_MINIMA,
+	NOTA_MAXIMA,
 	GrupoContenidoDto,
 	NotaRow,
 	GrupoNotaRow,
 	GrupoMiembroInfo,
 } from '@features/intranet/pages/profesor/models';
 import { isNotaAprobada } from '@intranet-shared/services/calificacion-config';
-import type { ConfiguracionCalificacionListDto } from '@data/models';
+import type { ConfiguracionCalificacionListDto, ConfiguracionLiteralDto } from '@data/models';
 
 export interface IndividualStats {
 	total: number;
@@ -116,4 +118,20 @@ export function calcGrupoStats(
 		sinCalificar: rows.filter((r) => r.nota === null || r.nota === undefined).length,
 		totalOverrides,
 	};
+}
+
+export function clampNota(nota: number): number {
+	const rounded = Math.round(nota * 10) / 10;
+	return Math.min(Math.max(rounded, NOTA_MINIMA), NOTA_MAXIMA);
+}
+
+export function literalMidpoint(literal: ConfiguracionLiteralDto | null): number | null {
+	if (!literal || literal.notaMinima == null || literal.notaMaxima == null) return null;
+	return Math.round(((literal.notaMinima + literal.notaMaxima) / 2) * 10) / 10;
+}
+
+export function sanitizeObservacion(observacion: string): string {
+	return observacion
+		.replace(/[^a-záéíóúüñA-ZÁÉÍÓÚÜÑ0-9\s.,;:\-()]/g, '')
+		.slice(0, 100);
 }

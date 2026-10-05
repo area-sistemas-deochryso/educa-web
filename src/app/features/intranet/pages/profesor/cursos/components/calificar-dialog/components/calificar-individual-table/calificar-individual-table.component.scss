@@ -1,0 +1,10 @@
+.nota-cell {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+:host ::ng-deep .nota-severity-tag {
+	font-size: 0.7rem;
+	padding: 0.15rem 0.4rem;
+}
