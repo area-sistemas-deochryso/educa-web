@@ -78,25 +78,6 @@ describe('EstudianteCursosFacade', () => {
 	});
 	// #endregion
 
-	// #region loadContenido
-	describe('loadContenido', () => {
-		it('should load contenido and open dialog', () => {
-			facade.loadContenido(1);
-
-			expect(store.contenido()).toEqual(mockContenido);
-			expect(store.contentDialogVisible()).toBe(true);
-			expect(store.contentLoading()).toBe(false);
-		});
-
-		it('should skip if already loading', () => {
-			store.setContentLoading(true);
-			facade.loadContenido(1);
-
-			expect(api.getContenido).not.toHaveBeenCalled();
-		});
-	});
-	// #endregion
-
 	// #region loadMisArchivos — lazy loading
 	describe('loadMisArchivos', () => {
 		it('should load archivos for semana', () => {

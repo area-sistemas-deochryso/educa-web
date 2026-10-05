@@ -34,7 +34,7 @@ import { CursoHubCalificacionesLoader } from './curso-hub-calificaciones.loader'
 	providers: [EduConfirmationService],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './profesor-curso-hub-informacion.component.html',
-	styleUrl: '../components/curso-content-dialog/curso-content-dialog.component.scss',
+	styleUrl: './curso-hub-content.scss',
 })
 export class ProfesorCursoHubInformacionComponent {
 	// #region Dependencias

@@ -40,7 +40,6 @@ describe('ProfesorCursoHubContenidoComponent', () => {
 		loadContenidoForHub: vi.fn(),
 		resetForHub: vi.fn(),
 		crearContenidoEnHub: vi.fn(),
-		loadContenido: vi.fn(),
 	};
 	const crudFacade = {
 		actualizarSemana: vi.fn(),
@@ -86,7 +85,6 @@ describe('ProfesorCursoHubContenidoComponent', () => {
 			fixture.destroy();
 
 			expect(dataFacade.loadContenidoForHub).not.toHaveBeenCalled();
-			expect(dataFacade.loadContenido).not.toHaveBeenCalled();
 			expect(dataFacade.resetForHub).not.toHaveBeenCalled();
 		});
 	});

@@ -23,7 +23,7 @@ import { EstudianteCursosFacade } from '../../services/estudiante-cursos.facade'
 	imports: [RouterLink, EduSpinner, EmptyStateComponent, ArchivosSummaryDialogComponent, TareasSummaryDialogComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './estudiante-curso-hub-informacion.component.html',
-	styleUrl: '../components/curso-content-readonly-dialog/curso-content-readonly-dialog.component.scss',
+	styleUrl: './curso-hub-content.scss',
 })
 export class EstudianteCursoHubInformacionComponent {
 	// #region Dependencias

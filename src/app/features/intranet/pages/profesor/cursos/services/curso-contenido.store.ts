@@ -34,7 +34,6 @@ interface UiState {
 	studentFilesDialogVisible: boolean;
 	studentFilesData: SemanaEstudianteArchivosDto[];
 	studentFilesLoading: boolean;
-	initialTab: string | null;
 	taskSubmissionsDialogVisible: boolean;
 	taskSubmissionsData: EstudianteTareaArchivosGroupDto[];
 	taskSubmissionsLoading: boolean;
@@ -63,7 +62,6 @@ const initialUi: UiState = {
 	studentFilesDialogVisible: false,
 	studentFilesData: [],
 	studentFilesLoading: false,
-	initialTab: null,
 	taskSubmissionsDialogVisible: false,
 	taskSubmissionsData: [],
 	taskSubmissionsLoading: false,
@@ -101,7 +99,6 @@ export class CursoContenidoStore {
 	readonly studentFilesDialogVisible = computed(() => this._ui().studentFilesDialogVisible);
 	readonly studentFilesData = computed(() => this._ui().studentFilesData);
 	readonly studentFilesLoading = computed(() => this._ui().studentFilesLoading);
-	readonly initialTab = computed(() => this._ui().initialTab);
 	readonly taskSubmissionsDialogVisible = computed(() => this._ui().taskSubmissionsDialogVisible);
 	readonly taskSubmissionsData = computed(() => this._ui().taskSubmissionsData);
 	readonly taskSubmissionsLoading = computed(() => this._ui().taskSubmissionsLoading);
@@ -150,7 +147,6 @@ export class CursoContenidoStore {
 		studentFilesData: this.studentFilesData(),
 		studentFilesLoading: this.studentFilesLoading(),
 		totalArchivosEstudiantes: this.totalArchivosEstudiantes(),
-		initialTab: this.initialTab(),
 		taskSubmissionsDialogVisible: this.taskSubmissionsDialogVisible(),
 		taskSubmissionsData: this.taskSubmissionsData(),
 		taskSubmissionsLoading: this.taskSubmissionsLoading(),
@@ -176,7 +172,6 @@ export class CursoContenidoStore {
 
 	// #region Comandos de mutación — UI
 	setSelectedHorarioId(id: number | null): void { this._ui.update((s) => ({ ...s, selectedHorarioId: id })); }
-	setInitialTab(tab: string | null): void { this._ui.update((s) => ({ ...s, initialTab: tab })); }
 	setStudentFilesData(data: SemanaEstudianteArchivosDto[]): void { this._ui.update((s) => ({ ...s, studentFilesData: data })); }
 	setStudentFilesLoading(loading: boolean): void { this._ui.update((s) => ({ ...s, studentFilesLoading: loading })); }
 	setTaskSubmissionsData(data: EstudianteTareaArchivosGroupDto[]): void { this._ui.update((s) => ({ ...s, taskSubmissionsData: data })); }

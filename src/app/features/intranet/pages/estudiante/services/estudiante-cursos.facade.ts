@@ -64,33 +64,6 @@ export class EstudianteCursosFacade {
 			});
 	}
 
-	loadContenido(horarioId: number): void {
-		if (this.store.contentLoading()) return;
-		this.store.setContentLoading(true);
-
-		this.api
-			.getContenido(horarioId)
-			.pipe(
-				withRetry({ tag: 'EstudianteCursosFacade:loadContenido' }),
-				takeUntilDestroyed(this.destroyRef),
-			)
-			.subscribe({
-				next: (contenido) => {
-					this.store.setContenido(contenido);
-					this.store.setContentLoading(false);
-					if (contenido) {
-						this.store.openContentDialog();
-						this.saveTareaSnapshots(contenido);
-					}
-				},
-				error: (err) => {
-					logger.error('EstudianteCursosFacade: Error al cargar contenido', err);
-					this.errorHandler.showError(UI_SUMMARIES.error, resolveErrorMessage(err, UI_ESTUDIANTE_ERROR_DETAILS.loadContenido));
-					this.store.setContentLoading(false);
-				},
-			});
-	}
-
 	/**
 	 * Carga el contenido de una franja para el hub de curso: no abre el modal y una
 	 * carga nueva cancela la anterior (un cambio rápido de franja no se ignora ni

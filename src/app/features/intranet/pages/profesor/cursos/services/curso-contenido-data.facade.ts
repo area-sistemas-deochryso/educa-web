@@ -14,7 +14,7 @@ import { CrearCursoContenidoRequest } from '../../models';
  *
  * @example
  * const facade = inject(CursoContenidoDataFacade);
- * facade.loadContenido(120);
+ * facade.loadContenidoForHub(120);
  */
 @Injectable({ providedIn: 'root' })
 export class CursoContenidoDataFacade {
@@ -56,92 +56,6 @@ export class CursoContenidoDataFacade {
 	}
 
 	// #region Comandos de carga
-
-	/**
-	 * Load course content for a schedule and open the proper dialog.
-	 *
-	 * @param horarioId Schedule id.
-	 * @param options.initialTab Tab to open on dialog show.
-	 * @param options.salonId SalonId del horario — almacenado para que CalificacionesFacade no lea stores ajenos.
-	 */
-	loadContenido(horarioId: number, options?: { initialTab?: string; salonId?: number }): void {
-		if (this.store.loading()) return;
-		this.store.setSelectedHorarioId(horarioId);
-		this.store.setInitialTab(options?.initialTab ?? null);
-		if (options?.salonId != null) {
-			this.store.setSalonId(options.salonId);
-		}
-		this.store.setLoading(true);
-		this.store.clearError();
-
-		this.api
-			.getContenido(horarioId)
-			.pipe(
-				withRetry({ tag: 'CursoContenidoDataFacade:loadContenido' }),
-				takeUntilDestroyed(this.destroyRef),
-			)
-			.subscribe({
-				next: (contenido) => {
-					this.store.setContenido(contenido);
-					this.store.setLoading(false);
-
-					if (contenido) {
-						this.store.openContentDialog();
-					} else {
-						this.store.openBuilderDialog();
-					}
-				},
-				error: (err) => {
-					logger.error('CursoContenidoDataFacade: Error al cargar contenido', err);
-					const message = resolveErrorMessage(err, UI_ADMIN_ERROR_DETAILS.loadContenido);
-					this.errorHandler.showError(UI_SUMMARIES.error, message);
-					this.store.setError(message);
-					this.store.setLoading(false);
-				},
-			});
-	}
-
-	/**
-	 * Switch to a different course/schedule without leaving the content dialog.
-	 *
-	 * @param horarioId Schedule id to switch to.
-	 * @param options.salonId SalonId del nuevo horario.
-	 * @param options.onLoaded Callback invocado con el id del contenido cargado (o no llamado si el curso no tiene contenido creado).
-	 */
-	switchCourse(horarioId: number, options?: { salonId?: number; onLoaded?: (contenidoId: number) => void }): void {
-		this.store.setSelectedHorarioId(horarioId);
-		if (options?.salonId != null) {
-			this.store.setSalonId(options.salonId);
-		}
-		this.store.setContenido(null);
-		this.store.setLoading(true);
-		this.store.clearError();
-
-		this.api
-			.getContenido(horarioId)
-			.pipe(
-				withRetry({ tag: 'CursoContenidoDataFacade:switchCourse' }),
-				takeUntilDestroyed(this.destroyRef),
-			)
-			.subscribe({
-				next: (contenido) => {
-					this.store.setContenido(contenido);
-					this.store.setLoading(false);
-					if (contenido) {
-						options?.onLoaded?.(contenido.id);
-					} else {
-						this.store.openBuilderDialog();
-					}
-				},
-				error: (err) => {
-					logger.error('CursoContenidoDataFacade: Error switching course', err);
-					const message = resolveErrorMessage(err, UI_ADMIN_ERROR_DETAILS.loadContenido);
-					this.errorHandler.showError(UI_SUMMARIES.error, message);
-					this.store.setError(message);
-					this.store.setLoading(false);
-				},
-			});
-	}
 
 	/**
 	 * Load the content of a schedule for the course hub: no dialog is opened and

@@ -41,7 +41,6 @@ describe('EstudianteCursoHubContenidoComponent', () => {
 		vm,
 		loadContenidoForHub: vi.fn(),
 		resetForHub: vi.fn(),
-		loadContenido: vi.fn(),
 		refreshContenido: vi.fn(),
 		loadMisArchivos: vi.fn(),
 		loadMisTareaArchivos: vi.fn(),
@@ -89,7 +88,6 @@ describe('EstudianteCursoHubContenidoComponent', () => {
 			fixture.destroy();
 
 			expect(facade.loadContenidoForHub).not.toHaveBeenCalled();
-			expect(facade.loadContenido).not.toHaveBeenCalled();
 			expect(facade.resetForHub).not.toHaveBeenCalled();
 		});
 

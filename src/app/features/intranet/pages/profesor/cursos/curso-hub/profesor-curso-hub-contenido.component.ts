@@ -15,7 +15,7 @@ import type { ActualizarTareaRequest, CrearTareaRequest } from '@features/intran
 /**
  * Pestaña Contenido del hub de curso del profesor (`…/contenido`).
  *
- * Implementación propia del hub: no importa ni modifica `curso-content-dialog`
+ * Implementación propia del hub: no depende del antiguo modal de contenido
  * (decisión de F1b: duplicación temporal hasta F6). Comparte con el modal los
  * stores/facades root. La carga y el reset del store son del shell del hub
  * (`ProfesorCursoHubComponent`): esta pestaña solo lee.

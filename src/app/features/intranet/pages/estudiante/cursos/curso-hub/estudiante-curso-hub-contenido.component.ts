@@ -57,7 +57,7 @@ import {
 	providers: [EduConfirmationService],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './estudiante-curso-hub-contenido.component.html',
-	styleUrl: '../components/curso-content-readonly-dialog/curso-content-readonly-dialog.component.scss',
+	styleUrl: './curso-hub-content.scss',
 })
 export class EstudianteCursoHubContenidoComponent {
 	// #region Dependencias
