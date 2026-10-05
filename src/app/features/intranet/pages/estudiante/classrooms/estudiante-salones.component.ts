@@ -7,6 +7,7 @@ import {
 	PeriodToggleComponent,
 	EmptyStateComponent,
 } from '@intranet-shared/components';
+import { buildCursoHubLink } from '@intranet-shared/helpers';
 import { StudentClassroomsFacade } from './services/estudiante-salones.facade';
 import { EstudianteSalon, EstudianteSalonCurso, JustificarInasistenciaContext } from '../models';
 import { EstudianteSalonDialogComponent } from './components/estudiante-salon-dialog/estudiante-salon-dialog.component';
@@ -81,7 +82,7 @@ import { EduSpinner, EduTag, EduTooltip } from '@edu-ui';
 										[nombre]="curso.cursoNombre"
 										class="cursor-pointer"
 										data-info-anchor="estudiante-salones-card-curso-tag"
-										(click)="onVerCurso(curso, $event)"
+										(click)="onVerCurso(salon, curso, $event)"
 										eduTooltip="Ver contenido del curso"
 										eduTooltipPosition="top"
 									/>
@@ -158,11 +159,15 @@ export class StudentClassroomsComponent implements OnInit {
 		this.facade.openDialog(salon.salonId);
 	}
 
-	onVerCurso(curso: EstudianteSalonCurso, event: Event): void {
+	onVerCurso(salon: EstudianteSalon, curso: EstudianteSalonCurso, event: Event): void {
 		event.stopPropagation();
-		this.router.navigate(['/intranet/estudiante/cursos'], {
-			queryParams: { horarioId: curso.horarioId },
-		});
+		// Sin franja: `curso.horarioId` es solo una del par, el hub resuelve la suya.
+		const { commands, queryParams } = buildCursoHubLink(
+			'estudiante',
+			{ id: curso.horarioId, cursoId: curso.cursoId, salonId: salon.salonId },
+			{ withSlot: false },
+		);
+		this.router.navigate(commands, { queryParams });
 	}
 
 	onDialogVisibleChange(visible: boolean): void {

@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 
 import { PageHeaderComponent } from '@intranet-shared/components';
+import { buildCursoHubLink } from '@intranet-shared/helpers';
 import { ThemeService } from '@core/services/theme';
 import { environment } from '@config/environment';
 import { ProfesorFacade } from '../services/profesor.facade';
@@ -268,9 +269,12 @@ export class TeacherSchedulesComponent implements OnInit {
 		const block = this.selectedBlock();
 		if (!block) return;
 		popover.hide();
-		this.router.navigate(['/intranet/profesor/cursos'], {
-			queryParams: { horarioId: block.id, returnTo: 'horarios' },
+		const { commands, queryParams } = buildCursoHubLink('profesor', {
+			id: block.id,
+			cursoId: block.cursoId,
+			salonId: block.salonId,
 		});
+		this.router.navigate(commands, { queryParams });
 	}
 
 	irACalificaciones(popover: EduPopover): void {

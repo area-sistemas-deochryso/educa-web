@@ -4,6 +4,7 @@ import { cursoColorFor, darkenColor } from '@intranet-shared/config/curso-colors
 // #region Types
 export interface HorarioBlock {
 	id: number;
+	cursoId: number;
 	cursoNombre: string;
 	horaInicio: string;
 	horaFin: string;
@@ -45,6 +46,7 @@ export function buildBlocks(
 
 		return {
 			id: h.id,
+			cursoId: h.cursoId,
 			cursoNombre: h.cursoNombre,
 			horaInicio: h.horaInicio,
 			horaFin: h.horaFin,

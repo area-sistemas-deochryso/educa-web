@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 import { CursoChipComponent, PageHeaderComponent, PeriodToggleComponent } from '@intranet-shared/components';
 import { PluralizePipe } from '@intranet-shared/pipes';
+import { buildCursoHubLink } from '@intranet-shared/helpers';
 import { SalonCursoInfo, VistaPromedio, ActualizarGrupoDto, ProfesorSalonConEstudiantes } from '../models';
 import { ProfesorFacade } from '../services/profesor.facade';
 import { GruposFacade } from './services/grupos.facade';
@@ -79,10 +80,14 @@ export class TeacherClassroomsComponent implements OnInit {
 	// #endregion
 
 	// #region Salon table handlers
-	onVerCursoContenido(curso: SalonCursoInfo): void {
-		this.router.navigate(['/intranet/profesor/cursos'], {
-			queryParams: { horarioId: curso.horarioId, returnTo: 'salones' },
-		});
+	onVerCursoContenido(salon: ProfesorSalonConEstudiantes, curso: SalonCursoInfo): void {
+		// Sin franja: `curso.horarioId` es solo la primera del par, el hub resuelve la suya.
+		const { commands, queryParams } = buildCursoHubLink(
+			'profesor',
+			{ id: curso.horarioId, cursoId: curso.cursoId, salonId: salon.salonId },
+			{ withSlot: false },
+		);
+		this.router.navigate(commands, { queryParams });
 	}
 
 	openSalonDialog(salon: ProfesorSalonConEstudiantes): void {

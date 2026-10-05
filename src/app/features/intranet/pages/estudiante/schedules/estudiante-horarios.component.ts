@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 
 import { PageHeaderComponent } from '@intranet-shared/components';
+import { buildCursoHubLink } from '@intranet-shared/helpers';
 import { SkeletonLoaderComponent } from '@shared/components';
 import { StudentSchedulesFacade } from './services/estudiante-horarios.facade';
 import { EstudianteFacade } from '../services/estudiante.facade';
@@ -16,6 +17,7 @@ import { EduTooltip } from '@edu-ui';
 // #region Block interface
 interface HorarioBlock {
 	id: number;
+	cursoId: number;
 	cursoNombre: string;
 	horaInicio: string;
 	horaFin: string;
@@ -59,6 +61,7 @@ function buildBlocks(horarios: HorarioProfesorDto[], dark: boolean): HorarioBloc
 
 		return {
 			id: h.id,
+			cursoId: h.cursoId,
 			cursoNombre: h.cursoNombre,
 			horaInicio: h.horaInicio,
 			horaFin: h.horaFin,
@@ -303,9 +306,12 @@ export class StudentSchedulesComponent implements OnInit {
 	// #endregion
 	// #region Event handlers
 	verCursoContenido(block: HorarioBlock): void {
-		this.router.navigate(['/intranet/estudiante/cursos'], {
-			queryParams: { horarioId: block.id },
+		const { commands, queryParams } = buildCursoHubLink('estudiante', {
+			id: block.id,
+			cursoId: block.cursoId,
+			salonId: block.salonId,
 		});
+		this.router.navigate(commands, { queryParams });
 	}
 	// #endregion
 }
