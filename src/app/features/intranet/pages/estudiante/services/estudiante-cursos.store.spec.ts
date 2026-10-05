@@ -45,7 +45,6 @@ describe('EstudianteCursosStore', () => {
 		});
 
 		it('should have dialogs closed', () => {
-			expect(store.contentDialogVisible()).toBe(false);
 			expect(store.archivosSummaryDialogVisible()).toBe(false);
 			expect(store.tareasSummaryDialogVisible()).toBe(false);
 		});
@@ -141,20 +140,11 @@ describe('EstudianteCursosStore', () => {
 
 	// #region Dialog commands
 	describe('dialog commands', () => {
-		it('should open and close content dialog', () => {
-			store.openContentDialog();
-			expect(store.contentDialogVisible()).toBe(true);
-
-			store.closeContentDialog();
-			expect(store.contentDialogVisible()).toBe(false);
-		});
-
-		it('should clean up state on closeContentDialog', () => {
+		it('should clean up state on resetContenido', () => {
 			store.setContenido(mockContenido as never);
 			store.setMisArchivos(1, [{ id: 1 }] as never[]);
-			store.openContentDialog();
 
-			store.closeContentDialog();
+			store.resetContenido();
 
 			expect(store.contenido()).toBeNull();
 			expect(store.misArchivos()).toEqual({});

@@ -106,7 +106,7 @@ export class EstudianteCursosFacade {
 		this.asistenciaSub?.unsubscribe();
 		this.asistenciaSub = null;
 		this.asistenciaHorarioId = null;
-		this.store.closeContentDialog();
+		this.store.resetContenido();
 		this.store.setContentLoading(false);
 	}
 
@@ -422,7 +422,6 @@ export class EstudianteCursosFacade {
 	// #endregion
 	// #region Dialog commands
 
-	closeContentDialog(): void { this.store.closeContentDialog(); }
 	openArchivosSummaryDialog(): void { this.store.openArchivosSummaryDialog(); }
 	closeArchivosSummaryDialog(): void { this.store.closeArchivosSummaryDialog(); }
 	openTareasSummaryDialog(): void { this.store.openTareasSummaryDialog(); }

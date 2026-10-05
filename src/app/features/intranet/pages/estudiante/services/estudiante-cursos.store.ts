@@ -15,7 +15,6 @@ interface EstudianteCursosState {
 	contentLoading: boolean;
 	saving: boolean;
 	error: string | null;
-	contentDialogVisible: boolean;
 	/** Student's own files keyed by semanaId. */
 	misArchivos: Record<number, EstudianteArchivoDto[]>;
 	/** Semana IDs already loaded. */
@@ -43,7 +42,6 @@ const initialState: EstudianteCursosState = {
 	contentLoading: false,
 	saving: false,
 	error: null,
-	contentDialogVisible: false,
 	misArchivos: {},
 	loadedSemanas: [],
 	misTareaArchivos: {},
@@ -69,7 +67,6 @@ export class EstudianteCursosStore {
 	readonly contentLoading = computed(() => this._state().contentLoading);
 	readonly saving = computed(() => this._state().saving);
 	readonly error = computed(() => this._state().error);
-	readonly contentDialogVisible = computed(() => this._state().contentDialogVisible);
 	readonly misArchivos = computed(() => this._state().misArchivos);
 	readonly loadedSemanas = computed(() => this._state().loadedSemanas);
 	readonly misTareaArchivos = computed(() => this._state().misTareaArchivos);
@@ -103,7 +100,6 @@ export class EstudianteCursosStore {
 		error: this.error(),
 		totalArchivos: this.totalArchivos(),
 		totalTareas: this.totalTareas(),
-		contentDialogVisible: this.contentDialogVisible(),
 		misArchivos: this.misArchivos(),
 		misTareaArchivos: this.misTareaArchivos(),
 		archivosSummaryDialogVisible: this.archivosSummaryDialogVisible(),
@@ -223,14 +219,9 @@ export class EstudianteCursosStore {
 
 	// #endregion
 	// #region Dialog commands
-	openContentDialog(): void {
-		this._state.update((s) => ({ ...s, contentDialogVisible: true }));
-	}
-
-	closeContentDialog(): void {
+	resetContenido(): void {
 		this._state.update((s) => ({
 			...s,
-			contentDialogVisible: false,
 			contenido: null,
 			misArchivos: {},
 			loadedSemanas: [],

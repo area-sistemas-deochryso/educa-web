@@ -22,8 +22,6 @@ interface DomainState {
 }
 
 interface UiState {
-	contentDialogVisible: boolean;
-	builderDialogVisible: boolean;
 	semanaEditDialogVisible: boolean;
 	tareaDialogVisible: boolean;
 	selectedSemana: CursoContenidoSemanaDto | null;
@@ -50,8 +48,6 @@ const initialDomain: DomainState = {
 };
 
 const initialUi: UiState = {
-	contentDialogVisible: false,
-	builderDialogVisible: false,
 	semanaEditDialogVisible: false,
 	tareaDialogVisible: false,
 	selectedSemana: null,
@@ -87,8 +83,6 @@ export class CursoContenidoStore {
 	// #endregion
 
 	// #region Lecturas públicas — UI
-	readonly contentDialogVisible = computed(() => this._ui().contentDialogVisible);
-	readonly builderDialogVisible = computed(() => this._ui().builderDialogVisible);
 	readonly semanaEditDialogVisible = computed(() => this._ui().semanaEditDialogVisible);
 	readonly tareaDialogVisible = computed(() => this._ui().tareaDialogVisible);
 	readonly selectedSemana = computed(() => this._ui().selectedSemana);
@@ -134,8 +128,6 @@ export class CursoContenidoStore {
 	}));
 
 	readonly uiVm = computed(() => ({
-		contentDialogVisible: this.contentDialogVisible(),
-		builderDialogVisible: this.builderDialogVisible(),
 		semanaEditDialogVisible: this.semanaEditDialogVisible(),
 		tareaDialogVisible: this.tareaDialogVisible(),
 		selectedSemana: this.selectedSemana(),
@@ -218,13 +210,6 @@ export class CursoContenidoStore {
 	// #endregion
 
 	// #region Dialog commands (UI)
-	openContentDialog(): void { this._ui.update((s) => ({ ...s, contentDialogVisible: true })); }
-	closeContentDialog(): void {
-		this._ui.update((s) => ({ ...s, contentDialogVisible: false, selectedHorarioId: null }));
-		this._domain.update((s) => ({ ...s, contenido: null }));
-	}
-	openBuilderDialog(): void { this._ui.update((s) => ({ ...s, builderDialogVisible: true })); }
-	closeBuilderDialog(): void { this._ui.update((s) => ({ ...s, builderDialogVisible: false })); }
 	openSemanaEditDialog(semana: CursoContenidoSemanaDto): void { this._ui.update((s) => ({ ...s, semanaEditDialogVisible: true, selectedSemana: semana })); }
 	closeSemanaEditDialog(): void { this._ui.update((s) => ({ ...s, semanaEditDialogVisible: false, selectedSemana: null })); }
 	openTareaDialog(tarea: CursoContenidoTareaDto | null): void { this._ui.update((s) => ({ ...s, tareaDialogVisible: true, selectedTarea: tarea })); }

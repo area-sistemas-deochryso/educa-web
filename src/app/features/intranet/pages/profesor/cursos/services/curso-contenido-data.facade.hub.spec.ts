@@ -39,24 +39,21 @@ describe('CursoContenidoDataFacade — hub', () => {
 	});
 
 	describe('loadContenidoForHub', () => {
-		it('loads the slot content without opening any dialog', () => {
+		it('loads the slot content', () => {
 			facade.loadContenidoForHub(1, { salonId: 34 });
 
 			expect(store.contenido()?.id).toBe(8);
 			expect(store.selectedHorarioId()).toBe(1);
 			expect(store.salonId()).toBe(34);
 			expect(store.loading()).toBe(false);
-			expect(store.contentDialogVisible()).toBe(false);
-			expect(store.builderDialogVisible()).toBe(false);
 		});
 
-		it('leaves the content null (and no builder dialog) for a slot without content', () => {
+		it('leaves the content null for a slot without content', () => {
 			api.getContenido.mockReturnValue(of(null));
 
 			facade.loadContenidoForHub(2);
 
 			expect(store.contenido()).toBeNull();
-			expect(store.builderDialogVisible()).toBe(false);
 		});
 
 		it('does not ignore a slot switch while a load is in flight', () => {
@@ -119,15 +116,13 @@ describe('CursoContenidoDataFacade — hub', () => {
 			if (step === 'commit') config.onCommit(created);
 		}
 
-		it('never opens the content or builder dialogs of the modal', () => {
+		it('stores the created content on commit', () => {
 			facade.loadContenidoForHub(1);
 			facade.crearContenidoEnHub(request);
 
 			run('apply');
 			run('commit');
 
-			expect(store.contentDialogVisible()).toBe(false);
-			expect(store.builderDialogVisible()).toBe(false);
 			expect(store.contenido()?.id).toBe(20);
 		});
 
@@ -163,14 +158,13 @@ describe('CursoContenidoDataFacade — hub', () => {
 
 		beforeEach(() => facade.loadContenidoForHub(1, { salonId: 34 }));
 
-		it('empties the content optimistically without touching modal flags', () => {
+		it('empties the content optimistically', () => {
 			facade.eliminarContenidoEnHub(8);
 
 			expect(walConfig().resourceId).toBe(8);
 			walConfig().optimistic.apply();
 
 			expect(store.contenido()).toBeNull();
-			expect(store.contentDialogVisible()).toBe(false);
 		});
 
 		it('restores the content on rollback when the hub is still on the same slot', () => {
@@ -180,7 +174,6 @@ describe('CursoContenidoDataFacade — hub', () => {
 			walConfig().optimistic.rollback();
 
 			expect(store.contenido()?.id).toBe(8);
-			expect(store.contentDialogVisible()).toBe(false);
 		});
 
 		it('does not resurrect the content on another slot after a rollback', () => {

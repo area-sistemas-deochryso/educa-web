@@ -58,9 +58,8 @@ export class CursoContenidoDataFacade {
 	// #region Comandos de carga
 
 	/**
-	 * Load the content of a schedule for the course hub: no dialog is opened and
-	 * a newer call cancels the in-flight one (a fast slot switch must not be
-	 * ignored nor let the older response overwrite the newer one).
+	 * Load the content of a schedule for the course hub. A newer call cancels the in-flight
+	 * one (a fast slot switch must not be ignored nor let the older response overwrite the newer one).
 	 *
 	 * @param horarioId Schedule id.
 	 * @param options.salonId SalonId del horario (lo lee CalificacionesFacade desde el store).
@@ -132,39 +131,8 @@ export class CursoContenidoDataFacade {
 	// #region CRUD Contenido
 
 	/**
-	 * Create content with WAL and close builder dialog optimistically.
-	 *
-	 * @param request Creation payload.
-	 */
-	crearContenido(request: CrearCursoContenidoRequest): void {
-		this.wal.execute({
-			operation: 'CREATE',
-			resourceType: 'cursoContenido',
-			endpoint: this.contenidoUrl,
-			method: 'POST',
-			payload: request,
-			http$: () => this.api.crearContenido(request),
-			optimistic: {
-				apply: () => {
-					this.store.setSaving(false);
-					this.store.closeBuilderDialog();
-				},
-				rollback: () => {
-					this.store.openBuilderDialog();
-				},
-			},
-			onCommit: (contenido) => {
-				this.store.setContenido(contenido);
-				this.store.openContentDialog();
-			},
-			onError: (err) => this.errHandler.handle(err, 'crear contenido', () => this.store.setSaving(false)),
-		});
-	}
-
-	/**
-	 * Create content from the course hub. Same WAL flow as `crearContenido` but
-	 * without the modal side effects (it would leave `contentDialogVisible` on
-	 * and the Cursos page modal would pop open on the next visit).
+	 * Create content from the course hub with WAL. The hub drives its own
+	 * builder through the `hooks`; the store only receives the committed content.
 	 *
 	 * @param request Creation payload.
 	 * @param hooks.onApplied Optimistic apply (the hub closes its builder).
@@ -198,38 +166,8 @@ export class CursoContenidoDataFacade {
 	}
 
 	/**
-	 * Delete content with WAL and close content dialog optimistically.
-	 *
-	 * @param contenidoId Content id.
-	 */
-	eliminarContenido(contenidoId: number): void {
-		this.wal.execute({
-			operation: 'DELETE',
-			resourceType: 'cursoContenido',
-			resourceId: contenidoId,
-			endpoint: `${this.contenidoUrl}/${contenidoId}`,
-			method: 'DELETE',
-			payload: null,
-			http$: () => this.api.eliminarContenido(contenidoId),
-			optimistic: {
-				apply: () => {
-					this.store.closeContentDialog();
-					this.store.setSaving(false);
-				},
-				rollback: () => {
-					this.store.openContentDialog();
-				},
-			},
-			onCommit: () => {},
-			onError: (err) => this.errHandler.handle(err, 'eliminar contenido', () => this.store.setSaving(false)),
-		});
-	}
-
-
-	/**
-	 * Delete content from the course hub. Same WAL flow as `eliminarContenido`
-	 * but without modal side effects: the hub just shows its empty state
-	 * (`contenido = null`) and a rollback restores the previous content.
+	 * Delete content from the course hub with WAL: the hub just shows its empty
+	 * state (`contenido = null`) and a rollback restores the previous content.
 	 *
 	 * @param contenidoId Content id.
 	 */

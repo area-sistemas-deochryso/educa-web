@@ -44,7 +44,6 @@ describe('EstudianteCursosFacade — hub', () => {
 
 		expect(store.contenido()?.id).toBe(8);
 		expect(store.contentLoading()).toBe(false);
-		expect(store.contentDialogVisible()).toBe(false);
 	});
 
 	it('does not ignore a slot switch while a load is in flight and drops the stale response', () => {

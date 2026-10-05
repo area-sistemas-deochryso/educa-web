@@ -46,8 +46,6 @@ describe('CursoContenidoStore', () => {
 		});
 
 		it('should have all dialogs closed', () => {
-			expect(store.contentDialogVisible()).toBe(false);
-			expect(store.builderDialogVisible()).toBe(false);
 			expect(store.semanaEditDialogVisible()).toBe(false);
 			expect(store.tareaDialogVisible()).toBe(false);
 		});
@@ -174,23 +172,6 @@ describe('CursoContenidoStore', () => {
 
 	// #region Dialog commands
 	describe('dialog commands', () => {
-		it('should open/close content dialog', () => {
-			store.openContentDialog();
-			expect(store.contentDialogVisible()).toBe(true);
-
-			store.setContenido(mockContenido);
-			store.closeContentDialog();
-			expect(store.contentDialogVisible()).toBe(false);
-			expect(store.contenido()).toBeNull();
-		});
-
-		it('should open/close builder dialog', () => {
-			store.openBuilderDialog();
-			expect(store.builderDialogVisible()).toBe(true);
-			store.closeBuilderDialog();
-			expect(store.builderDialogVisible()).toBe(false);
-		});
-
 		it('should open/close semana edit dialog', () => {
 			const semana = { id: 1, titulo: 'Sem 1' } as never;
 			store.openSemanaEditDialog(semana);
@@ -239,7 +220,6 @@ describe('CursoContenidoStore', () => {
 			store.setContenido(mockContenido);
 			const vm = store.vm();
 			expect(vm.semanas).toHaveLength(2);
-			expect(vm.contentDialogVisible).toBe(false);
 		});
 	});
 	// #endregion
@@ -248,13 +228,11 @@ describe('CursoContenidoStore', () => {
 	describe('reset', () => {
 		it('should reset all state', () => {
 			store.setContenido(mockContenido);
-			store.openContentDialog();
 			store.setLoading(true);
 
 			store.reset();
 
 			expect(store.contenido()).toBeNull();
-			expect(store.contentDialogVisible()).toBe(false);
 			expect(store.loading()).toBe(false);
 		});
 	});

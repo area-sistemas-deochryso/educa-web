@@ -49,16 +49,6 @@ export class CursoContenidoUiFacade {
 		this.store.closeTareaDialog();
 	}
 
-	/** Close content dialog and clear content state. */
-	closeContentDialog(): void {
-		this.store.closeContentDialog();
-	}
-
-	/** Close content builder dialog. */
-	closeBuilderDialog(): void {
-		this.store.closeBuilderDialog();
-	}
-
 	/** Open archivos summary sub-modal. */
 	openArchivosSummaryDialog(): void {
 		this.store.openArchivosSummaryDialog();
