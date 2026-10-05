@@ -13,7 +13,7 @@
 ### Profesor
 
 - Asistencia (marcar en clase), Calificaciones
-- Cursos (contenido, tareas, archivos — 16 sub-componentes). Hub por par curso+salón en `profesor/cursos/:cursoId/:salonId?horarioId=` (P105 D1, en construcción: shell + selector de franja y 5 pestañas — Contenido, Calificaciones, Asistencia, Información y Salón; los modales siguen vigentes hasta F6)
+- Cursos (contenido, tareas, archivos — 16 sub-componentes). Hub por par curso+salón en `profesor/cursos/:cursoId/:salonId?horarioId=` (P105 D1, en construcción: shell + selector de franja y 5 pestañas — Contenido, Calificaciones, Asistencia, Información y Salón; «Mis Cursos» ya entra al hub con una tarjeta por par y redirige `?horarioId=` legacy; los modales de curso siguen en el código hasta F6)
 - Horarios (ver personal), Salones, Foro, Mensajería
 - Final Salones (cierre de notas por periodo)
 

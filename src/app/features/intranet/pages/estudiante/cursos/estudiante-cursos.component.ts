@@ -1,16 +1,13 @@
-import { Component, ChangeDetectionStrategy, inject, OnInit, DestroyRef, computed } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { filter, take } from 'rxjs';
+import { Component, ChangeDetectionStrategy, inject, OnInit, computed } from '@angular/core';
+import { Router } from '@angular/router';
 
-import { PageHeaderComponent, EmptyStateComponent } from '@intranet-shared/components';
+import { PageHeaderComponent, EmptyStateComponent, CursoPairCardComponent } from '@intranet-shared/components';
 import { buildCursoColorMap } from '@intranet-shared/config/curso-colors';
+import { groupHorariosByPair, setupCursoHubLegacyRedirect } from '@intranet-shared/helpers';
 import { ThemeService } from '@core/services/theme';
 import { EstudianteCursosFacade } from '../services/estudiante-cursos.facade';
-import { CursoContentReadonlyDialogComponent } from './components/curso-content-readonly-dialog/curso-content-readonly-dialog.component';
-import { HorarioProfesorDto } from '../models';
 import { SkeletonLoaderComponent } from '@shared/components';
-import { EduButton, EduTag, EduTooltip } from '@edu-ui';
+import { EduButton } from '@edu-ui';
 
 const DAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
 
@@ -19,13 +16,10 @@ const DAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Vierne
 	standalone: true,
 	imports: [
 		EduButton,
-		EduTag,
-		EduTooltip,
 		SkeletonLoaderComponent,
-		RouterLink,
 		PageHeaderComponent,
 		EmptyStateComponent,
-		CursoContentReadonlyDialogComponent,
+		CursoPairCardComponent,
 	],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	styles: `
@@ -38,39 +32,9 @@ const DAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Vierne
 			flex-wrap: wrap;
 			gap: 1rem;
 		}
-		.course-card {
+		app-curso-pair-card {
 			flex: 1 1 320px;
-			min-width: 0;
 			max-width: 100%;
-			border-radius: 8px;
-			border: 1px solid var(--surface-200);
-			border-left: 4px solid var(--card-accent, var(--primary-accent));
-			background: var(--surface-card, #fcfdfe);
-			padding: 1rem 1.25rem;
-			cursor: pointer;
-			transition: box-shadow 0.15s, border-color 0.15s;
-		}
-		.course-card:hover {
-			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-			border-color: var(--surface-300);
-			border-left-color: var(--card-accent, var(--primary-accent));
-		}
-		.course-card-affordance {
-			display: flex;
-			align-items: center;
-			justify-content: flex-end;
-			gap: 0.35rem;
-			margin-top: 0.75rem;
-			font-size: 0.75rem;
-			font-weight: 600;
-			color: var(--primary-accent);
-		}
-		.course-card-affordance i {
-			font-size: 0.7rem;
-			transition: transform 0.15s;
-		}
-		.course-card:hover .course-card-affordance i {
-			transform: translateX(3px);
 		}
 		.hoy-strip {
 			background: var(--surface-50);
@@ -80,7 +44,7 @@ const DAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Vierne
 		}
 	`,
 	template: `
-		@if (vm().loading) {
+		@if (vm().loading || legacyRedirect.pending()) {
 			<div class="course-grid" style="min-height: 240px;">
 				@for (i of [1, 2, 3, 4, 5, 6]; track i) {
 					<app-skeleton-loader variant="card" height="140px" />
@@ -106,55 +70,35 @@ const DAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Vierne
 				}
 
 				<div class="course-grid">
-					@for (horario of vm().horarios; track horario.id) {
-						<div
-							class="course-card"
-							data-info-anchor="estudiante-cursos-card"
-							[style.--card-accent]="colorMap().get(horario.cursoId)"
-							(click)="onVerContenido(horario)"
-							eduTooltip="Ver contenido"
-							eduTooltipPosition="top"
+					@for (group of groups(); track group.key) {
+						<app-curso-pair-card
+							rol="estudiante"
+							anchorPrefix="estudiante-cursos"
+							salonLink="/intranet/estudiante/salones"
+							[group]="group"
+							[accent]="colorMap().get(group.cursoId)"
 						>
-							<div class="flex align-items-start justify-content-between mb-2">
-								<span class="font-bold text-lg line-height-3">{{ horario.cursoNombre }}</span>
-								<a routerLink="/intranet/estudiante/salones" data-info-anchor="estudiante-cursos-card-salon-tag" class="no-underline" (click)="$event.stopPropagation()">
-									<edu-tag [value]="horario.salonDescripcion" severity="info" />
-								</a>
-							</div>
-							<div class="flex flex-column gap-1 text-sm text-color-secondary">
+							@if (group.profesores.length > 0) {
 								<div class="flex align-items-center gap-2">
-									<i class="pi pi-calendar text-xs"></i>
-									<span>{{ horario.diaSemanaDescripcion }} · {{ horario.horaInicio }} - {{ horario.horaFin }}</span>
+									<i class="pi pi-user text-xs"></i>
+									<span>{{ group.profesores.join(', ') }}</span>
 								</div>
-								@if (horario.profesorNombreCompleto) {
-									<div class="flex align-items-center gap-2">
-										<i class="pi pi-user text-xs"></i>
-										<span>{{ horario.profesorNombreCompleto }}</span>
-									</div>
-								}
-							</div>
-							<div class="course-card-affordance">
-								<span>Ver curso</span>
-								<i class="pi pi-arrow-right"></i>
-							</div>
-						</div>
+							}
+						</app-curso-pair-card>
 					}
 				</div>
 			</div>
 		}
-
-		<app-curso-content-readonly-dialog />
 	`,
 })
 export class EstudianteCursosComponent implements OnInit {
 	private readonly facade = inject(EstudianteCursosFacade);
-	private readonly route = inject(ActivatedRoute);
 	private readonly router = inject(Router);
-	private readonly destroyRef = inject(DestroyRef);
 	private readonly theme = inject(ThemeService);
 
 	readonly vm = this.facade.vm;
 
+	readonly groups = computed(() => groupHorariosByPair(this.vm().horarios));
 	readonly colorMap = computed(() => buildCursoColorMap(this.vm().horarios, this.theme.isDarkMode()));
 
 	readonly todayCourses = computed(() => {
@@ -162,32 +106,19 @@ export class EstudianteCursosComponent implements OnInit {
 		return this.vm().horarios.filter(h => h.diaSemanaDescripcion === todayName);
 	});
 
+	/** Los enlaces viejos `?horarioId=N` (antes abrían el modal) ahora redirigen al hub del par. */
+	protected readonly legacyRedirect = setupCursoHubLegacyRedirect({
+		rol: 'estudiante',
+		horarios: computed(() => this.vm().horarios),
+		loading: computed(() => this.vm().loading),
+		loadError: computed(() => this.vm().error),
+	});
+
 	ngOnInit(): void {
 		this.facade.loadHorarios();
-		this.handleHorarioQueryParam();
-	}
-
-	onVerContenido(horario: HorarioProfesorDto): void {
-		this.facade.loadContenido(horario.id);
 	}
 
 	onVerHorario(): void {
 		this.router.navigate(['/intranet/estudiante/horarios']);
-	}
-
-	private handleHorarioQueryParam(): void {
-		this.route.queryParams
-			.pipe(
-				filter((params) => !!params['horarioId']),
-				take(1),
-				takeUntilDestroyed(this.destroyRef),
-			)
-			.subscribe((params) => {
-				const horarioId = Number(params['horarioId']);
-				if (horarioId) {
-					this.facade.loadContenido(horarioId);
-					this.router.navigate([], { queryParams: {}, replaceUrl: true });
-				}
-			});
 	}
 }

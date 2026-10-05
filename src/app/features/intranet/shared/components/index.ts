@@ -19,6 +19,7 @@ export * from './curso-hub-header';
 export * from './curso-hub-salon-summary';
 export * from './curso-hub-shell';
 export * from './curso-hub-tabs';
+export * from './curso-pair-card';
 export * from './table-skeleton';
 export * from './attendance-scope-banner';
 export * from './attendance-scope-student-notice';
