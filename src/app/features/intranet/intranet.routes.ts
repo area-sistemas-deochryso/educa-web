@@ -1,7 +1,7 @@
 /* eslint-disable max-lines -- Razón: archivo central de rutas de la intranet; crece linealmente con cada feature nuevo registrado y cada spread condicional por feature flag. Fraccionarlo (ej: `intranet-admin.routes.ts`) es un refactor transversal y se posterga como deuda técnica menor. */
 // #region Imports
 import { Route, Routes } from '@angular/router';
-import { authGuard, permissionsGuard, viewAsGateGuard } from '@core/guards';
+import { authGuard, pendingChangesGuard, permissionsGuard, viewAsGateGuard } from '@core/guards';
 import type { ViewAsRol } from '@core/services/view-as';
 
 import { IntranetLayoutComponent } from '@intranet-shared/components/layout/intranet-layout';
@@ -62,6 +62,9 @@ const PROFESOR_ROUTES_RAW: Route[] = [
 			),
 		title: 'Intranet - Curso (Profesor)',
 		data: { permissionPath: 'intranet/profesor/cursos' },
+		// Solo en el padre: salir del hub (menú, atrás, otra ruta) con asistencia sin guardar pregunta; cambiar de
+		// pestaña no, porque las ediciones viven en un store que sobrevive entre pestañas.
+		canDeactivate: [pendingChangesGuard],
 		children: [
 			// La pestaña es una ruta hija con URL propia; hereda el guard de "ver como" y el
 			// `permissionPath` del padre. El redirect conserva el query (`horarioId`).

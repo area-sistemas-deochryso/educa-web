@@ -7,6 +7,7 @@ import { of, throwError } from 'rxjs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { EduConfirmationService } from '@edu-ui';
+import { pendingChangesGuard } from '@core/guards';
 import { ErrorHandlerService, WalClockService } from '@core/services';
 
 import type { HorarioProfesorDto } from '../../models';
@@ -61,13 +62,20 @@ describe('ProfesorCursoHubComponent', () => {
 		registroDirty: false,
 		registroData: null,
 	});
-	const asistenciaFacade = { vm: asistenciaVm, resetAsistencia: vi.fn() };
+	const asistenciaFacade = {
+		vm: asistenciaVm,
+		resetAsistencia: vi.fn(),
+		registrar: vi.fn(),
+		canSaveOutsidePanel: vi.fn(),
+	};
 
 	let router: Router;
 
 	beforeEach(() => {
 		vm.set({ horarios: [], loading: false, error: null });
 		asistenciaVm.set({ registroDirty: false, registroData: null });
+		asistenciaFacade.registrar.mockResolvedValue(true);
+		asistenciaFacade.canSaveOutsidePanel.mockReturnValue(true);
 		facade.loadData.mockImplementation(() => vm.update((v) => ({ ...v, loading: true })));
 		facade.getContenido.mockReturnValue(of(null));
 
@@ -75,7 +83,11 @@ describe('ProfesorCursoHubComponent', () => {
 			providers: [
 				provideRouter([
 					{ path: 'intranet/profesor/cursos', component: CursosListStubComponent },
-					{ path: 'intranet/profesor/cursos/:cursoId/:salonId', component: ProfesorCursoHubComponent },
+					{
+						path: 'intranet/profesor/cursos/:cursoId/:salonId',
+						component: ProfesorCursoHubComponent,
+						canDeactivate: [pendingChangesGuard],
+					},
 				]),
 				{ provide: ProfesorFacade, useValue: facade },
 				{ provide: ErrorHandlerService, useValue: errorHandler },
@@ -321,65 +333,209 @@ describe('ProfesorCursoHubComponent', () => {
 		};
 		const confirmation = (harness: RouterTestingHarness) =>
 			(harness.routeDebugElement as DebugElement).injector.get(EduConfirmationService);
-
-		it('asks before leaving the slot and keeps the selector on the current one', async () => {
+		const openDirtyHub = async () => {
 			const harness = await openHub('/intranet/profesor/cursos/24/34?horarioId=1');
 			await finishLoad(harness, [MON_SLOT, WED_SLOT]);
 			asistenciaVm.set({ registroDirty: true, registroData: { horarioId: 1 } });
+			return harness;
+		};
+		/** La navegación queda colgada del aviso: no se puede esperar a `whenStable` hasta responderlo. */
+		const waitForPrompt = (harness: RouterTestingHarness) =>
+			vi.waitFor(() => expect(confirmation(harness).confirmation()).not.toBeNull());
 
-			await clickSecondSlot(harness);
+		describe('cambiar de franja', () => {
+			it('asks before leaving the slot and keeps the selector on the current one', async () => {
+				const harness = await openDirtyHub();
 
-			expect(router.url).toBe('/intranet/profesor/cursos/24/34?horarioId=1');
-			expect(confirmation(harness).confirmation()?.header).toBe('Cambios sin guardar');
-			expect(selectedLabel(harness)).toBe('Lunes 08:00 - 09:30');
+				await clickSecondSlot(harness);
+
+				expect(router.url).toBe('/intranet/profesor/cursos/24/34?horarioId=1');
+				expect(confirmation(harness).confirmation()?.header).toBe('Cambios sin guardar');
+				expect(selectedLabel(harness)).toBe('Lunes 08:00 - 09:30');
+			});
+
+			it('offers to save, discard or stay when saving from outside the panel is safe', async () => {
+				const harness = await openDirtyHub();
+
+				await clickSecondSlot(harness);
+
+				const options = confirmation(harness).confirmation();
+				expect(options?.acceptLabel).toBe('Guardar y salir');
+				expect(options?.alternateLabel).toBe('Salir sin guardar');
+				expect(options?.rejectLabel).toBe('Quedarme');
+			});
+
+			it('does not offer to save on an atypical date: only discard or stay', async () => {
+				asistenciaFacade.canSaveOutsidePanel.mockReturnValue(false);
+				const harness = await openDirtyHub();
+
+				await clickSecondSlot(harness);
+
+				const options = confirmation(harness).confirmation();
+				expect(options?.acceptLabel).toBe('Salir sin guardar');
+				expect(options?.alternateLabel).toBeUndefined();
+			});
+
+			it('saves the edited slot and then changes the slot', async () => {
+				const harness = await openDirtyHub();
+				await clickSecondSlot(harness);
+
+				confirmation(harness).confirmation()?.accept?.();
+				await vi.waitFor(() => expect(router.url).toBe('/intranet/profesor/cursos/24/34?horarioId=2'));
+				harness.detectChanges();
+
+				expect(asistenciaFacade.registrar).toHaveBeenCalledExactlyOnceWith(1);
+				expect(selectedLabel(harness)).toBe('Miércoles 10:00 - 11:30');
+			});
+
+			it('stays on the slot when the save fails', async () => {
+				asistenciaFacade.registrar.mockResolvedValue(false);
+				const harness = await openDirtyHub();
+				await clickSecondSlot(harness);
+
+				confirmation(harness).confirmation()?.accept?.();
+				await harness.fixture.whenStable();
+				harness.detectChanges();
+
+				expect(router.url).toBe('/intranet/profesor/cursos/24/34?horarioId=1');
+				expect(selectedLabel(harness)).toBe('Lunes 08:00 - 09:30');
+			});
+
+			it('changes the slot without saving when the user discards', async () => {
+				const harness = await openDirtyHub();
+				await clickSecondSlot(harness);
+
+				confirmation(harness).confirmation()?.alternate?.();
+				await vi.waitFor(() => expect(router.url).toBe('/intranet/profesor/cursos/24/34?horarioId=2'));
+				harness.detectChanges();
+
+				expect(asistenciaFacade.registrar).not.toHaveBeenCalled();
+				expect(selectedLabel(harness)).toBe('Miércoles 10:00 - 11:30');
+			});
+
+			it('does not change anything when the user stays', async () => {
+				const harness = await openDirtyHub();
+				await clickSecondSlot(harness);
+
+				confirmation(harness).confirmation()?.reject?.();
+				harness.detectChanges();
+
+				expect(router.url).toBe('/intranet/profesor/cursos/24/34?horarioId=1');
+				expect(selectedLabel(harness)).toBe('Lunes 08:00 - 09:30');
+			});
+
+			it('changes the slot without asking when nothing is edited', async () => {
+				const harness = await openHub('/intranet/profesor/cursos/24/34?horarioId=1');
+				await finishLoad(harness, [MON_SLOT, WED_SLOT]);
+
+				await clickSecondSlot(harness);
+
+				expect(confirmation(harness).confirmation()).toBeNull();
+				expect(router.url).toBe('/intranet/profesor/cursos/24/34?horarioId=2');
+			});
+
+			it('ignores edits that belong to another slot', async () => {
+				const harness = await openHub('/intranet/profesor/cursos/24/34?horarioId=1');
+				await finishLoad(harness, [MON_SLOT, WED_SLOT]);
+				asistenciaVm.set({ registroDirty: true, registroData: { horarioId: 2 } });
+
+				await clickSecondSlot(harness);
+
+				expect(confirmation(harness).confirmation()).toBeNull();
+				expect(router.url).toBe('/intranet/profesor/cursos/24/34?horarioId=2');
+			});
 		});
 
-		it('changes the slot once the user accepts', async () => {
-			const harness = await openHub('/intranet/profesor/cursos/24/34?horarioId=1');
-			await finishLoad(harness, [MON_SLOT, WED_SLOT]);
-			asistenciaVm.set({ registroDirty: true, registroData: { horarioId: 1 } });
-			await clickSecondSlot(harness);
+		describe('salir del hub (canDeactivate)', () => {
+			it('leaves without asking when nothing is edited', async () => {
+				const harness = await openHub('/intranet/profesor/cursos/24/34?horarioId=1');
+				await finishLoad(harness, [MON_SLOT, WED_SLOT]);
 
-			confirmation(harness).confirmation()?.accept?.();
-			await harness.fixture.whenStable();
-			harness.detectChanges();
+				await router.navigateByUrl('/intranet/profesor/cursos');
 
-			expect(router.url).toBe('/intranet/profesor/cursos/24/34?horarioId=2');
-			expect(selectedLabel(harness)).toBe('Miércoles 10:00 - 11:30');
+				expect(router.url).toBe('/intranet/profesor/cursos');
+			});
+
+			it('asks and stays in the hub while the prompt is open', async () => {
+				const harness = await openDirtyHub();
+
+				const navigation = router.navigateByUrl('/intranet/profesor/cursos');
+				await waitForPrompt(harness);
+
+				expect(router.url).toBe('/intranet/profesor/cursos/24/34?horarioId=1');
+				expect(confirmation(harness).confirmation()?.message).toBe('Tienes cambios de asistencia sin guardar.');
+
+				confirmation(harness).confirmation()?.reject?.();
+				await expect(navigation).resolves.toBe(false);
+				expect(router.url).toBe('/intranet/profesor/cursos/24/34?horarioId=1');
+			});
+
+			it('leaves without saving when the user discards', async () => {
+				const harness = await openDirtyHub();
+
+				const navigation = router.navigateByUrl('/intranet/profesor/cursos');
+				await waitForPrompt(harness);
+				confirmation(harness).confirmation()?.alternate?.();
+
+				await expect(navigation).resolves.toBe(true);
+				expect(router.url).toBe('/intranet/profesor/cursos');
+				expect(asistenciaFacade.registrar).not.toHaveBeenCalled();
+			});
+
+			it('saves and then leaves', async () => {
+				const harness = await openDirtyHub();
+
+				const navigation = router.navigateByUrl('/intranet/profesor/cursos');
+				await waitForPrompt(harness);
+				confirmation(harness).confirmation()?.accept?.();
+
+				await expect(navigation).resolves.toBe(true);
+				expect(asistenciaFacade.registrar).toHaveBeenCalledExactlyOnceWith(1);
+				expect(router.url).toBe('/intranet/profesor/cursos');
+			});
+
+			it('stays in the hub when the save fails', async () => {
+				asistenciaFacade.registrar.mockResolvedValue(false);
+				const harness = await openDirtyHub();
+
+				const navigation = router.navigateByUrl('/intranet/profesor/cursos');
+				await waitForPrompt(harness);
+				confirmation(harness).confirmation()?.accept?.();
+
+				await expect(navigation).resolves.toBe(false);
+				expect(router.url).toBe('/intranet/profesor/cursos/24/34?horarioId=1');
+			});
+
+			it('stays in the hub when the prompt is dismissed with X / ESC', async () => {
+				const harness = await openDirtyHub();
+
+				const navigation = router.navigateByUrl('/intranet/profesor/cursos');
+				await waitForPrompt(harness);
+				confirmation(harness).confirmation()?.dismiss?.();
+
+				await expect(navigation).resolves.toBe(false);
+			});
 		});
 
-		it('does not change anything when the user cancels', async () => {
-			const harness = await openHub('/intranet/profesor/cursos/24/34?horarioId=1');
-			await finishLoad(harness, [MON_SLOT, WED_SLOT]);
-			asistenciaVm.set({ registroDirty: true, registroData: { horarioId: 1 } });
-			await clickSecondSlot(harness);
+		describe('cerrar o recargar la pestaña del navegador', () => {
+			const fireBeforeUnload = () => {
+				const event = new Event('beforeunload', { cancelable: true });
+				window.dispatchEvent(event);
+				return event;
+			};
 
-			confirmation(harness).close();
-			harness.detectChanges();
+			it('asks the browser to confirm when there are edits', async () => {
+				await openDirtyHub();
 
-			expect(router.url).toBe('/intranet/profesor/cursos/24/34?horarioId=1');
-			expect(selectedLabel(harness)).toBe('Lunes 08:00 - 09:30');
-		});
+				expect(fireBeforeUnload().defaultPrevented).toBe(true);
+			});
 
-		it('changes the slot without asking when nothing is edited', async () => {
-			const harness = await openHub('/intranet/profesor/cursos/24/34?horarioId=1');
-			await finishLoad(harness, [MON_SLOT, WED_SLOT]);
+			it('does not interfere when nothing is edited', async () => {
+				const harness = await openHub('/intranet/profesor/cursos/24/34?horarioId=1');
+				await finishLoad(harness, [MON_SLOT, WED_SLOT]);
 
-			await clickSecondSlot(harness);
-
-			expect(confirmation(harness).confirmation()).toBeNull();
-			expect(router.url).toBe('/intranet/profesor/cursos/24/34?horarioId=2');
-		});
-
-		it('ignores edits that belong to another slot', async () => {
-			const harness = await openHub('/intranet/profesor/cursos/24/34?horarioId=1');
-			await finishLoad(harness, [MON_SLOT, WED_SLOT]);
-			asistenciaVm.set({ registroDirty: true, registroData: { horarioId: 2 } });
-
-			await clickSecondSlot(harness);
-
-			expect(confirmation(harness).confirmation()).toBeNull();
-			expect(router.url).toBe('/intranet/profesor/cursos/24/34?horarioId=2');
+				expect(fireBeforeUnload().defaultPrevented).toBe(false);
+			});
 		});
 	});
 

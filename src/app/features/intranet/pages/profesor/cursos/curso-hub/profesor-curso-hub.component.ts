@@ -6,6 +6,7 @@ import {
 	CursoHubShellBase,
 } from '@intranet-shared/components';
 import type { CursoHubRol } from '@intranet-shared/helpers';
+import { UnsavedChangesPromptService } from '@intranet-shared/services';
 import { ProfesorFacade } from '../../services/profesor.facade';
 import { AttendanceCourseFacade } from '../services/attendance-course.facade';
 import { CursoContenidoDataFacade } from '../services/curso-contenido-data.facade';
@@ -24,7 +25,7 @@ import { CursoHubCalificacionesLoader } from './curso-hub-calificaciones.loader'
 	selector: 'app-profesor-curso-hub',
 	standalone: true,
 	imports: CURSO_HUB_SHELL_IMPORTS,
-	providers: [EduConfirmationService],
+	providers: [EduConfirmationService, UnsavedChangesPromptService],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: CURSO_HUB_SHELL_TEMPLATE,
 })
@@ -66,6 +67,19 @@ export class ProfesorCursoHubComponent extends CursoHubShellBase {
 	protected override hasUnsavedChanges(): boolean {
 		const vm = this.asistenciaFacade.vm();
 		return vm.registroDirty && vm.registroData?.horarioId === this.slot()?.id;
+	}
+
+	protected override unsavedChangesMessage(): string {
+		return 'Tienes cambios de asistencia sin guardar.';
+	}
+
+	protected override canSaveUnsaved(): boolean {
+		return this.asistenciaFacade.canSaveOutsidePanel(this.slot()?.diaSemana ?? null);
+	}
+
+	protected override saveUnsaved(): Promise<boolean> {
+		const horarioId = this.slot()?.id;
+		return horarioId === undefined ? Promise.resolve(false) : this.asistenciaFacade.registrar(horarioId);
 	}
 
 	protected loadHorarios(): void {

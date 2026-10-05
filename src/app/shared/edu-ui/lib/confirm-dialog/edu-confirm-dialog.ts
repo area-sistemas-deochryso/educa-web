@@ -36,6 +36,14 @@ import { EduConfirmation, EduConfirmationService } from './edu-confirmation.serv
 						[text]="true"
 						(click)="onReject(confirmation)"
 					></edu-button>
+					@if (confirmation.alternateLabel) {
+						<edu-button
+							[label]="confirmation.alternateLabel"
+							[class]="confirmation.alternateButtonStyleClass ?? ''"
+							[outlined]="true"
+							(click)="onAlternate(confirmation)"
+						></edu-button>
+					}
 					<edu-button
 						[label]="confirmation.acceptLabel ?? 'Aceptar'"
 						[class]="confirmation.acceptButtonStyleClass ?? ''"
@@ -59,6 +67,7 @@ import { EduConfirmation, EduConfirmationService } from './edu-confirmation.serv
 
 		.edu-confirm-dialog__footer {
 			display: flex;
+			flex-wrap: wrap;
 			justify-content: flex-end;
 			gap: 0.5rem;
 			margin-top: 1.5rem;
@@ -78,8 +87,14 @@ export class EduConfirmDialog {
 		this.confirmationService.close();
 	}
 
+	protected onAlternate(confirmation: EduConfirmation): void {
+		confirmation.alternate?.();
+		this.confirmationService.close();
+	}
+
 	protected onVisibleChange(visible: boolean): void {
 		if (!visible) {
+			this.confirmationService.confirmation()?.dismiss?.();
 			this.confirmationService.close();
 		}
 	}

@@ -8,8 +8,14 @@ export interface EduConfirmation {
 	rejectLabel?: string;
 	acceptButtonStyleClass?: string;
 	rejectButtonStyleClass?: string;
+	/** Optional third action (rendered between reject and accept), e.g. «Salir sin guardar» next to «Guardar y salir». */
+	alternateLabel?: string;
+	alternateButtonStyleClass?: string;
 	accept?: () => void;
 	reject?: () => void;
+	alternate?: () => void;
+	/** Closed without choosing (X / ESC). Not called after accept, reject or alternate. */
+	dismiss?: () => void;
 }
 
 /**

@@ -5,6 +5,7 @@ import { ActivatedRoute, provideRouter } from '@angular/router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { CursoHubContextService } from '@intranet-shared/components';
+import { UnsavedChangesPromptService } from '@intranet-shared/services';
 import { AttendanceCourseFacade } from '../services/attendance-course.facade';
 import { ProfesorCursoHubAsistenciaComponent } from './profesor-curso-hub-asistencia.component';
 // #endregion
@@ -42,10 +43,12 @@ describe('ProfesorCursoHubAsistenciaComponent', () => {
 		loadRegistro: vi.fn(),
 		loadResumen: vi.fn(),
 		registrar: vi.fn(),
+		canSaveOutsidePanel: vi.fn(),
 		setEstudianteEstado: vi.fn(),
 		setEstudianteJustificacion: vi.fn(),
 		resetAsistencia: vi.fn(),
 	};
+	const prompt = { confirmProceed: vi.fn() };
 	let fechaQuery: string | null = null;
 
 	function create() {
@@ -62,6 +65,7 @@ describe('ProfesorCursoHubAsistenciaComponent', () => {
 		resumen(): unknown;
 		diaSemana(): number | null;
 		diaSemanaDescripcion(): string | null;
+		fechaResetKey(): number;
 		onFechaChange(fecha: string): void;
 		onEstadoChange(e: { estudianteId: number; estado: 'P' | 'T' | 'F' }): void;
 		onJustificacionChange(e: { estudianteId: number; justificacion: string | null }): void;
@@ -76,10 +80,12 @@ describe('ProfesorCursoHubAsistenciaComponent', () => {
 		vm.set({ ...baseVm });
 		slot.set({ id: 5, diaSemana: 1, diaSemanaDescripcion: 'Lunes' });
 		fechaQuery = null;
+		facade.canSaveOutsidePanel.mockReturnValue(true);
 		TestBed.configureTestingModule({
 			providers: [
 				provideRouter([]),
 				{ provide: AttendanceCourseFacade, useValue: facade },
+				{ provide: UnsavedChangesPromptService, useValue: prompt },
 				{ provide: CursoHubContextService, useValue: { slot } },
 				{
 					provide: ActivatedRoute,
@@ -241,6 +247,83 @@ describe('ProfesorCursoHubAsistenciaComponent', () => {
 			expect(facade.loadRegistro).not.toHaveBeenCalled();
 			expect(facade.registrar).not.toHaveBeenCalled();
 			expect(facade.loadResumen).not.toHaveBeenCalled();
+		});
+	});
+
+	describe('cambiar de fecha con ediciones sin guardar', () => {
+		const editedList = () => vm.set({ ...baseVm, registroData: registro(5, '2026-10-05'), registroDirty: true });
+		const flush = () => new Promise<void>((resolve) => setTimeout(resolve));
+
+		it('asks before replacing the edited list and waits for the answer', () => {
+			editedList();
+			prompt.confirmProceed.mockReturnValue(new Promise<boolean>(() => undefined));
+			const fixture = create();
+
+			api(fixture).onFechaChange('2026-10-07');
+
+			expect(prompt.confirmProceed).toHaveBeenCalledOnce();
+			expect(facade.loadRegistro).not.toHaveBeenCalled();
+			expect(api(fixture).fecha()).toBe('2026-10-05');
+		});
+
+		it('offers to save only when the facade says it is safe outside the panel', () => {
+			editedList();
+			prompt.confirmProceed.mockReturnValue(new Promise<boolean>(() => undefined));
+			facade.canSaveOutsidePanel.mockReturnValue(false);
+			const fixture = create();
+
+			api(fixture).onFechaChange('2026-10-07');
+
+			expect(facade.canSaveOutsidePanel).toHaveBeenCalledWith(1);
+			expect(prompt.confirmProceed).toHaveBeenCalledWith(expect.objectContaining({ canSave: false }));
+		});
+
+		it('saves the list of the slot (not the new date) when the user chooses to save', () => {
+			editedList();
+			prompt.confirmProceed.mockReturnValue(new Promise<boolean>(() => undefined));
+			const fixture = create();
+			api(fixture).onFechaChange('2026-10-07');
+
+			prompt.confirmProceed.mock.calls[0][0].save();
+
+			expect(facade.registrar).toHaveBeenCalledExactlyOnceWith(5);
+		});
+
+		it('loads the new date once the user proceeds', async () => {
+			editedList();
+			prompt.confirmProceed.mockResolvedValue(true);
+			const fixture = create();
+
+			api(fixture).onFechaChange('2026-10-07');
+			await flush();
+
+			expect(api(fixture).fecha()).toBe('2026-10-07');
+			expect(facade.loadRegistro).toHaveBeenCalledExactlyOnceWith('2026-10-07', 5);
+			expect(api(fixture).fechaResetKey()).toBe(0);
+		});
+
+		it('keeps the list and sends the datepicker back to the current date when the user stays', async () => {
+			editedList();
+			prompt.confirmProceed.mockResolvedValue(false);
+			const fixture = create();
+
+			api(fixture).onFechaChange('2026-10-07');
+			await flush();
+
+			expect(facade.loadRegistro).not.toHaveBeenCalled();
+			expect(api(fixture).fecha()).toBe('2026-10-05');
+			expect(api(fixture).fechaResetKey()).toBe(1);
+		});
+
+		it('does not ask when the edits belong to another slot', () => {
+			vm.set({ ...baseVm, registroData: registro(9), registroDirty: true });
+			const fixture = create();
+			facade.loadRegistro.mockClear();
+
+			api(fixture).onFechaChange('2026-10-07');
+
+			expect(prompt.confirmProceed).not.toHaveBeenCalled();
+			expect(facade.loadRegistro).toHaveBeenCalledExactlyOnceWith('2026-10-07', 5);
 		});
 	});
 });

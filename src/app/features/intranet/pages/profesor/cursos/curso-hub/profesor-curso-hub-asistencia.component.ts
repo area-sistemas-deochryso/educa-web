@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, u
 import { ActivatedRoute } from '@angular/router';
 import { EduTab, EduTabPanel, EduTabs } from '@edu-ui';
 import { CursoHubContextService } from '@intranet-shared/components';
+import { UnsavedChangesPromptService } from '@intranet-shared/services';
 import { AttendanceCourseFacade } from '../services/attendance-course.facade';
 import { AttendanceRegistrationPanelComponent } from '../components/attendance-registration-panel/attendance-registration-panel.component';
 import { AttendanceSummaryPanelComponent } from '../components/attendance-summary-panel/attendance-summary-panel.component';
@@ -26,6 +27,8 @@ function todayIso(): string {
  * `horarioId` coincide con la franja: nunca la lista de otra. El shell es dueño del
  * reset al salir del hub y del aviso por ediciones sin guardar al cambiar de franja;
  * esta pestaña no resetea al destruirse, así cambiar de pestaña conserva lo editado.
+ * Cambiar la fecha del datepicker recarga la lista y descartaría lo editado, así que
+ * pasa por el mismo aviso que el shell (guardar, descartar o quedarse en la fecha actual).
  *
  * `?fecha=yyyy-mm-dd` (viene del popover de «Mi Horario») fija la fecha inicial.
  */
@@ -88,6 +91,7 @@ export class ProfesorCursoHubAsistenciaComponent {
 	private readonly hubContext = inject(CursoHubContextService);
 	private readonly facade = inject(AttendanceCourseFacade);
 	private readonly route = inject(ActivatedRoute);
+	private readonly unsavedPrompt = inject(UnsavedChangesPromptService);
 	// #endregion
 
 	// #region Estado derivado
@@ -96,6 +100,8 @@ export class ProfesorCursoHubAsistenciaComponent {
 
 	/** Fecha de la lista en pantalla (`yyyy-mm-dd`); también alimenta al datepicker del panel. */
 	protected readonly fecha = signal<string | null>(this.readFechaQuery());
+	/** Sube cuando el usuario se queda en la fecha actual: el datepicker del panel vuelve a ella. */
+	protected readonly fechaResetKey = signal(0);
 
 	/** La lista cargada pertenece a la franja elegida (descarta la de otra que aún quede en el store). */
 	private readonly registroDeLaFranja = computed(() => this.vm().registroData?.horarioId === this.slotId());
@@ -145,6 +151,29 @@ export class ProfesorCursoHubAsistenciaComponent {
 
 	// #region Handlers
 	protected onFechaChange(fecha: string): void {
+		const id = this.slotId();
+		if (id === null || !this.hasUnsavedEdits()) {
+			this.applyFecha(fecha);
+			return;
+		}
+		void this.unsavedPrompt
+			.confirmProceed({
+				message: 'Tienes cambios de asistencia sin guardar. Si cambias de fecha se perderán.',
+				canSave: this.facade.canSaveOutsidePanel(this.hubContext.slot()?.diaSemana ?? null),
+				save: () => this.facade.registrar(id),
+			})
+			.then((proceed) => {
+				if (proceed) this.applyFecha(fecha);
+				else this.fechaResetKey.update((n) => n + 1);
+			});
+	}
+
+	/** Hay ediciones de la lista de esta franja que todavía no se guardaron. */
+	private hasUnsavedEdits(): boolean {
+		return this.vm().registroDirty && this.registroDeLaFranja();
+	}
+
+	private applyFecha(fecha: string): void {
 		this.fecha.set(fecha);
 		const id = this.slotId();
 		if (id !== null) this.facade.loadRegistro(fecha, id);
@@ -160,7 +189,7 @@ export class ProfesorCursoHubAsistenciaComponent {
 
 	protected onSave(): void {
 		const id = this.slotId();
-		if (id !== null) this.facade.registrar(id);
+		if (id !== null) void this.facade.registrar(id);
 	}
 
 	protected onBuscarResumen(event: { fechaInicio: string; fechaFin: string }): void {

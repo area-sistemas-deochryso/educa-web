@@ -73,6 +73,7 @@ Cada línea: `- ruta/archivo.md — <trigger>`. Leé el archivo cuando el trigge
 ### Datos y mutaciones
 
 - [.claude/reference/crud-patterns.md](reference/crud-patterns.md) — creás CRUD admin (Store + Facade, multi-facade, BaseCrudStore, anti-patrones)
+- [.claude/reference/unsaved-changes.md](reference/unsaved-changes.md) — un formulario puede perder ediciones al salir (ruta, `beforeunload`, selector/datepicker que recarga): `pendingChangesGuard`, `HasPendingChanges`, `UnsavedChangesPromptService`, cuándo cada mecanismo aplica
 - [.claude/reference/optimistic-ui.md](reference/optimistic-ui.md) — hacés mutación FE → backend con WAL (`wal.execute`, apply/rollback, niveles de consistencia, cross-tab refetch)
 
 ### Infra del cliente

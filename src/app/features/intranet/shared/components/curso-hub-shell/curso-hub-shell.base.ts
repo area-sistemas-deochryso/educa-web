@@ -1,13 +1,15 @@
-import { Directive, DestroyRef, OnInit, Signal, computed, effect, inject, signal, untracked } from '@angular/core';
+import { Directive, DestroyRef, HostListener, OnInit, Signal, computed, effect, inject, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { Observable, catchError, forkJoin, map, of } from 'rxjs';
-import { EduConfirmDialog, EduConfirmationService, EduSpinner } from '@edu-ui';
+import { EduConfirmDialog, EduSpinner } from '@edu-ui';
+import type { HasPendingChanges } from '@core/guards';
 import { ErrorHandlerService, WalClockService } from '@core/services';
 import type { HorarioProfesorDto } from '@features/intranet/pages/profesor/models';
 
 import { buildCursosListCommands, type CursoHubRol } from '../../helpers/curso-hub-link.helpers';
 import { filterPairSlots, resolveSlot } from '../../helpers/curso-hub-slot.helpers';
+import { UnsavedChangesPromptService } from '../../services/unsaved-changes-prompt.service';
 import { EmptyStateComponent } from '../empty-state';
 import { CursoHubHeaderComponent } from '../curso-hub-header';
 import { CursoHubTabsComponent, cursoHubTabsFor } from '../curso-hub-tabs';
@@ -69,9 +71,14 @@ function parseId(raw: string | null): number {
  * franja (query válido → única con contenido → en curso → siguiente futura) y
  * emite los avisos de par/franja inválidos. Cada rol aporta solo su fuente de
  * horarios y su sonda de contenido.
+ *
+ * También es el dueño del aviso por cambios sin guardar (`HasPendingChanges`): lo usan el
+ * selector de franja, el guard de salida de la ruta y `beforeunload`. Cada rol solo dice
+ * si hay ediciones y, opcionalmente, cómo guardarlas. El componente concreto debe proveer
+ * `EduConfirmationService` y `UnsavedChangesPromptService`.
  */
 @Directive()
-export abstract class CursoHubShellBase implements OnInit {
+export abstract class CursoHubShellBase implements OnInit, HasPendingChanges {
 	// #region Dependencias
 	private readonly route = inject(ActivatedRoute);
 	private readonly router = inject(Router);
@@ -79,7 +86,7 @@ export abstract class CursoHubShellBase implements OnInit {
 	private readonly clock = inject(WalClockService);
 	private readonly destroyRef = inject(DestroyRef);
 	private readonly hubContext = inject(CursoHubContextService);
-	private readonly confirmation = inject(EduConfirmationService);
+	private readonly unsavedPrompt = inject(UnsavedChangesPromptService);
 	// #endregion
 
 	// #region Contrato por rol
@@ -90,9 +97,21 @@ export abstract class CursoHubShellBase implements OnInit {
 	protected abstract loadHorarios(): void;
 	/** Contenido de la franja (`null` si todavía no existe). Solo se usa como sonda. */
 	protected abstract probeContenido(horarioId: number): Observable<unknown | null>;
-	/** Si hay datos del rol editados sin guardar; avisa antes de cambiar de franja. Por defecto no hay. */
+	/** Si hay datos del rol editados sin guardar; avisa antes de salir o cambiar de franja. Por defecto no hay. */
 	protected hasUnsavedChanges(): boolean {
 		return false;
+	}
+	/** Qué se pierde, en lenguaje del usuario. */
+	protected unsavedChangesMessage(): string {
+		return 'Tienes cambios sin guardar.';
+	}
+	/** Si el aviso puede ofrecer «Guardar y salir». Por defecto no: solo descartar o quedarse. */
+	protected canSaveUnsaved(): boolean {
+		return false;
+	}
+	/** Guarda las ediciones; `true` solo si el servidor las confirmó. */
+	protected saveUnsaved(): Promise<boolean> {
+		return Promise.resolve(false);
 	}
 	// #endregion
 
@@ -198,22 +217,40 @@ export abstract class CursoHubShellBase implements OnInit {
 		this.loadHorarios();
 	}
 
+	// #region Cambios sin guardar
+	hasPendingChanges(): boolean {
+		return this.hasUnsavedChanges();
+	}
+
+	/** `true` si se puede salir: sin ediciones, descartadas o guardadas. Si se queda, el selector vuelve a la franja vigente. */
+	async confirmLeave(): Promise<boolean> {
+		const proceed = await this.unsavedPrompt.confirmProceed({
+			message: this.unsavedChangesMessage(),
+			canSave: this.canSaveUnsaved(),
+			save: () => this.saveUnsaved(),
+		});
+		if (!proceed) this.selectionResetKey.update((n) => n + 1);
+		return proceed;
+	}
+
+	/** Recargar o cerrar la pestaña no pasa por el router: solo el navegador puede preguntar (con su texto genérico). */
+	@HostListener('window:beforeunload', ['$event'])
+	protected onBeforeUnload(event: BeforeUnloadEvent): void {
+		if (this.hasUnsavedChanges()) event.preventDefault();
+	}
+	// #endregion
+
 	protected onSlotChange(horarioId: number): void {
-		if (this.hasUnsavedChanges()) {
-			// El selector ya muestra la franja elegida: se revierte de inmediato y solo avanza si el usuario acepta
-			// (cerrar con la X o Cancelar deja todo como estaba).
-			this.selectionResetKey.update((n) => n + 1);
-			this.confirmation.confirm({
-				header: 'Cambios sin guardar',
-				message: 'Tienes cambios sin guardar. Si cambias de franja se perderán. ¿Quieres continuar?',
-				icon: 'pi pi-exclamation-triangle',
-				acceptLabel: 'Sí, cambiar de franja',
-				rejectLabel: 'Cancelar',
-				accept: () => this.navigateToSlot(horarioId),
-			});
+		if (!this.hasUnsavedChanges()) {
+			this.navigateToSlot(horarioId);
 			return;
 		}
-		this.navigateToSlot(horarioId);
+		// El selector ya muestra la franja elegida: se revierte de inmediato y solo avanza si el usuario descarta o
+		// guarda (Quedarme, X/ESC o un guardado fallido dejan todo como estaba).
+		this.selectionResetKey.update((n) => n + 1);
+		void this.confirmLeave().then((proceed) => {
+			if (proceed) this.navigateToSlot(horarioId);
+		});
 	}
 
 	private navigateToSlot(horarioId: number): void {

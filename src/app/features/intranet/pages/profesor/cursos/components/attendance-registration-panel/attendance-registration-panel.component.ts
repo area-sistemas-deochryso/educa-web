@@ -41,6 +41,8 @@ export class AttendanceRegistrationPanelComponent {
 	readonly diaSemanaEsperadoDescripcion = input<string | null>(null);
 	/** Fecha inicial en formato "yyyy-mm-dd" (ej. al llegar desde el popover de "Mi Horario"). */
 	readonly initialFecha = input<string | null>(null);
+	/** Sube cuando el padre rechazó el cambio de fecha: el datepicker vuelve a `initialFecha` aunque no haya cambiado. */
+	readonly fechaResetKey = input(0);
 	// #endregion
 
 	// #region Outputs
@@ -53,6 +55,7 @@ export class AttendanceRegistrationPanelComponent {
 	// #region Estado local
 	selectedDate: Date = new Date();
 	private lastAppliedInitialFecha: string | null = null;
+	private lastAppliedResetKey = 0;
 	/** true solo mientras `selectedDate` sea la fecha atípica que el profesor confirmó explícitamente. */
 	readonly confirmadoFechaAtipica = signal(false);
 	// #endregion
@@ -62,8 +65,10 @@ export class AttendanceRegistrationPanelComponent {
 		// * ediciones posteriores del usuario en el datepicker.
 		effect(() => {
 			const fecha = this.initialFecha();
-			if (!fecha || fecha === this.lastAppliedInitialFecha) return;
+			const resetKey = this.fechaResetKey();
+			if (!fecha || (fecha === this.lastAppliedInitialFecha && resetKey === this.lastAppliedResetKey)) return;
 			this.lastAppliedInitialFecha = fecha;
+			this.lastAppliedResetKey = resetKey;
 			const [y, m, d] = fecha.split('-').map(Number);
 			this.selectedDate = new Date(y, m - 1, d);
 		});

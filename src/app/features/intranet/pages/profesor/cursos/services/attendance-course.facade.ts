@@ -8,6 +8,7 @@ import { environment } from '@config';
 import { UI_SUMMARIES, UI_ASISTENCIA_SUCCESS_MESSAGES } from '@shared/constants';
 import { ProfesorApiService } from '../../services/profesor-api.service';
 import { CursoContenidoStore } from './curso-contenido.store';
+import { isOffScheduleDate } from './attendance-schedule.helpers';
 import { AttendanceCourseStore } from './attendance-course.store';
 import { EstadoAsistenciaCurso, RegistrarAsistenciaCursoDto } from '../../models';
 
@@ -113,11 +114,15 @@ export class AttendanceCourseFacade {
 
 	// #region Comandos de registro
 
-	registrar(overrideHorarioId?: number): void {
+	/**
+	 * Resuelve `true` solo cuando el servidor confirmó el guardado; `false` si falló o no había nada que enviar.
+	 * Quien no necesita esperar el resultado puede ignorar la promesa.
+	 */
+	registrar(overrideHorarioId?: number): Promise<boolean> {
 		const horarioId = overrideHorarioId ?? this.getHorarioId();
 		const data = this.store.registroData();
 		// Nunca mandar la lista de otra franja a este horario (p. ej. cambio de franja con carga en vuelo).
-		if (!horarioId || !data || data.horarioId !== horarioId) return;
+		if (!horarioId || !data || data.horarioId !== horarioId) return Promise.resolve(false);
 
 		this.activityTracker.track('USER_ACTION', `Registrar asistencia: ${data.estudiantes.length} estudiantes`, { action: 'form_submit' });
 
@@ -137,31 +142,45 @@ export class AttendanceCourseFacade {
 
 		this.store.setRegistroSaving(true);
 
-		// server-confirmed (no WAL/optimistic queue): un 400 de validación de fecha/horario
-		// debe mostrar toast inmediato, igual que Calificaciones — no encolarse silenciosamente
-		// en "Operaciones pendientes". Ver brief 418 F2.
-		this.wal.execute({
-			operation: 'CREATE',
-			resourceType: 'asistenciaCurso',
-			endpoint: `${this.apiUrl}/horario/${horarioId}/registrar`,
-			method: 'POST',
-			payload: dto,
-			consistencyLevel: 'server-confirmed',
-			http$: () => this.api.registrarAsistenciaCurso(horarioId, dto),
-			onCommit: () => {
-				this.store.setRegistroSaving(false);
-				this.store.markRegistroSaved();
-				this.errorHandler.showSuccess(UI_SUMMARIES.success, UI_ASISTENCIA_SUCCESS_MESSAGES.registered);
-			},
-			onError: (err) => {
-				this.errHandler.handle(err, 'registrar asistencia');
-				this.store.setRegistroSaving(false);
-			},
-			optimistic: {
-				apply: () => {},
-				rollback: () => {},
-			},
+		return new Promise<boolean>((resolve) => {
+			// server-confirmed (no WAL/optimistic queue): un 400 de validación de fecha/horario
+			// debe mostrar toast inmediato, igual que Calificaciones — no encolarse silenciosamente
+			// en "Operaciones pendientes". Ver brief 418 F2.
+			this.wal.execute({
+				operation: 'CREATE',
+				resourceType: 'asistenciaCurso',
+				endpoint: `${this.apiUrl}/horario/${horarioId}/registrar`,
+				method: 'POST',
+				payload: dto,
+				consistencyLevel: 'server-confirmed',
+				http$: () => this.api.registrarAsistenciaCurso(horarioId, dto),
+				onCommit: () => {
+					this.store.setRegistroSaving(false);
+					this.store.markRegistroSaved();
+					this.errorHandler.showSuccess(UI_SUMMARIES.success, UI_ASISTENCIA_SUCCESS_MESSAGES.registered);
+					resolve(true);
+				},
+				onError: (err) => {
+					this.errHandler.handle(err, 'registrar asistencia');
+					this.store.setRegistroSaving(false);
+					resolve(false);
+				},
+				optimistic: {
+					apply: () => {},
+					rollback: () => {},
+				},
+			});
 		});
+	}
+
+	/**
+	 * `true` si la lista cargada puede guardarse sin pasar por el panel. La fecha atípica (fuera del día de
+	 * horario) exige la confirmación explícita del panel, que vive en su estado local: desde fuera no se sabe
+	 * si ya se dio, así que no se ofrece guardar.
+	 */
+	canSaveOutsidePanel(diaSemanaEsperado: number | null): boolean {
+		const data = this.store.registroData();
+		return !!data && !isOffScheduleDate(data.fecha, diaSemanaEsperado);
 	}
 	// #endregion
 

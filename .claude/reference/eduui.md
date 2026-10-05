@@ -87,6 +87,21 @@ import type { EduPaginatorPageEvent } from '@edu-ui';
 </edu-dialog>
 ```
 
+## ConfirmDialog con tercera acción y `dismiss`
+
+`EduConfirmation` admite, además de `accept`/`reject`, una acción alternativa (botón central, outlined) y un callback de cierre sin elegir:
+
+| Campo | Cuándo se invoca |
+|---|---|
+| `accept` / `acceptLabel` | Botón primario (derecha). |
+| `alternate` / `alternateLabel` / `alternateButtonStyleClass` | Botón central, solo si hay `alternateLabel`. Ej.: «Salir sin guardar» entre «Quedarme» y «Guardar y salir». |
+| `reject` / `rejectLabel` | Botón de texto (izquierda). |
+| `dismiss` | Cierre sin elegir (X / ESC). **No** se invoca tras `accept`, `reject` ni `alternate`. |
+
+`dismiss` existe para quien convierte el aviso en una `Promise` (un guard no puede quedar colgado si el usuario cierra con la X). Ver `reference/unsaved-changes.md`.
+
+> ⚠️ **`shared/edu-ui` es vendorizada** (fuente de verdad en `educa-libs`). Esta extensión se hizo localmente en el brief 769: hay que portarla a `educa-libs` o el próximo re-sync la pisa y rompe `UnsavedChangesPromptService`.
+
 ## Por qué es necesario (overlays)
 
 - **Diálogos**: sin `appendTo="body"`, el overlay puede quedar atrapado con z-index menor dentro del dialog padre.

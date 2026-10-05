@@ -2,7 +2,7 @@
 // #region Imports
 import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { Subject, of } from 'rxjs';
+import { Subject, of, throwError } from 'rxjs';
 
 import { firstValueFrom } from 'rxjs';
 
@@ -209,6 +209,58 @@ describe('AttendanceCourseFacade', () => {
 			facade.registrar(1);
 
 			await vi.waitFor(() => expect(store.registroDirty()).toBe(false));
+		});
+
+		it('should resolve true once the server confirmed the save', async () => {
+			store.setRegistroData(mockRegistroData as never);
+
+			await expect(facade.registrar(1)).resolves.toBe(true);
+		});
+
+		it('should resolve false when the save fails and keep the edits pending', async () => {
+			store.setRegistroData(mockRegistroData as never);
+			facade.setEstudianteEstado(1, 'F');
+			api.registrarAsistenciaCurso.mockReturnValue(throwError(() => new Error('400')));
+
+			await expect(facade.registrar(1)).resolves.toBe(false);
+
+			expect(store.registroSaving()).toBe(false);
+			expect(store.registroDirty()).toBe(true);
+		});
+
+		it('should resolve false without sending when there is nothing to send', async () => {
+			await expect(facade.registrar(1)).resolves.toBe(false);
+
+			store.setRegistroData(mockRegistroData as never);
+			await expect(facade.registrar(2)).resolves.toBe(false);
+			expect(api.registrarAsistenciaCurso).not.toHaveBeenCalled();
+		});
+	});
+	// #endregion
+
+	// #region canSaveOutsidePanel
+	describe('canSaveOutsidePanel', () => {
+		// mockRegistroData.fecha (2026-03-21) is a Saturday.
+		it('is false without a loaded list', () => {
+			expect(facade.canSaveOutsidePanel(6)).toBe(false);
+		});
+
+		it('is true when the loaded date is the scheduled weekday', () => {
+			store.setRegistroData(mockRegistroData as never);
+
+			expect(facade.canSaveOutsidePanel(6)).toBe(true);
+		});
+
+		it('is false on an atypical date: only the panel can confirm it', () => {
+			store.setRegistroData(mockRegistroData as never);
+
+			expect(facade.canSaveOutsidePanel(1)).toBe(false);
+		});
+
+		it('is true when the course has no expected weekday', () => {
+			store.setRegistroData(mockRegistroData as never);
+
+			expect(facade.canSaveOutsidePanel(null)).toBe(true);
 		});
 	});
 	// #endregion

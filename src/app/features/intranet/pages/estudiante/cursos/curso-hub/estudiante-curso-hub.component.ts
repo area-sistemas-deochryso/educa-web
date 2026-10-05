@@ -6,6 +6,7 @@ import {
 	CursoHubShellBase,
 } from '@intranet-shared/components';
 import type { CursoHubRol } from '@intranet-shared/helpers';
+import { UnsavedChangesPromptService } from '@intranet-shared/services';
 import { EstudianteCursosFacade } from '../../services/estudiante-cursos.facade';
 
 /**
@@ -20,7 +21,7 @@ import { EstudianteCursosFacade } from '../../services/estudiante-cursos.facade'
 	selector: 'app-estudiante-curso-hub',
 	standalone: true,
 	imports: CURSO_HUB_SHELL_IMPORTS,
-	providers: [EduConfirmationService],
+	providers: [EduConfirmationService, UnsavedChangesPromptService],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: CURSO_HUB_SHELL_TEMPLATE,
 })
