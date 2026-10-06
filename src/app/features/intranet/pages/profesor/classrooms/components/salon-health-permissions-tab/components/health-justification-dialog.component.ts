@@ -1,14 +1,16 @@
-import { Component, ChangeDetectionStrategy, input, output, signal, computed, OnChanges } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, input, output, signal, computed, OnChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { StudentForHealthDto, DateValidationResult } from '@features/intranet/pages/profesor/models';
-import { EduButton, EduDatePicker, EduDialog, EduFileUpload, EduSelect, EduTag, EduTextarea } from '@edu-ui';
+import { EduButton, EduDatePicker, EduDialog, EduFileUpload, EduSelect, EduTag, EduTextarea, EduTooltip } from '@edu-ui';
+import { ErrorHandlerService } from '@core/services';
+import { FileRowComponent, JUSTIFICATION_UPLOAD_ACCEPT, JUSTIFICATION_UPLOAD_LIMITS, validateUploadFile } from '@shared/components';
 
 @Component({
 	selector: 'app-health-justification-dialog',
 	standalone: true,
 	imports: [
 		FormsModule, EduDialog, EduSelect, EduDatePicker,
-		EduFileUpload, EduTextarea, EduButton, EduTag],
+		EduFileUpload, EduTextarea, EduButton, EduTag, EduTooltip, FileRowComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
 		<edu-dialog
@@ -71,19 +73,29 @@ import { EduButton, EduDatePicker, EduDialog, EduFileUpload, EduSelect, EduTag, 
 					mode="basic"
 					[auto]="false"
 					data-info-anchor="profesor-health-justificacion-adjuntar"
-					accept=".pdf,.jpg,.jpeg,.png,.webp"
-					[maxFileSize]="10485760"
+					[accept]="acceptedTypes"
 					chooseLabel="Seleccionar archivo"
 					chooseIcon="pi pi-upload"
 					(onSelect)="onFileSelect($event)"
 					(onClear)="onFileClear()"
 					styleClass="w-full"
 				/>
-				@if (selectedFile()) {
-					<div class="file-info">
-						<i class="pi pi-file"></i>
-						<span>{{ selectedFile()!.name }} ({{ formatSize(selectedFile()!.size) }})</span>
-					</div>
+				@if (selectedFile(); as file) {
+					<app-file-row [name]="file.name" [mimeType]="file.type || null" [sizeBytes]="file.size" [small]="true">
+						<span actions>
+							<edu-button
+								icon="pi pi-times"
+								[text]="true"
+								[rounded]="true"
+								size="small"
+								severity="danger"
+								eduTooltip="Quitar archivo"
+								eduTooltipPosition="top"
+								(click)="onFileClear()"
+								[pt]="{ root: { 'aria-label': 'Quitar archivo' } }"
+							/>
+						</span>
+					</app-file-row>
 				}
 
 				<!-- Observacion -->
@@ -146,17 +158,11 @@ import { EduButton, EduDatePicker, EduDialog, EduFileUpload, EduSelect, EduTag, 
 				padding: 0.25rem 0.5rem;
 				font-size: 0.85rem;
 			}
-
-			.file-info {
-				display: flex;
-				align-items: center;
-				gap: 0.5rem;
-				font-size: 0.85rem;
-				color: var(--text-color-secondary);
-			}
 		`],
 })
 export class HealthJustificationDialogComponent implements OnChanges {
+	private readonly errorHandler = inject(ErrorHandlerService);
+
 	// #region Inputs/Outputs
 	readonly visible = input(false);
 	readonly estudiantes = input<StudentForHealthDto[]>([]);
@@ -173,6 +179,7 @@ export class HealthJustificationDialogComponent implements OnChanges {
 	selectedDates: Date[] = [];
 	observacion = '';
 	readonly selectedFile = signal<File | null>(null);
+	readonly acceptedTypes = JUSTIFICATION_UPLOAD_ACCEPT;
 	readonly today = new Date();
 	readonly yearStart = new Date(this.today.getFullYear(), 0, 1);
 
@@ -217,9 +224,14 @@ export class HealthJustificationDialogComponent implements OnChanges {
 	}
 
 	onFileSelect(event: { files: File[] }): void {
-		if (event.files.length > 0) {
-			this.selectedFile.set(event.files[0]);
+		const file = event.files[0];
+		if (!file) return;
+		const error = validateUploadFile(file, JUSTIFICATION_UPLOAD_LIMITS);
+		if (error) {
+			this.errorHandler.showWarning('Archivo no válido', error);
+			return;
 		}
+		this.selectedFile.set(file);
 	}
 
 	onFileClear(): void {
@@ -256,12 +268,6 @@ export class HealthJustificationDialogComponent implements OnChanges {
 		formData.append('documento', file);
 
 		this.save.emit(formData);
-	}
-
-	formatSize(bytes: number): string {
-		if (bytes < 1024) return bytes + ' B';
-		if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-		return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
 	}
 
 	private resetForm(): void {

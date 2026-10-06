@@ -6,10 +6,10 @@ export interface Attachment {
 	id: number;
 	/** Display name for the file. */
 	name: string;
-	/** Normalized file type for UI icons. */
-	type: 'pdf' | 'doc' | 'video' | 'image' | 'link';
-	/** Human readable file size. */
-	size: string;
+	/** MIME type reported at upload time; `app-file-row` falls back to the file extension when null. */
+	mimeType: string | null;
+	/** File size in bytes; `app-file-row` formats it. */
+	sizeBytes: number | null;
 	/** Localized date string for display. */
 	date: string;
 	/** True when user has opened the attachment. */

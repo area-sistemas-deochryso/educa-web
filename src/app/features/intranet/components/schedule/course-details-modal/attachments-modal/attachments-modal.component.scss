@@ -50,19 +50,12 @@
 }
 
 .attachment-item {
-	display: flex;
-	align-items: center;
-	gap: 0.75rem;
-	padding: 0.75rem 1rem;
+	display: block;
+	padding: 0.25rem 0.75rem;
 	border-bottom: 1px solid var(--intranet-border-color);
-	transition: background-color 0.2s;
 
 	&:last-child {
 		border-bottom: none;
-	}
-
-	&:hover {
-		background-color: rgba(0, 0, 0, 0.02);
 	}
 
 	&.unread {
@@ -70,47 +63,16 @@
 	}
 }
 
-.attachment-icon {
-	width: 36px;
-	height: 36px;
-	border: 1px solid var(--intranet-border-color);
-	border-radius: 4px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	flex-shrink: 0;
-
-	i {
-		font-size: 1rem;
-		color: var(--intranet-accent-color-blue);
-	}
-}
-
-.attachment-info {
-	flex: 1;
-	min-width: 0;
-	display: flex;
-	flex-direction: column;
-	gap: 0.15rem;
-}
-
-.attachment-name {
-	font-size: 0.8rem;
-	color: var(--intranet-default-text-color);
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-}
-
-.attachment-meta {
-	font-size: 0.7rem;
-	color: var(--intranet-soft-text-color);
-}
-
 .attachment-actions {
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;
+}
+
+.attachment-date {
+	font-size: 0.7rem;
+	color: var(--intranet-soft-text-color);
+	white-space: nowrap;
 }
 
 .unread-badge {
@@ -120,33 +82,6 @@
 	padding: 0.15rem 0.4rem;
 	border-radius: 3px;
 	font-weight: 500;
-}
-
-.action-btn {
-	background: transparent;
-	border: 1px solid var(--intranet-border-color);
-	border-radius: 4px;
-	width: 28px;
-	height: 28px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	cursor: pointer;
-	transition: all 0.2s;
-
-	i {
-		font-size: 0.8rem;
-		color: var(--intranet-soft-text-color);
-	}
-
-	&:hover {
-		border-color: var(--intranet-accent-color-blue);
-		background-color: var(--intranet-accent-color-blue);
-
-		i {
-			color: var(--white-color);
-		}
-	}
 }
 
 .modal-footer {

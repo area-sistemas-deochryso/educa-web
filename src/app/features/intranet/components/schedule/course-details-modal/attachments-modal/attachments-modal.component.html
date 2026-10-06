@@ -20,7 +20,8 @@
 				#fileUpload
 				mode="basic"
 				[multiple]="true"
-				[maxFileSize]="50000000"
+				[accept]="uploadAccept"
+				[maxFileSize]="uploadMaxBytes"
 				[auto]="true"
 				[customUpload]="true"
 				(uploadHandler)="onFileSelect($event)"
@@ -45,40 +46,34 @@
 		<!-- * Files list -->
 		<div class="attachments-list">
 			@for (attachment of vm().attachments; track attachment.id) {
-				<div class="attachment-item" [class.unread]="!attachment.isRead">
-					<div class="attachment-icon">
-						<i class="pi" [ngClass]="getIcon(attachment.type)"></i>
-					</div>
-					<div class="attachment-info">
-						<span class="attachment-name">{{ attachment.name }}</span>
-						<span class="attachment-meta"
-							>{{ attachment.size }} · {{ attachment.date }}</span
-						>
-					</div>
-					<div class="attachment-actions">
+				<app-file-row
+					class="attachment-item"
+					[class.unread]="!attachment.isRead"
+					data-info-anchor="horario-adjuntos-archivo-abrir"
+					[name]="attachment.name"
+					[mimeType]="attachment.mimeType"
+					[sizeBytes]="attachment.sizeBytes"
+					(open)="onDownloadAttachment(attachment)"
+				>
+					<span actions class="attachment-actions">
+						<span class="attachment-date">{{ attachment.date }}</span>
 						@if (!attachment.isRead) {
 							<span class="unread-badge">Nuevo</span>
 						}
-						<button
-							class="action-btn"
-							(click)="onDownloadAttachment(attachment)"
-							title="Descargar"
-							type="button"
-							aria-label="Descargar archivo"
-						>
-							<i class="pi pi-download"></i>
-						</button>
-						<button
-							class="action-btn delete-btn"
+						<edu-button
+							icon="pi pi-trash"
+							[text]="true"
+							[rounded]="true"
+							size="small"
+							severity="danger"
+							eduTooltip="Eliminar"
+							eduTooltipPosition="top"
+							data-info-anchor="horario-adjuntos-archivo-eliminar"
 							(click)="onDeleteAttachment(attachment)"
-							title="Eliminar"
-							type="button"
-							aria-label="Eliminar archivo"
-						>
-							<i class="pi pi-trash"></i>
-						</button>
-					</div>
-				</div>
+							[pt]="{ root: { 'aria-label': 'Eliminar archivo' } }"
+						/>
+					</span>
+				</app-file-row>
 			}
 		</div>
 

@@ -1,7 +1,7 @@
 // #region Imports
 import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { BlobStorageService, ErrorHandlerService, WalFacadeHelper } from '@core/services';
+import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
 import { logger, extractBackendMessage, facadeErrorHandler } from '@core/helpers';
 import { environment } from '@config';
 import { ProfesorApiService } from '@features/intranet/pages/profesor/services/profesor-api.service';
@@ -9,6 +9,7 @@ import type {
 	CursoContenidoArchivoDto,
 	RegistrarArchivoRequest,
 } from '@features/intranet/pages/profesor/models';
+import { validateUploadFile } from '@shared/components';
 import { AttachmentsModalStore, type Attachment } from './attachments-modal.store';
 import {
 	UI_ADMIN_ERROR_DETAILS_DYNAMIC,
@@ -19,8 +20,6 @@ import {
 
 // #endregion
 // #region Constants
-/** Maximum allowed file size in bytes (50 MB). */
-const MAX_FILE_SIZE = 50000000;
 /** Base API endpoint for course content resources. */
 const CONTENIDO_URL = `${environment.apiUrl}/api/CursoContenido`;
 // #endregion
@@ -47,7 +46,6 @@ const CONTENIDO_URL = `${environment.apiUrl}/api/CursoContenido`;
 export class AttachmentsModalFacade {
 	// #region Dependencies
 	private readonly api = inject(ProfesorApiService);
-	private readonly blobService = inject(BlobStorageService);
 	private readonly errorHandler = inject(ErrorHandlerService);
 	private readonly wal = inject(WalFacadeHelper);
 	private readonly store = inject(AttachmentsModalStore);
@@ -79,7 +77,7 @@ export class AttachmentsModalFacade {
 		const validationError = this.validateFile(file);
 		if (validationError) {
 			logger.error(validationError);
-			this.errorHandler.showError(UI_SUMMARIES.error, validationError);
+			this.errorHandler.showWarning('Archivo no válido', validationError);
 			return;
 		}
 
@@ -241,8 +239,8 @@ export class AttachmentsModalFacade {
 		return {
 			id: dto.id,
 			name: dto.nombreArchivo,
-			type: this.blobService.getFileType(dto.nombreArchivo),
-			size: dto.tamanoBytes ? this.blobService.formatFileSize(dto.tamanoBytes) : '-',
+			mimeType: dto.tipoArchivo,
+			sizeBytes: dto.tamanoBytes,
 			date: new Date(dto.fechaReg).toLocaleDateString('es-PE'),
 			isRead: false,
 			url: dto.urlArchivo,
@@ -251,7 +249,7 @@ export class AttachmentsModalFacade {
 
 	/**
 	 * Validate a file before upload.
-	 * Enforces presence, non empty size, and maximum size.
+	 * Enforces presence, non empty size, and the shared upload limits (type, name length, max size).
 	 *
 	 * @param file File selected by the user.
 	 * @returns Error message when invalid; null when valid.
@@ -259,8 +257,7 @@ export class AttachmentsModalFacade {
 	private validateFile(file: File): string | null {
 		if (!file) return UI_ATTACHMENT_MESSAGES.fileMissing;
 		if (file.size === 0) return UI_ATTACHMENT_MESSAGES.fileEmpty;
-		if (file.size > MAX_FILE_SIZE) return UI_ATTACHMENT_MESSAGES.fileTooLarge(MAX_FILE_SIZE / 1000000);
-		return null;
+		return validateUploadFile(file);
 	}
 
 	// #endregion

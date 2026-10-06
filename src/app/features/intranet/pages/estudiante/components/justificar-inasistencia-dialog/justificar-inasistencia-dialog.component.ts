@@ -1,16 +1,15 @@
-import { Component, ChangeDetectionStrategy, input, output, signal, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, input, output, signal, computed } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { JustificarInasistenciaContext } from '@features/intranet/pages/estudiante/models';
-import { EduButton, EduDialog, EduFileUpload, EduMessage, EduTextarea } from '@edu-ui';
-
-const MAX_FILE_SIZE = 10485760;
-const ACCEPTED_TYPES = '.pdf,.jpg,.jpeg,.png,.webp';
+import { EduButton, EduDialog, EduFileUpload, EduMessage, EduTextarea, EduTooltip } from '@edu-ui';
+import { ErrorHandlerService } from '@core/services';
+import { FileRowComponent, JUSTIFICATION_UPLOAD_ACCEPT, JUSTIFICATION_UPLOAD_LIMITS, validateUploadFile } from '@shared/components';
 
 @Component({
 	selector: 'app-justificar-inasistencia-dialog',
 	standalone: true,
-	imports: [DatePipe, FormsModule, EduDialog, EduFileUpload, EduTextarea, EduButton, EduMessage],
+	imports: [DatePipe, FormsModule, EduDialog, EduFileUpload, EduTextarea, EduButton, EduMessage, EduTooltip, FileRowComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
 		<edu-dialog
@@ -34,18 +33,28 @@ const ACCEPTED_TYPES = '.pdf,.jpg,.jpeg,.png,.webp';
 						[auto]="false"
 						data-info-anchor="estudiante-justificar-inasistencia-adjuntar"
 						[accept]="acceptedTypes"
-						[maxFileSize]="maxFileSize"
 						chooseLabel="Seleccionar archivo"
 						chooseIcon="pi pi-upload"
 						(onSelect)="onFileSelect($event)"
 						(onClear)="onFileClear()"
 						styleClass="w-full"
 					/>
-					@if (selectedFile()) {
-						<div class="file-info">
-							<i class="pi pi-file"></i>
-							<span>{{ selectedFile()!.name }} ({{ formatSize(selectedFile()!.size) }})</span>
-						</div>
+					@if (selectedFile(); as file) {
+						<app-file-row [name]="file.name" [mimeType]="file.type || null" [sizeBytes]="file.size" [small]="true">
+							<span actions>
+								<edu-button
+									icon="pi pi-times"
+									[text]="true"
+									[rounded]="true"
+									size="small"
+									severity="danger"
+									eduTooltip="Quitar archivo"
+									eduTooltipPosition="top"
+									(click)="onFileClear()"
+									[pt]="{ root: { 'aria-label': 'Quitar archivo' } }"
+								/>
+							</span>
+						</app-file-row>
 					}
 
 					<label for="just-comentario">Comentario (opcional)</label>
@@ -96,17 +105,11 @@ const ACCEPTED_TYPES = '.pdf,.jpg,.jpeg,.png,.webp';
 			.fecha-info {
 				margin: 0;
 			}
-
-			.file-info {
-				display: flex;
-				align-items: center;
-				gap: 0.5rem;
-				font-size: 0.85rem;
-				color: var(--text-color-secondary);
-			}
 		`],
 })
 export class JustificarInasistenciaDialogComponent {
+	private readonly errorHandler = inject(ErrorHandlerService);
+
 	// #region Inputs/Outputs
 	readonly visible = input(false);
 	readonly contexto = input<JustificarInasistenciaContext | null>(null);
@@ -118,8 +121,7 @@ export class JustificarInasistenciaDialogComponent {
 	// #region Estado local
 	comentario = '';
 	readonly selectedFile = signal<File | null>(null);
-	readonly maxFileSize = MAX_FILE_SIZE;
-	readonly acceptedTypes = ACCEPTED_TYPES;
+	readonly acceptedTypes = JUSTIFICATION_UPLOAD_ACCEPT;
 	// #endregion
 
 	readonly canSaveComputed = computed(() => this.selectedFile() !== null);
@@ -134,9 +136,14 @@ export class JustificarInasistenciaDialogComponent {
 	}
 
 	onFileSelect(event: { files: File[] }): void {
-		if (event.files.length > 0) {
-			this.selectedFile.set(event.files[0]);
+		const file = event.files[0];
+		if (!file) return;
+		const error = validateUploadFile(file, JUSTIFICATION_UPLOAD_LIMITS);
+		if (error) {
+			this.errorHandler.showWarning('Archivo no válido', error);
+			return;
 		}
+		this.selectedFile.set(file);
 	}
 
 	onFileClear(): void {
@@ -156,12 +163,6 @@ export class JustificarInasistenciaDialogComponent {
 		formData.append('documento', file);
 
 		this.save.emit({ asistenciaCursoId: ctx.asistenciaCursoId, formData });
-	}
-
-	formatSize(bytes: number): string {
-		if (bytes < 1024) return bytes + ' B';
-		if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-		return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
 	}
 
 	private resetForm(): void {

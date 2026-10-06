@@ -1,18 +1,18 @@
 // #region Imports
 import { Component, EventEmitter, Input, Output, inject, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import type { Attachment } from './attachments-modal.models';
 // eslint-disable-next-line layer-enforcement/imports-error -- Razón: AttachmentsModalStore es ephemeral/scoped, se registra como provider del component junto al facade (patrón wizard/modal local). No se consumen sus APIs directamente.
 import { AttachmentsModalStore } from './attachments-modal.store';
 import { AttachmentsModalFacade } from './attachments-modal.facade';
-import { EduDialog, EduFileUpload, EduSpinner } from '@edu-ui';
+import { EduButton, EduDialog, EduFileUpload, EduSpinner, EduTooltip } from '@edu-ui';
+import { FileRowComponent, UPLOAD_ACCEPT, UPLOAD_LIMITS } from '@shared/components';
 
 // #endregion
 // #region Implementation
 @Component({
 	selector: 'app-attachments-modal',
 	standalone: true,
-	imports: [CommonModule, EduDialog, EduSpinner, EduFileUpload],
+	imports: [EduButton, EduDialog, EduSpinner, EduFileUpload, EduTooltip, FileRowComponent],
 	providers: [AttachmentsModalStore, AttachmentsModalFacade],
 	templateUrl: './attachments-modal.component.html',
 	styleUrl: './attachments-modal.component.scss',
@@ -46,6 +46,9 @@ export class AttachmentsModalComponent {
 	// #region Facade state
 	/** View model stream for UI binding. */
 	readonly vm = this.facade.vm;
+	/** Upload picker filters shared with the rest of the file flows. */
+	readonly uploadAccept = UPLOAD_ACCEPT;
+	readonly uploadMaxBytes = UPLOAD_LIMITS.maxFileSizeBytes;
 	// #endregion
 
 	// #region Dialog handlers
@@ -65,26 +68,6 @@ export class AttachmentsModalComponent {
 
 	// #region Event handlers
 	/**
-	 * Resolve the icon class for a file type.
-	 *
-	 * @param type Normalized type key.
-	 * @returns PrimeIcons class for the UI.
-	 *
-	 * @example
-	 * const icon = getIcon('pdf');
-	 */
-	getIcon(type: string): string {
-		const icons: Record<string, string> = {
-			pdf: 'pi-file-pdf',
-			doc: 'pi-file-word',
-			video: 'pi-video',
-			image: 'pi-image',
-			link: 'pi-external-link',
-		};
-		return icons[type] || 'pi-file';
-	}
-
-	/**
 	 * Handle file selection from the upload component.
 	 *
 	 * @param event PrimeNG FileUpload select event payload.
@@ -97,7 +80,7 @@ export class AttachmentsModalComponent {
 	}
 
 	/**
-	 * Download and mark an attachment as read.
+	 * Open the attachment in a new tab and mark it as read.
 	 *
 	 * @param attachment Attachment to open.
 	 */

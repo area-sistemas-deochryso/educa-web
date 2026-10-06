@@ -68,8 +68,6 @@ export const UI_ATTACHMENT_MESSAGES = {
 	uploadSuccess: 'Archivo subido correctamente',
 	fileMissing: 'No se seleccionó ningún archivo',
 	fileEmpty: 'El archivo está vacío',
-	fileTooLarge: (maxMb: number): string =>
-		`El archivo es demasiado grande (máximo ${maxMb}MB)`,
 	uploadFailed: 'No se pudo subir el archivo',
 	registerFailed: 'No se pudo registrar el archivo',
 	deleteFailed: 'No se pudo eliminar el archivo',

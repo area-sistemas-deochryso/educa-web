@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@config/environment';
-import { logger, FileUploadBuilder, withRetry, classifyFile, formatFileSize } from '@core/helpers';
+import { logger, FileUploadBuilder, withRetry } from '@core/helpers';
 
 // #endregion
 // #region Implementation
@@ -51,27 +51,6 @@ export class BlobStorageService {
 		return this.http
 			.post<BlobUploadResponse>(`${this.apiUrl}/upload`, formData)
 			.pipe(withRetry({ tag: 'BlobStorageService:uploadFile' }));
-	}
-
-	/**
-	 * Formatea el tamaño del archivo en formato legible
-	 * @param bytes - Tamaño en bytes
-	 * @returns Tamaño formateado (ej: "2.4 MB")
-	 */
-	formatFileSize(bytes: number): string {
-		return formatFileSize(bytes);
-	}
-
-	/**
-	 * Obtiene el tipo de archivo basándose en la extensión
-	 * @param fileName - Nombre del archivo
-	 * @returns Tipo de archivo ('pdf', 'doc', 'image', 'video', 'link')
-	 */
-	getFileType(fileName: string): 'pdf' | 'doc' | 'image' | 'video' | 'link' {
-		const kind = classifyFile({ fileName });
-		if (kind === 'pdf' || kind === 'image' || kind === 'video') return kind;
-		if (kind === 'word' || kind === 'excel' || kind === 'ppt') return 'doc';
-		return 'link';
 	}
 }
 // #endregion
