@@ -33,6 +33,21 @@ export interface HorarioProfesorDto {
 	profesorNombreCompleto: string | null;
 	/** Student count. */
 	cantidadEstudiantes: number;
+	/**
+	 * Content progress of this slot. Absent when the slot has no active content
+	 * (shown as «sin contenido», not «0/0»). Only `mis-horarios` and `horario/profesor/{id}` send it.
+	 */
+	contenidoResumen?: ContenidoResumenDto;
+}
+
+/**
+ * Per-slot content summary: weeks with at least one file or task over total weeks.
+ */
+export interface ContenidoResumenDto {
+	/** Total weeks of the slot's content. */
+	numeroSemanas: number;
+	/** Weeks with at least one file or task. */
+	semanasConMaterial: number;
 }
 
 /**
