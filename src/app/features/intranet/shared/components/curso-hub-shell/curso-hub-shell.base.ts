@@ -210,6 +210,14 @@ export abstract class CursoHubShellBase implements OnInit, HasPendingChanges {
 			if (slots.length < 2 || hasValidRequest) return;
 			untracked(() => this.probeContent(slots));
 		});
+
+		// Sin `horarioId` en la URL la franja es flotante (reloj, sondeo de contenido): puede cambiar sola y la
+		// pestaña la descartaría con las ediciones. Al primer cambio sin guardar se fija en la URL.
+		effect(() => {
+			const current = this.slot();
+			if (!current || this.requestedId() !== null || !this.hasUnsavedChanges()) return;
+			untracked(() => this.navigateToSlot(current.id));
+		});
 	}
 
 	ngOnInit(): void {

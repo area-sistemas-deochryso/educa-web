@@ -13,7 +13,8 @@ import {
  * El shell resuelve el par y la franja (query, única con contenido, en curso,
  * siguiente); las pestañas solo la leen. Es un servicio y no un input de ruta
  * porque la franja preseleccionada no vive en la URL: el shell no la escribe
- * para no alterar el deep link del usuario.
+ * para no alterar el deep link del usuario (salvo cuando hay ediciones sin
+ * guardar: entonces la fija para que no flote bajo ellas).
  */
 @Injectable({ providedIn: 'root' })
 export class CursoHubContextService {

@@ -11,6 +11,7 @@ No es un solo mecanismo. Cada camino de pérdida necesita el suyo:
 | Salir de la ruta (menú, atrás, otra ruta, cambio de path-param) | `canDeactivate: [pendingChangesGuard]` | `component.confirmLeave()` |
 | Cerrar o recargar la pestaña del navegador | `@HostListener('window:beforeunload')` | El navegador (texto genérico, no personalizable) |
 | Estado interno que reemplaza lo editado (selector de franja, datepicker) | Llamar al prompt desde el handler | `UnsavedChangesPromptService.confirmProceed()` |
+| Un valor **derivado** que cambia solo (franja resuelta por reloj o por sondeo de contenido, sin `?horarioId=`) | Fijarlo en la URL al primer cambio sucio (`CursoHubShellBase`, `navigateToSlot`) | Nadie: ya no hay cambio que avisar |
 
 `canDeactivate` **no corre** con un cambio solo de query-params ni cuando una ruta hija reemplaza a otra. Por eso el guard va en la ruta que **es dueña de las ediciones**, nunca en las pestañas, y los cambios de query (p. ej. `?horarioId=`) se cubren aparte en el handler que los dispara. `runGuardsAndResolvers: 'paramsOrQueryParamsChange'` no es una salida: re-corre también los `canActivate`/resolvers del padre.
 
@@ -48,5 +49,7 @@ Referencia viva: `CursoHubShellBase` (`@intranet-shared/components`) + `Profesor
 
 ## Límites conocidos
 
-- Cambio de franja por **URL** dentro del mismo par (botón atrás, enlace de «Mi Horario» con otro `horarioId`) no pasa por `canDeactivate` ni por el selector, y `loadForSlot` descarta lo editado sin avisar. No cubierto en el brief 769.
 - El texto de `beforeunload` lo pone el navegador.
+- **Cambio de franja por URL: no es un hueco** (brief 770). Dentro del hub solo el selector cambia `?horarioId=` en el mismo par y ya pregunta; el botón atrás no recorre franjas (`replaceUrl`), las entradas «Mi Horario»/Salones/tarjetas vienen de fuera del hub, y el enlace a otro curso del salón cambia `:cursoId` (path param → `canDeactivate` corre). Las `actionUrl` de notificaciones no apuntan al hub.
+- **El hueco real era la franja flotante**: sin `?horarioId=` la franja se resuelve por reloj (`WalClockService.adjustedNow` es un `computed` que se invalida con cada `Date` de respuesta HTTP) y por sondeo de contenido, y cambiaba sin navegación; `loadForSlot` descartaba lo editado y `hasUnsavedChanges()` dejaba de coincidir. Se cierra fijando la franja en la URL al primer cambio sucio (spec `profesor-curso-hub.floating-slot.spec.ts`). Regla general: **si un valor derivado puede cambiar bajo una edición, no basta con avisar en los handlers; hay que anclarlo**.
+- Sin ediciones la franja sigue flotando a propósito (un hub abierto sigue «la clase en curso»). Un mock plano de `WalClockService` (`adjustedNow: () => x`) oculta esto en los tests; usar el servicio real con `Date` falseado.
