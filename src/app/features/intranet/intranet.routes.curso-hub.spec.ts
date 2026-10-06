@@ -5,7 +5,7 @@ import { Route, Router, provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { describe, expect, it } from 'vitest';
 
-import { viewAsGateGuard } from '@core/guards';
+import { pendingChangesGuard, viewAsGateGuard } from '@core/guards';
 
 import { INTRANET_ROUTES } from './intranet.routes';
 // #endregion
@@ -87,30 +87,51 @@ describe('curso hub routes (P105 D1 F1a)', () => {
 	});
 
 	describe('child tabs (P105 D1 F2)', () => {
+		const HUB_PATHS = {
+			profesor: 'profesor/cursos/:cursoId/:salonId',
+			estudiante: 'estudiante/cursos/:cursoId/:salonId',
+		};
+		const TABS = ['contenido', 'calificaciones', 'asistencia', 'informacion', 'salon'];
 		const childPaths = (path: string) => (findRoute(path)?.children ?? []).map((c) => c.path);
 
-		it('profesor hub has Contenido, Calificaciones and Información as child routes', () => {
-			expect(childPaths('profesor/cursos/:cursoId/:salonId')).toEqual(['', 'contenido', 'calificaciones', 'informacion']);
+		it('profesor hub has the five tabs as child routes, after the default redirect', () => {
+			expect(childPaths(HUB_PATHS.profesor)).toEqual(['', ...TABS]);
 		});
 
-		it('estudiante hub keeps only Contenido until its own tabs land', () => {
-			expect(childPaths('estudiante/cursos/:cursoId/:salonId')).toEqual(['', 'contenido']);
+		it('estudiante hub has the same five tabs as child routes, after the default redirect', () => {
+			expect(childPaths(HUB_PATHS.estudiante)).toEqual(['', ...TABS]);
 		});
 
-		it('every tab inherits authorization: no own permissionPath nor guards', () => {
-			const tabs = (findRoute('profesor/cursos/:cursoId/:salonId')?.children ?? []).filter((c) => c.path);
-			for (const tab of tabs) {
-				expect(tab.data?.['permissionPath']).toBeUndefined();
-				expect(tab.canActivate).toBeUndefined();
-				expect(tab.loadComponent).toBeTypeOf('function');
+		it('redirects the bare hub URL to Contenido in both roles', () => {
+			for (const path of Object.values(HUB_PATHS)) {
+				const index = (findRoute(path)?.children ?? []).find((c) => c.path === '');
+				expect(index?.redirectTo).toBe('contenido');
 			}
 		});
 
-		it('lazy-loads each new tab component', async () => {
-			const children = findRoute('profesor/cursos/:cursoId/:salonId')?.children ?? [];
-			for (const path of ['calificaciones', 'informacion']) {
-				const component = await children.find((c) => c.path === path)?.loadComponent?.();
-				expect(component).toBeTypeOf('function');
+		it('every tab inherits authorization: no own permissionPath nor guards', () => {
+			for (const path of Object.values(HUB_PATHS)) {
+				const tabs = (findRoute(path)?.children ?? []).filter((c) => c.path);
+				for (const tab of tabs) {
+					expect(tab.data?.['permissionPath']).toBeUndefined();
+					expect(tab.canActivate).toBeUndefined();
+					expect(tab.canDeactivate).toBeUndefined();
+					expect(tab.loadComponent).toBeTypeOf('function');
+				}
+			}
+		});
+
+		it('profesor hub asks before leaving with unsaved attendance: the exit guard lives on the parent only', () => {
+			expect(findRoute(HUB_PATHS.profesor)?.canDeactivate).toContain(pendingChangesGuard);
+		});
+
+		it('lazy-loads every tab component', async () => {
+			for (const path of Object.values(HUB_PATHS)) {
+				const children = findRoute(path)?.children ?? [];
+				for (const tab of TABS) {
+					const component = await children.find((c) => c.path === tab)?.loadComponent?.();
+					expect(component, `${path}/${tab}`).toBeTypeOf('function');
+				}
 			}
 		});
 	});

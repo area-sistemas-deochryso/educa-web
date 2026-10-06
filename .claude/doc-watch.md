@@ -43,7 +43,7 @@
 | reference/state-management.md | `src/app/**/*.store.ts`, `src/app/**/*.facade.ts` | Stores, facades, signals, frontera RxJS↔Signals |
 | reference/storage.md | `src/app/core/services/storage/**` | `StorageService`, IndexedDB, SessionStorage, Preferences |
 | reference/unsaved-changes.md | `src/app/core/guards/pending-changes/**`, `src/app/features/intranet/shared/services/unsaved-changes-prompt.service.ts`, `src/app/features/intranet/shared/components/curso-hub-shell/**` | Guard de salida, prompt de cambios sin guardar, `HasPendingChanges` |
-| reference/testing.md | `src/**/*.spec.ts`, `vitest.config.*` | Configuración y convenciones de Vitest |
+| reference/testing.md | `src/**/*.spec.ts`, `vite.config.ts` | Configuración y convenciones de Vitest |
 | rules/business-rules.md | `src/app/core/services/wal/**`, `src/app/core/interceptors/view-as/**`, `src/app/core/guards/view-as/**` | Contratos REST FE↔BE, casing WAL, identidad "ver como" |
 | rules/optimistic-ui.md | `src/app/core/services/wal/**` | Casing lowercase de `WalEntry.endpoint` |
 
