@@ -36,6 +36,7 @@ import { SaludSedeBannerComponent } from '@intranet-shared/components/salud-sede
 import { ConnectionStatusIndicatorComponent } from '@intranet-shared/components/connection-status-indicator/connection-status-indicator.component';
 import { ViewAsBannerComponent } from '@intranet-shared/components/view-as-banner';
 import { SwUpdateBannerComponent } from '@intranet-shared/components/sw-update-banner';
+import { FileViewerComponent } from '@shared/components';
 
 // #endregion
 
@@ -99,6 +100,7 @@ const NAV_GAP = 4;
 		ViewAsBannerComponent,
 		SwUpdateBannerComponent,
 		TestToolsNavLinkComponent,
+		FileViewerComponent,
 	],
 	templateUrl: './intranet-layout.component.html',
 	styleUrl: './intranet-layout.component.scss',

@@ -1,11 +1,11 @@
-import { Component, ChangeDetectionStrategy, input, output, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, output, signal, inject } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
 
 import { SemanaEstudianteArchivosDto, CalificacionConNotasDto } from '@features/intranet/pages/profesor/models';
 import { getNotaSeverity } from '@intranet-shared/services/calificacion-config';
 import type { ConfiguracionCalificacionListDto } from '@data/models';
-import { FileRowComponent, SkeletonLoaderComponent } from '@shared/components';
+import { FileRowComponent, SkeletonLoaderComponent, FileViewerService, ViewableArchivo } from '@shared/components';
 import { EduButton, EduDialog, EduTag, EduTooltip } from '@edu-ui';
 
 @Component({
@@ -17,6 +17,7 @@ import { EduButton, EduDialog, EduTag, EduTooltip } from '@edu-ui';
 	styleUrl: './student-files-dialog.component.scss',
 })
 export class StudentFilesDialogComponent {
+	private readonly viewer = inject(FileViewerService);
 	// #region Inputs/Outputs
 	readonly visible = input<boolean>(false);
 	readonly data = input<SemanaEstudianteArchivosDto[]>([]);
@@ -42,8 +43,8 @@ export class StudentFilesDialogComponent {
 		}
 	}
 
-	openArchivo(url: string): void {
-		window.open(url, '_blank');
+	openArchivo(archivo: ViewableArchivo): void {
+		this.viewer.openArchivo(archivo);
 	}
 
 	onIrACalificaciones(): void {

@@ -86,7 +86,7 @@
 											[name]="archivo.nombreArchivo"
 											[mimeType]="archivo.tipoArchivo"
 											[sizeBytes]="archivo.tamanoBytes"
-											(open)="openArchivo(archivo.urlArchivo)"
+											(open)="openArchivo(archivo)"
 										>
 											<span actions class="file-date">{{ archivo.fechaReg | date: 'dd/MM/yyyy HH:mm' }}</span>
 										</app-file-row>

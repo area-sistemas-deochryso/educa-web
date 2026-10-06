@@ -9,7 +9,7 @@ import type {
 	CursoContenidoArchivoDto,
 	RegistrarArchivoRequest,
 } from '@features/intranet/pages/profesor/models';
-import { validateUploadFile } from '@shared/components';
+import { FileViewerService, validateUploadFile } from '@shared/components';
 import { AttachmentsModalStore, type Attachment } from './attachments-modal.store';
 import {
 	UI_ADMIN_ERROR_DETAILS_DYNAMIC,
@@ -48,6 +48,7 @@ export class AttachmentsModalFacade {
 	private readonly api = inject(ProfesorApiService);
 	private readonly errorHandler = inject(ErrorHandlerService);
 	private readonly wal = inject(WalFacadeHelper);
+	private readonly viewer = inject(FileViewerService);
 	private readonly store = inject(AttachmentsModalStore);
 	private readonly destroyRef = inject(DestroyRef);
 	private readonly errHandler = facadeErrorHandler({
@@ -208,7 +209,7 @@ export class AttachmentsModalFacade {
 	}
 
 	/**
-	 * Open the attachment URL in a new tab and mark it as read.
+	 * Open the attachment (in-app viewer for images/PDF, new tab otherwise) and mark it as read.
 	 * If there is no URL, it logs a message only.
 	 *
 	 * @param attachment Attachment to download.
@@ -220,7 +221,7 @@ export class AttachmentsModalFacade {
 		this.markAttachmentAsRead(attachment.id);
 
 		if (attachment.url) {
-			window.open(attachment.url, '_blank');
+			this.viewer.open({ name: attachment.name, url: attachment.url, mimeType: attachment.mimeType });
 		} else {
 			logger.log('Downloading:', attachment.name);
 		}

@@ -41,7 +41,7 @@ describe('AttachmentsModalComponent', () => {
 		expect(rows()[1].textContent).toContain('5 MB');
 	});
 
-	it('abrir una fila delega en el facade (window.open + marcar leído)', () => {
+	it('abrir una fila delega en el facade (visor + marcar leído)', () => {
 		(rows()[0].querySelector('.file-row__info') as HTMLButtonElement).click();
 		expect(facade.downloadAttachment).toHaveBeenCalledWith(attachments[0]);
 	});

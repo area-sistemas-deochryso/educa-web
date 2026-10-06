@@ -1,3 +1,4 @@
+import { FileViewerService } from '@shared/components';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { CursoContenidoSemanaDto } from '@features/intranet/pages/profesor/models';
@@ -34,10 +35,10 @@ describe('ArchivosSummaryDialogComponent', () => {
 		expect(rowEls()[0].textContent).toContain('guia.pdf');
 	});
 
-	it('(open) de la fila abre la URL en una pestaña nueva', () => {
-		const openSpy = vi.spyOn(window, 'open').mockReturnValue(null);
+	it('(open) delega en el visor compartido con name y url del archivo', () => {
+		const openSpy = vi.spyOn(TestBed.inject(FileViewerService), 'open').mockImplementation(() => undefined);
 		(rowEls()[0].querySelector('.file-row__info') as HTMLButtonElement).click();
-		expect(openSpy).toHaveBeenCalledWith('https://blob/guia.pdf', '_blank');
+		expect(openSpy).toHaveBeenCalledWith(expect.objectContaining({ name: 'guia.pdf', url: 'https://blob/guia.pdf' }));
 	});
 
 	it('ya no expone clasificadores de ícono propios', () => {

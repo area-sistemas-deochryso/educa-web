@@ -8,3 +8,4 @@ export * from './sections';
 export * from './layout';
 export * from './modo-asignacion-badge';
 export * from './file-row';
+export * from './file-viewer';

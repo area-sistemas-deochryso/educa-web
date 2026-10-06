@@ -115,7 +115,7 @@
 															} @else {
 																<div class="content-list">
 																	@for (archivo of semana.archivos; track archivo.id) {
-																		<app-file-row data-info-anchor="estudiante-curso-dialog-archivo-profesor" [name]="archivo.nombreArchivo" [mimeType]="archivo.tipoArchivo" [sizeBytes]="archivo.tamanoBytes" (open)="openArchivo(archivo.urlArchivo)"></app-file-row>
+																		<app-file-row data-info-anchor="estudiante-curso-dialog-archivo-profesor" [name]="archivo.nombreArchivo" [mimeType]="archivo.tipoArchivo" [sizeBytes]="archivo.tamanoBytes" (open)="openArchivo(archivo)"></app-file-row>
 																	}
 																</div>
 															}
@@ -145,7 +145,7 @@
 															} @else {
 																<div class="content-list">
 																	@for (archivo of getMisArchivosSemana(semana.id); track archivo.id) {
-																		<app-file-row data-info-anchor="estudiante-curso-dialog-mi-archivo" [name]="archivo.nombreArchivo" [mimeType]="archivo.tipoArchivo" [sizeBytes]="archivo.tamanoBytes" (open)="openArchivo(archivo.urlArchivo)">
+																		<app-file-row data-info-anchor="estudiante-curso-dialog-mi-archivo" [name]="archivo.nombreArchivo" [mimeType]="archivo.tipoArchivo" [sizeBytes]="archivo.tamanoBytes" (open)="openArchivo(archivo)">
 <span actions><edu-button
 																					icon="pi pi-trash"
 																					[text]="true"
@@ -213,7 +213,7 @@
 																				</div>
 																				<div class="tarea-archivos-list">
 																					@for (archivo of tarea.archivos; track archivo.id) {
-																						<app-file-row data-info-anchor="estudiante-curso-dialog-archivo-profesor" [name]="archivo.nombreArchivo" [mimeType]="archivo.tipoArchivo" [sizeBytes]="archivo.tamanoBytes" [small]="true" (open)="openArchivo(archivo.urlArchivo)"></app-file-row>
+																						<app-file-row data-info-anchor="estudiante-curso-dialog-archivo-profesor" [name]="archivo.nombreArchivo" [mimeType]="archivo.tipoArchivo" [sizeBytes]="archivo.tamanoBytes" [small]="true" (open)="openArchivo(archivo)"></app-file-row>
 																					}
 																				</div>
 																			</div>
@@ -238,7 +238,7 @@
 																			} @else {
 																				<div class="tarea-archivos-list">
 																					@for (archivo of getMisTareaArchivos(tarea.id); track archivo.id) {
-																						<app-file-row data-info-anchor="estudiante-curso-dialog-mi-entrega" [name]="archivo.nombreArchivo" [mimeType]="archivo.tipoArchivo" [sizeBytes]="archivo.tamanoBytes" [small]="true" (open)="openArchivo(archivo.urlArchivo)">
+																						<app-file-row data-info-anchor="estudiante-curso-dialog-mi-entrega" [name]="archivo.nombreArchivo" [mimeType]="archivo.tipoArchivo" [sizeBytes]="archivo.tamanoBytes" [small]="true" (open)="openArchivo(archivo)">
 <span actions><edu-button
 																									icon="pi pi-trash"
 																									[text]="true"

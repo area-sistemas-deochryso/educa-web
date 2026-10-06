@@ -1,3 +1,4 @@
+import { FileViewerService } from '@shared/components';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { EstudianteTareaArchivosGroupDto } from '@features/intranet/pages/profesor/models';
@@ -38,9 +39,9 @@ describe('StudentTaskSubmissionsDialogComponent', () => {
 		expect(rowEls()[0].querySelector('.file-date')?.textContent).toContain('01/10/2026');
 	});
 
-	it('(open) abre la URL en una pestaña nueva', () => {
-		const openSpy = vi.spyOn(window, 'open').mockReturnValue(null);
+	it('(open) delega en el visor compartido con name y url del archivo', () => {
+		const openSpy = vi.spyOn(TestBed.inject(FileViewerService), 'open').mockImplementation(() => undefined);
 		(rowEls()[0].querySelector('.file-row__info') as HTMLButtonElement).click();
-		expect(openSpy).toHaveBeenCalledWith('https://blob/informe.pdf', '_blank');
+		expect(openSpy).toHaveBeenCalledWith(expect.objectContaining({ name: 'informe.pdf', url: 'https://blob/informe.pdf' }));
 	});
 });

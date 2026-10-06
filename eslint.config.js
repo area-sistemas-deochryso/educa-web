@@ -1323,6 +1323,15 @@ module.exports = tseslint.config(
 
 	// #region Excepciones — servicios de infraestructura que necesitan APIs directas
 	{
+		// P105 G F4: el visor in-app embebe el PDF en un <iframe>, que Angular trata como contexto de
+		// resource URL. La URL llega ya validada (solo http/https) por FileViewerService.open/openExternally.
+		// Excepción acotada a este único archivo; cualquier otro uso de bypassSecurityTrust* sigue prohibido.
+		files: ['src/app/shared/components/file-viewer/file-viewer.component.ts'],
+		rules: {
+			'security/no-bypass-security-trust': 'off',
+		},
+	},
+	{
 		files: ['src/app/core/services/storage/**/*.ts'],
 		rules: {
 			'no-restricted-globals': 'off',

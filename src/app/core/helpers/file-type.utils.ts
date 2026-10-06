@@ -93,6 +93,34 @@ export function getFileKindMeta(descriptor: FileDescriptor): FileKindMeta {
 }
 // #endregion
 
+// #region Visor inline
+export type InlineViewKind = 'image' | 'pdf';
+
+/** Espeja `FileUploadConfig.InlineSafeMimeTypes` del BE: lo único que el blob sirve con `Content-Disposition: inline`. */
+const INLINE_IMAGE_MIME = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
+const INLINE_IMAGE_EXTENSION = new Set(['jpg', 'jpeg', 'png', 'webp', 'gif']);
+
+function extensionOf(fileName: string): string {
+	const dot = fileName.lastIndexOf('.');
+	return dot < 0 ? '' : fileName.slice(dot + 1).toLowerCase();
+}
+
+/**
+ * Decide si un archivo se puede mostrar embebido (visor in-app) y con qué elemento.
+ * Imagen: solo jpg/png/webp/gif (SVG queda fuera: puede ejecutar contenido). PDF: siempre.
+ * Cualquier otro tipo devuelve `null` y el llamador cae a abrir/descargar.
+ */
+export function resolveInlineViewKind(descriptor: FileDescriptor): InlineViewKind | null {
+	const kind = classifyFile(descriptor);
+	if (kind === 'pdf') return 'pdf';
+	if (kind !== 'image') return null;
+
+	const mime = descriptor.mimeType?.toLowerCase();
+	if (mime?.startsWith('image/')) return INLINE_IMAGE_MIME.has(mime) ? 'image' : null;
+	return INLINE_IMAGE_EXTENSION.has(extensionOf(descriptor.fileName ?? '')) ? 'image' : null;
+}
+// #endregion
+
 // #region Tamaño
 const SIZE_UNITS = ['B', 'KB', 'MB', 'GB'] as const;
 

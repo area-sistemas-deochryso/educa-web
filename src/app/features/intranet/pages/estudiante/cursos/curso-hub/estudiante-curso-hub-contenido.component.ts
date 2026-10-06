@@ -10,7 +10,7 @@ import {
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ErrorHandlerService } from '@core/services';
-import { FileRowComponent, UPLOAD_ACCEPT, UPLOAD_LIMITS, validateUploadFile } from '@shared/components';
+import { FileRowComponent, UPLOAD_ACCEPT, UPLOAD_LIMITS, validateUploadFile, FileViewerService, ViewableArchivo } from '@shared/components';
 import { CursoHubContextService, EmptyStateComponent } from '@intranet-shared/components';
 import { EstudianteCursosFacade } from '@features/intranet/pages/estudiante/services/estudiante-cursos.facade';
 import type { EstudianteArchivoDto, EstudianteTareaArchivoDto } from '@features/intranet/pages/estudiante/models';
@@ -60,6 +60,7 @@ import {
 	styleUrl: './curso-hub-content.scss',
 })
 export class EstudianteCursoHubContenidoComponent {
+	private readonly viewer = inject(FileViewerService);
 	// #region Dependencias
 	private readonly hubContext = inject(CursoHubContextService);
 	private readonly facade = inject(EstudianteCursosFacade);
@@ -161,8 +162,8 @@ export class EstudianteCursoHubContenidoComponent {
 		return this.vm().misTareaArchivos[tareaId] ?? [];
 	}
 
-	protected openArchivo(url: string): void {
-		window.open(url, '_blank');
+	protected openArchivo(archivo: ViewableArchivo): void {
+		this.viewer.openArchivo(archivo);
 	}
 
 	private confirmDelete(nombreArchivo: string, accept: () => void): void {

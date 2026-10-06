@@ -1,7 +1,7 @@
-import { Component, ChangeDetectionStrategy, input, output, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, output, computed, inject } from '@angular/core';
 
 import { CursoContenidoSemanaDto } from '@features/intranet/pages/profesor/models';
-import { FileRowComponent } from '@shared/components';
+import { FileRowComponent, FileViewerService, ViewableArchivo } from '@shared/components';
 import { EduDialog } from '@edu-ui';
 
 @Component({
@@ -13,6 +13,7 @@ import { EduDialog } from '@edu-ui';
 	styleUrl: './archivos-summary-dialog.component.scss',
 })
 export class ArchivosSummaryDialogComponent {
+	private readonly viewer = inject(FileViewerService);
 	readonly visible = input<boolean>(false);
 	readonly semanas = input<CursoContenidoSemanaDto[]>([]);
 	readonly visibleChange = output<boolean>();
@@ -25,7 +26,7 @@ export class ArchivosSummaryDialogComponent {
 		}
 	}
 
-	openArchivo(url: string): void {
-		window.open(url, '_blank');
+	openArchivo(archivo: ViewableArchivo): void {
+		this.viewer.openArchivo(archivo);
 	}
 }

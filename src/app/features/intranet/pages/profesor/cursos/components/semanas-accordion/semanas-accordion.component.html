@@ -129,7 +129,7 @@
 												[name]="archivo.nombreArchivo"
 												[mimeType]="archivo.tipoArchivo"
 												[sizeBytes]="archivo.tamanoBytes"
-												(open)="openArchivo(archivo.urlArchivo)"
+												(open)="openArchivo(archivo)"
 											>
 												<span actions>
 													<edu-button
@@ -271,7 +271,7 @@
 																[mimeType]="archivo.tipoArchivo"
 																[sizeBytes]="archivo.tamanoBytes"
 																[small]="true"
-																(open)="openArchivo(archivo.urlArchivo)"
+																(open)="openArchivo(archivo)"
 															>
 																<span actions>
 																	<edu-button

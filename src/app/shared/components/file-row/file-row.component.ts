@@ -4,7 +4,7 @@ import { getFileKindMeta, formatFileSize } from '@core/helpers';
 
 /**
  * Fila de archivo compartida: ícono por tipo, nombre truncado con tooltip, tamaño y slot de acciones.
- * `(open)` es el gancho para abrir/previsualizar; el consumidor decide qué hace (hoy `window.open`, F4 visor).
+ * `(open)` es el gancho para abrir/previsualizar; el consumidor decide qué hace (hoy delega en `FileViewerService`).
  */
 @Component({
 	selector: 'app-file-row',

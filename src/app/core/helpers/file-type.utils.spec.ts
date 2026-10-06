@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { classifyFile, formatFileSize, getFileKindMeta } from './file-type.utils';
+import { classifyFile, formatFileSize, getFileKindMeta, resolveInlineViewKind } from './file-type.utils';
 
 describe('classifyFile', () => {
 	it.each([
@@ -56,5 +56,33 @@ describe('formatFileSize', () => {
 		[3 * 1024 ** 3, '3 GB'],
 	])('%s → %s', (bytes, label) => {
 		expect(formatFileSize(bytes)).toBe(label);
+	});
+});
+
+describe('resolveInlineViewKind', () => {
+	it.each([
+		[{ mimeType: 'application/pdf' }, 'pdf'],
+		[{ fileName: 'guia.PDF' }, 'pdf'],
+		[{ mimeType: 'image/jpeg' }, 'image'],
+		[{ mimeType: 'image/png', fileName: 'x.png' }, 'image'],
+		[{ mimeType: 'image/webp' }, 'image'],
+		[{ mimeType: 'image/gif' }, 'image'],
+		[{ fileName: 'foto.JPG' }, 'image'],
+		[{ mimeType: 'application/octet-stream', fileName: 'foto.png' }, 'image'],
+	])('%j → %s', (descriptor, expected) => {
+		expect(resolveInlineViewKind(descriptor)).toBe(expected);
+	});
+
+	it.each([
+		[{ mimeType: 'image/svg+xml' }],
+		[{ fileName: 'logo.svg' }],
+		[{ mimeType: 'image/svg+xml', fileName: 'logo.png' }],
+		[{ mimeType: 'image/bmp' }],
+		[{ fileName: 'informe.docx' }],
+		[{ mimeType: 'application/zip' }],
+		[{ mimeType: 'video/mp4' }],
+		[{}],
+	])('%j → null (cae a abrir/descargar)', (descriptor) => {
+		expect(resolveInlineViewKind(descriptor)).toBeNull();
 	});
 });

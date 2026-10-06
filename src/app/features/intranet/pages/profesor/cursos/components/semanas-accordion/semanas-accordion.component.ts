@@ -6,7 +6,7 @@ import { CursoContenidoCrudFacade } from '../../services/curso-contenido-crud.fa
 import { CursoContenidoUiFacade } from '../../services/curso-contenido-ui.facade';
 import { CursoContenidoSemanaDto, CursoContenidoTareaDto } from '@features/intranet/pages/profesor/models';
 import { ErrorHandlerService } from '@core/services';
-import { FileRowComponent, UPLOAD_ACCEPT, UPLOAD_LIMITS, validateUploadFile } from '@shared/components';
+import { FileRowComponent, UPLOAD_ACCEPT, UPLOAD_LIMITS, validateUploadFile, FileViewerService, ViewableArchivo } from '@shared/components';
 import { EduAccordion, EduAccordionHeader, EduAccordionPanel, EduButton, EduConfirmationService, EduFileUpload, type EduFileUploadSelectEvent, EduTooltip } from '@edu-ui';
 @Component({
 	selector: 'app-semanas-accordion',
@@ -17,6 +17,7 @@ import { EduAccordion, EduAccordionHeader, EduAccordionPanel, EduButton, EduConf
 	styleUrl: './semanas-accordion.component.scss',
 })
 export class SemanasAccordionComponent {
+	private readonly viewer = inject(FileViewerService);
 	// #region Dependencias
 	private readonly dataFacade = inject(CursoContenidoDataFacade);
 	private readonly crudFacade = inject(CursoContenidoCrudFacade);
@@ -105,8 +106,8 @@ export class SemanasAccordionComponent {
 		});
 	}
 
-	openArchivo(url: string): void {
-		window.open(url, '_blank');
+	openArchivo(archivo: ViewableArchivo): void {
+		this.viewer.openArchivo(archivo);
 	}
 	// #endregion
 

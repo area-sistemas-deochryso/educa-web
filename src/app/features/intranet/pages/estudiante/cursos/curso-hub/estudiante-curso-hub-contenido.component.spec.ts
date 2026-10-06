@@ -4,6 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ErrorHandlerService } from '@core/services';
+import { FileViewerService } from '@shared/components';
 import { CursoHubContextService } from '@intranet-shared/components';
 import { EstudianteCursosFacade } from '@features/intranet/pages/estudiante/services/estudiante-cursos.facade';
 import { EstudianteCursoHubContenidoComponent } from './estudiante-curso-hub-contenido.component';
@@ -56,6 +57,7 @@ describe('EstudianteCursoHubContenidoComponent', () => {
 		filteredSemanas: () => typeof SEMANAS;
 		onAccordionChangeStr(values: string[]): void;
 		onRefreshContenido(): void;
+		openArchivo(archivo: { nombreArchivo: string; urlArchivo: string; tipoArchivo: string | null }): void;
 	}
 
 	function create() {
@@ -99,6 +101,17 @@ describe('EstudianteCursoHubContenidoComponent', () => {
 			fixture.detectChanges();
 
 			expect(component.searchQuery()).toBe('');
+		});
+	});
+
+	describe('archivos', () => {
+		it('openArchivo delega en el visor compartido con name, url y mimeType', () => {
+			const openSpy = vi.spyOn(TestBed.inject(FileViewerService), 'open').mockImplementation(() => undefined);
+			const { component } = create();
+
+			component.openArchivo({ nombreArchivo: 'guia.pdf', urlArchivo: 'https://blob/guia.pdf', tipoArchivo: 'application/pdf' });
+
+			expect(openSpy).toHaveBeenCalledWith({ name: 'guia.pdf', url: 'https://blob/guia.pdf', mimeType: 'application/pdf' });
 		});
 	});
 

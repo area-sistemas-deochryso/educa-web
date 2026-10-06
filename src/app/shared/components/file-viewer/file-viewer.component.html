@@ -1,0 +1,26 @@
+<edu-dialog
+	[visible]="visible()"
+	(visibleChange)="onVisibleChange($event)"
+	[header]="file()?.name ?? 'Archivo'"
+	[dismissableMask]="true"
+	styleClass="file-viewer-dialog"
+	[style]="{ width: 'min(94vw, 980px)' }"
+	[contentStyle]="{ padding: '0' }"
+>
+	@if (file(); as current) {
+		<div class="file-viewer__body">
+			@if (current.kind === 'image') {
+				@if (imageFailed()) {
+					<p class="file-viewer__error">No se pudo mostrar la imagen. Probá abrirla en una pestaña nueva.</p>
+				} @else {
+					<img class="file-viewer__image" [src]="current.url" [alt]="current.name" (error)="imageFailed.set(true)" />
+				}
+			} @else {
+				<iframe class="file-viewer__frame" [src]="frameUrl()" [title]="current.name"></iframe>
+			}
+		</div>
+	}
+	<ng-template #footer>
+		<edu-button label="Abrir en pestaña" icon="pi pi-external-link" [text]="true" size="small" (click)="openExternally()" />
+	</ng-template>
+</edu-dialog>

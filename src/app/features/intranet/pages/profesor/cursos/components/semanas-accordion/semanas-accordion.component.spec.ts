@@ -1,3 +1,4 @@
+import { FileViewerService } from '@shared/components';
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -65,10 +66,10 @@ describe('SemanasAccordionComponent', () => {
 		expect(el().querySelectorAll('edu-file-upload').length).toBe(2);
 	});
 
-	it('(open) de una fila abre la URL en una pestaña nueva', () => {
-		const openSpy = vi.spyOn(window, 'open').mockReturnValue(null);
+	it('(open) delega en el visor compartido con name y url del archivo', () => {
+		const openSpy = vi.spyOn(TestBed.inject(FileViewerService), 'open').mockImplementation(() => undefined);
 		(el().querySelector('app-file-row .file-row__info') as HTMLButtonElement).click();
-		expect(openSpy).toHaveBeenCalledWith('https://blob/guia.pdf', '_blank');
+		expect(openSpy).toHaveBeenCalledWith(expect.objectContaining({ name: 'guia.pdf', url: 'https://blob/guia.pdf' }));
 	});
 
 	it('rechaza un tipo de archivo no permitido y avisa', () => {
