@@ -56,8 +56,8 @@ export class AttendanceRegistrationPanelComponent {
 	selectedDate: Date = new Date();
 	private lastAppliedInitialFecha: string | null = null;
 	private lastAppliedResetKey = 0;
-	/** true solo mientras `selectedDate` sea la fecha atípica que el profesor confirmó explícitamente. */
-	readonly confirmadoFechaAtipica = signal(false);
+	/** Fecha ("yyyy-mm-dd") para la que el profesor confirmó explícitamente la excepción; null si no confirmó ninguna. */
+	private readonly confirmedFor = signal<string | null>(null);
 	// #endregion
 
 	constructor() {
@@ -76,7 +76,6 @@ export class AttendanceRegistrationPanelComponent {
 
 	// #region Computed
 	readonly hasEstudiantes = computed(() => this.estudiantes().length > 0);
-	readonly puedeGuardar = computed(() => !this.fechaFueraDeHorario() || this.confirmadoFechaAtipica());
 	/** true solo cuando el backend confirmó explícitamente que no hay registro guardado (evita falso positivo si el flag no llegó). */
 	readonly esListaSinGuardar = computed(() => this.tieneRegistros() === false);
 	// #endregion
@@ -90,7 +89,6 @@ export class AttendanceRegistrationPanelComponent {
 
 	// #region Handlers
 	onDateSelect(): void {
-		this.confirmadoFechaAtipica.set(false);
 		const fecha = this.formatDate(this.selectedDate);
 		this.fechaChange.emit(fecha);
 	}
@@ -106,6 +104,16 @@ export class AttendanceRegistrationPanelComponent {
 	onSave(): void {
 		if (!this.puedeGuardar()) return;
 		this.save.emit();
+	}
+
+	/** true solo mientras `selectedDate` sea la fecha atípica confirmada: volver a ella restituye la confirmación, otra fecha no la hereda. */
+	confirmadoFechaAtipica(): boolean {
+		return this.confirmedFor() === this.formatDate(this.selectedDate);
+	}
+
+	/** `selectedDate` no es un signal, por eso se deriva en cada lectura en vez de cachearse en un `computed`. */
+	puedeGuardar(): boolean {
+		return !this.fechaFueraDeHorario() || this.confirmadoFechaAtipica();
 	}
 
 	/** Advertencia no-bloqueante: la fecha elegida no cae en el día de horario del curso. */
@@ -125,13 +133,14 @@ export class AttendanceRegistrationPanelComponent {
 
 	/** Pide confirmación explícita para guardar en una fecha fuera del día de horario (ej. clase de recuperación). */
 	confirmarFechaAtipica(): void {
+		const fecha = this.formatDate(this.selectedDate);
 		this.confirmationService.confirm({
 			message:
 				'La fecha elegida no corresponde al día de horario del curso. ¿Confirmás que es una clase de recuperación u otra excepción válida?',
 			header: 'Confirmar fecha atípica',
 			acceptLabel: 'Sí, guardar igual',
 			rejectLabel: 'Cancelar',
-			accept: () => this.confirmadoFechaAtipica.set(true),
+			accept: () => this.confirmedFor.set(fecha),
 		});
 	}
 	// #endregion

@@ -115,4 +115,4 @@ Pedir feedback con `/feedback`.
 - **Portar a `educa-libs`**: `EduConfirmation.alternate*` y `dismiss` se añadieron a la copia vendorizada `shared/edu-ui`. Un re-sync desde `educa-libs` los pisa y rompe `UnsavedChangesPromptService`.
 - **Cambio de franja por URL** dentro del mismo par (botón atrás / enlace de «Mi Horario» con otro `horarioId`): `loadForSlot` descarta lo editado sin avisar. `canDeactivate` no corre con cambio solo de query.
 - **Spec de rutas desactualizado** (`intranet.routes.curso-hub.spec.ts`, 2 tests) — ya roto en `main`.
-- Al volver a la fecha vieja tras «Quedarme», el panel pierde la confirmación de fecha atípica ya dada (`onDateSelect` la resetea antes de emitir). Menor.
+- Al volver a la fecha vieja tras «Quedarme», el panel pierde la confirmación de fecha atípica ya dada (`onDateSelect` la resetea antes de emitir). Menor. **Resuelto en el brief 771** (`confirmedFor` por fecha).
