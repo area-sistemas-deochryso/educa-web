@@ -20,10 +20,10 @@
 | Backlog | Límite | Tipo | Edad crítica |
 |---|---:|---|---|
 | `chats/running/` | **1** | **duro** | — |
-| `chats/open/` | 5 | blando | >30d |
+| `chats/open/` | **sin límite** | — | >30d |
 | `chats/waiting/` | 3 | blando | >14d |
 | `chats/troubles/` | 2 | blando | >7d |
-| `chats/awaiting-prod/` | 20 (soft) · 25 (hard) | mixto | >14d |
+| `chats/awaiting-prod/` | **sin límite** | — | >14d |
 | `tasks/` | 8 | blando | >60d |
 | `plan/maestro.md` cola (top-3) | 12 | blando | — |
 
@@ -35,18 +35,20 @@ Dos chats activos en repos distintos (FE + BE) trabajando en piezas independient
 
 Briefs cerrados localmente (commit hecho, validación local pasó) que esperan **confirmación post-deploy del usuario**: smoke test browser, query SQL en prod, validación del jefe, telemetría observada, etc. Salen del bucket vía [`/verify <NNN>`](../commands/verify.md) — `✅` mueve a `closed/`, `❌ rollback` mueve a `running/` con motivo registrado.
 
-**Razón de los límites (soft=20, hard=25) y edad crítica (14d)**: validar un deploy debería tomar minutos a días, no semanas. Si un brief lleva >14d sin verificarse:
+**Sin tope de cantidad (decisión del usuario, 2026-10-06)**: `open/` y `awaiting-prod/` ya no tienen límite blando ni duro. Antes `awaiting-prod/` tenía soft=20 / hard=25 (el hard frenaba `/end`) y `open/` tenía soft=5. `/end` ya **no** se frena por el tamaño de `awaiting-prod/` y `/next-chat` ya **no** se frena por el de `open/`.
+
+Se conserva la **edad crítica** como única señal de higiene de estos dos buckets (`awaiting-prod/` >14d, `open/` >30d): validar un deploy debería tomar minutos a días, no semanas. Si un brief lleva >14d sin verificarse:
 
 - El deploy nunca ocurrió (mover a `waiting/` — bloqueo externo real).
 - El deploy ocurrió pero se olvidó verificar (forzar `/verify <NNN>` confirmando ✅ o detectar el bug).
 
-El soft (20) absorbe ventanas largas sin permiso de deploy (ej: viernes→lunes, freeze pre-release) avisando con `/triage`. El hard (25) frena `/end` para forzar verify antes de seguir cerrando local — el desdoble preserva flexibilidad de cierre sin permitir que el bucket crezca sin techo.
+La excepción documentada para fases de audit deliberadamente pesadas (briefs de `open/` por encima del soft cap) deja de ser necesaria: ya no hay cap que superar.
 
 ## Comandos que enforzan
 
 | Comando | Qué valida |
 |---|---|
-| [`/next-chat`](../commands/next-chat.md) | `open/` ≤ 5, items viejos en `waiting/troubles/` |
+| [`/next-chat`](../commands/next-chat.md) | items viejos en `waiting/troubles/` (`open/` sin límite) |
 | [`/start-chat`](../commands/start-chat.md) | `running/` = 0 (gate duro) |
 | [`/end`](../commands/end.md) | cola maestro ≤ 12 al cerrar; pregunta gate post-deploy |
 | [`/verify`](../commands/verify.md) | brief existe en `awaiting-prod/` |
@@ -55,4 +57,4 @@ El soft (20) absorbe ventanas largas sin permiso de deploy (ej: viernes→lunes,
 
 ## Razón de los números
 
-educa-web maneja **más planes en paralelo** que un repo single-plan típico (multi-plan, multi-repo FE+BE), por eso `open/` y la cola son más altos que en otros proyectos.
+educa-web maneja **más planes en paralelo** que un repo single-plan típico (multi-plan, multi-repo FE+BE), por eso la cola es más alta que en otros proyectos y `open/` y `awaiting-prod/` no tienen tope.

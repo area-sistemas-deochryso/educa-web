@@ -227,20 +227,9 @@ case "$cmd" in
 
     running_count="$(find "$chats_dir/running" -maxdepth 1 -name '*.md' -type f 2>/dev/null | wc -l | tr -d ' ')"
     open_count="$(find "$chats_dir/open" -maxdepth 1 -name '*.md' -type f 2>/dev/null | wc -l | tr -d ' ')"
-    aprod_count="$(find "$chats_dir/awaiting-prod" -maxdepth 1 -name '*.md' -type f 2>/dev/null | wc -l | tr -d ' ')"
 
     if [ "$running_count" -eq 0 ] && [ "$open_count" -gt 0 ]; then
       issues="${issues}- **[idle]** running/ vacío con $open_count brief(s) en open/ — sugerir \`/start-chat\`.\n"
-      drift_count=$((drift_count + 1))
-    fi
-
-    if [ "$aprod_count" -ge 20 ]; then
-      issues="${issues}- **[bucket-pressure]** awaiting-prod/ = $aprod_count (soft=20, hard=25) — priorizar \`/verify\`.\n"
-      drift_count=$((drift_count + 1))
-    fi
-
-    if [ "$open_count" -gt 5 ]; then
-      issues="${issues}- **[bucket-pressure]** open/ = $open_count (soft=5) — considerar \`/triage\`.\n"
       drift_count=$((drift_count + 1))
     fi
 

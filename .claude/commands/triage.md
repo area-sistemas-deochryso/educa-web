@@ -7,10 +7,10 @@
 | Bucket | Límite | Tipo | Edad crítica |
 | --- | ---: | --- | --- |
 | `chats/running/` | 1 | duro | — |
-| `chats/open/` | 5 | blando | >30d |
+| `chats/open/` | sin límite | — | >30d |
 | `chats/waiting/` | 3 | blando | >14d |
 | `chats/troubles/` | 2 | blando | >7d |
-| `chats/awaiting-prod/` | 8 | blando | >14d |
+| `chats/awaiting-prod/` | sin límite | — | >14d |
 | `tasks/` | 8 | blando | >60d |
 | `plan/maestro.md` cola | 12 | blando | — |
 
@@ -24,10 +24,10 @@ Definidos en [rules/backlog-hygiene.md](../rules/backlog-hygiene.md).
 ### chats/running/ (N / 1 duro) — ESTADO
 (lista vacía si no hay, o item actual con días desde Creado)
 
-### chats/open/ (N / 5 blando) — ESTADO
+### chats/open/ (N, sin límite, crítico >30d) — ESTADO
 - `038-plan-31-chat-2-be-bounce-parser-imap-job.md` — 5d — OK
 - `052-plan-30b-fe-entradas-con-correo-tab.md` — 0d — OK
-- (si hay >5, marcar EXCEDIDO y listar acción)
+- (si >30d, marcar VIEJO y listar acción)
 
 ### chats/waiting/ (N / 3 blando, crítico >14d)
 ...
@@ -35,7 +35,7 @@ Definidos en [rules/backlog-hygiene.md](../rules/backlog-hygiene.md).
 ### chats/troubles/ (N / 2 blando, crítico >7d)
 ...
 
-### chats/awaiting-prod/ (N / 8 blando, crítico >14d)
+### chats/awaiting-prod/ (N, sin límite, crítico >14d)
 - `045-plan-32-chat-4-fe-correlation-hub-pill-wiring.md` — 2d en bucket — OK
 - (si >14d, marcar VIEJO con acción: forzar `/verify` o investigar por qué no hubo deploy)
 

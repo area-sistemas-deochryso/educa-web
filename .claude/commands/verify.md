@@ -4,7 +4,7 @@
 
 **Principio**: `/end` y `/verify` son **dos cierres distintos**. `/end` cierra el trabajo local (commit + validación local). `/verify` cierra la **realidad de producción** (smoke test browser, query SQL, validación del jefe, telemetría observada).
 
-> Sin este comando, el bucket `awaiting-prod/` crece sin límite y la única señal de que algo se verificó vive en la cabeza del usuario. `/verify` lo deja en el archivo y en git history.
+> Sin este comando, el bucket `awaiting-prod/` (que no tiene tope) solo acumula y la única señal de que algo se verificó vive en la cabeza del usuario. `/verify` lo deja en el archivo y en git history.
 
 ## Cuándo se invoca
 
@@ -109,7 +109,7 @@ La razón se preserva en git history y en el brief — futuros chats la leen par
 
 ## Relación con backlog-hygiene
 
-- Bucket `awaiting-prod/` tiene **límite blando 8** y **edad crítica 14d**.
+- Bucket `awaiting-prod/` **no tiene tope de cantidad** (decisión 2026-10-06) y conserva la **edad crítica 14d**.
 - Si un brief lleva >14d en el bucket, `/triage` lo marca como `VIEJO` y sugiere:
   - El deploy nunca ocurrió → mover a `waiting/` (bloqueo externo).
   - El deploy ocurrió pero no se acuerda si verificó → forzar verificación o asumir ✅ y `/verify` directo.

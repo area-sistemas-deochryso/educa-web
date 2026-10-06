@@ -78,7 +78,10 @@ check_bucket() {
   local label="$1" dir="$2" limit="$3" age="$4" kind="$5" hard="${6:-}"
   local count status
   count=$(count_md "$dir")
-  if [[ -n "$hard" ]] && (( count > hard )); then
+  if [[ "$limit" == "-" ]]; then
+    # Bucket sin tope de cantidad: solo cuenta la edad critica (abajo).
+    status="$count (sin limite)"
+  elif [[ -n "$hard" ]] && (( count > hard )); then
     status="EXCEDIDO HARD ($count/$hard)"
     WARNINGS+=("$label en $count supera limite hard $hard - frenar /end")
   elif (( count > limit )); then
@@ -140,10 +143,10 @@ last_shipped() {
 }
 
 check_bucket "running/"        "$CLAUDE/chats/running"        1 "-"  "duro"
-check_bucket "open/"           "$CLAUDE/chats/open"           5 30   "blando"
+check_bucket "open/"           "$CLAUDE/chats/open"           - 30   "sin limite"
 check_bucket "waiting/"        "$CLAUDE/chats/waiting"        3 14   "blando"
 check_bucket "troubles/"       "$CLAUDE/chats/troubles"       2 7    "blando"
-check_bucket "awaiting-prod/"  "$CLAUDE/chats/awaiting-prod"  20 14  "mixto" 25
+check_bucket "awaiting-prod/"  "$CLAUDE/chats/awaiting-prod"  - 14  "sin limite"
 check_bucket "tasks/"          "$CLAUDE/tasks"                8 60   "blando"
 
 cola=$(cola_count)
