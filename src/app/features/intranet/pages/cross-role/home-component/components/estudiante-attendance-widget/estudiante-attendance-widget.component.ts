@@ -39,7 +39,7 @@ export class EstudianteAttendanceWidgetComponent implements OnInit {
 	// #region Computed
 	readonly estadoHoy = computed<EstadoAsistenciaCurso | null>(() => {
 		const hoy = formatDateISO(new Date());
-		return this.resumen()?.detalle.find((d) => d.fecha === hoy)?.estado ?? null;
+		return this.resumen()?.detalle.find((d) => d.fecha.slice(0, 10) === hoy)?.estado ?? null;
 	});
 
 	readonly hasDataHoy = computed(() => this.estadoHoy() !== null);

@@ -2,6 +2,7 @@
 
 > **Repo destino**: `educa-web` (frontend, branch `main`). Abrir el chat nuevo en este repo.
 > **Origen**: pasada de verificación local 2026-10-07 (brief 754) · BBDD de prueba, sesión real de estudiante.
+> **Validación prod**: ⏳ pendiente desde 2026-10-07 (smoke local con sesión de estudiante; depende del brief 778 BE)
 > **Created**: 2026-10-07
 > **MODO SUGERIDO**: `/execute` (arreglo pequeño; `/investigate` corto si se quiere confirmar el contrato)
 > **exclusive**: `false` · **modules**: `home`, `estudiante`
@@ -26,6 +27,6 @@ Prueba: con la respuesta real interceptada (Biología, 11/08/2026, estado `J`) e
 
 ## Criterios de cierre
 
-- [ ] Con `fecha: "…T00:00:00"` del BE, el widget muestra el estado de hoy.
-- [ ] Spec nuevo verde; lint y build verdes.
+- [x] Con `fecha: "…T00:00:00"` del BE, el widget muestra el estado de hoy.
+- [x] Spec nuevo verde; lint y build verdes.
 - [ ] Smoke local con sesión de estudiante y asistencia de hoy (requiere poder guardar asistencia: ver brief 778 del BE; hasta entonces, probar con la respuesta interceptada).
