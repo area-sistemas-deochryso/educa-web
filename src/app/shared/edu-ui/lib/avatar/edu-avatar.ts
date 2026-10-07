@@ -17,7 +17,6 @@ export type EduAvatarVariant = 'neutral' | 'brand';
 			[class.edu-avatar--xl]="size() === 'xlarge'"
 			[class.edu-avatar--circle]="shape() === 'circle'"
 			[attr.data-variant]="variant()"
-			[attr.data-rol-severity]="rolAccent()?.severity"
 		>
 			@if (icon()) {
 				<i [class]="icon()"></i>
@@ -41,7 +40,7 @@ export class EduAvatar {
 	readonly size = input<EduAvatarSize>('normal');
 	readonly shape = input<EduAvatarShape>('square');
 	readonly variant = input<EduAvatarVariant>('neutral');
-	/** Nombre del rol: añade borde de color + ícono-insignia. El relleno no se toca (reservado al color de curso). */
+	/** Nombre del rol: añade un ícono-insignia de color según el rol. El relleno no se toca (reservado al color de curso). */
 	readonly rol = input<string | null>();
 	protected readonly rolAccent = computed(() => getAvatarRolAccent(this.rol()));
 }

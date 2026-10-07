@@ -48,17 +48,13 @@
 	}
 }
 
-// Acento de rol: borde + insignia con ícono (doble señal: no depende solo del color).
+// Acento de rol: insignia con ícono (la forma del ícono, no solo el color, identifica el rol).
 $rol-severities: (
 	success: green,
 	warn: orange,
 	danger: red,
 	info: sky,
 );
-
-.edu-avatar[data-rol-severity] {
-	border: 2px solid var(--edu-avatar-rol-color);
-}
 
 .edu-avatar__rol-badge {
 	position: absolute;

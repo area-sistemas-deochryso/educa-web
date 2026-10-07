@@ -65,3 +65,7 @@
 - Registrar decisiones borde+ícono y Director=Administrador en el plan P105 (`educa-coord`, cross-repo).
 - `attendance-persona-day-list`: `tipoPersona` A/C/M/D/N quedan sin rol (neutro) hasta confirmar qué roles son.
 - Límite del criterio B: 1 apellido + 2 nombres ("Perez Juan Carlos") da "PC".
+
+## AJUSTE POST-CIERRE (2026-10-07)
+
+Por pedido del usuario se **quitó el borde de color** del avatar; el acento de rol queda solo como insignia con ícono (esquina inferior derecha). Al verificar en prod no buscar el aro de color.
