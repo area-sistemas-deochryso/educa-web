@@ -23,4 +23,4 @@ El 742 dejó `extractErrorMessage` leyendo `detail` primero, pero mantuvo `err.m
 - Migrados a `extractBackendMessage(err) ?? fallback`: `attachments-modal.facade`, `user-info-dialog`, `ctest-k6.facade`. Nota: para errores no-HTTP (`Error`, string) estos 3 ahora muestran su fallback en vez de `Error.message`.
 - Tests: `error.utils.spec.ts` actualizado (+4), `error-policy.spec.ts` nuevo (3). Suite 2737/0, lint 0 errores, build OK.
 
-> **Validación prod**: ⏳ pendiente desde 2026-09-30 — provocar un error HTTP sin `detail` (ej. 500 sin cuerpo) en un facade y confirmar que el toast muestra "No se pudo …" y no "Http failure response for …"; idem en cambio de contraseña (user-info-dialog).
+> **Validación prod**: ✅ verificada 2026-10-07 — local (BBDD TEST): 404 sin cuerpo muestra «No se pudieron cargar los datos» (simulado reescribiendo la URL).

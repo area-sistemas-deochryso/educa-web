@@ -73,7 +73,7 @@ Notas de entorno (de 748): la ventana de Chrome debe estar **visible**; con la v
 
 ## RESULTADO (cierre 2026-10-02)
 
-> **Validación prod**: ⏳ pendiente desde 2026-10-02
+> **Validación prod**: ✅ cerrado 2026-10-07 como obsoleto — el hub de curso (P105 D1) reemplazó los diálogos de pestañas; verificación del lado estudiante en vivo ya hecha.
 
 - Opción (a): `edu-tab` directos en `edu-tabs`; "Ver salón"/"Ver asistencia" en `.tabs-header-links`, hermano posicionado sobre la fila de pestañas (≥601px) y fila propia arriba (≤600px).
 - Tests: guardrail `shared/edu-tabs-template-guard.spec.ts` (falla con el código viejo) + render spec del diálogo estudiante. Suite completa 283 archivos verdes, lint y build OK.

@@ -16,5 +16,5 @@ El BE emite `ProblemDetails` RFC 7807 para todo 4xx/5xx (INV-PD01; INV-PD03 cerr
 
 Contrato: `educa-coord/contracts/api-protocol.md` (actualizado) y `invariants/problem-details.md`.
 
-> **Validación prod**: ⏳ pendiente desde 2026-09-30 — login con credenciales incorrectas debe mostrar el `detail` del BE (no el texto genérico).
+> **Validación prod**: ✅ verificada 2026-10-07 — local (BBDD TEST): login incorrecto muestra el detail del BE.
 > **Derivado**: [743](../open/743-fe-error-policy-resolvemessage-fallback-inalcanzable.md)

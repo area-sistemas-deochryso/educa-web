@@ -52,7 +52,7 @@ Medido en BBDD TEST (solo lectura, 2026-10-01): 48 cursos totales. Cursos distin
 
 ## Cierre (2026-10-02)
 
-> **Validación prod**: ⏳ pendiente desde 2026-10-02 — verificación en vivo (local, BBDD de prueba, ≥9 cursos a la vez, ambos temas) sin hacer; sugerida en Salones estudiante.
+> **Validación prod**: ✅ verificada 2026-10-07 — local (BBDD TEST): 9 cursos con 9 colores, contraste ≥4.93:1; tema oscuro dado por bueno por el usuario (verificado analíticamente).
 > **Commit**: `d7985738` en la branch `chat/750-fe-p105-h-color-curso-f2` (worktree `EducaWeb/WT/educa-web/750-fe-p105-h-color-curso-f2`), **sin mergear** → `/wt-merge`.
 
 **Decisión sobre el 7.8°**: 3 bandas de luminosidad (0.40/0.47/0.54, por `cursoId % 3`). Peor ΔE OKLab entre 20 cursos consecutivos: 0.024 → 0.045 (test nuevo en `curso-colors.spec.ts`). Contraste mínimo vs blanco 4.81:1 en ambos temas. La banda clara no puede pasar de 0.54: a 0.55 baja a 4.61 y a 0.57 a 4.23. Una primera cifra de 0.074 era sin recorte de gamut ni contraste; no vale.
