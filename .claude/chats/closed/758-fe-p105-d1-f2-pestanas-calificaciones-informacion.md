@@ -1,6 +1,7 @@
 # 758 — FE: P105 D1 F2 — Pestañas Calificaciones e Información del hub (profesor y estudiante)
 
 > **Repo destino**: `educa-web` (frontend, branch `main`). Abrir el chat nuevo en este repo.
+> **Validación prod**: ✅ verificada 2026-10-07 — smoke local con «ver como» (BBDD TEST): contadores de Información y «Eliminar todo el contenido» OK; «Ir a calificaciones» sin probar.
 > **Plan**: 105 · **Chat**: D1-F2 · **Fase**: F2 · **Creado**: 2026-10-03 · **Estado**: ✅ implementado (2026-10-03)
 > **Origen**: brief 757 (F1b, commit `505dba77`, en `main` local sin push) · diseño en briefs 753 y 755
 > **Plan file**: `educa-coord/plans/xrepo/100-119/xrepo-105-backlog-ux-sesion-20260820.md` § "D1 — Diseño del hub de curso"

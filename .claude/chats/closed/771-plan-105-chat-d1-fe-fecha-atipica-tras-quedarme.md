@@ -2,7 +2,7 @@
 
 > **Repo destino**: `educa-web` (frontend, branch `main`). Abrir el chat nuevo en este repo.
 > **Plan**: 105 · **Chat**: D1 (derivado) · **Fase**: investigar → ejecutar · **Creado**: 2026-10-06 · **Estado**: ⏳ pendiente arrancar
-> **Validación prod**: ⏳ pendiente desde 2026-10-06 — commit `8d9bbe48` en `chat/771-p105-d1-fecha-atipica-quedarme` (sin integrar ni pushear). Falta smoke «ver como» profesor en local (`UseTestEnv: true`): confirmar fecha atípica → elegir otra → «Quedarme» → sigue confirmada.
+> **Validación prod**: ✅ verificada 2026-10-07 — smoke local con «ver como» (BBDD TEST), sin datos de prod.
 > **Hallazgo extra**: `puedeGuardar` era un `computed` cacheado sobre `selectedDate` (no signal); permitía guardar sin confirmar al pasar de fecha válida a atípica. Corregido en el mismo commit.
 > **Origen**: cierre del brief 770 (commits `c3b03746`, `57aed2d4`, integrados en `main` local como `1ecbb6e8`; **sin push**); quedó como residual «menor» desde el 769 (`awaiting-prod/`, § `DERIVADOS / DEUDA`).
 > **Plan file**: `educa-coord/plans/xrepo/100-119/xrepo-105-backlog-ux-sesion-20260820.md` § "D1 — Diseño del hub de curso". Solo intención y decisiones.

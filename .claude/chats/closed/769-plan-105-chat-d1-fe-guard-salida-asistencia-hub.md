@@ -2,7 +2,7 @@
 
 > **Repo destino**: `educa-web` (frontend, branch `main`). Abrir el chat nuevo en este repo.
 > **Plan**: 105 · **Chat**: D1 (derivado) · **Fase**: diseño → ejecución · **Creado**: 2026-10-05 · **Estado**: ✅ cerrado localmente 2026-10-05 (worktree `chat/769-fe-p105-d1-guard-salida-asistencia-hub`, pendiente `/wt-merge`)
-> **Validación prod**: ⏳ pendiente desde 2026-10-05 — smoke manual con «ver como» (profesor) no realizado; ver `## RESULTADO`.
+> **Validación prod**: ✅ verificada 2026-10-07 — smoke local con «ver como» (BBDD TEST), sin datos de prod.
 > **Origen**: cierre del brief 766 (F7, commit `8a28982a`); quedó «fuera de alcance» en 765 y 766.
 > **Plan file**: `educa-coord/plans/xrepo/100-119/xrepo-105-backlog-ux-sesion-20260820.md` § "D1 — Diseño del hub de curso" (decisión: las pestañas navegan con reemplazo de URL; el query de franja sobrevive al cambio de pestaña). Solo intención y decisiones.
 > **depends_on**: D1 F3b (pestaña Asistencia del profesor, brief 762/763) ✅ integrada.

@@ -2,7 +2,7 @@
 
 > **Repo destino**: `educa-web` (frontend, branch `main`). Abrir el chat nuevo en este repo.
 > **Plan**: 105 · **Chat**: D1 (derivado) · **Fase**: investigar → (diseño) → ejecución · **Creado**: 2026-10-05 · **Estado**: ✅ cerrado local 2026-10-06 → `awaiting-prod`
-> **Validación prod**: ⏳ pendiente desde 2026-10-06 — smoke local «ver como» (profesor) sin hacer; confirmar en prod (solo lectura, `rules/browsing.md`) que con asistencia sin guardar y sin `?horarioId=` la URL fija la franja al editar. Cierre vía `/verify 770`.
+> **Validación prod**: ✅ verificada 2026-10-07 — smoke local con «ver como» (BBDD TEST), sin datos de prod.
 > **Origen**: cierre del brief 769 (commit `8eef0ef5`); quedó «fuera de alcance / residual» en 769.
 > **Plan file**: `educa-coord/plans/xrepo/100-119/xrepo-105-backlog-ux-sesion-20260820.md` § "D1 — Diseño del hub de curso". Solo intención y decisiones.
 > **depends_on**: brief 769 ✅ integrado en `main` local (`8eef0ef5`; **sin push**).

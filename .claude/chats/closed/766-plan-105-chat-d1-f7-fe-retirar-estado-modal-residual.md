@@ -5,7 +5,7 @@
 > **Origen**: brief 765 (F6, commit `ed53e1c2`, ya en `main` local sin push; vive en `awaiting-prod/`)
 > **Plan file**: `educa-coord/plans/xrepo/100-119/xrepo-105-backlog-ux-sesion-20260820.md` § "D1 — Diseño del hub de curso". Solo intención y decisiones.
 > **depends_on**: F6 ✅ (765).
-> **Validación prod**: ⏳ pendiente desde 2026-10-05 — falta smoke local con «ver como» (hub → Contenido → crear desde el builder); sin push a `main`.
+> **Validación prod**: ✅ verificada 2026-10-07 — smoke local con «ver como» (BBDD TEST), sin datos de prod.
 > **MODO SUGERIDO**: `/investigate` → `/execute` → `/validate`. Razón: borrado de código muerto con consumidores a re-verificar; sin decisión de diseño abierta.
 > **exclusive**: `false` · **isolation**: `worktree`
 > **touches**: `pages/profesor/cursos/services/{curso-contenido.store,curso-contenido-data.facade,curso-contenido-ui.facade}.ts`, `pages/estudiante/services/{estudiante-cursos.store,estudiante-cursos.facade}.ts` y sus specs.
