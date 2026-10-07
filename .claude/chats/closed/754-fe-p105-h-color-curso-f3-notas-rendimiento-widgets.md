@@ -4,7 +4,7 @@
 > **Repos afectados**: `educa-web`, `Educa.API` (DTOs)
 > **Plan**: `educa-coord/plans/xrepo/100-119/xrepo-105-backlog-ux-sesion-20260820.md` § Diseños → H
 > **Created**: 2026-10-02
-> **Validación prod**: ⏳ pendiente desde 2026-10-02 — verificar en local con ≥9 cursos en ambos temas (chip de curso en plazos, asistencia, notas y rendimiento; chip neutro si cursoId nulo). Depende de que 756 (BE, `74561aa7`) esté desplegado.
+> **Validación prod**: ✅ verificada 2026-10-07 — local (BBDD TEST), sesión real de estudiante: chip de curso en Plazos de Inicio, Notas y Rendimiento (mismo color por curso); chip del widget de asistencia verificado con respuesta real de `mi-asistencia` interceptada (Biología, 104/35/122); chip neutro con `cursoId` nulo cubierto con spec nuevo (`curso-chip.component.spec.ts`, 7 tests). **Hallazgo aparte**: el widget compara `d.fecha === hoy` pero el BE devuelve `2026-08-11T00:00:00`, así que nunca muestra la asistencia de hoy con datos reales.
 > **depends_on**: 750 (F2) integrado en `main` (aporta `app-curso-chip`, `PickerGridOption.cursoId` y las 3 bandas del helper)
 > **MODO SUGERIDO**: `/investigate` (qué DTOs, qué endpoints) → `/design` → `/execute` → `/validate`
 > **exclusive**: `false`
