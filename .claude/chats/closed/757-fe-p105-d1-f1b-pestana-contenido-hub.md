@@ -1,7 +1,7 @@
 # 757 — FE: P105 D1 F1b — Pestaña Contenido del hub (profesor y estudiante)
 
 > **Repo destino**: `educa-web` (frontend, branch `main`). Abrir el chat nuevo en este repo.
-> **Validación prod**: ⏳ pendiente desde 2026-10-02 (verificación en vivo: pares 24/34 y 14/25, deep link, cambio rápido de franja, estudiante multi-franja)
+> **Validación prod**: ✅ verificada 2026-10-07 — prod (ver como estudiante, par 26/46): pestaña Contenido con 16 semanas. Contenido real sin cubrir (prod sin contenido)
 > **Plan**: 105 · **Chat**: D1-F1b · **Creado**: 2026-10-02 · **Estado**: ✅ implementado y validado local (lint · build · 2922 tests)
 > **Origen**: brief 756 (F1a, commit `b73faded`) · diseño en briefs 753 y 755
 > **Plan file**: `educa-coord/plans/xrepo/100-119/xrepo-105-backlog-ux-sesion-20260820.md` § "D1 — Diseño del hub de curso"

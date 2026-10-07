@@ -31,7 +31,7 @@ Pestañas **Mis Calificaciones** (`app-notas-curso-card`, carga perezosa, refres
 
 ---
 
-> **Validación prod**: ⏳ pendiente desde 2026-10-03
+> **Validación prod**: ✅ verificada 2026-10-07 — prod (ver como estudiante, par 26/46): pestañas Calificaciones e Información cargan por deep link
 
 ## CIERRE (2026-10-03)
 - Shell estudiante dueño de carga/reset; facade/store limpian y cancelan notas (`notasSub`, `clearMisNotas`).

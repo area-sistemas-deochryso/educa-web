@@ -45,7 +45,7 @@
 
 ## Cierre
 
-> **Validación prod**: ⏳ pendiente desde 2026-09-29
+> **Validación prod**: ✅ verificada 2026-10-07 — prod: nota «Los datos llegan hasta hoy (07/10)» en Panel > Semana
 
 - Lint, 8 tests nuevos (`future-period.util.spec.ts`) y `ng build`: OK.
 - Pendiente: verificar en `/intranet/admin/asistencias/panel` (Semana/Mes, periodo actual y futuro) que la nota aparece y el texto es correcto.

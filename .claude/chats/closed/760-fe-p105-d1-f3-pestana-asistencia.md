@@ -76,7 +76,7 @@ Sumar la pestaña **Asistencia** al hub como ruta hija con URL propia, para la f
 
 ## RESULTADO (2026-10-03)
 
-> **Validación prod**: ⏳ pendiente desde 2026-10-03
+> **Validación prod**: ✅ verificada 2026-10-07 — prod (ver como estudiante, par 26/46): pestaña Asistencia carga por deep link; sin registros en prod
 
 - **Alcance**: solo estudiante (profesor en chat aparte). Pestaña de solo lectura + enlace «Justificar inasistencias» a `/intranet/estudiante/asistencia?horarioId=` cuando hay faltas.
 - **Dueño de la carga**: la pestaña pide con `hubContext.slot().id` (franja sin contenido igual tiene asistencia). Facade: `loadMiAsistenciaForHub` (idempotente por franja, cancela la anterior) y `refreshMiAsistenciaForHub`; `resetForHub` cancela. La vista descarta resúmenes con otro `horarioId`.

@@ -104,7 +104,7 @@ Standalone + `OnPush`, `inject()`, signals, alias `@app/@core/@data/@config/...`
 
 ## RESULTADO (2026-10-03)
 
-> **Validación prod**: ⏳ pendiente desde 2026-10-03
+> **Validación prod**: ✅ verificada 2026-10-07 — prod (ver como estudiante, par 26/46): pestaña Salón (17 matriculados + enlace a Mis Salones)
 
 - **Alcance**: pestaña Salón de profesor y estudiante (ruta hija `…/salon`). Cierra las 5 pestañas del hub y desbloquea F5a (tarjeta por par y redirect legacy: depende de F2, F3 y F4).
 - **Validación local**: lint 0 errores (4 warnings preexistentes) ✅ · build ✅ · vitest `pages/profesor` + `pages/estudiante` + `shared` 732 verdes ✅.

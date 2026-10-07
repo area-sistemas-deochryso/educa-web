@@ -44,7 +44,7 @@
 
 ## Cierre
 
-> **Validación prod**: ⏳ pendiente desde 2026-09-29
+> **Validación prod**: ✅ verificada 2026-10-07 — prod: login con lista de sesiones con scroll vertical (~3 tarjetas)
 
 - Lint, 23 tests (login + integración) y `ng build`: OK.
 - Pendiente: verificar en `/intranet/login` con ≥4 sesiones guardadas que el scroll/snap se ve bien, el hover no se recorta y el click único en una sesión guardada sigue iniciando sesión.

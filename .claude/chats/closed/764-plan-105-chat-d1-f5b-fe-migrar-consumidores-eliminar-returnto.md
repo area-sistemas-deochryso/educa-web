@@ -5,7 +5,7 @@
 > **Origen**: brief 763 (F5a, commit `d2ecd2d8`, integrado en `main` local sin push; vive en `awaiting-prod/`)
 > **Plan file**: `educa-coord/plans/xrepo/100-119/xrepo-105-backlog-ux-sesion-20260820.md` § "D1 — Diseño del hub de curso" (fila F5b). El plan se lee solo por intención y decisiones.
 > **depends_on**: F5a ✅ (763). F2–F4 ✅ (758–762).
-> **Validación prod**: ⏳ pendiente desde 2026-10-05 (ver «ver como»: clic desde Salones y Horarios, franja correcta, «atrás»)
+> **Validación prod**: ✅ verificada 2026-10-07 — prod (ver como estudiante): clic desde Salones y Horarios llega al hub con la franja correcta; «atrás» vuelve al origen
 > **MODO SUGERIDO**: `/investigate` → `/execute` → `/validate` (sin `/design` salvo que aparezca una decisión abierta)
 > **exclusive**: `false` · **isolation**: `worktree`
 > **touches**: `pages/profesor/classrooms/profesor-salones.component.ts`, `pages/profesor/schedules/profesor-horarios.component.ts`, `pages/estudiante/classrooms/estudiante-salones.component.ts`, `pages/estudiante/schedules/estudiante-horarios.component.ts`, sus specs si existen. Lectura de `shared/helpers/curso-hub-link.helpers.ts`, `curso-hub-legacy-redirect.helpers.ts`. **No toca** el hub, sus pestañas, `profesor-cursos`/`estudiante-cursos` ni los modales (F6).

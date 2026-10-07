@@ -3,7 +3,7 @@
 > **Repos afectados**: `educa-web`
 > **Plan**: `educa-coord/plans/xrepo/100-119/xrepo-105-backlog-ux-sesion-20260820.md` (idea E)
 > **Created**: 2026-09-29 · **Estado**: ✅ implementado (opción A), esperando verificación en vivo.
-> **Validación prod**: ⏳ pendiente desde 2026-09-29 — mirar `/intranet/estudiante/cursos` como estudiante: el botón "Ver horario" se nota y navega a `/intranet/estudiante/horarios`.
+> **Validación prod**: ✅ verificada 2026-10-07 — prod (ver como estudiante): botón «Ver horario» outlined navega a /estudiante/horarios
 > **MODO SUGERIDO**: `/design` (el plan P105 exige diseño antes de ejecutar; luego `/execute`)
 > **exclusive**: `false`
 > **modules**: `academic`, `schedules`

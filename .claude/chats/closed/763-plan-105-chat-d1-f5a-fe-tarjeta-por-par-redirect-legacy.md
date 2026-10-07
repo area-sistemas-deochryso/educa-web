@@ -61,7 +61,7 @@ Hacer **alcanzable el hub** desde la UI: en «Mis Cursos» (profesor y estudiant
 - **Cierre**: copiar el brief a `awaiting-prod/` dentro del worktree. `awaiting-prod/` está en **19** (límite blando 20, duro 25): cerrar este brief ahí lo deja en el límite blando → conviene `/verify` antes. Integrar con `/wt-merge` (rama de integración + promoción a `main`) y limpiar con `/wt-clean` (`git branch -d` exige que `main` ya tenga el merge). Commit sin `Co-Authored-By`.
 - **Doc**: `.claude/context/domain.md` (líneas del hub) dice «en construcción… los modales siguen vigentes hasta F6»; revisar al cerrar F5a/F5b.
 
-> **Validación prod**: ⏳ pendiente desde 2026-10-05 — verificar en local con «ver como» (par multi-franja) y el redirect `?horarioId=` (existente, inexistente, «atrás») antes de cualquier push.
+> **Validación prod**: ✅ verificada 2026-10-07 — prod (ver como estudiante): ?horarioId=7 redirige al hub con la franja; inexistente queda en Cursos con URL limpia
 
 ## DISEÑO F5a (decidido en /design, 2026-10-05)
 Hallazgos de `/investigate` contra `main` (`72dfdf54`):

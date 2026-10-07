@@ -5,7 +5,7 @@
 > **Plan**: `educa-coord/plans/xrepo/100-119/xrepo-105-backlog-ux-sesion-20260820.md` § D (D4) y `xrepo-89-propuestas-rediseno-ux-horarios-cursos.md` § 5.
 > **Created**: 2026-10-06
 > **MODO SUGERIDO**: `/execute` (el contrato está cerrado; el diseño visual del chip ya se decidió en 774: indicador **por franja**, un `n/N` por chip)
-> **Validación prod**: ⏳ pendiente desde 2026-10-06 (requiere deploy del BE `b02f9694` + `/verify-prod`)
+> **Validación prod**: ✅ verificada 2026-10-07 — prod: chip «Jueves · 07:00-18:00 · 0/16» con progressbar (now=0, max=16); BE b02f9694 desplegado
 > **exclusive**: `false`
 > **modules**: `academic`
 > **touches** (a re-verificar): modelo `HorarioProfesorDto`, `groupHorariosByPair`, `CursoPairCardComponent`, `cache-versions.config.ts` (`horarios`), tests, specs de a11y.

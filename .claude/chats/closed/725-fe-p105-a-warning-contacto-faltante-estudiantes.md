@@ -56,4 +56,4 @@
 
 ~1.5 h (sin BE).
 
-> **Validación prod**: ⏳ pendiente desde 2026-09-29 — desplegar BE primero (param `sinCorreoApoderado`); luego verificar en /intranet/admin/usuarios (pestaña Estudiantes): ícono de advertencia + filtro "Contacto incompleto".
+> **Validación prod**: ✅ verificada 2026-10-07 — prod (admin/usuarios, Estudiantes): ícono «Sin correo de apoderado» + filtro «Contacto incompleto» (57 de 248)

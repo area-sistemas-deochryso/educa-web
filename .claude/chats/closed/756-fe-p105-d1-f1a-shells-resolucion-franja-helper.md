@@ -3,7 +3,7 @@
 > **Repo destino**: `educa-web` (frontend, branch `main`). Abrir el chat nuevo en este repo.
 > **Plan**: 105 · **Chat**: D1-F1a · **Creado**: 2026-10-02 · **Estado**: ✅ implementado y validado local (lint/build/test); ⏳ verificación en vivo pendiente
 > **Origen**: brief 755 (validación D1, cerrado) · diseño en brief 753
-> **Validación prod**: ⏳ pendiente desde 2026-10-02 (verificación en vivo del hub: par 24/34 y 14/25 en TEST, deep link con F5, par y franja inválidos, selector; ver sección VERIFICACIÓN EN VIVO)
+> **Validación prod**: ✅ verificada 2026-10-07 — prod (ver como estudiante, par 26/46): shell, cabecera, deep links, par inválido redirige a Cursos, franja inválida se limpia. Selector multi-franja sin cubrir (prod tiene 1 franja)
 > **Plan file**: `educa-coord/plans/xrepo/100-119/xrepo-105-backlog-ux-sesion-20260820.md` § "D1 — Diseño del hub de curso"
 > **depends_on**: 752 (integrado en `main`, commit `bfbfc967`; re-confirmar al arrancar)
 > **MODO SUGERIDO**: `/investigate` corto → `/execute` → `/validate`

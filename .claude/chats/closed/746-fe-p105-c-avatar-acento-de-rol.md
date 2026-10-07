@@ -4,7 +4,7 @@
 > **Repo afectado**: `educa-web`
 > **Plan**: `educa-coord/plans/xrepo/100-119/xrepo-105-backlog-ux-sesion-20260820.md` § Diseños → C
 > **Created**: 2026-10-01
-> **Validación prod**: ⏳ pendiente desde 2026-10-01
+> **Validación prod**: ✅ verificada 2026-10-07 — prod: insignia con ícono por rol; sin aro de color (quitado 60ce0d5a)
 > **MODO SUGERIDO**: `/design` (cierra 2 decisiones menores) → `/execute` → `/validate`
 > **exclusive**: `false`
 > **modules**: `infra`, `users`, `attendance`

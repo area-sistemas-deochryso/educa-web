@@ -2,7 +2,7 @@
 
 > **Repo destino**: `educa-web` (frontend, branch `main`). Abrir el chat nuevo en este repo.
 > **Plan**: 105 · **Chat**: D1-F6 · **Fase**: F6 · **Creado**: 2026-10-05 · **Estado**: ✅ cerrado local 2026-10-05
-> **Validación prod**: ⏳ pendiente desde 2026-10-05 — verificar con «ver como» que Cursos, Salones y Horarios llegan al hub sin modales
+> **Validación prod**: ✅ verificada 2026-10-07 — prod (ver como estudiante): Cursos, Salones y Horarios llegan al hub sin modales
 > **Origen**: brief 764 (F5b, commit `7ea76c54`, integrado en `main` local sin push; vive en `awaiting-prod/`)
 > **Plan file**: `educa-coord/plans/xrepo/100-119/xrepo-105-backlog-ux-sesion-20260820.md` § "D1 — Diseño del hub de curso" (fila F6). El plan se lee solo por intención y decisiones.
 > **depends_on**: F5b ✅ (764). F1–F5a ✅ (756–763).
