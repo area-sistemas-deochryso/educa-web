@@ -5,7 +5,7 @@
 > **Origen**: cierre del brief 766 (F7, commit `8a28982a`), que completó D1 (hub de curso).
 > **Plan file**: `educa-coord/plans/xrepo/100-119/xrepo-105-backlog-ux-sesion-20260820.md` § "Subplanes de D" y tabla de D. Solo intención y decisiones.
 > **depends_on**: D1 ✅ (F1a–F7 integrados en `main` local).
-> **Validación prod**: ⏳ pendiente desde 2026-10-05 — smoke visual con «ver como» de `calificar-dialog` en modo individual, grupal y literal (el diálogo no tiene spec propio).
+> **Validación prod**: ✅ verificada 2026-10-07 — local (BBDD TEST), «ver como» profesor: modo individual numérico, individual literal (AD/A/B/C → punto medio, guardado OK) y grupal (6 grupos, selector literal). Hallazgo previo (no de 767): `placeholder="undefined"` en `edu-input-number`.
 > **MODO SUGERIDO**: `/investigate` → (`/design` solo si queda algo que valga la pena) → `/execute` → `/validate`. Razón: el alcance original se encogió; hay que medir antes de planear.
 > **exclusive**: `false` · **isolation**: `worktree`
 > **touches**: por determinar en la investigación (candidatos: `pages/profesor/cursos/components/*-dialog/`, `pages/estudiante/**/*-dialog/`).
