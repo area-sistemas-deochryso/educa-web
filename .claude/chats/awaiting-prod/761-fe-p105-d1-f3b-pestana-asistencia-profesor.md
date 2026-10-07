@@ -114,6 +114,7 @@ Standalone + `OnPush`, `inject()`, signals, alias `@app/@core/@data/@config/...`
 ## RESULTADO (2026-10-03)
 
 > **Validación prod**: ⏳ pendiente desde 2026-10-03
+> **Verificación local parcial 2026-10-07**: pestaña Asistencia del profesor carga y el guard de salida funciona (ver 769); **no se pudo guardar**: `POST /api/AsistenciaCurso/horario/{id}/registrar` da 500 por transacción fuera de la estrategia de reintentos (brief 778, Educa.API). Cerrar tras corregir 778 y probar guardar + ver en Resumen.
 
 - **Alcance**: pestaña Asistencia del profesor (ruta hija `…/asistencia`) que embebe los paneles de registro y resumen con la franja del shell. Cierra F3 del plan 105 (estudiante en 760).
 - **Decisiones del usuario**: A2 (aviso «Cambios sin guardar» al cambiar de franja) y B2 (la pestaña soporta `?fecha=`).

@@ -5,6 +5,7 @@
 > **Plan**: `educa-coord/plans/xrepo/060-079/xrepo-77-test-suite-reliability-audit.md` · findings `xrepo-77-f2-findings.md` §2
 > **Created**: 2026-09-29
 > **Validación prod**: ⏳ pendiente desde 2026-09-29 (primera build Netlify con Node 22)
+> **Verificación local parcial 2026-10-07**: fuera del alcance de la app: se verifica en Netlify (build con Node 22), no desde el navegador de la intranet.
 > **MODO SUGERIDO**: `/execute` (fix mecánico; verificar antes el valor vigente)
 > **exclusive**: `false`
 > **modules**: `deploy`

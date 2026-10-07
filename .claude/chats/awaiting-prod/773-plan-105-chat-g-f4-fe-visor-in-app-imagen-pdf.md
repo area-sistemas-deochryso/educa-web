@@ -2,6 +2,7 @@
 
 > **Repo destino**: `educa-web` (frontend, branch `main`). Abrir el chat nuevo en este repo.
 > **Validación prod**: ⏳ pendiente desde 2026-10-06 — smoke en vivo de imagen/PDF/.docx (curso, attachments-modal, entrega). Commit `05719ff1` en `chat/773-p105-g-f4-visor-in-app-imagen-pdf`, sin push.
+> **Verificación local parcial 2026-10-07**: parcial. ✅ PDF (`TEST-747-material.pdf`, horario 26): abre en visor in-app con barra de PDF (el render congela las capturas del navegador; verificado por DOM). Sin verificar: imagen y .docx (necesitan subir archivos), entrega de estudiante.
 > **Plan**: 105 · **Chat**: G-F4 · **Fase**: F4 · **Creado**: 2026-10-06 · **Estado**: ✅ cerrado localmente 2026-10-06
 > **Origen**: cierre del brief 772 (commit `355f6759`, integrado en `main` local, **sin push**). G F1-F3 terminaron: todos los sitios de archivos usan `app-file-row`. F4 es lo único que queda de G y el usuario lo dejó **firme** el 2026-10-01 (G2: «visor in-app: imagen y PDF inline; resto descarga»).
 > **Plan file**: `educa-coord/plans/xrepo/100-119/xrepo-105-backlog-ux-sesion-20260820.md` § Diseños → G, y § Decisiones del usuario (2026-10-01). Solo intención y decisiones.

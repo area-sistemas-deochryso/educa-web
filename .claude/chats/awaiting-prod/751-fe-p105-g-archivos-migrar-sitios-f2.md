@@ -6,6 +6,7 @@
 > **Plan file**: `educa-coord/plans/xrepo/100-119/xrepo-105-backlog-ux-sesion-20260820.md` § Diseños → G (F2: "migrar cursos/entregas/resumen")
 > **depends_on**: 747 (F1) — ya integrado en `main`
 > **Validación prod**: ⏳ pendiente desde 2026-10-01 — falta verificar en vivo `student-task-submissions-dialog`, `student-files-dialog` (necesitan estudiantes asignados al horario 26) y `archivos-summary-dialog` (vista del estudiante).
+> **Verificación local parcial 2026-10-07**: sin verificar. Subir archivos exige el selector nativo del navegador (la herramienta solo sube rutas compartidas; asignar el archivo por JS no dispara la subida). Pendiente en TEST: `student-task-submissions-dialog`, `student-files-dialog` (estudiantes asignados al horario) y `archivos-summary-dialog` (vista estudiante). Requiere archivos de prueba pequeños.
 > **MODO SUGERIDO**: `/design` (ver "Decisiones abiertas", ~10 min) → `/execute` → `/validate`
 > **exclusive**: `false`
 > **isolation**: `worktree`

@@ -7,6 +7,7 @@
 > **depends_on**: brief 747 (G F1) ✅ y 751 (G F2) ✅ integrados en `main` local (ambos en `awaiting-prod/`).
 > **MODO SUGERIDO**: `/investigate` (corto: inventariar los sitios y confirmar qué consume `getFileType`) → `/execute` → `/validate`. Sin `/design`: el patrón (`app-file-row`, `UPLOAD_*`, `validateUploadFile`) lo fijó F1 y F2 lo aplicó.
 > **Validación prod**: ⏳ pendiente desde 2026-10-06 — smoke en local (`UseTestEnv: true`): justificar inasistencia con archivo válido y con uno rechazado (docx / >10 MB); abrir `attachments-modal` de un horario y abrir/eliminar cada fila.
+> **Verificación local parcial 2026-10-07**: sin verificar. Mismo límite de subida de archivos. Pendiente: justificar inasistencia con archivo válido y con uno rechazado (docx / >10 MB) — sin enviar justificaciones válidas más allá de lo mínimo (SMTP real heredado) — y abrir/eliminar filas en `attachments-modal`.
 > **exclusive**: `false` · **isolation**: `worktree`
 > **touches** (a re-verificar): `justificar-inasistencia-dialog`, `health-justification-dialog`, `attachments-modal` (horario), `BlobStorageService` (retiro del adaptador `getFileType`) y sus specs/scss.
 > **hot-paths**: ninguno conocido
