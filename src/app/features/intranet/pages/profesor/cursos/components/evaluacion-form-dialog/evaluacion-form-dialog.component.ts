@@ -8,15 +8,15 @@ import {
 	CursoContenidoSemanaDto,
 	TIPOS_EVALUACION,
 	TipoEvaluacion,
-	PESO_MINIMO,
-	PESO_MAXIMO,
 } from '@features/intranet/pages/profesor/models';
 import { EduButton, EduDatePicker, EduDialog, EduInputNumber, EduInputText, EduSelect, EduToggle, EduTooltip } from '@edu-ui';
 import type { EduInputNumberInputEvent } from '@edu-ui';
+import { PORCENTAJE_MAXIMO, PORCENTAJE_MINIMO, pesoAPorcentaje, porcentajeAPeso } from './peso-porcentaje';
 
 interface FormData {
 	titulo: string;
 	tipo: TipoEvaluacion;
+	/** Porcentaje entero (1–100); se convierte a la fracción 0–1 del contrato al enviar. */
 	peso: number;
 	fechaEvaluacion: Date | null;
 	semanaId: number | null;
@@ -52,7 +52,7 @@ export class EvaluacionFormDialogComponent {
 	readonly formData = signal<FormData>({
 		titulo: '',
 		tipo: 'Examen',
-		peso: 0.2,
+		peso: 20,
 		fechaEvaluacion: null,
 		semanaId: null,
 		tareaId: null,
@@ -60,8 +60,8 @@ export class EvaluacionFormDialogComponent {
 	});
 
 	readonly tiposOptions = TIPOS_EVALUACION.map((t) => ({ label: t, value: t }));
-	readonly PESO_MINIMO = PESO_MINIMO;
-	readonly PESO_MAXIMO = PESO_MAXIMO;
+	readonly PORCENTAJE_MINIMO = PORCENTAJE_MINIMO;
+	readonly PORCENTAJE_MAXIMO = PORCENTAJE_MAXIMO;
 
 	/** Local reentrancy guard: blocks a second onSave() before the `saving` input propagates back from the parent. */
 	private readonly submitting = signal(false);
@@ -89,8 +89,8 @@ export class EvaluacionFormDialogComponent {
 		return (
 			data.titulo.trim().length > 0 &&
 			data.tipo &&
-			data.peso >= PESO_MINIMO &&
-			data.peso <= PESO_MAXIMO &&
+			data.peso >= PORCENTAJE_MINIMO &&
+			data.peso <= PORCENTAJE_MAXIMO &&
 			data.fechaEvaluacion !== null &&
 			data.semanaId !== null
 		);
@@ -105,7 +105,7 @@ export class EvaluacionFormDialogComponent {
 				this.formData.set({
 					titulo: edit.titulo,
 					tipo: edit.tipo,
-					peso: edit.peso,
+					peso: pesoAPorcentaje(edit.peso),
 					fechaEvaluacion: new Date(edit.fechaEvaluacion),
 					semanaId: edit.semanaId,
 					tareaId: edit.tareaId,
@@ -115,7 +115,7 @@ export class EvaluacionFormDialogComponent {
 				this.formData.set({
 					titulo: '',
 					tipo: 'Examen',
-					peso: 0.2,
+					peso: 20,
 					fechaEvaluacion: null,
 					semanaId: null,
 					tareaId: null,
@@ -152,15 +152,15 @@ export class EvaluacionFormDialogComponent {
 		this.lastRawPeso = null;
 		if (raw === null) return;
 
-		if (raw > PESO_MAXIMO) {
+		if (raw > PORCENTAJE_MAXIMO) {
 			this.errorHandler.showWarning(
 				'Peso ajustado',
-				`El peso máximo es ${PESO_MAXIMO.toFixed(2)}, se ajustó automáticamente.`,
+				`El peso máximo es ${PORCENTAJE_MAXIMO} %, se ajustó automáticamente.`,
 			);
-		} else if (raw < PESO_MINIMO) {
+		} else if (raw < PORCENTAJE_MINIMO) {
 			this.errorHandler.showWarning(
 				'Peso ajustado',
-				`El peso mínimo es ${PESO_MINIMO.toFixed(2)}, se ajustó automáticamente.`,
+				`El peso mínimo es ${PORCENTAJE_MINIMO} %, se ajustó automáticamente.`,
 			);
 		}
 	}
@@ -179,7 +179,7 @@ export class EvaluacionFormDialogComponent {
 			tareaId: data.tareaId,
 			semanaId: data.semanaId,
 			titulo: data.titulo.trim(),
-			peso: data.peso,
+			peso: porcentajeAPeso(data.peso),
 			fechaEvaluacion: toLocalIso(data.fechaEvaluacion),
 			tipo: data.tipo,
 			esGrupal: data.esGrupal,

@@ -165,7 +165,7 @@ export const UI_ERROR_CODES: Record<string, string> = {
 	EVALUACION_ACCESS_DENIED: 'No tiene acceso a esta evaluación.',
 	EVALUACION_EDIT_WINDOW_EXCEEDED: 'Se venció la ventana de edición para esta evaluación.',
 	EVALUACION_PERIODO_CERRADO:
-		'No se puede modificar la evaluación porque el periodo está cerrado.',
+		'No se puede modificar la evaluación porque el periodo está cerrado. Consulta con administración.',
 	EVALUACION_PESO_EXCEDIDO: 'El peso total de las evaluaciones excede el máximo permitido.',
 	NOTA_NOT_FOUND: 'No se encontró la nota solicitada.',
 	PERIODO_NOT_FOUND: 'No se encontró el periodo solicitado.',
