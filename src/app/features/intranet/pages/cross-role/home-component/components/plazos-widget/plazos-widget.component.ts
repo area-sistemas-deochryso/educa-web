@@ -2,13 +2,13 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
-import { Observable, catchError, map, of } from 'rxjs';
+import { catchError, of } from 'rxjs';
 import { logger } from '@core/helpers';
 import { UserProfileService } from '@core/services/user';
-import { EstudianteApiService } from '@features/intranet/pages/estudiante/services';
 import { ProfesorCursosApiService } from '@features/intranet/pages/profesor/services';
 import { SkeletonLoaderComponent } from '@shared/components';
 import { CursoChipComponent } from '@intranet-shared/components';
+import { TareasPendientesService } from '@intranet-shared/services';
 
 // #endregion
 // #region Types
@@ -19,15 +19,23 @@ interface PlazoItem {
 	titulo: string;
 	cursoId: number | null;
 	cursoNombre: string;
-	fecha: string;
-	diasRestantes: number;
+	/** Fecha límite (estudiante) o de evaluación (profesor); `null` si la tarea no tiene fecha. */
+	fecha: string | null;
+	diasRestantes: number | null;
+	/** Solo profesor: estudiantes matriculados sin nota. */
+	sinNota: number | null;
+	esNueva: boolean;
 }
 
-const MAX_ITEMS = 3;
+const MAX_ITEMS = 5;
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
 // #endregion
 
 // #region Implementation
+/**
+ * Tarjeta de pendientes del Inicio (P110-F14): el estudiante ve sus tareas sin entregar
+ * (con fecha límite y marca de "Nueva") y el profesor sus evaluaciones con alumnos sin nota.
+ */
 @Component({
 	selector: 'app-plazos-widget',
 	standalone: true,
@@ -38,22 +46,33 @@ const MS_PER_DAY = 1000 * 60 * 60 * 24;
 })
 export class PlazosWidgetComponent implements OnInit {
 	// #region Dependencias
-	private readonly estudianteApi = inject(EstudianteApiService);
+	private readonly tareasPendientes = inject(TareasPendientesService);
 	private readonly profesorApi = inject(ProfesorCursosApiService);
 	private readonly userProfile = inject(UserProfileService);
 	private readonly destroyRef = inject(DestroyRef);
 	// #endregion
 
 	// #region Estado
-	readonly loading = signal(true);
-	private readonly allItems = signal<PlazoItem[]>([]);
+	readonly isProfesor = computed(() => this.userProfile.isProfesor());
+
+	private readonly profesorLoading = signal(true);
+	private readonly profesorItems = signal<PlazoItem[]>([]);
+
+	readonly loading = computed(() => (this.isProfesor() ? this.profesorLoading() : !this.tareasPendientes.loaded()));
+
+	private readonly allItems = computed<PlazoItem[]>(() =>
+		this.isProfesor()
+			? this.profesorItems()
+			: this.tareasPendientes.tareas().map((t) =>
+					this.toItem(`tarea-${t.tareaId}`, t.titulo, t.cursoId ?? null, t.cursoNombre, t.fechaLimite ?? null, null, t.esNueva),
+				),
+	);
 
 	readonly items = computed(() => this.allItems().slice(0, MAX_ITEMS));
 	readonly hiddenCount = computed(() => Math.max(0, this.allItems().length - MAX_ITEMS));
-	readonly isProfesor = computed(() => this.userProfile.isProfesor());
 
-	readonly title = computed(() => (this.isProfesor() ? 'Calificaciones por cerrar' : 'Tareas por vencer'));
-	readonly icon = computed(() => (this.isProfesor() ? 'pi pi-lock' : 'pi pi-clock'));
+	readonly title = computed(() => (this.isProfesor() ? 'Calificaciones pendientes' : 'Tareas pendientes'));
+	readonly icon = computed(() => (this.isProfesor() ? 'pi pi-pencil' : 'pi pi-clock'));
 	readonly detailRoute = computed(() =>
 		this.isProfesor() ? '/intranet/profesor/cursos' : '/intranet/estudiante/cursos',
 	);
@@ -61,68 +80,63 @@ export class PlazosWidgetComponent implements OnInit {
 
 	// #region Helpers de presentación
 	urgencia(item: PlazoItem): PlazoUrgencia {
+		if (item.diasRestantes === null) return 'normal';
 		if (item.diasRestantes <= 0) return 'urgent';
 		if (item.diasRestantes <= 3) return 'soon';
 		return 'normal';
 	}
 
 	label(item: PlazoItem): string {
-		const verbo = this.isProfesor() ? 'Se congela' : 'Vence';
-		if (item.diasRestantes <= 0) return `${verbo} hoy`;
-		if (item.diasRestantes === 1) return `${verbo} mañana`;
-		return `${verbo} en ${item.diasRestantes} días`;
+		if (this.isProfesor()) return item.sinNota === 1 ? '1 sin nota' : `${item.sinNota ?? 0} sin nota`;
+		if (item.diasRestantes === null) return 'Sin fecha límite';
+		if (item.diasRestantes < 0) return 'Vencida';
+		if (item.diasRestantes === 0) return 'Vence hoy';
+		if (item.diasRestantes === 1) return 'Vence mañana';
+		return `Vence en ${item.diasRestantes} días`;
 	}
 	// #endregion
 
 	// #region Lifecycle
 	ngOnInit(): void {
-		const source$ = this.userProfile.isProfesor() ? this.loadProfesor() : this.loadEstudiante();
-		source$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((items) => {
-			this.allItems.set(items);
-			this.loading.set(false);
-		});
-	}
-
-	private loadEstudiante(): Observable<PlazoItem[]> {
-		return this.estudianteApi.getMisTareasPorVencer().pipe(
-			map((tareas) =>
-				this.sortByFecha(
-					tareas.map((t) => this.toItem(`tarea-${t.tareaId}`, t.titulo, t.cursoId ?? null, t.cursoNombre, t.fechaLimite)),
-				),
-			),
-			catchError((err) => this.fallback('getMisTareasPorVencer', err)),
-		);
-	}
-
-	private loadProfesor(): Observable<PlazoItem[]> {
-		return this.profesorApi.getEvaluacionesPorCongelarse().pipe(
-			map((evaluaciones) =>
-				this.sortByFecha(
+		if (!this.userProfile.isProfesor()) {
+			this.tareasPendientes.refresh();
+			return;
+		}
+		this.profesorApi
+			.getCalificacionesPendientes()
+			.pipe(
+				catchError((err: { status?: number }) => {
+					logger.warn('[PlazosWidget] getCalificacionesPendientes failed — fallback empty', err?.status);
+					return of([]);
+				}),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe((evaluaciones) => {
+				this.profesorItems.set(
 					evaluaciones.map((e) =>
-						this.toItem(`evaluacion-${e.evaluacionId}`, e.titulo, e.cursoId ?? null, e.cursoNombre, e.fechaLimiteEdicion),
+						this.toItem(`calificacion-${e.calificacionId}`, e.titulo, e.cursoId ?? null, e.cursoNombre, e.fechaEvaluacion, e.sinNota, false),
 					),
-				),
-			),
-			catchError((err) => this.fallback('getEvaluacionesPorCongelarse', err)),
-		);
+				);
+				this.profesorLoading.set(false);
+			});
 	}
 
-	private fallback(op: string, err: { status?: number }): Observable<PlazoItem[]> {
-		logger.warn(`[PlazosWidget] ${op} failed — fallback empty`, err?.status);
-		return of([]);
+	private toItem(
+		key: string,
+		titulo: string,
+		cursoId: number | null,
+		cursoNombre: string,
+		fecha: string | null,
+		sinNota: number | null,
+		esNueva: boolean,
+	): PlazoItem {
+		return { key, titulo, cursoId, cursoNombre, fecha, diasRestantes: this.diffDays(fecha), sinNota, esNueva };
 	}
 
-	private toItem(key: string, titulo: string, cursoId: number | null, cursoNombre: string, fecha: string): PlazoItem {
-		return { key, titulo, cursoId, cursoNombre, fecha, diasRestantes: this.diffDays(fecha) };
-	}
-
-	private sortByFecha(items: PlazoItem[]): PlazoItem[] {
-		return [...items].sort((a, b) => a.fecha.localeCompare(b.fecha));
-	}
-
-	private diffDays(fecha: string): number {
+	private diffDays(fecha: string | null): number | null {
+		if (!fecha) return null;
 		const target = new Date(fecha);
-		if (isNaN(target.getTime())) return Number.MAX_SAFE_INTEGER;
+		if (isNaN(target.getTime())) return null;
 		const today = new Date();
 		const a = new Date(target.getFullYear(), target.getMonth(), target.getDate()).getTime();
 		const b = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();

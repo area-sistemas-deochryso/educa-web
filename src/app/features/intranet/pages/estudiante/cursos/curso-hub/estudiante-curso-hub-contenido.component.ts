@@ -3,6 +3,7 @@ import {
 	Component,
 	computed,
 	effect,
+	ElementRef,
 	inject,
 	signal,
 	untracked,
@@ -12,6 +13,7 @@ import { FormsModule } from '@angular/forms';
 import { ErrorHandlerService } from '@core/services';
 import { FileRowComponent, UPLOAD_ACCEPT, UPLOAD_LIMITS, validateUploadFile, FileViewerService, ViewableArchivo } from '@shared/components';
 import { CursoHubContextService, EmptyStateComponent } from '@intranet-shared/components';
+import { TareasPendientesService } from '@intranet-shared/services';
 import { EstudianteCursosFacade } from '@features/intranet/pages/estudiante/services/estudiante-cursos.facade';
 import type { EstudianteArchivoDto, EstudianteTareaArchivoDto } from '@features/intranet/pages/estudiante/models';
 import {
@@ -85,6 +87,8 @@ export class EstudianteCursoHubContenidoComponent {
 	private readonly facade = inject(EstudianteCursosFacade);
 	private readonly confirmationService = inject(EduConfirmationService);
 	private readonly errorHandler = inject(ErrorHandlerService);
+	private readonly tareasPendientes = inject(TareasPendientesService);
+	private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 	protected readonly uploadAccept = UPLOAD_ACCEPT;
 	protected readonly uploadMaxBytes = UPLOAD_LIMITS.maxFileSizeBytes;
 	// #endregion
@@ -97,6 +101,16 @@ export class EstudianteCursoHubContenidoComponent {
 	protected readonly openPanelsStr = computed(() => this.openPanels().map((v) => v.toString()));
 
 	private readonly slotId = computed(() => this.hubContext.slot()?.id ?? null);
+
+	/** Id de la semana vigente (P110-F14); `null` si el BE no pudo derivarla o no existe esa semana. */
+	protected readonly semanaVigenteId = computed(() => {
+		const vigente = this.vm().contenido?.semanaVigente;
+		if (!vigente) return null;
+		return this.vm().semanas.find((s) => s.numeroSemana === vigente)?.id ?? null;
+	});
+
+	/** Tareas nuevas al abrirse en esta visita: conservan la marca "Nueva" aunque ya se hayan registrado como vistas. */
+	private readonly vistasEstaVisita = signal<ReadonlySet<number>>(new Set());
 
 	protected readonly filteredSemanas = computed(() => {
 		const semanas = this.vm().semanas;
@@ -123,6 +137,35 @@ export class EstudianteCursoHubContenidoComponent {
 			untracked(() => {
 				this.searchQuery.set('');
 				this.openPanels.set([]);
+				this.vistasEstaVisita.set(new Set());
+			});
+		});
+
+		// Semana vigente: se expande sola y la vista se lleva hasta ella; el resto queda colapsado.
+		effect(() => {
+			const semanaId = this.semanaVigenteId();
+			if (semanaId === null) return;
+			untracked(() => {
+				if (this.openPanels().includes(semanaId)) return;
+				this.onAccordionChangeStr([...this.openPanels(), semanaId].map(String));
+				this.scrollToSemanaVigente();
+			});
+		});
+
+		// Una tarea nueva cuenta como vista cuando su semana está expandida (P110-F14, H11).
+		effect(() => {
+			const abiertas = this.openPanels();
+			const nuevas = this.tareasPendientes.nuevasIds();
+			const semanas = this.vm().semanas;
+			if (nuevas.size === 0) return;
+			untracked(() => {
+				const ids = semanas
+					.filter((s) => abiertas.includes(s.id))
+					.flatMap((s) => s.tareas.map((t) => t.id))
+					.filter((id) => nuevas.has(id));
+				if (ids.length === 0) return;
+				this.vistasEstaVisita.update((prev) => new Set([...prev, ...ids]));
+				ids.forEach((id) => this.tareasPendientes.marcarVista(id));
 			});
 		});
 	}
@@ -173,6 +216,19 @@ export class EstudianteCursoHubContenidoComponent {
 	// #endregion
 
 	// #region Helpers
+	protected esTareaNueva(tareaId: number): boolean {
+		return this.tareasPendientes.nuevasIds().has(tareaId) || this.vistasEstaVisita().has(tareaId);
+	}
+
+	/** Desplaza la vista hasta la semana vigente una vez que el acordeón la pintó expandida. */
+	private scrollToSemanaVigente(): void {
+		setTimeout(() => {
+			this.host.nativeElement
+				.querySelector('[data-semana-vigente="true"]')
+				?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+		});
+	}
+
 	protected getMisArchivosSemana(semanaId: number): EstudianteArchivoDto[] {
 		return this.vm().misArchivos[semanaId] ?? [];
 	}

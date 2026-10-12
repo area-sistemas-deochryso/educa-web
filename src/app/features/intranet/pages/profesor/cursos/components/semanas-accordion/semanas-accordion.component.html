@@ -50,10 +50,13 @@
 			@for (semana of filteredSemanas(); track semana.id) {
 				<edu-accordion-panel [value]="semana.id.toString()">
 					<edu-accordion-header data-info-anchor="profesor-semanas-accordion-header">
-						<div class="week-header">
+						<div class="week-header" [class.week-header--vigente]="semana.id === semanaVigenteId()" [attr.data-semana-vigente]="semana.id === semanaVigenteId() ? 'true' : null">
 							<span class="week-number">{{ semana.numeroSemana }}</span>
 							<div class="week-title-group">
 								<span class="week-label">Semana {{ semana.numeroSemana }}</span>
+								@if (semana.id === semanaVigenteId()) {
+									<span class="week-vigente-tag">Semana actual</span>
+								}
 								@if (semana.titulo) {
 									<span class="week-subtitle">{{ semana.titulo }}</span>
 								}

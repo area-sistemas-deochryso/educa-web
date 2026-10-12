@@ -142,6 +142,8 @@ export interface CursoContenidoDetalleDto {
 	salonDescripcion: string;
 	/** List of weeks with files and tasks. */
 	semanas: CursoContenidoSemanaDto[];
+	/** Current week (1..numeroSemanas) derived by the backend; absent when it cannot be derived. */
+	semanaVigente?: number | null;
 }
 
 /**

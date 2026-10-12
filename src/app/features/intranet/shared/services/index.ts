@@ -2,6 +2,7 @@
 export * from './calificacion-config';
 export * from './fab-menu-visibility.service';
 export * from './foro-unread';
+export * from './tareas-pendientes/tareas-pendientes.service';
 export * from './informative-mode.service';
 export * from './quick-access-layout.service';
 export * from './unsaved-changes-prompt.service';

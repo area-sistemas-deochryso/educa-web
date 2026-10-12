@@ -2,7 +2,7 @@
    agregar la referencia a app-test-tools-nav-link (import + entrada en `imports:`) cruza el
    límite por 1 línea. Partir este componente es un refactor propio, fuera de alcance de P107 F1. */
 // #region Imports
-import { ChangeDetectionStrategy, Component, HostListener, inject, OnInit, OnDestroy, AfterViewInit, DestroyRef, signal, effect, computed, viewChild, viewChildren, ElementRef, afterRenderEffect } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener, inject, OnInit, OnDestroy, AfterViewInit, DestroyRef, signal, effect, computed, viewChild, viewChildren, ElementRef, afterRenderEffect, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink, RouterOutlet, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs';
@@ -27,7 +27,7 @@ import { ModuloMenu, buildModuloMenus, detectModuloFromUrl } from './intranet-me
 import { findMenuItemDefByUrl, resolveMenuItemLabel } from '@intranet-shared/config/intranet-menu.config';
 import { ModuloId, MODULOS } from '@shared/constants';
 import { FeatureFlagsFacade } from '@core/services/feature-flags';
-import { QuickAccessLayoutService, ForoUnreadService } from '@intranet-shared/services';
+import { QuickAccessLayoutService, ForoUnreadService, TareasPendientesService } from '@intranet-shared/services';
 import { TestToolsNavLinkComponent } from './components/test-tools-nav-link';
 import { AccessDeniedModalComponent } from '@intranet-shared/components/access-denied-modal';
 import { WalMigrationBannerComponent } from '@intranet-shared/components/wal-migration-banner';
@@ -117,6 +117,7 @@ export class IntranetLayoutComponent implements OnInit, AfterViewInit, OnDestroy
 	private feedbackFacade = inject(FeedbackReportFacade);
 	readonly favoritesService = inject(QuickAccessLayoutService);
 	private readonly foroUnread = inject(ForoUnreadService);
+	private readonly tareasPendientes = inject(TareasPendientesService);
 	private readonly moduleSelector = viewChild(ModuleSelectorComponent);
 	private readonly mobileMenu = viewChild(MobileMenuComponent);
 
@@ -259,18 +260,29 @@ export class IntranetLayoutComponent implements OnInit, AfterViewInit, OnDestroy
 	 */
 	private readonly effectiveRol = computed(() => this.viewAsContext.activeContext()?.rol ?? this.authService.currentUser?.rol);
 
-	/** Badge del ítem "Foro" con mensajes no leídos (brief 542, P98 F4) — solo Estudiante por ahora. */
+	/**
+	 * Badges del menú — solo Estudiante por ahora: mensajes no leídos del "Foro" (brief 542,
+	 * P98 F4) y tareas nuevas sin abrir en "Mis Cursos" (P110-F14, H11).
+	 */
 	private buildBadgesByRoute(): Record<string, number> {
 		if (this.effectiveRol() !== 'Estudiante') return {};
-		const total = this.foroUnread.total();
-		return total > 0 ? { '/intranet/estudiante/foro': total } : {};
+		const badges: Record<string, number> = {};
+		const foro = this.foroUnread.total();
+		if (foro > 0) badges['/intranet/estudiante/foro'] = foro;
+		const tareasNuevas = this.tareasPendientes.nuevasCount();
+		if (tareasNuevas > 0) badges['/intranet/estudiante/cursos'] = tareasNuevas;
+		return badges;
 	}
 
 	constructor() {
 		effect(() => {
 			const loaded = this.userPermissionsService.loaded();
 			const caps = this.userPermissionsService.userCapabilities();
-			if (this.effectiveRol() === 'Estudiante') this.foroUnread.refresh();
+			if (this.effectiveRol() === 'Estudiante') {
+				this.foroUnread.refresh();
+				// untracked: el conteo de nuevas se lee más abajo; un refresh por cada cambio de conteo reabriría la carrera con el POST de vista.
+				untracked(() => this.tareasPendientes.refresh());
+			}
 			const badgesByRoute = this.buildBadgesByRoute();
 			if (loaded) {
 				const modulos = buildModuloMenus(caps, this.effectiveRol(), badgesByRoute);
