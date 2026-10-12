@@ -171,7 +171,7 @@ export class SessionActivityService {
 		} else {
 			this.errorHandler.showWarning(
 				'Sesión expirada',
-				'Tu sesión expiró. Iniciá sesión de nuevo.',
+				'Tu sesión expiró. Inicia sesión de nuevo.',
 				5000,
 			);
 		}

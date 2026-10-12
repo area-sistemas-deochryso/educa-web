@@ -73,7 +73,7 @@ export function setupCursoHubLegacyRedirect(source: CursoHubLegacyRedirectSource
 				return;
 			}
 			if (!source.loadError()) {
-				errorHandler.showWarning('Franja no disponible', 'No se encontró esa franja entre tus cursos.');
+				errorHandler.showWarning('Clase no disponible', 'No se encontró esa clase entre tus cursos.');
 			}
 			void router.navigate([], {
 				queryParams: { horarioId: null, tab: null, returnTo: null },

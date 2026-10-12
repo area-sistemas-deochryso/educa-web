@@ -146,7 +146,7 @@ export class QuarantineTabComponent implements OnInit {
 	onRelease(item: EmailQuarantineListaDto): void {
 		this.confirmationService.confirm({
 			header: 'Liberar cuarentena',
-			message: `¿Seguro que querés liberar la cuarentena de "${item.destinatario}"?`,
+			message: `¿Seguro que quieres liberar la cuarentena de "${item.destinatario}"?`,
 			acceptLabel: 'Liberar',
 			rejectLabel: 'Cancelar',
 			acceptButtonStyleClass: 'p-button-warning',

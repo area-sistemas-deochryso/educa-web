@@ -66,7 +66,7 @@ Items con el mismo `group.label` dentro de un módulo se renderizan como dropdow
 | Estudiante | Mensajes | Foro, Mensajería |
 | Estudiante | — (suelto) | Calendario, Videoconferencias |
 | Profesor | Mi Aula | Mis Cursos, Mis Salones, Mi Horario |
-| Profesor | Mi Seguimiento | Mis Calificaciones, Mi Asistencia, Resumen de Salones |
+| Profesor | Mi Seguimiento | Mis Calificaciones, Asistencia de mis cursos, Resumen de Salones |
 | Profesor | Mensajes | Foro, Mensajería |
 | Profesor | — (suelto) | Calendario, Videoconferencias |
 | Administrador | Académico | Cursos, Salones, Horarios |

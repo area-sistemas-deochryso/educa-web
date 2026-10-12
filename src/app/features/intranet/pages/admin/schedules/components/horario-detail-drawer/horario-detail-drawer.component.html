@@ -284,11 +284,11 @@
 								<div class="no-candidates-hint">
 									<i class="pi pi-info-circle"></i>
 									@if (modoAsignacion() === 'TutorPleno') {
-										<p>El salón <strong>{{ detalle()!.salonDescripcion }}</strong> no tiene tutor asignado. Asigná un profesor como tutor desde Gestión de Usuarios.</p>
+										<p>El salón <strong>{{ detalle()!.salonDescripcion }}</strong> no tiene tutor asignado. Asigna un profesor como tutor desde Gestión de Usuarios.</p>
 									} @else if (modoAsignacion() === 'PorCurso') {
-										<p>No hay profesores asignados al curso <strong>{{ detalle()!.cursoNombre }}</strong>. Asigná el curso a un profesor desde Gestión de Usuarios.</p>
+										<p>No hay profesores asignados al curso <strong>{{ detalle()!.cursoNombre }}</strong>. Asigna el curso a un profesor desde Gestión de Usuarios.</p>
 									} @else {
-										<p>No hay profesores disponibles. Registrá profesores desde Gestión de Usuarios.</p>
+										<p>No hay profesores disponibles. Registra profesores desde Gestión de Usuarios.</p>
 									}
 									<a
 										class="no-candidates-link"

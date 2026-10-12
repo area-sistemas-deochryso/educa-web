@@ -35,7 +35,7 @@ interface SlotOption {
 		<app-page-header icon="pi pi-book" [title]="cursoNombre()" [subtitle]="subtitle()">
 			@if (showSelector()) {
 				<div class="slot-selector" data-info-anchor="curso-hub-franja-selector">
-					<span class="slot-selector__label">Franja:</span>
+					<span class="slot-selector__label">Clase:</span>
 					<edu-select-button
 						[options]="options()"
 						optionLabel="label"

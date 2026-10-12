@@ -160,7 +160,7 @@ describe('CorreoIndividualFacade', () => {
 		expect(store.error()).toBe('SELECCION_REQUERIDA');
 		expect(errorHandler.showWarning).toHaveBeenCalledWith(
 			'Diagnóstico por correo',
-			expect.stringContaining('Seleccioná'),
+			expect.stringContaining('Selecciona'),
 		);
 	});
 

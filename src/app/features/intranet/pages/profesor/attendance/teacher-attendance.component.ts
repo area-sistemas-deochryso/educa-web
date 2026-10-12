@@ -88,7 +88,7 @@ import { EduSpinner, EduTab, EduTabPanel, EduTabs } from '@edu-ui';
 		<div class="asistencia-container">
 			<app-page-header
 				icon="pi pi-check-square"
-				title="Mi Asistencia"
+				title="Asistencia de mis cursos"
 				subtitle="Registra la asistencia diaria de tus cursos y revisa el resumen histórico"
 			/>
 
@@ -241,6 +241,9 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
 					this.asistenciaFacade.loadRegistro(this.pendingFecha, pending);
 					this.pendingFecha = null;
 				}
+			} else if (opts.length === 1 && this.selectedHorarioId() === null) {
+				// Con un solo curso no hay nada que elegir: se deja listo para registrar.
+				this.onCursoChange(opts[0].value);
 			}
 		});
 	}

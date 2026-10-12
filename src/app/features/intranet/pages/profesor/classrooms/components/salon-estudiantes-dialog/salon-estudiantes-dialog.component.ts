@@ -117,6 +117,7 @@ export class SalonEstudiantesDialogComponent {
 	readonly gruposCloseAsignar = output<void>();
 	readonly gruposConfirmDialogHide = output<void>();
 	readonly gruposTabActivated = output<void>();
+	readonly gruposIrAContenido = output<void>();
 	readonly gruposRefresh = output<void>();
 	readonly notasRefresh = output<void>();
 	readonly descargarBoletas = output<void>();

@@ -65,12 +65,12 @@ import type { ActualizarTareaRequest, CrearTareaRequest } from '@features/intran
 				<app-empty-state
 					icon="pi pi-exclamation-triangle"
 					title="Contenido"
-					message="No se pudo cargar el contenido de esta franja. Intenta de nuevo más tarde."
+					message="No se pudo cargar el contenido de este curso. Intenta de nuevo más tarde."
 				/>
 			} @else {
 				<div class="hub-contenido__empty" data-info-anchor="profesor-curso-hub-sin-contenido">
 					<i class="pi pi-book"></i>
-					<p class="m-0">Esta franja todavía no tiene contenido.</p>
+					<p class="m-0">Este curso todavía no tiene contenido.</p>
 					<edu-button
 						label="Crear contenido"
 						icon="pi pi-plus"

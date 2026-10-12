@@ -180,7 +180,7 @@ type TagSeverity = 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contr
 						[pt]="{ root: { 'aria-label': 'Refrescar asistencia' } }"
 					/>
 				</div>
-				<app-empty-state icon="pi pi-check-square" title="Mi asistencia" message="No hay asistencia disponible para esta franja." />
+				<app-empty-state icon="pi pi-check-square" title="Mi asistencia" message="No hay asistencia disponible para este curso." />
 			}
 		</div>
 	`,

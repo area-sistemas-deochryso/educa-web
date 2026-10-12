@@ -148,6 +148,22 @@ export class TeacherClassroomsComponent implements OnInit {
 		}
 	}
 
+	/** Salida del estado vacío de Grupos: lleva al hub del curso (abre en Contenido) del salón abierto. */
+	onGruposIrAContenido(): void {
+		const salon = this.vm().selectedSalon;
+		const cursoId = this.gruposCursoId;
+		if (!salon || !cursoId) return;
+		const horarioId = this.resolveHorarioId(salon.salonId, cursoId);
+		if (!horarioId) return;
+		const { commands, queryParams } = buildCursoHubLink(
+			'profesor',
+			{ id: horarioId, cursoId, salonId: salon.salonId },
+			{ withSlot: false },
+		);
+		this.onDialogVisibleChange(false);
+		this.router.navigate(commands, { queryParams });
+	}
+
 	onGruposCursoChange(cursoId: number): void {
 		const salon = this.vm().selectedSalon;
 		if (!salon) return;

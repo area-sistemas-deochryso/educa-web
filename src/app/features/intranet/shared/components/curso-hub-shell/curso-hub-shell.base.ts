@@ -283,8 +283,8 @@ export abstract class CursoHubShellBase implements OnInit, HasPendingChanges {
 		if (raw === null || raw === this.warnedRequest) return;
 		this.warnedRequest = raw;
 		this.errorHandler.showWarning(
-			'Franja no disponible',
-			'La franja indicada no corresponde a este curso. Se muestra la franja que corresponde por horario.',
+			'Clase no disponible',
+			'La clase indicada no corresponde a este curso. Se muestra la clase que corresponde por horario.',
 		);
 		void this.router.navigate([], {
 			queryParams: { horarioId: null },

@@ -42,6 +42,14 @@
 			No se ha creado contenido para este curso.<br />
 			Primero crea el contenido del curso para poder gestionar grupos.
 		</p>
+		<edu-button
+			class="empty-state__action"
+			label="Ir al contenido del curso"
+			icon="pi pi-arrow-right"
+			size="small"
+			data-info-anchor="profesor-grupos-ir-contenido"
+			(click)="irAContenido.emit()"
+		/>
 	</div>
 }
 <!-- #endregion -->

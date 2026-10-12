@@ -91,11 +91,11 @@ import { CursoHubCalificacionesLoader } from './curso-hub-calificaciones.loader'
 				<app-empty-state
 					icon="pi pi-exclamation-triangle"
 					title="Calificaciones"
-					message="No se pudo cargar el contenido de esta franja. Intenta de nuevo más tarde."
+					message="No se pudo cargar el contenido de este curso. Intenta de nuevo más tarde."
 				/>
 			} @else {
 				<div class="text-center p-4" data-info-anchor="profesor-curso-hub-calificaciones-sin-contenido">
-					<p class="m-0 mb-2">Esta franja todavía no tiene contenido, por lo que no hay evaluaciones.</p>
+					<p class="m-0 mb-2">Este curso todavía no tiene contenido, por lo que no hay evaluaciones.</p>
 					<a routerLink="../contenido" queryParamsHandling="merge" [replaceUrl]="true">Ir a Contenido</a>
 				</div>
 			}

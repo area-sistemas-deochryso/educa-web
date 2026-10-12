@@ -69,7 +69,7 @@ export class CorrelationSearchComponent {
 		const trimmed = this.query().trim();
 		if (trimmed.length === 0) return null; // aún no intentó buscar
 		if (trimmed.length < this.QUERY_MIN_LENGTH) {
-			return `Ingresá al menos ${this.QUERY_MIN_LENGTH} caracteres`;
+			return `Ingresa al menos ${this.QUERY_MIN_LENGTH} caracteres`;
 		}
 		if (trimmed.length > this.QUERY_MAX_LENGTH) {
 			return `Máximo ${this.QUERY_MAX_LENGTH} caracteres`;
@@ -117,8 +117,8 @@ export class CorrelationSearchComponent {
 					this.results.set(null);
 					this.error.set(
 						err.status === 400
-							? 'Filtros inválidos. Revisá la query, el rango de fechas o el DNI.'
-							: 'No se pudo completar la búsqueda. Reintentá en unos segundos.',
+							? 'Filtros inválidos. Revisa la query, el rango de fechas o el DNI.'
+							: 'No se pudo completar la búsqueda. Reintenta en unos segundos.',
 					);
 				},
 			});

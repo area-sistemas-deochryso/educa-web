@@ -2,7 +2,7 @@
 	@if (!canAccess) {
 		<div class="empty-state">
 			<i class="pi pi-lock text-3xl mb-2"></i>
-			<p>No tenés permiso para acceder al catálogo de tipos.</p>
+			<p>No tienes permiso para acceder al catálogo de tipos.</p>
 		</div>
 	} @else {
 		<div class="toolbar">
@@ -16,12 +16,12 @@
 		} @else if (error()) {
 			<div class="empty-state">
 				<i class="pi pi-exclamation-triangle text-3xl mb-2"></i>
-				<p>No se pudo cargar el catálogo. Intentá de nuevo.</p>
+				<p>No se pudo cargar el catálogo. Intenta de nuevo.</p>
 			</div>
 		} @else if (tipos().length === 0) {
 			<div class="empty-state">
 				<i class="pi pi-tags text-3xl mb-2"></i>
-				<p>Todavía no hay tipos de ticket. Creá el primero.</p>
+				<p>Todavía no hay tipos de ticket. Crea el primero.</p>
 			</div>
 		} @else {
 			<section class="table-section">

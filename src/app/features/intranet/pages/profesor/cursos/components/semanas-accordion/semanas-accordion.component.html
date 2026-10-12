@@ -162,17 +162,17 @@
 							<!-- #region Tareas -->
 							<div class="section-block">
 								<div class="section-header">
-									<button
-										class="section-label section-action"
-										type="button"
-										data-info-anchor="profesor-semanas-agregar-tarea"
-										(click)="setActiveSemanaForTarea(semana); onAddTarea()"
-										aria-label="Agregar tarea"
-									>
+									<div class="section-label">
 										<i class="pi pi-file-edit"></i>
 										Tareas
-										<i class="pi pi-plus action-hint"></i>
-									</button>
+									</div>
+									<edu-button
+										label="Agregar tarea"
+										icon="pi pi-plus"
+										size="small"
+										data-info-anchor="profesor-semanas-agregar-tarea"
+										(click)="setActiveSemanaForTarea(semana); onAddTarea()"
+									/>
 								</div>
 
 								@if (semana.tareas.length === 0) {

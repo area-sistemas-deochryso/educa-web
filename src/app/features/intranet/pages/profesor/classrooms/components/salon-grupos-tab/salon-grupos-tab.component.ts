@@ -58,6 +58,7 @@ export class SalonGruposTabComponent {
 	readonly openAsignar = output<number>();
 	readonly closeAsignar = output<void>();
 	readonly confirmDialogHide = output<void>();
+	readonly irAContenido = output<void>();
 	// #endregion
 
 	// #region Estado local
