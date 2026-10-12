@@ -188,6 +188,52 @@ describe('AttendanceCourseFacade', () => {
 			expect(errorHandler.showSuccess).toHaveBeenCalled();
 		});
 
+		it('INV-AC10: sends esRecuperacion and motivo once the date is declared as recovery', async () => {
+			store.setRegistroData(mockRegistroData as never);
+			facade.declararRecuperacion('2026-03-21', 'Clase recuperada por feriado');
+
+			facade.registrar(1);
+
+			await vi.waitFor(() => {
+				expect(api.registrarAsistenciaCurso).toHaveBeenCalledWith(
+					1,
+					expect.objectContaining({ esRecuperacion: true, motivo: 'Clase recuperada por feriado' }),
+				);
+			});
+		});
+
+		it('INV-AC10: does not send the recovery fields for a regular date', async () => {
+			store.setRegistroData(mockRegistroData as never);
+
+			facade.registrar(1);
+
+			await vi.waitFor(() => expect(api.registrarAsistenciaCurso).toHaveBeenCalled());
+			const dto = api.registrarAsistenciaCurso.mock.calls[0][1];
+			expect(dto).not.toHaveProperty('esRecuperacion');
+			expect(dto).not.toHaveProperty('motivo');
+		});
+
+		it('INV-AC10: ignores a recovery declared for a date that is not the loaded one', () => {
+			store.setRegistroData(mockRegistroData as never);
+
+			facade.declararRecuperacion('2026-03-28', 'Clase recuperada por feriado');
+
+			expect(store.registroData()?.esRecuperacion).toBeUndefined();
+		});
+
+		it('INV-AC10: re-sends the recovery of a list loaded from the server', async () => {
+			store.setRegistroData({ ...mockRegistroData, esRecuperacion: true, motivoRecuperacion: 'Feriado del jueves' } as never);
+
+			facade.registrar(1);
+
+			await vi.waitFor(() => {
+				expect(api.registrarAsistenciaCurso).toHaveBeenCalledWith(
+					1,
+					expect.objectContaining({ esRecuperacion: true, motivo: 'Feriado del jueves' }),
+				);
+			});
+		});
+
 		it('should do nothing without data', () => {
 			facade.registrar(1);
 			expect(api.registrarAsistenciaCurso).not.toHaveBeenCalled();

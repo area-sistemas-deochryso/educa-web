@@ -223,6 +223,10 @@ export const UI_ERROR_CODES: Record<string, string> = {
 	TIPO_PERSONA_INVALIDO: 'Tipo de persona inválido.',
 	ASISTENCIA_RANGO_INVALIDO: 'El rango de fechas es inválido.',
 	ASISTENCIA_FECHA_FUTURA: 'La fecha no puede ser posterior a hoy.',
+	ASISTENCIA_FECHA_DIA_INCORRECTO:
+		'La fecha no corresponde al día de horario del curso. Si es una clase de recuperación, confírmala con su motivo.',
+	ASISTENCIA_MOTIVO_RECUPERACION_INSUFICIENTE:
+		'El motivo de la recuperación debe tener al menos 10 caracteres.',
 	ASISTENCIA_FECHA_ANTERIOR_PERIODO: 'La fecha es anterior al inicio del periodo.',
 	ASISTENCIA_ESTUDIANTE_DUPLICADO:
 		'Hay un estudiante repetido en la lista de asistencia a guardar.',

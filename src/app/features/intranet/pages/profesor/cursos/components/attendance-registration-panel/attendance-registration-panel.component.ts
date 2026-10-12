@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, input, output, computed, effect, inject, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, output, computed, effect, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import {
@@ -10,20 +10,26 @@ import {
 } from '@features/intranet/pages/profesor/models';
 import { findNearestValidDate } from './attendance-registration-panel.helpers';
 import { SkeletonLoaderComponent } from '@shared/components';
-import { EduButton, EduConfirmDialog, EduConfirmationService, EduDatePicker, EduInputText, EduTag, EduTooltip } from '@edu-ui';
+import { EduButton, EduDatePicker, EduDialog, EduInputText, EduTag, EduTextarea, EduTooltip } from '@edu-ui';
+
+/** Motivo mínimo de una recuperación (`INV-AC10`, criterio de `INV-AD04`); el BE lo valida tras recortar. */
+export const MOTIVO_RECUPERACION_MIN_LENGTH = 10;
+
+/** Recuperación declarada para la lista cargada: `fecha` es la de esa lista (`yyyy-mm-dd`). */
+export interface RecuperacionDeclarada {
+	fecha: string;
+	motivo: string | null;
+}
 
 @Component({
 	selector: 'app-attendance-registration-panel',
 	standalone: true,
-	imports: [FormsModule, EduButton, EduDatePicker, EduTag, EduInputText, EduTooltip, EduConfirmDialog, SkeletonLoaderComponent],
-	providers: [EduConfirmationService],
+	imports: [FormsModule, EduButton, EduDatePicker, EduDialog, EduTag, EduInputText, EduTextarea, EduTooltip, SkeletonLoaderComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './attendance-registration-panel.component.html',
 	styleUrl: './attendance-registration-panel.component.scss',
 })
 export class AttendanceRegistrationPanelComponent {
-	private readonly confirmationService = inject(EduConfirmationService);
-
 	// #region Inputs
 	readonly estudiantes = input<AsistenciaCursoEstudianteDto[]>([]);
 	readonly loading = input(false);
@@ -45,6 +51,8 @@ export class AttendanceRegistrationPanelComponent {
 	readonly initialFecha = input<string | null>(null);
 	/** Sube cuando el padre rechazó el cambio de fecha: el datepicker vuelve a `initialFecha` aunque no haya cambiado. */
 	readonly fechaResetKey = input(0);
+	/** Recuperación ya declarada para la lista cargada (confirmada aquí o traída del servidor); null si no hay. */
+	readonly recuperacion = input<RecuperacionDeclarada | null>(null);
 	// #endregion
 
 	// #region Outputs
@@ -52,14 +60,16 @@ export class AttendanceRegistrationPanelComponent {
 	readonly estadoChange = output<{ estudianteId: number; estado: EstadoAsistenciaCurso }>();
 	readonly justificacionChange = output<{ estudianteId: number; justificacion: string | null }>();
 	readonly save = output<void>();
+	/** El profesor declaró la fecha elegida como clase de recuperación, con su motivo ya recortado y válido. */
+	readonly recuperacionConfirm = output<{ fecha: string; motivo: string }>();
 	// #endregion
 
 	// #region Estado local
 	selectedDate: Date = new Date();
 	private lastAppliedInitialFecha: string | null = null;
 	private lastAppliedResetKey = 0;
-	/** Fecha ("yyyy-mm-dd") para la que el profesor confirmó explícitamente la excepción; null si no confirmó ninguna. */
-	private readonly confirmedFor = signal<string | null>(null);
+	readonly motivoDialogVisible = signal(false);
+	readonly motivoText = signal('');
 	// #endregion
 
 	constructor() {
@@ -80,6 +90,7 @@ export class AttendanceRegistrationPanelComponent {
 	readonly hasEstudiantes = computed(() => this.estudiantes().length > 0);
 	/** true solo cuando el backend confirmó explícitamente que no hay registro guardado (evita falso positivo si el flag no llegó). */
 	readonly esListaSinGuardar = computed(() => this.tieneRegistros() === false);
+	readonly motivoValido = computed(() => this.motivoText().trim().length >= MOTIVO_RECUPERACION_MIN_LENGTH);
 	/** "HH:MM" del último guardado confirmado, para el indicador "Guardado a las …". */
 	readonly guardadoALabel = computed(() => {
 		const fecha = this.guardadoA();
@@ -113,9 +124,9 @@ export class AttendanceRegistrationPanelComponent {
 		this.save.emit();
 	}
 
-	/** true solo mientras `selectedDate` sea la fecha atípica confirmada: volver a ella restituye la confirmación, otra fecha no la hereda. */
+	/** true solo mientras `selectedDate` sea la fecha de la recuperación declarada: otra fecha no la hereda. */
 	confirmadoFechaAtipica(): boolean {
-		return this.confirmedFor() === this.formatDate(this.selectedDate);
+		return this.recuperacion()?.fecha === this.formatDate(this.selectedDate);
 	}
 
 	/** `selectedDate` no es un signal, por eso se deriva en cada lectura en vez de cachearse en un `computed`. */
@@ -138,17 +149,20 @@ export class AttendanceRegistrationPanelComponent {
 		this.onDateSelect();
 	}
 
-	/** Pide confirmación explícita para guardar en una fecha fuera del día de horario (ej. clase de recuperación). */
+	/** Abre el diálogo que pide el motivo para declarar la fecha elegida como clase de recuperación. */
 	confirmarFechaAtipica(): void {
-		const fecha = this.formatDate(this.selectedDate);
-		this.confirmationService.confirm({
-			message:
-				'La fecha elegida no corresponde al día de horario del curso. ¿Confirmás que es una clase de recuperación u otra excepción válida?',
-			header: 'Confirmar fecha atípica',
-			acceptLabel: 'Sí, guardar igual',
-			rejectLabel: 'Cancelar',
-			accept: () => this.confirmedFor.set(fecha),
-		});
+		this.motivoText.set(this.recuperacion()?.motivo ?? '');
+		this.motivoDialogVisible.set(true);
+	}
+
+	onMotivoDialogVisibleChange(visible: boolean): void {
+		this.motivoDialogVisible.set(visible);
+	}
+
+	confirmarRecuperacion(): void {
+		if (!this.motivoValido()) return;
+		this.recuperacionConfirm.emit({ fecha: this.formatDate(this.selectedDate), motivo: this.motivoText().trim() });
+		this.motivoDialogVisible.set(false);
 	}
 	// #endregion
 

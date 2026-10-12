@@ -41,6 +41,9 @@ export interface AsistenciaCursoFechaDto {
 	estudiantes: AsistenciaCursoEstudianteDto[];
 	/** false = lista sin guardar (defaults). undefined = backend sin el flag desplegado todavía. */
 	tieneRegistros?: boolean;
+	/** `INV-AC10`: la fecha guardada es una clase de recuperación (fuera del día de horario). Ausente en un BE anterior a P110-F5. */
+	esRecuperacion?: boolean;
+	motivoRecuperacion?: string | null;
 }
 
 export interface AsistenciaCursoResumenEstudianteDto {
@@ -72,5 +75,8 @@ export interface AsistenciaCursoItemDto {
 export interface RegistrarAsistenciaCursoDto {
 	fecha: string;
 	asistencias: AsistenciaCursoItemDto[];
+	/** Fuera del día de horario solo se acepta con `esRecuperacion: true` y `motivo` ≥10 caracteres (`INV-AC10`). */
+	esRecuperacion?: boolean;
+	motivo?: string;
 }
 // #endregion
