@@ -8,11 +8,9 @@ import {
 	CalificacionConMiNotaDto,
 } from '@features/intranet/pages/estudiante/models';
 import {
-	getNotaSeverity,
+	getNotaSeverity as getNotaSeverityFn,
 	formatNotaConConfig,
-	calcularPorcentajeEvaluado,
-	getPromedioSeverity,
-	esPromedioProvisional,
+	getRotuloParcial,
 } from '@intranet-shared/services/calificacion-config';
 import type { ConfiguracionCalificacionListDto } from '@data/models';
 import { EduAccordion, EduAccordionHeader, EduAccordionPanel, EduTag } from '@edu-ui';
@@ -54,21 +52,21 @@ export class NotasCursoCardComponent {
 		});
 	}
 
-	readonly promedioGeneral = computed(() => this.curso().promedios.general);
+	/** Promedio parcial del BE (INV-C12). `null` con cobertura 0: la UI dice "Sin calificar", nunca una cifra. */
+	readonly promedioParcial = computed(() => this.curso().promedios.promedioParcial);
 
-	/** % del peso total del curso que ya tiene nota registrada (INV-C04: pesos no se normalizan). */
-	readonly porcentajeEvaluado = computed(() =>
-		calcularPorcentajeEvaluado(this.curso().evaluaciones),
+	/** % del curso con nota, entregado por el BE (INV-C12) — el FE no lo deriva. */
+	readonly coberturaEvaluada = computed(() => this.curso().promedios.coberturaEvaluada);
+
+	readonly sinCalificar = computed(() => this.coberturaEvaluada() === 0 || this.promedioParcial() === null);
+
+	/** "Parcial · X % evaluado" mientras la cobertura < 100 %; sin rotulo al 100 %. */
+	readonly rotuloParcial = computed(() =>
+		this.sinCalificar() ? null : getRotuloParcial(this.coberturaEvaluada()),
 	);
 
-	/** Color del promedio general, neutralizado mientras la cobertura evaluada esta por debajo del umbral. */
-	readonly promedioSeverity = computed(() =>
-		getPromedioSeverity(this.promedioGeneral(), this.porcentajeEvaluado(), this.calificacionConfig()),
-	);
-
-	readonly promedioProvisional = computed(() =>
-		esPromedioProvisional(this.promedioGeneral(), this.porcentajeEvaluado()),
-	);
+	/** Semaforo sobre el parcial, sin neutralizar por cobertura (INV-C12). */
+	readonly promedioSeverity = computed(() => getNotaSeverityFn(this.promedioParcial(), this.calificacionConfig()));
 
 	/**
 	 * Conteo simple de evaluaciones (no ponderado) — distinto de `porcentajeEvaluado`,
@@ -91,7 +89,7 @@ export class NotasCursoCardComponent {
 			return [
 				{
 					periodo: { id: -1, nombre: 'General', orden: 0, semanaInicio: 0, semanaFin: 0 },
-					promedio: curso.promedios.general,
+					promedio: curso.promedios.promedioParcial,
 					evaluaciones: curso.evaluaciones,
 				}];
 		}
@@ -111,7 +109,7 @@ export class NotasCursoCardComponent {
 	});
 
 	getNotaSeverity(nota: number | null): 'success' | 'warn' | 'danger' | 'secondary' {
-		return getNotaSeverity(nota, this.calificacionConfig());
+		return getNotaSeverityFn(nota, this.calificacionConfig());
 	}
 
 	formatNota(nota: number | null): string {

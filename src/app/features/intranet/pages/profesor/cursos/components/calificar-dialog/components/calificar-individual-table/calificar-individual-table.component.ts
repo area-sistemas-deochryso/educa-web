@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
+import { Component, ChangeDetectionStrategy, computed, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NOTA_MINIMA, NOTA_MAXIMA, NotaRow } from '@features/intranet/pages/profesor/models';
 import {
@@ -25,6 +25,12 @@ export class CalificarIndividualTableComponent {
 	readonly isLiteral = input(false);
 	readonly literales = input<ConfiguracionLiteralDto[]>([]);
 	// #endregion
+
+	/** Cabecera según la escala del salón (H17): "Nota (AD · A · B · C)" en LITERAL, "Nota (0-20)" en NUMERICO. */
+	readonly notaHeader = computed(() => {
+		const letras = this.literales().map((l) => l.letra);
+		return this.isLiteral() && letras.length > 0 ? `Nota (${letras.join(' · ')})` : 'Nota (0-20)';
+	});
 
 	// #region Outputs
 	readonly edited = output<void>();

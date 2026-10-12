@@ -1,22 +1,20 @@
 <div class="curso-card">
 	<!-- #region Hero promedio -->
 	<div class="hero-promedio">
-		<span class="hero-label">Promedio General</span>
-		<span class="hero-number" [class]="'severity-' + promedioSeverity()">
-			{{ formatNota(promedioGeneral()) }}
-			@if (promedioProvisional()) {
-				<i
-					class="pi pi-clock hero-provisional-icon"
-					title="Promedio provisional — se actualizará conforme se califiquen más evaluaciones"
-				></i>
+		<span class="hero-label">Promedio</span>
+		@if (sinCalificar()) {
+			<span class="hero-number hero-number--vacio severity-secondary">Sin calificar</span>
+		} @else {
+			<span class="hero-number" [class]="'severity-' + promedioSeverity()">{{ formatNota(promedioParcial()) }}</span>
+			@if (rotuloParcial(); as rotulo) {
+				<span class="hero-parcial-rotulo">{{ rotulo }}</span>
 			}
-		</span>
+		}
 		<app-curso-chip class="hero-curso" [cursoId]="curso().cursoId" [nombre]="curso().cursoNombre" />
 		<span class="text-sm text-color-secondary">{{ curso().salonDescripcion }}</span>
-		@if (porcentajeEvaluado() < 100) {
+		@if (coberturaEvaluada() < 100) {
 			<div class="hero-evaluado-note">
 				<span>Evaluaciones calificadas: {{ evaluacionesProgreso().completadas }}/{{ evaluacionesProgreso().total }}</span>
-				<span>Cobertura del curso: {{ porcentajeEvaluado() }}%</span>
 			</div>
 		}
 	</div>
@@ -36,10 +34,10 @@
 		}
 		@if (curso().periodos.length > 0) {
 			<div class="periodo-chip periodo-general">
-				<span class="periodo-name">General</span>
+				<span class="periodo-name">{{ rotuloParcial() ? 'Parcial' : 'General' }}</span>
 				<edu-tag
-					[value]="formatNota(promedioGeneral())"
-					[severity]="promedioSeverity()"
+					[value]="sinCalificar() ? 'Sin calificar' : formatNota(promedioParcial())"
+					[severity]="sinCalificar() ? 'secondary' : promedioSeverity()"
 					[rounded]="true"
 				/>
 			</div>

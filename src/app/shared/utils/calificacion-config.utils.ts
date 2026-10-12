@@ -91,11 +91,40 @@ export function formatNotaConConfig(
 }
 // #endregion
 
-// #region Cobertura del promedio general
+// #region Promedio parcial (INV-C12)
+/**
+ * Promedio parcial = Σ(nota × peso) ÷ Σ(peso) sobre las evaluaciones con nota,
+ * 1 decimal. Espejo local del calculo del BE para el simulador de notas del
+ * estudiante; el promedio parcial real de "Mis notas" lo entrega el BE.
+ * Retorna null si no hay evaluaciones con peso (cobertura 0).
+ */
+export function calcularPromedioParcial(
+	evaluaciones: { nota: number; peso: number }[],
+): number | null {
+	const pesoTotal = evaluaciones.reduce((acc, e) => acc + e.peso, 0);
+	if (evaluaciones.length === 0 || pesoTotal <= 0) return null;
+	const suma = evaluaciones.reduce((acc, e) => acc + e.nota * e.peso, 0);
+	return Math.round((suma / pesoTotal) * 10) / 10;
+}
+
+/** Cobertura (0-100, entero) de un conjunto de evaluaciones calificadas: Σ(peso) × 100, tope 100. */
+export function calcularCoberturaPorPesos(evaluaciones: { peso: number }[]): number {
+	const pesoTotal = evaluaciones.reduce((acc, e) => acc + e.peso, 0);
+	return Math.min(100, Math.round(pesoTotal * 100));
+}
+
+/** Rotulo de un promedio parcial: "Parcial · 20 % evaluado". Con cobertura 100 % no hay rotulo (parcial = oficial). */
+export function getRotuloParcial(cobertura: number): string | null {
+	return cobertura < 100 ? `Parcial · ${cobertura} % evaluado` : null;
+}
+// #endregion
+
+// #region Cobertura del promedio general (vistas del profesor — INV-C04)
 /**
  * Umbral de % del curso evaluado por debajo del cual el promedio general
  * se muestra en color neutro en vez del semaforo real. Ajustable — no es
- * un valor de negocio cerrado.
+ * un valor de negocio cerrado. Solo vistas del profesor: el estudiante usa
+ * el promedio parcial del BE (INV-C12) y no neutraliza por cobertura.
  */
 export const UMBRAL_COBERTURA_PROMEDIO_GENERAL = 50;
 

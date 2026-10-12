@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
+import { Component, ChangeDetectionStrategy, computed, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import {
@@ -7,7 +7,7 @@ import {
 	NOTA_MAXIMA,
 } from '@features/intranet/pages/estudiante/models';
 import { NotaSimulada } from '../../services/estudiante-notas.models';
-import { getNotaSeverity, formatNotaConConfig } from '@intranet-shared/services/calificacion-config';
+import { getNotaSeverity, formatNotaConConfig, getRotuloParcial } from '@intranet-shared/services/calificacion-config';
 import type { ConfiguracionCalificacionListDto } from '@data/models';
 import { EduButton, EduDrawer, EduInputNumber, EduTag } from '@edu-ui';
 
@@ -25,6 +25,7 @@ export class SimuladorNotasComponent {
 	readonly curso = input.required<EstudianteMisNotasDto>();
 	readonly simulaciones = input<NotaSimulada[]>([]);
 	readonly promedioSimulado = input<number | null>(null);
+	readonly coberturaSimulada = input(0);
 	readonly calificacionConfig = input<ConfiguracionCalificacionListDto | null>(null);
 	// #endregion
 
@@ -33,6 +34,10 @@ export class SimuladorNotasComponent {
 	readonly notaChange = output<{ calificacionId: number; nota: number | null }>();
 	readonly resetSimulacion = output<void>();
 	// #endregion
+
+	readonly rotuloParcial = computed(() =>
+		this.promedioSimulado() === null ? null : getRotuloParcial(this.coberturaSimulada()),
+	);
 
 	// #region Constants
 	readonly notaMin = NOTA_MINIMA;

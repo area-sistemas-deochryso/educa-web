@@ -33,12 +33,12 @@
 	&.severity-warn { color: var(--yellow-500); }
 	&.severity-danger { color: var(--red-500); }
 	&.severity-secondary { color: var(--text-color-secondary); }
+	&.hero-number--vacio { font-size: 1.5rem; }
 }
 
-.hero-provisional-icon {
-	font-size: 1.1rem;
-	margin-left: 0.4rem;
-	vertical-align: middle;
+.hero-parcial-rotulo {
+	font-size: 0.85rem;
+	font-weight: 600;
 	color: var(--text-color-secondary);
 }
 

@@ -3,8 +3,8 @@ import {
 	EstudianteMisNotasDto,
 	CalificacionConMiNotaDto,
 	VistaPromedio,
-	calcularPromedioPonderado,
 } from '../../models';
+import { calcularCoberturaPorPesos, calcularPromedioParcial } from '@shared/utils';
 import { NotaSimulada } from './estudiante-notas.models';
 
 interface EstudianteNotasState {
@@ -55,17 +55,29 @@ export class EstudianteNotasStore {
 		this.cursos().map((c, i) => ({ label: `${c.cursoNombre} - ${c.salonDescripcion}`, value: i })),
 	);
 
-	/** Promedios simulados del curso seleccionado */
-	readonly promedioSimulado = computed<number | null>(() => {
+	/** Notas simuladas ya ingresadas del curso seleccionado, o `null` si no se simuló nada. */
+	private readonly itemsSimulados = computed(() => {
 		const curso = this.selectedCurso();
 		if (!curso) return null;
 		const sims = this.simulaciones()[curso.cursoNombre];
-		if (!sims || sims.length === 0) return curso.promedios.general;
-
-		const items = sims
+		if (!sims || sims.length === 0) return null;
+		return sims
 			.filter((s): s is NotaSimulada & { notaSimulada: number } => s.notaSimulada !== null)
 			.map((s) => ({ nota: s.notaSimulada, peso: s.peso }));
-		return calcularPromedioPonderado(items);
+	});
+
+	/** Promedio parcial simulado (INV-C12): Σ(nota×peso) ÷ Σ(peso) sobre lo calificado + simulado. */
+	readonly promedioSimulado = computed<number | null>(() => {
+		const items = this.itemsSimulados();
+		if (items === null) return this.selectedCurso()?.promedios.promedioParcial ?? null;
+		return calcularPromedioParcial(items);
+	});
+
+	/** Cobertura (0-100) de lo calificado + simulado, para el rótulo "Parcial · X % evaluado". */
+	readonly coberturaSimulada = computed<number>(() => {
+		const items = this.itemsSimulados();
+		if (items === null) return this.selectedCurso()?.promedios.coberturaEvaluada ?? 0;
+		return calcularCoberturaPorPesos(items);
 	});
 
 	readonly totalCursos = computed(() => this.cursos().length);
@@ -81,6 +93,7 @@ export class EstudianteNotasStore {
 		simuladorVisible: this.simuladorVisible(),
 		simulaciones: this.simulaciones(),
 		promedioSimulado: this.promedioSimulado(),
+		coberturaSimulada: this.coberturaSimulada(),
 		totalCursos: this.totalCursos(),
 		isEmpty: this.cursos().length === 0,
 	}));

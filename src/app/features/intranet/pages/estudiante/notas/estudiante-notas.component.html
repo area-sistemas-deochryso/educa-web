@@ -112,6 +112,7 @@
 			[curso]="curso"
 			[simulaciones]="vm().simulaciones[curso.cursoNombre]"
 			[promedioSimulado]="vm().promedioSimulado"
+			[coberturaSimulada]="vm().coberturaSimulada"
 			(visibleChange)="onCloseSimulador()"
 			(notaChange)="onSimulacionChange($event)"
 			(resetSimulacion)="onResetSimulacion()"

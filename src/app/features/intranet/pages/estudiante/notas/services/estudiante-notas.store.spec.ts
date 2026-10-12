@@ -156,6 +156,51 @@ describe('EstudianteNotasStore', () => {
 	});
 	// #endregion
 
+	// #region Promedio parcial simulado (INV-C12)
+	describe('promedio parcial simulado (INV-C12)', () => {
+		const cursoParcial = [
+			{
+				cursoNombre: 'Arte', salonDescripcion: '1A',
+				evaluaciones: [
+					{ id: 1, nombre: 'Examen', nota: 15.5, peso: 0.2 },
+					{ id: 2, nombre: 'Trabajo', nota: null, peso: 0.8 },
+				],
+				promedios: { general: 3.1, promedioParcial: 15.5, coberturaEvaluada: 20, porPeriodo: [], porSemana: [] },
+			},
+		] as unknown as EstudianteMisNotasDto[];
+
+		beforeEach(() => store.setCursos(cursoParcial));
+
+		it('should use the BE partial average and coverage before simulating', () => {
+			expect(store.promedioSimulado()).toBe(15.5);
+			expect(store.coberturaSimulada()).toBe(20);
+		});
+
+		it('should normalize by the graded weight instead of showing the raw sum', () => {
+			store.openSimulador();
+
+			expect(store.promedioSimulado()).toBe(15.5);
+			expect(store.coberturaSimulada()).toBe(20);
+		});
+
+		it('should widen coverage and recompute the partial when simulating a pending evaluation', () => {
+			store.openSimulador();
+			store.updateSimulacion('Arte', 2, 10);
+
+			expect(store.coberturaSimulada()).toBe(100);
+			expect(store.promedioSimulado()).toBe(11.1);
+		});
+
+		it('should have no partial average when every simulated nota is cleared', () => {
+			store.openSimulador();
+			store.updateSimulacion('Arte', 1, null);
+
+			expect(store.promedioSimulado()).toBeNull();
+			expect(store.coberturaSimulada()).toBe(0);
+		});
+	});
+	// #endregion
+
 	// #region Vista
 	describe('vista', () => {
 		it('should change vista actual', () => {

@@ -117,7 +117,12 @@ export interface PromedioPeriodoDto {
 export interface EstudiantePromediosDto {
   porSemana: PromedioSemanaDto[];
   porPeriodo: PromedioPeriodoDto[];
+  /** Promedio oficial (INV-C04, Σ nota×peso). No usar como "promedio" en la UI del estudiante. */
   general: number | null;
+  /** Promedio parcial sobre lo calificado (INV-C12). `null` si cobertura 0. Lo calcula el BE. */
+  promedioParcial: number | null;
+  /** % del curso con nota (0-100, entero). Lo calcula el BE (INV-C12). */
+  coberturaEvaluada: number;
 }
 
 export interface EstudianteMisNotasDto {
