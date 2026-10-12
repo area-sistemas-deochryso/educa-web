@@ -57,6 +57,7 @@ describe('EstudianteCursoHubContenidoComponent', () => {
 		filteredSemanas: () => typeof SEMANAS;
 		onAccordionChangeStr(values: string[]): void;
 		onRefreshContenido(): void;
+		estadoTarea(tarea: { id: number; fechaLimite: string | null }): { kind: string; label: string } | null;
 		openArchivo(archivo: { nombreArchivo: string; urlArchivo: string; tipoArchivo: string | null }): void;
 	}
 
@@ -160,6 +161,38 @@ describe('EstudianteCursoHubContenidoComponent', () => {
 			component.onRefreshContenido();
 
 			expect(facade.refreshContenido).toHaveBeenCalledOnce();
+		});
+	});
+
+	describe('estado de la tarea', () => {
+		const archivo = { id: 1, nombreArchivo: 'tarea.pdf' };
+
+		it('has no estado until the student files of the tarea are loaded', () => {
+			const { component } = create();
+
+			expect(component.estadoTarea({ id: 100, fechaLimite: '2000-01-01' })).toBeNull();
+		});
+
+		it('is entregada when the student uploaded at least one file, even past the due date', () => {
+			vm.set({ ...baseVm, misTareaArchivos: { 100: [archivo] } });
+			const { component } = create();
+
+			expect(component.estadoTarea({ id: 100, fechaLimite: '2000-01-01' })?.kind).toBe('entregada');
+		});
+
+		it('is pendiente with no files and a future or missing due date', () => {
+			vm.set({ ...baseVm, misTareaArchivos: { 100: [] } });
+			const { component } = create();
+
+			expect(component.estadoTarea({ id: 100, fechaLimite: '2999-12-31T00:00:00' })?.kind).toBe('pendiente');
+			expect(component.estadoTarea({ id: 100, fechaLimite: null })?.kind).toBe('pendiente');
+		});
+
+		it('is vencida with no files once the due date has passed', () => {
+			vm.set({ ...baseVm, misTareaArchivos: { 100: [] } });
+			const { component } = create();
+
+			expect(component.estadoTarea({ id: 100, fechaLimite: '2000-01-01T00:00:00' })?.kind).toBe('vencida');
 		});
 	});
 });
