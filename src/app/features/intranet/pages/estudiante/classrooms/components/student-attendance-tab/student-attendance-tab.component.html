@@ -44,8 +44,14 @@
 				<div class="stat-label">Falto</div>
 			</div>
 			<div class="stat-card stat-info">
-				<div class="stat-value">{{ s.porcentajeAsistencia }}%</div>
-				<div class="stat-label">Asistencia</div>
+				@if (s.porcentajeAsistencia === null) {
+					<div class="stat-value">{{ emptyLabel }}</div>
+					<div class="stat-label">Asistencia</div>
+				} @else {
+					<div class="stat-value">{{ s.porcentajeAsistencia }}%</div>
+					<div class="stat-label">Asistencia</div>
+					<div class="stat-legend">{{ legend }}</div>
+				}
 			</div>
 		</div>
 	}

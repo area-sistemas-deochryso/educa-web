@@ -1,3 +1,4 @@
+export * from './attendance-percentage.utils';
 export * from './calificacion-config.utils';
 export * from './client-paging.utils';
 export * from './date-range.utils';

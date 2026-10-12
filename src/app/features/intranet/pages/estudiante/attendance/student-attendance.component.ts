@@ -15,7 +15,12 @@ import { ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { logger, withRetry, detectarNivel } from '@core/helpers';
 import { ErrorStateComponent } from '@shared/components';
-import { createClientPaging } from '@shared/utils';
+import {
+	ATTENDANCE_EMPTY_LABEL,
+	ATTENDANCE_PERCENTAGE_LEGEND,
+	calcAttendancePercentage,
+	createClientPaging,
+} from '@shared/utils';
 import { PageHeaderComponent } from '@intranet-shared/components';
 import { EstudianteFacade } from '../services/estudiante.facade';
 import {
@@ -113,9 +118,11 @@ export class StudentAttendanceComponent implements OnInit {
 
 	readonly porcentaje = computed(() => {
 		const data = this.asistencia();
-		if (!data || data.totalClases === 0) return 0;
-		return Math.round(((data.totalPresente + data.totalTarde) / data.totalClases) * 100);
+		if (!data) return null;
+		return calcAttendancePercentage(data.totalPresente, data.totalTarde, data.totalClases);
 	});
+	readonly emptyLabel = ATTENDANCE_EMPTY_LABEL;
+	readonly legend = ATTENDANCE_PERCENTAGE_LEGEND;
 
 	readonly selectedNivel = computed(() => {
 		const horario = this._horarios().find((h) => h.id === this.selectedHorarioId());
