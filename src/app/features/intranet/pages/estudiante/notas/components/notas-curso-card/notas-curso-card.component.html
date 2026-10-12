@@ -23,13 +23,16 @@
 	<!-- #region Periodos row -->
 	<div class="periodos-row">
 		@for (g of periodoGroups(); track g.periodo.id) {
-			<div class="periodo-chip" [class.empty]="g.promedio === null">
+			<div class="periodo-chip" [class.empty]="g.promedio === null && !g.sinCalificar">
 				<span class="periodo-name">{{ g.periodo.nombre }}</span>
 				<edu-tag
-					[value]="formatNota(g.promedio)"
-					[severity]="getNotaSeverity(g.promedio)"
+					[value]="g.sinCalificar ? 'Sin calificar' : formatNota(g.promedio)"
+					[severity]="g.sinCalificar ? 'secondary' : getNotaSeverity(g.promedio)"
 					[rounded]="true"
 				/>
+				@if (g.rotulo) {
+					<span class="periodo-parcial-rotulo">{{ g.rotulo }}</span>
+				}
 			</div>
 		}
 		@if (curso().periodos.length > 0) {
