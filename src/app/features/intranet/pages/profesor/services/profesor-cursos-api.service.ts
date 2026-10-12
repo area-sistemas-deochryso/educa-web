@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@config/environment';
 import { FileUploadBuilder } from '@core/helpers';
+import type { CalificacionPendienteDto } from '@data/models';
 import {
 	CursoContenidoDetalleDto,
 	CrearCursoContenidoRequest,
@@ -139,6 +140,10 @@ export class ProfesorCursosApiService {
 	// #region Calificaciones
 	getEvaluacionesPorCongelarse(): Observable<EvaluacionPorCongelarseDto[]> {
 		return this.http.get<EvaluacionPorCongelarseDto[]>(`${this.calificacionUrl}/por-congelarse`);
+	}
+
+	getCalificacionesPendientes(): Observable<CalificacionPendienteDto[]> {
+		return this.http.get<CalificacionPendienteDto[]>(`${this.calificacionUrl}/pendientes`);
 	}
 
 	getCalificaciones(contenidoId: number): Observable<CalificacionConNotasDto[]> {

@@ -14,6 +14,7 @@ export * from './recipient-summary.models';
 export * from './events-calendar.models';
 export * from './mensajeria.models';
 export * from './notification.models';
+export * from './pendientes.models';
 export * from './notificaciones-admin.models';
 export * from './profesor-curso.models';
 export * from './quick-access-layout.models';

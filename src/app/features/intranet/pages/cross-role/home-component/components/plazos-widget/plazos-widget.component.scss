@@ -125,3 +125,15 @@
 	}
 }
 // #endregion
+
+.plazo-nueva {
+	display: inline-block;
+	margin-left: 0.4rem;
+	padding: 0.1rem 0.45rem;
+	border-radius: 999px;
+	font-size: 0.65rem;
+	font-weight: 600;
+	vertical-align: middle;
+	background: var(--primary-color);
+	color: var(--primary-color-text);
+}

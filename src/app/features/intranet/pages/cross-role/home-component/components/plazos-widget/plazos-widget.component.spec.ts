@@ -2,11 +2,13 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { signal } from '@angular/core';
 import { of, throwError } from 'rxjs';
 import { testProviders } from '@test';
 import { UserProfileService } from '@core/services/user';
-import { EstudianteApiService } from '@features/intranet/pages/estudiante/services';
+import type { TareaPendienteDto } from '@data/models';
 import { ProfesorCursosApiService } from '@features/intranet/pages/profesor/services';
+import { TareasPendientesService } from '@intranet-shared/services';
 import { PlazosWidgetComponent } from './plazos-widget.component';
 
 // #endregion
@@ -17,21 +19,40 @@ function isoDaysFromNow(days: number): string {
 	return new Date(2026, 8, 29 + days, 18, 0, 0).toISOString();
 }
 
-function setup(opts: { profesor: boolean; estudiante$?: unknown; profesor$?: unknown }) {
+function tarea(partial: Partial<TareaPendienteDto> & Pick<TareaPendienteDto, 'tareaId' | 'titulo'>): TareaPendienteDto {
+	return { cursoNombre: 'Curso', horarioId: 1, esNueva: false, ...partial };
+}
+
+function setup(opts: { profesor: boolean; tareas?: TareaPendienteDto[]; loaded?: boolean; profesor$?: unknown }) {
+	const refresh = vi.fn();
 	TestBed.configureTestingModule({
 		imports: [PlazosWidgetComponent],
 		providers: [
 			...testProviders,
 			provideRouter([]),
 			{ provide: UserProfileService, useValue: { isProfesor: () => opts.profesor } },
-			{ provide: EstudianteApiService, useValue: { getMisTareasPorVencer: () => opts.estudiante$ ?? of([]) } },
-			{ provide: ProfesorCursosApiService, useValue: { getEvaluacionesPorCongelarse: () => opts.profesor$ ?? of([]) } },
+			{
+				provide: TareasPendientesService,
+				useValue: { tareas: signal(opts.tareas ?? []), loaded: signal(opts.loaded ?? true), refresh },
+			},
+			{ provide: ProfesorCursosApiService, useValue: { getCalificacionesPendientes: () => opts.profesor$ ?? of([]) } },
 		],
 	});
 	const fixture = TestBed.createComponent(PlazosWidgetComponent);
 	fixture.detectChanges();
-	return { fixture, component: fixture.componentInstance, el: fixture.nativeElement as HTMLElement };
+	return { fixture, component: fixture.componentInstance, el: fixture.nativeElement as HTMLElement, refresh };
 }
+
+const item = (d: number | null, sinNota: number | null = null) => ({
+	key: 'k',
+	titulo: 't',
+	cursoId: null,
+	cursoNombre: 'c',
+	fecha: null,
+	diasRestantes: d,
+	sinNota,
+	esNueva: false,
+});
 // #endregion
 
 describe('PlazosWidgetComponent', () => {
@@ -44,51 +65,87 @@ describe('PlazosWidgetComponent', () => {
 		vi.useRealTimers();
 	});
 
-	it('estudiante: lista tareas ordenadas por fecha, máx. 3, con contador de restantes', () => {
-		const tareas = [
-			{ tareaId: 1, titulo: 'T-lejos', cursoNombre: 'Mate', fechaLimite: isoDaysFromNow(6), horarioId: 1 },
-			{ tareaId: 2, titulo: 'T-hoy', cursoNombre: 'Arte', fechaLimite: isoDaysFromNow(0), horarioId: 2 },
-			{ tareaId: 3, titulo: 'T-manana', cursoNombre: 'Ciencia', fechaLimite: isoDaysFromNow(1), horarioId: 3 },
-			{ tareaId: 4, titulo: 'T-cuatro', cursoNombre: 'Lengua', fechaLimite: isoDaysFromNow(4), horarioId: 4 },
-		];
-		const { el, component } = setup({ profesor: false, estudiante$: of(tareas) });
+	it('estudiante: pide el refresh y muestra el orden del BE, máx. 5, con contador de restantes', () => {
+		const tareas = [1, 2, 3, 4, 5, 6].map((id) => tarea({ tareaId: id, titulo: `T-${id}`, fechaLimite: isoDaysFromNow(id) }));
+		const { el, component, refresh } = setup({ profesor: false, tareas });
 
-		const titulos = Array.from(el.querySelectorAll('.plazo-titulo')).map((n) => n.textContent?.trim());
-		expect(titulos).toEqual(['T-hoy', 'T-manana', 'T-cuatro']);
+		const titulos = Array.from(el.querySelectorAll('.plazo-titulo')).map((n) => n.textContent?.replace('Nueva', '').trim());
+		expect(refresh).toHaveBeenCalledOnce();
+		expect(titulos).toEqual(['T-1', 'T-2', 'T-3', 'T-4', 'T-5']);
 		expect(component.hiddenCount()).toBe(1);
 		expect(el.querySelector('.plazos-more')?.textContent).toContain('1 más');
-		expect(component.title()).toBe('Tareas por vencer');
+		expect(component.title()).toBe('Tareas pendientes');
+	});
+
+	it('estudiante: una tarea sin fecha límite se lista como "Sin fecha límite"', () => {
+		const { el } = setup({ profesor: false, tareas: [tarea({ tareaId: 1, titulo: 'Sin fecha', fechaLimite: null })] });
+		expect(el.querySelector('.plazo-badge')?.textContent?.trim()).toBe('Sin fecha límite');
+	});
+
+	it('estudiante: marca "Nueva" solo en las tareas que el estudiante no abrió', () => {
+		const tareas = [
+			tarea({ tareaId: 1, titulo: 'Nueva', fechaLimite: isoDaysFromNow(2), esNueva: true }),
+			tarea({ tareaId: 2, titulo: 'Vista', fechaLimite: isoDaysFromNow(3) }),
+		];
+		const { el } = setup({ profesor: false, tareas });
+
+		const filas = Array.from(el.querySelectorAll('.plazo-row'));
+		expect(filas[0].querySelector('.plazo-nueva')).not.toBeNull();
+		expect(filas[1].querySelector('.plazo-nueva')).toBeNull();
 	});
 
 	it('estudiante: etiqueta y urgencia según días restantes', () => {
 		const { component } = setup({ profesor: false });
-		const item = (d: number) => ({ key: 'k', titulo: 't', cursoNombre: 'c', fecha: '', diasRestantes: d });
 
+		expect(component.label(item(-2))).toBe('Vencida');
 		expect(component.label(item(0))).toBe('Vence hoy');
 		expect(component.label(item(1))).toBe('Vence mañana');
 		expect(component.label(item(5))).toBe('Vence en 5 días');
+		expect(component.label(item(null))).toBe('Sin fecha límite');
+		expect(component.urgencia(item(-2))).toBe('urgent');
 		expect(component.urgencia(item(0))).toBe('urgent');
 		expect(component.urgencia(item(3))).toBe('soon');
 		expect(component.urgencia(item(4))).toBe('normal');
+		expect(component.urgencia(item(null))).toBe('normal');
 	});
 
-	it('profesor: consume evaluaciones por congelarse con vocabulario propio', () => {
-		const evaluaciones = [
-			{ evaluacionId: 9, titulo: 'Examen 1', cursoNombre: 'Física', fechaLimiteEdicion: isoDaysFromNow(2), horarioId: 5 },
+	it('estudiante: muestra el skeleton mientras las tareas no cargaron', () => {
+		const { el } = setup({ profesor: false, loaded: false });
+		expect(el.querySelector('app-skeleton-loader')).not.toBeNull();
+	});
+
+	it('profesor: consume calificaciones pendientes y muestra los alumnos sin nota', () => {
+		const pendientes = [
+			{
+				calificacionId: 9,
+				titulo: 'Examen 1',
+				cursoNombre: 'Física',
+				horarioId: 5,
+				numeroSemana: 3,
+				fechaEvaluacion: isoDaysFromNow(2),
+				totalEstudiantes: 20,
+				sinNota: 4,
+			},
 		];
-		const { el, component } = setup({ profesor: true, profesor$: of(evaluaciones) });
+		const { el, component, refresh } = setup({ profesor: true, profesor$: of(pendientes) });
 
-		expect(component.title()).toBe('Calificaciones por cerrar');
-		expect(el.querySelector('.plazo-badge')?.textContent?.trim()).toBe('Se congela en 2 días');
+		expect(refresh).not.toHaveBeenCalled();
+		expect(component.title()).toBe('Calificaciones pendientes');
+		expect(el.querySelector('.plazo-badge')?.textContent?.trim()).toBe('4 sin nota');
 	});
 
-	it('no renderiza nada si no hay plazos cercanos', () => {
-		const { el } = setup({ profesor: false, estudiante$: of([]) });
+	it('profesor: singular cuando falta una sola nota', () => {
+		const { component } = setup({ profesor: true });
+		expect(component.label(item(2, 1))).toBe('1 sin nota');
+	});
+
+	it('no renderiza nada si no hay pendientes', () => {
+		const { el } = setup({ profesor: false, tareas: [] });
 		expect(el.querySelector('.widget-card')).toBeNull();
 	});
 
-	it('si el endpoint falla, degrada a vacío sin romper Inicio', () => {
-		const { el, component } = setup({ profesor: false, estudiante$: throwError(() => ({ status: 500 })) });
+	it('profesor: si el endpoint falla, degrada a vacío sin romper Inicio', () => {
+		const { el, component } = setup({ profesor: true, profesor$: throwError(() => ({ status: 500 })) });
 		expect(component.loading()).toBe(false);
 		expect(el.querySelector('.widget-card')).toBeNull();
 	});

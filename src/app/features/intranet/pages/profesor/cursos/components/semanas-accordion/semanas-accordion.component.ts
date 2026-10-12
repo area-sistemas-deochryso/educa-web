@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, signal, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ElementRef, effect, inject, signal, computed, untracked } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CursoContenidoDataFacade } from '../../services/curso-contenido-data.facade';
@@ -24,6 +24,7 @@ export class SemanasAccordionComponent {
 	private readonly uiFacade = inject(CursoContenidoUiFacade);
 	private readonly confirmationService = inject(EduConfirmationService);
 	private readonly errorHandler = inject(ErrorHandlerService);
+	private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 	readonly uploadAccept = UPLOAD_ACCEPT;
 	readonly uploadMaxBytes = UPLOAD_LIMITS.maxFileSizeBytes;
 	// #endregion
@@ -35,6 +36,32 @@ export class SemanasAccordionComponent {
 	// #region Estado local
 	readonly searchQuery = signal('');
 	readonly openPanels = signal<number[]>([]);
+	// #endregion
+
+	// #region Semana vigente (P110-F14)
+	/** Id de la semana vigente; `null` si el BE no pudo derivarla o no existe esa semana. */
+	readonly semanaVigenteId = computed(() => {
+		const vigente = this.vm().contenido?.semanaVigente;
+		if (!vigente) return null;
+		return this.vm().semanas.find((s) => s.numeroSemana === vigente)?.id ?? null;
+	});
+
+	constructor() {
+		// La semana vigente se expande sola y la vista se lleva hasta ella; el resto queda colapsado.
+		effect(() => {
+			const semanaId = this.semanaVigenteId();
+			if (semanaId === null) return;
+			untracked(() => {
+				if (this.openPanels().includes(semanaId)) return;
+				this.openPanels.update((prev) => [...prev, semanaId]);
+				setTimeout(() => {
+					this.host.nativeElement
+						.querySelector('[data-semana-vigente="true"]')
+						?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+				});
+			});
+		});
+	}
 	// #endregion
 
 	// #region Accordion value bridge

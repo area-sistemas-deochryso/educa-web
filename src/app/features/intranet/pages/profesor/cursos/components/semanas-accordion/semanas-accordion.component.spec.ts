@@ -93,3 +93,61 @@ describe('SemanasAccordionComponent', () => {
 		expect(errorHandler.showWarning).not.toHaveBeenCalled();
 	});
 });
+
+describe('SemanasAccordionComponent — semana vigente (P110-F14)', () => {
+	const dosSemanas = [
+		{ id: 1, numeroSemana: 1, titulo: null, archivos: [], tareas: [] },
+		{ id: 2, numeroSemana: 2, titulo: null, archivos: [], tareas: [] },
+	];
+
+	function create(contenido: { semanaVigente?: number | null } | null) {
+		TestBed.configureTestingModule({
+			imports: [SemanasAccordionComponent],
+			providers: [
+				{ provide: CursoContenidoUiFacade, useValue: { vm: signal({ semanas: dosSemanas, contenido }) } },
+				{ provide: CursoContenidoDataFacade, useValue: { refreshContenido: vi.fn() } },
+				{ provide: CursoContenidoCrudFacade, useValue: {} },
+				{ provide: ErrorHandlerService, useValue: { showWarning: vi.fn() } },
+			],
+		});
+		const fixture = TestBed.createComponent(SemanasAccordionComponent);
+		fixture.detectChanges();
+		return { fixture, component: fixture.componentInstance, el: fixture.nativeElement as HTMLElement };
+	}
+
+	const scrollIntoView = vi.fn();
+	beforeEach(() => {
+		scrollIntoView.mockClear();
+		// jsdom no implementa scrollIntoView.
+		Element.prototype.scrollIntoView = scrollIntoView;
+	});
+
+	it('expande y destaca la semana vigente y lleva la vista hasta ella; las demás quedan colapsadas', async () => {
+		const { fixture, component, el } = create({ semanaVigente: 2 });
+		fixture.detectChanges();
+		await new Promise((resolve) => setTimeout(resolve));
+
+		expect(scrollIntoView).toHaveBeenCalledOnce();
+
+		expect(component.openPanels()).toEqual([2]);
+		expect(el.querySelectorAll('.week-vigente-tag').length).toBe(1);
+		expect(el.querySelector('[data-semana-vigente="true"]')?.textContent).toContain('Semana 2');
+	});
+
+	it('sin semanaVigente no expande ni destaca nada', async () => {
+		const { component, el } = create({});
+		await new Promise((resolve) => setTimeout(resolve));
+
+		expect(scrollIntoView).not.toHaveBeenCalled();
+
+		expect(component.openPanels()).toEqual([]);
+		expect(el.querySelector('.week-vigente-tag')).toBeNull();
+	});
+
+	it('con una semanaVigente fuera de rango no rompe ni destaca nada', () => {
+		const { component, el } = create({ semanaVigente: 52 });
+
+		expect(component.openPanels()).toEqual([]);
+		expect(el.querySelector('[data-semana-vigente]')).toBeNull();
+	});
+});

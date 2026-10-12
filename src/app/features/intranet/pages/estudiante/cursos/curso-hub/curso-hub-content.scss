@@ -737,3 +737,26 @@
 	}
 }
 // #endregion
+
+// P110-F14: semana vigente y tarea nueva
+.week-vigente-tag,
+.tarea-nueva-tag {
+	display: inline-block;
+	width: fit-content;
+	font-size: 0.65rem;
+	font-weight: 600;
+	padding: 0.1rem 0.45rem;
+	border-radius: 999px;
+	background: var(--primary-color);
+	color: var(--primary-color-text);
+}
+
+.tarea-nueva-tag {
+	margin-left: 0.4rem;
+	vertical-align: middle;
+}
+
+.week-header--vigente .week-number {
+	background: var(--primary-color);
+	color: var(--primary-color-text);
+}

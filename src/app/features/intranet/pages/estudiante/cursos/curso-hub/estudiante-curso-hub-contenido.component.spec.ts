@@ -6,6 +6,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ErrorHandlerService } from '@core/services';
 import { FileViewerService } from '@shared/components';
 import { CursoHubContextService } from '@intranet-shared/components';
+import { TareasPendientesService } from '@intranet-shared/services';
 import { EstudianteCursosFacade } from '@features/intranet/pages/estudiante/services/estudiante-cursos.facade';
 import { EstudianteCursoHubContenidoComponent } from './estudiante-curso-hub-contenido.component';
 // #endregion
@@ -28,7 +29,7 @@ const SEMANAS = [
 
 const baseVm = {
 	contentLoading: false,
-	contenido: null as { id: number } | null,
+	contenido: null as { id: number; semanaVigente?: number | null } | null,
 	semanas: [] as typeof SEMANAS,
 	misArchivos: {} as Record<number, unknown[]>,
 	misTareaArchivos: {} as Record<number, unknown[]>,
@@ -51,6 +52,8 @@ describe('EstudianteCursoHubContenidoComponent', () => {
 		eliminarTareaArchivo: vi.fn(),
 	};
 	const errorHandler = { showWarning: vi.fn() };
+	const nuevasIds = signal<ReadonlySet<number>>(new Set());
+	const pendientes = { nuevasIds, marcarVista: vi.fn() };
 
 	interface Internals {
 		searchQuery: { (): string; set(v: string): void };
@@ -71,9 +74,11 @@ describe('EstudianteCursoHubContenidoComponent', () => {
 		vi.clearAllMocks();
 		vm.set({ ...baseVm });
 		slot.set(MON);
+		nuevasIds.set(new Set());
 
 		TestBed.configureTestingModule({
 			providers: [
+				{ provide: TareasPendientesService, useValue: pendientes },
 				{ provide: EstudianteCursosFacade, useValue: facade },
 				{ provide: ErrorHandlerService, useValue: errorHandler },
 			],
@@ -161,6 +166,72 @@ describe('EstudianteCursoHubContenidoComponent', () => {
 			component.onRefreshContenido();
 
 			expect(facade.refreshContenido).toHaveBeenCalledOnce();
+		});
+	});
+
+	describe('semana vigente (P110-F14)', () => {
+		const loaded = (semanaVigente?: number | null) =>
+			vm.set({ ...baseVm, contenido: { id: 1, semanaVigente }, semanas: SEMANAS });
+
+		it('expande la semana vigente y carga sus archivos como si se abriera a mano', () => {
+			loaded(2);
+			const { fixture, component } = create();
+			fixture.detectChanges();
+
+			expect((component as unknown as { openPanels(): number[] }).openPanels()).toEqual([11]);
+			expect(facade.loadMisArchivos).toHaveBeenCalledWith(11);
+		});
+
+		it('no expande nada si el BE no devuelve semanaVigente', () => {
+			loaded(undefined);
+			const { component } = create();
+
+			expect((component as unknown as { openPanels(): number[] }).openPanels()).toEqual([]);
+		});
+
+		it('no expande nada si semanaVigente no corresponde a ninguna semana', () => {
+			loaded(52);
+			const { component } = create();
+
+			expect((component as unknown as { openPanels(): number[] }).openPanels()).toEqual([]);
+		});
+	});
+
+	describe('tarea nueva (P110-F14)', () => {
+		const loaded = () => vm.set({ ...baseVm, contenido: { id: 1, semanaVigente: 1 }, semanas: SEMANAS });
+		const esNueva = (c: unknown, id: number) => (c as { esTareaNueva(id: number): boolean }).esTareaNueva(id);
+
+		it('registra como vista la tarea nueva cuando su semana queda expandida', () => {
+			nuevasIds.set(new Set([100]));
+			loaded();
+			create();
+
+			expect(pendientes.marcarVista).toHaveBeenCalledExactlyOnceWith(100);
+		});
+
+		it('conserva la marca "Nueva" durante la visita aunque el servicio ya la haya apagado', () => {
+			nuevasIds.set(new Set([100]));
+			loaded();
+			const { component } = create();
+
+			nuevasIds.set(new Set());
+
+			expect(esNueva(component, 100)).toBe(true);
+		});
+
+		it('no registra vistas si la semana de la tarea sigue colapsada', () => {
+			nuevasIds.set(new Set([100]));
+			vm.set({ ...baseVm, contenido: { id: 1, semanaVigente: 2 }, semanas: SEMANAS });
+			create();
+
+			expect(pendientes.marcarVista).not.toHaveBeenCalled();
+		});
+
+		it('una tarea que no es nueva no lleva marca', () => {
+			loaded();
+			const { component } = create();
+
+			expect(esNueva(component, 100)).toBe(false);
 		});
 	});
 

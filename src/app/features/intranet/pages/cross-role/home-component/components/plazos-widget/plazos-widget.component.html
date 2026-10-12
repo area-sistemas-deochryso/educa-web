@@ -20,7 +20,12 @@
 			@for (item of items(); track item.key) {
 				<li class="plazo-row">
 					<div class="plazo-info">
-						<span class="plazo-titulo">{{ item.titulo }}</span>
+						<span class="plazo-titulo">
+							{{ item.titulo }}
+							@if (item.esNueva) {
+								<span class="plazo-nueva">Nueva</span>
+							}
+						</span>
 						<app-curso-chip class="plazo-curso" [cursoId]="item.cursoId" [nombre]="item.cursoNombre" />
 					</div>
 					<span class="plazo-badge" [class]="'plazo-badge--' + urgencia(item)">{{ label(item) }}</span>
