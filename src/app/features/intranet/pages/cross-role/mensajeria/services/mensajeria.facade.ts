@@ -13,6 +13,7 @@ import {
 } from '@data/models';
 import { SalonMensajeriaApiService } from './mensajeria-api.service';
 import { SalonMensajeriaStore } from './mensajeria.store';
+import { PendingSends } from './pending-sends';
 
 const FORO_PREFIX = 'Foro:';
 
@@ -41,6 +42,7 @@ export class SalonMensajeriaFacade {
 	/** Timestamp of last successful conversaciones fetch (prevents rapid refetch). */
 	private lastConversacionesFetchMs = 0;
 	private static readonly REFETCH_THROTTLE_MS = 5_000;
+	private readonly pendingSends = new PendingSends();
 	// #endregion
 
 	// #region Estado expuesto
@@ -60,16 +62,13 @@ export class SalonMensajeriaFacade {
 				// el eco de SignalR llega con un id que no matchea el tempId optimista
 				// y duplicaba la burbuja. Ver brief 418 F5.
 				if (mensaje.remitenteDni === this.auth.currentUser?.dni) return;
+				const ownTempId = this.pendingSends.take(mensaje.contenido);
+				if (ownTempId !== null) {
+					this.store.replaceTempMensaje(ownTempId, mensaje.id);
+					return;
+				}
 
-				const localMensaje: MensajeDto = {
-					id: mensaje.id,
-					remitenteDni: mensaje.remitenteDni,
-					remitenteNombre: mensaje.remitenteNombre,
-					contenido: mensaje.contenido,
-					fechaEnvio: mensaje.fechaEnvio,
-					esMio: false,
-				};
-				this.store.addMensaje(localMensaje);
+				this.store.addMensaje({ ...mensaje, esMio: false });
 			});
 	}
 
@@ -124,7 +123,7 @@ export class SalonMensajeriaFacade {
 						this.joinConversacion(foro.id);
 					} else if (salonDescripcion && estudiantesDni.length > 0) {
 						const foroAsunto = `${FORO_PREFIX} ${salonDescripcion}`;
-						this.crearForoConversacion(foroAsunto, estudiantesDni, salonDescripcion, horarioId);
+						this.crearForoConversacion(foroAsunto, estudiantesDni, horarioId);
 					} else {
 						// Read-only student or no students — nothing to create
 						this.store.setForoLoading(false);
@@ -264,6 +263,7 @@ export class SalonMensajeriaFacade {
 
 		// Temporary ID for optimistic add (replaced by server ID on commit or SignalR dedup)
 		const tempId = -Date.now();
+		this.pendingSends.add(tempId, contenido);
 		const optimisticMensaje: MensajeDto = {
 			id: tempId,
 			remitenteDni: userDni,
@@ -283,9 +283,11 @@ export class SalonMensajeriaFacade {
 			onCommit: (response) => {
 				// Replace temp message with server-confirmed ID
 				this.store.replaceTempMensaje(tempId, response.mensajeId);
+				this.pendingSends.remove(tempId);
 				this.store.setSending(false);
 			},
 			onError: (err) => {
+				this.pendingSends.remove(tempId);
 				this.errHandler.handle(err, 'enviar mensaje');
 				this.store.setSending(false);
 			},
@@ -311,13 +313,12 @@ export class SalonMensajeriaFacade {
 	private crearForoConversacion(
 		asunto: string,
 		estudiantesDni: string[],
-		salonDescripcion: string,
-		horarioId?: number,
+		horarioId: number,
 	): void {
 		const dto: CrearConversacionDto = {
 			asunto,
 			destinatariosDni: estudiantesDni,
-			mensajeInicial: `Bienvenidos al foro del salón ${salonDescripcion}.`,
+			// Sin mensaje inicial: el foro nace vacío y el profesor decide qué publicar (H19, brief 805).
 			horarioId,
 		};
 
