@@ -137,10 +137,12 @@ import { EduSpinner, EduTab, EduTabPanel, EduTabs } from '@edu-ui';
 									[diaSemanaEsperado]="selectedHorarioDiaSemana()"
 									[diaSemanaEsperadoDescripcion]="selectedHorarioDiaDescripcion()"
 									[initialFecha]="initialFecha()"
+									[recuperacion]="recuperacion()"
 									(fechaChange)="onFechaChange($event)"
 									(estadoChange)="onEstadoChange($event)"
 									(justificacionChange)="onJustificacionChange($event)"
 									(save)="onSaveAsistencia()"
+									(recuperacionConfirm)="onRecuperacionConfirm($event)"
 								/>
 							</edu-tabpanel>
 							<edu-tabpanel value="1">
@@ -177,6 +179,11 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
 	// #region Computed
 	readonly pageLoading = computed(() => this.facade.vm().loading);
 	readonly asistenciaVm = this.asistenciaFacade.vm;
+	/** Recuperación declarada (o traída del servidor) para la lista cargada. */
+	readonly recuperacion = computed(() => {
+		const data = this.asistenciaVm().registroData;
+		return data?.esRecuperacion ? { fecha: data.fecha, motivo: data.motivoRecuperacion ?? null } : null;
+	});
 
 	readonly cursoOptions = computed(() => {
 		const horarios = this.facade.vm().horarios;
@@ -270,6 +277,10 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
 			event.estudianteId,
 			event.justificacion,
 		);
+	}
+
+	onRecuperacionConfirm(event: { fecha: string; motivo: string }): void {
+		this.asistenciaFacade.declararRecuperacion(event.fecha, event.motivo);
 	}
 
 	onSaveAsistencia(): void {

@@ -44,9 +44,9 @@
 		<span>
 			La fecha elegida no corresponde al día de horario del curso ({{ diaSemanaEsperadoDescripcion() }}).
 			@if (confirmadoFechaAtipica()) {
-				Confirmaste que es una excepción válida — el guardado está habilitado.
+				Declaraste esta fecha como clase de recuperación — el guardado está habilitado.
 			} @else {
-				El guardado está bloqueado hasta confirmar que es una excepción válida (ej. clase de recuperación).
+				El guardado está bloqueado hasta declarar que es una clase de recuperación y su motivo.
 			}
 		</span>
 		<edu-button
@@ -61,7 +61,7 @@
 		@if (!confirmadoFechaAtipica()) {
 			<edu-button
 				type="button"
-				label="Confirmar excepción"
+				label="Declarar clase de recuperación"
 				icon="pi pi-check"
 				[text]="true"
 				size="small"
@@ -72,7 +72,38 @@
 }
 <!-- #endregion -->
 
-<edu-confirm-dialog />
+<edu-dialog
+	[visible]="motivoDialogVisible()"
+	(visibleChange)="onMotivoDialogVisibleChange($event)"
+	[modal]="true"
+	[draggable]="false"
+	[resizable]="false"
+	header="Clase de recuperación"
+	[style]="{ width: '450px' }"
+	appendTo="body"
+>
+	<div class="recuperacion-dialog">
+		<p>
+			La fecha elegida no corresponde al día de horario del curso. Se guardará como clase de recuperación y el
+			estudiante la verá con esa etiqueta.
+		</p>
+		<label for="recuperacion-motivo">Motivo <span class="required">*</span></label>
+		<textarea
+			eduTextarea
+			id="recuperacion-motivo"
+			rows="3"
+			class="w-full"
+			placeholder="Ej.: clase recuperada por feriado del jueves"
+			[ngModel]="motivoText()"
+			(ngModelChange)="motivoText.set($event)"
+		></textarea>
+		<small [class.invalid]="motivoText().length > 0 && !motivoValido()">Mínimo 10 caracteres.</small>
+		<div class="recuperacion-dialog__footer">
+			<edu-button label="Cancelar" severity="secondary" [text]="true" (click)="onMotivoDialogVisibleChange(false)" />
+			<edu-button label="Guardar como recuperación" icon="pi pi-check" [disabled]="!motivoValido()" (click)="confirmarRecuperacion()" />
+		</div>
+	</div>
+</edu-dialog>
 
 <!-- #region Loading -->
 @if (loading()) {
@@ -151,7 +182,7 @@
 			(click)="onSave()"
 			[loading]="saving()"
 			[disabled]="saving() || !puedeGuardar()"
-			[eduTooltip]="!puedeGuardar() ? 'Confirmá que la fecha es una excepción válida para poder guardar' : ''"
+			[eduTooltip]="!puedeGuardar() ? 'Declará la clase de recuperación con su motivo para poder guardar' : ''"
 			eduTooltipPosition="top"
 		/>
 	</div>

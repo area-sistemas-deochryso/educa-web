@@ -108,6 +108,15 @@ export class AttendanceCourseStore {
 		}));
 	}
 
+	/** Declara la fecha cargada como clase de recuperación (`INV-AC10`); ignora una fecha que no es la de la lista en pantalla. */
+	setRecuperacion(fecha: string, motivo: string): void {
+		this._state.update((s) =>
+			s.registroData?.fecha === fecha
+				? { ...s, registroData: { ...s.registroData, esRecuperacion: true, motivoRecuperacion: motivo } }
+				: s,
+		);
+	}
+
 	setRegistroLoading(loading: boolean): void {
 		this._state.update((s) => ({ ...s, registroLoading: loading }));
 	}

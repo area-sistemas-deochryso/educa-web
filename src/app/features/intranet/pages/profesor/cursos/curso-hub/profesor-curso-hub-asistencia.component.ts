@@ -69,10 +69,12 @@ function todayIso(): string {
 						[diaSemanaEsperado]="diaSemana()"
 						[diaSemanaEsperadoDescripcion]="diaSemanaDescripcion()"
 						[initialFecha]="fecha()"
+						[recuperacion]="recuperacion()"
 						(fechaChange)="onFechaChange($event)"
 						(estadoChange)="onEstadoChange($event)"
 						(justificacionChange)="onJustificacionChange($event)"
 						(save)="onSave()"
+						(recuperacionConfirm)="onRecuperacionConfirm($event)"
 					/>
 				</edu-tabpanel>
 				<edu-tabpanel value="1">
@@ -112,6 +114,11 @@ export class ProfesorCursoHubAsistenciaComponent {
 		this.registroDeLaFranja() ? this.vm().registroTieneRegistros : undefined,
 	);
 	protected readonly guardadoA = computed(() => (this.registroDeLaFranja() ? this.vm().registroSavedAt : null));
+	/** Recuperación declarada (o traída del servidor) para la lista cargada de esta franja. */
+	protected readonly recuperacion = computed(() => {
+		const data = this.registroDeLaFranja() ? this.vm().registroData : null;
+		return data?.esRecuperacion ? { fecha: data.fecha, motivo: data.motivoRecuperacion ?? null } : null;
+	});
 	protected readonly resumen = computed(() => {
 		const resumen = this.vm().resumen;
 		return resumen && resumen.horarioId === this.slotId() ? resumen : null;
@@ -187,6 +194,10 @@ export class ProfesorCursoHubAsistenciaComponent {
 
 	protected onJustificacionChange(event: { estudianteId: number; justificacion: string | null }): void {
 		this.facade.setEstudianteJustificacion(event.estudianteId, event.justificacion);
+	}
+
+	protected onRecuperacionConfirm(event: { fecha: string; motivo: string }): void {
+		this.facade.declararRecuperacion(event.fecha, event.motivo);
 	}
 
 	protected onSave(): void {

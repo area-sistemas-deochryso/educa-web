@@ -141,6 +141,8 @@ export class AttendanceCourseFacade {
 					estado: e.estado,
 					justificacion: e.estado !== 'P' ? e.justificacion : null,
 				})),
+			// El re-guardado de una recuperación debe reenviar flag y motivo: sin ellos el BE rechaza la fecha (INV-AC09).
+			...(data.esRecuperacion && data.motivoRecuperacion ? { esRecuperacion: true, motivo: data.motivoRecuperacion } : {}),
 		};
 
 		this.store.setRegistroSaving(true);
@@ -178,12 +180,17 @@ export class AttendanceCourseFacade {
 
 	/**
 	 * `true` si la lista cargada puede guardarse sin pasar por el panel. La fecha atípica (fuera del día de
-	 * horario) exige la confirmación explícita del panel, que vive en su estado local: desde fuera no se sabe
-	 * si ya se dio, así que no se ofrece guardar.
+	 * horario) exige declararla recuperación con motivo en el panel; si la lista ya la trae declarada (cargada
+	 * del servidor o confirmada) se puede guardar desde fuera, de lo contrario no se ofrece guardar.
 	 */
 	canSaveOutsidePanel(diaSemanaEsperado: number | null): boolean {
 		const data = this.store.registroData();
-		return !!data && !isOffScheduleDate(data.fecha, diaSemanaEsperado);
+		return !!data && (!!data.esRecuperacion || !isOffScheduleDate(data.fecha, diaSemanaEsperado));
+	}
+
+	/** El profesor declaró la fecha cargada como recuperación (`INV-AC10`); viaja al guardar. */
+	declararRecuperacion(fecha: string, motivo: string): void {
+		this.store.setRecuperacion(fecha, motivo);
 	}
 	// #endregion
 

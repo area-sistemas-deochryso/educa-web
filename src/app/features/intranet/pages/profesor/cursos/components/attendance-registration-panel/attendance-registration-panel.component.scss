@@ -43,6 +43,27 @@
 		flex: 1;
 	}
 }
+
+.recuperacion-dialog {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+
+	.required {
+		color: var(--red-500, #ef4444);
+	}
+
+	small.invalid {
+		color: var(--red-600, #dc2626);
+	}
+
+	&__footer {
+		display: flex;
+		justify-content: flex-end;
+		gap: 0.5rem;
+		margin-top: 0.5rem;
+	}
+}
 // #endregion
 
 // #region Loading

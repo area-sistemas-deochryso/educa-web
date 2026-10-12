@@ -87,6 +87,9 @@
 									[value]="getEstadoLabel(item.estado)"
 									[severity]="getEstadoSeverity(item.estado)"
 								/>
+								@if (item.esRecuperacion) {
+									<edu-tag value="Recuperación" severity="info" />
+								}
 							</td>
 							<td>
 								@let jstate = getJustificacionState(item);
