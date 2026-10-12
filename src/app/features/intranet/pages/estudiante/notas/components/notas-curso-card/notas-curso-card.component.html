@@ -3,7 +3,7 @@
 	<div class="hero-promedio">
 		<span class="hero-label">Promedio</span>
 		@if (sinCalificar()) {
-			<span class="hero-number hero-number--vacio severity-secondary">Sin calificar</span>
+			<span class="hero-number hero-number--vacio severity-secondary">{{ SIN_CALIFICAR }}</span>
 		} @else {
 			<span class="hero-number" [class]="'severity-' + promedioSeverity()">{{ formatNota(promedioParcial()) }}</span>
 			@if (rotuloParcial(); as rotulo) {
@@ -23,10 +23,10 @@
 	<!-- #region Periodos row -->
 	<div class="periodos-row">
 		@for (g of periodoGroups(); track g.periodo.id) {
-			<div class="periodo-chip" [class.empty]="g.promedio === null && !g.sinCalificar">
+			<div class="periodo-chip" [class.empty]="g.evaluaciones.length === 0">
 				<span class="periodo-name">{{ g.periodo.nombre }}</span>
 				<edu-tag
-					[value]="g.sinCalificar ? 'Sin calificar' : formatNota(g.promedio)"
+					[value]="g.sinCalificar ? SIN_CALIFICAR : formatNota(g.promedio)"
 					[severity]="g.sinCalificar ? 'secondary' : getNotaSeverity(g.promedio)"
 					[rounded]="true"
 				/>
@@ -39,7 +39,7 @@
 			<div class="periodo-chip periodo-general">
 				<span class="periodo-name">{{ rotuloParcial() ? 'Parcial' : 'General' }}</span>
 				<edu-tag
-					[value]="sinCalificar() ? 'Sin calificar' : formatNota(promedioParcial())"
+					[value]="sinCalificar() ? SIN_CALIFICAR : formatNota(promedioParcial())"
 					[severity]="sinCalificar() ? 'secondary' : promedioSeverity()"
 					[rounded]="true"
 				/>
@@ -73,8 +73,8 @@
 									</div>
 									<div class="eval-nota">
 										<edu-tag
-											[value]="formatNota(eval.nota)"
-											[severity]="getNotaSeverity(eval.nota)"
+											[value]="notaEvaluacion(eval)"
+											[severity]="getNotaSeverity(notaPresentada(eval))"
 											[rounded]="true"
 											class="nota-tag"
 										/>

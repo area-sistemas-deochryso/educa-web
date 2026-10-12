@@ -44,7 +44,7 @@
 				</div>
 				<div class="sim-nota-input">
 					<span class="text-xs text-color-secondary mb-1">
-						Original: {{ formatNota(sim.notaOriginal) }}
+						Original: {{ sim.notaOriginal === null ? 'Sin calificar aún' : formatNota(sim.notaOriginal) }}
 					</span>
 					<edu-input-number
 						data-info-anchor="estudiante-notas-simulador-input"

@@ -60,10 +60,10 @@ describe('NotasCursoCardComponent (INV-C12)', () => {
 		expect(el.querySelector('.hero-number')?.classList.contains('severity-secondary')).toBe(false);
 	});
 
-	it('says "Sin calificar" with coverage 0 %, never a number', () => {
+	it('says "Sin calificar aún" with coverage 0 %, never a number', () => {
 		const el = render(buildCurso(null, 0, null));
 
-		expect(el.querySelector('.hero-number')?.textContent).toContain('Sin calificar');
+		expect(el.querySelector('.hero-number')?.textContent).toContain('Sin calificar aún');
 		expect(el.querySelector('.hero-parcial-rotulo')).toBeNull();
 	});
 
@@ -130,11 +130,18 @@ describe('NotasCursoCardComponent (INV-C12)', () => {
 		expect(chip(el)?.textContent).not.toMatch(/\d/);
 	});
 
-	it('shows the empty chip (no figure) for a period without evaluations', () => {
+	it('says "Sin calificar aún" (no "-", no figure) for a period without evaluations (INV-C12)', () => {
 		const el = render(buildCursoConPeriodo({ promedio: null, promedioParcial: null, coberturaEvaluada: 0 }, false));
 
 		expect(chip(el)?.classList.contains('empty')).toBe(true);
-		expect(chip(el)?.textContent).not.toContain('Sin calificar');
+		expect(chip(el)?.textContent).toContain('Sin calificar aún');
+		expect(chip(el)?.textContent).not.toContain('-');
+	});
+
+	it('says "Sin calificar aún" for a legacy period without figure instead of "-"', () => {
+		const el = render(buildCursoConPeriodo({ promedio: null }));
+
+		expect(chip(el)?.textContent).toContain('Sin calificar aún');
 	});
 
 	it('formats the period partial with the course scale (INV-U06)', () => {
@@ -153,6 +160,57 @@ describe('NotasCursoCardComponent (INV-C12)', () => {
 
 		expect(chip(el)?.textContent).toContain('12');
 		expect(chip(el)?.querySelector('.periodo-parcial-rotulo')).toBeNull();
+	});
+	// #endregion
+
+	// #region Evaluaciones sin nota y vencidas (INV-C12 § Vacíos y vencimiento del plazo)
+	function buildCursoConEvaluaciones(evaluaciones: object[], escala?: ConfiguracionCalificacionListDto): EstudianteMisNotasDto {
+		return {
+			...buildCursoConPeriodo({ promedio: 0, promedioParcial: 0, coberturaEvaluada: 20 }),
+			evaluaciones,
+			escalaCalificacion: escala ?? null,
+		} as unknown as EstudianteMisNotasDto;
+	}
+
+	const base = { tipo: 'Quiz', peso: 0.2, numeroSemana: 2, fechaEvaluacion: '2026-03-01' };
+	const notaTags = (el: HTMLElement) => Array.from(el.querySelectorAll('.eval-row .nota-tag')).map((t) => t.textContent?.trim());
+
+	it('INV-C12: an ungraded evaluation before the deadline says "Sin calificar aún", no figure', () => {
+		const el = render(buildCursoConEvaluaciones([{ ...base, id: 1, titulo: 'Q1', nota: null, vencida: false }]));
+
+		expect(notaTags(el)).toEqual(['Sin calificar aún']);
+	});
+
+	it('INV-C12: an overdue ungraded evaluation shows 0 with the course scale', () => {
+		const el = render(buildCursoConEvaluaciones([{ ...base, id: 1, titulo: 'Q1', nota: null, vencida: true }]));
+
+		expect(notaTags(el)).toEqual(['0.0']);
+	});
+
+	it('INV-C12 + INV-U06: an overdue evaluation shows the letter of a literal scale', () => {
+		const el = render(buildCursoConEvaluaciones([{ ...base, id: 1, titulo: 'Q1', nota: null, vencida: true }], ESCALA_LITERAL));
+
+		expect(notaTags(el)).toEqual(['C']);
+	});
+
+	it('shows the real grade when the evaluation has one', () => {
+		const el = render(buildCursoConEvaluaciones([{ ...base, id: 1, titulo: 'Q1', nota: 15, vencida: false }]));
+
+		expect(notaTags(el)).toEqual(['15.0']);
+	});
+
+	it('does not break when the evaluation arrives without `vencida` (previous BE): treated as not overdue', () => {
+		const el = render(buildCursoConEvaluaciones([{ ...base, id: 1, titulo: 'Q1', nota: null }]));
+
+		expect(notaTags(el)).toEqual(['Sin calificar aún']);
+	});
+
+	it('INV-C12: an overdue-only course shows its 0.0 partial, not "Sin calificar"', () => {
+		const el = render(buildCurso(0, 20, 0));
+
+		expect(el.querySelector('.hero-number')?.textContent).toContain('0');
+		expect(el.querySelector('.hero-number')?.textContent).not.toContain('Sin calificar');
+		expect(el.querySelector('.hero-parcial-rotulo')?.textContent).toContain('Parcial · 20 % evaluado');
 	});
 	// #endregion
 });
