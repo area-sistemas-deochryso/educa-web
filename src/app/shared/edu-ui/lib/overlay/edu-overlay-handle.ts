@@ -20,6 +20,8 @@ export interface EduOverlayOpenOptions {
 	backdropClass?: string;
 	closeOnBackdropClick: boolean;
 	closeOnEscape?: boolean;
+	/** Defaults to true. Pass false when the trigger is a typable input that must keep the caret. */
+	trapFocus?: boolean;
 }
 
 export interface EduOverlayCloseOptions {
@@ -78,8 +80,10 @@ export class EduOverlayHandle {
 			requestAnimationFrame(() => panelEl.setAttribute('data-open', ''));
 		}
 
-		this.focusTrap = this.focusTrapFactory.create(this.overlayRef.overlayElement);
-		this.focusTrap.focusInitialElementWhenReady();
+		if (options.trapFocus ?? true) {
+			this.focusTrap = this.focusTrapFactory.create(this.overlayRef.overlayElement);
+			this.focusTrap.focusInitialElementWhenReady();
+		}
 
 		if (options.closeOnEscape ?? true) {
 			this.subscriptions.add(

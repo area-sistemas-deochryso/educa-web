@@ -48,8 +48,31 @@
 }
 
 .edu-datepicker__icon {
+	display: inline-flex;
+	align-items: center;
 	flex: 0 0 auto;
+	padding: 0;
+	background: none;
+	border: none;
 	color: var(--eduui-text-muted-color);
+	cursor: pointer;
+
+	&:disabled {
+		cursor: default;
+	}
+}
+
+.edu-datepicker--invalid,
+.edu-datepicker--invalid:hover:not(.edu-datepicker--disabled),
+.edu-datepicker--invalid:focus-within {
+	border-color: var(--eduui-form-field-invalid-border-color);
+}
+
+.edu-datepicker__error {
+	display: block;
+	margin-top: 0.25rem;
+	color: var(--eduui-form-field-invalid-text-color);
+	font-size: 0.8125rem;
 }
 
 .edu-datepicker__clear {

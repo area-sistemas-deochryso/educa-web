@@ -103,11 +103,21 @@ export function formatTime(date: Date): string {
 
 type DateToken = 'dd' | 'mm' | 'yy' | 'yyyy';
 
+/** Human hint for a format: `dd/mm/yy` → `dd/mm/aa`, `yy-mm-dd` → `aa-mm-dd`. */
+export function formatHint(dateFormat: string): string {
+	return dateFormat.replace(/yyyy|yy/g, (token) => (token === 'yyyy' ? 'aaaa' : 'aa'));
+}
+
+/**
+ * Parses typed text against `dateFormat`. Either year token accepts 2 or 4 digits
+ * (a 2-digit year means 20xx). Returns null when the text doesn't match or isn't a
+ * real calendar date (`31/02/2026` must not roll over into March).
+ */
 export function parseDate(text: string, dateFormat: string): Date | null {
 	const tokenOrder: DateToken[] = [];
 	const pattern = dateFormat.replace(/yyyy|yy|mm|dd/g, (token) => {
 		tokenOrder.push(token as DateToken);
-		return token === 'yyyy' ? '(\\d{4})' : '(\\d{1,2})';
+		return token === 'yyyy' || token === 'yy' ? '(\\d{4}|\\d{2})' : '(\\d{1,2})';
 	});
 
 	const match = new RegExp(`^${pattern}$`).exec(text.trim());
@@ -126,13 +136,13 @@ export function parseDate(text: string, dateFormat: string): Date | null {
 			day = raw;
 		} else if (token === 'mm') {
 			month = raw - 1;
-		} else if (token === 'yyyy') {
-			year = raw;
 		} else {
-			year = 2000 + raw;
+			year = match[index + 1].length === 2 ? 2000 + raw : raw;
 		}
 	});
 
 	const date = new Date(year, month, day);
-	return Number.isNaN(date.getTime()) ? null : date;
+	const isRealDate =
+		date.getFullYear() === year && date.getMonth() === month && date.getDate() === day;
+	return isRealDate ? date : null;
 }
