@@ -31,6 +31,10 @@
 
 Dos chats activos en repos distintos (FE + BE) trabajando en piezas independientes del mismo plan. En ese caso, ambos pueden estar en `running/` siempre que se confirme explícitamente que no chocan. Ver `~/.claude/rules/one-repo-one-chat.md`.
 
+## Excepción por plan en modo paralelo (ADR-0007)
+
+Un plan cross-repo que declare *modo paralelo* (hoy: P110) admite hasta **3 chats de código** simultáneos en `running/` (los de solo diseño no cuentan), cada uno en su worktree (`WT/educa-web/<NNN>-<slug>`). El overlap de `touches` no bloquea (se resuelve en `/wt-merge`, rama más pequeña primero); merge, push y `/verify` siguen siendo secuenciales. Fuente: `../educa-coord/decisions/0007-parallel-chats-per-plan.md`.
+
 ## Bucket extra: `chats/awaiting-prod/`
 
 Briefs cerrados localmente (commit hecho, validación local pasó) que esperan **confirmación post-deploy del usuario**: smoke test browser, query SQL en prod, validación del jefe, telemetría observada, etc. Salen del bucket vía [`/verify <NNN>`](../commands/verify.md) — `✅` mueve a `closed/`, `❌ rollback` mueve a `running/` con motivo registrado.

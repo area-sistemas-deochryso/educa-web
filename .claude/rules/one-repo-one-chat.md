@@ -18,6 +18,7 @@ Antes de hacer `/start-chat` en `educa-web/.claude/chats/open/`:
 
 ## Cuándo NO aplica
 
+- **Plan en modo paralelo** ([ADR-0007](../../../educa-coord/decisions/0007-parallel-chats-per-plan.md)): varios chats de código sobre `educa-web` a la vez, cada uno en su **propio worktree** (`WT/educa-web/<NNN>-<slug>`, rama `chat/<NNN>-…`), hasta 3. Cada chat edita solo su worktree; nunca el checkout principal. El veto de esta regla existía porque comparten working tree; el worktree lo elimina.
 - Brief cross-repo en `educa-coord/chats/running/` que **solo** toca `Educa.API` (no incluye `educa-web` en `repos:`). Ese chat no edita `educa-web/`, así que un chat local FE puede correr en paralelo.
 - Brief cross-repo en `educa-coord/chats/waiting/` o `educa-coord/chats/awaiting-prod/`. No están activos.
 
