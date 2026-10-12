@@ -33,7 +33,7 @@ Dos chats activos en repos distintos (FE + BE) trabajando en piezas independient
 
 ## Excepción por plan en modo paralelo (ADR-0007)
 
-Un plan cross-repo que declare *modo paralelo* (hoy: P110) admite hasta **3 chats de código** simultáneos en `running/` (los de solo diseño no cuentan), cada uno en su worktree (`WT/educa-web/<NNN>-<slug>`). El overlap de `touches` no bloquea (se resuelve en `/wt-merge`, rama más pequeña primero); merge, push y `/verify` siguen siendo secuenciales. Fuente: `../educa-coord/decisions/0007-parallel-chats-per-plan.md`.
+Un plan cross-repo que declare *modo paralelo* (hoy: P110) admite hasta **5 chats de código** simultáneos en `running/` (los de solo diseño no cuentan), cada uno en su worktree (`WT/educa-web/<NNN>-<slug>`). El overlap de `touches` no bloquea (se resuelve en `/wt-merge`, rama más pequeña primero); merge, push y `/verify` siguen siendo secuenciales. Fuente: `../educa-coord/decisions/0007-parallel-chats-per-plan.md`.
 
 ## Bucket extra: `chats/awaiting-prod/`
 
