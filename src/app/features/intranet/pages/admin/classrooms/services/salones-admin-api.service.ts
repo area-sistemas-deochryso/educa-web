@@ -105,6 +105,13 @@ export class ClassroomsAdminApiService {
 			{},
 		);
 	}
+
+	/** DEV-ONLY (BD TEST): el backend responde 404 fuera de Development + UseTestEnv. */
+	reabrirPeriodoDev(id: number): Observable<boolean> {
+		return this.http
+			.put<unknown>(`${this.baseUrl}/api/PeriodoAcademico/${id}/reabrir-dev`, {})
+			.pipe(map(() => true));
+	}
 	// #endregion
 
 	// #region Aprobaciones

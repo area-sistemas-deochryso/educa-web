@@ -12,7 +12,7 @@ import { forkJoin } from 'rxjs';
 import { Observable } from 'rxjs';
 
 import { logger, withRetry } from '@core/helpers';
-import { ErrorHandlerService } from '@core/services';
+import { ErrorHandlerService, SwService } from '@core/services';
 import {
 	UI_SUMMARIES,
 	UI_SALONES_SUCCESS_MESSAGES,
@@ -36,6 +36,9 @@ import {
 	CrearSalonDto,
 	SeccionSimpleDto,
 } from '../models';
+
+/** Recurso de la lista de salones; el interceptor de mutaciones de periodo no lo invalida. */
+const SALONES_ADMIN_CACHE_PATTERN = '/api/AprobacionEstudiante/salones-admin';
 
 /**
  * Orquestación de operaciones sobre salones admin.
@@ -66,6 +69,7 @@ export class ClassroomsAdminFacade {
 	private sedesApi = inject(SedesApiService);
 	private store = inject(ClassroomsAdminStore);
 	private errorHandler = inject(ErrorHandlerService);
+	private swService = inject(SwService);
 	private destroyRef = inject(DestroyRef);
 	// #endregion
 
@@ -238,6 +242,33 @@ export class ClassroomsAdminFacade {
 				},
 				error: () => {
 					this.errorHandler.showError(UI_SUMMARIES.error, UI_SALONES_ERROR_DETAILS.closePeriodo);
+					this.store.setLoading(false);
+				},
+			});
+	}
+
+	/**
+	 * DEV-ONLY: reabre un periodo cerrado para QA en BD TEST (visible solo con `environment.debug.testTools`).
+	 * El interceptor solo invalida `/api/PeriodoAcademico`; la lista de salones vive bajo otro recurso
+	 * y el SWR la serviría vieja, así que se invalida a mano antes de recargar todo (H23).
+	 */
+	reabrirPeriodoDev(periodoId: number): void {
+		this.store.setLoading(true);
+
+		this.api
+			.reabrirPeriodoDev(periodoId)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: () => {
+					this.errorHandler.showSuccess(UI_SUMMARIES.success, UI_SALONES_SUCCESS_MESSAGES.periodoReopenedDev, 6000);
+					void this.swService.invalidateCacheByPattern(SALONES_ADMIN_CACHE_PATTERN).then(() => this.loadAll());
+				},
+				error: (err: unknown) => {
+					const detail =
+						err instanceof HttpErrorResponse && err.status === 404
+							? UI_SALONES_ERROR_DETAILS.reopenPeriodoDevUnavailable
+							: UI_SALONES_ERROR_DETAILS.reopenPeriodoDev;
+					this.errorHandler.showError(UI_SUMMARIES.error, detail);
 					this.store.setLoading(false);
 				},
 			});

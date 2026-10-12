@@ -96,6 +96,16 @@
 								data-info-anchor="admin-salones-cerrar-periodo-btn"
 							/>
 						}
+						@if (testTools && vm().periodoActual && vm().periodoCerrado) {
+							<edu-button
+								label="Reabrir periodo (dev)"
+								icon="pi pi-lock-open"
+								size="small"
+								severity="warn"
+								[outlined]="true"
+								(click)="onReabrirPeriodoDev(vm().periodoActual!.id)"
+							/>
+						}
 					</div>
 				</div>
 
@@ -166,3 +176,4 @@
 <!-- #endregion -->
 
 <edu-toast />
+<edu-confirm-dialog />
