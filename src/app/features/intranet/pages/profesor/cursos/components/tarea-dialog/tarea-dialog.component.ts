@@ -23,7 +23,9 @@ import { EduButton, EduDatePicker, EduDialog, EduInputText, EduTextarea, EduTogg
 		<edu-dialog
 			[visible]="visible()"
 			(visibleChange)="onVisibleChange($event)"
+			#dlg
 			[modal]="true"
+			[dirty]="dirty()"
 			[header]="tarea() ? 'Editar Tarea' : 'Nueva Tarea'"
 			[style]="{ width: '520px', maxWidth: '95vw' }"
 		>
@@ -31,7 +33,7 @@ import { EduButton, EduDatePicker, EduDialog, EduInputText, EduTextarea, EduTogg
 				<div class="form-field">
 					<label for="tareaTitle" class="form-label">
 						<i class="pi pi-file-edit" style="font-size: 0.78rem"></i>
-						Título *
+						Título <span class="required-hint">(obligatorio)</span>
 					</label>
 					<input
 						eduInputText
@@ -39,8 +41,15 @@ import { EduButton, EduDatePicker, EduDialog, EduInputText, EduTextarea, EduTogg
 						[(ngModel)]="titulo"
 						placeholder="Título de la tarea"
 						[maxlength]="200"
+						[attr.aria-invalid]="mostrarErrorTitulo() ? 'true' : null"
+						aria-describedby="tareaTitleError"
 						class="w-full"
 					/>
+					@if (mostrarErrorTitulo()) {
+						<small id="tareaTitleError" class="field-error" role="alert">
+							Escribe un título para crear la tarea.
+						</small>
+					}
 				</div>
 
 				<div class="form-field">
@@ -52,11 +61,11 @@ import { EduButton, EduDatePicker, EduDialog, EduInputText, EduTextarea, EduTogg
 						eduTextarea
 						id="tareaDesc"
 						[(ngModel)]="descripcion"
-						[rows]="3"
+						[rows]="4"
 						[maxlength]="2000"
 						placeholder="Descripción e instrucciones de la tarea..."
 						[autoResize]="true"
-						class="w-full"
+						class="w-full descripcion-field"
 					></textarea>
 				</div>
 
@@ -102,14 +111,13 @@ import { EduButton, EduDatePicker, EduDialog, EduInputText, EduTextarea, EduTogg
 
 			<ng-template #footer>
 				<div class="dialog-footer">
-					<edu-button label="Cancelar" [text]="true" data-info-anchor="profesor-tarea-dialog-cancelar" (click)="onCancel()" />
+					<edu-button label="Cancelar" [text]="true" data-info-anchor="profesor-tarea-dialog-cancelar" (click)="dlg.requestClose()" />
 					<edu-button
 						[label]="tarea() ? 'Guardar' : 'Crear'"
 						icon="pi pi-check"
 						data-info-anchor="profesor-tarea-dialog-guardar"
 						(click)="onSave()"
 						[loading]="saving()"
-						[disabled]="!titulo.trim()"
 					/>
 				</div>
 			</ng-template>
@@ -156,6 +164,17 @@ import { EduButton, EduDatePicker, EduDialog, EduInputText, EduTextarea, EduTogg
 			font-weight: 500;
 			color: var(--text-color);
 		}
+		.required-hint {
+			font-weight: 400;
+			color: var(--text-color-secondary);
+		}
+		.field-error {
+			color: var(--red-500, #dc2626);
+		}
+		/* 4 líneas reales aunque el autoajuste mida con el overlay aún sin layout */
+		.descripcion-field {
+			min-height: 6.5rem;
+		}
 		.field-hint {
 			font-size: 0.72rem;
 			color: var(--text-color-secondary);
@@ -197,6 +216,24 @@ export class TareaDialogComponent implements OnChanges {
 	esGrupal = false;
 	/** Solo se acota al crear una tarea nueva — editar una tarea ya vencida sigue permitido. */
 	minFechaLimite: Date | null = null;
+	/** El título falta y el docente ya intentó crear: se explica en vez de dejar el botón mudo. */
+	intentoGuardar = false;
+
+	private baseline = { titulo: '', descripcion: '', fecha: null as number | null, esGrupal: false };
+
+	mostrarErrorTitulo(): boolean {
+		return this.intentoGuardar && !this.titulo.trim();
+	}
+
+	dirty(): boolean {
+		const b = this.baseline;
+		return (
+			this.titulo !== b.titulo ||
+			this.descripcion !== b.descripcion ||
+			(this.fechaLimite?.getTime() ?? null) !== b.fecha ||
+			this.esGrupal !== b.esGrupal
+		);
+	}
 
 	ngOnChanges(changes: SimpleChanges): void {
 		if (changes['tarea'] || changes['visible']) {
@@ -215,6 +252,13 @@ export class TareaDialogComponent implements OnChanges {
 					this.esGrupal = false;
 					this.minFechaLimite = new Date();
 				}
+				this.intentoGuardar = false;
+				this.baseline = {
+					titulo: this.titulo,
+					descripcion: this.descripcion,
+					fecha: this.fechaLimite?.getTime() ?? null,
+					esGrupal: this.esGrupal,
+				};
 			}
 		}
 	}
@@ -225,12 +269,11 @@ export class TareaDialogComponent implements OnChanges {
 		}
 	}
 
-	onCancel(): void {
-		this.visibleChange.emit(false);
-	}
-
 	onSave(): void {
-		if (!this.titulo.trim()) return;
+		if (!this.titulo.trim()) {
+			this.intentoGuardar = true;
+			return;
+		}
 
 		const fechaStr = this.fechaLimite ? toLocalIso(this.fechaLimite) : null;
 

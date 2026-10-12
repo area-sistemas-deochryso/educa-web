@@ -2,7 +2,9 @@
 	[header]="dialogTitle()"
 	[visible]="visible()"
 	(visibleChange)="onVisibleChange($event)"
+	#dlg
 	[modal]="true"
+	[dirty]="dirty()"
 	[style]="{ width: '520px', maxWidth: '95vw' }"
 	[closable]="true"
 >
@@ -137,7 +139,7 @@
 				label="Cancelar"
 				[text]="true"
 				data-info-anchor="profesor-evaluacion-cancelar"
-				(click)="onVisibleChange(false)"
+				(click)="dlg.requestClose()"
 			/>
 			<edu-button
 				[label]="isEditing() ? 'Guardar' : 'Crear'"

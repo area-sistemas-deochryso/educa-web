@@ -11,25 +11,27 @@ import { CursoContenidoStore } from './curso-contenido.store';
 // #endregion
 
 // #region Fixtures
-const contenido = (id: number, horarioId: number) => ({ id, horarioId, semanas: [] }) as never;
+const contenido = (id: number, horarioId: number) => ({ id, horarioId, numeroSemanas: 3, semanas: [] }) as never;
 // #endregion
 
 describe('CursoContenidoDataFacade — hub', () => {
 	let facade: CursoContenidoDataFacade;
 	let store: CursoContenidoStore;
+	let showSuccess: ReturnType<typeof vi.fn>;
 	let api: { getContenido: ReturnType<typeof vi.fn>; crearContenido: ReturnType<typeof vi.fn> };
 	let wal: { execute: ReturnType<typeof vi.fn> };
 
 	beforeEach(() => {
 		api = { getContenido: vi.fn().mockReturnValue(of(contenido(8, 1))), crearContenido: vi.fn() };
 		wal = { execute: vi.fn() };
+		showSuccess = vi.fn();
 
 		TestBed.configureTestingModule({
 			providers: [
 				CursoContenidoDataFacade,
 				CursoContenidoStore,
 				{ provide: ProfesorApiService, useValue: api },
-				{ provide: ErrorHandlerService, useValue: { showError: vi.fn() } },
+				{ provide: ErrorHandlerService, useValue: { showError: vi.fn(), showSuccess } },
 				{ provide: WalFacadeHelper, useValue: wal },
 				{ provide: WalCrossTabRefetchService, useValue: { subscribe: vi.fn() } },
 			],
@@ -115,6 +117,16 @@ describe('CursoContenidoDataFacade — hub', () => {
 			if (step === 'rollback') config.optimistic.rollback();
 			if (step === 'commit') config.onCommit(created);
 		}
+
+		it('tells the teacher how many weeks the server created', () => {
+			facade.loadContenidoForHub(1);
+			facade.crearContenidoEnHub(request);
+
+			run('apply');
+			run('commit');
+
+			expect(showSuccess).toHaveBeenCalledWith('Contenido creado', 'Se crearon 3 semanas.', 8000);
+		});
 
 		it('stores the created content on commit', () => {
 			facade.loadContenidoForHub(1);

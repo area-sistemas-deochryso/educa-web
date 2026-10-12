@@ -78,6 +78,24 @@ export class EvaluacionFormDialogComponent {
 		})),
 	);
 
+	/** Línea base = último valor cargado por el efecto (vacío al crear, la evaluación al editar). */
+	private readonly baseline = signal<FormData | null>(null);
+
+	readonly dirty = computed(() => {
+		const base = this.baseline();
+		const now = this.formData();
+		if (!base) return false;
+		return (
+			now.titulo !== base.titulo ||
+			now.tipo !== base.tipo ||
+			now.peso !== base.peso ||
+			(now.fechaEvaluacion?.getTime() ?? null) !== (base.fechaEvaluacion?.getTime() ?? null) ||
+			now.semanaId !== base.semanaId ||
+			now.tareaId !== base.tareaId ||
+			now.esGrupal !== base.esGrupal
+		);
+	});
+
 	readonly isEditing = computed(() => !!this.editing());
 
 	readonly dialogTitle = computed(() =>
@@ -101,27 +119,27 @@ export class EvaluacionFormDialogComponent {
 		// Populate form when editing
 		effect(() => {
 			const edit = this.editing();
-			if (edit) {
-				this.formData.set({
-					titulo: edit.titulo,
-					tipo: edit.tipo,
-					peso: pesoAPorcentaje(edit.peso),
-					fechaEvaluacion: new Date(edit.fechaEvaluacion),
-					semanaId: edit.semanaId,
-					tareaId: edit.tareaId,
-					esGrupal: edit.esGrupal,
-				});
-			} else {
-				this.formData.set({
-					titulo: '',
-					tipo: 'Examen',
-					peso: 20,
-					fechaEvaluacion: null,
-					semanaId: null,
-					tareaId: null,
-					esGrupal: false,
-				});
-			}
+			const initial: FormData = edit
+				? {
+						titulo: edit.titulo,
+						tipo: edit.tipo,
+						peso: pesoAPorcentaje(edit.peso),
+						fechaEvaluacion: new Date(edit.fechaEvaluacion),
+						semanaId: edit.semanaId,
+						tareaId: edit.tareaId,
+						esGrupal: edit.esGrupal,
+					}
+				: {
+						titulo: '',
+						tipo: 'Examen',
+						peso: 20,
+						fechaEvaluacion: null,
+						semanaId: null,
+						tareaId: null,
+						esGrupal: false,
+					};
+			this.formData.set(initial);
+			this.baseline.set(initial);
 		});
 
 		// Release the local guard once the async save settles (success or error)
