@@ -18,7 +18,8 @@ import {
 	CrearSalonDto,
 } from './models';
 import { NuevoSalonDialogComponent } from './components/nuevo-salon-dialog/nuevo-salon-dialog.component';
-import { EduButton, EduInputNumber, EduMessageService, EduTab, EduTabPanel, EduTabs, EduTag, EduToast } from '@edu-ui';
+import { environment } from '@config/environment';
+import { EduButton, EduConfirmDialog, EduConfirmationService, EduInputNumber, EduMessageService, EduTab, EduTabPanel, EduTabs, EduTag, EduToast } from '@edu-ui';
 @Component({
 	selector: 'app-classrooms-admin',
 	standalone: true,
@@ -29,6 +30,7 @@ import { EduButton, EduInputNumber, EduMessageService, EduTab, EduTabPanel, EduT
 		EduTag,
 		EduInputNumber,
 		EduToast,
+		EduConfirmDialog,
 		PageHeaderComponent,
 		PeriodToggleComponent,
 		KpiStatsComponent,
@@ -37,7 +39,7 @@ import { EduButton, EduInputNumber, EduMessageService, EduTab, EduTabPanel, EduT
 		ClosePeriodDialogComponent,
 		ClassroomDetailDialogComponent,
 		NuevoSalonDialogComponent],
-	providers: [EduMessageService],
+	providers: [EduMessageService, EduConfirmationService],
 	templateUrl: './salones-admin.component.html',
 	styleUrl: './salones-admin.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -46,6 +48,7 @@ export class ClassroomsAdminComponent implements OnInit {
 	// #region Dependencias
 	private facade = inject(ClassroomsAdminFacade);
 	private router = inject(Router);
+	private confirmationService = inject(EduConfirmationService);
 	// #endregion
 
 	// #region Estado del facade
@@ -75,6 +78,8 @@ export class ClassroomsAdminComponent implements OnInit {
 	// #endregion
 
 	// #region Estado local
+	/** Herramientas de QA: solo true en environment.development. */
+	readonly testTools = environment.debug.testTools;
 	readonly niveles = NIVELES;
 	readonly nivelTabIndex: Record<NivelEducativo, number> = {
 		Inicial: 0,
@@ -175,6 +180,20 @@ export class ClassroomsAdminComponent implements OnInit {
 
 	onConfirmarCierrePeriodo(periodoId: number): void {
 		this.facade.cerrarPeriodo(periodoId);
+	}
+
+	/** DEV-ONLY: reabrir periodo cerrado (BD TEST). */
+	onReabrirPeriodoDev(periodoId: number): void {
+		this.confirmationService.confirm({
+			header: 'Reabrir periodo (dev)',
+			message:
+				'Herramienta solo para QA en BD de prueba. Se reabrirá el periodo saltando la regla de cierre irreversible. Los salones del año siguiente creados al cerrar no se eliminan. ¿Continuar?',
+			icon: 'pi pi-exclamation-triangle',
+			accept: () => {
+				if (this.vm().loading) return;
+				this.facade.reabrirPeriodoDev(periodoId);
+			},
+		});
 	}
 	// #endregion
 
