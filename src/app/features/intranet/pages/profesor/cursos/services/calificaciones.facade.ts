@@ -1,4 +1,5 @@
 /* eslint-disable max-lines -- Razón: facade de calificaciones con CRUD + carga de contenido + evaluaciones + notas. 301 líneas efectivas — 1 sobre el límite por expansión de setters. */
+import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin, type Subscription } from 'rxjs';
@@ -9,6 +10,7 @@ import { environment } from '@config';
 import { ProfesorApiService } from '../../services/profesor-api.service';
 import { CursoContenidoStore } from './curso-contenido.store';
 import { CalificacionesStore } from './calificaciones.store';
+import { buildPeriodoCerradoMessage } from './periodo-cerrado-message';
 import {
 	CrearCalificacionDto,
 	CalificarLoteDto,
@@ -84,6 +86,7 @@ export class CalificacionesFacade {
 					this.store.setPeriodos(result.periodos);
 					if ('salon' in result && result.salon) {
 						this.store.setSalonEstudiantes(result.salon.estudiantes);
+						this.store.setSalonContexto({ grado: result.salon.grado, anio: result.salon.anio });
 						this.loadCalificacionConfig(result.salon.grado);
 					}
 					this.store.setLoading(false);
@@ -129,7 +132,14 @@ export class CalificacionesFacade {
 				this.store.closeCalificacionDialog();
 			},
 			onError: (err) => {
-				this.errHandler.handle(err,'crear evaluación');
+				if (this.isPeriodoCerrado(err)) {
+					this.errorHandler.showError(
+						'Periodo cerrado',
+						buildPeriodoCerradoMessage('crear', this.store.salonContexto()),
+					);
+				} else {
+					this.errHandler.handle(err, 'crear evaluación');
+				}
 				this.store.setSaving(false);
 			},
 			optimistic: {
@@ -399,6 +409,11 @@ export class CalificacionesFacade {
 			.getConfig(nivel)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe((config) => this.store.setCalificacionConfig(config));
+	}
+
+	/** `EVALUACION_PERIODO_CERRADO`: el mensaje genérico del mapa no sabe nivel/año ni la acción. */
+	private isPeriodoCerrado(err: unknown): boolean {
+		return err instanceof HttpErrorResponse && err.error?.errorCode === 'EVALUACION_PERIODO_CERRADO';
 	}
 
 	/** Refetch calificaciones after mutation (needed for nested notas). */

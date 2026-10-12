@@ -7,6 +7,7 @@ import {
 	ProfesorEstudianteSalonDto,
 	GrupoContenidoDto,
 } from '../../models';
+import type { SalonPeriodoContexto } from './periodo-cerrado-message';
 
 interface CalificacionesState {
 	calificaciones: CalificacionConNotasDto[];
@@ -15,6 +16,8 @@ interface CalificacionesState {
 	gruposForCalificar: GrupoContenidoDto[];
 	/** Config de escala/umbral del nivel del salón actual — null hasta resolverse o si no hay salón. */
 	calificacionConfig: ConfiguracionCalificacionListDto | null;
+	/** Grado y año del salón actual — null hasta resolverse o si no hay salón. */
+	salonContexto: SalonPeriodoContexto | null;
 	loading: boolean;
 	saving: boolean;
 	// #region Dialog state
@@ -32,6 +35,7 @@ const initialState: CalificacionesState = {
 	salonEstudiantes: [],
 	gruposForCalificar: [],
 	calificacionConfig: null,
+	salonContexto: null,
 	loading: false,
 	saving: false,
 	calificacionDialogVisible: false,
@@ -53,6 +57,7 @@ export class CalificacionesStore {
 	readonly salonEstudiantes = computed(() => this._state().salonEstudiantes);
 	readonly gruposForCalificar = computed(() => this._state().gruposForCalificar);
 	readonly calificacionConfig = computed(() => this._state().calificacionConfig);
+	readonly salonContexto = computed(() => this._state().salonContexto);
 	readonly loading = computed(() => this._state().loading);
 	readonly saving = computed(() => this._state().saving);
 	readonly calificacionDialogVisible = computed(() => this._state().calificacionDialogVisible);
@@ -116,6 +121,10 @@ export class CalificacionesStore {
 
 	setCalificacionConfig(config: ConfiguracionCalificacionListDto | null): void {
 		this._state.update((s) => ({ ...s, calificacionConfig: config }));
+	}
+
+	setSalonContexto(salonContexto: SalonPeriodoContexto | null): void {
+		this._state.update((s) => ({ ...s, salonContexto }));
 	}
 
 	setLoading(loading: boolean): void {
