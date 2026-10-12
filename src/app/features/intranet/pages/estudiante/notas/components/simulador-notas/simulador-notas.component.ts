@@ -8,7 +8,6 @@ import {
 } from '@features/intranet/pages/estudiante/models';
 import { NotaSimulada } from '../../services/estudiante-notas.models';
 import { getNotaSeverity, formatNotaConConfig, getRotuloParcial } from '@intranet-shared/services/calificacion-config';
-import type { ConfiguracionCalificacionListDto } from '@data/models';
 import { EduButton, EduDrawer, EduInputNumber, EduTag } from '@edu-ui';
 
 @Component({
@@ -26,7 +25,6 @@ export class SimuladorNotasComponent {
 	readonly simulaciones = input<NotaSimulada[]>([]);
 	readonly promedioSimulado = input<number | null>(null);
 	readonly coberturaSimulada = input(0);
-	readonly calificacionConfig = input<ConfiguracionCalificacionListDto | null>(null);
 	// #endregion
 
 	// #region Outputs
@@ -34,6 +32,9 @@ export class SimuladorNotasComponent {
 	readonly notaChange = output<{ calificacionId: number; nota: number | null }>();
 	readonly resetSimulacion = output<void>();
 	// #endregion
+
+	/** Escala del salón del curso (INV-U06), resuelta por el BE. */
+	readonly calificacionConfig = computed(() => this.curso().escalaCalificacion ?? null);
 
 	readonly rotuloParcial = computed(() =>
 		this.promedioSimulado() === null ? null : getRotuloParcial(this.coberturaSimulada()),

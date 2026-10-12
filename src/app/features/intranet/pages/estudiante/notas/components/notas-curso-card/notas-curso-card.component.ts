@@ -12,7 +12,6 @@ import {
 	formatNotaConConfig,
 	getRotuloParcial,
 } from '@intranet-shared/services/calificacion-config';
-import type { ConfiguracionCalificacionListDto } from '@data/models';
 import { EduAccordion, EduAccordionHeader, EduAccordionPanel, EduTag } from '@edu-ui';
 interface PeriodoGroup {
 	periodo: PeriodoCalificacionDto;
@@ -30,7 +29,8 @@ interface PeriodoGroup {
 })
 export class NotasCursoCardComponent {
 	readonly curso = input.required<EstudianteMisNotasDto>();
-	readonly calificacionConfig = input<ConfiguracionCalificacionListDto | null>(null);
+	/** Escala del salón del curso (INV-U06), resuelta por el BE. */
+	readonly calificacionConfig = computed(() => this.curso().escalaCalificacion ?? null);
 
 	readonly openPanels = signal<number[]>([]);
 

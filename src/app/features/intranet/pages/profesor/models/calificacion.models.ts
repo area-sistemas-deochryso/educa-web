@@ -1,6 +1,7 @@
 // #region Shared types (importados + re-exportados desde @data/models)
 import type {
   CalificacionDto,
+  ConfiguracionCalificacionListDto,
   EstudianteNotasResumenDto,
   NotaResumenDto,
   PeriodoCalificacionDto,
@@ -133,6 +134,8 @@ export interface EstudianteMisNotasDto {
   evaluaciones: CalificacionConMiNotaDto[];
   periodos: PeriodoCalificacionDto[];
   promedios: EstudiantePromediosDto;
+  /** Escala (INV-U06) del nivel/año del salón del curso; `null`/ausente si no hay config → presentación numérica. La resuelve el BE. */
+  escalaCalificacion?: ConfiguracionCalificacionListDto | null;
 }
 // #endregion
 

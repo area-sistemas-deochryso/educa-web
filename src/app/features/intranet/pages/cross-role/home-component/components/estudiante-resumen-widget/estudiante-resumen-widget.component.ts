@@ -6,6 +6,7 @@ import { forkJoin, catchError, of } from 'rxjs';
 import { logger } from '@core/helpers';
 import { EstudianteApiService } from '@features/intranet/pages/estudiante/services';
 import { HorarioProfesorDto, EstudianteMisNotasDto } from '@features/intranet/pages/estudiante/models/estudiante.models';
+import { formatNotaConConfig } from '@intranet-shared/services/calificacion-config';
 import { buildBlocks, getNextOccurrence, HorarioBlock } from '@intranet-shared/helpers';
 import { SkeletonLoaderComponent } from '@shared/components';
 
@@ -20,6 +21,8 @@ interface UltimaCalificacion {
 	cursoNombre: string;
 	titulo: string;
 	nota: number;
+	/** Nota ya formateada con la escala del curso (letra si LITERAL, número si no hay config). */
+	notaTexto: string;
 	fechaEvaluacion: string;
 }
 // #endregion
@@ -110,7 +113,9 @@ export class EstudianteResumenWidgetComponent implements OnInit {
 
 	private resolveUltimaCalificacion(notas: EstudianteMisNotasDto[]): UltimaCalificacion | null {
 		const calificadas = notas
-			.flatMap((n) => n.evaluaciones.map((e) => ({ ...e, cursoNombre: n.cursoNombre })))
+			.flatMap((n) =>
+				n.evaluaciones.map((e) => ({ ...e, cursoNombre: n.cursoNombre, escala: n.escalaCalificacion ?? null })),
+			)
 			.filter((e) => e.nota !== null);
 
 		if (calificadas.length === 0) return null;
@@ -121,6 +126,7 @@ export class EstudianteResumenWidgetComponent implements OnInit {
 			cursoNombre: ultima.cursoNombre,
 			titulo: ultima.titulo,
 			nota: ultima.nota as number,
+			notaTexto: formatNotaConConfig(ultima.nota, ultima.escala),
 			fechaEvaluacion: ultima.fechaEvaluacion,
 		};
 	}
