@@ -15,7 +15,9 @@ import { EduButton, EduDialog, EduInputText, EduTextarea } from '@edu-ui';
 		<edu-dialog
 			[visible]="visible()"
 			(visibleChange)="onVisibleChange($event)"
+			#dlg
 			[modal]="true"
+			[dirty]="dirty()"
 			[header]="semana() ? 'Editar Semana ' + semana()!.numeroSemana : 'Editar Semana'"
 			[style]="{ width: '520px', maxWidth: '95vw' }"
 		>
@@ -72,7 +74,7 @@ import { EduButton, EduDialog, EduInputText, EduTextarea } from '@edu-ui';
 
 			<ng-template #footer>
 				<div class="flex justify-content-end gap-2">
-					<edu-button label="Cancelar" [text]="true" data-info-anchor="profesor-semana-edit-cancelar" (click)="onCancel()" />
+					<edu-button label="Cancelar" [text]="true" data-info-anchor="profesor-semana-edit-cancelar" (click)="dlg.requestClose()" />
 					<edu-button
 						label="Guardar"
 						icon="pi pi-check"
@@ -121,6 +123,13 @@ export class SemanaEditDialogComponent implements OnChanges {
 	descripcion = '';
 	mensajeDocente = '';
 
+	private baseline = { titulo: '', descripcion: '', mensajeDocente: '' };
+
+	dirty(): boolean {
+		const b = this.baseline;
+		return this.titulo !== b.titulo || this.descripcion !== b.descripcion || this.mensajeDocente !== b.mensajeDocente;
+	}
+
 	ngOnChanges(changes: SimpleChanges): void {
 		if (changes['semana'] || changes['visible']) {
 			const s = this.semana();
@@ -128,6 +137,7 @@ export class SemanaEditDialogComponent implements OnChanges {
 				this.titulo = s.titulo ?? '';
 				this.descripcion = s.descripcion ?? '';
 				this.mensajeDocente = s.mensajeDocente ?? '';
+				this.baseline = { titulo: this.titulo, descripcion: this.descripcion, mensajeDocente: this.mensajeDocente };
 			}
 		}
 	}
@@ -136,10 +146,6 @@ export class SemanaEditDialogComponent implements OnChanges {
 		if (!value) {
 			this.visibleChange.emit(false);
 		}
-	}
-
-	onCancel(): void {
-		this.visibleChange.emit(false);
 	}
 
 	onSave(): void {

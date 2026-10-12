@@ -87,3 +87,40 @@
 :host-context(.dark-mode) .edu-dialog-header__close:hover {
 	background: var(--eduui-surface-800);
 }
+
+.edu-dialog-confirm {
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 1rem;
+	background: color-mix(in srgb, var(--eduui-content-background) 80%, transparent);
+
+	&__box {
+		max-width: 22rem;
+		padding: 1.25rem;
+		border: 1px solid var(--eduui-content-border-color);
+		border-radius: var(--eduui-content-border-radius);
+		background: var(--eduui-content-background);
+		box-shadow: var(--eduui-overlay-modal-shadow);
+	}
+
+	&__title {
+		margin: 0 0 0.5rem;
+		font-weight: 600;
+	}
+
+	&__message {
+		margin: 0 0 1rem;
+		color: var(--eduui-text-muted-color);
+	}
+
+	&__actions {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: flex-end;
+		gap: 0.5rem;
+	}
+}

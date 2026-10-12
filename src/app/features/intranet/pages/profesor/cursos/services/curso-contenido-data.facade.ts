@@ -160,6 +160,12 @@ export class CursoContenidoDataFacade {
 				if (this.store.selectedHorarioId() === contenido.horarioId) {
 					this.store.setContenido(contenido);
 				}
+				// Conteo que confirma el servidor (no el pedido): si difiere, el docente lo ve.
+				this.errorHandler.showSuccess(
+					'Contenido creado',
+					`Se crearon ${contenido.numeroSemanas} ${contenido.numeroSemanas === 1 ? 'semana' : 'semanas'}.`,
+					8000,
+				);
 			},
 			onError: (err) => this.errHandler.handle(err, 'crear contenido', () => this.store.setSaving(false)),
 		});
