@@ -84,6 +84,8 @@ export interface MiAsistenciaCursoItemDto {
 	fecha: string;
 	estado: EstadoAsistenciaCurso;
 	justificacion: string | null;
+	/** `INV-AC10`: la clase fue una recuperación fuera del día de horario. Ausente en un BE anterior a P110-F5. */
+	esRecuperacion?: boolean;
 }
 
 export interface MiAsistenciaCursoResumenDto {

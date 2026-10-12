@@ -1,7 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { describe, expect, it } from 'vitest';
 
-import { EduConfirmationService } from '@edu-ui';
 import { AttendanceRegistrationPanelComponent } from './attendance-registration-panel.component';
 
 describe('AttendanceRegistrationPanelComponent', () => {
@@ -63,9 +62,15 @@ describe('AttendanceRegistrationPanelComponent', () => {
 			fixture.detectChanges();
 			return fixture;
 		}
-		function confirmCurrentDate(fixture: ReturnType<typeof create>) {
-			fixture.componentInstance.confirmarFechaAtipica();
-			fixture.debugElement.injector.get(EduConfirmationService).confirmation()?.accept?.();
+		/** Simula al padre: el panel emite la declaración y el padre la devuelve como `recuperacion`. */
+		function confirmCurrentDate(fixture: ReturnType<typeof create>, motivo = 'Clase recuperada por feriado') {
+			const panel = fixture.componentInstance;
+			let emitted: { fecha: string; motivo: string } | undefined;
+			panel.recuperacionConfirm.subscribe((e) => (emitted = e));
+			panel.confirmarFechaAtipica();
+			panel.motivoText.set(motivo);
+			panel.confirmarRecuperacion();
+			if (emitted) fixture.componentRef.setInput('recuperacion', { fecha: emitted.fecha, motivo: emitted.motivo });
 			fixture.detectChanges();
 		}
 		function pickAnotherDate(fixture: ReturnType<typeof create>, day: number) {
@@ -137,6 +142,43 @@ describe('AttendanceRegistrationPanelComponent', () => {
 			pickAnotherDate(fixture, 7);
 
 			expect(fixture.componentInstance.puedeGuardar()).toBe(false);
+		});
+
+		it('INV-AC10: does not let the user declare a recovery with a motive under 10 characters', () => {
+			const fixture = createAtypical();
+			const panel = fixture.componentInstance;
+			let emitted = false;
+			panel.recuperacionConfirm.subscribe(() => (emitted = true));
+			panel.confirmarFechaAtipica();
+
+			panel.motivoText.set('  corto  ');
+			panel.confirmarRecuperacion();
+
+			expect(emitted).toBe(false);
+			expect(panel.motivoDialogVisible()).toBe(true);
+			expect(panel.puedeGuardar()).toBe(false);
+		});
+
+		it('INV-AC10: emits the trimmed motive and the date of the recovery', () => {
+			const fixture = createAtypical();
+			const panel = fixture.componentInstance;
+			let emitted: { fecha: string; motivo: string } | undefined;
+			panel.recuperacionConfirm.subscribe((e) => (emitted = e));
+			panel.confirmarFechaAtipica();
+
+			panel.motivoText.set('  Clase recuperada por feriado  ');
+			panel.confirmarRecuperacion();
+
+			expect(emitted).toEqual({ fecha: '2026-10-05', motivo: 'Clase recuperada por feriado' });
+			expect(panel.motivoDialogVisible()).toBe(false);
+		});
+
+		it('INV-AC10: allows saving when the loaded list already comes declared as recovery', () => {
+			const fixture = createAtypical();
+			fixture.componentRef.setInput('recuperacion', { fecha: '2026-10-05', motivo: 'Clase recuperada por feriado' });
+			fixture.detectChanges();
+
+			expect(fixture.componentInstance.puedeGuardar()).toBe(true);
 		});
 	});
 });
