@@ -44,7 +44,8 @@ export interface ParticipanteDto {
 export interface CrearConversacionDto {
 	asunto: string;
 	destinatariosDni: string[];
-	mensajeInicial: string;
+	/** Opcional solo para foros de salón (`horarioId` presente): vacío = foro sin mensaje de bienvenida. */
+	mensajeInicial?: string;
 	horarioId?: number;
 }
 
