@@ -14,15 +14,17 @@ import {
 	inject,
 	input,
 	model,
+	signal,
 	viewChild,
 } from '@angular/core';
+import { EduButton } from '../button/edu-button';
 import { EduOverlayHandle } from '../overlay/edu-overlay-handle';
 import { EduPassThrough, EduPtRoot } from '../passthrough/edu-pt-root';
 
 @Component({
 	selector: 'edu-dialog',
 	standalone: true,
-	imports: [EduPtRoot, NgTemplateOutlet],
+	imports: [EduPtRoot, NgTemplateOutlet, EduButton],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
 		<ng-template #overlayTemplate>
@@ -66,6 +68,18 @@ import { EduPassThrough, EduPtRoot } from '../passthrough/edu-pt-root';
 						<ng-container [ngTemplateOutlet]="tpl"></ng-container>
 					</div>
 				}
+				@if (confirmingClose()) {
+					<div class="edu-dialog-confirm" role="alertdialog" aria-label="Cambios sin guardar">
+						<div class="edu-dialog-confirm__box">
+							<p class="edu-dialog-confirm__title">Cambios sin guardar</p>
+							<p class="edu-dialog-confirm__message">{{ dirtyMessage() }}</p>
+							<div class="edu-dialog-confirm__actions">
+								<edu-button label="Quedarme" [text]="true" (click)="stay()" />
+								<edu-button label="Salir sin guardar" severity="danger" (click)="discard()" />
+							</div>
+						</div>
+					</div>
+				}
 				@if (resizable()) {
 					<div
 						class="edu-dialog-resize-handle"
@@ -85,6 +99,12 @@ export class EduDialog implements OnDestroy {
 	readonly closable = input(true);
 	readonly closeOnEscape = input(true);
 	readonly dismissableMask = input(false);
+	/**
+	 * Marca el formulario como editado: cerrar (X, ESC o `requestClose()`) pide confirmación
+	 * dentro del propio diálogo en vez de descartar lo escrito en silencio.
+	 */
+	readonly dirty = input(false);
+	readonly dirtyMessage = input('Tienes cambios sin guardar. Si sales ahora, se perderán.');
 	readonly showHeader = input(true);
 	readonly header = input('');
 	readonly style = input<Record<string, string> | null>(null);
@@ -102,6 +122,8 @@ export class EduDialog implements OnDestroy {
 	private readonly focusTrapFactory = inject(FocusTrapFactory);
 	private readonly handle = new EduOverlayHandle(this.overlay, this.focusTrapFactory);
 
+	protected readonly confirmingClose = signal(false);
+
 	private panelEl: HTMLElement | null = null;
 	private dragOffset = { x: 0, y: 0 };
 
@@ -110,6 +132,7 @@ export class EduDialog implements OnDestroy {
 			if (this.visible()) {
 				this.open();
 			} else {
+				this.confirmingClose.set(false);
 				this.handle.close();
 			}
 		});
@@ -119,7 +142,25 @@ export class EduDialog implements OnDestroy {
 		this.handle.close({ immediate: true });
 	}
 
-	protected requestClose(): void {
+	/** Camino único de cierre del usuario: respeta `dirty`. Con la confirmación abierta equivale a «Quedarme». */
+	requestClose(): void {
+		if (this.confirmingClose()) {
+			this.stay();
+			return;
+		}
+		if (this.dirty()) {
+			this.confirmingClose.set(true);
+			return;
+		}
+		this.visible.set(false);
+	}
+
+	protected stay(): void {
+		this.confirmingClose.set(false);
+	}
+
+	protected discard(): void {
+		this.confirmingClose.set(false);
 		this.visible.set(false);
 	}
 
