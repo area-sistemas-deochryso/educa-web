@@ -89,4 +89,70 @@ describe('NotasCursoCardComponent (INV-C12)', () => {
 
 		expect(el.querySelector('.hero-number')?.textContent).toContain('15.5');
 	});
+
+	// #region Parcial por periodo (INV-C12 § Parcial por periodo)
+	function buildCursoConPeriodo(
+		porPeriodo: { promedio: number | null; promedioParcial?: number | null; coberturaEvaluada?: number },
+		conEvaluaciones = true,
+	): EstudianteMisNotasDto {
+		const base = buildCurso(15.5, 20, 3.1);
+		return {
+			...base,
+			periodos: [{ id: 1, nombre: 'Bimestre I', orden: 1, semanaInicio: 1, semanaFin: 8 }],
+			evaluaciones: conEvaluaciones
+				? [{ id: 10, titulo: 'Quiz', tipo: 'Quiz', peso: 0.2, numeroSemana: 2, nota: 15.5 }]
+				: [],
+			promedios: { ...base.promedios, porPeriodo: [{ periodoNombre: 'Bimestre I', ...porPeriodo }] },
+		} as unknown as EstudianteMisNotasDto;
+	}
+
+	const chip = (el: HTMLElement) => el.querySelector('.periodos-row .periodo-chip:not(.periodo-general)');
+
+	it('shows the period partial with its coverage label, not the raw accumulated sum', () => {
+		const el = render(buildCursoConPeriodo({ promedio: 3.1, promedioParcial: 15.5, coberturaEvaluada: 20 }));
+
+		expect(chip(el)?.textContent).toContain('15.5');
+		expect(chip(el)?.textContent).not.toContain('3.1');
+		expect(chip(el)?.querySelector('.periodo-parcial-rotulo')?.textContent).toContain('Parcial · 20 % evaluado');
+	});
+
+	it('drops the period label at 100 % period coverage', () => {
+		const el = render(buildCursoConPeriodo({ promedio: 14, promedioParcial: 14, coberturaEvaluada: 100 }));
+
+		expect(chip(el)?.textContent).toContain('14');
+		expect(chip(el)?.querySelector('.periodo-parcial-rotulo')).toBeNull();
+	});
+
+	it('says "Sin calificar" for a period with evaluations but 0 % coverage, never a number', () => {
+		const el = render(buildCursoConPeriodo({ promedio: 0, promedioParcial: null, coberturaEvaluada: 0 }));
+
+		expect(chip(el)?.textContent).toContain('Sin calificar');
+		expect(chip(el)?.textContent).not.toMatch(/\d/);
+	});
+
+	it('shows the empty chip (no figure) for a period without evaluations', () => {
+		const el = render(buildCursoConPeriodo({ promedio: null, promedioParcial: null, coberturaEvaluada: 0 }, false));
+
+		expect(chip(el)?.classList.contains('empty')).toBe(true);
+		expect(chip(el)?.textContent).not.toContain('Sin calificar');
+	});
+
+	it('formats the period partial with the course scale (INV-U06)', () => {
+		const curso = {
+			...buildCursoConPeriodo({ promedio: 3.1, promedioParcial: 15.5, coberturaEvaluada: 20 }),
+			escalaCalificacion: ESCALA_LITERAL,
+		};
+		const el = render(curso);
+
+		expect(chip(el)?.textContent).toContain('A');
+		expect(chip(el)?.textContent).not.toContain('15.5');
+	});
+
+	it('does not break when the period arrives without the new fields (previous BE)', () => {
+		const el = render(buildCursoConPeriodo({ promedio: 12 }));
+
+		expect(chip(el)?.textContent).toContain('12');
+		expect(chip(el)?.querySelector('.periodo-parcial-rotulo')).toBeNull();
+	});
+	// #endregion
 });

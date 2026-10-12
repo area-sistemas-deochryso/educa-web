@@ -5,6 +5,7 @@ import { CursoChipComponent } from '@intranet-shared/components';
 import {
 	EstudianteMisNotasDto,
 	PeriodoCalificacionDto,
+	PromedioPeriodoDto,
 	CalificacionConMiNotaDto,
 } from '@features/intranet/pages/estudiante/models';
 import {
@@ -15,7 +16,12 @@ import {
 import { EduAccordion, EduAccordionHeader, EduAccordionPanel, EduTag } from '@edu-ui';
 interface PeriodoGroup {
 	periodo: PeriodoCalificacionDto;
+	/** Cifra a mostrar en el chip: parcial del periodo (INV-C12). `null` = sin cifra. */
 	promedio: number | null;
+	/** "Parcial · X % evaluado" mientras la cobertura del periodo < 100 %. */
+	rotulo: string | null;
+	/** Periodo con evaluaciones pero ninguna calificada: el chip dice "Sin calificar", nunca una cifra. */
+	sinCalificar: boolean;
 	evaluaciones: CalificacionConMiNotaDto[];
 }
 
@@ -89,24 +95,41 @@ export class NotasCursoCardComponent {
 			return [
 				{
 					periodo: { id: -1, nombre: 'General', orden: 0, semanaInicio: 0, semanaFin: 0 },
-					promedio: curso.promedios.promedioParcial,
+					promedio: this.sinCalificar() ? null : this.promedioParcial(),
+					rotulo: this.rotuloParcial(),
+					sinCalificar: this.sinCalificar(),
 					evaluaciones: curso.evaluaciones,
 				}];
 		}
 
 		const periodos = [...curso.periodos].sort((a, b) => a.orden - b.orden);
-		const promedioMap = new Map(
-			curso.promedios.porPeriodo.map((p) => [p.periodoNombre, p.promedio]),
-		);
+		const promedioMap = new Map(curso.promedios.porPeriodo.map((p) => [p.periodoNombre, p]));
 
-		return periodos.map((periodo) => ({
-			periodo,
-			promedio: promedioMap.get(periodo.nombre) ?? null,
-			evaluaciones: curso.evaluaciones.filter(
+		return periodos.map((periodo) => {
+			const evaluaciones = curso.evaluaciones.filter(
 				(e) => e.numeroSemana >= periodo.semanaInicio && e.numeroSemana <= periodo.semanaFin,
-			),
-		}));
+			);
+			return { periodo, evaluaciones, ...this.presentarPeriodo(promedioMap.get(periodo.nombre), evaluaciones.length) };
+		});
 	});
+
+	/**
+	 * Parcial y cobertura del periodo los entrega el BE (INV-C12 § Parcial por periodo); el FE solo los presenta.
+	 * Sin los campos nuevos (BE anterior) cae al promedio de antes, sin rótulo, para no romper.
+	 */
+	private presentarPeriodo(
+		p: PromedioPeriodoDto | undefined,
+		totalEvaluaciones: number,
+	): Pick<PeriodoGroup, 'promedio' | 'rotulo' | 'sinCalificar'> {
+		if (totalEvaluaciones === 0) return { promedio: null, rotulo: null, sinCalificar: false };
+		if (p?.coberturaEvaluada === undefined) {
+			return { promedio: p?.promedio ?? null, rotulo: null, sinCalificar: false };
+		}
+		if (p.coberturaEvaluada === 0 || p.promedioParcial == null) {
+			return { promedio: null, rotulo: null, sinCalificar: true };
+		}
+		return { promedio: p.promedioParcial, rotulo: getRotuloParcial(p.coberturaEvaluada), sinCalificar: false };
+	}
 
 	getNotaSeverity(nota: number | null): 'success' | 'warn' | 'danger' | 'secondary' {
 		return getNotaSeverityFn(nota, this.calificacionConfig());
