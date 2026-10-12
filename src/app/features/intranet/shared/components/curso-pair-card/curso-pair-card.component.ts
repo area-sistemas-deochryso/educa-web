@@ -225,9 +225,9 @@ function buildProgress(resumen: ContenidoResumenDto | undefined): SlotProgress |
 											[style.width.%]="progress.percent"
 										></span>
 									</span>
-									<span aria-hidden="true"
-										>{{ progress.done }}/{{ progress.total }}</span
-									>
+									<span aria-hidden="true" class="pair-card__progress-text"
+											>{{ progress.done }}/{{ progress.total }} semanas con material</span
+										>
 								</span>
 							} @else {
 								<span class="pair-card__progress pair-card__progress--empty"
