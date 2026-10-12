@@ -3,7 +3,12 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, untracked
 import { RouterLink } from '@angular/router';
 import { EduButton, EduSpinner, EduTable, EduTag, EduTooltip } from '@edu-ui';
 import { CursoHubContextService, EmptyStateComponent } from '@intranet-shared/components';
-import { createClientPaging } from '@shared/utils';
+import {
+	ATTENDANCE_EMPTY_LABEL,
+	ATTENDANCE_PERCENTAGE_LEGEND,
+	calcAttendancePercentage,
+	createClientPaging,
+} from '@shared/utils';
 import { EstudianteCursosFacade } from '../../services/estudiante-cursos.facade';
 import { ESTADO_ASISTENCIA_LABELS, ESTADO_ASISTENCIA_SEVERITIES } from '../../models/estudiante.models';
 
@@ -70,6 +75,11 @@ type TagSeverity = 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contr
 			background: var(--blue-50);
 			color: var(--blue-700);
 		}
+		.stat-card .stat-legend {
+			margin-top: 0.25rem;
+			font-size: 0.75rem;
+			opacity: 0.8;
+		}
 	`,
 	template: `
 		<div class="hub-asistencia">
@@ -113,8 +123,14 @@ type TagSeverity = 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contr
 						<div class="stat-label">Faltó</div>
 					</div>
 					<div class="stat-card stat-info">
-						<div class="stat-value">{{ porcentaje() }}%</div>
-						<div class="stat-label">Asistencia</div>
+						@if (porcentaje() === null) {
+							<div class="stat-value">{{ emptyLabel }}</div>
+							<div class="stat-label">Asistencia</div>
+						} @else {
+							<div class="stat-value">{{ porcentaje() }}%</div>
+							<div class="stat-label">Asistencia</div>
+							<div class="stat-legend">{{ legend }}</div>
+						}
 					</div>
 				</div>
 				@if (asistencia.detalle.length > 0) {
@@ -186,10 +202,12 @@ export class EstudianteCursoHubAsistenciaComponent {
 	});
 	protected readonly loading = computed(() => this.vm().miAsistenciaLoading);
 	protected readonly detallePaging = createClientPaging(computed(() => this.resumen()?.detalle ?? []));
+	protected readonly emptyLabel = ATTENDANCE_EMPTY_LABEL;
+	protected readonly legend = ATTENDANCE_PERCENTAGE_LEGEND;
 	protected readonly porcentaje = computed(() => {
 		const data = this.resumen();
-		if (!data || data.totalClases === 0) return 0;
-		return Math.round(((data.totalPresente + data.totalTarde) / data.totalClases) * 100);
+		if (!data) return null;
+		return calcAttendancePercentage(data.totalPresente, data.totalTarde, data.totalClases);
 	});
 	// #endregion
 

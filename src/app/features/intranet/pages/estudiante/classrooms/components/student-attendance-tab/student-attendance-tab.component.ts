@@ -4,7 +4,12 @@ import { FormsModule } from '@angular/forms';
 
 import { NivelEducativo } from '@core/helpers';
 import { ErrorStateComponent } from '@shared/components';
-import { createClientPaging } from '@shared/utils';
+import {
+	ATTENDANCE_EMPTY_LABEL,
+	ATTENDANCE_PERCENTAGE_LEGEND,
+	calcAttendancePercentage,
+	createClientPaging,
+} from '@shared/utils';
 import {
 	MiAsistenciaCursoResumenDto,
 	MiAsistenciaCursoItemDto,
@@ -57,6 +62,8 @@ export class StudentAttendanceTabComponent implements OnInit {
 	// #region Estado local
 	selectedCursoLocal: number | null = null;
 	readonly mensajeGestionada = MENSAJE_JUSTIFICACION_GESTIONADA;
+	readonly emptyLabel = ATTENDANCE_EMPTY_LABEL;
+	readonly legend = ATTENDANCE_PERCENTAGE_LEGEND;
 	readonly detallePaging = createClientPaging(computed(() => this.asistenciaData()?.detalle ?? []));
 	// #endregion
 
@@ -64,15 +71,12 @@ export class StudentAttendanceTabComponent implements OnInit {
 	readonly stats = computed(() => {
 		const data = this.asistenciaData();
 		if (!data) return null;
-		const porcentaje = data.totalClases > 0
-			? Math.round((data.totalPresente / data.totalClases) * 100)
-			: 0;
 		return {
 			totalPresente: data.totalPresente,
 			totalTarde: data.totalTarde,
 			totalFalto: data.totalFalto,
 			totalClases: data.totalClases,
-			porcentajeAsistencia: porcentaje,
+			porcentajeAsistencia: calcAttendancePercentage(data.totalPresente, data.totalTarde, data.totalClases),
 		};
 	});
 

@@ -42,7 +42,7 @@ describe('EstudianteCursoHubAsistenciaComponent', () => {
 	const api = (fixture: ReturnType<typeof create>) =>
 		fixture.componentInstance as unknown as {
 			resumen(): unknown;
-			porcentaje(): number;
+			porcentaje(): number | null;
 			onRefresh(): void;
 		};
 
@@ -93,6 +93,22 @@ describe('EstudianteCursoHubAsistenciaComponent', () => {
 
 		expect(api(fixture).resumen()).not.toBeNull();
 		expect(api(fixture).porcentaje()).toBe(90);
+	});
+
+	it('INV-AC11: has no percentage (not a false 0 %) when the slot has no registered classes', () => {
+		vm.set({ ...baseVm, miAsistencia: { ...resumen(5), totalPresente: 0, totalTarde: 0, totalFalto: 0, totalClases: 0 } });
+
+		const fixture = create();
+
+		expect(api(fixture).porcentaje()).toBeNull();
+	});
+
+	it('INV-AC11: a single late counts as attendance (0 present, 1 late, 0 absent → 100 %)', () => {
+		vm.set({ ...baseVm, miAsistencia: { ...resumen(5), totalPresente: 0, totalTarde: 1, totalFalto: 0, totalClases: 1 } });
+
+		const fixture = create();
+
+		expect(api(fixture).porcentaje()).toBe(100);
 	});
 
 	it('never exposes the summary of another slot left in the store', () => {
