@@ -93,7 +93,7 @@ export class BulkTestDataFacade {
 				if (response.rechazados > 0) {
 					this.errorHandler.showWarning(
 						'Filas rechazadas',
-						`${response.rechazados} fila(s) de ${entidadLabel} rechazadas — revisá el detalle`,
+						`${response.rechazados} fila(s) de ${entidadLabel} rechazadas — revisa el detalle`,
 					);
 				}
 			}),
@@ -113,7 +113,7 @@ export class BulkTestDataFacade {
 				if (response.rechazados > 0) {
 					this.errorHandler.showWarning(
 						'Registros rechazados',
-						`${response.rechazados} ${entidadLabel} de prueba no se pudieron eliminar — revisá el detalle`,
+						`${response.rechazados} ${entidadLabel} de prueba no se pudieron eliminar — revisa el detalle`,
 					);
 				}
 			}),

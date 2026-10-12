@@ -110,7 +110,7 @@ export class StudentGapProfileComponent implements OnInit {
 			this.emails.set(emailRows);
 		} catch (err) {
 			logger.error('Error loading student gap profile', err);
-			this.error.set('No se pudo cargar la información del estudiante. Intentá recargar la página.');
+			this.error.set('No se pudo cargar la información del estudiante. Intenta recargar la página.');
 		} finally {
 			this.loading.set(false);
 		}

@@ -157,7 +157,7 @@ export class CorreoIndividualFacade {
 		if (sugerencias.length > 1) {
 			this.errorHandler.showWarning(
 				'Diagnóstico por correo',
-				'Seleccioná una persona de las sugerencias para diagnosticar su correo.',
+				'Selecciona una persona de las sugerencias para diagnosticar su correo.',
 			);
 			this.store.setError('SELECCION_REQUERIDA');
 			return;
@@ -165,8 +165,8 @@ export class CorreoIndividualFacade {
 
 		// * 0 sugerencias — distinguimos DNI vs texto para dar pista útil.
 		const mensaje = esDniNumerico
-			? 'No encontramos a nadie activo con ese DNI. Verificá el número o probá con apellido o correo.'
-			: 'No encontramos coincidencias. Tipea un correo completo (con @) o probá otro nombre.';
+			? 'No encontramos a nadie activo con ese DNI. Verifica el número o prueba con apellido o correo.'
+			: 'No encontramos coincidencias. Tipea un correo completo (con @) o prueba otro nombre.';
 		this.errorHandler.showError('Diagnóstico por correo', mensaje);
 		this.store.setError('SIN_COINCIDENCIAS');
 	}
@@ -215,7 +215,7 @@ export class CorreoIndividualFacade {
 			case 'CORREO_INVALIDO':
 				return 'El correo no tiene un formato válido.';
 			case 'SELECCION_REQUERIDA':
-				return 'Seleccioná una persona de las sugerencias.';
+				return 'Selecciona una persona de las sugerencias.';
 			case 'SIN_COINCIDENCIAS':
 				return 'No encontramos coincidencias.';
 			case 'UNKNOWN':

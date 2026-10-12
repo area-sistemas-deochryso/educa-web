@@ -29,7 +29,7 @@ export class EmailDomainPauseCrudFacade {
 		if (!request.observacion || request.observacion.trim().length === 0) {
 			this.errorHandler.showError(
 				'Observación requerida',
-				'Para pausar un dominio manualmente, escribí la razón.',
+				'Para pausar un dominio manualmente, escribe la razón.',
 			);
 			return false;
 		}

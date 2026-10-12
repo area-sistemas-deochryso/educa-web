@@ -21,7 +21,7 @@ export type ModuloId = (typeof MODULO_IDS)[number];
 /**
  * Registro centralizado de módulos de la intranet.
  *
- * Cada módulo responde UNA pregunta: "¿quién sos?" (antes: "¿qué necesitás hacer?").
+ * Cada módulo responde UNA pregunta: "¿quién eres?" (antes: "¿qué necesitas hacer?").
  * - inicio:        Punto de entrada (siempre visible, sin dropdown)
  * - estudiante:    Todo lo que un estudiante necesita de su propia experiencia
  * - profesor:      Todo lo que un profesor necesita para dictar y hacer seguimiento

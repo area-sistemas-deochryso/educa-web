@@ -2,7 +2,7 @@
 	@if (!canAccess) {
 		<div class="empty-state">
 			<i class="pi pi-lock text-3xl mb-2"></i>
-			<p>No tenés permiso para acceder a la bandeja de justificaciones.</p>
+			<p>No tienes permiso para acceder a la bandeja de justificaciones.</p>
 		</div>
 	} @else {
 		<!-- #region Filtro -->
@@ -125,7 +125,7 @@
 				id="motivo-rechazo"
 				[ngModel]="motivoRechazo()"
 				(ngModelChange)="motivoRechazo.set($event)"
-				placeholder="Explicá por qué se rechaza la solicitud..."
+				placeholder="Explica por qué se rechaza la solicitud..."
 				[rows]="3"
 				[maxlength]="500"
 				class="w-full"

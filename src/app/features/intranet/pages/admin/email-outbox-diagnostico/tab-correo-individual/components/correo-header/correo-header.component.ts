@@ -85,7 +85,7 @@ export class CorreoHeaderComponent {
 	}
 
 	onModelChange(value: string | PersonaConCorreoDto): void {
-		// * PrimeNG llama (ngModelChange) con el string mientras tipeás y con el objeto al seleccionar.
+		// * PrimeNG llama (ngModelChange) con el string mientras tipeas y con el objeto al seleccionar.
 		// * El (onSelect) handler ya emite seleccionarPersona, así que acá solo nos importa el string.
 		if (typeof value === 'string') {
 			this.correoInputChange.emit(value);

@@ -63,7 +63,7 @@ import { EstudianteCursosFacade } from '../../services/estudiante-cursos.facade'
 				}
 			} @else {
 				<div class="text-center p-4" data-info-anchor="estudiante-curso-hub-calificaciones-sin-contenido">
-					<p class="m-0 mb-2">Esta franja todavía no tiene contenido, por lo que no hay calificaciones.</p>
+					<p class="m-0 mb-2">Este curso todavía no tiene contenido, por lo que no hay calificaciones.</p>
 					<a routerLink="../contenido" queryParamsHandling="merge" [replaceUrl]="true">Ir a Contenido</a>
 				</div>
 			}

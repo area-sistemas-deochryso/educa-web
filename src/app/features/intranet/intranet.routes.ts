@@ -32,7 +32,7 @@ const PROFESOR_ROUTES_RAW: Route[] = [
 			import('./pages/profesor/attendance/teacher-attendance.component').then(
 				(m) => m.TeacherAttendanceComponent,
 			),
-		title: 'Intranet - Mi Asistencia',
+		title: 'Intranet - Asistencia de mis cursos',
 	},
 	{
 		path: 'profesor/calificaciones',

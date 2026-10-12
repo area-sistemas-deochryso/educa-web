@@ -105,7 +105,7 @@ import { EduButton, EduDatePicker, EduDialog, EduInputText, EduTextarea, EduTogg
 
 				<div class="task-eval-hint">
 					<i class="pi pi-info-circle"></i>
-					<span>Esta tarea no se calificará automáticamente. Creá la evaluación correspondiente en Calificaciones.</span>
+					<span>Esta tarea no se calificará automáticamente. Crea la evaluación correspondiente en Calificaciones.</span>
 				</div>
 			</div>
 

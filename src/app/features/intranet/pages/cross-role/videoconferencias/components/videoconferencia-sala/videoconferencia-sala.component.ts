@@ -208,7 +208,7 @@ export class VideoconferenciaSalaComponent implements OnInit, OnDestroy {
 		this.expiryWarningTimer = setTimeout(() => {
 			this.errorHandler.showWarning(
 				'Sesión por expirar',
-				'La videollamada va a desconectarse en unos minutos por vencimiento de la sesión. Reconectá para seguir sin cortes.',
+				'La videollamada va a desconectarse en unos minutos por vencimiento de la sesión. Reconecta para seguir sin cortes.',
 				15000,
 				{ label: 'Reconectar', callback: () => this.reconnect() },
 			);

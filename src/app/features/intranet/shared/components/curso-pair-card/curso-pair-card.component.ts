@@ -192,7 +192,7 @@ function buildProgress(resumen: ContenidoResumenDto | undefined): SlotProgress |
 			<div class="text-sm text-color-secondary">
 				<ng-content />
 			</div>
-			<ul class="pair-card__slots" aria-label="Franjas del curso">
+			<ul class="pair-card__slots" aria-label="Clases del curso">
 				@for (item of slotLinks(); track item.slot.id) {
 					<li>
 						<a

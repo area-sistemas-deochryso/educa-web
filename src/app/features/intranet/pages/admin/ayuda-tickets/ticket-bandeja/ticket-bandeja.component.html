@@ -2,7 +2,7 @@
 	@if (!canAccess) {
 		<div class="empty-state">
 			<i class="pi pi-lock text-3xl mb-2"></i>
-			<p>No tenés permiso para acceder a la bandeja de tickets.</p>
+			<p>No tienes permiso para acceder a la bandeja de tickets.</p>
 		</div>
 	} @else {
 		<!-- #region Filtro -->
@@ -29,7 +29,7 @@
 		} @else if (error()) {
 			<div class="empty-state">
 				<i class="pi pi-exclamation-triangle text-3xl mb-2"></i>
-				<p>No se pudo cargar la bandeja. Intentá de nuevo.</p>
+				<p>No se pudo cargar la bandeja. Intenta de nuevo.</p>
 			</div>
 		} @else if (tickets().length === 0) {
 			<div class="empty-state">

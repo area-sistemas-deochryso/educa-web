@@ -308,7 +308,8 @@
 	color: var(--text-color-secondary);
 	text-align: center;
 
-	i {
+	// Solo el icono ilustrativo: el botón de acción trae su propio icono.
+	> i {
 		font-size: 2.5rem;
 		margin-bottom: 0.5rem;
 		opacity: 0.35;
@@ -318,6 +319,10 @@
 		margin: 0;
 		font-size: 0.85rem;
 		line-height: 1.5;
+	}
+
+	&__action {
+		margin-top: 1rem;
 	}
 }
 // #endregion

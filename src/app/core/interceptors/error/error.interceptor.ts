@@ -63,7 +63,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 			if (errorClass === 'timeout') {
 				logger.warn('[ErrorInterceptor] Request timeout:', req.url);
 				if (!req.headers.has('X-Skip-Error-Toast')) {
-					errorHandler.showWarning('Timeout', 'La operación tardó demasiado. Intentá nuevamente.');
+					errorHandler.showWarning('Timeout', 'La operación tardó demasiado. Intenta nuevamente.');
 				}
 				return throwError(() => error);
 			}
@@ -113,7 +113,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 			// Server unreachable (status 0 but online) — specific message
 			if (errorClass === 'server-unreachable') {
 				logger.error('[ErrorInterceptor] Server unreachable:', req.url);
-				errorHandler.showError('Sin respuesta', 'El servidor no está disponible. Reintentá en unos minutos.');
+				errorHandler.showError('Sin respuesta', 'El servidor no está disponible. Reintenta en unos minutos.');
 				errorReporter.reportHttpError(0, req.url, req.method, undefined, requestId, initiationStack, req.body, undefined);
 				return throwError(() => httpError);
 			}

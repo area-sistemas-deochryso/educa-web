@@ -38,7 +38,7 @@
 					optionValue="value"
 					[ngModel]="formData().motivo"
 					(ngModelChange)="onMotivoChange($event)"
-					placeholder="Seleccioná un motivo"
+					placeholder="Selecciona un motivo"
 					appendTo="body"
 					[disabled]="submitting()"
 				/>
@@ -62,7 +62,7 @@
 					(ngModelChange)="onObservacionChange($event)"
 					[placeholder]="
 						motivoIsManual()
-							? 'Explicá la razón del bloqueo (mínimo ' + observacionMin + ' caracteres)'
+							? 'Explica la razón del bloqueo (mínimo ' + observacionMin + ' caracteres)'
 							: 'Notas opcionales (motivo de la decisión, contexto, etc.)'
 					"
 					[disabled]="submitting()"

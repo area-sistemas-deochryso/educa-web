@@ -25,9 +25,9 @@
 			
 				<edu-tab value="0" data-info-anchor="profesor-salon-dialog-tab">
 					<i class="pi pi-users tab-icon"></i>Grupos
-					@if (!dialogLoading()) {
+					@if (!gruposLoading() && gruposData().length > 0) {
 						<edu-tag
-							[value]="s.cantidadEstudiantes.toString()"
+							[value]="gruposData().length.toString()"
 							styleClass="tag-neutral"
 							[rounded]="true"
 							class="ml-2"
@@ -90,6 +90,7 @@
 						(openAsignar)="gruposOpenAsignar.emit($event)"
 						(closeAsignar)="gruposCloseAsignar.emit()"
 						(confirmDialogHide)="gruposConfirmDialogHide.emit()"
+						(irAContenido)="gruposIrAContenido.emit()"
 					/>
 				</edu-tabpanel>
 				<!-- #endregion -->

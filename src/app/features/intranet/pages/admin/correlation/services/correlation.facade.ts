@@ -47,13 +47,13 @@ export class CorrelationFacade {
 					this.store.setLoading(false);
 					if (error.status === 400) {
 						this.store.setError(
-							'CorrelationId inválido. Verificá el formato (máx 64 chars, no vacío).',
+							'CorrelationId inválido. Verifica el formato (máx 64 chars, no vacío).',
 						);
 					} else if (error.status === 401 || error.status === 403) {
-						this.store.setError('No tenés permiso para consultar este correlation id.');
+						this.store.setError('No tienes permiso para consultar este correlation id.');
 					} else {
 						this.store.setError(
-							'No se pudo cargar el snapshot. Reintentá en unos segundos.',
+							'No se pudo cargar el snapshot. Reintenta en unos segundos.',
 						);
 					}
 					return;

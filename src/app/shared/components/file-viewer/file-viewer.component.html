@@ -11,7 +11,7 @@
 		<div class="file-viewer__body">
 			@if (current.kind === 'image') {
 				@if (imageFailed()) {
-					<p class="file-viewer__error">No se pudo mostrar la imagen. Probá abrirla en una pestaña nueva.</p>
+					<p class="file-viewer__error">No se pudo mostrar la imagen. Prueba a abrirla en una pestaña nueva.</p>
 				} @else {
 					<img class="file-viewer__image" [src]="current.url" [alt]="current.name" (error)="imageFailed.set(true)" />
 				}
