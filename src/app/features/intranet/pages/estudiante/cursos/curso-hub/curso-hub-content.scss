@@ -429,6 +429,43 @@
 	color: var(--text-color-secondary);
 }
 
+.tarea-meta {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.25rem 0.75rem;
+}
+
+// Estado derivado de «Mi entrega»; el color acompaña al texto y al icono, no los reemplaza.
+.row-info .tarea-estado {
+	font-weight: 600;
+	padding: 0.05rem 0.45rem;
+	border-radius: 999px;
+	border: 1px solid currentColor;
+
+	&[data-estado='entregada'] {
+		color: var(--green-700, #15803d);
+	}
+
+	&[data-estado='pendiente'] {
+		color: var(--yellow-800, #854d0e);
+	}
+
+	&[data-estado='vencida'] {
+		color: var(--red-700, #b91c1c);
+	}
+
+	i {
+		font-size: 0.7rem;
+	}
+}
+
+.section-hint {
+	margin: 0 0 0.25rem;
+	font-size: 0.72rem;
+	color: var(--text-color-secondary);
+}
+
 // #endregion
 // #region Tarea archivos
 .tarea-archivos-section {

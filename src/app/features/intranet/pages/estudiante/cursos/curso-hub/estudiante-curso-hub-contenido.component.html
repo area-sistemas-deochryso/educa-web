@@ -127,18 +127,17 @@
 															<div class="section-header">
 																<div class="section-label">
 																	<i class="pi pi-upload"></i>
-																	Mis Archivos
-																</div>
-																<edu-file-upload
-																	data-info-anchor="estudiante-curso-dialog-mis-archivos-upload"
-																	mode="basic"
-																	chooseLabel="Subir archivo"
+																	Mis archivos de la semana </div> <edu-file-upload data-info-anchor="estudiante-curso-dialog-mis-archivos-upload" mode="basic" chooseLabel="Subir a la semana"
 																	[customUpload]="true"
 																	[accept]="uploadAccept"
 																	[maxFileSize]="uploadMaxBytes"
 																	(uploadHandler)="onFilesSelected($event, semana.id)"
 																/>
 															</div>
+
+															<p class="section-hint" data-info-anchor="estudiante-curso-dialog-mis-archivos-ayuda">
+																Archivos personales de esta semana. No cuentan como entrega: las tareas se entregan dentro de cada tarea, en «Mi entrega».
+															</p>
 
 															@if (getMisArchivosSemana(semana.id).length === 0) {
 																<div class="section-empty">No has subido archivos</div>
@@ -192,16 +191,23 @@
 																				@if (tarea.descripcion) {
 																					<span class="tarea-desc">{{ tarea.descripcion }}</span>
 																				}
-																				@if (tarea.fechaLimite) {
-																					<span>
-																						<i
-																							class="pi pi-calendar"
-																							style="font-size: 0.65rem"
-																						></i>
-																						{{ tarea.fechaLimite | date: 'dd/MM/yyyy' }}
-																					</span>
-																				}
-																			</div>
+																				<div class="tarea-meta">
+<span class="tarea-fecha" data-info-anchor="estudiante-curso-dialog-tarea-fecha">
+<i class="pi pi-calendar" style="font-size: 0.65rem"></i>
+@if (tarea.fechaLimite) {
+Entrega hasta {{ tarea.fechaLimite | date: 'dd/MM/yyyy' }}
+} @else {
+Sin fecha límite
+}
+</span>
+@if (estadoTarea(tarea); as estado) {
+<span class="tarea-estado" [attr.data-estado]="estado.kind" data-info-anchor="estudiante-curso-dialog-tarea-estado">
+<i [class]="estado.icon"></i>
+{{ estado.label }}
+</span>
+}
+</div>
+</div>
 																		</div>
 
 																		<!-- Archivos del profesor en la tarea (read-only) -->
@@ -224,9 +230,7 @@
 																			<div class="tarea-section-label">
 																				<span class="tarea-attach-label"><i class="pi pi-upload"></i> Mi entrega</span>
 																				<edu-file-upload
-																					data-info-anchor="estudiante-curso-dialog-mi-entrega-upload"
-																					mode="basic"
-																					chooseLabel="Subir archivo"
+																					data-info-anchor="estudiante-curso-dialog-mi-entrega-upload" mode="basic" chooseLabel="Subir entrega"
 																					[customUpload]="true"
 																					[accept]="uploadAccept"
 																					[maxFileSize]="uploadMaxBytes"

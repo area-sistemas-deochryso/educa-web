@@ -27,6 +27,25 @@ import {
 	EduTooltip,
 } from '@edu-ui';
 
+type TareaEstadoKind = 'entregada' | 'pendiente' | 'vencida';
+
+interface TareaEstado {
+	kind: TareaEstadoKind;
+	label: string;
+	icon: string;
+}
+
+const TAREA_ESTADO: Record<TareaEstadoKind, TareaEstado> = {
+	entregada: { kind: 'entregada', label: 'Entregada', icon: 'pi pi-check-circle' },
+	pendiente: { kind: 'pendiente', label: 'Pendiente de entrega', icon: 'pi pi-clock' },
+	vencida: { kind: 'vencida', label: 'Vencida sin entrega', icon: 'pi pi-exclamation-circle' },
+};
+
+/** Fecha local de hoy como `YYYY-MM-DD`, comparable con el prefijo de `fechaLimite`. */
+function todayIso(): string {
+	return new Date().toLocaleDateString('en-CA');
+}
+
 /**
  * Pestaña Contenido del hub de curso del estudiante (`…/contenido`): consulta
  * el contenido de la franja y entrega archivos/tareas.
@@ -160,6 +179,19 @@ export class EstudianteCursoHubContenidoComponent {
 
 	protected getMisTareaArchivos(tareaId: number): EstudianteTareaArchivoDto[] {
 		return this.vm().misTareaArchivos[tareaId] ?? [];
+	}
+
+	/**
+	 * El contrato no trae un estado de entrega: se deriva de los archivos que el
+	 * estudiante subió en «Mi entrega». `null` mientras esos archivos no cargan
+	 * (evita mostrar «Pendiente» por un instante a quien ya entregó).
+	 */
+	protected estadoTarea(tarea: { id: number; fechaLimite: string | null }): TareaEstado | null {
+		const entregas = this.vm().misTareaArchivos[tarea.id];
+		if (!entregas) return null;
+		if (entregas.length > 0) return TAREA_ESTADO.entregada;
+		const venceAntesDeHoy = !!tarea.fechaLimite && tarea.fechaLimite.slice(0, 10) < todayIso();
+		return venceAntesDeHoy ? TAREA_ESTADO.vencida : TAREA_ESTADO.pendiente;
 	}
 
 	protected openArchivo(archivo: ViewableArchivo): void {

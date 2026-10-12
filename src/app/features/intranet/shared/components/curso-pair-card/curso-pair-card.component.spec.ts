@@ -148,7 +148,7 @@ describe('CursoPairCardComponent', () => {
 			expect(bar.getAttribute('role')).toBe('progressbar');
 			expect(bar.getAttribute('aria-valuenow')).toBe('0');
 			expect(bar.getAttribute('aria-valuemax')).toBe('16');
-			expect(bar.textContent?.trim()).toBe('0/16');
+			expect(bar.textContent?.trim()).toBe('0/16 semanas con material');
 			expect(bar.querySelector<HTMLElement>('.pair-card__progress-fill')?.style.width).toBe(
 				'0%',
 			);
@@ -161,7 +161,7 @@ describe('CursoPairCardComponent', () => {
 			])[0];
 			const items = bars(render({ group }));
 
-			expect(items.map((b) => b.textContent?.trim())).toEqual(['4/16', '8/16']);
+			expect(items.map((b) => b.textContent?.trim())).toEqual(['4/16 semanas con material', '8/16 semanas con material']);
 			expect(items.map((b) => b.getAttribute('aria-valuenow'))).toEqual(['4', '8']);
 			expect(items[0].getAttribute('aria-valuetext')).toBe('4 de 16 semanas con material');
 			expect(items[0].getAttribute('aria-label')).toBe('Semanas con material de Lunes');
@@ -174,7 +174,7 @@ describe('CursoPairCardComponent', () => {
 			const group = groupHorariosByPair([withResumen(MON, 16, 16)])[0];
 			const [bar] = bars(render({ group }));
 
-			expect(bar.textContent?.trim()).toBe('16/16');
+			expect(bar.textContent?.trim()).toBe('16/16 semanas con material');
 			expect(bar.querySelector<HTMLElement>('.pair-card__progress-fill')?.style.width).toBe(
 				'100%',
 			);
@@ -184,7 +184,7 @@ describe('CursoPairCardComponent', () => {
 			const group = groupHorariosByPair([withResumen(MON, 2, 10), WED])[0];
 
 			expect(bars(render({ group })).map((b) => b.textContent?.trim())).toEqual([
-				'2/10',
+				'2/10 semanas con material',
 				'Sin contenido',
 			]);
 		});
