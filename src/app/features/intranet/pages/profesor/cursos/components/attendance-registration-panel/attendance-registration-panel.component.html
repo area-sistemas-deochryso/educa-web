@@ -31,6 +31,8 @@
 			<edu-tag [value]="'Faltas: ' + stats().faltas" severity="danger" />
 			@if (esListaSinGuardar()) {
 				<edu-tag value="Sin guardar" severity="warn" icon="pi pi-info-circle" />
+			} @else if (guardadoALabel(); as hora) {
+				<edu-tag [value]="'Guardado a las ' + hora" severity="success" icon="pi pi-check-circle" />
 			}
 		</div>
 	}

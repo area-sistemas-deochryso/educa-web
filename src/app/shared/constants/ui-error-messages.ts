@@ -10,7 +10,14 @@ export const UI_SUMMARIES = {
 } as const;
 
 export const UI_ERROR_SUMMARIES = {
-	connection: 'Error de conexion',
+	/** Sin respuesta del servidor (red caída, timeout de conexión). */
+	connection: 'Sin conexión',
+	/** El servidor respondió con 5xx. */
+	server: 'Error del servidor',
+	/** El servidor rechazó una mutación (4xx): regla de negocio o validación; el motivo va en el detalle. */
+	saveRejected: 'No se pudo guardar',
+	/** El servidor rechazó una lectura (4xx). */
+	requestRejected: 'No se pudo completar la acción',
 	application: 'Error de aplicacion',
 	validation: 'Error de validacion',
 	generic: 'Error',

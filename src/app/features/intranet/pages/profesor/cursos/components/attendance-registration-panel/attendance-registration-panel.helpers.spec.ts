@@ -35,5 +35,27 @@ describe('findNearestValidDate', () => {
 		const result = findNearestValidDate(from, 1);
 		expect(result.getDate()).toBe(13);
 	});
+
+	describe('with notAfter (no future dates)', () => {
+		it('falls back to the previous occurrence when the nearest match is in the future', () => {
+			// Monday 2026-10-12: nearest Thursday is the 15th (3 ahead) -> must be Thursday 08/10.
+			const monday = new Date(2026, 9, 12);
+			const result = findNearestValidDate(monday, 4, monday);
+			expect(result.getMonth()).toBe(9);
+			expect(result.getDate()).toBe(8);
+		});
+
+		it('returns today when today is a schedule day', () => {
+			const thursday = new Date(2026, 9, 15);
+			const result = findNearestValidDate(thursday, 4, thursday);
+			expect(result.getDate()).toBe(15);
+		});
+
+		it('keeps the nearest match when it is not in the future', () => {
+			// Wednesday 14/10 -> nearest Thursday is 15th (future); nearest Tuesday is 13th (past).
+			const wednesday = new Date(2026, 9, 14);
+			expect(findNearestValidDate(wednesday, 2, wednesday).getDate()).toBe(13);
+		});
+	});
 });
 // #endregion

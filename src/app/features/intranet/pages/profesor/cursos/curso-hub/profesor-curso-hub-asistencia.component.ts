@@ -65,6 +65,7 @@ function todayIso(): string {
 						[saving]="vm().registroSaving"
 						[stats]="stats()"
 						[tieneRegistros]="tieneRegistros()"
+						[guardadoA]="guardadoA()"
 						[diaSemanaEsperado]="diaSemana()"
 						[diaSemanaEsperadoDescripcion]="diaSemanaDescripcion()"
 						[initialFecha]="fecha()"
@@ -110,6 +111,7 @@ export class ProfesorCursoHubAsistenciaComponent {
 	protected readonly tieneRegistros = computed(() =>
 		this.registroDeLaFranja() ? this.vm().registroTieneRegistros : undefined,
 	);
+	protected readonly guardadoA = computed(() => (this.registroDeLaFranja() ? this.vm().registroSavedAt : null));
 	protected readonly resumen = computed(() => {
 		const resumen = this.vm().resumen;
 		return resumen && resumen.horarioId === this.slotId() ? resumen : null;

@@ -100,7 +100,7 @@ export class ErrorHandlerService {
 
 		this.showNotification({
 			severity: 'error',
-			summary: UI_ERROR_SUMMARIES.connection,
+			summary: this.getHttpErrorSummary(error, method),
 			detail: displayMessage,
 			life: error.status === 401 ? 3000 : 5000,
 			action: actionCfg
@@ -284,6 +284,14 @@ export class ErrorHandlerService {
 			message: error.message,
 			body: error.error,
 		};
+	}
+
+	/** Título del toast según el origen del fallo: red, servidor, o rechazo de regla de negocio. */
+	private getHttpErrorSummary(error: HttpErrorResponse, method?: string): string {
+		if (error.status === 0) return UI_ERROR_SUMMARIES.connection;
+		if (error.status >= 500) return UI_ERROR_SUMMARIES.server;
+		const isMutation = !!method && method.toUpperCase() !== 'GET';
+		return isMutation ? UI_ERROR_SUMMARIES.saveRejected : UI_ERROR_SUMMARIES.requestRejected;
 	}
 
 	private getHttpErrorMessage(error: HttpErrorResponse): string {

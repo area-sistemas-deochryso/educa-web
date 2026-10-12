@@ -36,6 +36,8 @@ export class AttendanceRegistrationPanelComponent {
 	});
 	/** false = lista sin guardar (defaults). undefined = backend sin el flag desplegado todavía (no mostrar indicador). */
 	readonly tieneRegistros = input<boolean | undefined>(undefined);
+	/** Momento del último guardado confirmado de la lista en pantalla; null si no se guardó desde que se cargó. */
+	readonly guardadoA = input<Date | null>(null);
 	/** día de semana (0=domingo, 1=lunes...5=viernes) esperado según el horario del curso — null si no aplica. */
 	readonly diaSemanaEsperado = input<number | null>(null);
 	readonly diaSemanaEsperadoDescripcion = input<string | null>(null);
@@ -78,6 +80,11 @@ export class AttendanceRegistrationPanelComponent {
 	readonly hasEstudiantes = computed(() => this.estudiantes().length > 0);
 	/** true solo cuando el backend confirmó explícitamente que no hay registro guardado (evita falso positivo si el flag no llegó). */
 	readonly esListaSinGuardar = computed(() => this.tieneRegistros() === false);
+	/** "HH:MM" del último guardado confirmado, para el indicador "Guardado a las …". */
+	readonly guardadoALabel = computed(() => {
+		const fecha = this.guardadoA();
+		return fecha ? fecha.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit', hour12: false }) : null;
+	});
 	// #endregion
 
 	// #region Constants
@@ -123,11 +130,11 @@ export class AttendanceRegistrationPanelComponent {
 		return this.selectedDate.getDay() !== dia;
 	}
 
-	/** Busca la fecha válida más cercana (adelante o atrás) y dispara la búsqueda. */
+	/** Busca la fecha válida más cercana que no sea futura (el backend rechaza fechas posteriores a hoy) y dispara la búsqueda. */
 	irAFechaValida(): void {
 		const dia = this.diaSemanaEsperado();
 		if (dia === null) return;
-		this.selectedDate = findNearestValidDate(this.selectedDate, dia);
+		this.selectedDate = findNearestValidDate(this.selectedDate, dia, new Date());
 		this.onDateSelect();
 	}
 

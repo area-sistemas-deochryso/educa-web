@@ -13,6 +13,8 @@ interface AsistenciaCursoState {
 	registroBaseline: AsistenciaCursoEstudianteDto[];
 	registroLoading: boolean;
 	registroSaving: boolean;
+	/** Momento del último guardado confirmado de la lista cargada; null si se cargó de nuevo o nunca se guardó. */
+	registroSavedAt: Date | null;
 	// #endregion
 	// #region Resumen
 	resumen: AsistenciaCursoResumenDto | null;
@@ -26,6 +28,7 @@ const initialState: AsistenciaCursoState = {
 	registroBaseline: [],
 	registroLoading: false,
 	registroSaving: false,
+	registroSavedAt: null,
 	resumen: null,
 	resumenLoading: false,
 	resumenError: null,
@@ -42,6 +45,7 @@ export class AttendanceCourseStore {
 	private readonly registroBaseline = computed(() => this._state().registroBaseline);
 	readonly registroLoading = computed(() => this._state().registroLoading);
 	readonly registroSaving = computed(() => this._state().registroSaving);
+	readonly registroSavedAt = computed(() => this._state().registroSavedAt);
 	readonly resumen = computed(() => this._state().resumen);
 	readonly resumenLoading = computed(() => this._state().resumenLoading);
 	readonly resumenError = computed(() => this._state().resumenError);
@@ -79,6 +83,7 @@ export class AttendanceCourseStore {
 		registroEstudiantes: this.registroEstudiantes(),
 		registroLoading: this.registroLoading(),
 		registroSaving: this.registroSaving(),
+		registroSavedAt: this.registroSavedAt(),
 		registroStats: this.registroStats(),
 		registroTieneRegistros: this.registroTieneRegistros(),
 		registroDirty: this.registroDirty(),
@@ -90,12 +95,17 @@ export class AttendanceCourseStore {
 
 	// #region Comandos de mutacion
 	setRegistroData(data: AsistenciaCursoFechaDto | null): void {
-		this._state.update((s) => ({ ...s, registroData: data, registroBaseline: data?.estudiantes ?? [] }));
+		this._state.update((s) => ({ ...s, registroData: data, registroBaseline: data?.estudiantes ?? [], registroSavedAt: null }));
 	}
 
-	/** Tras guardar: lo mostrado pasa a ser la nueva referencia (ya no hay ediciones pendientes). */
-	markRegistroSaved(): void {
-		this._state.update((s) => ({ ...s, registroBaseline: s.registroData?.estudiantes ?? [] }));
+	/** Tras guardar: lo mostrado pasa a ser la nueva referencia (ya no hay ediciones pendientes) y la lista ya tiene registros. */
+	markRegistroSaved(savedAt: Date = new Date()): void {
+		this._state.update((s) => ({
+			...s,
+			registroBaseline: s.registroData?.estudiantes ?? [],
+			registroData: s.registroData ? { ...s.registroData, tieneRegistros: true } : null,
+			registroSavedAt: savedAt,
+		}));
 	}
 
 	setRegistroLoading(loading: boolean): void {

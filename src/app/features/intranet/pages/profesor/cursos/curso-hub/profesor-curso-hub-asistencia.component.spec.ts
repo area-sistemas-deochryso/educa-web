@@ -22,6 +22,7 @@ const baseVm = {
 	registroEstudiantes: [{ estudianteId: 1 }] as unknown[],
 	registroLoading: false,
 	registroSaving: false,
+	registroSavedAt: null as Date | null,
 	registroStats: { total: 1, presentes: 1, tardes: 0, faltas: 0 },
 	registroTieneRegistros: true as boolean | undefined,
 	registroDirty: false,

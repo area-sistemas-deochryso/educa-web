@@ -133,6 +133,7 @@ import { EduSpinner, EduTab, EduTabPanel, EduTabs } from '@edu-ui';
 									[saving]="asistenciaVm().registroSaving"
 									[stats]="asistenciaVm().registroStats"
 									[tieneRegistros]="asistenciaVm().registroTieneRegistros"
+									[guardadoA]="asistenciaVm().registroSavedAt"
 									[diaSemanaEsperado]="selectedHorarioDiaSemana()"
 									[diaSemanaEsperadoDescripcion]="selectedHorarioDiaDescripcion()"
 									[initialFecha]="initialFecha()"

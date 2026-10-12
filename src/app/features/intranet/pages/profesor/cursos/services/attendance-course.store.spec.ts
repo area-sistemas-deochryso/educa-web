@@ -223,6 +223,25 @@ describe('AttendanceCourseStore', () => {
 			expect(store.registroDirty()).toBe(false);
 		});
 
+		it('marks the list as having records and stamps the save time', () => {
+			store.setRegistroData({ ...mockRegistroData, tieneRegistros: false } as never);
+			const savedAt = new Date(2026, 9, 12, 10, 2);
+
+			store.markRegistroSaved(savedAt);
+
+			expect(store.registroTieneRegistros()).toBe(true);
+			expect(store.registroSavedAt()).toBe(savedAt);
+		});
+
+		it('clears the save time when another list is loaded', () => {
+			store.setRegistroData(mockRegistroData as never);
+			store.markRegistroSaved();
+
+			store.setRegistroData({ ...mockRegistroData, fecha: '2026-03-22' } as never);
+
+			expect(store.registroSavedAt()).toBeNull();
+		});
+
 		it('is false after loading another list over an edited one', () => {
 			store.setRegistroData(mockRegistroData as never);
 			store.updateEstudianteEstado(1, 'F');

@@ -63,6 +63,17 @@ describe('ErrorHandlerService', () => {
 			expect(appError.message).toContain('Ref: abc12345');
 		});
 
+		it.each([
+			[0, 'POST', 'Sin conexión'],
+			[400, 'POST', 'No se pudo guardar'],
+			[400, 'GET', 'No se pudo completar la acción'],
+			[503, 'POST', 'Error del servidor'],
+		])('should title a %i on %s as "%s"', (status, method, summary) => {
+			service.handleHttpError(new HttpErrorResponse({ status }), { method });
+
+			expect(service.currentNotification()?.summary).toBe(summary);
+		});
+
 		it('should count http errors', () => {
 			service.handleHttpError(new HttpErrorResponse({ status: 500 }));
 			service.handleHttpError(new HttpErrorResponse({ status: 404 }));

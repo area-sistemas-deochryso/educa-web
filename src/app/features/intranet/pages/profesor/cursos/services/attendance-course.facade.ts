@@ -12,6 +12,9 @@ import { isOffScheduleDate } from './attendance-schedule.helpers';
 import { AttendanceCourseStore } from './attendance-course.store';
 import { EstadoAsistenciaCurso, RegistrarAsistenciaCursoDto } from '../../models';
 
+/** Más que el default (3s): el profesor debe alcanzar a leer que el guardado se confirmó. */
+const SAVE_SUCCESS_TOAST_LIFE_MS = 6000;
+
 @Injectable({ providedIn: 'root' })
 export class AttendanceCourseFacade {
 	// #region Dependencias
@@ -157,7 +160,7 @@ export class AttendanceCourseFacade {
 				onCommit: () => {
 					this.store.setRegistroSaving(false);
 					this.store.markRegistroSaved();
-					this.errorHandler.showSuccess(UI_SUMMARIES.success, UI_ASISTENCIA_SUCCESS_MESSAGES.registered);
+					this.errorHandler.showSuccess(UI_SUMMARIES.success, UI_ASISTENCIA_SUCCESS_MESSAGES.registered, SAVE_SUCCESS_TOAST_LIFE_MS);
 					resolve(true);
 				},
 				onError: (err) => {
