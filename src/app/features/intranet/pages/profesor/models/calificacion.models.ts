@@ -103,6 +103,11 @@ export interface CalificacionConMiNotaDto extends CalificacionDto {
   nota: number | null;
   observacion: string | null;
   promedioGeneral: number | null;
+  /**
+   * Sin nota del estudiante y con el plazo vencido (INV-C12 § Vacíos y vencimiento del plazo). `nota` sigue `null`:
+   * el 0 es de presentación. Lo decide el BE; ausente en un BE anterior (se trata como no vencida).
+   */
+  vencida?: boolean;
 }
 
 export interface PromedioSemanaDto {
