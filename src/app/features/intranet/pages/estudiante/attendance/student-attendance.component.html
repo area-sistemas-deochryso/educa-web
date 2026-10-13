@@ -61,6 +61,11 @@
 				</div>
 			</div>
 
+			<!-- Calendario (misma fuente que la tabla; se reinicia al cambiar de curso) -->
+			@for (horarioId of [asistencia()!.horarioId]; track horarioId) {
+				<app-attendance-calendar class="block mb-4" [days]="asistencia()!.detalle" />
+			}
+
 			<!-- Tabla detalle -->
 			@if (asistencia()!.detalle.length > 0) {
 				<edu-table
