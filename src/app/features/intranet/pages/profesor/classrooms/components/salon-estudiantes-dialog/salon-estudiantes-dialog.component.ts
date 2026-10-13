@@ -20,6 +20,9 @@ import {
 import { NotaSaveEvent } from '../salon-notas-estudiante-tab/salon-notas-estudiante-tab.component';
 import { EduButton, EduDialog, EduTab, EduTabPanel, EduTabs, EduTag, EduTooltip } from '@edu-ui';
 
+/** Valor de la pestaña «Notas del Salón» en `edu-tabs`. */
+const TAB_NOTAS_SALON = '2';
+
 @Component({
 	selector: 'app-salon-estudiantes-dialog',
 	standalone: true,
@@ -95,7 +98,11 @@ export class SalonEstudiantesDialogComponent {
 		return { height: '65vh', 'max-height': '80vh', 'overflow-y': 'auto' };
 	});
 
+	/** true cuando la pantalla completa la activó la pestaña «Notas del Salón», no el usuario. */
+	private fullscreenFromTab = false;
+
 	toggleFullscreen(): void {
+		this.fullscreenFromTab = false;
 		this.isFullscreen.update((v) => !v);
 	}
 	// #endregion
@@ -139,14 +146,27 @@ export class SalonEstudiantesDialogComponent {
 
 	onVisibleChange(value: boolean): void {
 		if (!value) {
+			this.fullscreenFromTab = false;
 			this.isFullscreen.set(false);
 			this.activeTab.set('0');
 			this.visibleChange.emit(false);
 		}
 	}
 
+	/** La matriz de «Notas del Salón» necesita ancho: entra en pantalla completa y vuelve al salir, salvo que el usuario ya la controlara. */
+	private syncFullscreenWithTab(value: string): void {
+		if (value === TAB_NOTAS_SALON && !this.isFullscreen()) {
+			this.fullscreenFromTab = true;
+			this.isFullscreen.set(true);
+		} else if (value !== TAB_NOTAS_SALON && this.fullscreenFromTab) {
+			this.fullscreenFromTab = false;
+			this.isFullscreen.set(false);
+		}
+	}
+
 	onTabChange(value: string): void {
 		this.activeTab.set(value);
+		this.syncFullscreenWithTab(value);
 		if (value === '0') {
 			this.gruposTabActivated.emit();
 		}
