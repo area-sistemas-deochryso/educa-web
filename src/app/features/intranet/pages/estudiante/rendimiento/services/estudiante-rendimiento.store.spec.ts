@@ -76,6 +76,53 @@ describe('EstudianteRendimientoStore', () => {
 		});
 	});
 
+	describe('vm.cursos (forma real del BE: campos nulos omitidos del JSON)', () => {
+		// Payload real de `mi-rendimiento` (2026-10-13): el periodo sin notas no trae `promedio` ni `outlier…`.
+		const respuestaBe = [
+			{
+				cursoContenidoId: 1013,
+				cursoId: 7,
+				cursoNombre: 'Personal Social',
+				anio: 2026,
+				periodos: [
+					{ periodoId: 2, periodoNombre: 'Bimestre QA 1', periodoOrden: 1, promedio: 3.1 },
+					{ periodoId: 3, periodoNombre: 'Bimestre QA 9', periodoOrden: 2 },
+				],
+				sinPeriodosConfigurados: false,
+			},
+		] as unknown as RendimientoPropioCursoDto[];
+
+		it('normalizes omitted promedio and deltas to null so `!== null` is reliable', () => {
+			store.setCursos(respuestaBe);
+			const [qa1, qa9] = store.vm().cursos[0].periodos;
+
+			expect(qa1.outlierVsPeriodoAnterior).toBeNull();
+			expect(qa1.outlierVsAnioAnterior).toBeNull();
+			expect(qa9.promedio).toBeNull();
+			expect(qa9.outlierVsPeriodoAnterior).toBeNull();
+		});
+
+		it('counts only graded periods and keeps the last graded one as the latest average', () => {
+			store.setCursos(respuestaBe);
+			const { periodos, puntosCalificados } = store.vm().cursos[0];
+			const ultimo = [...periodos].reverse().find((p) => p.promedio !== null);
+
+			expect(puntosCalificados).toBe(1);
+			expect(ultimo?.periodoNombre).toBe('Bimestre QA 1');
+		});
+
+		it('keeps a numeric delta of 0 as 0 (not null) when the BE sends it', () => {
+			store.setCursos([
+				{
+					...mockCursos[0],
+					periodos: [mockCursos[0].periodos[0], { ...mockCursos[0].periodos[1], outlierVsPeriodoAnterior: 0 }],
+				},
+			]);
+
+			expect(store.vm().cursos[0].periodos[1].outlierVsPeriodoAnterior).toBe(0);
+		});
+	});
+
 	describe('setLoading / setError', () => {
 		it('should track loading and error flags independently of cursos', () => {
 			store.setLoading(true);
