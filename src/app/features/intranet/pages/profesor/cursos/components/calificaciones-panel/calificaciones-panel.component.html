@@ -66,10 +66,6 @@
 										<i class="pi pi-calendar"></i>
 										{{ cal.fechaEvaluacion | date : 'dd/MM/yyyy' }}
 									</span>
-									<span class="text-sm text-color-secondary">
-										<i class="pi pi-users"></i>
-										{{ getNotasCount(cal) }} calificados
-									</span>
 									@if (getNotasCount(cal) > 0) {
 										<span class="text-sm text-color-secondary">
 											<i class="pi pi-chart-line"></i>
@@ -77,52 +73,48 @@
 										</span>
 									}
 								</div>
+								@if (totalEstudiantes() > 0) {
+									<div class="eval-progress">
+										<div
+											class="eval-progress__bar"
+											role="progressbar"
+											[attr.aria-valuenow]="getNotasCount(cal)"
+											aria-valuemin="0"
+											[attr.aria-valuemax]="totalEstudiantes()"
+											[attr.aria-label]="'Calificados: ' + getNotasCount(cal) + ' de ' + totalEstudiantes()"
+										>
+											<div class="eval-progress__fill" [style.width.%]="getProgresoPercent(cal)"></div>
+										</div>
+										<span class="eval-progress__label text-sm text-color-secondary">
+											{{ getNotasCount(cal) }}/{{ totalEstudiantes() }} calificados
+										</span>
+										@if (getEstado(cal); as estado) {
+											<span class="eval-estado eval-estado--{{ estado }}">{{ getEstadoLabel(estado) }}</span>
+										}
+									</div>
+								} @else {
+									<span class="text-sm text-color-secondary">{{ getNotasCount(cal) }} calificados</span>
+								}
 							</div>
 							<div class="eval-actions">
 								<edu-button
 									icon="pi pi-check-square"
-									[text]="true"
-									[rounded]="true"
+									label="Calificar"
 									size="small"
-									eduTooltip="Calificar estudiantes"
-									eduTooltipPosition="top"
 									data-info-anchor="profesor-calificaciones-calificar-estudiantes"
 									(click)="calificarEstudiantes.emit(cal)"
 									[pt]="{ root: { 'aria-label': 'Calificar estudiantes' } }"
 								/>
 								<edu-button
-									[icon]="cal.esGrupal ? 'pi pi-user' : 'pi pi-users'"
+									icon="pi pi-ellipsis-v"
 									[text]="true"
 									[rounded]="true"
 									size="small"
-									[eduTooltip]="cal.esGrupal ? 'Cambiar a individual' : 'Cambiar a grupal'"
+									eduTooltip="Más acciones"
 									eduTooltipPosition="top"
-									data-info-anchor="profesor-calificaciones-cambiar-tipo"
-									(click)="cambiarTipo.emit(cal)"
-									[pt]="{ root: { 'aria-label': cal.esGrupal ? 'Cambiar a individual' : 'Cambiar a grupal' } }"
-								/>
-								<edu-button
-									icon="pi pi-file-edit"
-									[text]="true"
-									[rounded]="true"
-									size="small"
-									eduTooltip="Editar evaluación"
-									eduTooltipPosition="top"
-									data-info-anchor="profesor-calificaciones-editar-evaluacion"
-									(click)="editarEvaluacion.emit(cal)"
-									[pt]="{ root: { 'aria-label': 'Editar evaluación' } }"
-								/>
-								<edu-button
-									icon="pi pi-trash"
-									[text]="true"
-									[rounded]="true"
-									size="small"
-									severity="danger"
-									eduTooltip="Eliminar evaluación"
-									eduTooltipPosition="top"
-									data-info-anchor="profesor-calificaciones-eliminar-evaluacion"
-									(click)="eliminarEvaluacion.emit(cal)"
-									[pt]="{ root: { 'aria-label': 'Eliminar evaluación' } }"
+									data-info-anchor="profesor-calificaciones-mas-acciones"
+									(click)="openMenu($event, cal)"
+									[pt]="{ root: { 'aria-label': 'Más acciones de la evaluación', 'aria-haspopup': 'menu' } }"
 								/>
 							</div>
 						</div>
@@ -133,3 +125,6 @@
 	</div>
 }
 <!-- #endregion -->
+
+<!-- Menú ⋯ compartido por todas las filas (siempre en el DOM, nunca dentro de @if) -->
+<edu-menu #rowMenu [model]="menuItems()" [popup]="true" [appendTo]="'body'" />

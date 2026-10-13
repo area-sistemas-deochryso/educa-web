@@ -132,8 +132,60 @@
 	}
 }
 
+.eval-progress {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	margin-top: 0.375rem;
+
+	&__bar {
+		flex: 0 1 8rem;
+		min-width: 4rem;
+		height: 0.375rem;
+		border-radius: 1rem;
+		background: var(--surface-border);
+		overflow: hidden;
+	}
+
+	&__fill {
+		height: 100%;
+		border-radius: 1rem;
+		background: var(--accent-interactive);
+		transition: width 0.2s;
+	}
+}
+
+// Chip de estado: texto oscuro sobre tinte (AA). Sin «Vencida» (INV-C12).
+.eval-estado {
+	font-size: 0.75rem;
+	font-weight: 600;
+	padding: 0.125rem 0.5rem;
+	border-radius: 1rem;
+	border: 1px solid transparent;
+
+	&--atrasada {
+		color: var(--tint-warning-text);
+		background: var(--tint-warning-bg);
+		border-color: var(--tint-warning-border);
+	}
+
+	&--pendiente {
+		color: var(--tint-primary-text);
+		background: var(--tint-primary-bg);
+		border-color: var(--tint-primary-border);
+	}
+
+	&--completa {
+		color: var(--tint-success-text);
+		background: var(--tint-success-bg);
+		border-color: var(--tint-success-border);
+	}
+}
+
 .eval-actions {
 	display: flex;
+	align-items: center;
 	gap: 0.25rem;
 	flex-shrink: 0;
 }
@@ -156,7 +208,7 @@
 		gap: 0.5rem;
 
 		.eval-actions {
-			justify-content: flex-end;
+			justify-content: space-between;
 		}
 	}
 }
