@@ -27,15 +27,67 @@
 	} @else {
 		<div class="rendimiento-cursos">
 			@for (curso of vm().cursos; track curso.cursoContenidoId) {
+				@let ultimo = ultimoPeriodo(curso);
 				<edu-card class="rendimiento-curso-card">
 					<div class="rendimiento-curso-header">
 						<h3><app-curso-chip [cursoId]="curso.cursoId" [nombre]="curso.cursoNombre" /></h3>
 						<span class="text-color-secondary text-sm">{{ curso.anio }}</span>
 					</div>
-					<app-estudiante-rendimiento-chart
-						[periodos]="curso.periodos"
-						[sinPeriodosConfigurados]="curso.sinPeriodosConfigurados"
-					/>
+
+					@if (ultimo; as u) {
+						<div class="rend-kpis">
+							<div class="rend-kpi">
+								<span class="rend-kpi__label">Último promedio</span>
+								<span class="rend-kpi__value">
+									<edu-tag
+										[value]="formatPromedio(curso, u.promedio)"
+										[severity]="severity(curso, u.promedio)"
+										[rounded]="true"
+									/>
+									@if (curso.escala?.tipoCalificacion === 'LITERAL') {
+										<span class="rend-kpi__sub">{{ u.promedio }}</span>
+									}
+								</span>
+								<span class="rend-kpi__sub">{{ u.periodoNombre }}</span>
+							</div>
+							@if (u.outlierVsPeriodoAnterior !== null) {
+								<div class="rend-kpi">
+									<span class="rend-kpi__label">Frente al periodo anterior</span>
+									<span class="rend-kpi__value">
+										<i
+											class="pi"
+											[class.pi-arrow-up]="u.outlierVsPeriodoAnterior > 0"
+											[class.pi-arrow-down]="u.outlierVsPeriodoAnterior < 0"
+											[class.pi-minus]="u.outlierVsPeriodoAnterior === 0"
+											aria-hidden="true"
+										></i>
+										{{ formatDelta(u.outlierVsPeriodoAnterior) }}
+									</span>
+									<span class="rend-kpi__sub">
+										{{ u.outlierVsPeriodoAnterior > 0 ? 'Subiste' : u.outlierVsPeriodoAnterior < 0 ? 'Bajaste' : 'Sin cambio' }}
+									</span>
+								</div>
+							}
+						</div>
+					}
+
+					@if (curso.puntosCalificados >= 2 || curso.periodos.length === 0) {
+						<app-estudiante-rendimiento-chart
+							[periodos]="curso.periodos"
+							[sinPeriodosConfigurados]="curso.sinPeriodosConfigurados"
+							[escala]="curso.escala"
+						/>
+					} @else if (curso.puntosCalificados === 1) {
+						<p class="rend-solo-punto">
+							<i class="pi pi-info-circle" aria-hidden="true"></i>
+							Aún hay un solo periodo calificado. La tendencia aparecerá cuando haya al menos dos.
+						</p>
+					} @else {
+						<p class="rend-solo-punto">
+							<i class="pi pi-info-circle" aria-hidden="true"></i>
+							Aún no hay periodos calificados en este curso.
+						</p>
+					}
 				</edu-card>
 			}
 		</div>

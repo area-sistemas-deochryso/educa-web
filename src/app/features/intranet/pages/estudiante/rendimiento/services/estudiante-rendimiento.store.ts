@@ -1,14 +1,18 @@
 import { Injectable, computed, signal } from '@angular/core';
-import { RendimientoPropioCursoDto } from './estudiante-rendimiento.models';
+import type { ConfiguracionCalificacionListDto } from '@data/models';
+import { RendimientoCursoVm, RendimientoPropioCursoDto } from './estudiante-rendimiento.models';
 
 interface EstudianteRendimientoState {
 	cursos: RendimientoPropioCursoDto[];
+	/** Escala por `cursoContenidoId`, tomada de `mis-notas`. Ausente → numérica. */
+	escalas: Record<number, ConfiguracionCalificacionListDto | null>;
 	loading: boolean;
 	error: string | null;
 }
 
 const initialState: EstudianteRendimientoState = {
 	cursos: [],
+	escalas: {},
 	loading: false,
 	error: null,
 };
@@ -26,8 +30,17 @@ export class EstudianteRendimientoStore {
 	// #endregion
 
 	// #region Computed
+	private readonly cursosVm = computed<RendimientoCursoVm[]>(() => {
+		const escalas = this._state().escalas;
+		return this.cursos().map((c) => ({
+			...c,
+			escala: escalas[c.cursoContenidoId] ?? null,
+			puntosCalificados: c.periodos.filter((p) => p.promedio !== null && p.promedio !== undefined).length,
+		}));
+	});
+
 	readonly vm = computed(() => ({
-		cursos: this.cursos(),
+		cursos: this.cursosVm(),
 		loading: this.loading(),
 		error: this.error(),
 		isEmpty: this.cursos().length === 0,
@@ -37,6 +50,10 @@ export class EstudianteRendimientoStore {
 	// #region Comandos de mutación
 	setCursos(cursos: RendimientoPropioCursoDto[]): void {
 		this._state.update((s) => ({ ...s, cursos }));
+	}
+
+	setEscalas(escalas: Record<number, ConfiguracionCalificacionListDto | null>): void {
+		this._state.update((s) => ({ ...s, escalas }));
 	}
 
 	setLoading(loading: boolean): void {

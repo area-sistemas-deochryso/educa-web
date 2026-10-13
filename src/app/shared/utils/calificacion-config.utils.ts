@@ -23,7 +23,7 @@ export function clasificarNota(
 	nota: number | null,
 	config: ConfiguracionCalificacionListDto | null = null,
 ): GradeClassification {
-	if (nota === null || nota === undefined) {
+	if (nota === null || nota === undefined || Number.isNaN(nota)) {
 		return { severity: 'secondary', cssClass: '', label: '-', esAprobatoria: false };
 	}
 
@@ -84,7 +84,7 @@ export function formatNotaConConfig(
 	nota: number | null,
 	config: ConfiguracionCalificacionListDto | null = null,
 ): string {
-	if (nota === null || nota === undefined) return '-';
+	if (nota === null || nota === undefined || Number.isNaN(nota)) return '-';
 
 	const scale = createGradeScale(config);
 	return scale.format(nota);
