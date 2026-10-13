@@ -1,0 +1,92 @@
+<!-- #region Template -->
+<section class="attendance-calendar" aria-label="Calendario de asistencia">
+	<!-- * Month navigation -->
+	<header class="attendance-calendar__header">
+		<button
+			type="button"
+			class="attendance-calendar__nav"
+			aria-label="Mes anterior"
+			[disabled]="!canGoPrevious()"
+			(click)="goToPreviousMonth()"
+		>
+			<i class="pi pi-chevron-left" aria-hidden="true"></i>
+		</button>
+		<span class="attendance-calendar__title" aria-live="polite">{{ monthTitle() }}</span>
+		<button
+			type="button"
+			class="attendance-calendar__nav"
+			aria-label="Mes siguiente"
+			[disabled]="!canGoNext()"
+			(click)="goToNextMonth()"
+		>
+			<i class="pi pi-chevron-right" aria-hidden="true"></i>
+		</button>
+	</header>
+
+	@if (!hasRecords()) {
+		<p class="attendance-calendar__empty" role="status">Sin registros</p>
+	}
+
+	<!-- * Grid: one tab stop (roving tabindex), arrows move between days -->
+	<div
+		class="attendance-calendar__grid"
+		role="grid"
+		[attr.aria-label]="'Asistencia de ' + monthTitle()"
+		(keydown)="onKeydown($event)"
+	>
+		<div class="attendance-calendar__row attendance-calendar__row--head" role="row">
+			@for (weekday of weekdays; track weekday.short) {
+				<div class="attendance-calendar__weekday" role="columnheader" [attr.aria-label]="weekday.full">
+					<span aria-hidden="true">{{ weekday.short }}</span>
+				</div>
+			}
+		</div>
+		@for (week of weeks(); track $index) {
+			<div class="attendance-calendar__row" role="row">
+				@for (cell of week; track $index) {
+					@if (cell) {
+						<div
+							class="attendance-calendar__cell"
+							role="gridcell"
+							[class.attendance-calendar__cell--recovery]="cell.esRecuperacion"
+							[attr.data-day]="cell.day"
+							[attr.data-estado]="cell.estado"
+							[attr.aria-label]="cell.label"
+							[attr.tabindex]="cell.focusable ? 0 : -1"
+							(focus)="onCellFocus(cell.day)"
+						>
+							<span class="attendance-calendar__day" aria-hidden="true">{{ cell.day }}</span>
+							@if (cell.icon) {
+								<i class="attendance-calendar__mark" [class]="cell.icon" aria-hidden="true"></i>
+							}
+							@if (cell.esRecuperacion) {
+								<span class="attendance-calendar__recovery-badge" aria-hidden="true">R</span>
+							}
+						</div>
+					} @else {
+						<div class="attendance-calendar__cell attendance-calendar__cell--blank" role="gridcell" aria-hidden="true"></div>
+					}
+				}
+			</div>
+		}
+	</div>
+
+	<!-- * Legend: icon + text, so it does not rely on color -->
+	<ul class="attendance-calendar__legend" aria-label="Leyenda">
+		@for (item of legendItems; track item.estado) {
+			<li class="attendance-calendar__legend-item" [attr.data-estado]="item.estado">
+				<i [class]="item.icon" aria-hidden="true"></i>
+				<span>{{ item.label }}</span>
+			</li>
+		}
+		<li class="attendance-calendar__legend-item">
+			<span class="attendance-calendar__recovery-badge" aria-hidden="true">R</span>
+			<span>Recuperación</span>
+		</li>
+		<li class="attendance-calendar__legend-item">
+			<span class="attendance-calendar__legend-neutral" aria-hidden="true"></span>
+			<span>Sin registro</span>
+		</li>
+	</ul>
+</section>
+<!-- #endregion -->
