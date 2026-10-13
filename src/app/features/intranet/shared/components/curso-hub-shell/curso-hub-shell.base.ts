@@ -1,4 +1,5 @@
-import { Directive, DestroyRef, HostListener, OnInit, Signal, computed, effect, inject, signal, untracked } from '@angular/core';
+import { NgComponentOutlet } from '@angular/common';
+import { Directive, DestroyRef, HostListener, OnInit, Signal, Type, computed, effect, inject, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { Observable, catchError, forkJoin, map, of } from 'rxjs';
@@ -17,6 +18,7 @@ import { CursoHubContextService } from './curso-hub-context.service';
 
 // #region Shared template
 export const CURSO_HUB_SHELL_IMPORTS = [
+	NgComponentOutlet,
 	RouterOutlet,
 	EduSpinner,
 	EduConfirmDialog,
@@ -48,7 +50,9 @@ export const CURSO_HUB_SHELL_TEMPLATE = `
 					[selectedSlotId]="current.id"
 					[resetKey]="selectionResetKey()"
 					(slotChange)="onSlotChange($event)"
-				/>
+				>
+					<ng-container [ngComponentOutlet]="chipsComponent" />
+				</app-curso-hub-header>
 				<app-curso-hub-tabs [tabs]="tabs()" />
 				<router-outlet />
 			}
@@ -95,6 +99,8 @@ export abstract class CursoHubShellBase implements OnInit, HasPendingChanges {
 	protected abstract readonly loading: Signal<boolean>;
 	protected abstract readonly loadError: Signal<string | null>;
 	protected abstract loadHorarios(): void;
+	/** Chips de resumen (y los diálogos que abren) que se proyectan junto al título; son del rol porque leen su store. */
+	protected abstract readonly chipsComponent: Type<unknown>;
 	/** Contenido de la franja (`null` si todavía no existe). Solo se usa como sonda. */
 	protected abstract probeContenido(horarioId: number): Observable<unknown | null>;
 	/** Si hay datos del rol editados sin guardar; avisa antes de salir o cambiar de franja. Por defecto no hay. */

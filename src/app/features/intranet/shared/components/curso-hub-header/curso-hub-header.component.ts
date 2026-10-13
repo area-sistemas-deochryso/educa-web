@@ -3,28 +3,67 @@ import { FormsModule, NgModel } from '@angular/forms';
 import { EduSelectButton } from '@edu-ui';
 import type { HorarioProfesorDto } from '@features/intranet/pages/profesor/models';
 
-import { PageHeaderComponent } from '../page-header';
-
 interface SlotOption {
 	label: string;
 	value: number;
 }
 
 /**
- * Encabezado del hub de curso: Curso y Salón (son del par) y, solo si el par
+ * Encabezado compacto del hub de curso, de una línea: Curso y Salón (son del par),
+ * los chips de resumen que el shell proyecta junto al título y, solo si el par
  * tiene más de una franja, el selector de franja.
  */
 @Component({
 	selector: 'app-curso-hub-header',
 	standalone: true,
-	imports: [FormsModule, EduSelectButton, PageHeaderComponent],
+	imports: [FormsModule, EduSelectButton],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	styles: `
+		.hub-header {
+			display: flex;
+			align-items: center;
+			flex-wrap: wrap;
+			gap: 0.5rem 1rem;
+			padding: 0.75rem 1rem;
+		}
+		.hub-header__title {
+			display: flex;
+			align-items: center;
+			gap: 0.625rem;
+			min-width: 0;
+		}
+		.hub-header__title > i {
+			font-size: 1.25rem;
+			color: var(--intranet-default-text-color);
+		}
+		.hub-header__heading {
+			display: flex;
+			align-items: baseline;
+			flex-wrap: wrap;
+			gap: 0 0.5rem;
+			min-width: 0;
+		}
+		.hub-header__heading h2 {
+			margin: 0;
+			font-size: 1.25rem;
+			font-weight: 600;
+			color: var(--intranet-default-text-color);
+		}
+		.hub-header__subtitle {
+			font-size: 0.875rem;
+			color: var(--intranet-soft-text-color, var(--text-color-secondary));
+		}
+		/* Los chips (proyectados) quedan junto al título; la franja, al borde derecho.
+		   con display: contents, si no hay chips (curso sin contenido) no dejan un hueco en el gap. */
+		.hub-header__chips {
+			display: contents;
+		}
 		.slot-selector {
 			display: flex;
 			align-items: center;
 			gap: 0.5rem;
 			flex-wrap: wrap;
+			margin-left: auto;
 		}
 		.slot-selector__label {
 			font-size: 0.8125rem;
@@ -32,7 +71,17 @@ interface SlotOption {
 		}
 	`,
 	template: `
-		<app-page-header icon="pi pi-book" [title]="cursoNombre()" [subtitle]="subtitle()">
+		<header class="hub-header">
+			<div class="hub-header__title">
+				<i class="pi pi-book" aria-hidden="true"></i>
+				<div class="hub-header__heading">
+					<h2>{{ cursoNombre() }}</h2>
+					<span class="hub-header__subtitle">{{ subtitle() }}</span>
+				</div>
+			</div>
+			<div class="hub-header__chips">
+				<ng-content />
+			</div>
 			@if (showSelector()) {
 				<div class="slot-selector" data-info-anchor="curso-hub-franja-selector">
 					<span class="slot-selector__label">Clase:</span>
@@ -46,7 +95,7 @@ interface SlotOption {
 					/>
 				</div>
 			}
-		</app-page-header>
+		</header>
 	`,
 })
 export class CursoHubHeaderComponent {

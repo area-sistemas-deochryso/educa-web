@@ -38,6 +38,22 @@ describe('EduConfirmDialog', () => {
 		expect(buttons()).toEqual(['No', 'Sí']);
 	});
 
+	it('gives the accept button the requested severity (default primary)', async () => {
+		const fixture = await render();
+		const acceptSeverity = () =>
+			document.querySelector('.edu-confirm-dialog__footer edu-button:last-child button')?.getAttribute('data-severity');
+
+		service.confirm({ message: 'm', acceptLabel: 'Eliminar', acceptButtonSeverity: 'danger' });
+		fixture.detectChanges();
+		await fixture.whenStable();
+		expect(acceptSeverity()).toBe('danger');
+
+		service.confirm({ message: 'm', acceptLabel: 'Aceptar' });
+		fixture.detectChanges();
+		await fixture.whenStable();
+		expect(acceptSeverity()).toBe('primary');
+	});
+
 	it('renders the alternate action between reject and accept', async () => {
 		const fixture = await render();
 

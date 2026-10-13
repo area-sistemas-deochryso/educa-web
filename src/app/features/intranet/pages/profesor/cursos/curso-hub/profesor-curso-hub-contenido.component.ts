@@ -1,10 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { EduButton, EduConfirmDialog, EduConfirmationService, EduSpinner } from '@edu-ui';
+import { EduButton, EduConfirmDialog, EduConfirmationService, EduMenu, EduSpinner, EduTooltip } from '@edu-ui';
+import type { EduMenuItem } from '@edu-ui';
 import { CursoHubContextService, EmptyStateComponent } from '@intranet-shared/components';
 import { CursoContenidoCrudFacade } from '../services/curso-contenido-crud.facade';
 import { CursoContenidoDataFacade } from '../services/curso-contenido-data.facade';
 import { CursoContenidoUiFacade } from '../services/curso-contenido-ui.facade';
+import { CursoHubCalificacionesLoader } from './curso-hub-calificaciones.loader';
 import { SemanasAccordionComponent } from '../components/semanas-accordion/semanas-accordion.component';
 import { SemanaEditDialogComponent } from '../components/semana-edit-dialog/semana-edit-dialog.component';
 import { TareaDialogComponent } from '../components/tarea-dialog/tarea-dialog.component';
@@ -26,7 +28,9 @@ import type { ActualizarTareaRequest, CrearTareaRequest } from '@features/intran
 	imports: [
 		EduButton,
 		EduConfirmDialog,
+		EduMenu,
 		EduSpinner,
+		EduTooltip,
 		EmptyStateComponent,
 		SemanasAccordionComponent,
 		SemanaEditDialogComponent,
@@ -60,7 +64,20 @@ import type { ActualizarTareaRequest, CrearTareaRequest } from '@features/intran
 					<edu-spinner strokeWidth="4" />
 				</div>
 			} @else if (vm().contenido) {
-				<app-semanas-accordion />
+				<app-semanas-accordion>
+					<edu-button
+						toolbarActions
+						icon="pi pi-ellipsis-v"
+						[text]="true"
+						[rounded]="true"
+						size="small"
+						data-info-anchor="profesor-curso-hub-contenido-menu"
+						eduTooltip="Más acciones"
+						eduTooltipPosition="top"
+						(click)="contenidoMenu.toggle($event)"
+						[pt]="{ root: { 'aria-label': 'Más acciones del contenido', 'aria-haspopup': 'menu' } }"
+					/>
+				</app-semanas-accordion>
 			} @else if (vm().error) {
 				<app-empty-state
 					icon="pi pi-exclamation-triangle"
@@ -115,6 +132,7 @@ import type { ActualizarTareaRequest, CrearTareaRequest } from '@features/intran
 			(create)="onCreateContenido($event)"
 		/>
 
+		<edu-menu #contenidoMenu [model]="contenidoMenuItems" [popup]="true" appendTo="body" />
 		<edu-confirm-dialog />
 		<!-- #endregion -->
 	`,
@@ -126,11 +144,18 @@ export class ProfesorCursoHubContenidoComponent {
 	private readonly crudFacade = inject(CursoContenidoCrudFacade);
 	private readonly uiFacade = inject(CursoContenidoUiFacade);
 	private readonly router = inject(Router);
+	private readonly calLoader = inject(CursoHubCalificacionesLoader);
+	private readonly confirmationService = inject(EduConfirmationService);
 	// #endregion
 
 	// #region Estado
 	protected readonly vm = this.uiFacade.vm;
 	protected readonly builderVisible = signal(false);
+
+	/** Menú ⋯ de la pestaña: hoy solo la zona destructiva (antes vivía en la pestaña Información). */
+	protected readonly contenidoMenuItems: EduMenuItem[] = [
+		{ label: 'Eliminar todo el contenido', icon: 'pi pi-trash', command: () => this.onDeleteContenido() },
+	];
 
 	private readonly slotId = computed(() => this.hubContext.slot()?.id ?? null);
 	// #endregion
@@ -179,6 +204,25 @@ export class ProfesorCursoHubContenidoComponent {
 	// #endregion
 
 	// #region Contenido de la franja
+	protected onDeleteContenido(): void {
+		const contenido = this.vm().contenido;
+		if (!contenido) return;
+		const { totalArchivos, totalTareas } = this.vm();
+		this.confirmationService.confirm({
+			message: `¿Eliminar todo el contenido de este curso? Esta acción no se puede deshacer. Se perderán ${totalArchivos} archivo${totalArchivos === 1 ? '' : 's'} y ${totalTareas} tarea${totalTareas === 1 ? '' : 's'}.`,
+			header: 'Eliminar Contenido',
+			icon: 'pi pi-exclamation-triangle',
+			acceptLabel: 'Eliminar',
+			rejectLabel: 'Cancelar',
+			acceptButtonSeverity: 'danger',
+			accept: () => {
+				// Las calificaciones pertenecían a ese contenido: si la baja se revierte, `ensure` las recarga.
+				this.calLoader.reset();
+				this.dataFacade.eliminarContenidoEnHub(contenido.id);
+			},
+		});
+	}
+
 	protected onOpenBuilder(): void {
 		this.builderVisible.set(true);
 	}

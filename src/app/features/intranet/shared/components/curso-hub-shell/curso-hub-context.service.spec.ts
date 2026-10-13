@@ -58,6 +58,6 @@ describe('CursoHubContextService', () => {
 	});
 
 	it('has no tab target before the shell resolved a slot', () => {
-		expect(ctx.tabTarget('profesor', 'informacion')).toBeNull();
+		expect(ctx.tabTarget('profesor', 'calificaciones')).toBeNull();
 	});
 });

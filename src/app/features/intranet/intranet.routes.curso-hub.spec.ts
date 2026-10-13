@@ -91,15 +91,47 @@ describe('curso hub routes (P105 D1 F1a)', () => {
 			profesor: 'profesor/cursos/:cursoId/:salonId',
 			estudiante: 'estudiante/cursos/:cursoId/:salonId',
 		};
-		const TABS = ['contenido', 'calificaciones', 'asistencia', 'informacion', 'salon'];
+		const TABS = ['contenido', 'calificaciones', 'asistencia', 'salon'];
+		/** `informacion` ya no es pestaña: queda como redirect para los enlaces guardados. */
+		const REDIRECT_ONLY = ['', 'informacion'];
 		const childPaths = (path: string) => (findRoute(path)?.children ?? []).map((c) => c.path);
 
-		it('profesor hub has the five tabs as child routes, after the default redirect', () => {
-			expect(childPaths(HUB_PATHS.profesor)).toEqual(['', ...TABS]);
+		it('profesor hub has the four tabs as child routes, plus the legacy `informacion` redirect', () => {
+			expect(childPaths(HUB_PATHS.profesor)).toEqual(['', 'contenido', 'calificaciones', 'asistencia', 'informacion', 'salon']);
 		});
 
-		it('estudiante hub has the same five tabs as child routes, after the default redirect', () => {
-			expect(childPaths(HUB_PATHS.estudiante)).toEqual(['', ...TABS]);
+		it('estudiante hub has the same four tabs as child routes, plus the legacy `informacion` redirect', () => {
+			expect(childPaths(HUB_PATHS.estudiante)).toEqual(['', 'contenido', 'calificaciones', 'asistencia', 'informacion', 'salon']);
+		});
+
+		it('redirects the retired `informacion` URL to Contenido in both roles', () => {
+			for (const path of Object.values(HUB_PATHS)) {
+				const legacy = (findRoute(path)?.children ?? []).find((c) => c.path === 'informacion');
+				expect(legacy?.redirectTo, path).toBe('contenido');
+				expect(legacy?.pathMatch, path).toBe('full');
+				expect(legacy?.loadComponent, path).toBeUndefined();
+			}
+		});
+
+		it('keeps the query (horarioId) when redirecting `informacion` to Contenido', async () => {
+			// Rutas reales del hub, con los componentes lazy reemplazados por un stub.
+			const routes: Route[] = Object.values(HUB_PATHS).map(
+				(path): Route => ({
+					path,
+					component: StubComponent,
+					children: (findRoute(path)?.children ?? []).map(
+						(c): Route => (c.redirectTo ? { path: c.path, pathMatch: c.pathMatch, redirectTo: c.redirectTo } : { path: c.path, component: StubComponent }),
+					),
+				}),
+			);
+			TestBed.configureTestingModule({ providers: [provideRouter(routes)] });
+			const router = TestBed.inject(Router);
+			const harness = await RouterTestingHarness.create();
+
+			for (const role of ['profesor', 'estudiante']) {
+				await harness.navigateByUrl(`/${role}/cursos/24/34/informacion?horarioId=7`);
+				expect(router.url, role).toBe(`/${role}/cursos/24/34/contenido?horarioId=7`);
+			}
 		});
 
 		it('redirects the bare hub URL to Contenido in both roles', () => {
@@ -111,7 +143,7 @@ describe('curso hub routes (P105 D1 F1a)', () => {
 
 		it('every tab inherits authorization: no own permissionPath nor guards', () => {
 			for (const path of Object.values(HUB_PATHS)) {
-				const tabs = (findRoute(path)?.children ?? []).filter((c) => c.path);
+				const tabs = (findRoute(path)?.children ?? []).filter((c) => c.path && !REDIRECT_ONLY.includes(c.path));
 				for (const tab of tabs) {
 					expect(tab.data?.['permissionPath']).toBeUndefined();
 					expect(tab.canActivate).toBeUndefined();

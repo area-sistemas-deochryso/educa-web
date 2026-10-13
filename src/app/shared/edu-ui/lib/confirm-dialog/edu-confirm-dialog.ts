@@ -46,6 +46,7 @@ import { EduConfirmation, EduConfirmationService } from './edu-confirmation.serv
 					}
 					<edu-button
 						[label]="confirmation.acceptLabel ?? 'Aceptar'"
+						[severity]="confirmation.acceptButtonSeverity ?? 'primary'"
 						[class]="confirmation.acceptButtonStyleClass ?? ''"
 						(click)="onAccept(confirmation)"
 					></edu-button>
