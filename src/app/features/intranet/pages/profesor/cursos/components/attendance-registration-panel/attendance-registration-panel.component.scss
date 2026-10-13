@@ -149,43 +149,13 @@
 	gap: 0.35rem;
 }
 
+// El color por estado lo resuelve edu-button (severity + outlined): el elegido va relleno, los demás con contorno.
 .estado-btn {
-	display: flex;
-	align-items: center;
-	gap: 0.25rem;
-	padding: 0.35rem 0.65rem;
-	border-radius: 6px;
-	font-size: 0.8rem;
-	font-weight: 600;
-	cursor: pointer;
-	border: 2px solid transparent;
-	transition:
-		background 0.15s,
-		border-color 0.15s,
-		color 0.15s;
-	background: var(--surface-100);
-	color: var(--text-color-secondary);
+	min-width: 3.5rem;
 
 	.estado-letter {
 		font-size: 0.78rem;
-	}
-
-	&--P.active {
-		background: var(--green-50);
-		border-color: var(--green-500);
-		color: var(--green-700);
-	}
-
-	&--T.active {
-		background: var(--yellow-50);
-		border-color: var(--yellow-500);
-		color: var(--yellow-700);
-	}
-
-	&--F.active {
-		background: var(--red-50);
-		border-color: var(--red-500);
-		color: var(--red-700);
+		font-weight: 600;
 	}
 }
 

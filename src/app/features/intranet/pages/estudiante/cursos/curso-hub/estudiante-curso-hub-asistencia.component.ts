@@ -1,8 +1,14 @@
 import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, untracked } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { EduButton, EduSpinner, EduTable, EduTag, EduTooltip } from '@edu-ui';
-import { CursoHubContextService, EmptyStateComponent } from '@intranet-shared/components';
+import { EduButton, EduTable, EduTag, EduTooltip } from '@edu-ui';
+import {
+	CursoHubContextService,
+	EmptyStateComponent,
+	StatsSkeletonComponent,
+	TableSkeletonComponent,
+} from '@intranet-shared/components';
+import type { SkeletonColumnDef } from '@intranet-shared/components';
 import {
 	ATTENDANCE_EMPTY_LABEL,
 	ATTENDANCE_PERCENTAGE_LEGEND,
@@ -27,7 +33,17 @@ type TagSeverity = 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contr
 @Component({
 	selector: 'app-estudiante-curso-hub-asistencia',
 	standalone: true,
-	imports: [DatePipe, RouterLink, EduButton, EduSpinner, EduTable, EduTag, EduTooltip, EmptyStateComponent],
+	imports: [
+		DatePipe,
+		RouterLink,
+		EduButton,
+		EduTable,
+		EduTag,
+		EduTooltip,
+		EmptyStateComponent,
+		StatsSkeletonComponent,
+		TableSkeletonComponent,
+	],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	styles: `
 		.hub-asistencia {
@@ -162,9 +178,8 @@ type TagSeverity = 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contr
 					<app-empty-state icon="pi pi-check-square" title="Mi asistencia" message="Todavía no hay registros de asistencia." />
 				}
 			} @else if (loading()) {
-				<div class="flex justify-content-center p-5">
-					<edu-spinner strokeWidth="4" />
-				</div>
+				<app-stats-skeleton [count]="4" />
+				<app-table-skeleton [columns]="skeletonColumns" [rows]="4" minHeight="220px" />
 			} @else {
 				<div class="hub-asistencia__toolbar">
 					<span></span>
@@ -186,6 +201,13 @@ type TagSeverity = 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contr
 	`,
 })
 export class EstudianteCursoHubAsistenciaComponent {
+	/** Reserva el espacio de la tabla (Fecha / Estado / Justificación) mientras llega la asistencia. */
+	protected readonly skeletonColumns: SkeletonColumnDef[] = [
+		{ width: '120px', cellType: 'text' },
+		{ width: '120px', cellType: 'badge' },
+		{ width: 'flex', cellType: 'text' },
+	];
+
 	// #region Dependencias
 	private readonly hubContext = inject(CursoHubContextService);
 	private readonly facade = inject(EstudianteCursosFacade);

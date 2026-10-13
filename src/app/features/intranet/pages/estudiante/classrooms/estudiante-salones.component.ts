@@ -8,6 +8,7 @@ import {
 	EmptyStateComponent,
 } from '@intranet-shared/components';
 import { buildCursoHubLink } from '@intranet-shared/helpers';
+import { PluralizePipe } from '@intranet-shared/pipes';
 import { StudentClassroomsFacade } from './services/estudiante-salones.facade';
 import { EstudianteSalon, EstudianteSalonCurso, JustificarInasistenciaContext } from '../models';
 import { EstudianteSalonDialogComponent } from './components/estudiante-salon-dialog/estudiante-salon-dialog.component';
@@ -21,6 +22,7 @@ import { EduSpinner, EduTag, EduTooltip } from '@edu-ui';
 		EduTooltip,
 		EduSpinner,
 		CursoChipComponent,
+		PluralizePipe,
 		PageHeaderComponent,
 		PeriodToggleComponent,
 		EmptyStateComponent,
@@ -70,7 +72,7 @@ import { EduSpinner, EduTag, EduTooltip } from '@edu-ui';
 							<div class="flex align-items-center justify-content-between mb-2">
 								<span class="font-bold text-lg">{{ salon.salonDescripcion }}</span>
 								<edu-tag
-									[value]="salon.cantidadEstudiantes + ' estudiantes'"
+									[value]="salon.cantidadEstudiantes | pluralize: 'estudiante'"
 									styleClass="tag-neutral"
 								/>
 							</div>

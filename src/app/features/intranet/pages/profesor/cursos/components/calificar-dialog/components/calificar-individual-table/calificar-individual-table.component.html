@@ -9,7 +9,7 @@
 		<tr>
 			<th style="width: 50px">#</th>
 			<th style="min-width: 200px">Estudiante</th>
-			<th style="width: 140px">{{ notaHeader() }}</th>
+			<th style="width: 190px">{{ notaHeader() }}</th>
 			<th style="min-width: 180px">Observación</th>
 		</tr>
 	</ng-template>
@@ -45,9 +45,11 @@
 						}
 						@if (row.nota !== null && row.nota !== undefined) {
 							<edu-tag
-								[value]="row.nota.toFixed(1)"
+								[value]="isLiteral() ? 'Nota ' + row.nota.toFixed(1) : row.nota.toFixed(1)"
 								[severity]="getNotaSeverity(row.nota)"
 								styleClass="nota-severity-tag"
+								[eduTooltip]="isLiteral() ? 'Nota numérica registrada para esta letra' : ''"
+								eduTooltipPosition="top"
 							/>
 						}
 					</div>

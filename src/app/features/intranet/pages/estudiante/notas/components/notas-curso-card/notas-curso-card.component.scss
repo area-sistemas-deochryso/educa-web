@@ -48,6 +48,13 @@
 	margin-top: 0.25rem;
 }
 
+// `text-sm text-color-secondary` no existen como utilidades (restos de PrimeFlex): el texto quedaba sin color
+// propio y en modo oscuro se leía negro sobre fondo oscuro.
+.hero-salon {
+	font-size: 0.875rem;
+	color: var(--text-color-secondary);
+}
+
 .hero-evaluado-note {
 	display: flex;
 	flex-direction: column;

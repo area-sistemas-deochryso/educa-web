@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, untracked } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { EduConfirmDialog, EduConfirmationService, EduSpinner } from '@edu-ui';
+import { EduButton, EduConfirmDialog, EduConfirmationService, EduSpinner } from '@edu-ui';
 import { CursoHubContextService, EmptyStateComponent } from '@intranet-shared/components';
 import { CalificacionesFacade } from '../services/calificaciones.facade';
 import { CursoContenidoDataFacade } from '../services/curso-contenido-data.facade';
@@ -24,6 +24,7 @@ import { CursoHubCalificacionesLoader } from './curso-hub-calificaciones.loader'
 	standalone: true,
 	imports: [
 		RouterLink,
+		EduButton,
 		EduConfirmDialog,
 		EduSpinner,
 		EmptyStateComponent,

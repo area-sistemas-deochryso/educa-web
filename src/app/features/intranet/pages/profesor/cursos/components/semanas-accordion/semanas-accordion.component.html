@@ -95,14 +95,15 @@
 							}
 
 							<!-- Editar semana -->
-							<button
+							<edu-button
 								class="edit-semana-link"
+								label="Editar semana"
+								icon="pi pi-pencil"
+								[text]="true"
+								size="small"
 								data-info-anchor="profesor-semanas-editar"
 								(click)="onEditSemana(semana); $event.stopPropagation()"
-							>
-								<i class="pi pi-pencil"></i>
-								Editar semana
-							</button>
+							/>
 
 							<!-- #region Archivos -->
 							<div class="section-block">
