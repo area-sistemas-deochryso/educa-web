@@ -121,6 +121,10 @@ export class StudentAttendanceComponent implements OnInit {
 		if (!data) return null;
 		return calcAttendancePercentage(data.totalPresente, data.totalTarde, data.totalClases);
 	});
+	/** La columna «Justificación» solo se muestra si alguna fila (de cualquier página) tiene algo que mostrar. */
+	readonly hayJustificaciones = computed(
+		() => this.asistencia()?.detalle.some((item) => this.getJustificacionState(item).kind !== 'dash') ?? false,
+	);
 	readonly emptyLabel = ATTENDANCE_EMPTY_LABEL;
 	readonly legend = ATTENDANCE_PERCENTAGE_LEGEND;
 
