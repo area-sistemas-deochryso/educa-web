@@ -30,20 +30,20 @@
 } @else {
 	<!-- #region Stats cards -->
 	@if (stats(); as s) {
-		<div class="stats-grid">
-			<div class="stat-card stat-success">
+		<div class="asistencia-kpis stats-spacing">
+			<div class="asistencia-kpi asistencia-kpi--success">
 				<div class="stat-value">{{ s.totalPresente }}</div>
 				<div class="stat-label">Presente</div>
 			</div>
-			<div class="stat-card stat-warn">
+			<div class="asistencia-kpi asistencia-kpi--warn">
 				<div class="stat-value">{{ s.totalTarde }}</div>
 				<div class="stat-label">Tarde</div>
 			</div>
-			<div class="stat-card stat-danger">
+			<div class="asistencia-kpi asistencia-kpi--danger">
 				<div class="stat-value">{{ s.totalFalto }}</div>
-				<div class="stat-label">Falto</div>
+				<div class="stat-label">Faltó</div>
 			</div>
-			<div class="stat-card stat-info">
+			<div class="asistencia-kpi asistencia-kpi--info asistencia-kpi--wide">
 				@if (s.porcentajeAsistencia === null) {
 					<div class="stat-value">{{ emptyLabel }}</div>
 					<div class="stat-label">Asistencia</div>
@@ -61,7 +61,7 @@
 	<edu-table
 		[value]="detallePaging.value()"
 		dataKey="fecha"
-		[paginator]="true"
+		[paginator]="detallePaging.totalRecords() > 10"
 		[rows]="10"
 		[first]="detallePaging.first()"
 		[totalRecords]="detallePaging.totalRecords()"
@@ -70,16 +70,18 @@
 		[rowsPerPageOptions]="[10, 25, 50]"
 	>
 		<ng-template #header>
-			<tr>
+			<tr class="asistencia-head">
 				<th eduSortableColumn="fecha" data-info-anchor="tabla-orden-columna">Fecha </th>
-				<th style="width: 120px; text-align: center">Estado</th>
-				<th>Justificacion</th>
+				<th>Estado</th>
+				@if (hayJustificaciones()) {
+					<th>Justificación</th>
+				}
 			</tr>
 		</ng-template>
 		<ng-template #body let-item>
-			<tr>
+			<tr class="asistencia-row">
 				<td>{{ item.fecha | date:'dd/MM/yyyy' }}</td>
-				<td style="text-align: center">
+				<td>
 					<edu-tag
 						[value]="getEstadoLabel(item.estado)"
 						[severity]="getEstadoSeverity(item.estado)"
@@ -88,7 +90,8 @@
 						<edu-tag value="Recuperación" severity="info" />
 					}
 				</td>
-				<td>
+				@if (hayJustificaciones()) {
+				<td class="asistencia-justificacion" [class.asistencia-justificacion--vacia]="getJustificacionState(item).kind === 'dash'">
 					@let jstate = getJustificacionState(item);
 					@switch (jstate.kind) {
 						@case ('text') { {{ jstate.text }} }
@@ -126,6 +129,7 @@
 						@default { — }
 					}
 				</td>
+				}
 			</tr>
 		</ng-template>
 		<ng-template #emptymessage>

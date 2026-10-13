@@ -68,6 +68,11 @@ export class StudentAttendanceTabComponent implements OnInit {
 	// #endregion
 
 	// #region Computed
+	/** La columna «Justificación» solo se muestra si alguna fila (de cualquier página) tiene algo que mostrar. */
+	readonly hayJustificaciones = computed(
+		() => this.asistenciaData()?.detalle.some((item) => this.getJustificacionState(item).kind !== 'dash') ?? false,
+	);
+
 	readonly stats = computed(() => {
 		const data = this.asistenciaData();
 		if (!data) return null;

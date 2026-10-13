@@ -62,45 +62,92 @@ type TagSeverity = 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contr
 			display: block;
 			margin-bottom: 1rem;
 		}
-		.stat-cards {
+		.asistencia-kpis {
 			display: grid;
-			grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-			gap: 1rem;
+			grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, 2fr);
+			gap: 0.75rem;
 			margin-bottom: 1rem;
 		}
-		.stat-card {
+		/* No usar .stat-card: styles.scss lo fuerza a transparente (design-system §1). Tonos --tint-* (traen dark). */
+		.asistencia-kpi {
 			padding: 1rem;
 			border-radius: 8px;
+			border: 1px solid var(--kpi-border);
+			background: var(--kpi-bg);
+			color: var(--kpi-text);
 			text-align: center;
 		}
-		.stat-card .stat-value {
+		.asistencia-kpi .stat-value {
 			font-size: 1.5rem;
 			font-weight: 700;
+			line-height: 1.2;
 		}
-		.stat-card .stat-label {
+		.asistencia-kpi .stat-label {
 			font-size: 0.85rem;
-			opacity: 0.8;
+			font-weight: 500;
 		}
-		.stat-success {
-			background: var(--green-50);
-			color: var(--green-700);
-		}
-		.stat-warn {
-			background: var(--yellow-50);
-			color: var(--yellow-700);
-		}
-		.stat-danger {
-			background: var(--red-50);
-			color: var(--red-700);
-		}
-		.stat-info {
-			background: var(--blue-50);
-			color: var(--blue-700);
-		}
-		.stat-card .stat-legend {
+		.asistencia-kpi .stat-legend {
 			margin-top: 0.25rem;
 			font-size: 0.75rem;
-			opacity: 0.8;
+		}
+		.asistencia-kpi--success {
+			--kpi-bg: var(--tint-success-bg);
+			--kpi-border: var(--tint-success-border);
+			--kpi-text: var(--tint-success-text);
+		}
+		.asistencia-kpi--warn {
+			--kpi-bg: var(--tint-warning-bg);
+			--kpi-border: var(--tint-warning-border);
+			--kpi-text: var(--tint-warning-text);
+		}
+		.asistencia-kpi--danger {
+			--kpi-bg: var(--tint-danger-bg);
+			--kpi-border: var(--tint-danger-border);
+			--kpi-text: var(--tint-danger-text);
+		}
+		.asistencia-kpi--info {
+			--kpi-bg: var(--tint-info-bg);
+			--kpi-border: var(--tint-info-border);
+			--kpi-text: var(--tint-info-text);
+		}
+		@media (max-width: 639.98px) {
+			.asistencia-kpis {
+				grid-template-columns: repeat(3, minmax(0, 1fr));
+				gap: 0.5rem;
+			}
+			.asistencia-kpi {
+				padding: 0.75rem 0.5rem;
+			}
+			.asistencia-kpi--wide {
+				grid-column: 1 / -1;
+			}
+			/* Filas como tarjetas: fecha + estado, justificación debajo si existe. */
+			tr.asistencia-head {
+				display: none;
+			}
+			tr.asistencia-row {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: center;
+				gap: 0.25rem 0.75rem;
+				padding: 0.75rem 1rem;
+				border-bottom: 1px solid var(--surface-border);
+			}
+			tr.asistencia-row > td {
+				display: block;
+				width: auto;
+				padding: 0;
+				border: 0;
+				text-align: left;
+			}
+			tr.asistencia-row > td.asistencia-justificacion {
+				flex-basis: 100%;
+				font-size: 0.85rem;
+				color: var(--text-color-secondary);
+			}
+			tr.asistencia-row > td.asistencia-justificacion--vacia {
+				display: none;
+			}
 		}
 	`,
 	template: `
@@ -131,20 +178,20 @@ type TagSeverity = 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contr
 						[pt]="{ root: { 'aria-label': 'Refrescar asistencia' } }"
 					/>
 				</div>
-				<div class="stat-cards">
-					<div class="stat-card stat-success">
+				<div class="asistencia-kpis">
+					<div class="asistencia-kpi asistencia-kpi--success">
 						<div class="stat-value">{{ asistencia.totalPresente }}</div>
 						<div class="stat-label">Presente</div>
 					</div>
-					<div class="stat-card stat-warn">
+					<div class="asistencia-kpi asistencia-kpi--warn">
 						<div class="stat-value">{{ asistencia.totalTarde }}</div>
 						<div class="stat-label">Tarde</div>
 					</div>
-					<div class="stat-card stat-danger">
+					<div class="asistencia-kpi asistencia-kpi--danger">
 						<div class="stat-value">{{ asistencia.totalFalto }}</div>
 						<div class="stat-label">Faltó</div>
 					</div>
-					<div class="stat-card stat-info">
+					<div class="asistencia-kpi asistencia-kpi--info asistencia-kpi--wide">
 						@if (porcentaje() === null) {
 							<div class="stat-value">{{ emptyLabel }}</div>
 							<div class="stat-label">Asistencia</div>
@@ -161,7 +208,7 @@ type TagSeverity = 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contr
 				@if (asistencia.detalle.length > 0) {
 					<edu-table
 						[value]="detallePaging.value()"
-						[paginator]="true"
+						[paginator]="detallePaging.totalRecords() > 10"
 						[rows]="10"
 						[first]="detallePaging.first()"
 						[totalRecords]="detallePaging.totalRecords()"
@@ -169,14 +216,16 @@ type TagSeverity = 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contr
 						(onPageChange)="detallePaging.onPageChange($event)"
 					>
 						<ng-template #header>
-							<tr>
+							<tr class="asistencia-head">
 								<th>Fecha</th>
 								<th>Estado</th>
-								<th>Justificación</th>
+								@if (hayJustificaciones()) {
+									<th>Justificación</th>
+								}
 							</tr>
 						</ng-template>
 						<ng-template #body let-item>
-							<tr>
+							<tr class="asistencia-row">
 								<td>{{ item.fecha | date: 'dd/MM/yyyy' }}</td>
 								<td>
 									<edu-tag [value]="estadoLabel(item.estado)" [severity]="estadoSeverity(item.estado)" />
@@ -184,7 +233,9 @@ type TagSeverity = 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contr
 										<edu-tag value="Recuperación" severity="info" />
 									}
 								</td>
-								<td>{{ item.justificacion ?? '—' }}</td>
+								@if (hayJustificaciones()) {
+									<td class="asistencia-justificacion" [class.asistencia-justificacion--vacia]="!item.justificacion">{{ item.justificacion ?? '—' }}</td>
+								}
 							</tr>
 						</ng-template>
 					</edu-table>
@@ -238,6 +289,10 @@ export class EstudianteCursoHubAsistenciaComponent {
 	});
 	protected readonly loading = computed(() => this.vm().miAsistenciaLoading);
 	protected readonly detallePaging = createClientPaging(computed(() => this.resumen()?.detalle ?? []));
+	/** La columna «Justificación» solo se muestra si alguna fila (de cualquier página) trae justificación. */
+	protected readonly hayJustificaciones = computed(
+		() => this.resumen()?.detalle.some((item) => !!item.justificacion) ?? false,
+	);
 	protected readonly emptyLabel = ATTENDANCE_EMPTY_LABEL;
 	protected readonly legend = ATTENDANCE_PERCENTAGE_LEGEND;
 	protected readonly porcentaje = computed(() => {

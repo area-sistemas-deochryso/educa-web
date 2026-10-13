@@ -1,0 +1,74 @@
+// #region KPI tonal cards
+// * `.asistencia-kpi` y no `.stat-card`: `styles.scss` fuerza `.stat-card { background: transparent !important }`
+//   (design-system §1) y dejaba estas tarjetas sin color. Tonos por `--tint-*` (_tokens.scss): traen variante dark y texto AA.
+// * En escritorio la tarjeta del % es el doble de ancha para que la leyenda de INV-AC11 (visible, sin tooltip) no se parta en 5 líneas.
+.asistencia-kpis {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, 2fr);
+	gap: 0.75rem;
+}
+
+.asistencia-kpi {
+	padding: 1rem;
+	border-radius: 8px;
+	border: 1px solid var(--kpi-border);
+	background: var(--kpi-bg);
+	color: var(--kpi-text);
+	text-align: center;
+
+	.stat-value {
+		font-size: 1.5rem;
+		font-weight: 700;
+		line-height: 1.2;
+	}
+
+	.stat-label {
+		font-size: 0.85rem;
+		font-weight: 500;
+	}
+
+	.stat-legend {
+		margin-top: 0.25rem;
+		font-size: 0.75rem;
+	}
+
+	&--success {
+		--kpi-bg: var(--tint-success-bg);
+		--kpi-border: var(--tint-success-border);
+		--kpi-text: var(--tint-success-text);
+	}
+
+	&--warn {
+		--kpi-bg: var(--tint-warning-bg);
+		--kpi-border: var(--tint-warning-border);
+		--kpi-text: var(--tint-warning-text);
+	}
+
+	&--danger {
+		--kpi-bg: var(--tint-danger-bg);
+		--kpi-border: var(--tint-danger-border);
+		--kpi-text: var(--tint-danger-text);
+	}
+
+	&--info {
+		--kpi-bg: var(--tint-info-bg);
+		--kpi-border: var(--tint-info-border);
+		--kpi-text: var(--tint-info-text);
+	}
+}
+
+@media (max-width: 639.98px) {
+	.asistencia-kpis {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 0.5rem;
+	}
+
+	.asistencia-kpi {
+		padding: 0.75rem 0.5rem;
+
+		&--wide {
+			grid-column: 1 / -1;
+		}
+	}
+}
+// #endregion
