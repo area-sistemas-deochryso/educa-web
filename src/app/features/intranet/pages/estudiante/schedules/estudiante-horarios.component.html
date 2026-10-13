@@ -68,7 +68,7 @@
 							<div class="mobile-card-details">
 								<span><i class="pi pi-clock"></i> {{ block.horaInicio }} - {{ block.horaFin }}</span>
 								<span><i class="pi pi-building"></i> {{ block.salonDescripcion }}</span>
-								<span><i class="pi pi-users"></i> {{ block.cantidadEstudiantes }} estudiantes</span>
+								<span><i class="pi pi-users"></i> {{ block.cantidadEstudiantes | pluralize: 'estudiante' }}</span>
 							</div>
 						</div>
 					}

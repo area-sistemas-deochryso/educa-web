@@ -81,15 +81,21 @@
 			</div>
 		</div>
 
-		<button
-			class="danger-link"
-			type="button"
-			data-info-anchor="profesor-curso-hub-eliminar-contenido"
-			(click)="onDeleteContenido()"
-		>
-			<i class="pi pi-trash"></i>
-			Eliminar todo el contenido
-		</button>
+		<section class="danger-zone" aria-label="Acciones destructivas">
+			<div class="danger-zone__text">
+				<strong>Eliminar contenido del curso</strong>
+				<span>Borra todas las semanas, archivos y tareas. Esta acción no se puede deshacer.</span>
+			</div>
+			<edu-button
+				label="Eliminar todo el contenido"
+				icon="pi pi-trash"
+				severity="danger"
+				[outlined]="true"
+				size="small"
+				data-info-anchor="profesor-curso-hub-eliminar-contenido"
+				(click)="onDeleteContenido()"
+			/>
+		</section>
 	} @else if (vm().error) {
 		<app-empty-state
 			icon="pi pi-exclamation-triangle"

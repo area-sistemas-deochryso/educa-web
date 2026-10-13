@@ -87,11 +87,12 @@ export class SalonEstudiantesDialogComponent {
 
 	readonly dialogStyle = computed((): Record<string, string> => {
 		if (this.isFullscreen()) return { width: '100vw', maxWidth: '100vw', height: '100vh', maxHeight: '100vh' };
-		return { width: '700px', maxWidth: '95vw' };
+		return { width: '920px', maxWidth: '95vw' };
 	});
 	readonly contentStyle = computed((): Record<string, string> => {
 		if (this.isFullscreen()) return { 'overflow-y': 'auto' };
-		return { 'max-height': '80vh', 'overflow-y': 'auto' };
+		// Alto fijo: el diálogo no cambia de alto (ni se re-centra) al cambiar de pestaña; lo que no entre scrollea adentro.
+		return { height: '65vh', 'max-height': '80vh', 'overflow-y': 'auto' };
 	});
 
 	toggleFullscreen(): void {

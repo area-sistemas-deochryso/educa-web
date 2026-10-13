@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 
 import { PageHeaderComponent } from '@intranet-shared/components';
 import { buildCursoHubLink } from '@intranet-shared/helpers';
+import { PluralizePipe } from '@intranet-shared/pipes';
 import { SkeletonLoaderComponent } from '@shared/components';
 import { StudentSchedulesFacade } from './services/estudiante-horarios.facade';
 import { EstudianteFacade } from '../services/estudiante.facade';
@@ -158,7 +159,7 @@ function buildCountdownMap(blocks: HorarioBlock[], now: Date): Map<number, Count
 @Component({
 	selector: 'app-student-schedules',
 	standalone: true,
-	imports: [CommonModule, EduTooltip, PageHeaderComponent, SkeletonLoaderComponent],
+	imports: [CommonModule, EduTooltip, PageHeaderComponent, PluralizePipe, SkeletonLoaderComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './estudiante-horarios.component.html',
 	styleUrl: './estudiante-horarios.component.scss',

@@ -29,6 +29,17 @@
 	gap: 0.35rem;
 }
 
+// Fila interruptor + etiqueta + ayuda. Antes usaba `flex gap-2` (no existen como utilidades) y la etiqueta quedaba pegada al interruptor.
+.toggle-row {
+	display: flex;
+	align-items: center;
+	gap: 0.625rem;
+
+	label {
+		cursor: pointer;
+	}
+}
+
 .help-icon {
 	font-size: 0.8rem;
 	color: var(--text-color-secondary);

@@ -42,6 +42,10 @@ export function cursoHubTabsFor(rol: CursoHubRol): readonly CursoHubTab[] {
 			padding: 0 1rem;
 			border-bottom: 1px solid var(--surface-200);
 			overflow-x: auto;
+				/* Sin barra nativa; overflow-y: hidden evita el scroll vertical fantasma que causaba el
+				   margin-bottom: -1px de cada pestaña. */
+				overflow-y: hidden;
+				scrollbar-width: none;
 		}
 		.hub-tab {
 			display: inline-flex;
@@ -56,7 +60,16 @@ export function cursoHubTabsFor(rol: CursoHubRol): readonly CursoHubTab[] {
 			border-bottom: 2px solid transparent;
 			margin-bottom: -1px;
 		}
-		.hub-tab:hover {
+		.hub-tabs::-webkit-scrollbar {
+				display: none;
+			}
+			/* En pantallas angostas el degradado de la derecha avisa que hay más pestañas fuera de vista. */
+			@media (max-width: 640px) {
+				.hub-tabs {
+					mask-image: linear-gradient(to right, #000 calc(100% - 2rem), transparent);
+				}
+			}
+			.hub-tab:hover {
 			color: var(--text-color);
 		}
 		.hub-tab.is-active {

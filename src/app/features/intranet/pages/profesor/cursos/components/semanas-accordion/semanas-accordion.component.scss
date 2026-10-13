@@ -207,27 +207,10 @@
 	}
 }
 
+// Acción terciaria: edu-button [text] size="small" (la jerarquía la da el componente, no CSS local).
 .edit-semana-link {
-	display: inline-flex;
-	align-items: center;
-	gap: 0.3rem;
-	font-size: 0.75rem;
-	color: var(--text-color);
-	cursor: pointer;
-	background: none;
-	border: none;
-	padding: 0;
-	margin-bottom: 1rem;
-	transition: color 0.15s;
-
-	i {
-		font-size: 0.7rem;
-	}
-
-	&:hover {
-		color: var(--green-600);
-		text-decoration: underline;
-	}
+	display: inline-block;
+	margin-bottom: 0.75rem;
 }
 
 // #endregion

@@ -3,12 +3,13 @@ import { FormsModule } from '@angular/forms';
 
 import { GruposResumenDto, GrupoContenidoDto } from '@features/intranet/pages/estudiante/models';
 import { AuthStore } from '@core/store';
+import { PluralizePipe } from '@intranet-shared/pipes';
 import { EduSelect, EduTag } from '@edu-ui';
 
 @Component({
 	selector: 'app-estudiante-grupos-tab',
 	standalone: true,
-	imports: [FormsModule, EduSelect, EduTag],
+	imports: [FormsModule, EduSelect, EduTag, PluralizePipe],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './estudiante-grupos-tab.component.html',
 	styleUrl: './estudiante-grupos-tab.component.scss',

@@ -270,6 +270,21 @@ body {
 	padding: 0;
 }
 
+/* Los overlays de edu-ui (diálogos, drawers, selects, menús, toasts) se montan como hijos de <body>, fuera
+   de .intranet-layout, y heredaban League Spartan (--body-font-family, tipografía del portal público).
+   La intranet usa Inter: se fija acá para que un diálogo no cambie de letra respecto de la página. */
+.edu-dialog-pane,
+.edu-drawer-pane,
+.edu-select-pane,
+.edu-multi-select-pane,
+.edu-menu-pane,
+.edu-popover-pane,
+.edu-datepicker-pane,
+.edu-autocomplete-pane,
+.edu-toast {
+	font-family: var(--intranet-font-family);
+}
+
 /*---------------------------------------
   TYPOGRAPHY
 -----------------------------------------*/

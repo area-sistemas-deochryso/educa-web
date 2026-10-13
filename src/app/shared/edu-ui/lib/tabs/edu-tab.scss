@@ -14,6 +14,7 @@
 	border-bottom: 2px solid transparent;
 	font: inherit;
 	font-weight: 500;
+	white-space: nowrap;
 	cursor: pointer;
 
 	&:hover:not(:disabled) {

@@ -114,8 +114,9 @@
 
 		<!-- #region Evaluación grupal -->
 		<div class="form-field">
-			<div class="flex align-items-center gap-2">
+			<div class="toggle-row">
 				<edu-toggle
+					ariaLabel="Evaluación grupal"
 					data-info-anchor="profesor-evaluacion-grupal-toggle"
 					[ngModel]="formData().esGrupal"
 					(ngModelChange)="updateField('esGrupal', $event)"

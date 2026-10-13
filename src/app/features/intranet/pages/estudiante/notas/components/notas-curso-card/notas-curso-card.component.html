@@ -11,7 +11,7 @@
 			}
 		}
 		<app-curso-chip class="hero-curso" [cursoId]="curso().cursoId" [nombre]="curso().cursoNombre" />
-		<span class="text-sm text-color-secondary">{{ curso().salonDescripcion }}</span>
+		<span class="hero-salon">{{ curso().salonDescripcion }}</span>
 		@if (coberturaEvaluada() < 100) {
 			<div class="hero-evaluado-note">
 				<span>Evaluaciones calificadas: {{ evaluacionesProgreso().completadas }}/{{ evaluacionesProgreso().total }}</span>
