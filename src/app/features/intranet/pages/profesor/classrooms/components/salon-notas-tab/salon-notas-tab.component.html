@@ -88,12 +88,12 @@
 				<tr>
 					@for (group of evaluacionesPorSemana(); track group.semana) {
 						@for (eval of group.evaluaciones; track eval.id) {
-							<th style="min-width: 65px; text-align: center">
+							<th style="min-width: 110px; text-align: center">
 								<div class="eval-header">
 									@if (eval.esGrupal) {
 										<i class="pi pi-users text-xs" title="Evaluación grupal"></i>
 									}
-									<span [title]="eval.titulo">{{ eval.titulo | slice : 0 : 8 }}</span>
+									<span class="eval-title" [title]="eval.titulo">{{ eval.titulo }}</span>
 									<span class="eval-peso">{{ eval.peso * 100 | number: '1.0-0' }}%</span>
 								</div>
 							</th>
@@ -123,12 +123,12 @@
 				<tr>
 					@for (group of evaluacionesPorPeriodo(); track group.periodo.id) {
 						@for (eval of group.evaluaciones; track eval.id) {
-							<th style="min-width: 65px; text-align: center">
+							<th style="min-width: 110px; text-align: center">
 								<div class="eval-header">
 									@if (eval.esGrupal) {
 										<i class="pi pi-users text-xs" title="Evaluación grupal"></i>
 									}
-									<span [title]="eval.titulo">{{ eval.titulo | slice : 0 : 8 }}</span>
+									<span class="eval-title" [title]="eval.titulo">{{ eval.titulo }}</span>
 									<span class="eval-peso">{{ eval.peso * 100 | number: '1.0-0' }}%</span>
 								</div>
 							</th>
@@ -159,7 +159,7 @@
 			<tr>
 				<td class="text-color-secondary">{{ i + 1 }}</td>
 				<td class="font-mono">{{ est.dni }}</td>
-				<td class="font-semibold">{{ est.nombreCompleto }}</td>
+				<td class="font-semibold student-name" [title]="est.nombreCompleto">{{ est.nombreCompleto }}</td>
 
 				<!-- Vista Semana: notas individuales agrupadas por semana -->
 				@if (vistaActual() === 'semana') {
