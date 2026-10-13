@@ -8,12 +8,64 @@
 // #endregion
 
 // #region Hero promedio
+// Banda horizontal compacta: promedio · curso · próxima evaluación. Ocupa todo el ancho del contenedor.
+.resumen-band {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.75rem 2rem;
+	padding: 0.25rem 0 1rem;
+}
+
 .hero-promedio {
 	display: flex;
 	flex-direction: column;
-	align-items: center;
-	padding: 1rem 0 1.25rem;
-	gap: 0.25rem;
+	align-items: flex-start;
+	gap: 0.15rem;
+}
+
+.resumen-curso {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 0.15rem;
+	min-width: 0;
+}
+
+// Sin `.stat-card` (fondo transparent !important global): tarjeta tonal propia.
+.proxima-evaluacion {
+	display: flex;
+	flex-direction: column;
+	gap: 0.15rem;
+	margin-left: auto;
+	min-width: 0;
+	max-width: 100%;
+	padding: 0.5rem 0.75rem;
+	background: var(--surface-ground);
+	border: 1px solid var(--surface-border);
+	border-left: 3px solid var(--primary-color);
+	border-radius: 8px;
+}
+
+.proxima-label {
+	font-size: 0.7rem;
+	font-weight: 600;
+	color: var(--text-color-secondary);
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+
+.proxima-titulo {
+	font-weight: 600;
+	font-size: 0.9rem;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.proxima-meta {
+	font-size: 0.8rem;
+	color: var(--text-color-secondary);
 }
 
 .hero-label {
@@ -56,13 +108,8 @@
 }
 
 .hero-evaluado-note {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 0.1rem;
 	font-size: 0.8rem;
 	color: var(--text-color-secondary);
-	margin-top: 0.25rem;
 }
 // #endregion
 
@@ -72,8 +119,8 @@
 	flex-wrap: wrap;
 	gap: 0.5rem;
 	justify-content: center;
-	margin-bottom: 1.25rem;
-	padding: 0.75rem;
+	margin-bottom: 0.75rem;
+	padding: 0.5rem;
 	background: var(--surface-ground);
 	border-radius: 8px;
 }
@@ -186,6 +233,11 @@
 @media (max-width: 576px) {
 	.hero-number {
 		font-size: 2rem;
+	}
+
+	.proxima-evaluacion {
+		margin-left: 0;
+		width: 100%;
 	}
 
 	.periodos-row {
