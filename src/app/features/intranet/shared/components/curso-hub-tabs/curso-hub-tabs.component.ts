@@ -35,6 +35,15 @@ export function cursoHubTabsFor(rol: CursoHubRol): readonly CursoHubTab[] {
 	imports: [RouterLink, RouterLinkActive],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	styles: `
+		/* Pegajosas bajo el header sticky de la intranet (--intranet-header-height la publica el layout).
+		   z-index por debajo del header (100) y fondo opaco para que el contenido no se vea detrás. */
+		:host {
+			display: block;
+			position: sticky;
+			top: var(--intranet-header-height, 0px);
+			z-index: 90;
+			background: var(--intranet-background-color, var(--surface-ground));
+		}
 		.hub-tabs {
 			display: flex;
 			gap: 0.25rem;

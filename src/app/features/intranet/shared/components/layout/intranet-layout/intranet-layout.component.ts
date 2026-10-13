@@ -224,6 +224,8 @@ export class IntranetLayoutComponent implements OnInit, AfterViewInit, OnDestroy
 	// Template ref sobre un <div> nativo: el read por defecto ya es ElementRef.
 	private readonly measureItems = viewChildren<ElementRef<HTMLElement>>('measureItem');
 	private resizeObserver?: ResizeObserver;
+	private readonly headerEl = viewChild<ElementRef<HTMLElement>>('intranetHeader');
+	private headerResizeObserver?: ResizeObserver;
 
 	readonly visibleNavItems = computed((): NavMenuItem[] => {
 		const items = this._allItems();
@@ -316,6 +318,7 @@ export class IntranetLayoutComponent implements OnInit, AfterViewInit, OnDestroy
 	}
 
 	ngAfterViewInit(): void {
+		this.observeHeaderHeight();
 		const nav = this.navLinksEl()?.nativeElement;
 		if (!nav) return;
 		this.resizeObserver = new ResizeObserver(() => this.recomputeVisibleCount());
@@ -358,6 +361,23 @@ export class IntranetLayoutComponent implements OnInit, AfterViewInit, OnDestroy
 		this.keyboardService.unregister('open-feedback-report');
 		this.keyboardService.unregister('open-command-palette');
 		this.resizeObserver?.disconnect();
+		this.headerResizeObserver?.disconnect();
+		document.documentElement.style.removeProperty('--intranet-header-height');
+	}
+
+	/**
+	 * Publica el alto real del header sticky (varía con el breadcrumb, el viewport y el safe-area)
+	 * como `--intranet-header-height`, para que otros elementos sticky de la intranet (p. ej. las
+	 * tabs del hub de curso) se peguen debajo y no queden tapados.
+	 */
+	private observeHeaderHeight(): void {
+		const header = this.headerEl()?.nativeElement;
+		if (!header) return;
+		const root = document.documentElement;
+		const publish = () => root.style.setProperty('--intranet-header-height', `${Math.ceil(header.getBoundingClientRect().height)}px`);
+		publish();
+		this.headerResizeObserver = new ResizeObserver(publish);
+		this.headerResizeObserver.observe(header);
 	}
 
 	// #region Acciones
