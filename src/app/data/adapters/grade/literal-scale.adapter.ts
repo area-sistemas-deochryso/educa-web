@@ -53,10 +53,17 @@ export class LiteralScale implements GradeScale {
 		return targetScale.min + normalized * (targetScale.max - targetScale.min);
 	}
 
+	/**
+	 * Busca la letra de una nota (INV-C13): los rangos son enteros y las notas
+	 * pueden tener decimales, asi que se busca el entero redondeado (mitad hacia
+	 * arriba). El redondeo es solo para la busqueda; la nota original no se altera.
+	 * Retorna null si el entero queda fuera de todos los rangos (escala con huecos).
+	 */
 	findLiteral(nota: number): ConfiguracionLiteralDto | null {
+		const entero = Math.round(nota);
 		for (const literal of this.sortedLiterales) {
 			if (literal.notaMinima !== null && literal.notaMaxima !== null) {
-				if (nota >= literal.notaMinima && nota <= literal.notaMaxima) {
+				if (entero >= literal.notaMinima && entero <= literal.notaMaxima) {
 					return literal;
 				}
 			}
