@@ -1,5 +1,14 @@
 // #region Off-schedule date
 /**
+ * Recorta una fecha del BE (`DateTime`: `2026-10-12T00:00:00`) a `yyyy-mm-dd`, el formato del
+ * selector. Se aplica una sola vez al cargar la lista; después todo se compara y reenvía con
+ * la misma forma.
+ */
+export function toDateOnly(fecha: string): string {
+	return fecha.slice(0, 10);
+}
+
+/**
  * `true` si `fecha` (`yyyy-mm-dd`) no cae en el día de semana del horario del curso
  * (0=domingo…6=sábado, igual que `Date.getDay`). Sin día esperado no hay fecha atípica.
  * Misma regla que `AttendanceRegistrationPanelComponent.fechaFueraDeHorario`, pero sobre

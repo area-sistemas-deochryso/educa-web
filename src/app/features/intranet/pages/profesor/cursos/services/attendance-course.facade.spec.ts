@@ -234,6 +234,56 @@ describe('AttendanceCourseFacade', () => {
 			});
 		});
 
+		// El BE serializa `DateTime`: la fecha llega con hora (H24).
+		describe('H24: fecha del BE con hora', () => {
+			const conHora = { ...mockRegistroData, fecha: '2026-03-21T00:00:00' };
+
+			it('normalizes the loaded date to yyyy-mm-dd once, on load', () => {
+				api.getAsistenciaCursoFecha.mockReturnValue(of(conHora));
+
+				facade.loadRegistro('2026-03-21', 1);
+
+				expect(store.registroData()?.fecha).toBe('2026-03-21');
+			});
+
+			it('accepts the recovery declaration for the date shown in the picker', () => {
+				api.getAsistenciaCursoFecha.mockReturnValue(of(conHora));
+				facade.loadRegistro('2026-03-21', 1);
+
+				facade.declararRecuperacion('2026-03-21', 'Clase recuperada por feriado');
+
+				expect(store.registroData()?.esRecuperacion).toBe(true);
+				expect(store.registroData()?.motivoRecuperacion).toBe('Clase recuperada por feriado');
+			});
+
+			it('recognizes a recovery already saved in the server (esRecuperacion: true) without asking again', () => {
+				api.getAsistenciaCursoFecha.mockReturnValue(of({ ...conHora, esRecuperacion: true, motivoRecuperacion: 'Feriado' }));
+				facade.loadRegistro('2026-03-21', 1);
+
+				// 2026-03-21 es sábado; el curso es de lunes (1): fecha atípica, pero ya declarada.
+				expect(facade.canSaveOutsidePanel(1)).toBe(true);
+			});
+
+			it('detects an atypical date on a list that came with time', () => {
+				api.getAsistenciaCursoFecha.mockReturnValue(of(conHora));
+				facade.loadRegistro('2026-03-21', 1);
+
+				expect(facade.canSaveOutsidePanel(6)).toBe(true);
+				expect(facade.canSaveOutsidePanel(1)).toBe(false);
+			});
+
+			it('sends the date-only form when saving', async () => {
+				api.getAsistenciaCursoFecha.mockReturnValue(of(conHora));
+				facade.loadRegistro('2026-03-21', 1);
+
+				facade.registrar(1);
+
+				await vi.waitFor(() => {
+					expect(api.registrarAsistenciaCurso).toHaveBeenCalledWith(1, expect.objectContaining({ fecha: '2026-03-21' }));
+				});
+			});
+		});
+
 		it('should do nothing without data', () => {
 			facade.registrar(1);
 			expect(api.registrarAsistenciaCurso).not.toHaveBeenCalled();

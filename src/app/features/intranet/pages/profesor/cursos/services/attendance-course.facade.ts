@@ -8,7 +8,7 @@ import { environment } from '@config';
 import { UI_SUMMARIES, UI_ASISTENCIA_SUCCESS_MESSAGES } from '@shared/constants';
 import { ProfesorApiService } from '../../services/profesor-api.service';
 import { CursoContenidoStore } from './curso-contenido.store';
-import { isOffScheduleDate } from './attendance-schedule.helpers';
+import { isOffScheduleDate, toDateOnly } from './attendance-schedule.helpers';
 import { AttendanceCourseStore } from './attendance-course.store';
 import { EstadoAsistenciaCurso, RegistrarAsistenciaCursoDto } from '../../models';
 
@@ -77,7 +77,7 @@ export class AttendanceCourseFacade {
 			)
 			.subscribe({
 				next: (data) => {
-					this.store.setRegistroData(data);
+					this.store.setRegistroData({ ...data, fecha: toDateOnly(data.fecha) });
 					this.store.setRegistroLoading(false);
 				},
 				error: (err) => {

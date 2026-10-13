@@ -116,7 +116,7 @@ export class EstudianteResumenWidgetComponent implements OnInit {
 			.flatMap((n) =>
 				n.evaluaciones.map((e) => ({ ...e, cursoNombre: n.cursoNombre, escala: n.escalaCalificacion ?? null })),
 			)
-			.filter((e) => e.nota !== null);
+			.filter((e) => e.nota != null);
 
 		if (calificadas.length === 0) return null;
 
