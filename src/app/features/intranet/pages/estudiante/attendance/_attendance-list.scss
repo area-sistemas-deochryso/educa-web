@@ -1,0 +1,36 @@
+// #region Lista de asistencia — filas como tarjetas en móvil
+// * Mismo markup de `edu-table` (conserva paginador y orden): bajo 640 px la fila pasa de tabla a bloque
+//   (fecha + estado, y la justificación debajo cuando existe) y se oculta el encabezado.
+@media (max-width: 639.98px) {
+	tr.asistencia-head {
+		display: none;
+	}
+
+	tr.asistencia-row {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.25rem 0.75rem;
+		padding: 0.75rem 1rem;
+		border-bottom: 1px solid var(--surface-border);
+	}
+
+	tr.asistencia-row > td {
+		display: block;
+		width: auto;
+		padding: 0;
+		border: 0;
+		text-align: left;
+	}
+
+	tr.asistencia-row > td.asistencia-justificacion {
+		flex-basis: 100%;
+		font-size: 0.85rem;
+		color: var(--text-color-secondary);
+	}
+
+	tr.asistencia-row > td.asistencia-justificacion--vacia {
+		display: none;
+	}
+}
+// #endregion
