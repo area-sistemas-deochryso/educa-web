@@ -39,8 +39,19 @@
 	gap: 0;
 }
 
+// Modo basic: misma apariencia que un edu-button [outlined] size="small". Así «Subir archivo» no compite
+// con la acción primaria de al lado (p. ej. «Agregar tarea») ni queda más grande que ella.
 .edu-file-upload__choose--basic {
-	padding: var(--eduui-form-field-padding-y) 0.75rem;
+	padding: var(--eduui-form-field-padding-y-sm) var(--eduui-form-field-padding-x-sm);
+	font-size: var(--eduui-form-field-font-size-sm);
+	background: transparent;
+	border-color: var(--eduui-primary-200);
+	color: var(--eduui-primary-color);
+
+	&:hover:not(:disabled) {
+		background: var(--eduui-primary-50);
+		border-color: var(--eduui-primary-200);
+	}
 }
 
 .edu-file-upload__files {
@@ -82,5 +93,16 @@
 	&:hover:not(:disabled) {
 		background: var(--eduui-surface-700);
 		border-color: var(--eduui-surface-700);
+	}
+}
+
+:host-context(.dark-mode) .edu-file-upload__choose--basic {
+	background: transparent;
+	border-color: var(--eduui-primary-200);
+	color: var(--eduui-primary-color);
+
+	&:hover:not(:disabled) {
+		background: var(--eduui-primary-50);
+		border-color: var(--eduui-primary-200);
 	}
 }

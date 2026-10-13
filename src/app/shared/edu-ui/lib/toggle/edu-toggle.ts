@@ -19,6 +19,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 			class="edu-toggle"
 			[attr.id]="inputId()"
 			[attr.aria-checked]="checked()"
+				[attr.aria-label]="ariaLabel() ?? null"
 			[class.edu-toggle--checked]="checked()"
 			[disabled]="isFormDisabled()"
 			(click)="toggle()"
@@ -31,6 +32,8 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 export class EduToggle implements ControlValueAccessor {
 	readonly disabled = input(false);
 	readonly inputId = input<string>();
+	/** Nombre accesible del interruptor cuando no hay un `<label for>` asociado. */
+	readonly ariaLabel = input<string>();
 
 	protected readonly checked = signal(false);
 	private readonly cvaDisabled = signal(false);

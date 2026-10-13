@@ -14,9 +14,10 @@
 
 	&[data-severity='primary'] { background: var(--eduui-primary-100); color: var(--eduui-primary-700); }
 	&[data-severity='secondary'] { background: var(--eduui-surface-100); color: var(--eduui-surface-600); }
-	&[data-severity='success'] { background: var(--eduui-green-100); color: var(--eduui-green-700); }
+	// success/warn usan el tono 800: con el 700 el contraste medido en pantalla quedaba bajo 4,5:1 (AA, texto de 14 px).
+	&[data-severity='success'] { background: var(--eduui-green-100); color: var(--eduui-green-800); }
 	&[data-severity='info'] { background: var(--eduui-sky-100); color: var(--eduui-sky-700); }
-	&[data-severity='warn'] { background: var(--eduui-orange-100); color: var(--eduui-orange-700); }
+	&[data-severity='warn'] { background: var(--eduui-orange-100); color: var(--eduui-orange-800); }
 	&[data-severity='danger'] { background: var(--eduui-red-100); color: var(--eduui-red-700); }
 	&[data-severity='contrast'] { background: var(--eduui-surface-950); color: var(--eduui-surface-0); }
 }
