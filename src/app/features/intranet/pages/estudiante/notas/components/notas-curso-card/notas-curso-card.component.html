@@ -55,7 +55,7 @@
 				<edu-accordion-header data-info-anchor="estudiante-notas-periodo-accordion">
 					<div class="accordion-header-content">
 						<span class="accordion-periodo-name">{{ g.periodo.nombre }}</span>
-						<span class="accordion-eval-count">{{ g.evaluaciones.length }} evaluación{{ g.evaluaciones.length !== 1 ? 'es' : '' }}</span>
+						<span class="accordion-eval-count">{{ g.evaluaciones.length }} {{ g.evaluaciones.length === 1 ? 'evaluación' : 'evaluaciones' }}</span>
 					</div>
 				</edu-accordion-header>
 				

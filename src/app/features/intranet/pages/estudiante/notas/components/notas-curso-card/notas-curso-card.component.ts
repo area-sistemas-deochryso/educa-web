@@ -87,7 +87,7 @@ export class NotasCursoCardComponent {
 	readonly evaluacionesProgreso = computed(() => {
 		const evaluaciones = this.curso().evaluaciones;
 		const total = evaluaciones.length;
-		const completadas = evaluaciones.filter((e) => e.nota !== null).length;
+		const completadas = evaluaciones.filter((e) => e.nota != null).length;
 		return { completadas, total, faltantes: total - completadas };
 	});
 

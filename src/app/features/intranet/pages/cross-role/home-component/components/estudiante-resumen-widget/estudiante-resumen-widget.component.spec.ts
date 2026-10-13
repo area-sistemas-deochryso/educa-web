@@ -70,4 +70,19 @@ describe('EstudianteResumenWidgetComponent (INV-U06)', () => {
 
 		expect(badge?.textContent).toContain('15.5');
 	});
+
+	it('H25: ignores an evaluation whose nota is absent (BE omits nulls) when picking the last grade', () => {
+		const curso = buildCurso(null);
+		const conPendiente = {
+			...curso,
+			evaluaciones: [
+				...curso.evaluaciones,
+				{ id: 2, titulo: 'Pendiente', fechaEvaluacion: '2026-10-09', peso: 0.2, numeroSemana: 2 },
+			],
+		} as unknown as EstudianteMisNotasDto;
+		const el = render(conPendiente);
+
+		expect(el.querySelector('.nota-badge')?.textContent).toContain('15.5');
+		expect(el.textContent).not.toContain('Pendiente');
+	});
 });

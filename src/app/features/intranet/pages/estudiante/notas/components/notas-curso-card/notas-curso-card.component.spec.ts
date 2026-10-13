@@ -199,6 +199,39 @@ describe('NotasCursoCardComponent (INV-C12)', () => {
 		expect(notaTags(el)).toEqual(['15.0']);
 	});
 
+	// El BE omite `nota` cuando no hay calificación: llega ausente, no `null` (H25).
+	it('H25: counts as graded only the evaluations that carry a nota (absent key is not graded)', () => {
+		const el = render(
+			buildCursoConEvaluaciones([
+				{ ...base, id: 1, titulo: 'Q1', nota: 15 },
+				{ ...base, id: 2, titulo: 'Q2' },
+				{ ...base, id: 3, titulo: 'Q3', vencida: false },
+			]),
+		);
+
+		expect(el.textContent).toContain('Evaluaciones calificadas: 1/3');
+	});
+
+	it('H25: an evaluation graded with 0 still counts as graded', () => {
+		const el = render(buildCursoConEvaluaciones([{ ...base, id: 1, titulo: 'Q1', nota: 0 }, { ...base, id: 2, titulo: 'Q2' }]));
+
+		expect(el.textContent).toContain('Evaluaciones calificadas: 1/2');
+	});
+
+	it('H26: the period counter says "1 evaluación" / "2 evaluaciones" (no accent on the plural)', () => {
+		const uno = render(buildCursoConEvaluaciones([{ ...base, id: 1, titulo: 'Q1', nota: 15 }]));
+		expect(uno.querySelector('.accordion-eval-count')?.textContent?.trim()).toBe('1 evaluación');
+
+		TestBed.resetTestingModule();
+		const dos = render(
+			buildCursoConEvaluaciones([
+				{ ...base, id: 1, titulo: 'Q1', nota: 15 },
+				{ ...base, id: 2, titulo: 'Q2', nota: 12 },
+			]),
+		);
+		expect(dos.querySelector('.accordion-eval-count')?.textContent?.trim()).toBe('2 evaluaciones');
+	});
+
 	it('does not break when the evaluation arrives without `vencida` (previous BE): treated as not overdue', () => {
 		const el = render(buildCursoConEvaluaciones([{ ...base, id: 1, titulo: 'Q1', nota: null }]));
 
