@@ -14,6 +14,8 @@ import {
 	getRotuloParcial,
 } from '@intranet-shared/services/calificacion-config';
 import { EduAccordion, EduAccordionHeader, EduAccordionPanel, EduTag } from '@edu-ui';
+import { describirDistancia, findProximaEvaluacion } from './proxima-evaluacion';
+
 /** Texto de un vacío de calificaciones: nunca "-" ni una cifra que se lea como desempeño (INV-C12). */
 const SIN_CALIFICAR = 'Sin calificar aún';
 
@@ -89,6 +91,12 @@ export class NotasCursoCardComponent {
 		const total = evaluaciones.length;
 		const completadas = evaluaciones.filter((e) => e.nota != null).length;
 		return { completadas, total, faltantes: total - completadas };
+	});
+
+	/** Próxima evaluación sin nota y no vencida; `null` oculta el bloque de la banda. */
+	readonly proximaEvaluacion = computed(() => {
+		const proxima = findProximaEvaluacion(this.curso().evaluaciones);
+		return proxima ? { ...proxima, distancia: describirDistancia(proxima.fechaEvaluacion) } : null;
 	});
 
 	readonly periodoGroups = computed<PeriodoGroup[]>(() => {

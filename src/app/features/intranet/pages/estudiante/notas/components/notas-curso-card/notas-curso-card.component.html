@@ -1,20 +1,36 @@
 <div class="curso-card">
-	<!-- #region Hero promedio -->
-	<div class="hero-promedio">
-		<span class="hero-label">Promedio</span>
-		@if (sinCalificar()) {
-			<span class="hero-number hero-number--vacio severity-secondary">{{ SIN_CALIFICAR }}</span>
-		} @else {
-			<span class="hero-number" [class]="'severity-' + promedioSeverity()">{{ formatNota(promedioParcial()) }}</span>
-			@if (rotuloParcial(); as rotulo) {
-				<span class="hero-parcial-rotulo">{{ rotulo }}</span>
+	<!-- #region Banda compacta (P110-F24b) -->
+	<div class="resumen-band" data-info-anchor="estudiante-notas-resumen">
+		<div class="hero-promedio">
+			<span class="hero-label">Promedio</span>
+			@if (sinCalificar()) {
+				<span class="hero-number hero-number--vacio severity-secondary">{{ SIN_CALIFICAR }}</span>
+			} @else {
+				<span class="hero-number" [class]="'severity-' + promedioSeverity()">{{ formatNota(promedioParcial()) }}</span>
+				@if (rotuloParcial(); as rotulo) {
+					<span class="hero-parcial-rotulo">{{ rotulo }}</span>
+				}
 			}
-		}
-		<app-curso-chip class="hero-curso" [cursoId]="curso().cursoId" [nombre]="curso().cursoNombre" />
-		<span class="hero-salon">{{ curso().salonDescripcion }}</span>
-		@if (coberturaEvaluada() < 100) {
-			<div class="hero-evaluado-note">
-				<span>Evaluaciones calificadas: {{ evaluacionesProgreso().completadas }}/{{ evaluacionesProgreso().total }}</span>
+		</div>
+
+		<div class="resumen-curso">
+			<app-curso-chip class="hero-curso" [cursoId]="curso().cursoId" [nombre]="curso().cursoNombre" />
+			<span class="hero-salon">{{ curso().salonDescripcion }}</span>
+			@if (coberturaEvaluada() < 100) {
+				<span class="hero-evaluado-note">
+					Evaluaciones calificadas: {{ evaluacionesProgreso().completadas }}/{{ evaluacionesProgreso().total }}
+				</span>
+			}
+		</div>
+
+		@if (proximaEvaluacion(); as proxima) {
+			<div class="proxima-evaluacion" data-info-anchor="estudiante-notas-proxima-evaluacion">
+				<span class="proxima-label">Próxima evaluación</span>
+				<span class="proxima-titulo">{{ proxima.titulo }}</span>
+				<span class="proxima-meta">
+					<strong class="proxima-distancia">{{ proxima.distancia }}</strong>
+					· {{ proxima.fechaEvaluacion | date: 'dd/MM/yyyy' }} · Peso: {{ (proxima.peso * 100).toFixed(0) }}%
+				</span>
 			</div>
 		}
 	</div>

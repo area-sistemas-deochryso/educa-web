@@ -246,4 +246,63 @@ describe('NotasCursoCardComponent (INV-C12)', () => {
 		expect(el.querySelector('.hero-parcial-rotulo')?.textContent).toContain('Parcial · 20 % evaluado');
 	});
 	// #endregion
+
+	// #region Banda compacta (P110-F24b)
+	const dia = (offset: number): string => {
+		const d = new Date();
+		d.setDate(d.getDate() + offset);
+		const mm = String(d.getMonth() + 1).padStart(2, '0');
+		const dd = String(d.getDate()).padStart(2, '0');
+		return `${d.getFullYear()}-${mm}-${dd}T08:00:00`;
+	};
+	const proximaEl = (el: HTMLElement) => el.querySelector('.proxima-evaluacion');
+
+	it('P4-B: the band shows the nearest future ungraded evaluation and skips overdue/graded ones', () => {
+		const el = render(
+			buildCursoConEvaluaciones([
+				{ ...base, id: 1, titulo: 'Vencida', nota: null, vencida: true, fechaEvaluacion: dia(-30) },
+				{ ...base, id: 2, titulo: 'Lejana', nota: null, vencida: false, fechaEvaluacion: dia(10) },
+				{ ...base, id: 3, titulo: 'Cercana', nota: null, vencida: false, fechaEvaluacion: dia(3) },
+				{ ...base, id: 4, titulo: 'Calificada', nota: 15, vencida: false, fechaEvaluacion: dia(1) },
+			]),
+		);
+
+		expect(proximaEl(el)?.querySelector('.proxima-titulo')?.textContent).toContain('Cercana');
+		expect(proximaEl(el)?.querySelector('.proxima-distancia')?.textContent).toContain('En 3 días');
+	});
+
+	it('P4-B: today counts as "Hoy" even with an earlier time', () => {
+		const el = render(
+			buildCursoConEvaluaciones([{ ...base, id: 1, titulo: 'De hoy', nota: null, vencida: false, fechaEvaluacion: dia(0) }]),
+		);
+
+		expect(proximaEl(el)?.querySelector('.proxima-distancia')?.textContent).toContain('Hoy');
+	});
+
+	it('P4-B: hides the block when there is no candidate (no empty placeholder)', () => {
+		const el = render(
+			buildCursoConEvaluaciones([
+				{ ...base, id: 1, titulo: 'Vencida', nota: null, vencida: true, fechaEvaluacion: dia(-30) },
+				{ ...base, id: 2, titulo: 'Calificada', nota: 12, vencida: false, fechaEvaluacion: dia(5) },
+			]),
+		);
+
+		expect(proximaEl(el)).toBeNull();
+		expect(el.textContent).not.toContain('Próxima evaluación');
+	});
+
+	it('INV-C13: a partial of 10.3 shows the letter C on the literal scale', () => {
+		const el = render({ ...buildCurso(10.3, 20, 2), escalaCalificacion: ESCALA_LITERAL });
+
+		expect(el.querySelector('.hero-number')?.textContent?.trim()).toBe('C');
+	});
+
+	it('never renders NaN/undefined in the band', () => {
+		const el = render(
+			buildCursoConEvaluaciones([{ ...base, id: 1, titulo: 'Q1', nota: null, vencida: false, fechaEvaluacion: dia(2) }]),
+		);
+
+		expect(el.querySelector('.resumen-band')?.textContent).not.toMatch(/NaN|undefined/);
+	});
+	// #endregion
 });
