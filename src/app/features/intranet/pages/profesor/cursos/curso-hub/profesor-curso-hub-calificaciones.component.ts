@@ -80,6 +80,7 @@ import { CursoHubCalificacionesLoader } from './curso-hub-calificaciones.loader'
 					[saving]="calVm().saving"
 					[totalEvaluaciones]="calVm().totalEvaluaciones"
 					[calificacionConfig]="calVm().calificacionConfig"
+					[totalEstudiantes]="calVm().salonEstudiantes.length"
 					(crearEvaluacion)="onCrearEvaluacion()"
 					(editarEvaluacion)="onEditarEvaluacion($event)"
 					(calificarEstudiantes)="onCalificarEstudiantes($event)"

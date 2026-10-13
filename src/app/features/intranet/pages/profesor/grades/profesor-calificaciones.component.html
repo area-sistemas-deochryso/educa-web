@@ -46,6 +46,7 @@
 				[saving]="calVm().saving"
 				[totalEvaluaciones]="calVm().totalEvaluaciones"
 				[calificacionConfig]="calVm().calificacionConfig"
+				[totalEstudiantes]="calVm().salonEstudiantes.length"
 				(crearEvaluacion)="calFacade.openCalificacionDialog()"
 				(editarEvaluacion)="calFacade.openCalificacionDialog($event)"
 				(calificarEstudiantes)="calFacade.openCalificarDialog($event)"
