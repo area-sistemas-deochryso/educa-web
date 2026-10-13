@@ -1,5 +1,5 @@
 // #region Imports
-import { NO_ERRORS_SCHEMA, signal } from '@angular/core';
+import { Component, input, NO_ERRORS_SCHEMA, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -8,6 +8,11 @@ import { CursoHubContextService } from '@intranet-shared/components';
 import { EstudianteCursosFacade } from '../../services/estudiante-cursos.facade';
 import { EstudianteCursoHubAsistenciaComponent } from './estudiante-curso-hub-asistencia.component';
 // #endregion
+
+@Component({ selector: 'app-attendance-calendar', standalone: true, template: '' })
+class CalendarStubComponent {
+	readonly days = input<readonly unknown[]>([]);
+}
 
 const resumen = (horarioId: number) => ({
 	horarioId,
@@ -33,7 +38,15 @@ describe('EstudianteCursoHubAsistenciaComponent', () => {
 		resetForHub: vi.fn(),
 	};
 
+	let realTemplate = false;
+
 	function create() {
+		TestBed.overrideComponent(
+			EstudianteCursoHubAsistenciaComponent,
+			realTemplate
+				? { set: { imports: [CalendarStubComponent], schemas: [NO_ERRORS_SCHEMA] } }
+				: { set: { imports: [], schemas: [NO_ERRORS_SCHEMA], template: '<div></div>' } },
+		);
 		const fixture = TestBed.createComponent(EstudianteCursoHubAsistenciaComponent);
 		fixture.detectChanges();
 		return fixture;
@@ -57,9 +70,7 @@ describe('EstudianteCursoHubAsistenciaComponent', () => {
 				{ provide: CursoHubContextService, useValue: { slot } },
 			],
 		});
-		TestBed.overrideComponent(EstudianteCursoHubAsistenciaComponent, {
-			set: { imports: [], schemas: [NO_ERRORS_SCHEMA], template: '<div></div>' },
-		});
+		realTemplate = false;
 	});
 
 	it('requests the attendance of the resolved slot, even when the slot has no contenido', () => {
@@ -127,5 +138,33 @@ describe('EstudianteCursoHubAsistenciaComponent', () => {
 
 		expect(facade.refreshMiAsistenciaForHub).toHaveBeenCalledExactlyOnceWith(5);
 		expect(facade.resetForHub).not.toHaveBeenCalled();
+	});
+
+	describe('calendar', () => {
+		const calendarDays = (fixture: ReturnType<typeof create>) =>
+			(fixture.debugElement.query((d) => d.name === 'app-attendance-calendar')?.componentInstance as CalendarStubComponent | undefined)?.days();
+
+		beforeEach(() => {
+			realTemplate = true;
+		});
+
+		it('mounts the calendar with the same detail records as the list', () => {
+			const detalle = [
+				{ asistenciaCursoId: 1, fecha: '2026-10-12T00:00:00', estado: 'F', justificacion: null, esRecuperacion: true },
+			];
+			vm.set({ ...baseVm, miAsistencia: { ...resumen(5), detalle } });
+
+			const fixture = create();
+
+			expect(calendarDays(fixture)).toEqual(detalle);
+		});
+
+		it('does not mount the calendar for another slot left in the store', () => {
+			vm.set({ ...baseVm, miAsistencia: resumen(4) });
+
+			const fixture = create();
+
+			expect(calendarDays(fixture)).toBeUndefined();
+		});
 	});
 });

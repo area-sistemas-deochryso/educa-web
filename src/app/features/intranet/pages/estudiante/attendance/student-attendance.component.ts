@@ -21,7 +21,7 @@ import {
 	calcAttendancePercentage,
 	createClientPaging,
 } from '@shared/utils';
-import { PageHeaderComponent } from '@intranet-shared/components';
+import { AttendanceCalendarComponent, PageHeaderComponent } from '@intranet-shared/components';
 import { EstudianteFacade } from '../services/estudiante.facade';
 import {
 	HorarioProfesorDto,
@@ -48,7 +48,7 @@ type JustificacionCellState =
 @Component({
 	selector: 'app-student-attendance',
 	standalone: true,
-	imports: [DatePipe, FormsModule, EduSelect, EduTag, EduTable, EduSpinner, EduButton, EduTooltip, PageHeaderComponent, JustificarInasistenciaDialogComponent, ErrorStateComponent],
+	imports: [DatePipe, FormsModule, EduSelect, EduTag, EduTable, EduSpinner, EduButton, EduTooltip, PageHeaderComponent, AttendanceCalendarComponent, JustificarInasistenciaDialogComponent, ErrorStateComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './student-attendance.component.html',
 	styleUrl: './student-attendance.component.scss',

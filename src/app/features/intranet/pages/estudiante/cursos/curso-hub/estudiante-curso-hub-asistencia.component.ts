@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, untracked
 import { RouterLink } from '@angular/router';
 import { EduButton, EduTable, EduTag, EduTooltip } from '@edu-ui';
 import {
+	AttendanceCalendarComponent,
 	CursoHubContextService,
 	EmptyStateComponent,
 	StatsSkeletonComponent,
@@ -40,6 +41,7 @@ type TagSeverity = 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contr
 		EduTable,
 		EduTag,
 		EduTooltip,
+		AttendanceCalendarComponent,
 		EmptyStateComponent,
 		StatsSkeletonComponent,
 		TableSkeletonComponent,
@@ -55,6 +57,10 @@ type TagSeverity = 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contr
 			justify-content: space-between;
 			gap: 1rem;
 			margin-bottom: 0.5rem;
+		}
+		app-attendance-calendar {
+			display: block;
+			margin-bottom: 1rem;
 		}
 		.stat-cards {
 			display: grid;
@@ -149,6 +155,9 @@ type TagSeverity = 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contr
 						}
 					</div>
 				</div>
+				@for (horarioId of [asistencia.horarioId]; track horarioId) {
+					<app-attendance-calendar [days]="asistencia.detalle" />
+				}
 				@if (asistencia.detalle.length > 0) {
 					<edu-table
 						[value]="detallePaging.value()"
@@ -169,7 +178,12 @@ type TagSeverity = 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contr
 						<ng-template #body let-item>
 							<tr>
 								<td>{{ item.fecha | date: 'dd/MM/yyyy' }}</td>
-								<td><edu-tag [value]="estadoLabel(item.estado)" [severity]="estadoSeverity(item.estado)" /></td>
+								<td>
+									<edu-tag [value]="estadoLabel(item.estado)" [severity]="estadoSeverity(item.estado)" />
+									@if (item.esRecuperacion) {
+										<edu-tag value="Recuperación" severity="info" />
+									}
+								</td>
 								<td>{{ item.justificacion ?? '—' }}</td>
 							</tr>
 						</ng-template>
