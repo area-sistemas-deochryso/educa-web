@@ -93,14 +93,9 @@ const PROFESOR_ROUTES_RAW: Route[] = [
 					),
 				title: 'Intranet - Asistencia del Curso (Profesor)',
 			},
-			{
-				path: 'informacion',
-				loadComponent: () =>
-					import('./pages/profesor/cursos/curso-hub/profesor-curso-hub-informacion.component').then(
-						(m) => m.ProfesorCursoHubInformacionComponent,
-					),
-				title: 'Intranet - Información del Curso (Profesor)',
-			},
+			// La pestaña Información se retiró (sus datos son chips del encabezado): se conserva la ruta para
+			// los enlaces guardados. El redirect conserva el query (`horarioId`).
+			{ path: 'informacion', pathMatch: 'full', redirectTo: 'contenido' },
 			{
 				path: 'salon',
 				loadComponent: () =>
@@ -209,14 +204,8 @@ const ESTUDIANTE_ROUTES_RAW: Route[] = [
 					),
 				title: 'Intranet - Asistencia del Curso (Estudiante)',
 			},
-			{
-				path: 'informacion',
-				loadComponent: () =>
-					import('./pages/estudiante/cursos/curso-hub/estudiante-curso-hub-informacion.component').then(
-						(m) => m.EstudianteCursoHubInformacionComponent,
-					),
-				title: 'Intranet - Información del Curso (Estudiante)',
-			},
+			// Igual que en el hub del profesor: la ruta se conserva solo para enlaces guardados.
+			{ path: 'informacion', pathMatch: 'full', redirectTo: 'contenido' },
 			{
 				path: 'salon',
 				loadComponent: () =>

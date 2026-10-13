@@ -1,4 +1,5 @@
 import { Injectable, signal } from '@angular/core';
+import type { EduButtonSeverity } from '../button/edu-button';
 
 export interface EduConfirmation {
 	message: string;
@@ -7,6 +8,8 @@ export interface EduConfirmation {
 	acceptLabel?: string;
 	rejectLabel?: string;
 	acceptButtonStyleClass?: string;
+	/** Severity of the accept button (e.g. `danger` for destructive actions). `acceptButtonStyleClass` has no CSS behind it. */
+	acceptButtonSeverity?: EduButtonSeverity;
 	rejectButtonStyleClass?: string;
 	/** Optional third action (rendered between reject and accept), e.g. «Salir sin guardar» next to «Guardar y salir». */
 	alternateLabel?: string;

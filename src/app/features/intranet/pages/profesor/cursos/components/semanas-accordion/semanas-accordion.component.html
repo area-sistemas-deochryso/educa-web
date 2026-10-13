@@ -1,5 +1,5 @@
 <!-- #region Refresh button -->
-<div style="display: flex; justify-content: flex-end; margin-bottom: 0.5rem">
+<div style="display: flex; justify-content: flex-end; align-items: center; gap: 0.25rem; margin-bottom: 0.5rem">
 	<edu-button
 		icon="pi pi-refresh"
 		[text]="true"
@@ -12,6 +12,8 @@
 		eduTooltipPosition="top"
 		[pt]="{ root: { 'aria-label': 'Refrescar contenido' } }"
 	/>
+	<!-- Acciones extra del anfitrión (ej. el menú ⋯ del hub), junto al botón de refrescar. -->
+	<ng-content select="[toolbarActions]" />
 </div>
 <!-- #endregion -->
 

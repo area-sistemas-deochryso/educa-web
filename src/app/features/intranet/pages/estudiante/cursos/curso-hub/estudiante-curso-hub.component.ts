@@ -8,6 +8,7 @@ import {
 import type { CursoHubRol } from '@intranet-shared/helpers';
 import { UnsavedChangesPromptService } from '@intranet-shared/services';
 import { EstudianteCursosFacade } from '../../services/estudiante-cursos.facade';
+import { EstudianteCursoHubChipsComponent } from './estudiante-curso-hub-chips.component';
 
 /**
  * Hub de curso del estudiante: `estudiante/cursos/:cursoId/:salonId?horarioId=`.
@@ -29,6 +30,7 @@ export class EstudianteCursoHubComponent extends CursoHubShellBase {
 	private readonly facade = inject(EstudianteCursosFacade);
 
 	protected readonly rol: CursoHubRol = 'estudiante';
+	protected readonly chipsComponent = EstudianteCursoHubChipsComponent;
 	protected readonly horarios = computed(() => this.facade.vm().horarios);
 	protected readonly loading = computed(() => this.facade.vm().loading);
 	protected readonly loadError = computed(() => this.facade.vm().error);

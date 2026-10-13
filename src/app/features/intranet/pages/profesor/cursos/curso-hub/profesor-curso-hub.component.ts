@@ -11,6 +11,7 @@ import { ProfesorFacade } from '../../services/profesor.facade';
 import { AttendanceCourseFacade } from '../services/attendance-course.facade';
 import { CursoContenidoDataFacade } from '../services/curso-contenido-data.facade';
 import { CursoHubCalificacionesLoader } from './curso-hub-calificaciones.loader';
+import { ProfesorCursoHubChipsComponent } from './profesor-curso-hub-chips.component';
 
 /**
  * Hub de curso del profesor: `profesor/cursos/:cursoId/:salonId?horarioId=`.
@@ -36,6 +37,7 @@ export class ProfesorCursoHubComponent extends CursoHubShellBase {
 	private readonly asistenciaFacade = inject(AttendanceCourseFacade);
 
 	protected readonly rol: CursoHubRol = 'profesor';
+	protected readonly chipsComponent = ProfesorCursoHubChipsComponent;
 	protected readonly horarios = computed(() => this.facade.vm().horarios);
 	protected readonly loading = computed(() => this.facade.vm().loading);
 	protected readonly loadError = computed(() => this.facade.vm().error);

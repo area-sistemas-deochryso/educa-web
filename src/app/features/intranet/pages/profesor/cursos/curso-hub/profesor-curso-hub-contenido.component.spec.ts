@@ -4,11 +4,13 @@ import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { EduConfirmationService } from '@edu-ui';
 import { CursoHubContextService } from '@intranet-shared/components';
 import type { HorarioProfesorDto } from '../../models';
 import { CursoContenidoCrudFacade } from '../services/curso-contenido-crud.facade';
 import { CursoContenidoDataFacade } from '../services/curso-contenido-data.facade';
 import { CursoContenidoUiFacade } from '../services/curso-contenido-ui.facade';
+import { CursoHubCalificacionesLoader } from './curso-hub-calificaciones.loader';
 import { ProfesorCursoHubContenidoComponent } from './profesor-curso-hub-contenido.component';
 // #endregion
 
@@ -40,7 +42,10 @@ describe('ProfesorCursoHubContenidoComponent', () => {
 		loadContenidoForHub: vi.fn(),
 		resetForHub: vi.fn(),
 		crearContenidoEnHub: vi.fn(),
+		eliminarContenidoEnHub: vi.fn(),
 	};
+	const calLoader = { ensure: vi.fn(), refresh: vi.fn(), reset: vi.fn() };
+	const confirmation = { confirm: vi.fn() };
 	const crudFacade = {
 		actualizarSemana: vi.fn(),
 		crearTarea: vi.fn(),
@@ -69,6 +74,8 @@ describe('ProfesorCursoHubContenidoComponent', () => {
 				{ provide: CursoContenidoDataFacade, useValue: dataFacade },
 				{ provide: CursoContenidoCrudFacade, useValue: crudFacade },
 				{ provide: CursoContenidoUiFacade, useValue: uiFacade },
+				{ provide: CursoHubCalificacionesLoader, useValue: calLoader },
+				{ provide: EduConfirmationService, useValue: confirmation },
 			],
 		});
 		TestBed.overrideComponent(ProfesorCursoHubContenidoComponent, {
@@ -215,6 +222,55 @@ describe('ProfesorCursoHubContenidoComponent', () => {
 
 			hooks.onRolledBack();
 			expect(builderVisible(fixture)).toBe(true);
+		});
+	});
+
+	describe('menú ⋯ y eliminar contenido', () => {
+		interface Internals {
+			contenidoMenuItems: { label: string; command?: () => void }[];
+			onDeleteContenido(): void;
+		}
+
+		it('offers «Eliminar todo el contenido» in the ⋯ menu, which asks for confirmation first', () => {
+			vm.set({ ...baseVm, contenido: { id: 8 }, totalArchivos: 3, totalTareas: 1 } as typeof baseVm);
+			const fixture = create();
+			const [item] = (fixture.componentInstance as unknown as Internals).contenidoMenuItems;
+
+			expect(item.label).toBe('Eliminar todo el contenido');
+			item.command?.();
+
+			expect(confirmation.confirm).toHaveBeenCalledOnce();
+			expect(dataFacade.eliminarContenidoEnHub).not.toHaveBeenCalled();
+		});
+
+		it('confirms with a red accept button and the counts of what is lost', () => {
+			vm.set({ ...baseVm, contenido: { id: 8 }, totalArchivos: 1, totalTareas: 2 } as typeof baseVm);
+			const fixture = create();
+
+			(fixture.componentInstance as unknown as Internals).onDeleteContenido();
+
+			const options = confirmation.confirm.mock.calls[0][0];
+			expect(options.acceptButtonSeverity).toBe('danger');
+			expect(options.message).toContain('1 archivo y 2 tareas');
+		});
+
+		it('deletes through the hub variant (no modal side effects) once confirmed', () => {
+			vm.set({ ...baseVm, contenido: { id: 8 } } as typeof baseVm);
+			const fixture = create();
+			(fixture.componentInstance as unknown as Internals).onDeleteContenido();
+
+			confirmation.confirm.mock.calls[0][0].accept();
+
+			expect(dataFacade.eliminarContenidoEnHub).toHaveBeenCalledWith(8);
+			expect(calLoader.reset).toHaveBeenCalledOnce();
+		});
+
+		it('does nothing without a contenido', () => {
+			const fixture = create();
+
+			(fixture.componentInstance as unknown as Internals).onDeleteContenido();
+
+			expect(confirmation.confirm).not.toHaveBeenCalled();
 		});
 	});
 

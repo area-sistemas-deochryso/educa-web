@@ -35,10 +35,22 @@ const MON_SLOT = slot(1, 1, 'Lunes', '08:00', '09:30');
 const WED_SLOT = slot(2, 3, 'Miércoles', '10:00', '11:30');
 const OTHER_PAIR = slot(9, 2, 'Martes', '08:00', '09:00', 14, 25);
 const MONDAY_830 = new Date(2026, 9, 5, 8, 30).getTime();
+
+// Lo que leen los chips del encabezado (el hub real los proyecta junto al título).
+const CHIPS_VM = {
+	contentLoading: false,
+	contenido: null,
+	totalArchivos: 0,
+	totalTareas: 0,
+	semanas: [],
+	archivosSummaryDialogVisible: false,
+	tareasSummaryDialogVisible: false,
+};
 // #endregion
 
 describe('EstudianteCursoHubComponent', () => {
-	const vm = signal<{ horarios: HorarioProfesorDto[]; loading: boolean; error: string | null }>({
+	const vm = signal<{ horarios: HorarioProfesorDto[]; loading: boolean; error: string | null } & typeof CHIPS_VM>({
+		...CHIPS_VM,
 		horarios: [],
 		loading: false,
 		error: null,
@@ -49,12 +61,14 @@ describe('EstudianteCursoHubComponent', () => {
 		getContenido: vi.fn(),
 		loadContenidoForHub: vi.fn(),
 		resetForHub: vi.fn(),
+		closeArchivosSummaryDialog: vi.fn(),
+		closeTareasSummaryDialog: vi.fn(),
 	};
 	const errorHandler = { showInfo: vi.fn(), showWarning: vi.fn() };
 	let router: Router;
 
 	beforeEach(() => {
-		vm.set({ horarios: [], loading: false, error: null });
+		vm.set({ ...CHIPS_VM, horarios: [], loading: false, error: null });
 		facade.loadHorarios.mockImplementation(() => vm.update((v) => ({ ...v, loading: true })));
 		facade.getContenido.mockReturnValue(of(null));
 
@@ -81,7 +95,7 @@ describe('EstudianteCursoHubComponent', () => {
 	}
 
 	async function finishLoad(harness: RouterTestingHarness, horarios: HorarioProfesorDto[]) {
-		vm.set({ horarios, loading: false, error: null });
+		vm.set({ ...CHIPS_VM, horarios, loading: false, error: null });
 		harness.detectChanges();
 		await harness.fixture.whenStable();
 		harness.detectChanges();
