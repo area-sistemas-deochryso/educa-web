@@ -5,4 +5,5 @@ export type {
 	ReporteRendimientoPropioDto,
 	RendimientoPropioCursoDto,
 	RendimientoPeriodoEstudianteDto,
+	RendimientoCursoVm,
 } from './estudiante-rendimiento.models';

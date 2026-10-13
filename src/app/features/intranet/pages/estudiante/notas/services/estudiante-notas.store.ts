@@ -62,7 +62,7 @@ export class EstudianteNotasStore {
 		const sims = this.simulaciones()[curso.cursoNombre];
 		if (!sims || sims.length === 0) return null;
 		return sims
-			.filter((s): s is NotaSimulada & { notaSimulada: number } => s.notaSimulada !== null)
+			.filter((s): s is NotaSimulada & { notaSimulada: number } => Number.isFinite(s.notaSimulada))
 			.map((s) => ({ nota: s.notaSimulada, peso: s.peso }));
 	});
 
@@ -132,9 +132,10 @@ export class EstudianteNotasStore {
 			// Init simulaciones from evaluaciones
 			const sims: NotaSimulada[] = curso.evaluaciones.map((e: CalificacionConMiNotaDto) => ({
 				calificacionId: e.id,
-				notaOriginal: e.nota,
-				notaSimulada: e.nota,
-				peso: e.peso,
+				// El BE puede omitir `nota` en una evaluación sin calificar (llega `undefined`, no `null`).
+				notaOriginal: e.nota ?? null,
+				notaSimulada: e.nota ?? null,
+				peso: e.peso ?? 0,
 			}));
 			this._state.update((s) => ({
 				...s,

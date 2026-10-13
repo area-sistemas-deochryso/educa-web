@@ -65,6 +65,10 @@ export class SimuladorNotasComponent {
 		return formatNotaConConfig(nota, this.calificacionConfig());
 	}
 
+	formatPeso(peso: number | null | undefined): string {
+		return Number.isFinite(peso) ? ((peso as number) * 100).toFixed(0) : '0';
+	}
+
 	onVisibleChange(value: boolean): void {
 		if (!value) {
 			this.visibleChange.emit(false);

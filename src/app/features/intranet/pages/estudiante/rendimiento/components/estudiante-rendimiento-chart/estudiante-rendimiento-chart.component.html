@@ -1,5 +1,5 @@
 <div class="chart-canvas-wrap">
-	<canvas #rendimientoChart [class.chart-canvas--hidden]="periodos().length === 0"></canvas>
+	<canvas #rendimientoChart role="img" [attr.aria-label]="ariaLabel()" [class.chart-canvas--hidden]="periodos().length === 0"></canvas>
 	@if (periodos().length === 0) {
 		<div class="chart-empty">
 			<i class="pi pi-chart-line" aria-hidden="true"></i>

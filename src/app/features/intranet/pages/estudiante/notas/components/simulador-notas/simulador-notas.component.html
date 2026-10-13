@@ -39,7 +39,7 @@
 					<span class="sim-titulo">{{ getEvalTitulo(sim.calificacionId) }}</span>
 					<div class="sim-meta">
 						<edu-tag [value]="getEvalTipo(sim.calificacionId)" styleClass="tag-neutral" [rounded]="true" />
-						<span class="text-xs text-color-secondary">Peso: {{ (sim.peso * 100).toFixed(0) }}%</span>
+						<span class="text-xs text-color-secondary">Peso: {{ formatPeso(sim.peso) }}%</span>
 					</div>
 				</div>
 				<div class="sim-nota-input">

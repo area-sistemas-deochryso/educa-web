@@ -1,6 +1,6 @@
 .rendimiento-cursos {
 	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+	grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 	gap: 1rem;
 }
 
@@ -16,4 +16,50 @@
 		font-size: 1rem;
 		font-weight: 600;
 	}
+}
+
+.rend-kpis {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+	gap: 0.75rem;
+	padding: 0.75rem 1rem 0;
+}
+
+.rend-kpi {
+	display: flex;
+	flex-direction: column;
+	gap: 0.15rem;
+	padding: 0.6rem 0.75rem;
+	border: 1px solid var(--surface-border);
+	border-radius: 0.5rem;
+
+	&__label {
+		color: var(--text-color-secondary);
+		font-size: 0.75rem;
+	}
+
+	&__value {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+		color: var(--text-color);
+		font-size: 1.15rem;
+		font-weight: 600;
+	}
+
+	&__sub {
+		color: var(--text-color-secondary);
+		font-size: 0.75rem;
+		font-weight: 400;
+	}
+}
+
+.rend-solo-punto {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	margin: 0;
+	padding: 1rem;
+	color: var(--text-color-secondary);
+	font-size: 0.85rem;
 }
