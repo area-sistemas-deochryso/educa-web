@@ -164,7 +164,8 @@ export class UsuariosImportDialogComponent {
 			const dni = dniKey ? String(raw[dniKey] ?? '').trim() : '';
 			const nombres = nombresKey ? String(raw[nombresKey] ?? '').trim() : '';
 			const apellidos = apellidosKey ? String(raw[apellidosKey] ?? '').trim() : '';
-			const contrasena = contrasenaKey ? String(raw[contrasenaKey] ?? '').trim() : '';
+			// INV-S10 (server-confirmed): la contraseña se normaliza a mayúsculas.
+			const contrasena = contrasenaKey ? String(raw[contrasenaKey] ?? '').trim().toUpperCase() : '';
 			const rolRaw = rolKey ? String(raw[rolKey] ?? '').trim() : '';
 			const sedeId = sedeKey ? parseId(raw[sedeKey]) : null;
 			const telefono = telefonoKey ? String(raw[telefonoKey] ?? '').trim() || null : null;
@@ -176,6 +177,7 @@ export class UsuariosImportDialogComponent {
 			if (!nombres) errors.push('Nombres requerido');
 			if (!apellidos) errors.push('Apellidos requerido');
 			if (!contrasena) errors.push('Contraseña requerida');
+			else if (contrasena.length < 6) errors.push('Contraseña mínimo 6 caracteres'); // INV-S11
 			if (!rolRaw || !rolesValidos.has(rolRaw.toUpperCase())) errors.push('Rol inválido');
 
 			const valido = errors.length === 0;

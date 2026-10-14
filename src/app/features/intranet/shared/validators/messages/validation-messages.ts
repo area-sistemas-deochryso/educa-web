@@ -35,9 +35,8 @@ export const VALIDATION_MESSAGES: ValidationMessageConfig = {
 
 	// Strong password
 	strongPassword: 'La contrasena no cumple con los requisitos de seguridad',
-	'strongPassword.minLength': 'Minimo 8 caracteres',
+	'strongPassword.minLength': 'Minimo 6 caracteres',
 	'strongPassword.noUppercase': 'Debe incluir una letra mayuscula',
-	'strongPassword.noLowercase': 'Debe incluir una letra minuscula',
 	'strongPassword.noNumber': 'Debe incluir un numero',
 	'strongPassword.noSpecial': 'Debe incluir un caracter especial (!@#$%^&*)',
 

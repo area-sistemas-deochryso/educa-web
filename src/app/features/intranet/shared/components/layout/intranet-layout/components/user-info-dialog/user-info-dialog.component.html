@@ -108,7 +108,7 @@
 								[ngModel]="nuevaContrasena()"
 								(ngModelChange)="nuevaContrasena.set($event.toUpperCase())"
 								name="nuevaContrasena"
-								placeholder="Mínimo 4 caracteres"
+								placeholder="Mínimo 6 caracteres (se guarda en mayúsculas)"
 								class="w-full"
 								[class.ng-invalid]="nuevaContrasenaError()"
 								autocomplete="new-password"

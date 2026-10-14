@@ -14,7 +14,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '@core/services';
 import { UserProfileService } from '@core/services';
-import { extractBackendMessage } from '@core/helpers';
+import { extractBackendMessage, resolveErrorMessage } from '@core/helpers';
 import { EduAvatar, EduButton, EduDialog, EduInputText, EduMessageService, EduTab, EduTabPanel, EduTabs, EduTag } from '@edu-ui';
 
 // #endregion
@@ -82,7 +82,8 @@ export class UserInfoDialogComponent {
 		if (!this.submitted()) return null;
 		const pass = this.nuevaContrasena();
 		if (!pass.trim()) return 'La nueva contraseña es requerida';
-		if (pass.length < 4) return 'Mínimo 4 caracteres';
+		// INV-S11 (server-confirmed): mínimo 6; INV-S10: se guarda en mayúsculas.
+		if (pass.length < 6) return 'Mínimo 6 caracteres';
 		return null;
 	});
 
@@ -97,7 +98,7 @@ export class UserInfoDialogComponent {
 	readonly isFormValid = computed(
 		() =>
 			!!this.contrasenaActual().trim() &&
-			this.nuevaContrasena().length >= 4 &&
+			this.nuevaContrasena().length >= 6 &&
 			this.confirmarContrasena() === this.nuevaContrasena(),
 	);
 	// #endregion
@@ -137,7 +138,7 @@ export class UserInfoDialogComponent {
 					this.visibleChange.emit(false);
 				},
 				error: (err: unknown) => {
-					const mensaje = extractBackendMessage(err) ?? 'No se pudo actualizar la contraseña';
+					const mensaje = resolveErrorMessage(err, extractBackendMessage(err) ?? 'No se pudo actualizar la contraseña');
 					this.messageService.add({
 						severity: 'danger',
 						summary: 'Error',

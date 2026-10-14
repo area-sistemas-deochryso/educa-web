@@ -133,9 +133,9 @@ export class UserFormDialogComponent {
 		return typeof pwd === 'string' ? pwd : '';
 	});
 
-	readonly contrasenaMinLengthValid = computed(() => this._contrasena().length >= 8);
+	// INV-S10/INV-S11 (server-confirmed): mayúsculas, mínimo 6, sin exigir minúscula.
+	readonly contrasenaMinLengthValid = computed(() => this._contrasena().length >= 6);
 	readonly contrasenaHasUppercase = computed(() => /[A-Z]/.test(this._contrasena()));
-	readonly contrasenaHasLowercase = computed(() => /[a-z]/.test(this._contrasena()));
 	readonly contrasenaHasNumber = computed(() => /[0-9]/.test(this._contrasena()));
 	readonly contrasenaHasSpecialChar = computed(() => /[!@#$%^&*(),.?":{}|<>]/.test(this._contrasena()));
 
@@ -145,7 +145,6 @@ export class UserFormDialogComponent {
 		return (
 			this.contrasenaMinLengthValid() &&
 			this.contrasenaHasUppercase() &&
-			this.contrasenaHasLowercase() &&
 			this.contrasenaHasNumber() &&
 			this.contrasenaHasSpecialChar()
 		);
