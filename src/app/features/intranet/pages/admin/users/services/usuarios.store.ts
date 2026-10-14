@@ -15,6 +15,7 @@ import {
 	UsuarioLista,
 	UsuariosEstadisticas,
 } from '../models';
+import { PendingSaveRegistry } from './usuarios-pending-saves';
 import { applyFormPolicies } from '../helpers/usuario-form-policies.utils';
 import {
 	isUsuarioFormValid,
@@ -83,6 +84,9 @@ export class UsersStore extends BaseCrudStore<UsuarioLista, UsuarioFormData, Usu
 	private readonly _profesorCursos = signal<ProfesorCursoListaDto[]>([]);
 	private readonly _cursosDisponibles = signal<CursoListaDto[]>([]);
 	private readonly _profesorCursosLoading = signal(false);
+
+	/** Guardados (PUT) en vuelo por usuario; bloquea reabrir su edición. */
+	readonly pendingSaves = new PendingSaveRegistry();
 	// #endregion
 
 	// #region Lecturas públicas — Feature-specific
@@ -178,7 +182,7 @@ export class UsersStore extends BaseCrudStore<UsuarioLista, UsuarioFormData, Usu
 		isProfesor: this.isProfesor(),
 		profesorCursos: this._profesorCursos(),
 		cursosDisponibles: this._cursosDisponibles(),
-		profesorCursosLoading: this._profesorCursosLoading(),
+		profesorCursosLoading: this._profesorCursosLoading(), pendingSaveKeys: this.pendingSaves.keys(),
 		dniError: this.dniError(),
 		correoError: this.correoError(),
 		correoApoderadoError: this.correoApoderadoError(),

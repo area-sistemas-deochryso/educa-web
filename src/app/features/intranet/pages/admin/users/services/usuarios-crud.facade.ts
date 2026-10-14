@@ -7,6 +7,7 @@ import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
 import { DebugService, logger, getEstadoToggleDeltas, getEstadoRollbackDeltas } from '@core/helpers';
 import { UI_ADMIN_ERROR_DETAILS, UI_ERROR_CODES, UI_SUMMARIES } from '@app/shared/constants';
 import { formatFullName } from '@shared/pipes';
+import { firstValueFrom } from 'rxjs';
 import {
 	ActualizarUsuarioRequest,
 	CrearUsuarioRequest,
@@ -21,6 +22,8 @@ import { buildCrearUsuarioPayload, buildActualizarUsuarioPayload } from './usuar
 import {
 	PendingDuplicateConfirmation,
 	ROL_STAT_KEY,
+	buildListaFieldsFromDetalle,
+	resolveUpdateErrorMessage,
 	extractDuplicateMatch,
 	resolveSalonNombre,
 } from './usuarios-crud.helpers';
@@ -261,19 +264,7 @@ export class UsersCrudFacade {
 		const endpoint = `${this.apiUrl}/${encodeURIComponent(rol)}/${id}`;
 
 		// Snapshot para rollback
-		const previousData: Partial<UsuarioLista> = {
-			dni: selectedUsuario.dni,
-			nombreCompleto: formatFullName(selectedUsuario.apellidos, selectedUsuario.nombres),
-			nombres: selectedUsuario.nombres,
-			apellidos: selectedUsuario.apellidos,
-			correo: selectedUsuario.correo,
-			telefono: selectedUsuario.telefono,
-			estado: selectedUsuario.estado,
-			salonNombre: selectedUsuario.salonNombre,
-			nombreApoderado: selectedUsuario.nombreApoderado,
-			telefonoApoderado: selectedUsuario.telefonoApoderado,
-			correoApoderado: selectedUsuario.correoApoderado,
-		};
+		const previousData = buildListaFieldsFromDetalle(selectedUsuario);
 
 		this.wal.execute({
 			operation: 'UPDATE',
@@ -284,8 +275,12 @@ export class UsersCrudFacade {
 			payload,
 			http$: () => this.usuariosService.actualizarUsuario(rol, id, payload),
 			// WAL: onCommit no debe disparar refetch — el cambio visible ya ocurrió en apply.
-			onCommit: () => {},
+			onCommit: () => {
+				this.store.pendingSaves.clear(rol, id);
+			},
 			onError: (err) => {
+				// El motor del WAL siempre llama rollback + onError en error, 409 y reintentos agotados.
+				this.store.pendingSaves.clear(rol, id);
 				const match = extractDuplicateMatch(err);
 				if (match) {
 					this._pendingDuplicate.set({
@@ -299,15 +294,13 @@ export class UsersCrudFacade {
 					return;
 				}
 				logger.error('Error:', err);
-				const errorCode =
-					err instanceof HttpErrorResponse ? (err.error?.errorCode as string | undefined) : undefined;
-				const message =
-					(errorCode && UI_ERROR_CODES[errorCode]) || UI_ADMIN_ERROR_DETAILS.updateUsuario;
-				this.errorHandler.showError(UI_SUMMARIES.error, message);
+				this.errorHandler.showError(UI_SUMMARIES.error, resolveUpdateErrorMessage(err));
 				this.store.setLoading(false);
+				void this.refetchRowFromServer(rol, id);
 			},
 			optimistic: {
 				apply: () => {
+					this.store.pendingSaves.mark(rol, id);
 					this.dataFacade.markCrudMutation();
 					const salonNombre = resolveSalonNombre(data, selectedUsuario, this.store.salones());
 					this.store.updateItem(id, {
@@ -330,6 +323,23 @@ export class UsersCrudFacade {
 				},
 			},
 		});
+	}
+
+	/**
+	 * Tras un rechazo del PUT (409 u otro), la fila se reemplaza con la lectura del servidor
+	 * en vez del snapshot previo, que puede estar obsoleto. El motor del WAL ya invalidó el
+	 * cache del SW antes de llamar a onError, así que el GET no sale del cache.
+	 * Si la relectura falla, se refresca la lista completa: la fila nunca queda en estado optimista.
+	 */
+	private async refetchRowFromServer(rol: string, id: number): Promise<void> {
+		try {
+			const detalle = await firstValueFrom(this.usuariosService.obtenerUsuario(rol, id));
+			if (!detalle) throw new Error('Respuesta vacía al releer el usuario');
+			this.store.updateItem(id, buildListaFieldsFromDetalle(detalle));
+		} catch (err) {
+			logger.warn('No se pudo releer la fila tras el rechazo; se refresca la lista', err);
+			this.store.triggerRefresh();
+		}
 	}
 
 	private updateRolEstadistica(rol: string, delta: number): void {

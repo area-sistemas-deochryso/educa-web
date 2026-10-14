@@ -6,6 +6,9 @@ export const UI_ADMIN_ERROR_DETAILS = {
 	deletePermiso: 'No se pudo eliminar el permiso',
 	loadUsuarios: 'No se pudieron cargar los usuarios',
 	updateUsuario: 'No se pudo actualizar el usuario',
+	updateUsuarioConflict:
+		'Los datos de este usuario cambiaron antes de guardar. La fila ya se actualizó con lo que hay en el servidor; revise y vuelva a editar si hace falta.',
+	usuarioSavePending: 'Este usuario se está guardando. Espere unos segundos y vuelva a intentarlo.',
 	createUsuario: 'No se pudo crear el usuario',
 	deleteUsuario: 'No se pudo eliminar el usuario',
 	changeEstado: 'No se pudo cambiar el estado',

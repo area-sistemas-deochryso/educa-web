@@ -100,6 +100,7 @@
 						class="action-icon"
 						eduTooltip="Ver detalles"
 						eduTooltipPosition="top"
+						[disabled]="isSavePending(usuario)"
 						(click)="onView(usuario)"
 						data-info-anchor="admin-users-ver-detalle-btn"
 						[pt]="{ root: { 'aria-label': 'Ver detalles del usuario' } }"
@@ -110,11 +111,13 @@
 						severity="success"
 						size="small"
 						class="action-icon"
-						eduTooltip="Editar"
+						[eduTooltip]="isSavePending(usuario) ? 'Guardando…' : 'Editar'"
 						eduTooltipPosition="top"
+						[loading]="isSavePending(usuario)"
+						[disabled]="isSavePending(usuario)"
 						(click)="onEdit(usuario)"
 						data-info-anchor="admin-users-edit-btn"
-						[pt]="{ root: { 'aria-label': 'Editar usuario' } }"
+						[pt]="{ root: { 'aria-label': isSavePending(usuario) ? 'Guardando usuario' : 'Editar usuario', 'aria-busy': isSavePending(usuario) ? 'true' : 'false' } }"
 					/>
 					<edu-button
 						[icon]="usuario.estado ? 'pi pi-ban' : 'pi pi-check'"

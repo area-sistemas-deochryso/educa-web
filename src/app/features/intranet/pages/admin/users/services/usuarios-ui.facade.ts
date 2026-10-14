@@ -41,6 +41,7 @@ export class UsersUiFacade {
 	// #region Detail View
 
 	openDetail(usuario: UsuarioLista): void {
+		if (this.blockIfSavePending(usuario.rol, usuario.id)) return;
 		this.usuariosService
 			.obtenerUsuario(usuario.rol, usuario.id)
 			.pipe(
@@ -75,6 +76,7 @@ export class UsersUiFacade {
 	}
 
 	editUsuario(usuario: UsuarioLista): void {
+		if (this.blockIfSavePending(usuario.rol, usuario.id)) return;
 		this.usuariosService
 			.obtenerUsuario(usuario.rol, usuario.id)
 			.pipe(
@@ -100,7 +102,7 @@ export class UsersUiFacade {
 
 	editFromDetail(): void {
 		const usuario = this.store.selectedUsuario();
-		if (usuario) {
+		if (usuario && !this.blockIfSavePending(usuario.rol, usuario.id)) {
 			this.store.closeDetailDrawer();
 			this.store.openEditDialog(usuario);
 		}
@@ -192,6 +194,17 @@ export class UsersUiFacade {
 
 	// #endregion
 	// #region Private Helpers
+
+	/**
+	 * Un usuario con un guardado en vuelo no se puede reabrir: el servidor todavía tiene el
+	 * `rowVersion` viejo y el WAL envía en serie, así que una segunda edición terminaría en 409.
+	 * Devuelve true si bloqueó la acción (y avisó al usuario).
+	 */
+	private blockIfSavePending(rol: string, id: number): boolean {
+		if (!this.store.pendingSaves.has(rol, id)) return false;
+		this.errorHandler.showInfo('Guardando', UI_ADMIN_ERROR_DETAILS.usuarioSavePending);
+		return true;
+	}
 
 	/**
 	 * Carga cursos asignados y disponibles si el profesor tiene

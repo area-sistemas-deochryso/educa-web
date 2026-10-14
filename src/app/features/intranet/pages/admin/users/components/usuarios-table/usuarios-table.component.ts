@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { UsuarioLista } from '../../services';
+import { buildUsuarioKey } from '../../services/usuarios-pending-saves';
 import { RoleTab } from '../../models';
 import { hasMissingGuardianEmail, MISSING_GUARDIAN_EMAIL_LABEL } from '../../helpers/usuario-contact.utils';
 import { getInitialsFromParts } from '@core/helpers';
@@ -29,6 +30,8 @@ export class UsersTableComponent {
 	readonly activeTab = input<RoleTab>(null);
 	readonly sortField = input<string | null>(null);
 	readonly sortOrder = input<'asc' | 'desc' | null>(null);
+	/** Claves `rol:id` de usuarios con un guardado en vuelo (ver `UsersStore.pendingSaveKeys`). */
+	readonly pendingSaveKeys = input<ReadonlySet<string>>(new Set());
 
 	readonly view = output<UsuarioLista>();
 	readonly edit = output<UsuarioLista>();
@@ -70,6 +73,10 @@ export class UsersTableComponent {
 	readonly hasMissingGuardianEmail = hasMissingGuardianEmail;
 
 	private initialLoadDone = false;
+
+	isSavePending(usuario: UsuarioLista): boolean {
+		return this.pendingSaveKeys().has(buildUsuarioKey(usuario.rol, usuario.id));
+	}
 
 	getInitials(usuario: UsuarioLista): string {
 		return getInitialsFromParts(usuario.apellidos, usuario.nombres);

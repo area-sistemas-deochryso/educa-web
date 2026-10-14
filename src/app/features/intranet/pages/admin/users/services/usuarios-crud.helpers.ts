@@ -5,8 +5,11 @@ import {
 	CrearUsuarioRequest,
 	DuplicateNameMatch,
 	UsuarioDetalle,
+	UsuarioLista,
 	UsuariosEstadisticas,
 } from '../models';
+import { formatFullName } from '@shared/pipes';
+import { UI_ADMIN_ERROR_DETAILS, UI_ERROR_CODES } from '@app/shared/constants';
 
 export interface PendingDuplicateConfirmation {
 	nombres: string;
@@ -56,4 +59,30 @@ export function resolveSalonNombre(
 		return firstSalon ? formatSalon(firstSalon.salonId) : undefined;
 	}
 	return selectedUsuario.salonNombre;
+}
+
+/** Campos de la fila de la lista que se derivan de un detalle del servidor (snapshot / relectura). */
+export function buildListaFieldsFromDetalle(detalle: UsuarioDetalle): Partial<UsuarioLista> {
+	return {
+		dni: detalle.dni,
+		nombreCompleto: formatFullName(detalle.apellidos, detalle.nombres),
+		nombres: detalle.nombres,
+		apellidos: detalle.apellidos,
+		correo: detalle.correo,
+		telefono: detalle.telefono,
+		estado: detalle.estado,
+		salonNombre: detalle.salonNombre,
+		nombreApoderado: detalle.nombreApoderado,
+		telefonoApoderado: detalle.telefonoApoderado,
+		correoApoderado: detalle.correoApoderado,
+		rowVersion: detalle.rowVersion,
+	};
+}
+
+/** Mensaje al usuario cuando el PUT de edición falla: el 409 explica que la fila se releyó del servidor. */
+export function resolveUpdateErrorMessage(err: unknown): string {
+	if (!(err instanceof HttpErrorResponse)) return UI_ADMIN_ERROR_DETAILS.updateUsuario;
+	if (err.status === 409) return UI_ADMIN_ERROR_DETAILS.updateUsuarioConflict;
+	const errorCode = err.error?.errorCode as string | undefined;
+	return (errorCode && UI_ERROR_CODES[errorCode]) || UI_ADMIN_ERROR_DETAILS.updateUsuario;
 }

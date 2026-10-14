@@ -4,6 +4,7 @@
 import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { of, throwError } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
 
 import { UsersCrudFacade } from './usuarios-crud.facade';
 import { UsersStore } from './usuarios.store';
@@ -66,6 +67,7 @@ function createMockApi() {
 	return {
 		crearUsuario: vi.fn().mockReturnValue(of({ mensaje: 'ok' })),
 		actualizarUsuario: vi.fn().mockReturnValue(of({ mensaje: 'ok' })),
+		obtenerUsuario: vi.fn().mockReturnValue(of(mockDetalle)),
 		eliminarUsuario: vi.fn().mockReturnValue(of({ mensaje: 'ok' })),
 		cambiarEstado: vi.fn().mockReturnValue(of({ mensaje: 'ok' })),
 		importarEstudiantes: vi.fn(),
@@ -214,7 +216,66 @@ describe('UsersCrudFacade', () => {
 			const before = store.refreshCounter();
 			wal.commit();
 			expect(store.refreshCounter()).toBe(before);
+			expect(api.obtenerUsuario).not.toHaveBeenCalled();
 		});
+
+		// #region Pending save lock (brief 835, B)
+		it('marks only the saved user as pending on apply', () => {
+			expect(store.pendingSaves.has(mockDetalle.rol, mockDetalle.id)).toBe(true);
+			expect(store.pendingSaves.has(mockUsuarios[0].rol, mockUsuarios[0].id)).toBe(false);
+		});
+
+		it('does not confuse the same id under another role', () => {
+			expect(store.pendingSaves.has('Estudiante', mockDetalle.id)).toBe(false);
+		});
+
+		it('releases the lock on commit', () => {
+			wal.commit();
+			expect(store.pendingSaves.has(mockDetalle.rol, mockDetalle.id)).toBe(false);
+		});
+
+		it('releases the lock on error / exhausted retries (rollback + onError)', () => {
+			wal.fail(new Error('Max retries exceeded'));
+			expect(store.pendingSaves.has(mockDetalle.rol, mockDetalle.id)).toBe(false);
+		});
+		// #endregion
+
+		// #region Refetch after rejection (brief 835, D)
+		it('on 409 replaces the row with the fresh server read, not the stale snapshot', async () => {
+			const fresh = { ...mockDetalle, nombres: 'María Server', apellidos: 'Servidor', rowVersion: 'v9' };
+			api.obtenerUsuario.mockReturnValue(of(fresh));
+
+			wal.fail(new HttpErrorResponse({ status: 409, error: { errorCode: 'CONCURRENCY_CONFLICT' } }));
+			await vi.waitFor(() => expect(api.obtenerUsuario).toHaveBeenCalledTimes(1));
+
+			const user = store.items().find((u) => u.id === mockDetalle.id);
+			expect(api.obtenerUsuario).toHaveBeenCalledWith(mockDetalle.rol, mockDetalle.id);
+			expect(user?.nombres).toBe('María Server');
+			expect(user?.apellidos).toBe('Servidor');
+			expect(user?.nombreCompleto).toContain('Servidor');
+			expect(store.pendingSaves.has(mockDetalle.rol, mockDetalle.id)).toBe(false);
+			expect(errorHandler.showError).toHaveBeenCalledWith(
+				expect.anything(),
+				expect.stringContaining('cambiaron antes de guardar'),
+			);
+		});
+
+		it('does not touch other rows when re-reading after a 409', async () => {
+			const before = store.items().find((u) => u.id === 1);
+			wal.fail(new HttpErrorResponse({ status: 409 }));
+			await vi.waitFor(() => expect(api.obtenerUsuario).toHaveBeenCalled());
+
+			expect(store.items().find((u) => u.id === 1)).toEqual(before);
+		});
+
+		it('refreshes the whole list if the re-read fails', async () => {
+			api.obtenerUsuario.mockReturnValue(throwError(() => new Error('offline')));
+			const before = store.refreshCounter();
+
+			wal.fail(new HttpErrorResponse({ status: 409 }));
+			await vi.waitFor(() => expect(store.refreshCounter()).toBe(before + 1));
+		});
+		// #endregion
 	});
 	// #endregion
 
