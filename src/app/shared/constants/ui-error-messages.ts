@@ -84,6 +84,10 @@ export const UI_ERROR_CODES: Record<string, string> = {
 	AUTH_PROFESOR_NOT_IDENTIFIED: 'No se pudo identificar al profesor.',
 	AUTH_ESTUDIANTE_NOT_IDENTIFIED: 'No se pudo identificar al estudiante.',
 
+	// Política de contraseña (INV-S10/INV-S11, 422 del BE)
+	PASSWORD_TOO_SHORT: 'La contraseña debe tener al menos 6 caracteres.',
+	PASSWORD_TOO_LONG: 'La contraseña no puede superar los 100 caracteres.',
+
 	// Usuarios
 	DNI_DUPLICADO: 'Ya existe un usuario con ese DNI.',
 	EMAIL_DUPLICADO: 'Ya existe un usuario con ese correo electrónico.',
