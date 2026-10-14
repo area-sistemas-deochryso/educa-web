@@ -8,10 +8,10 @@ function scoreStrength(value: string): EduPasswordStrength {
 		return null;
 	}
 	let score = 0;
-	if (value.length >= 8) {
+	if (value.length >= 6) {
 		score++;
 	}
-	if (/[a-z]/.test(value) && /[A-Z]/.test(value)) {
+	if (/[A-Z]/.test(value)) {
 		score++;
 	}
 	if (/[0-9]/.test(value)) {
@@ -72,6 +72,8 @@ export class EduPassword implements ControlValueAccessor {
 	readonly disabled = input(false);
 	readonly placeholder = input<string>();
 	readonly fluid = input(false);
+	/** Forces the typed value to uppercase (INV-S10). */
+	readonly uppercase = input(false);
 	readonly style = input<Record<string, string> | null>(null);
 	readonly inputStyle = input<Record<string, string> | null>(null);
 
@@ -102,7 +104,10 @@ export class EduPassword implements ControlValueAccessor {
 	}
 
 	protected onInput(event: Event): void {
-		const raw = (event.target as HTMLInputElement).value;
+		const target = event.target as HTMLInputElement;
+		const raw = this.uppercase() ? target.value.toUpperCase() : target.value;
+		// Keep the DOM value in sync when the transform changed it.
+		if (raw !== target.value) target.value = raw;
 		this.value.set(raw);
 		this.onChange(raw);
 	}

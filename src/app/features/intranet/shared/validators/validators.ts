@@ -49,10 +49,9 @@ export class AppValidators {
 	}
 
 	/**
-	 * Valida password fuerte
-	 * - Minimo 8 caracteres
+	 * Valida password fuerte (INV-S10/INV-S11: mayusculas, sin exigir minuscula)
+	 * - Minimo 6 caracteres
 	 * - Al menos una mayuscula
-	 * - Al menos una minuscula
 	 * - Al menos un numero
 	 * - Al menos un caracter especial
 	 */
@@ -63,9 +62,8 @@ export class AppValidators {
 			const value = control.value;
 			const errors: ValidationErrors = {};
 
-			if (value.length < 8) errors['minLength'] = true;
+			if (value.length < 6) errors['minLength'] = true;
 			if (!/[A-Z]/.test(value)) errors['noUppercase'] = true;
-			if (!/[a-z]/.test(value)) errors['noLowercase'] = true;
 			if (!/\d/.test(value)) errors['noNumber'] = true;
 			if (!/[!@#$%^&*(),.?":{}|<>]/.test(value)) errors['noSpecial'] = true;
 

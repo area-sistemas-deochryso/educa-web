@@ -124,6 +124,7 @@
 						[disabled]="!isEditing() || !canEditPassword()"
 						[toggleMask]="true"
 						[feedback]="false"
+						[uppercase]="true"
 						[style]="{ width: '100%' }"
 						[inputStyle]="{ width: '100%' }"
 						placeholder="Se generará automáticamente"
@@ -138,7 +139,7 @@
 					@if (isEditing() && canEditPassword()) {
 						<small class="text-muted">
 							<i class="pi pi-info-circle" style="margin-right: 0.25rem"></i>
-							Puede editar la contraseña
+							Puede editar la contraseña (mayúsculas, mínimo 6 caracteres)
 						</small>
 					}
 				</div>

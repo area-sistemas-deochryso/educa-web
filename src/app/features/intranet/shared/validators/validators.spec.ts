@@ -87,14 +87,19 @@ describe('AppValidators', () => {
 			expect(result?.['strongPassword']?.['noUppercase']).toBe(true);
 		});
 
-		it('should return noLowercase error', () => {
-			const control = new FormControl('ABCD123!');
-			const result = validator(control);
-			expect(result?.['strongPassword']?.['noLowercase']).toBe(true);
+		it('should accept an uppercase-only password of 6 chars (INV-S10/INV-S11)', () => {
+			const control = new FormControl('ABC12#');
+			expect(validator(control)).toBeNull();
+		});
+
+		it('should reject a 5-char password and no longer require lowercase', () => {
+			const result = validator(new FormControl('AB12#'));
+			expect(result?.['strongPassword']?.['minLength']).toBe(true);
+			expect(result?.['strongPassword']?.['noLowercase']).toBeUndefined();
 		});
 
 		it('should return noSpecial error', () => {
-			const control = new FormControl('Abcd1234');
+			const control = new FormControl('ABCD1234');
 			const result = validator(control);
 			expect(result?.['strongPassword']?.['noSpecial']).toBe(true);
 		});

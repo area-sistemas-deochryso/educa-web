@@ -1,4 +1,4 @@
-const RANDOM_LOWER_ALPHABET = 'abcdefghjkmnpqrstuvwxyz'; // sin l/o: evita confusión visual con 1/0
+const RANDOM_UPPER_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ'; // sin I/O: evita confusión visual con 1/0
 const RANDOM_SPECIAL_ALPHABET = '!@#$%';
 
 /**
@@ -17,16 +17,18 @@ function secureRandomChar(alphabet: string): string {
  * from public data (DNI/apellido).
  *
  * Format: first 2 letters of the last name (uppercase)
- *       + 3 random lowercase letters
+ *       + 3 random uppercase letters
  *       + last 4 digits of DNI
  *       + 1 random special character.
- * Length 10, satisfies: uppercase, lowercase, digit, special char, length >= 8.
+ * Length 10, uppercase-only (INV-S10, server-confirmed: the login and the BE
+ * normalize to uppercase) so it can be typed at login without adjustments;
+ * satisfies INV-S11 (min length 6, no lowercase required).
  *
  * @param apellidos Last names string.
  * @param dni DNI string.
  * @returns Generated password or empty string when inputs are insufficient.
  * @example
- * generatePassword('Garcia Lopez', '72345678'); // e.g. "GAxqz2345#" — random segment varies each call
+ * generatePassword('Garcia Lopez', '72345678'); // e.g. "GAXQZ2345#" — random segment varies each call
  */
 export function generatePassword(apellidos: string, dni: string): string {
 	const apellido = apellidos.trim();
@@ -38,8 +40,8 @@ export function generatePassword(apellidos: string, dni: string): string {
 
 	if (pref.length < 2 || suf.length < 4) return '';
 
-	const randomLower = Array.from({ length: 3 }, () => secureRandomChar(RANDOM_LOWER_ALPHABET)).join('');
+	const randomUpper = Array.from({ length: 3 }, () => secureRandomChar(RANDOM_UPPER_ALPHABET)).join('');
 	const randomSpecial = secureRandomChar(RANDOM_SPECIAL_ALPHABET);
 
-	return `${pref}${randomLower}${suf}${randomSpecial}`;
+	return `${pref}${randomUpper}${suf}${randomSpecial}`;
 }

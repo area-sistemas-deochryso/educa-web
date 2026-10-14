@@ -32,13 +32,19 @@ describe('password.utils', () => {
 			expect(result).toHaveLength(10);
 		});
 
-		it('should satisfy all password validation rules (upper, lower, digit, special, min length 8)', () => {
-			const result = generatePassword('Garcia Lopez', '72345678');
-			expect(result.length).toBeGreaterThanOrEqual(8);
-			expect(/[A-Z]/.test(result)).toBe(true);
-			expect(/[a-z]/.test(result)).toBe(true);
-			expect(/[0-9]/.test(result)).toBe(true);
-			expect(/[!@#$%^&*(),.?":{}|<>]/.test(result)).toBe(true);
+		it('should satisfy INV-S10/INV-S11 in 20 runs (no lowercase, min length 6, digit and special char)', () => {
+			for (let i = 0; i < 20; i++) {
+				const result = generatePassword('Garcia Lopez', '72345678');
+				expect(result.length).toBeGreaterThanOrEqual(6);
+				expect(/[a-z]/.test(result)).toBe(false);
+				expect(/[A-Z]/.test(result)).toBe(true);
+				expect(/[0-9]/.test(result)).toBe(true);
+				expect(/[!@#$%^&*(),.?":{}|<>]/.test(result)).toBe(true);
+			}
+		});
+
+		it('should uppercase a lowercase apellidos prefix', () => {
+			expect(generatePassword('garcia', '72345678').slice(0, 2)).toBe('GA');
 		});
 
 		it('should produce different results across calls (real randomness, not deterministic)', () => {
