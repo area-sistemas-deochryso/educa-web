@@ -48,8 +48,12 @@ $color-pendiente: var(--attendance-pendiente);
 		padding: 0.125rem;
 		display: flex;
 
-		&:hover { color: var(--text-color); }
-		i { font-size: 0.75rem; }
+		&:hover {
+			color: var(--text-color);
+		}
+		i {
+			font-size: 0.75rem;
+		}
 	}
 }
 
@@ -76,7 +80,6 @@ $color-pendiente: var(--attendance-pendiente);
 		select {
 			font-size: 0.85rem;
 			padding: 0.3rem 0.5rem;
-			height: 2rem;
 		}
 	}
 
@@ -169,11 +172,21 @@ $color-pendiente: var(--attendance-pendiente);
 	color: var(--gray-700);
 }
 
-.status-asistio { background-color: $color-asistio; }
-.status-tardanza { background-color: $color-tardanza; }
-.status-falta { background-color: $color-falta; }
-.status-justificado { background-color: $color-justificado; }
-.status-pendiente { background-color: $color-pendiente; }
+.status-asistio {
+	background-color: $color-asistio;
+}
+.status-tardanza {
+	background-color: $color-tardanza;
+}
+.status-falta {
+	background-color: $color-falta;
+}
+.status-justificado {
+	background-color: $color-justificado;
+}
+.status-pendiente {
+	background-color: $color-pendiente;
+}
 .status-sin-registro {
 	background-color: transparent;
 	border: 1px dashed var(--gray-300);
@@ -326,7 +339,6 @@ $color-pendiente: var(--attendance-pendiente);
 		padding: 0.75rem;
 		background: var(--surface-50);
 		border-radius: 6px;
-
 
 		.info {
 			display: flex;

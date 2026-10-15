@@ -47,8 +47,12 @@
 		display: flex;
 		z-index: 1;
 
-		&:hover { color: var(--text-color); }
-		i { font-size: 0.75rem; }
+		&:hover {
+			color: var(--text-color);
+		}
+		i {
+			font-size: 0.75rem;
+		}
 	}
 }
 
@@ -80,9 +84,16 @@
 		color: var(--text-color);
 		border-bottom: 1px solid var(--surface-50, #f8f9fa);
 
-		&:last-child { border-bottom: none; }
-		&:hover { background: var(--surface-hover); }
-		&.active { background: var(--primary-50, #eff6ff); font-weight: 600; }
+		&:last-child {
+			border-bottom: none;
+		}
+		&:hover {
+			background: var(--surface-hover);
+		}
+		&.active {
+			background: var(--primary-50, #eff6ff);
+			font-weight: 600;
+		}
 
 		.student-dni {
 			color: var(--text-color-secondary);
@@ -120,11 +131,12 @@
 	background: none;
 	border-radius: 0;
 
-	label { font-size: 0.85rem; }
+	label {
+		font-size: 0.85rem;
+	}
 	select {
 		font-size: 0.85rem;
 		padding: 0.3rem 0.5rem;
-		height: 2rem;
 	}
 }
 
