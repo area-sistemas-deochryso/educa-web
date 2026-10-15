@@ -1,0 +1,145 @@
+<edu-dialog
+	[visible]="visible()"
+	(visibleChange)="onVisibleChange($event)"
+	#dlg
+	[modal]="true"
+	[dirty]="dirty()"
+	[header]="headerText()"
+	[style]="{ width: '520px', maxWidth: '95vw' }"
+>
+	<div class="edit-form">
+		<div class="form-field">
+			<span class="form-label" id="tareaTipoLabel">
+				<i class="pi pi-tag" style="font-size: 0.78rem"></i>
+				Tipo
+			</span>
+			<div class="tipo-options" role="radiogroup" aria-labelledby="tareaTipoLabel">
+				@for (opt of tipoOptions; track opt.value) {
+					<button
+						type="button"
+						class="tipo-option"
+						role="radio"
+						[attr.aria-checked]="tipo === opt.value"
+						[attr.data-info-anchor]="'profesor-tarea-dialog-tipo-' + opt.value.toLowerCase()"
+						(click)="tipo = opt.value"
+					>
+						<i class="pi" [class]="opt.icon"></i>
+						<span>{{ opt.label }}</span>
+						<small>{{ opt.hint }}</small>
+					</button>
+				}
+			</div>
+		</div>
+
+		<div class="form-field">
+			<label for="tareaTitle" class="form-label">
+				<i class="pi pi-file-edit" style="font-size: 0.78rem"></i>
+				Título <span class="required-hint">(obligatorio)</span>
+			</label>
+			<input
+				eduInputText
+				id="tareaTitle"
+				[(ngModel)]="titulo"
+				[placeholder]="'Título de ' + etiqueta().toLowerCase()"
+				[maxlength]="200"
+				[attr.aria-invalid]="mostrarErrorTitulo() ? 'true' : null"
+				aria-describedby="tareaTitleError"
+				class="w-full"
+			/>
+			@if (mostrarErrorTitulo()) {
+				<small id="tareaTitleError" class="field-error" role="alert">
+					Escribe un título para crear {{ articulo() }} {{ etiqueta().toLowerCase() }}.
+				</small>
+			}
+		</div>
+
+		<div class="form-field">
+			<label for="tareaDesc" class="form-label">
+				<i class="pi pi-align-left" style="font-size: 0.78rem"></i>
+				Descripción
+			</label>
+			<textarea
+				eduTextarea
+				id="tareaDesc"
+				[(ngModel)]="descripcion"
+				[rows]="4"
+				[maxlength]="2000"
+				placeholder="Descripción e instrucciones de la tarea..."
+				[autoResize]="true"
+				class="w-full descripcion-field"
+			></textarea>
+		</div>
+
+		<div class="form-row">
+			<div class="form-field" style="flex: 1">
+				<label for="tareaFecha" class="form-label">
+					<i class="pi pi-calendar" style="font-size: 0.78rem"></i>
+					Fecha límite
+				</label>
+				<edu-datepicker
+					id="tareaFecha"
+					[(ngModel)]="fechaLimite"
+					[minDate]="minFechaLimite ?? undefined"
+					[showIcon]="true"
+					[showButtonBar]="true"
+					dateFormat="dd/mm/yy"
+					placeholder="Seleccionar fecha"
+					appendTo="body"
+					styleClass="w-full"
+				/>
+			</div>
+
+			<div class="form-field grupal-field">
+				<label class="form-label">
+					<i class="pi pi-users" style="font-size: 0.78rem"></i>
+					Modalidad
+				</label>
+				<div class="grupal-toggle">
+					<edu-toggle data-info-anchor="profesor-tarea-dialog-grupal-toggle" [(ngModel)]="esGrupal" />
+					<span class="grupal-label">{{ esGrupal ? 'Grupal' : 'Individual' }}</span>
+				</div>
+				<span class="field-hint">
+					{{ esGrupal ? 'La nota aplica a todo el grupo' : 'Cada estudiante entrega individualmente' }}
+				</span>
+			</div>
+		</div>
+
+		@if (tipo === 'EXAMEN') {
+			<div class="form-field">
+				<label for="tareaDuracion" class="form-label">
+					<i class="pi pi-clock" style="font-size: 0.78rem"></i>
+					Duración (minutos)
+				</label>
+				<input
+					eduInputText
+					id="tareaDuracion"
+					type="number"
+					min="5"
+					max="480"
+					[(ngModel)]="duracionMinutos"
+					placeholder="Ej: 45"
+					class="w-full"
+				/>
+				<span class="field-hint">Entre 5 y 480 minutos. Los estudiantes la ven junto a la fecha.</span>
+			</div>
+		}
+
+		<div class="task-eval-hint">
+			<i class="pi pi-info-circle"></i>
+			<span>Esto no se calificará automáticamente. Crea la evaluación correspondiente en Calificaciones.</span>
+		</div>
+	</div>
+
+	<ng-template #footer>
+		<div class="dialog-footer">
+			<edu-button label="Cancelar" [text]="true" data-info-anchor="profesor-tarea-dialog-cancelar" (click)="dlg.requestClose()" />
+			<edu-button
+				[label]="tarea() ? 'Guardar' : 'Crear'"
+				icon="pi pi-check"
+				data-info-anchor="profesor-tarea-dialog-guardar"
+				(click)="onSave()"
+				[loading]="saving()"
+			/>
+		</div>
+	</ng-template>
+</edu-dialog>

@@ -70,6 +70,12 @@
 															@if (semana.titulo) {
 																<span class="week-subtitle">{{ semana.titulo }}</span>
 															}
+															@if (semana.fechaInicio && semana.fechaFin) {
+																<span class="week-dates">
+																	<i class="pi pi-calendar"></i>
+																	{{ semana.fechaInicio | date: 'dd/MM' }} – {{ semana.fechaFin | date: 'dd/MM' }}
+																</span>
+															}
 														</div>
 														<div class="week-badges">
 															@if (semana.archivos.length > 0) {
@@ -78,10 +84,22 @@
 																	{{ semana.archivos.length }}
 																</span>
 															}
-															@if (semana.tareas.length > 0) {
-																<span class="mini-badge tasks">
+															@if (semana.tareas.length - contarExamenes(semana.tareas) > 0) {
+																<span class="mini-badge tasks" eduTooltip="Tareas y actividades" eduTooltipPosition="top">
 																	<i class="pi pi-file-edit"></i>
-																	{{ semana.tareas.length }}
+																	{{ semana.tareas.length - contarExamenes(semana.tareas) }}
+																</span>
+															}
+															@if (contarExamenes(semana.tareas) > 0) {
+																<span class="mini-badge exam" eduTooltip="Exámenes" eduTooltipPosition="top">
+																	<i class="pi pi-verified"></i>
+																	{{ contarExamenes(semana.tareas) }}
+																</span>
+															}
+															@if (proximaFechaLimite(semana.tareas); as proxima) {
+																<span class="mini-badge due" [class.due--pronto]="fechaLimiteEstado(proxima) === 'pronto'" eduTooltip="Próxima fecha límite" eduTooltipPosition="top">
+																	<i class="pi pi-clock"></i>
+																	{{ proxima | date: 'dd/MM' }}
 																</span>
 															}
 														</div>
@@ -91,16 +109,21 @@
 													<div class="semana-body">
 														<!-- Descripción y mensaje -->
 														@if (semana.descripcion || semana.mensajeDocente) {
-															<div class="semana-meta">
-																@if (semana.descripcion) {
-																	<p class="semana-desc">{{ semana.descripcion }}</p>
-																}
-																@if (semana.mensajeDocente) {
-																	<div class="teacher-message">
-																		<i class="pi pi-comment"></i>
-																		<span>{{ semana.mensajeDocente }}</span>
-																	</div>
-																}
+															<div class="semana-intro">
+																<div class="semana-intro__text">
+																	@if (semana.descripcion) {
+																		<p class="semana-desc">{{ semana.descripcion }}</p>
+																	}
+																	@if (semana.mensajeDocente) {
+																		<div class="teacher-message">
+																			<i class="pi pi-comment"></i>
+																			<div>
+																				<b>Mensaje del profesor</b>
+																				<span>{{ semana.mensajeDocente }}</span>
+																			</div>
+																		</div>
+																	}
+																</div>
 															</div>
 														}
 
@@ -109,62 +132,21 @@
 															<div class="section-header">
 																<div class="section-label">
 																	<i class="pi pi-paperclip"></i>
-																	Archivos
+																	Para estudiar
 																</div>
+																<span class="section-count">{{ semana.archivos.length }}</span>
 															</div>
 
 															@if (semana.archivos.length === 0) {
-																<div class="section-empty">Sin archivos adjuntos</div>
+																<div class="section-empty">Tu profesor aún no subió material esta semana</div>
 															} @else {
 																<div class="content-list">
 																	@for (archivo of semana.archivos; track archivo.id) {
-																		<app-file-row data-info-anchor="estudiante-curso-dialog-archivo-profesor" [name]="archivo.nombreArchivo" [mimeType]="archivo.tipoArchivo" [sizeBytes]="archivo.tamanoBytes" (open)="openArchivo(archivo)"></app-file-row>
-																	}
-																</div>
-															}
-														</div>
-														<!-- #endregion -->
-
-														<!-- #region Mis Archivos (estudiante) -->
-														<div class="section-block">
-															<div class="section-header">
-																<div class="section-label">
-																	<i class="pi pi-upload"></i>
-																	Mis archivos de la semana </div> <edu-file-upload data-info-anchor="estudiante-curso-dialog-mis-archivos-upload" mode="basic" chooseLabel="Subir a la semana"
-																	[customUpload]="true"
-																	[accept]="uploadAccept"
-																	[maxFileSize]="uploadMaxBytes"
-																	(uploadHandler)="onFilesSelected($event, semana.id)"
-																/>
-															</div>
-
-															<p class="section-hint" data-info-anchor="estudiante-curso-dialog-mis-archivos-ayuda">
-																Archivos personales de esta semana. No cuentan como entrega: las tareas se entregan dentro de cada tarea, en «Mi entrega».
-															</p>
-
-															@if (getMisArchivosSemana(semana.id).length === 0) {
-																<div class="section-empty">No has subido archivos</div>
-															} @else {
-																<div class="content-list">
-																	@for (archivo of getMisArchivosSemana(semana.id); track archivo.id) {
-																		<app-file-row data-info-anchor="estudiante-curso-dialog-mi-archivo" [name]="archivo.nombreArchivo" [mimeType]="archivo.tipoArchivo" [sizeBytes]="archivo.tamanoBytes" (open)="openArchivo(archivo)">
-<span actions><edu-button
-																					icon="pi pi-trash"
-																					[text]="true"
-																					[rounded]="true"
-																					size="small"
-																					severity="danger"
-																					eduTooltip="Eliminar"
-																					eduTooltipPosition="top"
-																					data-info-anchor="estudiante-curso-dialog-mi-archivo-eliminar"
-																					(click)="onDeleteMiArchivo(semana.id, archivo)"
-																					[pt]="{
-																						root: {
-																							'aria-label': 'Eliminar archivo',
-																						},
-																					}"
-																				/></span>
-</app-file-row>
+																		<app-file-row data-info-anchor="estudiante-curso-dialog-archivo-profesor" [name]="archivo.nombreArchivo" [mimeType]="archivo.tipoArchivo" [sizeBytes]="archivo.tamanoBytes" (open)="openArchivo(archivo)">
+																			@if (archivo.tipo === 'COMPLEMENTARIO') {
+																				<span actions><span class="tipo-tag tipo-tag--compl">Complementario</span></span>
+																			}
+																		</app-file-row>
 																	}
 																</div>
 															}
@@ -176,18 +158,29 @@
 															<div class="section-header">
 																<div class="section-label">
 																	<i class="pi pi-file-edit"></i>
-																	Tareas
+																	Para entregar
 																</div>
+																<span class="section-count">{{ semana.tareas.length }}</span>
 															</div>
 
 															@if (semana.tareas.length === 0) {
-																<div class="section-empty">Sin tareas asignadas</div>
+																<div class="section-empty">No tienes nada para entregar esta semana</div>
 															} @else {
 																<div class="content-list">
 																	@for (tarea of semana.tareas; track tarea.id) {
 																		<div class="content-row">
-																			<div class="row-icon tarea">
-																				<i class="pi pi-file-edit"></i>
+																			<div
+																				class="row-icon tarea"
+																				[class.row-icon--grupal]="tarea.esGrupal && tarea.tipo !== 'EXAMEN'"
+																				[class.row-icon--examen]="tarea.tipo === 'EXAMEN'"
+																			>
+																				<i
+																					class="pi"
+																					[class.pi-verified]="tarea.tipo === 'EXAMEN'"
+																					[class.pi-users]="tarea.esGrupal && tarea.tipo !== 'EXAMEN'"
+																					[class.pi-pencil]="!tarea.esGrupal && tarea.tipo === 'ACTIVIDAD'"
+																					[class.pi-file-edit]="!tarea.esGrupal && tarea.tipo !== 'ACTIVIDAD' && tarea.tipo !== 'EXAMEN'"
+																				></i>
 																			</div>
 																			<div class="row-info">
 																				<strong>
@@ -200,7 +193,16 @@
 																					<span class="tarea-desc">{{ tarea.descripcion }}</span>
 																				}
 																				<div class="tarea-meta">
-<span class="tarea-fecha" data-info-anchor="estudiante-curso-dialog-tarea-fecha">
+<span class="kind" [class.kind--grupal]="tarea.esGrupal" [class.kind--examen]="tarea.tipo === 'EXAMEN'">{{ tareaEtiqueta(tarea) }}</span>
+@if (tarea.tipo === 'EXAMEN' && tarea.duracionMinutos) {
+<span class="tarea-fecha"><i class="pi pi-clock" style="font-size: 0.65rem"></i> {{ tarea.duracionMinutos }} min</span>
+}
+<span
+class="tarea-fecha"
+[class.due-date--pronto]="fechaLimiteEstado(tarea.fechaLimite) === 'pronto'"
+[class.due-date--vencida]="fechaLimiteEstado(tarea.fechaLimite) === 'vencida'"
+data-info-anchor="estudiante-curso-dialog-tarea-fecha"
+>
 <i class="pi pi-calendar" style="font-size: 0.65rem"></i>
 @if (tarea.fechaLimite) {
 Entrega hasta {{ tarea.fechaLimite | date: 'dd/MM/yyyy' }}
@@ -272,6 +274,52 @@ Sin fecha límite
 																				</div>
 																			}
 																		</div>
+																	}
+																</div>
+															}
+														</div>
+														<!-- #endregion -->
+
+														<!-- #region Mis Archivos (estudiante) -->
+														<div class="section-block">
+															<div class="section-header">
+																<div class="section-label">
+																	<i class="pi pi-upload"></i>
+																	Mis archivos de la semana </div> <edu-file-upload data-info-anchor="estudiante-curso-dialog-mis-archivos-upload" mode="basic" chooseLabel="Subir a la semana"
+																	[customUpload]="true"
+																	[accept]="uploadAccept"
+																	[maxFileSize]="uploadMaxBytes"
+																	(uploadHandler)="onFilesSelected($event, semana.id)"
+																/>
+															</div>
+
+															<p class="section-hint" data-info-anchor="estudiante-curso-dialog-mis-archivos-ayuda">
+																Archivos personales de esta semana. No cuentan como entrega: las tareas se entregan dentro de cada tarea, en «Mi entrega».
+															</p>
+
+															@if (getMisArchivosSemana(semana.id).length === 0) {
+																<div class="section-empty">No has subido archivos</div>
+															} @else {
+																<div class="content-list">
+																	@for (archivo of getMisArchivosSemana(semana.id); track archivo.id) {
+																		<app-file-row data-info-anchor="estudiante-curso-dialog-mi-archivo" [name]="archivo.nombreArchivo" [mimeType]="archivo.tipoArchivo" [sizeBytes]="archivo.tamanoBytes" (open)="openArchivo(archivo)">
+<span actions><edu-button
+																					icon="pi pi-trash"
+																					[text]="true"
+																					[rounded]="true"
+																					size="small"
+																					severity="danger"
+																					eduTooltip="Eliminar"
+																					eduTooltipPosition="top"
+																					data-info-anchor="estudiante-curso-dialog-mi-archivo-eliminar"
+																					(click)="onDeleteMiArchivo(semana.id, archivo)"
+																					[pt]="{
+																						root: {
+																							'aria-label': 'Eliminar archivo',
+																						},
+																					}"
+																				/></span>
+</app-file-row>
 																	}
 																</div>
 															}

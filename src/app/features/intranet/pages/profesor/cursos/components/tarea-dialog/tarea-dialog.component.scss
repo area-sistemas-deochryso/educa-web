@@ -1,0 +1,120 @@
+.edit-form {
+	display: flex;
+	flex-direction: column;
+	gap: 1.25rem;
+	padding: 0.5rem 1rem;
+}
+.form-row {
+	display: flex;
+	gap: 1rem;
+	align-items: flex-start;
+}
+.form-field {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+.form-label {
+	font-size: 0.82rem;
+	font-weight: 600;
+	color: var(--text-color);
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+	i {
+		color: var(--text-color-secondary);
+	}
+}
+.tipo-options {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 0.5rem;
+}
+.tipo-option {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 0.1rem;
+	padding: 0.55rem 0.7rem;
+	font: inherit;
+	text-align: left;
+	color: var(--text-color);
+	background: var(--surface-card, #fff);
+	border: 1px solid var(--surface-border, #e5e7eb);
+	border-radius: 8px;
+	cursor: pointer;
+	i {
+		color: var(--text-color-secondary);
+	}
+	span {
+		font-size: 0.82rem;
+		font-weight: 600;
+	}
+	small {
+		font-size: 0.7rem;
+		color: var(--text-color-secondary);
+		line-height: 1.25;
+	}
+	&[aria-checked='true'] {
+		border-color: var(--accent-interactive);
+		background: var(--primary-50, rgba(16, 185, 129, 0.08));
+		i {
+			color: var(--primary-600);
+		}
+	}
+	&:focus-visible {
+		outline: 2px solid var(--accent-interactive);
+		outline-offset: 2px;
+	}
+}
+.grupal-field {
+	min-width: 140px;
+}
+.grupal-toggle {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+.grupal-label {
+	font-size: 0.82rem;
+	font-weight: 500;
+	color: var(--text-color);
+}
+.required-hint {
+	font-weight: 400;
+	color: var(--text-color-secondary);
+}
+.field-error {
+	color: var(--red-500, #dc2626);
+}
+/* 4 líneas reales aunque el autoajuste mida con el overlay aún sin layout */
+.descripcion-field {
+	min-height: 6.5rem;
+}
+.field-hint {
+	font-size: 0.72rem;
+	color: var(--text-color-secondary);
+}
+.task-eval-hint {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	font-size: 0.78rem;
+	color: var(--text-color-secondary);
+	i {
+		font-size: 0.9rem;
+	}
+}
+.dialog-footer {
+	display: flex;
+	justify-content: flex-end;
+	gap: 0.5rem;
+}
+@media (max-width: 640px) {
+	.form-row {
+		flex-direction: column;
+	}
+	.tipo-options {
+		grid-template-columns: 1fr;
+	}
+}

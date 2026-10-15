@@ -61,9 +61,10 @@ describe('SemanasAccordionComponent', () => {
 	const el = () => fixture.nativeElement as HTMLElement;
 	const file = (name: string, size = 1024) => ({ name, size }) as File;
 
-	it('renderiza archivos de semana y de tarea con app-file-row y subida con edu-file-upload', () => {
+	it('renderiza archivos de semana y de tarea con app-file-row; la subida de material va por el menú Agregar y la de tarea por edu-file-upload', () => {
 		expect(el().querySelectorAll('app-file-row').length).toBe(2);
-		expect(el().querySelectorAll('edu-file-upload').length).toBe(2);
+		expect(el().querySelectorAll('edu-file-upload').length).toBe(1);
+		expect(el().querySelector('input[type="file"]')).not.toBeNull();
 	});
 
 	it('(open) delega en el visor compartido con name y url del archivo', () => {
@@ -149,5 +150,122 @@ describe('SemanasAccordionComponent — semana vigente (P110-F14)', () => {
 
 		expect(component.openPanels()).toEqual([]);
 		expect(el.querySelector('[data-semana-vigente]')).toBeNull();
+	});
+});
+
+describe('SemanasAccordionComponent — rediseño (vista estudiante, estado de fecha)', () => {
+	function create() {
+		TestBed.configureTestingModule({
+			imports: [SemanasAccordionComponent],
+			providers: [
+				{ provide: CursoContenidoUiFacade, useValue: { vm: signal({ semanas, contenido: { semanaVigente: 1 } }) } },
+				{ provide: CursoContenidoDataFacade, useValue: { refreshContenido: vi.fn() } },
+				{ provide: CursoContenidoCrudFacade, useValue: {} },
+				{ provide: ErrorHandlerService, useValue: { showWarning: vi.fn() } },
+			],
+		});
+		const fixture = TestBed.createComponent(SemanasAccordionComponent);
+		fixture.componentInstance.openPanels.set([1]);
+		fixture.detectChanges();
+		return { fixture, component: fixture.componentInstance, el: fixture.nativeElement as HTMLElement };
+	}
+
+	it('vista estudiante oculta los controles de edición', () => {
+		const { fixture, component, el } = create();
+		expect(el.querySelector('[data-info-anchor="profesor-semanas-editar"]')).not.toBeNull();
+		expect(el.querySelector('[data-info-anchor="profesor-semanas-agregar"]')).not.toBeNull();
+
+		component.studentView.set(true);
+		fixture.detectChanges();
+
+		expect(el.querySelector('[data-info-anchor="profesor-semanas-editar"]')).toBeNull();
+		expect(el.querySelector('[data-info-anchor="profesor-semanas-agregar"]')).toBeNull();
+		expect(el.querySelector('[data-info-anchor="profesor-semanas-tarea-eliminar"]')).toBeNull();
+		expect(el.querySelector('.student-banner')).not.toBeNull();
+	});
+
+	it('clasifica la fecha límite: vencida, pronto y normal', () => {
+		const { component } = create();
+		const dia = 86_400_000;
+		expect(component.fechaLimiteEstado(null)).toBe('normal');
+		expect(component.fechaLimiteEstado(new Date(Date.now() - dia).toISOString())).toBe('vencida');
+		expect(component.fechaLimiteEstado(new Date(Date.now() + dia).toISOString())).toBe('pronto');
+		expect(component.fechaLimiteEstado(new Date(Date.now() + 10 * dia).toISOString())).toBe('normal');
+	});
+
+	it('el filtro "Para estudiar" oculta el bloque de tareas', () => {
+		const { fixture, component, el } = create();
+		component.filtro.set('study');
+		fixture.detectChanges();
+		const bloques = Array.from(el.querySelectorAll('.section-label')).map((n) => n.textContent?.trim());
+		expect(bloques).toEqual(['Para estudiar']);
+	});
+});
+
+describe('SemanasAccordionComponent — tipos y borradores', () => {
+	const semanasMixtas = [
+		{
+			id: 1,
+			numeroSemana: 1,
+			titulo: null,
+			publicado: true,
+			archivos: [
+				{ id: 1, nombreArchivo: 'clase.pdf', urlArchivo: 'u', tipoArchivo: null, tamanoBytes: 1, fechaReg: '2026-10-01', tipo: 'CLASE', publicado: true },
+				{ id: 2, nombreArchivo: 'oculto.pdf', urlArchivo: 'u', tipoArchivo: null, tamanoBytes: 1, fechaReg: '2026-10-01', tipo: 'COMPLEMENTARIO', publicado: false },
+			],
+			tareas: [
+				{ id: 10, titulo: 'Parcial', descripcion: null, fechaLimite: null, esGrupal: false, fechaReg: '2026-10-01', archivos: [], tipo: 'EXAMEN', duracionMinutos: 45, publicado: false, entregasRecibidas: 0, entregasEsperadas: 30 },
+				{ id: 11, titulo: 'Maqueta', descripcion: null, fechaLimite: null, esGrupal: true, fechaReg: '2026-10-01', archivos: [], tipo: 'ACTIVIDAD', publicado: true, entregasRecibidas: 3, entregasEsperadas: 8 },
+			],
+		},
+		{ id: 2, numeroSemana: 2, titulo: null, publicado: false, archivos: [], tareas: [] },
+	];
+
+	function create() {
+		TestBed.configureTestingModule({
+			imports: [SemanasAccordionComponent],
+			providers: [
+				{ provide: CursoContenidoUiFacade, useValue: { vm: signal({ semanas: semanasMixtas, contenido: { semanaVigente: 1 } }) } },
+				{ provide: CursoContenidoDataFacade, useValue: { refreshContenido: vi.fn() } },
+				{ provide: CursoContenidoCrudFacade, useValue: {} },
+				{ provide: ErrorHandlerService, useValue: { showWarning: vi.fn() } },
+			],
+		});
+		const fixture = TestBed.createComponent(SemanasAccordionComponent);
+		fixture.componentInstance.openPanels.set([1]);
+		fixture.detectChanges();
+		return { fixture, component: fixture.componentInstance, el: fixture.nativeElement as HTMLElement };
+	}
+
+	it('el docente ve borradores y el resumen cuenta el examen aparte de los trabajos', () => {
+		const { component, el } = create();
+		expect(el.textContent).toContain('oculto.pdf');
+		expect(el.textContent).toContain('Parcial');
+		expect(el.textContent).toContain('3/8');
+		expect(el.textContent).toContain('Examen');
+		expect(component.resumenes().get(1)).toMatchObject({ examenes: 1, individuales: 0, grupales: 1 });
+		expect(component.semanasVista().length).toBe(2);
+	});
+
+	it('la vista estudiante oculta semanas, archivos y tareas en borrador', () => {
+		const { fixture, component, el } = create();
+		component.studentView.set(true);
+		fixture.detectChanges();
+
+		expect(component.semanasVista().map((s) => s.numeroSemana)).toEqual([1]);
+		expect(el.textContent).toContain('clase.pdf');
+		expect(el.textContent).not.toContain('oculto.pdf');
+		expect(el.textContent).not.toContain('Parcial');
+		expect(el.textContent).toContain('Maqueta');
+		expect(el.textContent).not.toContain('3/8');
+	});
+
+	it('etiqueta cada tipo de trabajo y calcula el porcentaje de entregas', () => {
+		const { component } = create();
+		const [examen, actividad] = semanasMixtas[0].tareas as never[];
+		expect(component.tareaEtiqueta(examen)).toBe('Examen');
+		expect(component.tareaEtiqueta(actividad)).toBe('Actividad grupal');
+		expect(component.entregasPorcentaje(actividad)).toBe(38);
+		expect(component.entregasPorcentaje({ ...(actividad as object), entregasEsperadas: 0 } as never)).toBeNull();
 	});
 });

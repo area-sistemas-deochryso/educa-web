@@ -1,5 +1,13 @@
-<!-- #region Refresh button -->
-<div style="display: flex; justify-content: flex-end; align-items: center; gap: 0.25rem; margin-bottom: 0.5rem">
+<!-- #region Toolbar -->
+<div class="top-toolbar">
+	<edu-button
+		[label]="studentView() ? 'Volver a vista docente' : 'Vista estudiante'"
+		[icon]="studentView() ? 'pi pi-pencil' : 'pi pi-eye'"
+		[text]="true"
+		size="small"
+		data-info-anchor="profesor-semanas-vista-estudiante"
+		(click)="studentView.set(!studentView())"
+	/>
 	<edu-button
 		icon="pi pi-refresh"
 		[text]="true"
@@ -15,6 +23,12 @@
 	<!-- Acciones extra del anfitrión (ej. el menú ⋯ del hub), junto al botón de refrescar. -->
 	<ng-content select="[toolbarActions]" />
 </div>
+@if (studentView()) {
+	<div class="student-banner" role="status">
+		<i class="pi pi-eye"></i>
+		Así ven este curso los estudiantes. Los controles de edición están ocultos.
+	</div>
+}
 <!-- #endregion -->
 
 <!-- #region Search bar -->
@@ -40,8 +54,20 @@
 </div>
 <!-- #endregion -->
 
+<!-- Menú y selector de archivo compartidos por todas las semanas (la semana activa se fija al abrir el menú). -->
+<edu-menu #addMenu [model]="addMenuItems" [popup]="true" appendTo="body" />
+<input
+	#materialInput
+	type="file"
+	class="visually-hidden"
+	tabindex="-1"
+	aria-hidden="true"
+	[accept]="uploadAccept"
+	(change)="onMaterialSelected($event)"
+/>
+
 <!-- #region Accordion de semanas -->
-@if (filteredSemanas().length === 0) {
+@if (semanasVista().length === 0) {
 	<div class="empty-state">
 		<i class="pi pi-search"></i>
 		<p>No se encontraron semanas</p>
@@ -49,84 +75,175 @@
 } @else {
 	<div class="weeks-accordion">
 		<edu-accordion [multiple]="true" [value]="openPanelsStr()" (valueChange)="onOpenPanelsChangeStr($any($event))">
-			@for (semana of filteredSemanas(); track semana.id) {
+			@for (semana of semanasVista(); track semana.id) {
+				@let resumen = resumenes().get(semana.id);
 				<edu-accordion-panel [value]="semana.id.toString()">
 					<edu-accordion-header data-info-anchor="profesor-semanas-accordion-header">
-						<div class="week-header" [class.week-header--vigente]="semana.id === semanaVigenteId()" [attr.data-semana-vigente]="semana.id === semanaVigenteId() ? 'true' : null">
+						<div
+							class="week-header"
+							[class.week-header--vigente]="semana.id === semanaVigenteId()"
+							[class.week-header--pasada]="resumen?.estado === 'pasada'"
+							[attr.data-semana-vigente]="semana.id === semanaVigenteId() ? 'true' : null"
+						>
 							<span class="week-number">{{ semana.numeroSemana }}</span>
 							<div class="week-title-group">
 								<span class="week-label">Semana {{ semana.numeroSemana }}</span>
 								@if (semana.id === semanaVigenteId()) {
 									<span class="week-vigente-tag">Semana actual</span>
 								}
+								@if (semana.publicado === false && !studentView()) {
+									<span class="draft-tag" eduTooltip="Los estudiantes no ven esta semana" eduTooltipPosition="top">Borrador</span>
+								}
 								@if (semana.titulo) {
 									<span class="week-subtitle">{{ semana.titulo }}</span>
+								}
+								@if (semana.fechaInicio && semana.fechaFin) {
+									<span class="week-dates">
+										<i class="pi pi-calendar"></i>
+										{{ semana.fechaInicio | date: 'dd/MM' }} – {{ semana.fechaFin | date: 'dd/MM' }}
+									</span>
 								}
 							</div>
 							<div class="week-badges">
 								@if (semana.archivos.length > 0) {
-									<span class="mini-badge files">
+									<span class="mini-badge files" eduTooltip="Materiales" eduTooltipPosition="top">
 										<i class="pi pi-paperclip"></i>
 										{{ semana.archivos.length }}
 									</span>
 								}
-								@if (semana.tareas.length > 0) {
-									<span class="mini-badge tasks">
-										<i class="pi pi-file-edit"></i>
-										{{ semana.tareas.length }}
+								@if (resumen && resumen.individuales > 0) {
+									<span class="mini-badge tasks" eduTooltip="Tareas individuales" eduTooltipPosition="top">
+										<i class="pi pi-user"></i>
+										{{ resumen.individuales }}
 									</span>
+								}
+								@if (resumen && resumen.grupales > 0) {
+									<span class="mini-badge group" eduTooltip="Tareas grupales" eduTooltipPosition="top">
+										<i class="pi pi-users"></i>
+										{{ resumen.grupales }}
+									</span>
+								}
+								@if (resumen && resumen.examenes > 0) {
+									<span class="mini-badge exam" eduTooltip="Exámenes" eduTooltipPosition="top">
+										<i class="pi pi-verified"></i>
+										{{ resumen.examenes }}
+									</span>
+								}
+								@if (resumen?.proximaFecha; as proxima) {
+									<span class="mini-badge due" [class.due--pronto]="fechaLimiteEstado(proxima) === 'pronto'" eduTooltip="Próxima fecha límite" eduTooltipPosition="top">
+										<i class="pi pi-clock"></i>
+										{{ proxima | date: 'dd/MM' }}
+									</span>
+								}
+								@if (semana.archivos.length === 0 && semana.tareas.length === 0) {
+									<span class="mini-badge empty">Sin contenido</span>
 								}
 							</div>
 						</div>
 					</edu-accordion-header>
-					
-						<div class="semana-body">
-							<!-- Descripción y mensaje -->
-							@if (semana.descripcion || semana.mensajeDocente) {
-								<div class="semana-meta">
+
+					<div class="semana-body">
+						<!-- Descripción, mensaje y edición -->
+						@if (semana.descripcion || semana.mensajeDocente || !studentView()) {
+							<div class="semana-intro">
+								<div class="semana-intro__text">
 									@if (semana.descripcion) {
 										<p class="semana-desc">{{ semana.descripcion }}</p>
+									} @else if (!studentView()) {
+										<p class="semana-desc semana-desc--placeholder">Agrega una descripción para que los estudiantes sepan qué verán esta semana.</p>
 									}
 									@if (semana.mensajeDocente) {
 										<div class="teacher-message">
 											<i class="pi pi-comment"></i>
-											<span>{{ semana.mensajeDocente }}</span>
+											<div>
+												<b>Mensaje del profesor</b>
+												<span>{{ semana.mensajeDocente }}</span>
+											</div>
 										</div>
 									}
 								</div>
-							}
+								@if (!studentView()) {
+									<edu-button
+										class="edit-semana-link"
+										[icon]="semana.publicado === false ? 'pi pi-eye-slash' : 'pi pi-eye'"
+										[text]="true"
+										[rounded]="true"
+										size="small"
+										data-info-anchor="profesor-semanas-publicar"
+										[eduTooltip]="semana.publicado === false ? 'Es un borrador: clic para publicar la semana' : 'Publicada: clic para pasarla a borrador'"
+										eduTooltipPosition="top"
+										[pt]="{ root: { 'aria-label': semana.publicado === false ? 'Publicar semana ' + semana.numeroSemana : 'Pasar a borrador la semana ' + semana.numeroSemana } }"
+										(click)="togglePublicacionSemana(semana); $event.stopPropagation()"
+									/>
+									<edu-button
+										class="edit-semana-link"
+										icon="pi pi-pencil"
+										[text]="true"
+										[rounded]="true"
+										size="small"
+										data-info-anchor="profesor-semanas-editar"
+										eduTooltip="Editar semana"
+										eduTooltipPosition="top"
+										[pt]="{ root: { 'aria-label': 'Editar semana ' + semana.numeroSemana } }"
+										(click)="onEditSemana(semana); $event.stopPropagation()"
+									/>
+								}
+							</div>
+						}
 
-							<!-- Editar semana -->
-							<edu-button
-								class="edit-semana-link"
-								label="Editar semana"
-								icon="pi pi-pencil"
-								[text]="true"
-								size="small"
-								data-info-anchor="profesor-semanas-editar"
-								(click)="onEditSemana(semana); $event.stopPropagation()"
-							/>
+						<!-- Filtro y acción principal -->
+						@if (semana.archivos.length > 0 || semana.tareas.length > 0 || !studentView()) {
+							<div class="semana-toolbar">
+								<div class="filter-chips" role="group" aria-label="Filtrar contenido">
+									<button type="button" class="chip" [attr.aria-pressed]="filtro() === 'all'" (click)="filtro.set('all')">
+										Todo <b>{{ semana.archivos.length + semana.tareas.length }}</b>
+									</button>
+									<button type="button" class="chip" [attr.aria-pressed]="filtro() === 'study'" (click)="filtro.set('study')">
+										Para estudiar <b>{{ semana.archivos.length }}</b>
+									</button>
+									<button type="button" class="chip" [attr.aria-pressed]="filtro() === 'deliver'" (click)="filtro.set('deliver')">
+										Para entregar <b>{{ semana.tareas.length }}</b>
+									</button>
+								</div>
+								@if (!studentView()) {
+									<edu-button
+										label="Agregar"
+										icon="pi pi-plus"
+										size="small"
+										data-info-anchor="profesor-semanas-agregar"
+										(click)="openAddMenu($event, semana)"
+									/>
+								}
+							</div>
+						}
 
-							<!-- #region Archivos -->
+						<!-- #region Para estudiar (archivos) -->
+						@if (filtro() !== 'deliver' && (semana.archivos.length > 0 || !studentView())) {
 							<div class="section-block">
 								<div class="section-header">
 									<div class="section-label">
 										<i class="pi pi-paperclip"></i>
-										Archivos
+										Para estudiar
 									</div>
-									<edu-file-upload
-										data-info-anchor="profesor-semanas-subir-archivo"
-										mode="basic"
-										chooseLabel="Subir archivo"
-										[customUpload]="true"
-										[accept]="uploadAccept"
-										[maxFileSize]="uploadMaxBytes"
-										(uploadHandler)="onFilesSelected($event, semana.id)"
-									/>
+									<span class="section-count">{{ semana.archivos.length }}</span>
 								</div>
 
 								@if (semana.archivos.length === 0) {
-									<div class="section-empty">Sin archivos adjuntos</div>
+									<div class="empty-block">
+										<span class="empty-block__icon"><i class="pi pi-paperclip"></i></span>
+										<div class="empty-block__text">
+											<b>Aún no hay material</b>
+											<span>Sube presentaciones, guías o lecturas para esta semana.</span>
+										</div>
+										<edu-button
+											label="Subir material"
+											icon="pi pi-upload"
+											size="small"
+											severity="secondary"
+											data-info-anchor="profesor-semanas-subir-archivo"
+											(click)="onSubirMaterial(semana)"
+										/>
+									</div>
 								} @else {
 									<div class="content-list">
 										@for (archivo of semana.archivos; track archivo.id) {
@@ -138,177 +255,254 @@
 												(open)="openArchivo(archivo)"
 											>
 												<span actions>
-													<edu-button
-														icon="pi pi-trash"
-														[text]="true"
-														[rounded]="true"
-														size="small"
-														severity="danger"
-														eduTooltip="Eliminar"
-														eduTooltipPosition="top"
-														data-info-anchor="profesor-semanas-archivo-eliminar"
-														(click)="onDeleteArchivo(semana.id, archivo.id, archivo.nombreArchivo)"
-														[pt]="{
-															root: {
-																'aria-label': 'Eliminar archivo',
-															},
-														}"
-													/>
+													@if (archivo.tipo === 'COMPLEMENTARIO') {
+														<span class="tipo-tag tipo-tag--compl">Complementario</span>
+													}
+													@if (!studentView()) {
+														@if (archivo.publicado === false) {
+															<span class="draft-tag">Borrador</span>
+														}
+														<edu-button
+															[icon]="archivo.publicado === false ? 'pi pi-eye-slash' : 'pi pi-eye'"
+															[text]="true"
+															[rounded]="true"
+															size="small"
+															[eduTooltip]="archivo.publicado === false ? 'Publicar' : 'Pasar a borrador'"
+															eduTooltipPosition="top"
+															data-info-anchor="profesor-semanas-archivo-publicar"
+															(click)="togglePublicacionArchivo(semana.id, archivo)"
+															[pt]="{ root: { 'aria-label': archivo.publicado === false ? 'Publicar archivo' : 'Pasar archivo a borrador' } }"
+														/>
+														<edu-button
+															icon="pi pi-trash"
+															[text]="true"
+															[rounded]="true"
+															size="small"
+															severity="danger"
+															eduTooltip="Eliminar"
+															eduTooltipPosition="top"
+															data-info-anchor="profesor-semanas-archivo-eliminar"
+															(click)="onDeleteArchivo(semana.id, archivo.id, archivo.nombreArchivo)"
+															[pt]="{
+																root: {
+																	'aria-label': 'Eliminar archivo',
+																},
+															}"
+														/>
+													}
 												</span>
 											</app-file-row>
 										}
 									</div>
 								}
 							</div>
-							<!-- #endregion -->
+						}
+						<!-- #endregion -->
 
-							<!-- #region Tareas -->
+						<!-- #region Para entregar (tareas) -->
+						@if (filtro() !== 'study' && (semana.tareas.length > 0 || !studentView())) {
 							<div class="section-block">
 								<div class="section-header">
 									<div class="section-label">
 										<i class="pi pi-file-edit"></i>
-										Tareas
+										Para entregar
 									</div>
-									<edu-button
-										label="Agregar tarea"
-										icon="pi pi-plus"
-										size="small"
-										data-info-anchor="profesor-semanas-agregar-tarea"
-										(click)="setActiveSemanaForTarea(semana); onAddTarea()"
-									/>
+									<span class="section-count">{{ semana.tareas.length }}</span>
 								</div>
 
 								@if (semana.tareas.length === 0) {
-									<div class="section-empty">Sin tareas asignadas</div>
+									<div class="empty-block">
+										<span class="empty-block__icon"><i class="pi pi-file-edit"></i></span>
+										<div class="empty-block__text">
+											<b>Sin tareas asignadas</b>
+											<span>Crea una tarea, una actividad o un examen con fecha.</span>
+										</div>
+										<edu-button
+											label="Crear tarea"
+											icon="pi pi-plus"
+											size="small"
+											severity="secondary"
+											data-info-anchor="profesor-semanas-agregar-tarea"
+											(click)="setActiveSemanaForTarea(semana); onAddTarea()"
+										/>
+									</div>
 								} @else {
 									<div class="content-list">
 										@for (tarea of semana.tareas; track tarea.id) {
+											@let estadoFecha = fechaLimiteEstado(tarea.fechaLimite);
 											<div class="content-row">
-												<div class="row-icon tarea">
-													<i class="pi pi-file-edit"></i>
+												<div
+													class="row-icon tarea"
+													[class.row-icon--grupal]="tarea.esGrupal && tarea.tipo !== 'EXAMEN'"
+													[class.row-icon--examen]="tarea.tipo === 'EXAMEN'"
+												>
+													<i
+														class="pi"
+														[class.pi-verified]="tarea.tipo === 'EXAMEN'"
+														[class.pi-users]="tarea.esGrupal && tarea.tipo !== 'EXAMEN'"
+														[class.pi-pencil]="!tarea.esGrupal && tarea.tipo === 'ACTIVIDAD'"
+														[class.pi-file-edit]="!tarea.esGrupal && tarea.tipo !== 'ACTIVIDAD' && tarea.tipo !== 'EXAMEN'"
+													></i>
 												</div>
 												<div class="row-info">
-													<strong>{{ tarea.titulo }}</strong>
-													@if (tarea.fechaLimite) {
-														<span>
-															<i
-																class="pi pi-calendar"
-																style="font-size: 0.65rem"
-															></i>
-															{{ tarea.fechaLimite | date: 'dd/MM/yyyy' }}
-														</span>
-													}
+													<strong>
+														{{ tarea.titulo }}
+														@if (tarea.publicado === false && !studentView()) {
+															<span class="draft-tag">Borrador</span>
+														}
+													</strong>
+													<span class="row-meta">
+														<span class="kind" [class.kind--grupal]="tarea.esGrupal" [class.kind--examen]="tarea.tipo === 'EXAMEN'">{{ tareaEtiqueta(tarea) }}</span>
+														@if (tarea.tipo === 'EXAMEN' && tarea.duracionMinutos) {
+															<span class="due-date"><i class="pi pi-clock"></i> {{ tarea.duracionMinutos }} min</span>
+														}
+														@if (tarea.fechaLimite) {
+															<span class="due-date" [class.due-date--pronto]="estadoFecha === 'pronto'" [class.due-date--vencida]="estadoFecha === 'vencida'">
+																<i class="pi pi-calendar"></i>
+																@if (estadoFecha === 'vencida') {
+																	Venció el {{ tarea.fechaLimite | date: 'dd/MM/yyyy' }}
+																} @else {
+																	Vence el {{ tarea.fechaLimite | date: 'dd/MM/yyyy' }}
+																}
+															</span>
+														}
+													</span>
 												</div>
+												@if (!studentView() && entregasPorcentaje(tarea) !== null) {
+													<div class="entregas" [attr.aria-label]="'Entregas: ' + tarea.entregasRecibidas + ' de ' + tarea.entregasEsperadas">
+														<div class="entregas__nums"><span>Entregas</span><b>{{ tarea.entregasRecibidas }}/{{ tarea.entregasEsperadas }}</b></div>
+														<div class="entregas__track"><i [style.width.%]="entregasPorcentaje(tarea)"></i></div>
+													</div>
+												}
 												<div class="row-actions">
-													<edu-button
-														icon="pi pi-users"
-														[text]="true"
-														[rounded]="true"
-														size="small"
-														eduTooltip="Ver entregas de estudiantes"
-														eduTooltipPosition="top"
-														data-info-anchor="profesor-semanas-tarea-ver-entregas"
-														(click)="onViewTaskSubmissions(tarea)"
-														[pt]="{
-															root: {
-																'aria-label': 'Ver entregas de estudiantes',
-															},
-														}"
-													/>
-													<edu-button
-														icon="pi pi-pencil"
-														[text]="true"
-														[rounded]="true"
-														size="small"
-														eduTooltip="Editar"
-														eduTooltipPosition="top"
-														data-info-anchor="profesor-semanas-tarea-editar"
-														(click)="
-															setActiveSemanaForTarea(semana);
-															onEditTarea(tarea)
-														"
-														[pt]="{
-															root: {
-																'aria-label': 'Editar tarea',
-															},
-														}"
-													/>
-													<edu-button
-														icon="pi pi-trash"
-														[text]="true"
-														[rounded]="true"
-														size="small"
-														severity="danger"
-														eduTooltip="Eliminar"
-														eduTooltipPosition="top"
-														data-info-anchor="profesor-semanas-tarea-eliminar"
-														(click)="
-															onDeleteTarea(
-																semana.id,
-																tarea.id,
-																tarea.titulo
-															)
-														"
-														[pt]="{
-															root: {
-																'aria-label': 'Eliminar tarea',
-															},
-														}"
-													/>
+													@if (!studentView()) {
+														<edu-button
+															[icon]="tarea.publicado === false ? 'pi pi-eye-slash' : 'pi pi-eye'"
+															[text]="true"
+															[rounded]="true"
+															size="small"
+															[eduTooltip]="tarea.publicado === false ? 'Publicar' : 'Pasar a borrador'"
+															eduTooltipPosition="top"
+															data-info-anchor="profesor-semanas-tarea-publicar"
+															(click)="togglePublicacionTarea(semana.id, tarea)"
+															[pt]="{ root: { 'aria-label': tarea.publicado === false ? 'Publicar' : 'Pasar a borrador' } }"
+														/>
+														<edu-button
+															icon="pi pi-users"
+															[text]="true"
+															[rounded]="true"
+															size="small"
+															eduTooltip="Ver entregas de estudiantes"
+															eduTooltipPosition="top"
+															data-info-anchor="profesor-semanas-tarea-ver-entregas"
+															(click)="onViewTaskSubmissions(tarea)"
+															[pt]="{
+																root: {
+																	'aria-label': 'Ver entregas de estudiantes',
+																},
+															}"
+														/>
+														<edu-button
+															icon="pi pi-pencil"
+															[text]="true"
+															[rounded]="true"
+															size="small"
+															eduTooltip="Editar"
+															eduTooltipPosition="top"
+															data-info-anchor="profesor-semanas-tarea-editar"
+															(click)="
+																setActiveSemanaForTarea(semana);
+																onEditTarea(tarea)
+															"
+															[pt]="{
+																root: {
+																	'aria-label': 'Editar tarea',
+																},
+															}"
+														/>
+														<edu-button
+															icon="pi pi-trash"
+															[text]="true"
+															[rounded]="true"
+															size="small"
+															severity="danger"
+															eduTooltip="Eliminar"
+															eduTooltipPosition="top"
+															data-info-anchor="profesor-semanas-tarea-eliminar"
+															(click)="
+																onDeleteTarea(
+																	semana.id,
+																	tarea.id,
+																	tarea.titulo
+																)
+															"
+															[pt]="{
+																root: {
+																	'aria-label': 'Eliminar tarea',
+																},
+															}"
+														/>
+													}
 												</div>
 											</div>
 											<!-- Archivos adjuntos de la tarea -->
-											<div class="tarea-archivos-section">
-												<edu-file-upload
-													data-info-anchor="profesor-semanas-tarea-adjuntar"
-													mode="basic"
-													chooseLabel="Adjuntar archivo"
-													[customUpload]="true"
-													[accept]="uploadAccept"
-													[maxFileSize]="uploadMaxBytes"
-													(uploadHandler)="onTareaFilesSelected($event, semana.id, tarea.id)"
-												/>
-												@if (tarea.archivos.length > 0) {
-													<div class="tarea-archivos-list">
-														@for (archivo of tarea.archivos; track archivo.id) {
-															<app-file-row
-																data-info-anchor="profesor-semanas-archivo-abrir"
-																[name]="archivo.nombreArchivo"
-																[mimeType]="archivo.tipoArchivo"
-																[sizeBytes]="archivo.tamanoBytes"
-																[small]="true"
-																(open)="openArchivo(archivo)"
-															>
-																<span actions>
-																	<edu-button
-																		icon="pi pi-trash"
-																		[text]="true"
-																		[rounded]="true"
-																		size="small"
-																		severity="danger"
-																		eduTooltip="Eliminar"
-																		eduTooltipPosition="top"
-																		data-info-anchor="profesor-semanas-archivo-eliminar"
-																		(click)="onDeleteTareaArchivo(semana.id, tarea.id, archivo.id, archivo.nombreArchivo)"
-																		[pt]="{
-																			root: {
-																				'aria-label': 'Eliminar archivo de tarea',
-																			},
-																		}"
-																	/>
-																</span>
-															</app-file-row>
-														}
-													</div>
-												}
-											</div>
+											@if (!studentView() || tarea.archivos.length > 0) {
+												<div class="tarea-archivos-section">
+													@if (!studentView()) {
+														<edu-file-upload
+															data-info-anchor="profesor-semanas-tarea-adjuntar"
+															mode="basic"
+															chooseLabel="Adjuntar archivo"
+															[customUpload]="true"
+															[accept]="uploadAccept"
+															[maxFileSize]="uploadMaxBytes"
+															(uploadHandler)="onTareaFilesSelected($event, semana.id, tarea.id)"
+														/>
+													}
+													@if (tarea.archivos.length > 0) {
+														<div class="tarea-archivos-list">
+															@for (archivo of tarea.archivos; track archivo.id) {
+																<app-file-row
+																	data-info-anchor="profesor-semanas-archivo-abrir"
+																	[name]="archivo.nombreArchivo"
+																	[mimeType]="archivo.tipoArchivo"
+																	[sizeBytes]="archivo.tamanoBytes"
+																	[small]="true"
+																	(open)="openArchivo(archivo)"
+																>
+																	@if (!studentView()) {
+																		<span actions>
+																			<edu-button
+																				icon="pi pi-trash"
+																				[text]="true"
+																				[rounded]="true"
+																				size="small"
+																				severity="danger"
+																				eduTooltip="Eliminar"
+																				eduTooltipPosition="top"
+																				data-info-anchor="profesor-semanas-archivo-eliminar"
+																				(click)="onDeleteTareaArchivo(semana.id, tarea.id, archivo.id, archivo.nombreArchivo)"
+																				[pt]="{
+																					root: {
+																						'aria-label': 'Eliminar archivo de tarea',
+																					},
+																				}"
+																			/>
+																		</span>
+																	}
+																</app-file-row>
+															}
+														</div>
+													}
+												</div>
+											}
 										}
 									</div>
 								}
 							</div>
-							<!-- #endregion -->
-						</div>
-					
+						}
+						<!-- #endregion -->
+					</div>
 				</edu-accordion-panel>
 			}
 		</edu-accordion>

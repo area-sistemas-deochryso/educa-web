@@ -378,3 +378,366 @@
 	background: var(--primary-color);
 	color: var(--primary-color-text);
 }
+
+// #region Rediseño: toolbar, resumen en cabecera, bloques por tipo
+.top-toolbar {
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	gap: 0.25rem;
+	margin-bottom: 0.5rem;
+}
+
+.student-banner {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	margin-bottom: 0.75rem;
+	padding: 0.5rem 0.75rem;
+	border-radius: 8px;
+	font-size: 0.8rem;
+	background: var(--blue-50, #eff6ff);
+	color: var(--blue-700, #1d4ed8);
+}
+
+.visually-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+	white-space: nowrap;
+}
+
+.week-header--pasada {
+	.week-label {
+		color: var(--text-color-secondary);
+	}
+}
+
+.mini-badge {
+	&.group {
+		background: rgba(139, 92, 246, 0.12);
+		border-color: rgba(139, 92, 246, 0.25);
+		color: var(--purple-700, #6d28d9);
+	}
+
+	&.due {
+		background: var(--surface-ground, #f3f4f6);
+		border-color: var(--surface-border, #e5e7eb);
+		color: var(--text-color-secondary);
+
+		&.due--pronto {
+			background: rgba(245, 158, 11, 0.12);
+			border-color: rgba(245, 158, 11, 0.35);
+			color: var(--yellow-700);
+		}
+	}
+
+	&.empty {
+		background: transparent;
+		border-style: dashed;
+		border-color: var(--surface-border, #e5e7eb);
+		color: var(--text-color-secondary);
+		font-weight: 500;
+	}
+}
+
+.semana-intro {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.5rem;
+	margin-bottom: 0.9rem;
+}
+
+.semana-intro__text {
+	flex: 1;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 0.6rem;
+}
+
+.semana-desc {
+	max-width: 70ch;
+	color: var(--text-color);
+
+	&--placeholder {
+		color: var(--text-color-secondary);
+		font-style: italic;
+	}
+}
+
+.teacher-message {
+	margin-top: 0;
+	background: var(--primary-50, rgba(16, 185, 129, 0.08));
+	border-left: 0;
+	border-radius: 8px;
+	padding: 0.6rem 0.8rem;
+
+	i {
+		color: var(--primary-600);
+	}
+
+	div {
+		display: flex;
+		flex-direction: column;
+		gap: 0.1rem;
+	}
+
+	b {
+		font-size: 0.66rem;
+		font-weight: 700;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: var(--primary-600);
+	}
+
+	span {
+		font-size: 0.82rem;
+		color: var(--text-color);
+	}
+}
+
+.edit-semana-link {
+	display: inline-flex;
+	flex-shrink: 0;
+	margin-bottom: 0;
+}
+
+.semana-toolbar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.6rem;
+	margin-bottom: 0.9rem;
+}
+
+.filter-chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4rem;
+}
+
+.chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	font: inherit;
+	font-size: 0.78rem;
+	color: var(--text-color-secondary);
+	background: var(--surface-card, #fff);
+	border: 1px solid var(--surface-border, #e5e7eb);
+	border-radius: 999px;
+	padding: 0.2rem 0.7rem;
+	cursor: pointer;
+
+	b {
+		font-weight: 600;
+		color: var(--text-color);
+		font-variant-numeric: tabular-nums;
+	}
+
+	&[aria-pressed='true'] {
+		background: var(--text-color);
+		border-color: var(--text-color);
+		color: var(--surface-card, #fff);
+
+		b {
+			color: var(--surface-card, #fff);
+		}
+	}
+
+	&:focus-visible {
+		outline: 2px solid var(--accent-interactive);
+		outline-offset: 2px;
+	}
+}
+
+.section-count {
+	font-size: 0.72rem;
+	font-weight: 600;
+	color: var(--text-color-secondary);
+	font-variant-numeric: tabular-nums;
+}
+
+.empty-block {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 0.9rem;
+	border: 1.5px dashed var(--surface-border, #e5e7eb);
+	border-radius: 10px;
+}
+
+.empty-block__icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 40px;
+	height: 40px;
+	border-radius: 10px;
+	background: var(--primary-50, rgba(16, 185, 129, 0.1));
+	color: var(--primary-600);
+}
+
+.empty-block__text {
+	flex: 1;
+	min-width: 180px;
+	display: flex;
+	flex-direction: column;
+	font-size: 0.78rem;
+	color: var(--text-color-secondary);
+
+	b {
+		font-size: 0.82rem;
+		color: var(--text-color);
+	}
+}
+
+// Tareas: tipo (individual / grupal) y fecha límite con urgencia
+.row-icon.tarea.row-icon--grupal {
+	background: rgba(139, 92, 246, 0.1);
+	border-color: rgba(139, 92, 246, 0.3);
+
+	i {
+		color: var(--purple-500, #8b5cf6);
+	}
+}
+
+.row-info .row-meta {
+	flex-wrap: wrap;
+	gap: 0.2rem 0.75rem;
+}
+
+.kind {
+	font-weight: 600;
+	color: var(--yellow-700);
+
+	&--grupal {
+		color: var(--purple-700, #6d28d9);
+	}
+}
+
+.due-date {
+	i {
+		font-size: 0.65rem;
+	}
+
+	&--pronto {
+		color: var(--yellow-700);
+		font-weight: 600;
+	}
+
+	&--vencida {
+		color: var(--red-600, #dc2626);
+		font-weight: 600;
+	}
+}
+// #endregion
+
+// #region Tipos, borradores y entregas
+.week-dates {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3rem;
+	font-size: 0.7rem;
+	color: var(--text-color-secondary);
+	font-variant-numeric: tabular-nums;
+
+	i {
+		font-size: 0.65rem;
+	}
+}
+
+.draft-tag {
+	display: inline-block;
+	width: fit-content;
+	margin-left: 0.4rem;
+	font-size: 0.62rem;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	padding: 0.08rem 0.4rem;
+	border-radius: 999px;
+	background: rgba(245, 158, 11, 0.14);
+	color: var(--yellow-700);
+	vertical-align: middle;
+}
+
+.tipo-tag {
+	display: inline-block;
+	margin-right: 0.35rem;
+	font-size: 0.66rem;
+	font-weight: 600;
+	padding: 0.1rem 0.45rem;
+	border-radius: 999px;
+
+	&--compl {
+		background: rgba(99, 102, 241, 0.12);
+		color: var(--indigo-700, #4338ca);
+	}
+}
+
+.mini-badge.exam {
+	background: rgba(225, 29, 72, 0.1);
+	border-color: rgba(225, 29, 72, 0.25);
+	color: var(--red-700, #b91c1c);
+}
+
+.row-icon.tarea.row-icon--examen {
+	background: rgba(225, 29, 72, 0.08);
+	border-color: rgba(225, 29, 72, 0.28);
+
+	i {
+		color: var(--red-600, #dc2626);
+	}
+}
+
+.kind--examen {
+	color: var(--red-700, #b91c1c);
+}
+
+.entregas {
+	flex: none;
+	width: 8.5rem;
+	margin-right: 0.25rem;
+}
+
+.entregas__nums {
+	display: flex;
+	justify-content: space-between;
+	font-size: 0.7rem;
+	color: var(--text-color-secondary);
+	font-variant-numeric: tabular-nums;
+
+	b {
+		color: var(--text-color);
+		font-weight: 600;
+	}
+}
+
+.entregas__track {
+	height: 5px;
+	margin-top: 0.2rem;
+	border-radius: 999px;
+	background: var(--surface-ground, #f3f4f6);
+	border: 1px solid var(--surface-border, #e5e7eb);
+	overflow: hidden;
+
+	i {
+		display: block;
+		height: 100%;
+		border-radius: 999px;
+		background: var(--primary-500, #10b981);
+	}
+}
+
+@media (max-width: 640px) {
+	.entregas {
+		display: none;
+	}
+}
+// #endregion

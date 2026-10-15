@@ -29,6 +29,8 @@ import {
 	EduTooltip,
 } from '@edu-ui';
 
+import { contarExamenes, fechaLimiteEstado, proximaFechaLimite, tareaEtiqueta } from './contenido-tarea.helpers';
+
 type TareaEstadoKind = 'entregada' | 'pendiente' | 'vencida';
 
 interface TareaEstado {
@@ -91,6 +93,11 @@ export class EstudianteCursoHubContenidoComponent {
 	private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 	protected readonly uploadAccept = UPLOAD_ACCEPT;
 	protected readonly uploadMaxBytes = UPLOAD_LIMITS.maxFileSizeBytes;
+	// Presentación de tareas (funciones puras, ver contenido-tarea.helpers.ts)
+	protected readonly tareaEtiqueta = tareaEtiqueta;
+	protected readonly fechaLimiteEstado = fechaLimiteEstado;
+	protected readonly proximaFechaLimite = proximaFechaLimite;
+	protected readonly contarExamenes = contarExamenes;
 	// #endregion
 
 	// #region Estado

@@ -16,6 +16,7 @@ import {
 	CursoContenidoDetalleDto,
 	CrearCursoContenidoRequest,
 	ActualizarSemanaRequest,
+	CambiarPublicacionRequest,
 	CursoContenidoSemanaDto,
 	RegistrarArchivoRequest,
 	CursoContenidoArchivoDto,
@@ -94,6 +95,15 @@ export class ProfesorApiService {
 	}
 	registrarArchivo(semanaId: number, request: RegistrarArchivoRequest): Observable<CursoContenidoArchivoDto> {
 		return this.cursos.registrarArchivo(semanaId, request);
+	}
+	cambiarPublicacionSemana(semanaId: number, request: CambiarPublicacionRequest): Observable<CursoContenidoSemanaDto> {
+		return this.cursos.cambiarPublicacionSemana(semanaId, request);
+	}
+	cambiarPublicacionArchivo(archivoId: number, request: CambiarPublicacionRequest): Observable<CursoContenidoArchivoDto> {
+		return this.cursos.cambiarPublicacionArchivo(archivoId, request);
+	}
+	cambiarPublicacionTarea(tareaId: number, request: CambiarPublicacionRequest): Observable<CursoContenidoTareaDto> {
+		return this.cursos.cambiarPublicacionTarea(tareaId, request);
 	}
 	eliminarArchivo(archivoId: number): Observable<{ mensaje: string }> {
 		return this.cursos.eliminarArchivo(archivoId);
