@@ -38,6 +38,9 @@ export const contenidoMutations = {
 	addArchivoToSemana: (semanaId: number, archivo: CursoContenidoArchivoDto): Mutator =>
 		(c) => mapSemana(c, semanaId, (sem) => ({ ...sem, archivos: [...sem.archivos, archivo] })),
 
+	updateArchivoInSemana: (semanaId: number, archivoId: number, updates: Partial<CursoContenidoArchivoDto>): Mutator =>
+		(c) => mapSemana(c, semanaId, (sem) => ({ ...sem, archivos: sem.archivos.map((a) => (a.id === archivoId ? { ...a, ...updates } : a)) })),
+
 	removeArchivoFromSemana: (semanaId: number, archivoId: number): Mutator =>
 		(c) => mapSemana(c, semanaId, (sem) => ({ ...sem, archivos: sem.archivos.filter((a) => a.id !== archivoId) })),
 

@@ -5,7 +5,7 @@ import { ErrorHandlerService } from '@core/services';
 import { UI_SUMMARIES, UI_ATTACHMENT_MESSAGES } from '@shared/constants';
 import { ProfesorApiService } from '../../services/profesor-api.service';
 import { CursoContenidoStore } from './curso-contenido.store';
-import { CursoContenidoSemanaDto, CursoContenidoTareaDto } from '../../models';
+import { ContenidoTareaTipo, CursoContenidoSemanaDto, CursoContenidoTareaDto } from '../../models';
 
 /**
  * Facade for UI state: dialog visibility, student files/submissions data loading.
@@ -40,8 +40,8 @@ export class CursoContenidoUiFacade {
 	}
 
 	/** Open the task dialog with an existing task or null for create. */
-	openTareaDialog(tarea: CursoContenidoTareaDto | null): void {
-		this.store.openTareaDialog(tarea);
+	openTareaDialog(tarea: CursoContenidoTareaDto | null, tipoInicial: ContenidoTareaTipo = 'TAREA'): void {
+		this.store.openTareaDialog(tarea, tipoInicial);
 	}
 
 	/** Close the task dialog and clear selection. */

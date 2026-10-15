@@ -146,6 +146,17 @@ export interface CursoContenidoDetalleDto {
 	semanaVigente?: number | null;
 }
 
+/** Tipo de material de una semana. */
+export type ContenidoArchivoTipo = 'CLASE' | 'COMPLEMENTARIO';
+
+/** Tipo de trabajo para entregar. La modalidad individual/grupal va aparte en `esGrupal`. */
+export type ContenidoTareaTipo = 'TAREA' | 'ACTIVIDAD' | 'EXAMEN';
+
+/** Request to publish (visible to students) or unpublish (draft) a week, file or task. */
+export interface CambiarPublicacionRequest {
+	publicado: boolean;
+}
+
 /**
  * Week detail inside course content.
  */
@@ -164,6 +175,12 @@ export interface CursoContenidoSemanaDto {
 	archivos: CursoContenidoArchivoDto[];
 	/** Tasks for the week. */
 	tareas: CursoContenidoTareaDto[];
+	/** `false` = borrador: los estudiantes no ven la semana. Ausente se trata como publicada. */
+	publicado?: boolean;
+	/** Primer día de la semana (derivado del inicio del periodo); ausente si no se puede derivar. */
+	fechaInicio?: string | null;
+	/** Último día de la semana (inclusive). */
+	fechaFin?: string | null;
 	/** Concurrencia optimista. */
 	rowVersion?: string;
 }
@@ -184,6 +201,10 @@ export interface CursoContenidoArchivoDto {
 	tamanoBytes: number | null;
 	/** Registration date string. */
 	fechaReg: string;
+	/** CLASE o COMPLEMENTARIO. Ausente se trata como CLASE. */
+	tipo?: ContenidoArchivoTipo;
+	/** `false` = borrador. Ausente se trata como publicado. */
+	publicado?: boolean;
 }
 
 /**
@@ -204,6 +225,16 @@ export interface CursoContenidoTareaDto {
 	fechaReg: string;
 	/** Teacher attachments for the task. */
 	archivos: TareaArchivoDto[];
+	/** TAREA, ACTIVIDAD o EXAMEN. Ausente se trata como TAREA. */
+	tipo?: ContenidoTareaTipo;
+	/** Duración en minutos (solo exámenes). */
+	duracionMinutos?: number | null;
+	/** `false` = borrador. Ausente se trata como publicada. */
+	publicado?: boolean;
+	/** Estudiantes que ya entregaron. Solo viene en la vista docente. */
+	entregasRecibidas?: number | null;
+	/** Estudiantes activos que deben entregar. Solo viene en la vista docente. */
+	entregasEsperadas?: number | null;
 	/** Concurrencia optimista. */
 	rowVersion?: string;
 }
@@ -275,6 +306,8 @@ export interface RegistrarArchivoRequest {
 	tipoArchivo: string | null;
 	/** File size in bytes or null. */
 	tamanoBytes: number | null;
+	/** CLASE o COMPLEMENTARIO. El backend asume CLASE si se omite. */
+	tipo?: ContenidoArchivoTipo;
 }
 
 /**
@@ -289,6 +322,10 @@ export interface CrearTareaRequest {
 	fechaLimite: string | null;
 	/** Whether this task is group-based. */
 	esGrupal: boolean;
+	/** TAREA, ACTIVIDAD o EXAMEN. El backend asume TAREA si se omite. */
+	tipo?: ContenidoTareaTipo;
+	/** Duración en minutos; solo se guarda si el tipo es EXAMEN. */
+	duracionMinutos?: number | null;
 }
 
 /**
@@ -303,6 +340,10 @@ export interface ActualizarTareaRequest {
 	fechaLimite: string | null;
 	/** Whether this task is group-based. */
 	esGrupal: boolean;
+	/** TAREA, ACTIVIDAD o EXAMEN. */
+	tipo?: ContenidoTareaTipo;
+	/** Duración en minutos; solo se guarda si el tipo es EXAMEN. */
+	duracionMinutos?: number | null;
 	/** Concurrencia optimista. */
 	rowVersion?: string;
 }

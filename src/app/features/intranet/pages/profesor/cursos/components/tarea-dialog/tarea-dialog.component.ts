@@ -2,7 +2,7 @@
 import { Component, ChangeDetectionStrategy, input, output, OnChanges, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { toLocalIso } from '@core/helpers';
-import { CursoContenidoTareaDto, CrearTareaRequest, ActualizarTareaRequest } from '@features/intranet/pages/profesor/models';
+import { ContenidoTareaTipo, CursoContenidoTareaDto, CrearTareaRequest, ActualizarTareaRequest } from '@features/intranet/pages/profesor/models';
 import { EduButton, EduDatePicker, EduDialog, EduInputText, EduTextarea, EduToggle } from '@edu-ui';
 
 // #endregion
@@ -19,192 +19,15 @@ import { EduButton, EduDatePicker, EduDialog, EduInputText, EduTextarea, EduTogg
 		EduDatePicker,
 		EduToggle],
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	template: `
-		<edu-dialog
-			[visible]="visible()"
-			(visibleChange)="onVisibleChange($event)"
-			#dlg
-			[modal]="true"
-			[dirty]="dirty()"
-			[header]="tarea() ? 'Editar Tarea' : 'Nueva Tarea'"
-			[style]="{ width: '520px', maxWidth: '95vw' }"
-		>
-			<div class="edit-form">
-				<div class="form-field">
-					<label for="tareaTitle" class="form-label">
-						<i class="pi pi-file-edit" style="font-size: 0.78rem"></i>
-						Título <span class="required-hint">(obligatorio)</span>
-					</label>
-					<input
-						eduInputText
-						id="tareaTitle"
-						[(ngModel)]="titulo"
-						placeholder="Título de la tarea"
-						[maxlength]="200"
-						[attr.aria-invalid]="mostrarErrorTitulo() ? 'true' : null"
-						aria-describedby="tareaTitleError"
-						class="w-full"
-					/>
-					@if (mostrarErrorTitulo()) {
-						<small id="tareaTitleError" class="field-error" role="alert">
-							Escribe un título para crear la tarea.
-						</small>
-					}
-				</div>
-
-				<div class="form-field">
-					<label for="tareaDesc" class="form-label">
-						<i class="pi pi-align-left" style="font-size: 0.78rem"></i>
-						Descripción
-					</label>
-					<textarea
-						eduTextarea
-						id="tareaDesc"
-						[(ngModel)]="descripcion"
-						[rows]="4"
-						[maxlength]="2000"
-						placeholder="Descripción e instrucciones de la tarea..."
-						[autoResize]="true"
-						class="w-full descripcion-field"
-					></textarea>
-				</div>
-
-				<div class="form-row">
-					<div class="form-field" style="flex: 1">
-						<label for="tareaFecha" class="form-label">
-							<i class="pi pi-calendar" style="font-size: 0.78rem"></i>
-							Fecha límite
-						</label>
-						<edu-datepicker
-							id="tareaFecha"
-							[(ngModel)]="fechaLimite"
-							[minDate]="minFechaLimite ?? undefined"
-							[showIcon]="true"
-							[showButtonBar]="true"
-							dateFormat="dd/mm/yy"
-							placeholder="Seleccionar fecha"
-							appendTo="body"
-							styleClass="w-full"
-						/>
-					</div>
-
-					<div class="form-field grupal-field">
-						<label class="form-label">
-							<i class="pi pi-users" style="font-size: 0.78rem"></i>
-							Tarea grupal
-						</label>
-						<div class="grupal-toggle">
-							<edu-toggle data-info-anchor="profesor-tarea-dialog-grupal-toggle" [(ngModel)]="esGrupal" />
-							<span class="grupal-label">{{ esGrupal ? 'Grupal' : 'Individual' }}</span>
-						</div>
-						<span class="field-hint">
-							{{ esGrupal ? 'La nota aplica a todo el grupo' : 'Cada estudiante entrega individualmente' }}
-						</span>
-					</div>
-				</div>
-
-				<div class="task-eval-hint">
-					<i class="pi pi-info-circle"></i>
-					<span>Esta tarea no se calificará automáticamente. Crea la evaluación correspondiente en Calificaciones.</span>
-				</div>
-			</div>
-
-			<ng-template #footer>
-				<div class="dialog-footer">
-					<edu-button label="Cancelar" [text]="true" data-info-anchor="profesor-tarea-dialog-cancelar" (click)="dlg.requestClose()" />
-					<edu-button
-						[label]="tarea() ? 'Guardar' : 'Crear'"
-						icon="pi pi-check"
-						data-info-anchor="profesor-tarea-dialog-guardar"
-						(click)="onSave()"
-						[loading]="saving()"
-					/>
-				</div>
-			</ng-template>
-		</edu-dialog>
-	`,
-	styles: `
-		.edit-form {
-			display: flex;
-			flex-direction: column;
-			gap: 1.25rem;
-			padding: 0.5rem 1rem;
-		}
-		.form-row {
-			display: flex;
-			gap: 1rem;
-			align-items: flex-start;
-		}
-		.form-field {
-			display: flex;
-			flex-direction: column;
-			gap: 0.5rem;
-		}
-		.form-label {
-			font-size: 0.82rem;
-			font-weight: 600;
-			color: var(--text-color);
-			display: flex;
-			align-items: center;
-			gap: 0.4rem;
-			i {
-				color: var(--text-color-secondary);
-			}
-		}
-		.grupal-field {
-			min-width: 140px;
-		}
-		.grupal-toggle {
-			display: flex;
-			align-items: center;
-			gap: 0.5rem;
-		}
-		.grupal-label {
-			font-size: 0.82rem;
-			font-weight: 500;
-			color: var(--text-color);
-		}
-		.required-hint {
-			font-weight: 400;
-			color: var(--text-color-secondary);
-		}
-		.field-error {
-			color: var(--red-500, #dc2626);
-		}
-		/* 4 líneas reales aunque el autoajuste mida con el overlay aún sin layout */
-		.descripcion-field {
-			min-height: 6.5rem;
-		}
-		.field-hint {
-			font-size: 0.72rem;
-			color: var(--text-color-secondary);
-		}
-		.task-eval-hint {
-			display: flex;
-			align-items: center;
-			gap: 0.5rem;
-			font-size: 0.78rem;
-			color: var(--text-color-secondary);
-			i {
-				font-size: 0.9rem;
-			}
-		}
-		.dialog-footer {
-			display: flex;
-			justify-content: flex-end;
-			gap: 0.5rem;
-		}
-		@media (max-width: 640px) {
-			.form-row {
-				flex-direction: column;
-			}
-		}
-	`,
+	templateUrl: './tarea-dialog.component.html',
+	styleUrl: './tarea-dialog.component.scss',
 })
 export class TareaDialogComponent implements OnChanges {
 	readonly visible = input.required<boolean>();
 	readonly tarea = input.required<CursoContenidoTareaDto | null>();
 	readonly saving = input<boolean>(false);
+	/** Tipo preseleccionado al crear (el menú Agregar de la semana lo fija). */
+	readonly tipoInicial = input<ContenidoTareaTipo>('TAREA');
 
 	readonly visibleChange = output<boolean>();
 	readonly createTarea = output<CrearTareaRequest>();
@@ -214,12 +37,36 @@ export class TareaDialogComponent implements OnChanges {
 	descripcion = '';
 	fechaLimite: Date | null = null;
 	esGrupal = false;
+	tipo: ContenidoTareaTipo = 'TAREA';
+	duracionMinutos: number | null = null;
+
+	readonly tipoOptions: { value: ContenidoTareaTipo; label: string; hint: string; icon: string }[] = [
+		{ value: 'TAREA', label: 'Tarea', hint: 'Trabajo para casa', icon: 'pi-file-edit' },
+		{ value: 'ACTIVIDAD', label: 'Actividad', hint: 'Se trabaja en clase', icon: 'pi-pencil' },
+		{ value: 'EXAMEN', label: 'Examen', hint: 'Evaluación con duración', icon: 'pi-verified' },
+	];
+
+	etiqueta(): string {
+		return this.tipoOptions.find((o) => o.value === this.tipo)?.label ?? 'Tarea';
+	}
+
+	/** Artículo definido para "crear la tarea / el examen". */
+	articulo(): string {
+		return this.tipo === 'EXAMEN' ? 'el' : 'la';
+	}
+
+	headerText(): string {
+		const etiqueta = this.etiqueta();
+		if (this.tarea()) return `Editar ${etiqueta}`;
+		return this.tipo === 'EXAMEN' ? `Nuevo ${etiqueta}` : `Nueva ${etiqueta}`;
+	}
+
 	/** Solo se acota al crear una tarea nueva — editar una tarea ya vencida sigue permitido. */
 	minFechaLimite: Date | null = null;
 	/** El título falta y el docente ya intentó crear: se explica en vez de dejar el botón mudo. */
 	intentoGuardar = false;
 
-	private baseline = { titulo: '', descripcion: '', fecha: null as number | null, esGrupal: false };
+	private baseline = { titulo: '', descripcion: '', fecha: null as number | null, esGrupal: false, tipo: 'TAREA' as ContenidoTareaTipo, duracion: null as number | null };
 
 	mostrarErrorTitulo(): boolean {
 		return this.intentoGuardar && !this.titulo.trim();
@@ -231,12 +78,14 @@ export class TareaDialogComponent implements OnChanges {
 			this.titulo !== b.titulo ||
 			this.descripcion !== b.descripcion ||
 			(this.fechaLimite?.getTime() ?? null) !== b.fecha ||
-			this.esGrupal !== b.esGrupal
+			this.esGrupal !== b.esGrupal ||
+			this.tipo !== b.tipo ||
+			this.duracionMinutos !== b.duracion
 		);
 	}
 
 	ngOnChanges(changes: SimpleChanges): void {
-		if (changes['tarea'] || changes['visible']) {
+		if (changes['tarea'] || changes['visible'] || changes['tipoInicial']) {
 			const t = this.tarea();
 			if (this.visible()) {
 				if (t) {
@@ -244,12 +93,16 @@ export class TareaDialogComponent implements OnChanges {
 					this.descripcion = t.descripcion ?? '';
 					this.fechaLimite = t.fechaLimite ? new Date(t.fechaLimite) : null;
 					this.esGrupal = t.esGrupal;
+					this.tipo = t.tipo ?? 'TAREA';
+					this.duracionMinutos = t.duracionMinutos ?? null;
 					this.minFechaLimite = null;
 				} else {
 					this.titulo = '';
 					this.descripcion = '';
 					this.fechaLimite = null;
 					this.esGrupal = false;
+					this.tipo = this.tipoInicial();
+					this.duracionMinutos = null;
 					this.minFechaLimite = new Date();
 				}
 				this.intentoGuardar = false;
@@ -258,6 +111,8 @@ export class TareaDialogComponent implements OnChanges {
 					descripcion: this.descripcion,
 					fecha: this.fechaLimite?.getTime() ?? null,
 					esGrupal: this.esGrupal,
+					tipo: this.tipo,
+					duracion: this.duracionMinutos,
 				};
 			}
 		}
@@ -283,6 +138,8 @@ export class TareaDialogComponent implements OnChanges {
 				descripcion: this.descripcion.trim() || null,
 				fechaLimite: fechaStr,
 				esGrupal: this.esGrupal,
+				tipo: this.tipo,
+				duracionMinutos: this.tipo === 'EXAMEN' ? this.duracionMinutos : null,
 			});
 		} else {
 			this.createTarea.emit({
@@ -290,6 +147,8 @@ export class TareaDialogComponent implements OnChanges {
 				descripcion: this.descripcion.trim() || null,
 				fechaLimite: fechaStr,
 				esGrupal: this.esGrupal,
+				tipo: this.tipo,
+				duracionMinutos: this.tipo === 'EXAMEN' ? this.duracionMinutos : null,
 			});
 		}
 	}

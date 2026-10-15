@@ -46,12 +46,15 @@ import { EduButton, EduDialog, EduInputText, EduTextarea } from '@edu-ui';
 						eduTextarea
 						id="descripcion"
 						[(ngModel)]="descripcion"
-						[rows]="3"
+						[rows]="4"
 						[maxlength]="2000"
 						placeholder="Descripción de los temas de la semana..."
-						[autoResize]="true"
 						class="w-full"
 					></textarea>
+					<div class="form-hint">
+						<span>La ven los estudiantes arriba del contenido</span>
+						<span>{{ descripcion.length }} / 2000</span>
+					</div>
 				</div>
 
 				<div class="form-field">
@@ -63,12 +66,15 @@ import { EduButton, EduDialog, EduInputText, EduTextarea } from '@edu-ui';
 						eduTextarea
 						id="mensaje"
 						[(ngModel)]="mensajeDocente"
-						[rows]="2"
+						[rows]="3"
 						[maxlength]="2000"
 						placeholder="Mensaje o indicaciones para los estudiantes..."
-						[autoResize]="true"
 						class="w-full"
 					></textarea>
+					<div class="form-hint">
+						<span>Aparece resaltado, como aviso</span>
+						<span>{{ mensajeDocente.length }} / 2000</span>
+					</div>
 				</div>
 			</div>
 
@@ -97,6 +103,18 @@ import { EduButton, EduDialog, EduInputText, EduTextarea } from '@edu-ui';
 			display: flex;
 			flex-direction: column;
 			gap: 0.5rem;
+		}
+		// Altura mínima explícita: sin ella el textarea se renderizaba colapsado a una línea.
+		textarea {
+			min-height: 6rem;
+			resize: vertical;
+		}
+		.form-hint {
+			display: flex;
+			justify-content: space-between;
+			gap: 0.5rem;
+			font-size: 0.72rem;
+			color: var(--text-color-secondary);
 		}
 		.form-label {
 			font-size: 0.82rem;

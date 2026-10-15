@@ -5,6 +5,7 @@ import {
 	CursoContenidoArchivoDto,
 	CursoContenidoTareaDto,
 	TareaArchivoDto,
+	ContenidoTareaTipo,
 	SemanaEstudianteArchivosDto,
 	EstudianteTareaArchivosGroupDto,
 } from '../../models';
@@ -26,6 +27,8 @@ interface UiState {
 	tareaDialogVisible: boolean;
 	selectedSemana: CursoContenidoSemanaDto | null;
 	selectedTarea: CursoContenidoTareaDto | null;
+	/** Tipo con el que arranca el diálogo al crear una tarea nueva. */
+	tareaTipoInicial: ContenidoTareaTipo;
 	selectedHorarioId: number | null;
 	archivosSummaryDialogVisible: boolean;
 	tareasSummaryDialogVisible: boolean;
@@ -52,6 +55,7 @@ const initialUi: UiState = {
 	tareaDialogVisible: false,
 	selectedSemana: null,
 	selectedTarea: null,
+	tareaTipoInicial: 'TAREA',
 	selectedHorarioId: null,
 	archivosSummaryDialogVisible: false,
 	tareasSummaryDialogVisible: false,
@@ -87,6 +91,7 @@ export class CursoContenidoStore {
 	readonly tareaDialogVisible = computed(() => this._ui().tareaDialogVisible);
 	readonly selectedSemana = computed(() => this._ui().selectedSemana);
 	readonly selectedTarea = computed(() => this._ui().selectedTarea);
+	readonly tareaTipoInicial = computed(() => this._ui().tareaTipoInicial);
 	readonly selectedHorarioId = computed(() => this._ui().selectedHorarioId);
 	readonly archivosSummaryDialogVisible = computed(() => this._ui().archivosSummaryDialogVisible);
 	readonly tareasSummaryDialogVisible = computed(() => this._ui().tareasSummaryDialogVisible);
@@ -132,6 +137,7 @@ export class CursoContenidoStore {
 		tareaDialogVisible: this.tareaDialogVisible(),
 		selectedSemana: this.selectedSemana(),
 		selectedTarea: this.selectedTarea(),
+		tareaTipoInicial: this.tareaTipoInicial(),
 		selectedHorarioId: this.selectedHorarioId(),
 		archivosSummaryDialogVisible: this.archivosSummaryDialogVisible(),
 		tareasSummaryDialogVisible: this.tareasSummaryDialogVisible(),
@@ -180,6 +186,10 @@ export class CursoContenidoStore {
 		this.applyMutation(contenidoMutations.updateSemana(semanaId, updates));
 	}
 
+	updateArchivoInSemana(semanaId: number, archivoId: number, updates: Partial<CursoContenidoArchivoDto>): void {
+		this.applyMutation(contenidoMutations.updateArchivoInSemana(semanaId, archivoId, updates));
+	}
+
 	addArchivoToSemana(semanaId: number, archivo: CursoContenidoArchivoDto): void {
 		this.applyMutation(contenidoMutations.addArchivoToSemana(semanaId, archivo));
 	}
@@ -212,7 +222,7 @@ export class CursoContenidoStore {
 	// #region Dialog commands (UI)
 	openSemanaEditDialog(semana: CursoContenidoSemanaDto): void { this._ui.update((s) => ({ ...s, semanaEditDialogVisible: true, selectedSemana: semana })); }
 	closeSemanaEditDialog(): void { this._ui.update((s) => ({ ...s, semanaEditDialogVisible: false, selectedSemana: null })); }
-	openTareaDialog(tarea: CursoContenidoTareaDto | null): void { this._ui.update((s) => ({ ...s, tareaDialogVisible: true, selectedTarea: tarea })); }
+	openTareaDialog(tarea: CursoContenidoTareaDto | null, tipoInicial: ContenidoTareaTipo = 'TAREA'): void { this._ui.update((s) => ({ ...s, tareaDialogVisible: true, selectedTarea: tarea, tareaTipoInicial: tipoInicial })); }
 	closeTareaDialog(): void { this._ui.update((s) => ({ ...s, tareaDialogVisible: false, selectedTarea: null })); }
 	openArchivosSummaryDialog(): void { this._ui.update((s) => ({ ...s, archivosSummaryDialogVisible: true })); }
 	closeArchivosSummaryDialog(): void { this._ui.update((s) => ({ ...s, archivosSummaryDialogVisible: false })); }

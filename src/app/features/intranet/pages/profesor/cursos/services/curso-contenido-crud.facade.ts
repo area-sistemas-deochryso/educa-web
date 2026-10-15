@@ -8,6 +8,7 @@ import { ProfesorApiService } from '../../services/profesor-api.service';
 import { CursoContenidoStore } from './curso-contenido.store';
 import {
 	ActualizarSemanaRequest,
+	ContenidoArchivoTipo,
 	RegistrarArchivoRequest,
 	RegistrarTareaArchivoRequest,
 	CrearTareaRequest,
@@ -92,8 +93,9 @@ export class CursoContenidoCrudFacade {
 	 *
 	 * @param semanaId Week id that owns the file.
 	 * @param file File selected by the user.
+	 * @param tipo CLASE (material de clase) o COMPLEMENTARIO (opcional para el estudiante).
 	 */
-	uploadArchivo(semanaId: number, file: File): void {
+	uploadArchivo(semanaId: number, file: File, tipo: ContenidoArchivoTipo = 'CLASE'): void {
 		this.store.setSaving(true);
 
 		this.api
@@ -106,6 +108,7 @@ export class CursoContenidoCrudFacade {
 						urlArchivo: blobResponse.url,
 						tipoArchivo: file.type || null,
 						tamanoBytes: file.size,
+						tipo,
 					};
 
 					this.wal.execute({
@@ -303,6 +306,9 @@ export class CursoContenidoCrudFacade {
 					this.store.updateTareaInSemana(semanaId, tareaId, {
 						titulo: request.titulo,
 						descripcion: request.descripcion,
+						tipo: request.tipo,
+						duracionMinutos: request.duracionMinutos,
+						esGrupal: request.esGrupal,
 					} as CursoContenidoTareaDto);
 					this.store.setSaving(false);
 					this.store.closeTareaDialog();

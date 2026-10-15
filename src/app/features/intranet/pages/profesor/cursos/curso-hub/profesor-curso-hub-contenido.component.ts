@@ -110,6 +110,7 @@ import type { ActualizarTareaRequest, CrearTareaRequest } from '@features/intran
 		<app-tarea-dialog
 			[visible]="vm().tareaDialogVisible"
 			[tarea]="vm().selectedTarea"
+			[tipoInicial]="vm().tareaTipoInicial"
 			[saving]="vm().saving"
 			(visibleChange)="onTareaVisibleChange($event)"
 			(createTarea)="onCreateTarea($event)"

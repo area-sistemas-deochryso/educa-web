@@ -11,6 +11,7 @@ import {
 	CursoContenidoSemanaDto,
 	RegistrarArchivoRequest,
 	CursoContenidoArchivoDto,
+	CambiarPublicacionRequest,
 	CrearTareaRequest,
 	ActualizarTareaRequest,
 	CursoContenidoTareaDto,
@@ -83,6 +84,18 @@ export class ProfesorCursosApiService {
 			`${this.contenidoUrl}/semana/${semanaId}/archivo`,
 			request,
 		);
+	}
+
+	cambiarPublicacionSemana(semanaId: number, request: CambiarPublicacionRequest): Observable<CursoContenidoSemanaDto> {
+		return this.http.patch<CursoContenidoSemanaDto>(`${this.contenidoUrl}/semana/${semanaId}/publicacion`, request);
+	}
+
+	cambiarPublicacionArchivo(archivoId: number, request: CambiarPublicacionRequest): Observable<CursoContenidoArchivoDto> {
+		return this.http.patch<CursoContenidoArchivoDto>(`${this.contenidoUrl}/archivo/${archivoId}/publicacion`, request);
+	}
+
+	cambiarPublicacionTarea(tareaId: number, request: CambiarPublicacionRequest): Observable<CursoContenidoTareaDto> {
+		return this.http.patch<CursoContenidoTareaDto>(`${this.contenidoUrl}/tarea/${tareaId}/publicacion`, request);
 	}
 
 	eliminarArchivo(archivoId: number): Observable<{ mensaje: string }> {
