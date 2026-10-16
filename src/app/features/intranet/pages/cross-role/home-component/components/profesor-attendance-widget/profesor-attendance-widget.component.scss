@@ -68,6 +68,29 @@
 	}
 }
 
+.clase-asistencia-link {
+	font-size: 0.85rem;
+	color: var(--intranet-accent-color-blue, #253470);
+	text-decoration: none;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	font-weight: 600;
+
+	&:hover {
+		text-decoration: underline;
+	}
+
+	&:focus-visible {
+		outline: 2px solid var(--primary-color, #253470);
+		outline-offset: 2px;
+	}
+
+	i {
+		font-size: 0.7rem;
+	}
+}
+
 .salones-tutor-link {
 	font-size: 0.75rem;
 	color: var(--intranet-accent-color-blue, #253470);
