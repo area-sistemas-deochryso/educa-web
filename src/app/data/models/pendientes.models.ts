@@ -21,6 +21,8 @@ export interface CalificacionPendienteDto {
 	cursoNombre: string;
 	horarioId: number;
 	cursoId?: number | null;
+	/** Ausente si el horario no tiene salón asignado (`Horario.HorSalonCodId` es nullable). */
+	salonId?: number | null;
 	numeroSemana: number;
 	fechaEvaluacion: string;
 	totalEstudiantes: number;

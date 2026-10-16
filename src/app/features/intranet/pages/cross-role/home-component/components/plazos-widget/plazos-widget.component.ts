@@ -18,6 +18,9 @@ interface PlazoItem {
 	key: string;
 	titulo: string;
 	cursoId: number | null;
+	/** Solo profesor; junto con `cursoId` define si el ítem es navegable. */
+	salonId: number | null;
+	horarioId: number | null;
 	cursoNombre: string;
 	/** Fecha límite (estudiante) o de evaluación (profesor); `null` si la tarea no tiene fecha. */
 	fecha: string | null;
@@ -71,6 +74,12 @@ export class PlazosWidgetComponent implements OnInit {
 	readonly items = computed(() => this.allItems().slice(0, MAX_ITEMS));
 	readonly hiddenCount = computed(() => Math.max(0, this.allItems().length - MAX_ITEMS));
 
+	/** Link a Calificaciones del curso/salón; `null` si falta `cursoId` o `salonId` (ítem no navegable). */
+	gradesLink(item: PlazoItem): string[] | null {
+		if (!this.isProfesor() || !item.cursoId || !item.salonId) return null;
+		return ['/intranet/profesor/cursos', String(item.cursoId), String(item.salonId), 'calificaciones'];
+	}
+
 	readonly title = computed(() => (this.isProfesor() ? 'Calificaciones pendientes' : 'Tareas pendientes'));
 	readonly icon = computed(() => (this.isProfesor() ? 'pi pi-pencil' : 'pi pi-clock'));
 	readonly detailRoute = computed(() =>
@@ -114,7 +123,7 @@ export class PlazosWidgetComponent implements OnInit {
 			.subscribe((evaluaciones) => {
 				this.profesorItems.set(
 					evaluaciones.map((e) =>
-						this.toItem(`calificacion-${e.calificacionId}`, e.titulo, e.cursoId ?? null, e.cursoNombre, e.fechaEvaluacion, e.sinNota, false),
+						this.toItem(`calificacion-${e.calificacionId}`, e.titulo, e.cursoId ?? null, e.cursoNombre, e.fechaEvaluacion, e.sinNota, false, e.salonId ?? null, e.horarioId),
 					),
 				);
 				this.profesorLoading.set(false);
@@ -129,8 +138,10 @@ export class PlazosWidgetComponent implements OnInit {
 		fecha: string | null,
 		sinNota: number | null,
 		esNueva: boolean,
+		salonId: number | null = null,
+		horarioId: number | null = null,
 	): PlazoItem {
-		return { key, titulo, cursoId, cursoNombre, fecha, diasRestantes: this.diffDays(fecha), sinNota, esNueva };
+		return { key, titulo, cursoId, salonId, horarioId, cursoNombre, fecha, diasRestantes: this.diffDays(fecha), sinNota, esNueva };
 	}
 
 	private diffDays(fecha: string | null): number | null {

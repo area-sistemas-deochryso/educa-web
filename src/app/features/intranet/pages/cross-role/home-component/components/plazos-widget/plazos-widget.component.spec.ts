@@ -134,6 +134,29 @@ describe('PlazosWidgetComponent', () => {
 		expect(el.querySelector('.plazo-badge')?.textContent?.trim()).toBe('4 sin nota');
 	});
 
+	it('profesor: cada ítem navega a Calificaciones de su curso/salón; sin salonId o cursoId no hay link', () => {
+		const base = { titulo: 'E', cursoNombre: 'C', horarioId: 5, numeroSemana: 1, fechaEvaluacion: isoDaysFromNow(1), totalEstudiantes: 10, sinNota: 2 };
+		const pendientes = [
+			{ ...base, calificacionId: 1, cursoId: 10, salonId: 100 },
+			{ ...base, calificacionId: 2, cursoId: 20, salonId: 200 },
+			{ ...base, calificacionId: 3, cursoId: 30, salonId: null },
+			{ ...base, calificacionId: 4, cursoId: null, salonId: 400 },
+		];
+		const { el } = setup({ profesor: true, profesor$: of(pendientes) });
+
+		const links = Array.from(el.querySelectorAll<HTMLAnchorElement>('a.plazo-link')).map((a) => a.getAttribute('href'));
+		expect(links).toEqual([
+			'/intranet/profesor/cursos/10/100/calificaciones?horarioId=5',
+			'/intranet/profesor/cursos/20/200/calificaciones?horarioId=5',
+		]);
+		expect(el.querySelectorAll('.plazo-row').length).toBe(4);
+	});
+
+	it('estudiante: las tareas no llevan link de calificaciones', () => {
+		const { el } = setup({ profesor: false, tareas: [tarea({ tareaId: 1, titulo: 'T', cursoId: 10 })] });
+		expect(el.querySelector('a.plazo-link')).toBeNull();
+	});
+
 	it('profesor: singular cuando falta una sola nota', () => {
 		const { component } = setup({ profesor: true });
 		expect(component.label(item(2, 1))).toBe('1 sin nota');

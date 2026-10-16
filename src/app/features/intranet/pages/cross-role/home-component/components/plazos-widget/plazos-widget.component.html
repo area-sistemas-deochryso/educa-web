@@ -21,7 +21,11 @@
 				<li class="plazo-row">
 					<div class="plazo-info">
 						<span class="plazo-titulo">
-							{{ item.titulo }}
+							@if (gradesLink(item); as link) {
+								<a class="plazo-link" [routerLink]="link" [queryParams]="{ horarioId: item.horarioId }">{{ item.titulo }}</a>
+							} @else {
+								{{ item.titulo }}
+							}
 							@if (item.esNueva) {
 								<span class="plazo-nueva">Nueva</span>
 							}
