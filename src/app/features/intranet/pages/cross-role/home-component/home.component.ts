@@ -17,6 +17,7 @@ import { EstudianteAttendanceWidgetComponent } from './components/estudiante-att
 import { EstudianteResumenWidgetComponent } from './components/estudiante-resumen-widget/estudiante-resumen-widget.component';
 import { HorarioHoyWidgetComponent } from './components/horario-hoy-widget/horario-hoy-widget.component';
 import { PlazosWidgetComponent } from './components/plazos-widget/plazos-widget.component';
+import { ProfesorHorarioHomeService } from './services/profesor-horario-home.service';
 
 // #endregion
 // #region Implementation
@@ -37,6 +38,7 @@ import { PlazosWidgetComponent } from './components/plazos-widget/plazos-widget.
 		CdkDrag,
 		CdkDragHandle,
 	],
+	providers: [ProfesorHorarioHomeService],
 	templateUrl: './home.component.html',
 	styleUrl: './home.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

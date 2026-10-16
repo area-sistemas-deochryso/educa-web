@@ -28,6 +28,21 @@
 				</li>
 			}
 		</ul>
+	} @else if (isProfesor()) {
+		<div class="widget-empty">
+			<i class="pi pi-info-circle"></i>
+			<span>{{ mensajeVacio() }}</span>
+		</div>
+		@if (proximaClase(); as proxima) {
+			<p class="horario-proxima">
+				Próxima clase: {{ proxima.label }} ·
+				@if (hubLink(proxima.block); as link) {
+					<a class="horario-proxima-link" [routerLink]="link" [queryParams]="{ horarioId: proxima.block.id }">{{ proxima.block.cursoNombre }}</a>
+				} @else {
+					{{ proxima.block.cursoNombre }}
+				}
+			</p>
+		}
 	} @else {
 		<div class="widget-empty">
 			<i class="pi pi-info-circle"></i>

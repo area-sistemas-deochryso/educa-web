@@ -109,6 +109,27 @@
 // #endregion
 
 // #region Empty & skeleton
+.horario-proxima {
+	margin: 0.25rem 0 0;
+	font-size: 0.85rem;
+	color: var(--text-color-secondary);
+}
+
+.horario-proxima-link {
+	font-weight: 600;
+	color: var(--intranet-accent-color-blue, #253470);
+	text-decoration: none;
+
+	&:hover {
+		text-decoration: underline;
+	}
+
+	&:focus-visible {
+		outline: 2px solid var(--primary-color, #253470);
+		outline-offset: 2px;
+	}
+}
+
 .widget-empty {
 	display: flex;
 	align-items: center;

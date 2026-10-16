@@ -11,6 +11,12 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { forkJoin, of, catchError, Observable } from 'rxjs';
 import { logger } from '@core/helpers';
+import { ThemeService } from '@core/services/theme';
+import { UserProfileService } from '@core/services/user';
+import { buildBlocks, todayDia, HorarioBlock } from '@intranet-shared/helpers';
+import { HorarioProfesorDto } from '@features/intranet/pages/profesor/models';
+import { currentOrNextClassToday } from '../../helpers/home-schedule.helpers';
+import { ProfesorHorarioHomeService } from '../../services/profesor-horario-home.service';
 import {
 	AttendanceService,
 	AsistenciaProfesorApiService,
@@ -44,6 +50,9 @@ export class ProfesorAttendanceWidgetComponent implements OnInit {
 	// #region Dependencias
 	private attendance = inject(AttendanceService);
 	private profesorApi = inject(AsistenciaProfesorApiService);
+	private horarioHome = inject(ProfesorHorarioHomeService);
+	private userProfile = inject(UserProfileService);
+	private theme = inject(ThemeService);
 	private destroyRef = inject(DestroyRef);
 	// #endregion
 
@@ -53,6 +62,7 @@ export class ProfesorAttendanceWidgetComponent implements OnInit {
 	readonly stats = signal<EstadisticasAsistenciaDia | null>(null);
 	readonly salon = signal<SalonProfesor | null>(null);
 	readonly tutorSalonesCount = signal(0);
+	private readonly horarios = signal<HorarioProfesorDto[]>([]);
 	// #endregion
 
 	// #region Computed — Salón
@@ -139,6 +149,31 @@ export class ProfesorAttendanceWidgetComponent implements OnInit {
 	});
 	// #endregion
 
+	// #region Computed — Sin registro propio
+	private readonly esFinDeSemana = computed(() => todayDia(new Date()) === 0);
+
+	/** Mensaje según la causa de "Mi asistencia" vacía; la marcación es biométrica, no se registra desde la web. */
+	readonly miVacioMensaje = computed(() =>
+		this.esFinDeSemana()
+			? 'Hoy es fin de semana, no se espera marcación.'
+			: 'Aún no hay una marcación tuya registrada hoy.',
+	);
+
+	/** Clase de hoy en curso o siguiente: destino para tomar asistencia de alumnos (solo con curso y salón). */
+	readonly claseParaAsistencia = computed<HorarioBlock | null>(() => {
+		const now = new Date();
+		const dia = todayDia(now);
+		if (dia === 0) return null;
+		const hoy = buildBlocks(this.horarios(), new Map(), this.theme.isDarkMode()).filter((b) => b.dia === dia);
+		const clase = currentOrNextClassToday(now, hoy);
+		return clase?.cursoId && clase.salonId ? clase : null;
+	});
+
+	asistenciaLink(clase: HorarioBlock): string[] {
+		return ['/intranet/profesor/cursos', String(clase.cursoId), String(clase.salonId), 'asistencia'];
+	}
+	// #endregion
+
 	// #region Helpers
 	barPercent(value: number): number {
 		const s = this.stats();
@@ -149,6 +184,14 @@ export class ProfesorAttendanceWidgetComponent implements OnInit {
 	// #region Lifecycle
 	ngOnInit(): void {
 		const hoy = new Date();
+
+		// Se pide al inicio (misma pasada que el widget de horario) para compartir una sola petición.
+		const horarios$ = this.horarioHome.getHorarios(this.userProfile.entityId() ?? 0).pipe(
+			catchError((err) => {
+				logger.warn('[ProfesorWidget] getHorarios failed — fallback empty', err?.status);
+				return of([] as HorarioProfesorDto[]);
+			}),
+		);
 
 		this.attendance
 			.getSalonesProfesor()
@@ -179,11 +222,12 @@ export class ProfesorAttendanceWidgetComponent implements OnInit {
 					}),
 				);
 
-				forkJoin({ mi: mi$, salon: salon$ })
+				forkJoin({ mi: mi$, salon: salon$, horarios: horarios$ })
 					.pipe(takeUntilDestroyed(this.destroyRef))
 					.subscribe({
-						next: ({ mi, salon }) => {
+						next: ({ mi, salon, horarios }) => {
 							this.miAsistencia.set(mi?.asistencias?.[0] ?? null);
+							this.horarios.set(horarios);
 							this.stats.set(salon ? salon.estadisticas : null);
 							this.loading.set(false);
 						},
