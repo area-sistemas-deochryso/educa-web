@@ -17,7 +17,13 @@
 			@for (bloque of bloquesHoy(); track bloque.id) {
 				<li class="horario-item" [style.borderLeftColor]="bloque.color">
 					<span class="horario-hora">{{ bloque.horaInicio }} - {{ bloque.horaFin }}</span>
-					<span class="horario-curso">{{ bloque.cursoNombre }}</span>
+					@if (hubLink(bloque); as link) {
+						<span class="horario-curso">
+							<a class="horario-link" [routerLink]="link" [queryParams]="{ horarioId: bloque.id }">{{ bloque.cursoNombre }}</a>
+						</span>
+					} @else {
+						<span class="horario-curso">{{ bloque.cursoNombre }}</span>
+					}
 					<span class="horario-salon">{{ bloque.salonDescripcion }}</span>
 				</li>
 			}

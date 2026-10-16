@@ -1,6 +1,7 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal, computed } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { RouterLink } from '@angular/router';
 import { catchError, of, Observable } from 'rxjs';
 import { logger } from '@core/helpers';
 import { ThemeService } from '@core/services/theme';
@@ -16,7 +17,7 @@ import { SkeletonLoaderComponent } from '@shared/components';
 @Component({
 	selector: 'app-horario-hoy-widget',
 	standalone: true,
-	imports: [SkeletonLoaderComponent],
+	imports: [RouterLink, SkeletonLoaderComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './horario-hoy-widget.component.html',
 	styleUrl: './horario-hoy-widget.component.scss',
@@ -42,7 +43,16 @@ export class HorarioHoyWidgetComponent implements OnInit {
 			.filter((b) => b.dia === hoy)
 			.sort((a, b) => a.horaInicio.localeCompare(b.horaInicio));
 	});
+	readonly isProfesor = computed(() => this.userProfile.isProfesor());
 	readonly hasBloques = computed(() => this.bloquesHoy().length > 0);
+	// #endregion
+
+	// #region Helpers
+	/** Hub del curso/salón del bloque; solo profesor, y `null` si falta `cursoId` o `salonId`. */
+	hubLink(bloque: HorarioBlock): string[] | null {
+		if (!this.isProfesor() || !bloque.cursoId || !bloque.salonId) return null;
+		return ['/intranet/profesor/cursos', String(bloque.cursoId), String(bloque.salonId)];
+	}
 	// #endregion
 
 	// #region Lifecycle
