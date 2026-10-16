@@ -162,14 +162,22 @@ describe('PlazosWidgetComponent', () => {
 		expect(component.label(item(2, 1))).toBe('1 sin nota');
 	});
 
-	it('no renderiza nada si no hay pendientes', () => {
+	it('estudiante: no renderiza nada si no hay pendientes', () => {
 		const { el } = setup({ profesor: false, tareas: [] });
 		expect(el.querySelector('.widget-card')).toBeNull();
+	});
+
+	it('profesor: sin pendientes muestra mensaje "al día" y acceso a cursos', () => {
+		const { el } = setup({ profesor: true, profesor$: of([]) });
+
+		expect(el.querySelector('.plazos-empty')?.textContent).toContain('Estás al día');
+		expect(el.querySelector('a.widget-link')?.getAttribute('href')).toBe('/intranet/profesor/cursos');
+		expect(el.querySelector('.plazos-list')).toBeNull();
 	});
 
 	it('profesor: si el endpoint falla, degrada a vacío sin romper Inicio', () => {
 		const { el, component } = setup({ profesor: true, profesor$: throwError(() => ({ status: 500 })) });
 		expect(component.loading()).toBe(false);
-		expect(el.querySelector('.widget-card')).toBeNull();
+		expect(el.querySelector('.plazos-list')).toBeNull();
 	});
 });

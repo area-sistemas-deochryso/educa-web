@@ -1,8 +1,12 @@
 // #region Imports
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
+import { provideRouter } from '@angular/router';
 import { testProviders } from '@test';
+import { UserProfileService } from '@core/services/user';
+import type { HorarioProfesorDto } from '@features/intranet/pages/profesor/models';
+import { ProfesorHorarioHomeService } from '../../services/profesor-horario-home.service';
 import { ProfesorAttendanceWidgetComponent } from './profesor-attendance-widget.component';
 import {
 	AttendanceService,
@@ -91,12 +95,16 @@ describe('ProfesorAttendanceWidgetComponent', () => {
 		getAsistenciaDia: ReturnType<typeof vi.fn>;
 	};
 	let profesorApiMock: { obtenerMiAsistenciaDia: ReturnType<typeof vi.fn> };
+	let horarios: HorarioProfesorDto[];
 
 	const bootstrap = async () => {
 		await TestBed.configureTestingModule({
 			imports: [ProfesorAttendanceWidgetComponent],
 			providers: [
 				...testProviders,
+				provideRouter([]),
+				{ provide: UserProfileService, useValue: { entityId: () => 7 } },
+				{ provide: ProfesorHorarioHomeService, useValue: { getHorarios: () => of(horarios) } },
 				{ provide: AttendanceService, useValue: attendanceMock },
 				{ provide: AsistenciaProfesorApiService, useValue: profesorApiMock },
 			],
@@ -114,6 +122,11 @@ describe('ProfesorAttendanceWidgetComponent', () => {
 			getAsistenciaDia: vi.fn(),
 		};
 		profesorApiMock = { obtenerMiAsistenciaDia: vi.fn() };
+		horarios = [];
+	});
+
+	afterEach(() => {
+		vi.useRealTimers();
 	});
 
 	describe('profesor tutor', () => {
@@ -156,6 +169,90 @@ describe('ProfesorAttendanceWidgetComponent', () => {
 			await bootstrap();
 
 			expect(component.salonFueraAlcance()).toBe(false);
+		});
+	});
+
+	describe('sin marcación propia (vacío útil)', () => {
+		const clase = (partial: Partial<HorarioProfesorDto>): HorarioProfesorDto =>
+			({
+				id: 5,
+				cursoId: 10,
+				salonId: 100,
+				diaSemana: 1,
+				horaInicio: '08:00',
+				horaFin: '09:00',
+				cursoNombre: 'Física',
+				salonDescripcion: 'Salón',
+				...partial,
+			}) as HorarioProfesorDto;
+		const empty = () => (fixture.nativeElement as HTMLElement).querySelector('.widget-empty')?.textContent?.trim();
+		const link = () => (fixture.nativeElement as HTMLElement).querySelector<HTMLAnchorElement>('a.clase-asistencia-link');
+
+		beforeEach(() => {
+			attendanceMock.getSalonesProfesor.mockReturnValue(of([]));
+			profesorApiMock.obtenerMiAsistenciaDia.mockReturnValue(of(null));
+			vi.useFakeTimers({ toFake: ['Date'] });
+		});
+
+		it('día de semana con clase pendiente → mensaje de causa y link a Asistencia de esa clase', async () => {
+			vi.setSystemTime(new Date(2026, 8, 28, 7, 0, 0)); // lunes 07:00
+			horarios = [clase({})];
+
+			await bootstrap();
+
+			expect(empty()).toContain('Aún no hay una marcación');
+			expect(link()?.getAttribute('href')).toBe('/intranet/profesor/cursos/10/100/asistencia?horarioId=5');
+		});
+
+		it('elige la clase en curso, no la ya terminada', async () => {
+			vi.setSystemTime(new Date(2026, 8, 28, 10, 30, 0));
+			horarios = [
+				clase({ id: 1, cursoId: 1, salonId: 11, horaInicio: '08:00', horaFin: '09:00' }),
+				clase({ id: 2, cursoId: 2, salonId: 22, horaInicio: '10:00', horaFin: '11:00' }),
+			];
+
+			await bootstrap();
+
+			expect(link()?.getAttribute('href')).toBe('/intranet/profesor/cursos/2/22/asistencia?horarioId=2');
+		});
+
+		it('sin clases pendientes hoy → solo mensaje, sin link', async () => {
+			vi.setSystemTime(new Date(2026, 8, 28, 15, 0, 0));
+			horarios = [clase({})];
+
+			await bootstrap();
+
+			expect(empty()).toContain('Aún no hay una marcación');
+			expect(link()).toBeNull();
+		});
+
+		it('fin de semana → mensaje de fin de semana, sin link', async () => {
+			vi.setSystemTime(new Date(2026, 9, 17, 10, 0, 0)); // sábado
+			horarios = [clase({})];
+
+			await bootstrap();
+
+			expect(empty()).toContain('fin de semana');
+			expect(link()).toBeNull();
+		});
+
+		it('clase sin salón no genera link', async () => {
+			vi.setSystemTime(new Date(2026, 8, 28, 7, 0, 0));
+			horarios = [clase({ salonId: 0 })];
+
+			await bootstrap();
+
+			expect(link()).toBeNull();
+		});
+
+		it('con marcación propia no se muestra el vacío ni el link', async () => {
+			vi.setSystemTime(new Date(2026, 8, 28, 7, 0, 0));
+			profesorApiMock.obtenerMiAsistenciaDia.mockReturnValue(of(miDto));
+			horarios = [clase({})];
+
+			await bootstrap();
+
+			expect(link()).toBeNull();
 		});
 	});
 

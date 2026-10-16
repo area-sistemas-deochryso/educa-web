@@ -117,6 +117,15 @@
 	font-size: 0.8rem;
 	color: var(--text-color-secondary);
 }
+
+.plazos-empty {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.5rem 0;
+	color: var(--text-color-secondary);
+	font-size: 0.85rem;
+}
 // #endregion
 
 // #region Badge

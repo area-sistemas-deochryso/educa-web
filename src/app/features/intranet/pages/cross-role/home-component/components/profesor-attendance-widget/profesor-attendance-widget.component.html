@@ -50,8 +50,17 @@
 			} @else {
 				<div class="widget-empty">
 					<i class="pi pi-info-circle"></i>
-					<span>Sin registro de hoy</span>
+					<span>{{ miVacioMensaje() }}</span>
 				</div>
+				@if (claseParaAsistencia(); as clase) {
+					<a
+						class="clase-asistencia-link"
+						[routerLink]="asistenciaLink(clase)"
+						[queryParams]="{ horarioId: clase.id }"
+						>Tomar asistencia: {{ clase.cursoNombre }} · {{ clase.horaInicio }} - {{ clase.horaFin }}
+						<i class="pi pi-arrow-right"></i
+					></a>
+				}
 			}
 		</section>
 

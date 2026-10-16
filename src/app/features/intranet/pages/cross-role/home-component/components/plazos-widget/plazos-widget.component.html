@@ -41,5 +41,20 @@
 			<p class="plazos-more">y {{ hiddenCount() }} más</p>
 		}
 	</div>
+} @else if (isProfesor()) {
+	<div class="widget-card">
+		<div class="widget-header">
+			<div class="widget-title">
+				<i [class]="icon()"></i>
+				<h3>{{ title() }}</h3>
+			</div>
+			<a class="widget-link" [routerLink]="detailRoute()">Ver cursos</a>
+		</div>
+
+		<div class="plazos-empty">
+			<i class="pi pi-check-circle"></i>
+			<span>Estás al día: no tienes evaluaciones con estudiantes sin nota.</span>
+		</div>
+	</div>
 }
 <!-- #endregion -->
