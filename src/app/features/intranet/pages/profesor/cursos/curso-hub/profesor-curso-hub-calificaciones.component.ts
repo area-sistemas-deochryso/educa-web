@@ -1,5 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, untracked } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { map } from 'rxjs';
 import { EduButton, EduConfirmDialog, EduConfirmationService, EduSpinner, EduTooltip } from '@edu-ui';
 import { EmptyStateComponent } from '@intranet-shared/components';
 import type {
@@ -81,6 +83,8 @@ import { CursoHubCalificacionesLoader } from './curso-hub-calificaciones.loader'
 					[totalEvaluaciones]="calVm().totalEvaluaciones"
 					[calificacionConfig]="calVm().calificacionConfig"
 					[totalEstudiantes]="calVm().salonEstudiantes.length"
+					[focusEvaluacionId]="focusEvaluacionId()"
+					(focusConsumed)="onFocusConsumed()"
 					(crearEvaluacion)="onCrearEvaluacion()"
 					(editarEvaluacion)="onEditarEvaluacion($event)"
 					(calificarEstudiantes)="onCalificarEstudiantes($event)"
@@ -146,11 +150,25 @@ export class ProfesorCursoHubCalificacionesComponent {
 	private readonly calFacade = inject(CalificacionesFacade);
 	private readonly calLoader = inject(CursoHubCalificacionesLoader);
 	private readonly confirmationService = inject(EduConfirmationService);
+	private readonly route = inject(ActivatedRoute);
+	private readonly router = inject(Router);
 	// #endregion
 
 	// #region Estado
 	protected readonly vm = this.uiFacade.vm;
 	protected readonly calVm = this.calFacade.vm;
+
+	/** `?evaluacionId=` (link del Inicio): evaluación a ubicar; `null` si falta o no es un id válido. */
+	private readonly evaluacionIdQuery = toSignal(
+		this.route.queryParamMap.pipe(
+			map((params) => {
+				const id = Number(params.get('evaluacionId'));
+				return Number.isInteger(id) && id > 0 ? id : null;
+			}),
+		),
+		{ initialValue: null },
+	);
+	protected readonly focusEvaluacionId = this.evaluacionIdQuery;
 
 	private readonly contenidoId = computed(() => this.vm().contenido?.id ?? null);
 
@@ -174,6 +192,18 @@ export class ProfesorCursoHubCalificacionesComponent {
 			untracked(() => this.calLoader.ensure(id));
 		});
 	}
+
+	// #region Foco
+	/** El panel ya ubicó (o no encontró) la evaluación: se quita el parámetro para que refrescar no re-enfoque. */
+	protected onFocusConsumed(): void {
+		void this.router.navigate([], {
+			relativeTo: this.route,
+			queryParams: { evaluacionId: null },
+			queryParamsHandling: 'merge',
+			replaceUrl: true,
+		});
+	}
+	// #endregion
 
 	// #region Refresco
 	protected onRefreshCalificaciones(): void {

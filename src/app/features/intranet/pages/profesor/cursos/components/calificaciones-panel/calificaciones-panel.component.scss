@@ -89,6 +89,18 @@
 	&:hover {
 		border-color: var(--accent-interactive);
 	}
+
+	// Evaluación ubicada desde el Inicio: borde grueso + etiqueta (no depende solo del color).
+	&--focus {
+		border-width: 2px;
+		border-color: var(--accent-interactive);
+		box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-interactive) 25%, transparent);
+	}
+
+	&:focus-visible {
+		outline: 2px solid var(--accent-interactive);
+		outline-offset: 2px;
+	}
 }
 
 .eval-info {

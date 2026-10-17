@@ -1,4 +1,19 @@
-import { Component, ChangeDetectionStrategy, input, output, computed, signal, viewChild } from '@angular/core';
+import {
+	Component,
+	ChangeDetectionStrategy,
+	DestroyRef,
+	ElementRef,
+	Injector,
+	afterNextRender,
+	effect,
+	inject,
+	input,
+	output,
+	computed,
+	signal,
+	untracked,
+	viewChild,
+} from '@angular/core';
 import { DatePipe } from '@angular/common';
 
 import {
@@ -12,6 +27,9 @@ import type { ConfiguracionCalificacionListDto } from '@data/models';
 import { SkeletonLoaderComponent } from '@shared/components';
 import { PluralizePipe } from '@intranet-shared/pipes';
 import { EduButton, EduMenu, EduMenuItem, EduTag, EduTooltip } from '@edu-ui';
+
+/** Tiempo que la evaluación ubicada queda resaltada. */
+const FOCUS_HIGHLIGHT_MS = 6000;
 
 export type EvaluacionEstado = 'atrasada' | 'pendiente' | 'completa';
 
@@ -41,6 +59,8 @@ export class CalificacionesPanelComponent {
 	readonly calificacionConfig = input<ConfiguracionCalificacionListDto | null>(null);
 	/** Alumnos del salón (denominador del progreso). 0 = desconocido: no se muestra progreso ni chip de estado. */
 	readonly totalEstudiantes = input(0);
+	/** Evaluación a ubicar (viene del Inicio); `null` = sin foco. Se ignora mientras carga. */
+	readonly focusEvaluacionId = input<number | null>(null);
 	// #endregion
 
 	// #region Outputs
@@ -50,6 +70,19 @@ export class CalificacionesPanelComponent {
 	readonly eliminarEvaluacion = output<CalificacionConNotasDto>();
 	readonly cambiarTipo = output<CalificacionConNotasDto>();
 	readonly configurarPeriodos = output<void>();
+	/** El foco ya se resolvió (ubicada o inexistente): quien lo pidió debe limpiarlo. */
+	readonly focusConsumed = output<void>();
+	// #endregion
+
+	// #region Foco
+	private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+	private readonly injector = inject(Injector);
+	private readonly destroyRef = inject(DestroyRef);
+	private lastResolvedFocus: number | null = null;
+	private highlightTimer: ReturnType<typeof setTimeout> | null = null;
+
+	/** Id de la evaluación resaltada (temporal); `null` si ninguna. */
+	readonly highlightedId = signal<number | null>(null);
 	// #endregion
 
 	// #region Computed
@@ -78,6 +111,20 @@ export class CalificacionesPanelComponent {
 		];
 	});
 	// #endregion
+
+	constructor() {
+		this.destroyRef.onDestroy(() => this.clearHighlightTimer());
+		effect(() => {
+			const id = this.focusEvaluacionId();
+			if (id === null) {
+				this.lastResolvedFocus = null;
+				return;
+			}
+			if (this.loading() || id === this.lastResolvedFocus) return;
+			const map = this.calificacionesPorSemana();
+			untracked(() => this.resolveFocus(id, map));
+		});
+	}
 
 	// #region Helpers
 	getTipoSeverity(tipo: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' {
@@ -121,6 +168,33 @@ export class CalificacionesPanelComponent {
 
 	getEstadoLabel(estado: EvaluacionEstado): string {
 		return { atrasada: 'Atrasada', pendiente: 'Pendiente', completa: 'Completa' }[estado];
+	}
+
+	/** Ubica y resalta la evaluación; si no existe (borrada, otro periodo) no hace nada salvo liberar el foco. */
+	private resolveFocus(id: number, map: Map<number, CalificacionConNotasDto[]>): void {
+		this.lastResolvedFocus = id;
+		const exists = [...map.values()].some((cals) => cals.some((c) => c.id === id));
+		this.focusConsumed.emit();
+		if (!exists) return;
+		this.clearHighlightTimer();
+		this.highlightedId.set(id);
+		afterNextRender(
+			() => {
+				const card = this.host.nativeElement.querySelector<HTMLElement>(`[data-evaluacion-id="${id}"]`);
+				if (!card) return;
+				const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+				card.scrollIntoView({ block: 'center', behavior: reduceMotion ? 'auto' : 'smooth' });
+				card.focus({ preventScroll: true });
+			},
+			{ injector: this.injector },
+		);
+		this.highlightTimer = setTimeout(() => this.highlightedId.set(null), FOCUS_HIGHLIGHT_MS);
+	}
+
+	private clearHighlightTimer(): void {
+		if (this.highlightTimer === null) return;
+		clearTimeout(this.highlightTimer);
+		this.highlightTimer = null;
 	}
 
 	openMenu(event: Event, cal: CalificacionConNotasDto): void {

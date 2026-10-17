@@ -21,6 +21,8 @@ interface PlazoItem {
 	/** Solo profesor; junto con `cursoId` define si el ítem es navegable. */
 	salonId: number | null;
 	horarioId: number | null;
+	/** Solo profesor: evaluación a ubicar en la pestaña Calificaciones (`evaluacionId`). */
+	calificacionId: number | null;
 	cursoNombre: string;
 	/** Fecha límite (estudiante) o de evaluación (profesor); `null` si la tarea no tiene fecha. */
 	fecha: string | null;
@@ -74,6 +76,13 @@ export class PlazosWidgetComponent implements OnInit {
 	readonly items = computed(() => this.allItems().slice(0, MAX_ITEMS));
 	readonly hiddenCount = computed(() => Math.max(0, this.allItems().length - MAX_ITEMS));
 
+	/** Query del link: franja + evaluación a ubicar (solo ítems de profesor con evaluación). */
+	gradesQuery(item: PlazoItem): Record<string, number> {
+		const query: Record<string, number> = { horarioId: item.horarioId as number };
+		if (item.calificacionId !== null) query['evaluacionId'] = item.calificacionId;
+		return query;
+	}
+
 	/** Link a Calificaciones del curso/salón; `null` si falta `cursoId` o `salonId` (ítem no navegable). */
 	gradesLink(item: PlazoItem): string[] | null {
 		if (!this.isProfesor() || !item.cursoId || !item.salonId) return null;
@@ -123,7 +132,7 @@ export class PlazosWidgetComponent implements OnInit {
 			.subscribe((evaluaciones) => {
 				this.profesorItems.set(
 					evaluaciones.map((e) =>
-						this.toItem(`calificacion-${e.calificacionId}`, e.titulo, e.cursoId ?? null, e.cursoNombre, e.fechaEvaluacion, e.sinNota, false, e.salonId ?? null, e.horarioId),
+						this.toItem(`calificacion-${e.calificacionId}`, e.titulo, e.cursoId ?? null, e.cursoNombre, e.fechaEvaluacion, e.sinNota, false, e.salonId ?? null, e.horarioId, e.calificacionId),
 					),
 				);
 				this.profesorLoading.set(false);
@@ -140,8 +149,9 @@ export class PlazosWidgetComponent implements OnInit {
 		esNueva: boolean,
 		salonId: number | null = null,
 		horarioId: number | null = null,
+		calificacionId: number | null = null,
 	): PlazoItem {
-		return { key, titulo, cursoId, salonId, horarioId, cursoNombre, fecha, diasRestantes: this.diffDays(fecha), sinNota, esNueva };
+		return { key, titulo, cursoId, salonId, horarioId, calificacionId, cursoNombre, fecha, diasRestantes: this.diffDays(fecha), sinNota, esNueva };
 	}
 
 	private diffDays(fecha: string | null): number | null {

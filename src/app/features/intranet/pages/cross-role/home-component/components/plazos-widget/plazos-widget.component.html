@@ -22,7 +22,7 @@
 					<div class="plazo-info">
 						<span class="plazo-titulo">
 							@if (gradesLink(item); as link) {
-								<a class="plazo-link" [routerLink]="link" [queryParams]="{ horarioId: item.horarioId }">{{ item.titulo }}</a>
+								<a class="plazo-link" [routerLink]="link" [queryParams]="gradesQuery(item)">{{ item.titulo }}</a>
 							} @else {
 								{{ item.titulo }}
 							}

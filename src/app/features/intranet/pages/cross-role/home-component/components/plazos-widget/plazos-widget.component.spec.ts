@@ -146,8 +146,8 @@ describe('PlazosWidgetComponent', () => {
 
 		const links = Array.from(el.querySelectorAll<HTMLAnchorElement>('a.plazo-link')).map((a) => a.getAttribute('href'));
 		expect(links).toEqual([
-			'/intranet/profesor/cursos/10/100/calificaciones?horarioId=5',
-			'/intranet/profesor/cursos/20/200/calificaciones?horarioId=5',
+			'/intranet/profesor/cursos/10/100/calificaciones?horarioId=5&evaluacionId=1',
+			'/intranet/profesor/cursos/20/200/calificaciones?horarioId=5&evaluacionId=2',
 		]);
 		expect(el.querySelectorAll('.plazo-row').length).toBe(4);
 	});
