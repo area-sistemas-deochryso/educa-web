@@ -7,7 +7,7 @@ import { CursoContenidoPublicacionFacade } from '../../services/curso-contenido-
 import { CursoContenidoUiFacade } from '../../services/curso-contenido-ui.facade';
 import { ContenidoArchivoTipo, CursoContenidoArchivoDto, CursoContenidoSemanaDto, CursoContenidoTareaDto } from '@features/intranet/pages/profesor/models';
 import { ErrorHandlerService } from '@core/services';
-import { FileRowComponent, UPLOAD_ACCEPT, UPLOAD_LIMITS, validateUploadFile, FileViewerService, ViewableArchivo } from '@shared/components';
+import { FileRowComponent, UPLOAD_ACCEPT, UPLOAD_LIMITS, describeUploadLimits, validateUploadFile, FileViewerService, ViewableArchivo } from '@shared/components';
 import { EduAccordion, EduAccordionHeader, EduAccordionPanel, EduButton, EduConfirmationService, EduFileUpload, type EduFileUploadSelectEvent, EduMenu, type EduMenuItem, EduTooltip } from '@edu-ui';
 
 // #region Tipos de la vista
@@ -47,6 +47,7 @@ export class SemanasAccordionComponent {
 	private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 	readonly uploadAccept = UPLOAD_ACCEPT;
 	readonly uploadMaxBytes = UPLOAD_LIMITS.maxFileSizeBytes;
+	readonly uploadHint = describeUploadLimits();
 	// #endregion
 
 	// #region Estado del facade

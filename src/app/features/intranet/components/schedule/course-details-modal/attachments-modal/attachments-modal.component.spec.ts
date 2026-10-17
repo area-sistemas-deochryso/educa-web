@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AttachmentsModalComponent } from './attachments-modal.component';
 import { AttachmentsModalFacade } from './attachments-modal.facade';
 import { AttachmentsModalStore } from './attachments-modal.store';
+import { describeUploadLimits } from '@shared/components';
 import type { Attachment } from './attachments-modal.models';
 
 const attachments: Attachment[] = [
@@ -39,6 +40,12 @@ describe('AttachmentsModalComponent', () => {
 		expect(rows()[0].textContent).toContain('guia.pdf');
 		expect(rows()[0].textContent).toContain('2 KB');
 		expect(rows()[1].textContent).toContain('5 MB');
+	});
+
+	it('muestra el aviso de formatos y tamaño máximo junto al control de subida', () => {
+		const hint = document.querySelector('edu-file-upload .edu-file-upload__hint') as HTMLElement;
+		expect(hint.textContent?.trim()).toBe(describeUploadLimits());
+		expect(document.querySelector('edu-file-upload button')?.getAttribute('aria-describedby')).toBe(hint.id);
 	});
 
 	it('abrir una fila delega en el facade (visor + marcar leído)', () => {

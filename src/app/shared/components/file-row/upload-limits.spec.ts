@@ -1,5 +1,27 @@
 import { describe, expect, it } from 'vitest';
-import { JUSTIFICATION_UPLOAD_ACCEPT, JUSTIFICATION_UPLOAD_LIMITS, UPLOAD_ACCEPT, UPLOAD_LIMITS, validateUploadFile } from './upload-limits';
+import { JUSTIFICATION_UPLOAD_ACCEPT, JUSTIFICATION_UPLOAD_LIMITS, UPLOAD_ACCEPT, UPLOAD_LIMITS, describeUploadLimits, validateUploadFile } from './upload-limits';
+
+describe('describeUploadLimits', () => {
+	it('lista cada extensión permitida y el tamaño máximo de la fuente compartida', () => {
+		const text = describeUploadLimits();
+		for (const extension of UPLOAD_LIMITS.allowedExtensions) {
+			expect(text).toContain(extension.slice(1).toUpperCase());
+		}
+		expect(text).toContain('100 MB');
+	});
+
+	it('cambia cuando cambian los límites recibidos', () => {
+		const text = describeUploadLimits({ maxFileSizeBytes: 5 * 1024 * 1024, maxFileNameLength: 50, allowedExtensions: ['.abc', '.xyz'] });
+		expect(text).toContain('ABC, XYZ');
+		expect(text).toContain('5 MB');
+		expect(text).not.toContain('PDF');
+	});
+
+	it('describe lo mismo que valida: una extensión fuera de la lista no aparece en el aviso', () => {
+		expect(validateUploadFile({ name: 'virus.exe', size: 1 })).toContain('no permitido');
+		expect(describeUploadLimits()).not.toContain('EXE');
+	});
+});
 
 describe('validateUploadFile', () => {
 	it('acepta un archivo permitido dentro del tope', () => {

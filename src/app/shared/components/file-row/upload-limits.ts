@@ -36,6 +36,13 @@ export const JUSTIFICATION_UPLOAD_LIMITS: UploadLimits = {
 
 export const JUSTIFICATION_UPLOAD_ACCEPT = JUSTIFICATION_UPLOAD_LIMITS.allowedExtensions.join(',');
 
+/** Texto de ayuda para el control de subida, derivado de los límites: formatos válidos y tamaño máximo. */
+export function describeUploadLimits(limits: UploadLimits = UPLOAD_LIMITS): string {
+	const formats = limits.allowedExtensions.map((extension) => extension.replace('.', '').toUpperCase()).join(', ');
+	const maxMb = Math.round(limits.maxFileSizeBytes / (1024 * 1024));
+	return `Formatos permitidos: ${formats}. Tamaño máximo: ${maxMb} MB por archivo.`;
+}
+
 /** Devuelve el mensaje de error en español si el archivo no cumple los límites (por defecto los del BE general), o `null` si es válido. */
 export function validateUploadFile(file: Pick<File, 'name' | 'size'>, limits: UploadLimits = UPLOAD_LIMITS): string | null {
 	if (file.name.length > limits.maxFileNameLength) {

@@ -211,6 +211,7 @@
 										icon="pi pi-plus"
 										size="small"
 										data-info-anchor="profesor-semanas-agregar"
+										[pt]="{ root: { 'aria-describedby': 'material-hint-' + semana.id } }"
 										(click)="openAddMenu($event, semana)"
 									/>
 								}
@@ -227,6 +228,9 @@
 									</div>
 									<span class="section-count">{{ semana.archivos.length }}</span>
 								</div>
+								@if (!studentView()) {
+									<p class="upload-hint" data-info-anchor="profesor-semanas-formatos-ayuda" [id]="'material-hint-' + semana.id">{{ uploadHint }}</p>
+								}
 
 								@if (semana.archivos.length === 0) {
 									<div class="empty-block">
@@ -241,6 +245,7 @@
 											size="small"
 											severity="secondary"
 											data-info-anchor="profesor-semanas-subir-archivo"
+											[pt]="{ root: { 'aria-describedby': 'material-hint-' + semana.id } }"
 											(click)="onSubirMaterial(semana)"
 										/>
 									</div>
@@ -456,6 +461,7 @@
 															[customUpload]="true"
 															[accept]="uploadAccept"
 															[maxFileSize]="uploadMaxBytes"
+															[hint]="uploadHint"
 															(uploadHandler)="onTareaFilesSelected($event, semana.id, tarea.id)"
 														/>
 													}

@@ -11,7 +11,7 @@ import {
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ErrorHandlerService } from '@core/services';
-import { FileRowComponent, UPLOAD_ACCEPT, UPLOAD_LIMITS, validateUploadFile, FileViewerService, ViewableArchivo } from '@shared/components';
+import { FileRowComponent, UPLOAD_ACCEPT, UPLOAD_LIMITS, describeUploadLimits, validateUploadFile, FileViewerService, ViewableArchivo } from '@shared/components';
 import { CursoHubContextService, EmptyStateComponent } from '@intranet-shared/components';
 import { TareasPendientesService } from '@intranet-shared/services';
 import { EstudianteCursosFacade } from '@features/intranet/pages/estudiante/services/estudiante-cursos.facade';
@@ -93,6 +93,7 @@ export class EstudianteCursoHubContenidoComponent {
 	private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 	protected readonly uploadAccept = UPLOAD_ACCEPT;
 	protected readonly uploadMaxBytes = UPLOAD_LIMITS.maxFileSizeBytes;
+	protected readonly uploadHint = describeUploadLimits();
 	// Presentación de tareas (funciones puras, ver contenido-tarea.helpers.ts)
 	protected readonly tareaEtiqueta = tareaEtiqueta;
 	protected readonly fechaLimiteEstado = fechaLimiteEstado;

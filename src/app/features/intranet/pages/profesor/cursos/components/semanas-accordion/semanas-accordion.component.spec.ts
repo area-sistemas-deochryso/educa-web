@@ -3,7 +3,7 @@ import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ErrorHandlerService } from '@core/services';
-import { UPLOAD_LIMITS } from '@shared/components';
+import { UPLOAD_LIMITS, describeUploadLimits } from '@shared/components';
 import { CursoContenidoCrudFacade } from '../../services/curso-contenido-crud.facade';
 import { CursoContenidoDataFacade } from '../../services/curso-contenido-data.facade';
 import { CursoContenidoUiFacade } from '../../services/curso-contenido-ui.facade';
@@ -65,6 +65,25 @@ describe('SemanasAccordionComponent', () => {
 		expect(el().querySelectorAll('app-file-row').length).toBe(2);
 		expect(el().querySelectorAll('edu-file-upload').length).toBe(1);
 		expect(el().querySelector('input[type="file"]')).not.toBeNull();
+	});
+
+	it('muestra el aviso de formatos y tamaño en la subida de material y en la de adjuntos de tarea, asociado a cada control', () => {
+		const expected = describeUploadLimits();
+		const materialHint = el().querySelector('#material-hint-1') as HTMLElement;
+		expect(materialHint.textContent?.trim()).toBe(expected);
+		const buttons = Array.from(el().querySelectorAll('edu-button button'));
+		expect(buttons.some((b) => b.getAttribute('aria-describedby') === 'material-hint-1')).toBe(true);
+
+		const tareaUpload = el().querySelector('edu-file-upload') as HTMLElement;
+		const tareaHint = tareaUpload.querySelector('.edu-file-upload__hint') as HTMLElement;
+		expect(tareaHint.textContent?.trim()).toBe(expected);
+		expect(tareaUpload.querySelector('button')?.getAttribute('aria-describedby')).toBe(tareaHint.id);
+	});
+
+	it('no muestra el aviso de subida en la vista de estudiante', () => {
+		component.studentView.set(true);
+		fixture.detectChanges();
+		expect(el().querySelector('#material-hint-1')).toBeNull();
 	});
 
 	it('(open) delega en el visor compartido con name y url del archivo', () => {

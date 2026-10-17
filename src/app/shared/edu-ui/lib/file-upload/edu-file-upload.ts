@@ -4,6 +4,8 @@ export interface EduFileUploadSelectEvent {
 	files: File[];
 }
 
+let nextHintId = 0;
+
 @Component({
 	selector: 'edu-file-upload',
 	standalone: true,
@@ -25,13 +27,20 @@ export interface EduFileUploadSelectEvent {
 					type="button"
 					class="edu-file-upload__choose edu-file-upload__choose--basic"
 					[disabled]="disabled()"
+					[attr.aria-describedby]="hint() ? hintId : null"
 					(click)="nativeInput.click()"
 				>
 					<i class="pi pi-upload"></i>
 					<span>{{ chooseLabel() }}</span>
 				</button>
 			} @else {
-				<button type="button" class="edu-file-upload__choose" [disabled]="disabled()" (click)="nativeInput.click()">
+				<button
+					type="button"
+					class="edu-file-upload__choose"
+					[disabled]="disabled()"
+					[attr.aria-describedby]="hint() ? hintId : null"
+					(click)="nativeInput.click()"
+				>
 					<i class="pi pi-upload"></i>
 					<span>{{ chooseLabel() }}</span>
 				</button>
@@ -45,6 +54,9 @@ export interface EduFileUploadSelectEvent {
 						</button>
 					</div>
 				}
+			}
+			@if (hint()) {
+				<span class="edu-file-upload__hint" [id]="hintId">{{ hint() }}</span>
 			}
 			@if (errorMessage()) {
 				<span class="edu-file-upload__error">{{ errorMessage() }}</span>
@@ -63,10 +75,14 @@ export class EduFileUpload {
 	/** Accepted for template-binding parity — el componente nunca tuvo botón de confirmación manual, así que ya sube automáticamente al seleccionar cuando `customUpload` está activo; este flag no cambia ese comportamiento. */
 	readonly auto = input(false);
 	readonly mode = input<'advanced' | 'basic'>('advanced');
+	/** Texto de ayuda visible junto al control (p. ej. formatos y tamaño máximo); se asocia al botón con `aria-describedby`. */
+	readonly hint = input<string>();
 
 	readonly onSelect = output<EduFileUploadSelectEvent>();
 	readonly onClear = output<void>();
 	readonly uploadHandler = output<EduFileUploadSelectEvent>();
+
+	protected readonly hintId = `edu-file-upload-hint-${nextHintId++}`;
 
 	private readonly nativeInputRef = viewChild<ElementRef<HTMLInputElement>>('nativeInput');
 

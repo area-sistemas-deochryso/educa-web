@@ -5,7 +5,7 @@ import type { Attachment } from './attachments-modal.models';
 import { AttachmentsModalStore } from './attachments-modal.store';
 import { AttachmentsModalFacade } from './attachments-modal.facade';
 import { EduButton, EduDialog, EduFileUpload, EduSpinner, EduTooltip } from '@edu-ui';
-import { FileRowComponent, UPLOAD_ACCEPT, UPLOAD_LIMITS } from '@shared/components';
+import { FileRowComponent, UPLOAD_ACCEPT, UPLOAD_LIMITS, describeUploadLimits } from '@shared/components';
 
 // #endregion
 // #region Implementation
@@ -48,6 +48,7 @@ export class AttachmentsModalComponent {
 	readonly vm = this.facade.vm;
 	/** Upload picker filters shared with the rest of the file flows. */
 	readonly uploadAccept = UPLOAD_ACCEPT;
+	readonly uploadHint = describeUploadLimits();
 	readonly uploadMaxBytes = UPLOAD_LIMITS.maxFileSizeBytes;
 	// #endregion
 
