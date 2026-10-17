@@ -51,7 +51,13 @@
 				</div>
 				<div class="evaluaciones-list">
 					@for (cal of calificacionesPorSemana().get(semanaNum) ?? []; track cal.id) {
-						<div class="evaluacion-card">
+						<div
+							class="evaluacion-card"
+							[class.evaluacion-card--focus]="highlightedId() === cal.id"
+							[attr.data-evaluacion-id]="cal.id"
+							[attr.aria-current]="highlightedId() === cal.id ? 'true' : null"
+							tabindex="-1"
+						>
 							<div class="eval-info">
 								<div class="eval-title-row">
 									<edu-tag [value]="cal.tipo" styleClass="tag-neutral" />
@@ -59,6 +65,9 @@
 										<edu-tag value="Grupal" severity="warn" icon="pi pi-users" />
 									}
 									<span class="eval-title">{{ cal.titulo }}</span>
+									@if (highlightedId() === cal.id) {
+										<edu-tag value="Pendiente de calificar" severity="info" icon="pi pi-bookmark" />
+									}
 									<span class="eval-peso">{{ getPesoPercent(cal.peso) }}</span>
 								</div>
 								<div class="eval-meta">

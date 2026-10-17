@@ -1,6 +1,8 @@
 // #region Imports
 import { NO_ERRORS_SCHEMA, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
+import { BehaviorSubject } from 'rxjs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { EduConfirmationService } from '@edu-ui';
@@ -36,6 +38,8 @@ const baseCalVm = {
 
 interface Handlers {
 	onRefreshCalificaciones(): void;
+	onFocusConsumed(): void;
+	focusEvaluacionId(): number | null;
 	onEliminarEvaluacion(cal: unknown): void;
 	onCambiarTipo(cal: unknown): void;
 	onSaveCalificaciones(dto: unknown): void;
@@ -64,6 +68,9 @@ describe('ProfesorCursoHubCalificacionesComponent', () => {
 	};
 	const calLoader = { ensure: vi.fn(), refresh: vi.fn(), reset: vi.fn() };
 	const confirmation = { confirm: vi.fn() };
+	const queryParamMap$ = new BehaviorSubject(convertToParamMap({}));
+	const route = { queryParamMap: queryParamMap$.asObservable() };
+	const router = { navigate: vi.fn().mockResolvedValue(true) };
 
 	function create() {
 		const fixture = TestBed.createComponent(ProfesorCursoHubCalificacionesComponent);
@@ -75,12 +82,15 @@ describe('ProfesorCursoHubCalificacionesComponent', () => {
 		vi.clearAllMocks();
 		vm.set({ ...baseVm });
 		calVm.set({ ...baseCalVm });
+		queryParamMap$.next(convertToParamMap({}));
 
 		TestBed.configureTestingModule({
 			providers: [
 				{ provide: CursoContenidoUiFacade, useValue: uiFacade },
 				{ provide: CalificacionesFacade, useValue: calFacade },
 				{ provide: CursoHubCalificacionesLoader, useValue: calLoader },
+				{ provide: ActivatedRoute, useValue: route },
+				{ provide: Router, useValue: router },
 			],
 		});
 		TestBed.overrideComponent(ProfesorCursoHubCalificacionesComponent, {
@@ -134,6 +144,45 @@ describe('ProfesorCursoHubCalificacionesComponent', () => {
 			handlers.onRefreshCalificaciones();
 
 			expect(calLoader.refresh).toHaveBeenCalledWith(8);
+		});
+	});
+
+	describe('foco de evaluación (?evaluacionId)', () => {
+		it('reads a valid evaluacionId from the query', () => {
+			queryParamMap$.next(convertToParamMap({ horarioId: '5', evaluacionId: '42' }));
+
+			const { handlers } = create();
+
+			expect(handlers.focusEvaluacionId()).toBe(42);
+		});
+
+		it.each([[''], ['abc'], ['0'], ['-3'], ['1.5']])('ignores an invalid evaluacionId (%s)', (raw) => {
+			queryParamMap$.next(convertToParamMap({ evaluacionId: raw }));
+
+			const { handlers } = create();
+
+			expect(handlers.focusEvaluacionId()).toBeNull();
+		});
+
+		it('has no focus when the link carries no evaluacionId (F2 flow, bookmarks)', () => {
+			const { handlers } = create();
+
+			expect(handlers.focusEvaluacionId()).toBeNull();
+		});
+
+		it('drops only evaluacionId from the URL once consumed, keeping horarioId', () => {
+			const { handlers } = create();
+
+			handlers.onFocusConsumed();
+
+			expect(router.navigate).toHaveBeenCalledWith(
+				[],
+				expect.objectContaining({
+					queryParams: { evaluacionId: null },
+					queryParamsHandling: 'merge',
+					replaceUrl: true,
+				}),
+			);
 		});
 	});
 
