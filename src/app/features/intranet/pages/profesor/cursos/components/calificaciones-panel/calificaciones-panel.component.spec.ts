@@ -158,4 +158,68 @@ describe('CalificacionesPanelComponent', () => {
 			);
 		});
 	});
+
+	describe('foco desde el Inicio', () => {
+		let scrollIntoView: ReturnType<typeof vi.fn>;
+
+		beforeEach(() => {
+			scrollIntoView = vi.fn();
+			HTMLElement.prototype.scrollIntoView = scrollIntoView as unknown as typeof HTMLElement.prototype.scrollIntoView;
+		});
+
+		function createWithFocus(focusId: number | null, loading = false) {
+			const fixture = TestBed.createComponent(CalificacionesPanelComponent);
+			const consumed = vi.fn();
+			fixture.componentInstance.focusConsumed.subscribe(consumed);
+			fixture.componentRef.setInput('calificacionesPorSemana', new Map([[3, [evaluacion('2026-10-20T00:00:00', [])]]]));
+			fixture.componentRef.setInput('periodos', []);
+			fixture.componentRef.setInput('totalEstudiantes', 10);
+			fixture.componentRef.setInput('loading', loading);
+			fixture.componentRef.setInput('focusEvaluacionId', focusId);
+			fixture.detectChanges();
+			return { fixture, consumed, el: fixture.nativeElement as HTMLElement };
+		}
+
+		it('evaluación existente → se desplaza, se resalta con etiqueta y libera el foco', () => {
+			const { fixture, consumed, el } = createWithFocus(1);
+			fixture.detectChanges();
+
+			expect(scrollIntoView).toHaveBeenCalledTimes(1);
+			const card = el.querySelector('[data-evaluacion-id="1"]');
+			expect(card?.classList.contains('evaluacion-card--focus')).toBe(true);
+			expect(card?.getAttribute('aria-current')).toBe('true');
+			expect(card?.textContent).toContain('Pendiente de calificar');
+			expect(consumed).toHaveBeenCalledTimes(1);
+		});
+
+		it('evaluación inexistente → sin resaltado ni scroll, pero libera el foco', () => {
+			const { fixture, consumed, el } = createWithFocus(999);
+			fixture.detectChanges();
+
+			expect(scrollIntoView).not.toHaveBeenCalled();
+			expect(el.querySelector('.evaluacion-card--focus')).toBeNull();
+			expect(consumed).toHaveBeenCalledTimes(1);
+		});
+
+		it('sin foco (flujo previo, favoritos) → comportamiento igual al actual', () => {
+			const { fixture, consumed, el } = createWithFocus(null);
+			fixture.detectChanges();
+
+			expect(scrollIntoView).not.toHaveBeenCalled();
+			expect(el.querySelector('.evaluacion-card--focus')).toBeNull();
+			expect(consumed).not.toHaveBeenCalled();
+		});
+
+		it('espera a que termine la carga antes de resolver el foco', () => {
+			const { fixture, consumed } = createWithFocus(1, true);
+			expect(consumed).not.toHaveBeenCalled();
+
+			fixture.componentRef.setInput('loading', false);
+			fixture.detectChanges();
+			fixture.detectChanges();
+
+			expect(consumed).toHaveBeenCalledTimes(1);
+			expect(scrollIntoView).toHaveBeenCalledTimes(1);
+		});
+	});
 });
