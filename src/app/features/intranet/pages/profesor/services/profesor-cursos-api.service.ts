@@ -139,6 +139,10 @@ export class ProfesorCursosApiService {
 		);
 	}
 
+	cambiarPublicacionTareaArchivo(archivoId: number, request: CambiarPublicacionRequest): Observable<TareaArchivoDto> {
+		return this.http.patch<TareaArchivoDto>(`${this.contenidoUrl}/tarea-archivo/${archivoId}/publicacion`, request);
+	}
+
 	eliminarTareaArchivo(archivoId: number): Observable<{ mensaje: string }> {
 		return this.http.delete<{ mensaje: string }>(`${this.contenidoUrl}/tarea-archivo/${archivoId}`);
 	}

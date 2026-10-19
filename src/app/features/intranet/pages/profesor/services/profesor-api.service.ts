@@ -123,6 +123,9 @@ export class ProfesorApiService {
 	registrarTareaArchivo(tareaId: number, request: RegistrarTareaArchivoRequest): Observable<TareaArchivoDto> {
 		return this.cursos.registrarTareaArchivo(tareaId, request);
 	}
+	cambiarPublicacionTareaArchivo(archivoId: number, request: CambiarPublicacionRequest): Observable<TareaArchivoDto> {
+		return this.cursos.cambiarPublicacionTareaArchivo(archivoId, request);
+	}
 	eliminarTareaArchivo(archivoId: number): Observable<{ mensaje: string }> {
 		return this.cursos.eliminarTareaArchivo(archivoId);
 	}

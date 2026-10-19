@@ -214,6 +214,10 @@ export class CursoContenidoStore {
 		this.applyMutation(contenidoMutations.addArchivoToTarea(semanaId, tareaId, archivo));
 	}
 
+	updateArchivoInTarea(semanaId: number, tareaId: number, archivoId: number, updates: Partial<TareaArchivoDto>): void {
+		this.applyMutation(contenidoMutations.updateArchivoInTarea(semanaId, tareaId, archivoId, updates));
+	}
+
 	removeArchivoFromTarea(semanaId: number, tareaId: number, archivoId: number): void {
 		this.applyMutation(contenidoMutations.removeArchivoFromTarea(semanaId, tareaId, archivoId));
 	}
