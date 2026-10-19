@@ -56,6 +56,9 @@ export const contenidoMutations = {
 	addArchivoToTarea: (semanaId: number, tareaId: number, archivo: TareaArchivoDto): Mutator =>
 		(c) => mapTareaEnSemana(c, semanaId, tareaId, (t) => ({ ...t, archivos: [...t.archivos, archivo] })),
 
+	updateArchivoInTarea: (semanaId: number, tareaId: number, archivoId: number, updates: Partial<TareaArchivoDto>): Mutator =>
+		(c) => mapTareaEnSemana(c, semanaId, tareaId, (t) => ({ ...t, archivos: t.archivos.map((a) => (a.id === archivoId ? { ...a, ...updates } : a)) })),
+
 	removeArchivoFromTarea: (semanaId: number, tareaId: number, archivoId: number): Mutator =>
 		(c) => mapTareaEnSemana(c, semanaId, tareaId, (t) => ({ ...t, archivos: t.archivos.filter((a) => a.id !== archivoId) })),
 };

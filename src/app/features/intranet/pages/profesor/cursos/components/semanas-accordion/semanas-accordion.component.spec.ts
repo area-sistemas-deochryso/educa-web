@@ -6,6 +6,7 @@ import { ErrorHandlerService } from '@core/services';
 import { UPLOAD_LIMITS, describeUploadLimits } from '@shared/components';
 import { CursoContenidoCrudFacade } from '../../services/curso-contenido-crud.facade';
 import { CursoContenidoDataFacade } from '../../services/curso-contenido-data.facade';
+import { CursoContenidoPublicacionFacade } from '../../services/curso-contenido-publicacion.facade';
 import { CursoContenidoUiFacade } from '../../services/curso-contenido-ui.facade';
 import { SemanasAccordionComponent } from './semanas-accordion.component';
 
@@ -286,5 +287,99 @@ describe('SemanasAccordionComponent — tipos y borradores', () => {
 		expect(component.tareaEtiqueta(actividad)).toBe('Actividad grupal');
 		expect(component.entregasPorcentaje(actividad)).toBe(38);
 		expect(component.entregasPorcentaje({ ...(actividad as object), entregasEsperadas: 0 } as never)).toBeNull();
+	});
+});
+
+describe('SemanasAccordionComponent — archivos nuevos en borrador (P113 F4)', () => {
+	const archivo = (id: number, nombre: string, publicado: boolean) => ({
+		id,
+		nombreArchivo: nombre,
+		urlArchivo: 'u',
+		tipoArchivo: null,
+		tamanoBytes: 1,
+		fechaReg: '2026-10-01',
+		publicado,
+	});
+	// Estado tal como lo devuelve el BE al recargar: el borrador viene del dato, no de estado local.
+	const semanasBE = [
+		{
+			id: 1,
+			numeroSemana: 1,
+			titulo: null,
+			publicado: true,
+			archivos: [{ ...archivo(1, 'material-borrador.pdf', false), tipo: 'CLASE' }, { ...archivo(2, 'material-publicado.pdf', true), tipo: 'CLASE' }],
+			tareas: [
+				{
+					id: 10,
+					titulo: 'Tarea',
+					descripcion: null,
+					fechaLimite: null,
+					esGrupal: false,
+					fechaReg: '2026-10-01',
+					tipo: 'TAREA',
+					publicado: true,
+					archivos: [archivo(3, 'adjunto-borrador.pdf', false), archivo(4, 'adjunto-publicado.pdf', true)],
+				},
+			],
+		},
+	];
+	const publicacion = { cambiarPublicacionArchivo: vi.fn(), cambiarPublicacionTareaArchivo: vi.fn() };
+
+	function create() {
+		TestBed.configureTestingModule({
+			imports: [SemanasAccordionComponent],
+			providers: [
+				{ provide: CursoContenidoUiFacade, useValue: { vm: signal({ semanas: semanasBE, contenido: { semanaVigente: 1 } }) } },
+				{ provide: CursoContenidoDataFacade, useValue: { refreshContenido: vi.fn() } },
+				{ provide: CursoContenidoCrudFacade, useValue: {} },
+				{ provide: CursoContenidoPublicacionFacade, useValue: publicacion },
+				{ provide: ErrorHandlerService, useValue: { showWarning: vi.fn() } },
+			],
+		});
+		const fixture = TestBed.createComponent(SemanasAccordionComponent);
+		fixture.componentInstance.openPanels.set([1]);
+		fixture.detectChanges();
+		return { fixture, component: fixture.componentInstance, el: fixture.nativeElement as HTMLElement };
+	}
+
+	beforeEach(() => vi.clearAllMocks());
+
+	it('el docente ve la marca «Borrador» (texto, no solo color) solo en los archivos en borrador, de semana y de tarea', () => {
+		const { el } = create();
+		const marcas = Array.from(el.querySelectorAll('.draft-tag'));
+
+		expect(marcas).toHaveLength(2);
+		expect(marcas.every((m) => m.textContent?.trim() === 'Borrador')).toBe(true);
+	});
+
+	it('el archivo en borrador ofrece «Publicar» y el publicado «Pasar a borrador»', () => {
+		const { el } = create();
+
+		expect(el.querySelectorAll('button[aria-label="Publicar archivo"]')).toHaveLength(1);
+		expect(el.querySelectorAll('button[aria-label="Pasar archivo a borrador"]')).toHaveLength(1);
+		expect(el.querySelectorAll('button[aria-label="Publicar archivo de tarea"]')).toHaveLength(1);
+		expect(el.querySelectorAll('button[aria-label="Pasar archivo de tarea a borrador"]')).toHaveLength(1);
+	});
+
+	it('publicar un adjunto de tarea delega en la fachada con el estado contrario al actual', () => {
+		const { component } = create();
+
+		component.togglePublicacionTareaArchivo(1, 10, semanasBE[0].tareas[0].archivos[0]);
+		component.togglePublicacionTareaArchivo(1, 10, semanasBE[0].tareas[0].archivos[1]);
+
+		expect(publicacion.cambiarPublicacionTareaArchivo).toHaveBeenNthCalledWith(1, 1, 10, 3, true);
+		expect(publicacion.cambiarPublicacionTareaArchivo).toHaveBeenNthCalledWith(2, 1, 10, 4, false);
+	});
+
+	it('la vista estudiante no muestra archivos en borrador (ni de semana ni de tarea) ni las acciones de publicar', () => {
+		const { fixture, component, el } = create();
+		component.studentView.set(true);
+		fixture.detectChanges();
+
+		expect(el.textContent).not.toContain('material-borrador.pdf');
+		expect(el.textContent).not.toContain('adjunto-borrador.pdf');
+		expect(el.textContent).toContain('material-publicado.pdf');
+		expect(el.textContent).toContain('adjunto-publicado.pdf');
+		expect(el.querySelectorAll('.draft-tag')).toHaveLength(0);
 	});
 });

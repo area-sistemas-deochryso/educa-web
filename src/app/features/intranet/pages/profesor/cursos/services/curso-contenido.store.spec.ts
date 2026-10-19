@@ -162,6 +162,14 @@ describe('CursoContenidoStore', () => {
 			expect(sem.tareas[0].archivos).toHaveLength(2);
 		});
 
+		it('should update archivo state in tarea without touching others', () => {
+			store.addArchivoToTarea(1, 200, { id: 301, nombre: 'extra.pdf', publicado: false } as never);
+			store.updateArchivoInTarea(1, 200, 301, { publicado: true });
+			const sem = store.semanas()[0] as { tareas: { archivos: { id: number; publicado?: boolean }[] }[] };
+			expect(sem.tareas[0].archivos.find((a) => a.id === 301)?.publicado).toBe(true);
+			expect(sem.tareas[0].archivos.find((a) => a.id === 300)?.publicado).toBeUndefined();
+		});
+
 		it('should remove archivo from tarea', () => {
 			store.removeArchivoFromTarea(1, 200, 300);
 			const sem = store.semanas()[0] as { tareas: { archivos: unknown[] }[] };

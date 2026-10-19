@@ -249,6 +249,8 @@ export interface TareaArchivoDto {
 	tipoArchivo: string | null;
 	tamanoBytes: number | null;
 	fechaReg: string;
+	/** `false` = borrador: los estudiantes no lo ven. Ausente se trata como publicado. */
+	publicado?: boolean;
 }
 
 /**
