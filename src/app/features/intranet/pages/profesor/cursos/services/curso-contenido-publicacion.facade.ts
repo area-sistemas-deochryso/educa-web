@@ -6,7 +6,7 @@ import { ProfesorApiService } from '../../services/profesor-api.service';
 import { CursoContenidoStore } from './curso-contenido.store';
 
 /**
- * Publicar o pasar a borrador una semana, un archivo o una tarea. Un borrador no lo ven los estudiantes.
+ * Publicar o pasar a borrador una semana, un archivo, una tarea o un adjunto de tarea. Un borrador no lo ven los estudiantes.
  *
  * Vive aparte de `CursoContenidoCrudFacade` porque no crea ni borra nada: solo cambia la visibilidad.
  */
@@ -70,6 +70,31 @@ export class CursoContenidoPublicacionFacade {
 			},
 			onCommit: (archivo) => this.store.updateArchivoInSemana(semanaId, archivoId, { publicado: archivo.publicado }),
 			onError: (err) => this.errHandler.handle(err, 'cambiar la publicación del archivo'),
+		});
+	}
+
+	/** Publica o pasa a borrador un adjunto de tarea. */
+	cambiarPublicacionTareaArchivo(semanaId: number, tareaId: number, archivoId: number, publicado: boolean): void {
+		const anterior = this.store
+			.vm()
+			.contenido?.semanas?.find((s) => s.id === semanaId)
+			?.tareas.find((t) => t.id === tareaId)
+			?.archivos.find((a) => a.id === archivoId)?.publicado;
+		const request = { publicado };
+		this.wal.execute({
+			operation: 'UPDATE',
+			resourceType: 'tareaArchivo',
+			resourceId: archivoId,
+			endpoint: `${this.contenidoUrl}/tarea-archivo/${archivoId}/publicacion`,
+			method: 'PATCH',
+			payload: request,
+			http$: () => this.api.cambiarPublicacionTareaArchivo(archivoId, request),
+			optimistic: {
+				apply: () => this.store.updateArchivoInTarea(semanaId, tareaId, archivoId, { publicado }),
+				rollback: () => this.store.updateArchivoInTarea(semanaId, tareaId, archivoId, { publicado: anterior ?? true }),
+			},
+			onCommit: (archivo) => this.store.updateArchivoInTarea(semanaId, tareaId, archivoId, { publicado: archivo.publicado }),
+			onError: (err) => this.errHandler.handle(err, 'cambiar la publicación del archivo de la tarea'),
 		});
 	}
 

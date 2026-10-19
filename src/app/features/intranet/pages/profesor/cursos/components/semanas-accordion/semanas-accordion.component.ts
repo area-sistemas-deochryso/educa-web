@@ -5,7 +5,7 @@ import { CursoContenidoDataFacade } from '../../services/curso-contenido-data.fa
 import { CursoContenidoCrudFacade } from '../../services/curso-contenido-crud.facade';
 import { CursoContenidoPublicacionFacade } from '../../services/curso-contenido-publicacion.facade';
 import { CursoContenidoUiFacade } from '../../services/curso-contenido-ui.facade';
-import { ContenidoArchivoTipo, CursoContenidoArchivoDto, CursoContenidoSemanaDto, CursoContenidoTareaDto } from '@features/intranet/pages/profesor/models';
+import { ContenidoArchivoTipo, CursoContenidoArchivoDto, CursoContenidoSemanaDto, CursoContenidoTareaDto, TareaArchivoDto } from '@features/intranet/pages/profesor/models';
 import { ErrorHandlerService } from '@core/services';
 import { FileRowComponent, UPLOAD_ACCEPT, UPLOAD_LIMITS, describeUploadLimits, validateUploadFile, FileViewerService, ViewableArchivo } from '@shared/components';
 import { EduAccordion, EduAccordionHeader, EduAccordionPanel, EduButton, EduConfirmationService, EduFileUpload, type EduFileUploadSelectEvent, EduMenu, type EduMenuItem, EduTooltip } from '@edu-ui';
@@ -121,7 +121,9 @@ export class SemanasAccordionComponent {
 			.map((s) => ({
 				...s,
 				archivos: s.archivos.filter((a) => a.publicado !== false),
-				tareas: s.tareas.filter((t) => t.publicado !== false),
+				tareas: s.tareas
+					.filter((t) => t.publicado !== false)
+					.map((t) => ({ ...t, archivos: t.archivos.filter((a) => a.publicado !== false) })),
 			}));
 	});
 
@@ -226,6 +228,10 @@ export class SemanasAccordionComponent {
 
 	togglePublicacionArchivo(semanaId: number, archivo: CursoContenidoArchivoDto): void {
 		this.publicacionFacade.cambiarPublicacionArchivo(semanaId, archivo.id, archivo.publicado === false);
+	}
+
+	togglePublicacionTareaArchivo(semanaId: number, tareaId: number, archivo: TareaArchivoDto): void {
+		this.publicacionFacade.cambiarPublicacionTareaArchivo(semanaId, tareaId, archivo.id, archivo.publicado === false);
 	}
 
 	togglePublicacionTarea(semanaId: number, tarea: CursoContenidoTareaDto): void {

@@ -265,7 +265,7 @@
 													}
 													@if (!studentView()) {
 														@if (archivo.publicado === false) {
-															<span class="draft-tag">Borrador</span>
+															<span class="draft-tag" eduTooltip="Borrador: solo tú lo ves. Publícalo para que lo vean los estudiantes" eduTooltipPosition="top">Borrador</span>
 														}
 														<edu-button
 															[icon]="archivo.publicado === false ? 'pi pi-eye-slash' : 'pi pi-eye'"
@@ -478,6 +478,20 @@
 																>
 																	@if (!studentView()) {
 																		<span actions>
+																			@if (archivo.publicado === false) {
+																				<span class="draft-tag" eduTooltip="Borrador: solo tú lo ves. Publícalo para que lo vean los estudiantes" eduTooltipPosition="top">Borrador</span>
+																			}
+																			<edu-button
+																				[icon]="archivo.publicado === false ? 'pi pi-eye-slash' : 'pi pi-eye'"
+																				[text]="true"
+																				[rounded]="true"
+																				size="small"
+																				[eduTooltip]="archivo.publicado === false ? 'Publicar' : 'Pasar a borrador'"
+																				eduTooltipPosition="top"
+																				data-info-anchor="profesor-semanas-tarea-archivo-publicar"
+																				(click)="togglePublicacionTareaArchivo(semana.id, tarea.id, archivo)"
+																				[pt]="{ root: { 'aria-label': archivo.publicado === false ? 'Publicar archivo de tarea' : 'Pasar archivo de tarea a borrador' } }"
+																			/>
 																			<edu-button
 																				icon="pi pi-trash"
 																				[text]="true"

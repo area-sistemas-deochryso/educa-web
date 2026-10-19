@@ -912,6 +912,7 @@ Antes de brief 747 la fila ícono + nombre + tamaño estaba copiada en 5 sitios 
 ```
 
 - La fila es un `<button>` (foco por teclado); el nombre se trunca con elipsis y `eduTooltip` muestra el nombre completo. `[small]="true"` para listas anidadas (p. ej. material de una tarea).
+- El slot `actions` también admite una marca de estado junto a los botones (p. ej. `<span class="draft-tag">Borrador</span>` en archivos de profesor aún no publicados, P113 F4). La marca lleva **texto**, no solo color, y su `eduTooltip` explica la consecuencia («solo tú lo ves»).
 - `(open)` es el gancho del visor in-app (F4 del P105): hoy los consumidores hacen `window.open`.
 - Subida: `edu-file-upload` con `[accept]="UPLOAD_ACCEPT"` y `[maxFileSize]="UPLOAD_LIMITS.maxFileSizeBytes"`, y `validateUploadFile(file)` para extensión y largo de nombre (límites alineados con `FileUploadConfig.cs` del BE). Para avisar un rechazo usa `ErrorHandlerService.showWarning`, no `EduMessageService` inyectado: `ToastContainerComponent` provee su propia instancia y un toast enviado a la raíz nunca se ve.
 
