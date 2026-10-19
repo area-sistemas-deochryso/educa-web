@@ -11,6 +11,8 @@ export interface EstudianteArchivoDto {
 	tipoArchivo: string | null;
 	tamanoBytes: number | null;
 	fechaReg: string;
+	/** `false` = borrador: solo lo ve el estudiante autor. Publicado, lo ve el profesor y, si la actividad es grupal, su grupo. */
+	publicado: boolean;
 }
 
 /**
@@ -26,4 +28,6 @@ export interface EstudianteTareaArchivoDto {
 	tipoArchivo: string | null;
 	tamanoBytes: number | null;
 	fechaReg: string;
+	/** `false` = borrador: solo lo ve el estudiante autor. Publicado, lo ve el profesor y, si la actividad es grupal, su grupo. */
+	publicado: boolean;
 }

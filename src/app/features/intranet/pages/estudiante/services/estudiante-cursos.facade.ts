@@ -341,6 +341,48 @@ export class EstudianteCursosFacade {
 		});
 	}
 
+	/**
+	 * Publica o pasa a borrador un archivo propio de la semana. Optimista; revierte si el BE falla.
+	 * Un borrador solo lo ve su autor.
+	 */
+	cambiarPublicacionArchivo(semanaId: number, archivoId: number, publicado: boolean): void {
+		const anterior = (this.store.vm().misArchivos[semanaId] ?? []).find((a) => a.id === archivoId)?.publicado;
+		if (anterior === undefined) return;
+		const request = { publicado };
+
+		this.wal.execute({
+			operation: 'UPDATE',
+			resourceType: 'EstudianteArchivo',
+			resourceId: archivoId,
+			endpoint: `${ESTUDIANTE_CURSO_URL}/archivo/${archivoId}/publicacion`,
+			method: 'PATCH',
+			payload: request,
+			http$: () => this.api.cambiarPublicacionArchivo(archivoId, request),
+			optimistic: {
+				apply: () => this.store.updateMiArchivo(semanaId, archivoId, { publicado }),
+				rollback: () => this.store.updateMiArchivo(semanaId, archivoId, { publicado: anterior }),
+			},
+			onCommit: (archivo) => this.store.updateMiArchivo(semanaId, archivoId, { publicado: archivo.publicado }),
+			onError: (err) => {
+				logger.error('EstudianteCursosFacade: Error al cambiar la publicación del archivo', err);
+				this.errorHandler.showError(UI_SUMMARIES.error, UI_ATTACHMENT_MESSAGES.publishFailed);
+			},
+		});
+	}
+
+	/** Archivos publicados de otros miembros de mi grupo en la semana (una vez por semana). */
+	loadArchivosGrupoSemana(semanaId: number): void {
+		if (this.store.archivosGrupoSemana()[semanaId]) return;
+
+		this.api
+			.getArchivosGrupoSemana(semanaId)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (archivos) => this.store.setArchivosGrupoSemana(semanaId, archivos),
+				error: () => this.store.setArchivosGrupoSemana(semanaId, []),
+			});
+	}
+
 	// #endregion
 	// #region Student task file commands
 
@@ -417,6 +459,48 @@ export class EstudianteCursosFacade {
 				this.errorHandler.showError(UI_SUMMARIES.error, UI_ATTACHMENT_MESSAGES.deleteFailed);
 			},
 		});
+	}
+
+	/**
+	 * Publica o pasa a borrador una entrega propia de la tarea. Optimista; revierte si el BE falla.
+	 * Publicada la ve el profesor y, si la actividad es grupal, mi grupo.
+	 */
+	cambiarPublicacionTareaArchivo(tareaId: number, archivoId: number, publicado: boolean): void {
+		const anterior = (this.store.vm().misTareaArchivos[tareaId] ?? []).find((a) => a.id === archivoId)?.publicado;
+		if (anterior === undefined) return;
+		const request = { publicado };
+
+		this.wal.execute({
+			operation: 'UPDATE',
+			resourceType: 'EstudianteTareaArchivo',
+			resourceId: archivoId,
+			endpoint: `${ESTUDIANTE_CURSO_URL}/tarea-archivo/${archivoId}/publicacion`,
+			method: 'PATCH',
+			payload: request,
+			http$: () => this.api.cambiarPublicacionTareaArchivo(archivoId, request),
+			optimistic: {
+				apply: () => this.store.updateMiTareaArchivo(tareaId, archivoId, { publicado }),
+				rollback: () => this.store.updateMiTareaArchivo(tareaId, archivoId, { publicado: anterior }),
+			},
+			onCommit: (archivo) => this.store.updateMiTareaArchivo(tareaId, archivoId, { publicado: archivo.publicado }),
+			onError: (err) => {
+				logger.error('EstudianteCursosFacade: Error al cambiar la publicación del archivo de tarea', err);
+				this.errorHandler.showError(UI_SUMMARIES.error, UI_ATTACHMENT_MESSAGES.publishFailed);
+			},
+		});
+	}
+
+	/** Entregas publicadas de otros miembros de mi grupo en la tarea (una vez por tarea). El BE devuelve vacío si no es grupal. */
+	loadArchivosGrupoTarea(tareaId: number): void {
+		if (this.store.archivosGrupoTarea()[tareaId]) return;
+
+		this.api
+			.getArchivosGrupoTarea(tareaId)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (archivos) => this.store.setArchivosGrupoTarea(tareaId, archivos),
+				error: () => this.store.setArchivosGrupoTarea(tareaId, []),
+			});
 	}
 
 	// #endregion

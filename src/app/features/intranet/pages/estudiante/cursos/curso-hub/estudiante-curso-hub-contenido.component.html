@@ -248,13 +248,35 @@ Sin fecha límite
 																					(uploadHandler)="onTareaFilesSelected($event, tarea.id)"
 																				/>
 																			</div>
+																			<p class="section-hint" data-info-anchor="estudiante-curso-dialog-mi-entrega-ayuda">
+																				@if (tarea.esGrupal) {
+																					Lo que subes queda como borrador: solo tú lo ves. Al publicarlo, lo ven tu profesor y los miembros de tu grupo.
+																				} @else {
+																					Lo que subes queda como borrador: solo tú lo ves. Publícalo para que tu profesor lo vea y cuente como entrega.
+																				}
+																			</p>
 																			@if (getMisTareaArchivos(tarea.id).length === 0) {
 																				<div class="section-empty">No has subido archivos</div>
 																			} @else {
 																				<div class="tarea-archivos-list">
 																					@for (archivo of getMisTareaArchivos(tarea.id); track archivo.id) {
 																						<app-file-row data-info-anchor="estudiante-curso-dialog-mi-entrega" [name]="archivo.nombreArchivo" [mimeType]="archivo.tipoArchivo" [sizeBytes]="archivo.tamanoBytes" [small]="true" (open)="openArchivo(archivo)">
-<span actions><edu-button
+<span actions>
+																								@if (!archivo.publicado) {
+																									<span class="draft-tag" [eduTooltip]="tarea.esGrupal ? 'Borrador: solo tú lo ves. Publícalo para que lo vean tu profesor y tu grupo' : 'Borrador: solo tú lo ves. Publícalo para que lo vea tu profesor'" eduTooltipPosition="top">Borrador</span>
+																								}
+																								<edu-button
+																									[icon]="archivo.publicado ? 'pi pi-eye-slash' : 'pi pi-eye'"
+																									[text]="true"
+																									[rounded]="true"
+																									size="small"
+																									[eduTooltip]="archivo.publicado ? 'Volver a borrador' : 'Publicar'"
+																									eduTooltipPosition="top"
+																									data-info-anchor="estudiante-curso-dialog-mi-entrega-publicar"
+																									(click)="onTogglePublicacionMiTareaArchivo(tarea.id, archivo)"
+																									[pt]="{ root: { 'aria-label': archivo.publicado ? 'Volver a borrador la entrega' : 'Publicar la entrega' } }"
+																								/>
+																								<edu-button
 																									icon="pi pi-trash"
 																									[text]="true"
 																									[rounded]="true"
@@ -275,6 +297,23 @@ Sin fecha límite
 																				</div>
 																			}
 																		</div>
+
+																		<!-- Entregas publicadas por mi grupo (solo lectura) -->
+																		@if (tarea.esGrupal && getArchivosGrupoTarea(tarea.id).length > 0) {
+																			<div class="tarea-archivos-section" data-info-anchor="estudiante-curso-dialog-entrega-grupo">
+																				<div class="tarea-section-label">
+																					<i class="pi pi-users"></i>
+																					Publicado por mi grupo
+																				</div>
+																				<div class="tarea-archivos-list">
+																					@for (archivo of getArchivosGrupoTarea(tarea.id); track archivo.id) {
+																						<app-file-row [name]="archivo.nombreArchivo" [mimeType]="archivo.tipoArchivo" [sizeBytes]="archivo.tamanoBytes" [small]="true" (open)="openArchivo(archivo)">
+																							<span actions><span class="tipo-tag tipo-tag--grupo">{{ archivo.estudianteNombre }}</span></span>
+																						</app-file-row>
+																					}
+																				</div>
+																			</div>
+																		}
 																	}
 																</div>
 															}
@@ -296,7 +335,7 @@ Sin fecha límite
 															</div>
 
 															<p class="section-hint" data-info-anchor="estudiante-curso-dialog-mis-archivos-ayuda">
-																Archivos personales de esta semana. No cuentan como entrega: las tareas se entregan dentro de cada tarea, en «Mi entrega».
+																Archivos personales de esta semana. No cuentan como entrega: las tareas se entregan dentro de cada tarea, en «Mi entrega». Lo que subes queda como borrador (solo tú lo ves); al publicarlo lo ven tu profesor y los miembros de tu grupo.
 															</p>
 
 															@if (getMisArchivosSemana(semana.id).length === 0) {
@@ -305,7 +344,22 @@ Sin fecha límite
 																<div class="content-list">
 																	@for (archivo of getMisArchivosSemana(semana.id); track archivo.id) {
 																		<app-file-row data-info-anchor="estudiante-curso-dialog-mi-archivo" [name]="archivo.nombreArchivo" [mimeType]="archivo.tipoArchivo" [sizeBytes]="archivo.tamanoBytes" (open)="openArchivo(archivo)">
-<span actions><edu-button
+<span actions>
+																				@if (!archivo.publicado) {
+																					<span class="draft-tag" eduTooltip="Borrador: solo tú lo ves. Publícalo para que lo vean tu profesor y tu grupo" eduTooltipPosition="top">Borrador</span>
+																				}
+																				<edu-button
+																					[icon]="archivo.publicado ? 'pi pi-eye-slash' : 'pi pi-eye'"
+																					[text]="true"
+																					[rounded]="true"
+																					size="small"
+																					[eduTooltip]="archivo.publicado ? 'Volver a borrador' : 'Publicar'"
+																					eduTooltipPosition="top"
+																					data-info-anchor="estudiante-curso-dialog-mi-archivo-publicar"
+																					(click)="onTogglePublicacionMiArchivo(semana.id, archivo)"
+																					[pt]="{ root: { 'aria-label': archivo.publicado ? 'Volver a borrador el archivo' : 'Publicar el archivo' } }"
+																				/>
+																				<edu-button
 																					icon="pi pi-trash"
 																					[text]="true"
 																					[rounded]="true"
@@ -326,6 +380,25 @@ Sin fecha límite
 																</div>
 															}
 														</div>
+
+														@if (getArchivosGrupoSemana(semana.id).length > 0) {
+															<div class="section-block" data-info-anchor="estudiante-curso-dialog-archivos-grupo-semana">
+																<div class="section-header">
+																	<div class="section-label">
+																		<i class="pi pi-users"></i>
+																		Archivos publicados por mi grupo
+																	</div>
+																	<span class="section-count">{{ getArchivosGrupoSemana(semana.id).length }}</span>
+																</div>
+																<div class="content-list">
+																	@for (archivo of getArchivosGrupoSemana(semana.id); track archivo.id) {
+																		<app-file-row [name]="archivo.nombreArchivo" [mimeType]="archivo.tipoArchivo" [sizeBytes]="archivo.tamanoBytes" (open)="openArchivo(archivo)">
+																			<span actions><span class="tipo-tag tipo-tag--grupo">{{ archivo.estudianteNombre }}</span></span>
+																		</app-file-row>
+																	}
+																</div>
+															</div>
+														}
 														<!-- #endregion -->
 													</div>
 												
