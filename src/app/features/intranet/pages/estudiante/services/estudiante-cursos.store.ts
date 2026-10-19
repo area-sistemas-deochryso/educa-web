@@ -23,6 +23,10 @@ interface EstudianteCursosState {
 	misTareaArchivos: Record<number, EstudianteTareaArchivoDto[]>;
 	/** Tarea IDs already loaded. */
 	loadedTareas: number[];
+	/** Published files of other group members in a week, keyed by semanaId. Key present = already loaded. */
+	archivosGrupoSemana: Record<number, EstudianteArchivoDto[]>;
+	/** Published deliveries of other group members in a task, keyed by tareaId. Key present = already loaded. */
+	archivosGrupoTarea: Record<number, EstudianteTareaArchivoDto[]>;
 	// #region Sub-modal state
 	archivosSummaryDialogVisible: boolean;
 	tareasSummaryDialogVisible: boolean;
@@ -46,6 +50,8 @@ const initialState: EstudianteCursosState = {
 	loadedSemanas: [],
 	misTareaArchivos: {},
 	loadedTareas: [],
+	archivosGrupoSemana: {},
+	archivosGrupoTarea: {},
 	archivosSummaryDialogVisible: false,
 	tareasSummaryDialogVisible: false,
 	misNotasCurso: null,
@@ -68,6 +74,8 @@ export class EstudianteCursosStore {
 	readonly saving = computed(() => this._state().saving);
 	readonly error = computed(() => this._state().error);
 	readonly misArchivos = computed(() => this._state().misArchivos);
+	readonly archivosGrupoSemana = computed(() => this._state().archivosGrupoSemana);
+	readonly archivosGrupoTarea = computed(() => this._state().archivosGrupoTarea);
 	readonly loadedSemanas = computed(() => this._state().loadedSemanas);
 	readonly misTareaArchivos = computed(() => this._state().misTareaArchivos);
 	readonly loadedTareas = computed(() => this._state().loadedTareas);
@@ -101,6 +109,8 @@ export class EstudianteCursosStore {
 		totalArchivos: this.totalArchivos(),
 		totalTareas: this.totalTareas(),
 		misArchivos: this.misArchivos(),
+		archivosGrupoSemana: this.archivosGrupoSemana(),
+		archivosGrupoTarea: this.archivosGrupoTarea(),
 		misTareaArchivos: this.misTareaArchivos(),
 		archivosSummaryDialogVisible: this.archivosSummaryDialogVisible(),
 		tareasSummaryDialogVisible: this.tareasSummaryDialogVisible(),
@@ -184,6 +194,20 @@ export class EstudianteCursosStore {
 		}));
 	}
 
+	updateMiArchivo(semanaId: number, archivoId: number, changes: Partial<EstudianteArchivoDto>): void {
+		this._state.update((s) => ({
+			...s,
+			misArchivos: {
+				...s.misArchivos,
+				[semanaId]: (s.misArchivos[semanaId] ?? []).map((a) => (a.id === archivoId ? { ...a, ...changes } : a)),
+			},
+		}));
+	}
+
+	setArchivosGrupoSemana(semanaId: number, archivos: EstudianteArchivoDto[]): void {
+		this._state.update((s) => ({ ...s, archivosGrupoSemana: { ...s.archivosGrupoSemana, [semanaId]: archivos } }));
+	}
+
 	// #endregion
 	// #region Student task file mutations
 
@@ -217,6 +241,20 @@ export class EstudianteCursosStore {
 		}));
 	}
 
+	updateMiTareaArchivo(tareaId: number, archivoId: number, changes: Partial<EstudianteTareaArchivoDto>): void {
+		this._state.update((s) => ({
+			...s,
+			misTareaArchivos: {
+				...s.misTareaArchivos,
+				[tareaId]: (s.misTareaArchivos[tareaId] ?? []).map((a) => (a.id === archivoId ? { ...a, ...changes } : a)),
+			},
+		}));
+	}
+
+	setArchivosGrupoTarea(tareaId: number, archivos: EstudianteTareaArchivoDto[]): void {
+		this._state.update((s) => ({ ...s, archivosGrupoTarea: { ...s.archivosGrupoTarea, [tareaId]: archivos } }));
+	}
+
 	// #endregion
 	// #region Dialog commands
 	resetContenido(): void {
@@ -227,6 +265,8 @@ export class EstudianteCursosStore {
 			loadedSemanas: [],
 			misTareaArchivos: {},
 			loadedTareas: [],
+			archivosGrupoSemana: {},
+			archivosGrupoTarea: {},
 			misNotasCurso: null,
 			misNotasLoading: false,
 			miAsistencia: null,
@@ -263,6 +303,8 @@ export class EstudianteCursosStore {
 			loadedSemanas: [],
 			misTareaArchivos: {},
 			loadedTareas: [],
+			archivosGrupoSemana: {},
+			archivosGrupoTarea: {},
 		}));
 	}
 	// #endregion

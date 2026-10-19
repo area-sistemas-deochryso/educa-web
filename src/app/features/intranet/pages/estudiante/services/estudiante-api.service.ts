@@ -11,6 +11,7 @@ import {
 	RegistrarEstudianteArchivoRequest,
 	EstudianteTareaArchivoDto,
 	RegistrarEstudianteTareaArchivoRequest,
+	CambiarPublicacionRequest,
 	EstudianteMisNotasDto,
 	TareaPorVencerDto,
 	MiAsistenciaCursoResumenDto,
@@ -96,6 +97,15 @@ export class EstudianteApiService {
 		return this.http.delete<{ mensaje: string }>(`${this.baseUrl}/archivo/${archivoId}`);
 	}
 
+	cambiarPublicacionArchivo(archivoId: number, request: CambiarPublicacionRequest): Observable<EstudianteArchivoDto> {
+		return this.http.patch<EstudianteArchivoDto>(`${this.baseUrl}/archivo/${archivoId}/publicacion`, request);
+	}
+
+	/** Archivos publicados de otros miembros de mi grupo en la semana; el BE resuelve la membresía. */
+	getArchivosGrupoSemana(semanaId: number): Observable<EstudianteArchivoDto[]> {
+		return this.http.get<EstudianteArchivoDto[]>(`${this.baseUrl}/semana/${semanaId}/archivos-grupo`);
+	}
+
 	uploadFile(file: File): Observable<{ url: string; fileName: string }> {
 		const formData = FileUploadBuilder.create(file)
 			.container('curso-contenido')
@@ -120,6 +130,15 @@ export class EstudianteApiService {
 
 	eliminarTareaArchivo(archivoId: number): Observable<{ mensaje: string }> {
 		return this.http.delete<{ mensaje: string }>(`${this.baseUrl}/tarea-archivo/${archivoId}`);
+	}
+
+	cambiarPublicacionTareaArchivo(archivoId: number, request: CambiarPublicacionRequest): Observable<EstudianteTareaArchivoDto> {
+		return this.http.patch<EstudianteTareaArchivoDto>(`${this.baseUrl}/tarea-archivo/${archivoId}/publicacion`, request);
+	}
+
+	/** Entregas publicadas de otros miembros de mi grupo en la tarea; vacío si la tarea no es grupal. */
+	getArchivosGrupoTarea(tareaId: number): Observable<EstudianteTareaArchivoDto[]> {
+		return this.http.get<EstudianteTareaArchivoDto[]>(`${this.baseUrl}/tarea/${tareaId}/archivos-grupo`);
 	}
 
 	// #endregion

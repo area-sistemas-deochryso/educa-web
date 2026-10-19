@@ -74,6 +74,7 @@ export const UI_ATTACHMENT_MESSAGES = {
 	uploadFailed: 'No se pudo subir el archivo',
 	registerFailed: 'No se pudo registrar el archivo',
 	deleteFailed: 'No se pudo eliminar el archivo',
+	publishFailed: 'No se pudo cambiar la publicación del archivo',
 	loadStudentFilesFailed: 'No se pudo cargar los archivos de estudiantes',
 	loadSubmissionsFailed: 'No se pudo cargar las entregas de estudiantes',
 	periodoCerrado: 'No se puede entregar: el periodo académico ya está cerrado',

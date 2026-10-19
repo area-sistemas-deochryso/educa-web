@@ -33,6 +33,8 @@ const baseVm = {
 	semanas: [] as typeof SEMANAS,
 	misArchivos: {} as Record<number, unknown[]>,
 	misTareaArchivos: {} as Record<number, unknown[]>,
+	archivosGrupoSemana: {} as Record<number, unknown[]>,
+	archivosGrupoTarea: {} as Record<number, unknown[]>,
 };
 // #endregion
 
@@ -46,6 +48,10 @@ describe('EstudianteCursoHubContenidoComponent', () => {
 		refreshContenido: vi.fn(),
 		loadMisArchivos: vi.fn(),
 		loadMisTareaArchivos: vi.fn(),
+		loadArchivosGrupoSemana: vi.fn(),
+		loadArchivosGrupoTarea: vi.fn(),
+		cambiarPublicacionArchivo: vi.fn(),
+		cambiarPublicacionTareaArchivo: vi.fn(),
 		uploadArchivo: vi.fn(),
 		uploadTareaArchivo: vi.fn(),
 		eliminarArchivo: vi.fn(),
@@ -149,6 +155,28 @@ describe('EstudianteCursoHubContenidoComponent', () => {
 			expect(facade.loadMisTareaArchivos).toHaveBeenCalledWith(100);
 		});
 
+		it('loads the group files of the semana, and of the tareas only when they are grupales', () => {
+			const semanas = [
+				{
+					id: 10,
+					numeroSemana: 1,
+					titulo: null,
+					archivos: [],
+					tareas: [
+						{ id: 100, titulo: 'Individual', esGrupal: false, fechaLimite: null, archivos: [] },
+						{ id: 101, titulo: 'Grupal', esGrupal: true, fechaLimite: null, archivos: [] },
+					],
+				},
+			];
+			vm.set({ ...baseVm, contenido: { id: 8 }, semanas: semanas as never });
+			const { component } = create();
+
+			component.onAccordionChangeStr(['10']);
+
+			expect(facade.loadArchivosGrupoSemana).toHaveBeenCalledWith(10);
+			expect(facade.loadArchivosGrupoTarea).toHaveBeenCalledExactlyOnceWith(101);
+		});
+
 		it('does not reload files for a semana that was already open', () => {
 			vm.set({ ...baseVm, contenido: { id: 8 }, semanas: SEMANAS });
 			const { component } = create();
@@ -244,11 +272,28 @@ describe('EstudianteCursoHubContenidoComponent', () => {
 			expect(component.estadoTarea({ id: 100, fechaLimite: '2000-01-01' })).toBeNull();
 		});
 
-		it('is entregada when the student uploaded at least one file, even past the due date', () => {
-			vm.set({ ...baseVm, misTareaArchivos: { 100: [archivo] } });
+		it('is entregada when the student published a file, even past the due date', () => {
+			vm.set({ ...baseVm, misTareaArchivos: { 100: [{ ...archivo, publicado: true }] } });
 			const { component } = create();
 
 			expect(component.estadoTarea({ id: 100, fechaLimite: '2000-01-01' })?.kind).toBe('entregada');
+		});
+
+		it('is entregada when at least one file is published, even if others are still draft', () => {
+			vm.set({
+				...baseVm,
+				misTareaArchivos: { 100: [{ ...archivo, publicado: false }, { ...archivo, id: 2, publicado: true }] },
+			});
+			const { component } = create();
+
+			expect(component.estadoTarea({ id: 100, fechaLimite: null })?.kind).toBe('entregada');
+		});
+
+		it('is borrador, not entregada, when every uploaded file is still draft', () => {
+			vm.set({ ...baseVm, misTareaArchivos: { 100: [{ ...archivo, publicado: false }] } });
+			const { component } = create();
+
+			expect(component.estadoTarea({ id: 100, fechaLimite: '2000-01-01' })?.kind).toBe('borrador');
 		});
 
 		it('is pendiente with no files and a future or missing due date', () => {
