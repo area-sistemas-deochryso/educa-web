@@ -7,6 +7,7 @@ export type {
 	CursoContenidoArchivoDto,
 	CursoContenidoTareaDto,
 	TareaArchivoDto,
+	CambiarPublicacionRequest,
 	CalificacionDto,
 	CalificacionNotaDto,
 	CalificacionConNotasDto,

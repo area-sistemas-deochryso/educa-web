@@ -187,6 +187,49 @@ describe('EstudianteCursosStore', () => {
 	});
 	// #endregion
 
+	// #region Publicación de archivos propios y del grupo (P113 F5)
+	describe('publicación', () => {
+		const archivo = (id: number, publicado: boolean) => ({ id, nombreArchivo: `a${id}.pdf`, publicado }) as never;
+
+		it('updateMiArchivo cambia solo el archivo indicado de esa semana', () => {
+			store.setMisArchivos(1, [archivo(1, false), archivo(2, false)]);
+
+			store.updateMiArchivo(1, 1, { publicado: true });
+
+			expect(store.misArchivos()[1].map((a) => a.publicado)).toEqual([true, false]);
+		});
+
+		it('updateMiTareaArchivo cambia solo la entrega indicada de esa tarea', () => {
+			store.setMisTareaArchivos(10, [archivo(5, false), archivo(6, true)]);
+
+			store.updateMiTareaArchivo(10, 5, { publicado: true });
+
+			expect(store.misTareaArchivos()[10].map((a) => a.publicado)).toEqual([true, true]);
+		});
+
+		it('guarda los archivos del grupo por semana y por tarea', () => {
+			store.setArchivosGrupoSemana(1, [archivo(9, true)]);
+			store.setArchivosGrupoTarea(10, [archivo(8, true)]);
+
+			expect(store.archivosGrupoSemana()[1]).toHaveLength(1);
+			expect(store.archivosGrupoTarea()[10]).toHaveLength(1);
+		});
+
+		it('clearLoadedCaches y resetContenido descartan los archivos del grupo', () => {
+			store.setArchivosGrupoSemana(1, [archivo(9, true)]);
+			store.setArchivosGrupoTarea(10, [archivo(8, true)]);
+
+			store.clearLoadedCaches();
+			expect(store.archivosGrupoSemana()).toEqual({});
+			expect(store.archivosGrupoTarea()).toEqual({});
+
+			store.setArchivosGrupoSemana(1, [archivo(9, true)]);
+			store.resetContenido();
+			expect(store.archivosGrupoSemana()).toEqual({});
+		});
+	});
+	// #endregion
+
 	// #region ViewModel
 	describe('vm', () => {
 		it('should compose state', () => {

@@ -31,7 +31,7 @@ import {
 
 import { contarExamenes, fechaLimiteEstado, proximaFechaLimite, tareaEtiqueta } from './contenido-tarea.helpers';
 
-type TareaEstadoKind = 'entregada' | 'pendiente' | 'vencida';
+type TareaEstadoKind = 'entregada' | 'borrador' | 'pendiente' | 'vencida';
 
 interface TareaEstado {
 	kind: TareaEstadoKind;
@@ -41,6 +41,7 @@ interface TareaEstado {
 
 const TAREA_ESTADO: Record<TareaEstadoKind, TareaEstado> = {
 	entregada: { kind: 'entregada', label: 'Entregada', icon: 'pi pi-check-circle' },
+	borrador: { kind: 'borrador', label: 'Borrador sin publicar', icon: 'pi pi-eye-slash' },
 	pendiente: { kind: 'pendiente', label: 'Pendiente de entrega', icon: 'pi pi-clock' },
 	vencida: { kind: 'vencida', label: 'Vencida sin entrega', icon: 'pi pi-exclamation-circle' },
 };
@@ -195,7 +196,11 @@ export class EstudianteCursoHubContenidoComponent {
 			const semana = semanas.find((s) => s.id === semanaId);
 			if (semana) {
 				this.facade.loadMisArchivos(semana.id);
-				semana.tareas.forEach((t) => this.facade.loadMisTareaArchivos(t.id));
+				this.facade.loadArchivosGrupoSemana(semana.id);
+				semana.tareas.forEach((t) => {
+					this.facade.loadMisTareaArchivos(t.id);
+					if (t.esGrupal) this.facade.loadArchivosGrupoTarea(t.id);
+				});
 			}
 		}
 	}
@@ -210,6 +215,10 @@ export class EstudianteCursoHubContenidoComponent {
 	protected onDeleteMiArchivo(semanaId: number, archivo: EstudianteArchivoDto): void {
 		this.confirmDelete(archivo.nombreArchivo, () => this.facade.eliminarArchivo(semanaId, archivo.id));
 	}
+
+	protected onTogglePublicacionMiArchivo(semanaId: number, archivo: EstudianteArchivoDto): void {
+		this.facade.cambiarPublicacionArchivo(semanaId, archivo.id, !archivo.publicado);
+	}
 	// #endregion
 
 	// #region Entrega de tareas
@@ -220,6 +229,10 @@ export class EstudianteCursoHubContenidoComponent {
 
 	protected onDeleteMiTareaArchivo(tareaId: number, archivo: EstudianteTareaArchivoDto): void {
 		this.confirmDelete(archivo.nombreArchivo, () => this.facade.eliminarTareaArchivo(tareaId, archivo.id));
+	}
+
+	protected onTogglePublicacionMiTareaArchivo(tareaId: number, archivo: EstudianteTareaArchivoDto): void {
+		this.facade.cambiarPublicacionTareaArchivo(tareaId, archivo.id, !archivo.publicado);
 	}
 	// #endregion
 
@@ -245,15 +258,27 @@ export class EstudianteCursoHubContenidoComponent {
 		return this.vm().misTareaArchivos[tareaId] ?? [];
 	}
 
+	/** Archivos publicados de otros miembros de mi grupo en la semana (solo lectura). */
+	protected getArchivosGrupoSemana(semanaId: number): EstudianteArchivoDto[] {
+		return this.vm().archivosGrupoSemana[semanaId] ?? [];
+	}
+
+	/** Entregas publicadas de otros miembros de mi grupo en la tarea (solo lectura). */
+	protected getArchivosGrupoTarea(tareaId: number): EstudianteTareaArchivoDto[] {
+		return this.vm().archivosGrupoTarea[tareaId] ?? [];
+	}
+
 	/**
 	 * El contrato no trae un estado de entrega: se deriva de los archivos que el
-	 * estudiante subió en «Mi entrega». `null` mientras esos archivos no cargan
+	 * estudiante subió en «Mi entrega». Solo cuenta lo **publicado**: un borrador no lo
+	 * ve el profesor, así que no es una entrega. `null` mientras esos archivos no cargan
 	 * (evita mostrar «Pendiente» por un instante a quien ya entregó).
 	 */
 	protected estadoTarea(tarea: { id: number; fechaLimite: string | null }): TareaEstado | null {
 		const entregas = this.vm().misTareaArchivos[tarea.id];
 		if (!entregas) return null;
-		if (entregas.length > 0) return TAREA_ESTADO.entregada;
+		if (entregas.some((a) => a.publicado)) return TAREA_ESTADO.entregada;
+		if (entregas.length > 0) return TAREA_ESTADO.borrador;
 		const venceAntesDeHoy = !!tarea.fechaLimite && tarea.fechaLimite.slice(0, 10) < todayIso();
 		return venceAntesDeHoy ? TAREA_ESTADO.vencida : TAREA_ESTADO.pendiente;
 	}

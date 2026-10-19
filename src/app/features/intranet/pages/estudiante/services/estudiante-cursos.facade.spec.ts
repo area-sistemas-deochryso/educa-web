@@ -8,7 +8,7 @@ import { of, throwError } from 'rxjs';
 import { EstudianteCursosFacade } from './estudiante-cursos.facade';
 import { EstudianteCursosStore } from './estudiante-cursos.store';
 import { EstudianteApiService } from './estudiante-api.service';
-import { ErrorHandlerService } from '@core/services';
+import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
 import { SmartNotificationService } from '@core/services/notifications';
 
 // #endregion
@@ -35,6 +35,10 @@ function createMockApi() {
 		getMiAsistencia: vi.fn().mockReturnValue(of(null)),
 		uploadFile: vi.fn().mockReturnValue(of({ url: 'https://blob.test/entrega.pdf' })),
 		registrarTareaArchivo: vi.fn(),
+		cambiarPublicacionArchivo: vi.fn().mockReturnValue(of({})),
+		cambiarPublicacionTareaArchivo: vi.fn().mockReturnValue(of({})),
+		getArchivosGrupoSemana: vi.fn().mockReturnValue(of([])),
+		getArchivosGrupoTarea: vi.fn().mockReturnValue(of([])),
 	};
 }
 // #endregion
@@ -44,9 +48,11 @@ describe('EstudianteCursosFacade', () => {
 	let facade: EstudianteCursosFacade;
 	let store: EstudianteCursosStore;
 	let api: ReturnType<typeof createMockApi>;
+	let wal: { execute: ReturnType<typeof vi.fn> };
 
 	beforeEach(() => {
 		api = createMockApi();
+		wal = { execute: vi.fn() };
 
 		TestBed.configureTestingModule({
 			providers: [
@@ -54,6 +60,7 @@ describe('EstudianteCursosFacade', () => {
 				EstudianteCursosStore,
 				{ provide: EstudianteApiService, useValue: api },
 				{ provide: ErrorHandlerService, useValue: { showError: vi.fn() } },
+				{ provide: WalFacadeHelper, useValue: wal },
 				{ provide: SmartNotificationService, useValue: { saveActividadSnapshot: vi.fn() } },
 			],
 		});
@@ -124,6 +131,115 @@ describe('EstudianteCursosFacade', () => {
 			facade.uploadTareaArchivo(100, new File(['x'], 'entrega.pdf'));
 
 			expect(errorHandler.showError).toHaveBeenCalledWith(expect.any(String), 'No se pudo registrar el archivo');
+		});
+	});
+	// #endregion
+
+	// #region Publicación de archivos propios (P113 F5)
+	describe('cambiarPublicacionArchivo', () => {
+		const lastConfig = () => wal.execute.mock.lastCall?.[0];
+		const estado = () => store.misArchivos()[1][0].publicado;
+		beforeEach(() => store.setMisArchivos(1, [{ id: 7, nombreArchivo: 'a.pdf', publicado: false } as never]));
+
+		it('publica de forma optimista y envía el PATCH con el estado pedido', () => {
+			facade.cambiarPublicacionArchivo(1, 7, true);
+			const config = lastConfig();
+
+			config.optimistic.apply();
+			expect(estado()).toBe(true);
+
+			config.http$();
+			expect(api.cambiarPublicacionArchivo).toHaveBeenCalledWith(7, { publicado: true });
+		});
+
+		it('revierte a borrador si el BE falla', () => {
+			facade.cambiarPublicacionArchivo(1, 7, true);
+			const config = lastConfig();
+
+			config.optimistic.apply();
+			config.optimistic.rollback();
+
+			expect(estado()).toBe(false);
+		});
+
+		it('al confirmar toma el estado que devolvió el BE', () => {
+			facade.cambiarPublicacionArchivo(1, 7, true);
+
+			lastConfig().onCommit({ id: 7, publicado: false });
+
+			expect(estado()).toBe(false);
+		});
+
+		it('avisa al usuario si el BE falla', () => {
+			facade.cambiarPublicacionArchivo(1, 7, true);
+
+			lastConfig().onError(new HttpErrorResponse({ status: 500 }));
+
+			expect(TestBed.inject(ErrorHandlerService).showError).toHaveBeenCalled();
+		});
+
+		it('ignora un archivo que no está en el store', () => {
+			facade.cambiarPublicacionArchivo(1, 999, true);
+
+			expect(wal.execute).not.toHaveBeenCalled();
+		});
+	});
+
+	describe('cambiarPublicacionTareaArchivo', () => {
+		const lastConfig = () => wal.execute.mock.lastCall?.[0];
+		const estado = () => store.misTareaArchivos()[100][0].publicado;
+		beforeEach(() => store.setMisTareaArchivos(100, [{ id: 3, nombreArchivo: 'e.pdf', publicado: false } as never]));
+
+		it('publica de forma optimista y envía el PATCH', () => {
+			facade.cambiarPublicacionTareaArchivo(100, 3, true);
+			const config = lastConfig();
+
+			config.optimistic.apply();
+			expect(estado()).toBe(true);
+
+			config.http$();
+			expect(api.cambiarPublicacionTareaArchivo).toHaveBeenCalledWith(3, { publicado: true });
+		});
+
+		it('vuelve a borrador de forma optimista y revierte a publicado si el BE falla', () => {
+			store.updateMiTareaArchivo(100, 3, { publicado: true });
+			facade.cambiarPublicacionTareaArchivo(100, 3, false);
+			const config = lastConfig();
+
+			config.optimistic.apply();
+			expect(estado()).toBe(false);
+
+			config.optimistic.rollback();
+			expect(estado()).toBe(true);
+		});
+	});
+
+	describe('archivos del grupo', () => {
+		it('carga los de la semana una sola vez', () => {
+			facade.loadArchivosGrupoSemana(1);
+			facade.loadArchivosGrupoSemana(1);
+
+			expect(api.getArchivosGrupoSemana).toHaveBeenCalledOnce();
+			expect(store.archivosGrupoSemana()[1]).toEqual([]);
+		});
+
+		it('carga los de la tarea una sola vez y los guarda tal como los devuelve el BE', () => {
+			const deCompanero = { id: 50, estudianteNombre: 'Ana', publicado: true };
+			api.getArchivosGrupoTarea.mockReturnValue(of([deCompanero]));
+
+			facade.loadArchivosGrupoTarea(100);
+			facade.loadArchivosGrupoTarea(100);
+
+			expect(api.getArchivosGrupoTarea).toHaveBeenCalledOnce();
+			expect(store.archivosGrupoTarea()[100]).toEqual([deCompanero]);
+		});
+
+		it('si falla la carga deja la lista vacía sin romper', () => {
+			api.getArchivosGrupoSemana.mockReturnValue(throwError(() => new HttpErrorResponse({ status: 500 })));
+
+			facade.loadArchivosGrupoSemana(1);
+
+			expect(store.archivosGrupoSemana()[1]).toEqual([]);
 		});
 	});
 	// #endregion

@@ -24,9 +24,11 @@ const SEMANAS = [
 describe('EstudianteCursoHubContenidoComponent — aviso de formatos de subida', () => {
 	beforeEach(() => {
 		const facade = {
-			vm: signal({ contentLoading: false, contenido: { id: 8 }, semanas: SEMANAS, misArchivos: {}, misTareaArchivos: {} }),
+			vm: signal({ contentLoading: false, contenido: { id: 8 }, semanas: SEMANAS, misArchivos: {}, misTareaArchivos: {}, archivosGrupoSemana: {}, archivosGrupoTarea: {} }),
 			loadMisArchivos: vi.fn(),
 			loadMisTareaArchivos: vi.fn(),
+			loadArchivosGrupoSemana: vi.fn(),
+			loadArchivosGrupoTarea: vi.fn(),
 			uploadArchivo: vi.fn(),
 			uploadTareaArchivo: vi.fn(),
 		};

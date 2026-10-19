@@ -449,6 +449,10 @@
 		color: var(--green-700, #15803d);
 	}
 
+	&[data-estado='borrador'] {
+		color: var(--yellow-800, #854d0e);
+	}
+
 	&[data-estado='pendiente'] {
 		color: var(--yellow-800, #854d0e);
 	}
@@ -766,3 +770,25 @@
 	font-weight: 600;
 }
 // #endregion
+
+// Marca de archivo propio aún no publicado (P113 F5): lleva texto, no solo color.
+.draft-tag {
+	display: inline-block;
+	width: fit-content;
+	margin-right: 0.4rem;
+	font-size: 0.62rem;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	padding: 0.08rem 0.4rem;
+	border-radius: 999px;
+	background: rgba(245, 158, 11, 0.14);
+	color: var(--yellow-700);
+	vertical-align: middle;
+}
+
+// Autor de un archivo publicado por un compañero de grupo.
+.tipo-tag--grupo {
+	background: rgba(99, 102, 241, 0.12);
+	color: var(--indigo-700, #4338ca);
+}
