@@ -1,0 +1,53 @@
+@use '../shared-section.scss';
+
+.correlation-breadcrumbs-section {
+	&__list {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	&__step {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.6rem;
+		padding: 0.4rem 0.5rem;
+		border-radius: 6px;
+
+		> i {
+			color: var(--blue-800);
+		}
+
+		&--error {
+			background: color-mix(in srgb, var(--red-500) 8%, transparent);
+
+			> i {
+				color: var(--red-600);
+			}
+		}
+	}
+
+	&__label {
+		min-width: 5.5rem;
+		font-size: 0.8rem;
+		font-weight: 600;
+		color: var(--text-color);
+	}
+
+	&__route {
+		max-width: 28rem;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	&__offset {
+		margin-left: auto;
+		font-size: 0.8rem;
+		color: var(--text-color-secondary);
+	}
+}

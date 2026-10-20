@@ -53,6 +53,15 @@ Un error aislado es un misterio. Un error con las últimas 15-30 acciones del us
 - Body de requests (pueden contener datos sensibles)
 - Datos completos del usuario (solo DNI enmascarado o rol)
 
+### Variante por privacidad en educa-web (ADR-0008, Plan 41 F4)
+
+Conviven **dos buffers** en el cliente. `ActivityTrackerService` (30 entradas, incluye acciones de usuario) alimenta el canal `POST /errors`. `BreadcrumbTrackerService` es el de ADR-0008 y es deliberadamente más pobre, porque los usuarios incluyen menores:
+
+- 50 eventos en memoria, solo `navigation | http | error`; sin clics, formularios ni texto.
+- Cada evento es **forma, no contenido**: ruta normalizada (`/curso/:id`), método, status, nombre de la clase de error y `offsetMs` relativo al error. Sin query string, cuerpo ni mensajes.
+- Se envía **solo ante error** (5xx, 4xx inesperado fuera de 401/403/404/409/422/429, o excepción no capturada) a `POST /api/sistema/breadcrumbs`, asociado al `correlationId`. Un error de JS sin request recibe un `correlationId` generado en el cliente, compartido con su `ErrorLog`.
+- Retención 14 días en BE. Ampliar lo que se captura exige un ADR que sustituya al 0008.
+
 ---
 
 ## 3. Fire-and-forget con garantía de aislamiento
@@ -273,6 +282,7 @@ Si el sistema de reporte falla, y ese fallo genera otro error, y ese error se re
 - **Los endpoints del reporter están exentos del throttling global del cliente**: no consumen slot de concurrencia, no activan cooldown al recibir 429, no se bloquean si la app entró en cooldown por otra causa
 - Un 429 en el endpoint de reporte se maneja **localmente** en el facade que lo originó: mensaje inline "espera N segundos antes de enviar otro", sin afectar al resto de la aplicación
 - Los reportes manuales NO se reintentan automáticamente en background (`consistencyLevel: server-confirmed` en el patrón WAL). Un 429 o un error lo debe ver el usuario en el momento para decidir; un retry silencioso 30 segundos después es confuso
+- **El envío de breadcrumbs (ADR-0008) se marca con `SKIP_BREADCRUMBS`** (`HttpContextToken`): ni el trace interceptor lo captura ni el error interceptor lo reporta o muestra toast, así que su falla no puede disparar otro envío. Un solo intento, sin retry, un envío por `correlationId` y máximo 3 por minuto (el BE admite 10/min por IP). Es el mismo patrón de «efecto + rollback = bucle» del brief 847
 
 ### Por qué
 

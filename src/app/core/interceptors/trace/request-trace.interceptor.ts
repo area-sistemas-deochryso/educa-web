@@ -6,7 +6,12 @@ import {
 } from '@angular/common/http';
 import { finalize, tap } from 'rxjs';
 
-import { ActivityTrackerService, ErrorReporterService } from '@core/services/error';
+import {
+	ActivityTrackerService,
+	BreadcrumbTrackerService,
+	ErrorReporterService,
+	SKIP_BREADCRUMBS,
+} from '@core/services/error';
 import { RequestTraceFacade } from '@core/services/trace';
 import { inject } from '@angular/core';
 
@@ -31,6 +36,7 @@ export const requestTraceInterceptor: HttpInterceptorFn = (req, next) => {
 	const trace = inject(RequestTraceFacade);
 	const activityTracker = inject(ActivityTrackerService);
 	const errorReporter = inject(ErrorReporterService);
+	const breadcrumbTracker = inject(BreadcrumbTrackerService);
 
 	// Always send X-Request-Id for backend correlation (prod + dev).
 	// Plan 41 F3 — X-Platform identifica el origen del request para el
@@ -54,7 +60,9 @@ export const requestTraceInterceptor: HttpInterceptorFn = (req, next) => {
 	const initiationStack = new Error().stack;
 
 	// Skip breadcrumb tracking for the error reporter itself to avoid loops
-	const isErrorEndpoint = tracedReq.url.includes('/api/sistema/errors');
+	// Same for the breadcrumbs ingest POST (Plan 41 F4b): it must never feed the buffer it sends.
+	const isErrorEndpoint =
+		tracedReq.url.includes('/api/sistema/errors') || tracedReq.context.get(SKIP_BREADCRUMBS);
 
 	let status: number | null = null;
 	let ok = false;
@@ -82,6 +90,7 @@ export const requestTraceInterceptor: HttpInterceptorFn = (req, next) => {
 			// Always track API calls for error breadcrumbs (except error endpoint itself)
 			if (!isErrorEndpoint && status !== null) {
 				activityTracker.trackApiCall(tracedReq.method, tracedReq.url, status, durationMs);
+				breadcrumbTracker.trackHttp(tracedReq.method, tracedReq.url, status, requestId);
 			}
 
 			// Request lento + fallido = problema de red

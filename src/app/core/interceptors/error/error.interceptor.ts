@@ -6,7 +6,7 @@ import { Observable, Subject, catchError, filter, finalize, switchMap, take, thr
 import { logger, parseProblemDetails } from '@core/helpers';
 // eslint-disable-next-line layer-enforcement/imports-error -- DEBT: AuthApiService is internal to auth/
 import { AuthApiService } from '@core/services/auth/auth-api.service';
-import { ErrorHandlerService, ErrorReporterService } from '@core/services/error';
+import { ErrorHandlerService, ErrorReporterService, SKIP_BREADCRUMBS } from '@core/services/error';
 import { ForceLogoutSignal } from '@core/services/session';
 
 // * Centralizes HTTP error handling and reporting.
@@ -79,6 +79,12 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
 			// Never process errors from the error reporter itself (prevents infinite loop)
 			if (req.url.includes('/api/sistema/errors')) {
+				return throwError(() => httpError);
+			}
+
+			// Breadcrumbs ingest (Plan 41 F4b): a failed send is silent and never reported,
+			// otherwise reporting it would trigger another send. 401 still goes through refresh.
+			if (req.context.get(SKIP_BREADCRUMBS) && httpError.status !== 401) {
 				return throwError(() => httpError);
 			}
 

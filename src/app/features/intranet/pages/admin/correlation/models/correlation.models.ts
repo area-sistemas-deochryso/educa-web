@@ -97,6 +97,23 @@ export interface CorrelationRequestMetricDto {
 }
 
 /**
+ * Plan 41 F4 (ADR-0008) — paso previo al error que el cliente envió al fallar.
+ * Solo forma: ruta normalizada (`:id`), método y status; nunca contenido.
+ * `offsetMs` son los ms transcurridos entre el paso y el error.
+ */
+export interface CorrelationBreadcrumbDto {
+	tipo: BreadcrumbTipo;
+	offsetMs: number;
+	ruta: string;
+	// El BE omite los campos null del JSON: llegan ausentes, no como `null`.
+	metodo?: string | null;
+	statusCode?: number | null;
+	errorClass?: string | null;
+}
+
+export type BreadcrumbTipo = 'navigation' | 'http' | 'error';
+
+/**
  * Snapshot agregado de los 4 tipos de evento que comparten un CorrelationId.
  * Cada lista es independiente — el BE deja vacía la sección que falle (INV-S07)
  * y devuelve las 4 igualmente. Cap defensivo de 100 filas por sección.
@@ -124,6 +141,12 @@ export interface CorrelationSnapshot {
 	 * con BEs pre-Plan 41 F3.
 	 */
 	requestMetric?: CorrelationRequestMetricDto | null;
+	/**
+	 * Plan 41 F4b — pasos previos al error (del más antiguo al más reciente, máx. 50).
+	 * Vacío si el cliente no envió buffer o la ingesta está apagada. Opcional para
+	 * compatibilidad con BEs pre-F4.
+	 */
+	breadcrumbs?: CorrelationBreadcrumbDto[];
 }
 // #endregion
 
@@ -198,6 +221,22 @@ export const TIMELINE_KIND_LABEL_MAP: Record<TimelineEventKind, string> = {
 	'rate-limit': 'Rate limit',
 	reporte: 'Reporte',
 	outbox: 'Correo',
+};
+// #endregion
+
+// #region Pasos previos (Plan 41 F4b)
+/** Icono por tipo de paso previo. */
+export const BREADCRUMB_ICON_MAP: Record<BreadcrumbTipo, string> = {
+	navigation: 'pi pi-compass',
+	http: 'pi pi-globe',
+	error: 'pi pi-exclamation-circle',
+};
+
+/** Label humano por tipo de paso previo. */
+export const BREADCRUMB_LABEL_MAP: Record<BreadcrumbTipo, string> = {
+	navigation: 'Navegación',
+	http: 'Request',
+	error: 'Error',
 };
 // #endregion
 

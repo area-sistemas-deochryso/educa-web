@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ErrorReporterService } from './error-reporter.service';
 import { ActivityTrackerService } from './activity-tracker.service';
+import { BreadcrumbTrackerService } from './breadcrumb-tracker.service';
 import { ClientMetricsBufferService } from './client-metrics-buffer.service';
 // #endregion
 
@@ -54,6 +55,12 @@ describe('ErrorReporterService', () => {
 	let service: ErrorReporterService;
 	let httpMock: HttpTestingController;
 	let activityMock: ReturnType<typeof createActivityMock>;
+	let breadcrumbMock: {
+		onHttpError: ReturnType<typeof vi.fn>;
+		onClientError: ReturnType<typeof vi.fn>;
+		trackHttp: ReturnType<typeof vi.fn>;
+		reset: ReturnType<typeof vi.fn>;
+	};
 
 	beforeEach(() => {
 		vi.useFakeTimers();
@@ -62,6 +69,7 @@ describe('ErrorReporterService', () => {
 		vi.mocked(removeReportFromOutbox).mockClear();
 
 		activityMock = createActivityMock();
+		breadcrumbMock = { onHttpError: vi.fn(), onClientError: vi.fn(), trackHttp: vi.fn(), reset: vi.fn() };
 
 		TestBed.configureTestingModule({
 			providers: [
@@ -69,6 +77,7 @@ describe('ErrorReporterService', () => {
 				provideHttpClientTesting(),
 				ErrorReporterService,
 				{ provide: ActivityTrackerService, useValue: activityMock },
+				{ provide: BreadcrumbTrackerService, useValue: breadcrumbMock },
 				{ provide: ClientMetricsBufferService, useValue: { drain: vi.fn().mockReturnValue([]), destroy: vi.fn() } },
 			],
 		});
@@ -276,6 +285,48 @@ describe('ErrorReporterService', () => {
 			const req = httpMock.expectOne(ENDPOINT);
 			expect(req.request.body.mensaje.length).toBe(500);
 			req.flush({});
+		});
+
+		it('generates a correlationId, shared with the breadcrumb tracker, when none is given', () => {
+			service.reportClientError('boom', 'stack', undefined, 'TypeError');
+
+			const req = httpMock.expectOne(ENDPOINT);
+			const id = req.request.body.correlationId;
+			expect(id).toEqual(expect.any(String));
+			expect(breadcrumbMock.onClientError).toHaveBeenCalledWith('TypeError', id);
+			req.flush({});
+		});
+
+		it('keeps the given correlationId', () => {
+			service.reportClientError('boom', 'stack', 'req-1', 'Error');
+
+			const req = httpMock.expectOne(ENDPOINT);
+			expect(req.request.body.correlationId).toBe('req-1');
+			expect(breadcrumbMock.onClientError).toHaveBeenCalledWith('Error', 'req-1');
+			req.flush({});
+		});
+	});
+	// #endregion
+
+	// #region breadcrumb tracker hook (Plan 41 F4b)
+	describe('breadcrumb tracker hook', () => {
+		it('notifies the tracker on an HTTP error with its correlationId', () => {
+			service.reportHttpError(500, '/api/x', 'GET', undefined, 'req-1');
+
+			expect(breadcrumbMock.onHttpError).toHaveBeenCalledWith(500, '/api/x', 'GET', 'req-1');
+			httpMock.expectOne(ENDPOINT).flush({});
+		});
+
+		it('does not notify the tracker for the error endpoint itself', () => {
+			service.reportHttpError(500, ENDPOINT, 'POST', undefined, 'req-1');
+
+			expect(breadcrumbMock.onHttpError).not.toHaveBeenCalled();
+		});
+
+		it('resets the tracker on logout', () => {
+			service.resetOnLogout();
+
+			expect(breadcrumbMock.reset).toHaveBeenCalledOnce();
 		});
 	});
 	// #endregion

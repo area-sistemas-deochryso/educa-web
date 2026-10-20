@@ -148,6 +148,8 @@
 
 	<app-correlation-request-section [metric]="vm().snapshot?.requestMetric ?? null" />
 
+	<app-correlation-breadcrumbs-section [items]="vm().snapshot?.breadcrumbs ?? []" />
+
 	@if (viewMode() === 'timeline') {
 		<app-correlation-timeline-section [events]="vm().timelineEvents" />
 	} @else {

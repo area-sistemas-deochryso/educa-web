@@ -18,6 +18,7 @@ import { CorrelationReportsSectionComponent } from './components/correlation-rep
 import { CorrelationEmailsSectionComponent } from './components/correlation-emails-section';
 import { CorrelationTimelineSectionComponent } from './components/correlation-timeline-section';
 import { CorrelationRequestSectionComponent } from './components/correlation-request-section';
+import { CorrelationBreadcrumbsSectionComponent } from './components/correlation-breadcrumbs-section';
 import { EduButton, EduTooltip } from '@edu-ui';
 // #endregion
 
@@ -37,7 +38,7 @@ import { EduButton, EduTooltip } from '@edu-ui';
 @Component({
 	selector: 'app-correlation',
 	standalone: true,
-	imports: [DatePipe, EduButton, EduTooltip, PageHeaderComponent, CorrelationTimelineSectionComponent, CorrelationErrorsSectionComponent, CorrelationRateLimitSectionComponent, CorrelationReportsSectionComponent, CorrelationEmailsSectionComponent, CorrelationRequestSectionComponent, CorrelationIdPillComponent],
+	imports: [DatePipe, EduButton, EduTooltip, PageHeaderComponent, CorrelationTimelineSectionComponent, CorrelationErrorsSectionComponent, CorrelationRateLimitSectionComponent, CorrelationReportsSectionComponent, CorrelationEmailsSectionComponent, CorrelationRequestSectionComponent, CorrelationBreadcrumbsSectionComponent, CorrelationIdPillComponent],
 	templateUrl: './correlation.component.html',
 	styleUrl: './correlation.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

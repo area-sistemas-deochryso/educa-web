@@ -5,6 +5,7 @@ import { fromEvent, debounceTime } from 'rxjs';
 
 import { ActivityTrackerService } from './activity-tracker.service';
 import { Breadcrumb } from './activity-tracker.models';
+import { BreadcrumbTrackerService } from './breadcrumb-tracker.service';
 import { ClientMetricsBufferService } from './client-metrics-buffer.service';
 import { saveReportToOutbox, readPendingReports, removeReportFromOutbox } from './error-reporter-outbox.helper';
 import { createSwRevalidationListener } from './error-reporter-sw.helper';
@@ -21,6 +22,7 @@ import { logger } from '@core/helpers';
 export class ErrorReporterService {
 	private readonly http = inject(HttpClient);
 	private readonly activityTracker = inject(ActivityTrackerService);
+	private readonly breadcrumbTracker = inject(BreadcrumbTrackerService);
 	private readonly metricsBuffer = inject(ClientMetricsBufferService);
 	private readonly destroyRef = inject(DestroyRef);
 	private readonly isBrowser = typeof window !== 'undefined';
@@ -71,6 +73,9 @@ export class ErrorReporterService {
 		this.recentReports.set(dedupKey, now);
 		this.cleanRecentReports(now);
 
+		// Plan 41 F4b — buffer de pasos previos hacia el hub (solo 5xx / 4xx inesperado).
+		this.breadcrumbTracker.onHttpError(status, url, method, correlationId);
+
 		const origen = classifyHttpOrigin(status, this.isBrowser);
 		const breadcrumbKey = getBreadcrumbKey(status);
 		const maxBreadcrumbs = BREADCRUMB_LIMITS[breadcrumbKey] ?? BREADCRUMB_LIMITS['default'];
@@ -118,9 +123,14 @@ export class ErrorReporterService {
 		}));
 	}
 
-	reportClientError(message: string, stack?: string, correlationId?: string): void {
+	reportClientError(message: string, stack?: string, correlationId?: string, errorName?: string): void {
 		if (!this.isBrowser || !this.canReport()) return;
 		const sourceLocation = stack ? parseSourceLocation(stack) : null;
+
+		// Un error de JS no tiene request asociado: se le genera un id para que el
+		// ErrorLog y sus pasos previos queden enlazados en el hub (Plan 41 F4b).
+		const effectiveCorrelationId = correlationId ?? crypto.randomUUID();
+		this.breadcrumbTracker.onClientError(errorName, effectiveCorrelationId);
 
 		this.send(this.buildPayload({
 			origen: 'FRONTEND',
@@ -128,12 +138,13 @@ export class ErrorReporterService {
 			stackTrace: stack?.substring(0, 4000) ?? null,
 			url: this.isBrowser ? window.location.pathname : '/',
 			httpMethod: null, httpStatus: null, errorCode: null,
-			severidad: 'CRITICAL', correlationId: correlationId ?? null,
+			severidad: 'CRITICAL', correlationId: effectiveCorrelationId,
 			sourceLocation, breadcrumbCount: BREADCRUMB_LIMITS['js_unhandled'],
 		}));
 	}
 
 	resetOnLogout(): void {
+		this.breadcrumbTracker.reset();
 		this.recentReports.clear();
 		this.reportCount = 0;
 		if (this.resetTimer) {

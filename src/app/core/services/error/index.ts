@@ -2,6 +2,8 @@
 // * Error service re-exports.
 export * from './activity-tracker.models';
 export * from './activity-tracker.service';
+export * from './breadcrumb-tracker.models';
+export * from './breadcrumb-tracker.service';
 export * from './client-metrics-buffer.service';
 export * from './error.models';
 export * from './error-handler.service';

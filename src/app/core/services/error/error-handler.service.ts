@@ -147,7 +147,7 @@ export class ErrorHandlerService {
 		});
 
 		const correlationId = (context?.['requestId'] as string) ?? undefined;
-		this.errorReporter.reportClientError(error.message, error.stack, correlationId);
+		this.errorReporter.reportClientError(error.message, error.stack, correlationId, error.name);
 		if (correlationId) {
 			this.trace.trackVisibleError(correlationId);
 		}

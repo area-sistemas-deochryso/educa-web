@@ -1,0 +1,38 @@
+<section class="correlation-section correlation-breadcrumbs-section">
+	<header class="correlation-section__header">
+		<div class="correlation-section__title">
+			<i class="pi pi-history" aria-hidden="true"></i>
+			<h3>Pasos previos</h3>
+		</div>
+		@if (hasItems()) {
+			<span class="correlation-section__count">{{ items().length }}</span>
+		}
+	</header>
+
+	@if (!hasItems()) {
+		<div class="correlation-section__empty">
+			<i class="pi pi-info-circle" aria-hidden="true"></i>
+			<p>Sin pasos previos registrados para este correlation id.</p>
+		</div>
+	} @else {
+		<ol class="correlation-breadcrumbs-section__list">
+			@for (step of items(); track $index) {
+				<li class="correlation-breadcrumbs-section__step correlation-breadcrumbs-section__step--{{ step.tipo }}">
+					<i [class]="iconMap[step.tipo]" aria-hidden="true"></i>
+					<span class="correlation-breadcrumbs-section__label">{{ labelMap[step.tipo] }}</span>
+					@if (step.metodo) {
+						<span class="cell-mono">{{ step.metodo }}</span>
+					}
+					<span class="cell-mono correlation-breadcrumbs-section__route">{{ step.ruta }}</span>
+					@if (step.statusCode; as code) {
+						<edu-tag [value]="'' + code" [severity]="getStatusSeverity(code)" />
+					}
+					@if (step.errorClass) {
+						<span class="cell-mono">{{ step.errorClass }}</span>
+					}
+					<span class="correlation-breadcrumbs-section__offset">{{ formatOffset(step.offsetMs) }}</span>
+				</li>
+			}
+		</ol>
+	}
+</section>
