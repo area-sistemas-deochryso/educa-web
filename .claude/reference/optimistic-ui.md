@@ -360,6 +360,18 @@ ESLINT
 | `onError: () => store.rollback()` manual | Duplicado: el engine ya llama rollback del config | Dejar onError solo con logs/UI |
 | Omitir `optimistic` en UPDATE/DELETE/TOGGLE | Rompe compilación (union discriminado) | Declarar apply + rollback |
 | `consistencyLevel: 'server-confirmed'` sin justificación | Latencia alta sin motivo | Default optimistic o documentar el INV-* |
+| `effect()` que dispara una mutación y un rollback que reescribe el signal que ese `effect` observa | Bucle de reintentos: cada falla re-arma el `effect` (caso brief 847: ~8 POST/s hasta agotar la cuota) | Registrar lo ya intentado y filtrarlo en el `effect`; el rollback no reintenta |
+
+### Efecto + rollback = bucle
+
+Si un `effect` lee un signal `S`, llama a una mutación optimista, y el `error` de esa mutación restaura un snapshot en `S`, el `effect` vuelve a ejecutarse con la misma condición y repite la mutación sin fin. Un 429 o un 5xx lo arma igual que una falla de red.
+
+Para evitarlo:
+- Mantener un conjunto de «ya intentado» (por id) y filtrarlo dentro del `effect`, aunque el rollback restaure el estado visual.
+- Un 4xx/429 hace rollback una sola vez y no reintenta nunca (política de retry del proyecto).
+- Probar el camino de error: ante una falla, exactamente **una** llamada.
+
+Señal en producción: muchos 429 de un solo usuario al mismo endpoint de escritura en pocos segundos, con rechazos colaterales en lecturas. Ver brief 847.
 
 ---
 
