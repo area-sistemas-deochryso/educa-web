@@ -12,7 +12,7 @@
 | F5 | Consolidación Frontend | ⏳ 0% | Tras Plan 4 BE |
 | F8 | Design Patterns Backend | Incremental | Al tocar módulos |
 | F9 | Design Patterns Frontend | Incremental | Al tocar módulos |
-| xP41 | → Correlation Hub (coord) | ver P41 en coord (F5 search/export/auto-refresh materializado) | puede tocar FE — ver maestro coord |
+| xP41 | → Correlation Hub (coord) | ver P41 en coord (F4/F6 diseñadas, briefs 848-851; F5 materializado) | puede tocar FE — ver maestro coord |
 | xP50 | FE cohesion & coupling refactor (coord) | ✅ CERRADO (2026-09-25) — F1-F3a-F3b ✅ · F4 ❌ descartado | Service move + email consolidation |
 <!-- INDEX:END -->
 
@@ -35,9 +35,9 @@
 
 ## 📋 Cola priorizada
 
-**Cola vacía** — todos los planes Tier 0 (BAudit2, BAudit3) cerraron en 2026-09-22. `xP50` (todas sus fases FE) cerró completo el 2026-09-25. Siguientes candidatos:
+**Briefs en `open/` (2026-10-20)**: 852 (piloto de Signal Forms, P70 F4, baja). 847 (bucle de POST `/vista`, P110 F14) ✅ cerrado 2026-10-20 en `chat/847-…`, pendiente `/wt-merge`. Resto de la cola vacío — todos los planes Tier 0 (BAudit2, BAudit3) cerraron en 2026-09-22. `xP50` (todas sus fases FE) cerró completo el 2026-09-25. Siguientes candidatos:
 
-1. **xP41 F3-F6** (Correlation Hub) — puntero `educa-coord`
+1. **xP41 F4b/F6b** (briefs 849 y 851 en coord, tras 848/850 BE) — puntero `educa-coord`
 2. **F1 F4.4-F4.5** (INV-T*, INV-M* tests) — bloqueado por Plan 2/B BE
 3. **F5** (Consolidación FE) — bloqueado por Plan 4 BE
 

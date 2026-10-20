@@ -237,6 +237,19 @@ describe('EstudianteCursoHubContenidoComponent', () => {
 			expect(pendientes.marcarVista).toHaveBeenCalledExactlyOnceWith(100);
 		});
 
+		it('no reintenta la vista si el rollback del POST vuelve a marcar la tarea como nueva', () => {
+			nuevasIds.set(new Set([100]));
+			loaded();
+			TestBed.createComponent(EstudianteCursoHubContenidoComponent).detectChanges();
+
+			// Apagado optimista y luego rollback por falla del POST: el servicio reescribe el signal.
+			nuevasIds.set(new Set());
+			nuevasIds.set(new Set([100]));
+			TestBed.tick();
+
+			expect(pendientes.marcarVista).toHaveBeenCalledExactlyOnceWith(100);
+		});
+
 		it('conserva la marca "Nueva" durante la visita aunque el servicio ya la haya apagado', () => {
 			nuevasIds.set(new Set([100]));
 			loaded();
