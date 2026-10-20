@@ -168,10 +168,13 @@ export class EstudianteCursoHubContenidoComponent {
 			const semanas = this.vm().semanas;
 			if (nuevas.size === 0) return;
 			untracked(() => {
+				// Una tarea se intenta una sola vez por visita: si el POST falla, el rollback del
+				// servicio vuelve a marcarla nueva y sin este filtro el effect reintentaría en bucle.
+				const intentadas = this.vistasEstaVisita();
 				const ids = semanas
 					.filter((s) => abiertas.includes(s.id))
 					.flatMap((s) => s.tareas.map((t) => t.id))
-					.filter((id) => nuevas.has(id));
+					.filter((id) => nuevas.has(id) && !intentadas.has(id));
 				if (ids.length === 0) return;
 				this.vistasEstaVisita.update((prev) => new Set([...prev, ...ids]));
 				ids.forEach((id) => this.tareasPendientes.marcarVista(id));
