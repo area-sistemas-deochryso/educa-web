@@ -17,7 +17,7 @@
 | Repo | Rama | Remote |
 |------|------|--------|
 | Frontend (`educa-web`) | `main` | `origin/main` |
-| Backend (`Educa.API`) | `master` | `origin/master` |
+| Backend (`Educa.API`) | `main` | `origin/main` |
 
 ---
 
@@ -34,7 +34,7 @@
 [ ] Nuevas tablas/columnas/indices? → Script ejecutado y verificado
 [ ] Cambios breaking en DTOs? → Coordinar con frontend (DB_VERSION del SW)
 [ ] Secrets nuevos? → Configurados en Azure App Service (NO en appsettings.json)
-[ ] Git: commit limpio, push a master
+[ ] Git: commit limpio, push a main
 [ ] Azure: verificar que el deploy se completo (Deployment Center)
 ```
 
@@ -155,7 +155,7 @@ git push origin main
 **Alternativa git**:
 ```bash
 git revert HEAD
-git push origin master
+git push origin main
 # Esperar re-deploy en Azure
 ```
 
