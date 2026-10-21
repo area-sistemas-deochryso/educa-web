@@ -37,7 +37,7 @@ import {
 	EstadisticasAsistenciaDia,
 	HijoApoderado,
 	PersonaAsistencia,
-	computeStatsFromAsistencias,
+	computeStatsFromTableCounts,
 	profesorToPersonaAsistencia,
 } from '@data/models';
 import { AsistenciaProfesorApiService } from '@intranet-shared/services';
@@ -98,7 +98,8 @@ export class AttendanceDirectorProfesoresComponent implements OnInit {
 	readonly legendStats = computed(() => {
 		if (this.viewMode() !== VIEW_MODE.Mes) return this.estadisticasDia();
 		const prof = this.selectedProfesor();
-		return prof ? computeStatsFromAsistencias(prof.asistencias) : this.estadisticasDia();
+		// La leyenda sale de la tabla de Ingresos: incluye los días hábiles sin registro como F (INV-C15).
+		return prof ? computeStatsFromTableCounts(this.ingresos().counts) : this.estadisticasDia();
 	});
 	// #endregion
 

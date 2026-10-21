@@ -1,6 +1,6 @@
 /* eslint-disable max-lines -- Razón: componente orquesta 6 variantes de descarga (día/mes/periodo × salón/consolidado) × 2 formatos (PDF/Excel) + selector grado-sección + justificación. Dispersar en helpers externos fragmentaría la lógica cohesiva del componente. */
 import { StorageService } from '@core/services';
-import { AttendanceStatus, GradoSeccion, computeStatsFromAsistencias } from '@data/models';
+import { AttendanceStatus, GradoSeccion, computeStatsFromTableCounts } from '@data/models';
 import { AttendanceService } from '@intranet-shared/services';
 import { downloadBlob, viewBlobInNewTab } from '@core/helpers';
 import { periodoEnMes, filtrarPorPeriodoAcademico } from '@shared/models';
@@ -72,7 +72,8 @@ export class AttendanceDirectorEstudiantesComponent implements OnInit {
 	readonly legendStats = computed(() => {
 		if (this.view.viewMode() !== VIEW_MODE.Mes) return this.view.estadisticasDia();
 		const est = this.view.selectedEstudiante();
-		return est ? computeStatsFromAsistencias(est.asistencias) : this.view.estadisticasDia();
+		// La leyenda sale de la tabla de Ingresos: incluye los días hábiles sin registro como F (INV-C15).
+		return est ? computeStatsFromTableCounts(this.view.ingresos().counts) : this.view.estadisticasDia();
 	});
 	readonly hasMonthData = computed(() => {
 		const ing = this.view.ingresos().counts;

@@ -36,7 +36,7 @@ import {
 	HijoApoderado,
 	PersonaAsistencia,
 	asistenteAdminToPersonaAsistencia,
-	computeStatsFromAsistencias,
+	computeStatsFromTableCounts,
 } from '@data/models';
 import { AsistenciaStaffApiService } from '@intranet-shared/services';
 import { formatDateLocalIso } from '@core/helpers';
@@ -94,7 +94,8 @@ export class AttendanceDirectorStaffComponent implements OnInit {
 	readonly legendStats = computed(() => {
 		if (this.viewMode() !== VIEW_MODE.Mes) return this.estadisticasDia();
 		const person = this.selectedPerson();
-		return person ? computeStatsFromAsistencias(person.asistencias) : this.estadisticasDia();
+		// La leyenda sale de la tabla de Ingresos: incluye los días hábiles sin registro como F (INV-C15).
+		return person ? computeStatsFromTableCounts(this.ingresos().counts) : this.estadisticasDia();
 	});
 	// #endregion
 

@@ -225,6 +225,29 @@ export interface EstadisticasAsistenciaDia {
 	pendiente: number;
 }
 
+/**
+ * Estadísticas de leyenda a partir de los conteos de una tabla Ingresos/Salidas.
+ * A diferencia de `computeStatsFromAsistencias` (solo cuenta registros existentes), los conteos de la
+ * tabla incluyen los días hábiles pasados sin registro como F (INV-C15), así la leyenda cuadra con la tabla.
+ */
+export function computeStatsFromTableCounts(counts: {
+	A: number;
+	T: number;
+	F: number;
+	J: number;
+	'-': number;
+}): EstadisticasAsistenciaDia {
+	const { A, T, F, J, '-': pendiente } = counts;
+	return {
+		total: A + T + F + J + pendiente,
+		asistio: A,
+		tardanza: T,
+		falta: F,
+		justificado: J,
+		pendiente,
+	};
+}
+
 export function computeStatsFromAsistencias(
 	asistencias: AsistenciaDetalle[],
 	field: 'estadoCodigo' | 'estadoIngreso' | 'estadoSalida' = 'estadoCodigo',
