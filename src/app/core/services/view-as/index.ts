@@ -3,4 +3,5 @@
 export * from './view-as-context.model';
 export * from './view-as-context.service';
 export * from './view-as-filtros.service';
+export * from './view-as-sujetos.service';
 // #endregion

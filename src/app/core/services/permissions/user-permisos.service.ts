@@ -8,6 +8,7 @@ import { StorageService } from '../storage';
 import { CapabilityAuthEntry } from '../storage/storage.models';
 import { PermissionsService } from './permisos.service';
 import { CapabilityAuth } from './permisos.models';
+import { VIEW_AS_CAPABILITY, ViewAsContextService, ViewAsSujetosService } from '../view-as';
 
 const CAPABILITIES_TTL = Duration.minutes(30);
 const CAPABILITIES_REFRESH_INTERVAL = Duration.minutes(5);
@@ -21,6 +22,8 @@ export class UserPermissionsService {
 	private permisosService = inject(PermissionsService);
 	private storageService = inject(StorageService);
 	private destroyRef = inject(DestroyRef);
+	private viewAsContext = inject(ViewAsContextService);
+	private viewAsSujetos = inject(ViewAsSujetosService);
 	// #endregion
 
 	// #region Private state
@@ -32,6 +35,19 @@ export class UserPermissionsService {
 	private readonly _doneLoading$ = toObservable(computed(() => this._loaded() || this._loadFailed()));
 	private _lastFetchTimestamp = 0;
 	private wasAuthenticated = false;
+	// Capabilities del sujeto de "ver como" (P115 F4). `key` = `rol:entityId`: nunca se sirven las de un
+	// sujeto distinto al del contexto activo (INV-VIEWAS01).
+	private readonly _subjectCapabilities = signal<{ key: string; capabilities: CapabilityAuth[] } | null>(null);
+	private subjectLoad: { key: string; promise: Promise<void> } | null = null;
+	private readonly subjectKey = computed(() => {
+		const context = this.viewAsContext.activeContext();
+		return context ? `${context.rol}:${context.entityId}` : null;
+	});
+	/** Gobierna guard, menú y UI: las del sujeto mientras hay "ver como" y ya cargaron; si no, las propias. */
+	private readonly effectiveCapabilities = computed(() => {
+		const subject = this._subjectCapabilities();
+		return subject && subject.key === this.subjectKey() ? subject.capabilities : this._capabilities();
+	});
 	// #endregion
 
 	// #region Public readonly state
@@ -42,11 +58,16 @@ export class UserPermissionsService {
 	readonly isAuthenticated = toSignal(this.authService.isAuthenticated$, { initialValue: false });
 
 	readonly userCapabilities = computed<Set<string>>(() => {
+		return new Set(this.effectiveCapabilities().map((c) => c.codigo));
+	});
+
+	/** Capabilities del usuario real, ignorando "ver como" (para decidir si PUEDE ver como otro). */
+	readonly ownCapabilities = computed<Set<string>>(() => {
 		return new Set(this._capabilities().map((c) => c.codigo));
 	});
 
 	readonly vistasPermitidas = computed<string[]>(() => {
-		const caps = this._capabilities();
+		const caps = this.effectiveCapabilities();
 		const routes: string[] = [];
 		for (const cap of caps) {
 			if (cap.ruta) routes.push(cap.ruta);
@@ -121,6 +142,43 @@ export class UserPermissionsService {
 	}
 
 	async ensurePermisosLoaded(): Promise<boolean> {
+		const ownLoaded = await this.ensureOwnPermisosLoaded();
+		if (ownLoaded) await this.ensureSubjectCapabilities();
+		return ownLoaded;
+	}
+
+	/**
+	 * Con "ver como" activo, carga las capabilities del sujeto para que guard y menú reflejen lo que ÉL
+	 * puede ver. Ante un fallo (o una lista vacía, que `tienePermiso` leería como "todo permitido") se
+	 * conservan las propias: quien no tenga acceso por sí mismo queda sin acceso, nunca con más.
+	 */
+	private async ensureSubjectCapabilities(): Promise<void> {
+		const context = this.viewAsContext.activeContext();
+		const key = this.subjectKey();
+		if (!context || !key) return;
+		if (!this.ownCapabilities().has(VIEW_AS_CAPABILITY)) return;
+		if (this._subjectCapabilities()?.key === key) return;
+		if (this.subjectLoad?.key === key) return this.subjectLoad.promise;
+
+		const promise: Promise<void> = firstValueFrom(this.viewAsSujetos.obtenerCapabilities(context.rol, context.entityId))
+			.then((caps) => {
+				if (caps.length > 0) {
+					this._subjectCapabilities.set({ key, capabilities: caps });
+				} else {
+					logger.warn('[UserPermisos] El sujeto de "ver como" no devolvió capabilities — se usan las propias');
+				}
+			})
+			.catch((error) => {
+				logger.warn('[UserPermisos] No se pudieron cargar las capabilities del sujeto de "ver como":', error);
+			})
+			.finally(() => {
+				if (this.subjectLoad?.promise === promise) this.subjectLoad = null;
+			});
+		this.subjectLoad = { key, promise };
+		return promise;
+	}
+
+	private async ensureOwnPermisosLoaded(): Promise<boolean> {
 		if (!this.authService.isAuthenticated) {
 			this.clear();
 			return false;
@@ -180,6 +238,11 @@ export class UserPermissionsService {
 		return this.userCapabilities().has(code);
 	}
 
+	/** Capability del usuario real, sin considerar "ver como" (ej. ¿puede ver como otro usuario?). */
+	hasOwnCapability(code: string): boolean {
+		return this.ownCapabilities().has(code);
+	}
+
 	// #endregion
 
 	// #region Commands
@@ -202,6 +265,8 @@ export class UserPermissionsService {
 
 	private resetState(): void {
 		this._capabilities.set([]);
+		this._subjectCapabilities.set(null);
+		this.subjectLoad = null;
 		this._loaded.set(false);
 		this._loading.set(false);
 		this._loadFailed.set(false);

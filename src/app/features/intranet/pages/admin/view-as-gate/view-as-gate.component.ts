@@ -8,13 +8,14 @@ import { PageHeaderComponent } from '@intranet-shared/components/page-header';
 import { ViewAsPickerComponent } from '@intranet-shared/components/view-as-picker';
 
 import { AuthService } from '@core/services/auth';
-import { ViewAsContext, ViewAsContextService, ViewAsRol } from '@core/services/view-as';
+import { UserPermissionsService } from '@core/services/permissions';
+import { VIEW_AS_CAPABILITY, ViewAsContext, ViewAsContextService, ViewAsRol } from '@core/services/view-as';
 // #endregion
 
 // #region Implementation
 /**
- * Entry gate for the "ver como" flow (P92 F2, decision #3): an
- * Administrador lands here — via `viewAsGateGuard` redirecting from
+ * Entry gate for the "ver como" flow (P92 F2, decision #3; P115 F3): a user
+ * with the "ver como" capability lands here — via `viewAsGateGuard` redirecting from
  * `estudiante/*`/`profesor/*`, or by navigating here directly — and must
  * pick a user of the matching role before the guard lets them through.
  *
@@ -35,18 +36,20 @@ export class ViewAsGateComponent implements OnInit {
 	private readonly route = inject(ActivatedRoute);
 	private readonly router = inject(Router);
 	private readonly authService = inject(AuthService);
+	private readonly userPermissions = inject(UserPermissionsService);
 	private readonly viewAsContext = inject(ViewAsContextService);
 
 	readonly rol = signal<ViewAsRol | null>(null);
 	private returnUrl: string | null = null;
 
-	ngOnInit(): void {
-		// Defense in depth — the route itself is reachable by any authenticated
-		// user (it reuses the generic `intranet` permission path, same trick as
-		// the `ayuda` route). The real security boundary is the backend: without
-		// `ADMIN_VER_COMO`, `ResolveViewAsIdentity` 403s regardless of what a
-		// non-admin sets here. This redirect is purely UX.
-		if (this.authService.currentUser?.rol !== 'Administrador') {
+	async ngOnInit(): Promise<void> {
+		// Defense in depth — the route itself is reachable by any authenticated user (it reuses the
+		// generic `intranet` permission path, same trick as the `ayuda` route). The real security
+		// boundary is the backend: without `USUARIOS_API_IMPERSONATE`, `ResolveViewAsIdentity` 403s
+		// regardless of what a user without it sets here. This redirect is purely UX, and it asks for
+		// the capability (assignable per role), not for a role name (P115 F3).
+		await this.userPermissions.ensurePermisosLoaded();
+		if (!this.userPermissions.hasOwnCapability(VIEW_AS_CAPABILITY)) {
 			this.router.navigateByUrl('/intranet');
 			return;
 		}
@@ -54,6 +57,12 @@ export class ViewAsGateComponent implements OnInit {
 		const rolParam = this.route.snapshot.paramMap.get('rol');
 		const resolved = rolParam === 'profesor' ? 'Profesor' : rolParam === 'estudiante' ? 'Estudiante' : null;
 		if (!resolved) {
+			this.router.navigateByUrl('/intranet');
+			return;
+		}
+
+		// A real profesor/estudiante has nobody to "view as" inside their own module.
+		if (this.authService.currentUser?.rol === resolved) {
 			this.router.navigateByUrl('/intranet');
 			return;
 		}

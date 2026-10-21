@@ -2,6 +2,7 @@
 // * Verifies authorization invariants INV-S03 and INV-S04.
 // * Complements user-permisos.service.spec.ts (functional behavior).
 // #region Imports
+import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { of, Subject } from 'rxjs';
@@ -9,6 +10,7 @@ import { of, Subject } from 'rxjs';
 import { UserPermissionsService } from './user-permisos.service';
 import { AuthService } from '../auth';
 import { StorageService } from '../storage';
+import { ViewAsContextService, ViewAsSujetosService } from '../view-as';
 import { PermissionsService } from './permisos.service';
 import { CapabilityAuth } from './permisos.models';
 
@@ -59,6 +61,8 @@ describe('UserPermissionsService — Security Contracts', () => {
 				{ provide: AuthService, useValue: mocks.authService },
 				{ provide: StorageService, useValue: mocks.storageService },
 				{ provide: PermissionsService, useValue: mocks.permisosService },
+				{ provide: ViewAsContextService, useValue: { activeContext: signal(null) } },
+				{ provide: ViewAsSujetosService, useValue: { obtenerCapabilities: vi.fn() } },
 			],
 		});
 

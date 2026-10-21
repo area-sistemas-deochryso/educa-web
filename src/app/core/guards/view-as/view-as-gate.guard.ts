@@ -3,38 +3,48 @@ import { CanActivateFn, Router } from '@angular/router';
 import { inject } from '@angular/core';
 
 import { AuthService } from '@core/services/auth';
-import { ViewAsContextService, ViewAsRol } from '@core/services/view-as';
+import { UserPermissionsService } from '@core/services/permissions';
+import { VIEW_AS_CAPABILITY, ViewAsContextService, ViewAsRol } from '@core/services/view-as';
 // #endregion
 
 // #region Implementation
 /**
- * Gate for `estudiante/*`/`profesor/*` routes (P92 F2, decision #3): an
- * Administrador cannot enter the module without first choosing a user of
- * the matching role via `/intranet/ver-como/:rol`.
+ * Gate for `estudiante/*`/`profesor/*` routes (P92 F2, decision #3; P115 F3): a user who can "ver
+ * como" (capability `USUARIOS_API_IMPERSONATE`, assigned per role from Permisos → Por Rol) cannot
+ * enter the module without first choosing a user of the matching role via `/intranet/ver-como/:rol`.
  *
- * No-op for non-admin users (real profesores/estudiantes navigating their
- * own module) — mirrors the backend's "no headers → no work" fast path in
- * `BaseApiController.ResolveViewAsIdentity`. Only `Administrador` (rol 8)
- * holds `ADMIN_VER_COMO`; no other admin-like role (Director, Coordinador,
- * etc.) does, so the check is a strict string match, not the broader
- * `ADMIN_ROLES` list used elsewhere in the menu config.
+ * No-op for everyone else — a real profesor/estudiante navigating their own module, or a user
+ * without the capability (the route permission guard and the backend decide for them). Mirrors the
+ * backend's "no headers → no work" fast path in `BaseApiController.ResolveViewAsIdentity`. The
+ * decision is the capability, never the role name, so granting or revoking it needs no deploy.
  *
  * Routes using this guard must set `data: { viewAsRol: 'Profesor' | 'Estudiante' }`.
  *
  * @example
  * { path: 'profesor/cursos', canActivate: [viewAsGateGuard], data: { viewAsRol: 'Profesor' }, ... }
  */
-export const viewAsGateGuard: CanActivateFn = (route, state) => {
+export const viewAsGateGuard: CanActivateFn = async (route, state) => {
 	const authService = inject(AuthService);
+	const userPermissions = inject(UserPermissionsService);
 	const viewAsContext = inject(ViewAsContextService);
 	const router = inject(Router);
 
-	if (authService.currentUser?.rol !== 'Administrador') {
+	const expectedRol = route.data['viewAsRol'] as ViewAsRol | undefined;
+	if (!expectedRol) {
 		return true;
 	}
 
-	const expectedRol = route.data['viewAsRol'] as ViewAsRol | undefined;
-	if (!expectedRol || viewAsContext.hasContextForRol(expectedRol)) {
+	// A real profesor/estudiante is inside their own module.
+	if (authService.currentUser?.rol === expectedRol) {
+		return true;
+	}
+
+	await userPermissions.ensurePermisosLoaded();
+	if (!userPermissions.hasOwnCapability(VIEW_AS_CAPABILITY)) {
+		return true;
+	}
+
+	if (viewAsContext.hasContextForRol(expectedRol)) {
 		return true;
 	}
 

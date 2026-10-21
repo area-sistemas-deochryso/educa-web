@@ -1,5 +1,6 @@
 // * Tests for UserPermissionsService — validates tienePermiso, ensurePermisosLoaded, and state lifecycle.
 // #region Imports
+import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { of, Subject, throwError } from 'rxjs';
@@ -7,6 +8,7 @@ import { of, Subject, throwError } from 'rxjs';
 import { UserPermissionsService } from './user-permisos.service';
 import { AuthService } from '../auth';
 import { StorageService } from '../storage';
+import { ViewAsContext, ViewAsContextService, ViewAsSujetosService } from '../view-as';
 import { PermissionsService } from './permisos.service';
 import { CapabilityAuth } from './permisos.models';
 
@@ -43,6 +45,8 @@ function createMocks() {
 		permisosService: {
 			getMyCapabilities: vi.fn().mockReturnValue(of(mockCapabilities)),
 		},
+		viewAsContext: { activeContext: signal<ViewAsContext | null>(null) },
+		viewAsSujetos: { obtenerCapabilities: vi.fn() },
 	};
 }
 // #endregion
@@ -61,6 +65,8 @@ describe('UserPermissionsService', () => {
 				{ provide: AuthService, useValue: mocks.authService },
 				{ provide: StorageService, useValue: mocks.storageService },
 				{ provide: PermissionsService, useValue: mocks.permisosService },
+				{ provide: ViewAsContextService, useValue: mocks.viewAsContext },
+				{ provide: ViewAsSujetosService, useValue: mocks.viewAsSujetos },
 			],
 		});
 
@@ -262,6 +268,8 @@ describe('UserPermissionsService', () => {
 					{ provide: AuthService, useValue: mocks.authService },
 					{ provide: StorageService, useValue: mocks.storageService },
 					{ provide: PermissionsService, useValue: mocks.permisosService },
+				{ provide: ViewAsContextService, useValue: mocks.viewAsContext },
+				{ provide: ViewAsSujetosService, useValue: mocks.viewAsSujetos },
 				],
 			});
 
@@ -281,6 +289,8 @@ describe('UserPermissionsService', () => {
 					{ provide: AuthService, useValue: mocks.authService },
 					{ provide: StorageService, useValue: mocks.storageService },
 					{ provide: PermissionsService, useValue: mocks.permisosService },
+				{ provide: ViewAsContextService, useValue: mocks.viewAsContext },
+				{ provide: ViewAsSujetosService, useValue: mocks.viewAsSujetos },
 				],
 			});
 
@@ -335,6 +345,103 @@ describe('UserPermissionsService', () => {
 		it('should return empty set when capabilities is empty', () => {
 			(service as unknown as ServiceTestAccess)._capabilities.set([]);
 			expect(service.userCapabilities().size).toBe(0);
+		});
+	});
+	// #endregion
+
+	// #region "Ver como" — capabilities del sujeto (P115 F4, INV-VIEWAS01)
+	describe('ver como: capabilities efectivas', () => {
+		const ownCaps: CapabilityAuth[] = [
+			{ codigo: 'USUARIOS_API_IMPERSONATE', ruta: null },
+			{ codigo: 'ASISTENCIA_ADMIN_PAGE_VIEW', ruta: 'intranet/admin/asistencias/panel' },
+		];
+		const subjectCaps: CapabilityAuth[] = [
+			{ codigo: 'CURSOS_PROFESOR_PAGE_VIEW', ruta: 'intranet/profesor/cursos' },
+		];
+		const profesor77: ViewAsContext = { entityId: 77, rol: 'Profesor', nombreCompleto: 'Prof 77' };
+		const profesor88: ViewAsContext = { entityId: 88, rol: 'Profesor', nombreCompleto: 'Prof 88' };
+
+		beforeEach(() => {
+			mocks.authService.isAuthenticated = true;
+			mocks.permisosService.getMyCapabilities.mockReturnValue(of(ownCaps));
+			mocks.viewAsSujetos.obtenerCapabilities.mockReturnValue(of(subjectCaps));
+		});
+
+		it('sin contexto usa las capabilities propias y no consulta al sujeto', async () => {
+			await service.ensurePermisosLoaded();
+
+			expect(service.hasCapability('ASISTENCIA_ADMIN_PAGE_VIEW')).toBe(true);
+			expect(mocks.viewAsSujetos.obtenerCapabilities).not.toHaveBeenCalled();
+		});
+
+		it('con contexto, guard y UI se evalúan contra el sujeto; las propias siguen visibles aparte', async () => {
+			mocks.viewAsContext.activeContext.set(profesor77);
+
+			await service.ensurePermisosLoaded();
+
+			expect(mocks.viewAsSujetos.obtenerCapabilities).toHaveBeenCalledWith('Profesor', 77);
+			expect(service.tienePermiso('intranet/profesor/cursos')).toBe(true);
+			expect(service.tienePermiso('intranet/admin/asistencias/panel')).toBe(false);
+			expect(service.hasCapability('CURSOS_PROFESOR_PAGE_VIEW')).toBe(true);
+			expect(service.hasCapability('ASISTENCIA_ADMIN_PAGE_VIEW')).toBe(false);
+			expect(service.hasOwnCapability('USUARIOS_API_IMPERSONATE')).toBe(true);
+			expect(service.hasOwnCapability('CURSOS_PROFESOR_PAGE_VIEW')).toBe(false);
+		});
+
+		it('al limpiar el contexto vuelve a las capabilities propias', async () => {
+			mocks.viewAsContext.activeContext.set(profesor77);
+			await service.ensurePermisosLoaded();
+
+			mocks.viewAsContext.activeContext.set(null);
+
+			expect(service.hasCapability('ASISTENCIA_ADMIN_PAGE_VIEW')).toBe(true);
+			expect(service.hasCapability('CURSOS_PROFESOR_PAGE_VIEW')).toBe(false);
+		});
+
+		it('nunca sirve las capabilities de un sujeto distinto al del contexto activo', async () => {
+			mocks.viewAsContext.activeContext.set(profesor77);
+			await service.ensurePermisosLoaded();
+
+			mocks.viewAsContext.activeContext.set(profesor88);
+
+			expect(service.hasCapability('CURSOS_PROFESOR_PAGE_VIEW')).toBe(false);
+			expect(service.hasCapability('ASISTENCIA_ADMIN_PAGE_VIEW')).toBe(true);
+		});
+
+		it('sin la capability de ver como no consulta al sujeto', async () => {
+			mocks.permisosService.getMyCapabilities.mockReturnValue(of([{ codigo: 'INTRANET', ruta: 'intranet' }]));
+			mocks.viewAsContext.activeContext.set(profesor77);
+
+			await service.ensurePermisosLoaded();
+
+			expect(mocks.viewAsSujetos.obtenerCapabilities).not.toHaveBeenCalled();
+		});
+
+		it('si falla la carga del sujeto conserva las propias (nunca más acceso que el propio)', async () => {
+			mocks.viewAsSujetos.obtenerCapabilities.mockReturnValue(throwError(() => new Error('boom')));
+			mocks.viewAsContext.activeContext.set(profesor77);
+
+			await expect(service.ensurePermisosLoaded()).resolves.toBe(true);
+
+			expect(service.tienePermiso('intranet/profesor/cursos')).toBe(false);
+			expect(service.hasCapability('ASISTENCIA_ADMIN_PAGE_VIEW')).toBe(true);
+		});
+
+		it('una lista vacía del sujeto no se usa (tienePermiso leería "todo permitido")', async () => {
+			mocks.viewAsSujetos.obtenerCapabilities.mockReturnValue(of([]));
+			mocks.viewAsContext.activeContext.set(profesor77);
+
+			await service.ensurePermisosLoaded();
+
+			expect(service.tienePermiso('intranet/profesor/cursos')).toBe(false);
+		});
+
+		it('llamadas concurrentes comparten una sola consulta del sujeto', async () => {
+			mocks.viewAsContext.activeContext.set(profesor77);
+
+			await Promise.all([service.ensurePermisosLoaded(), service.ensurePermisosLoaded()]);
+
+			expect(mocks.viewAsSujetos.obtenerCapabilities).toHaveBeenCalledTimes(1);
 		});
 	});
 	// #endregion
