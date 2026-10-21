@@ -71,7 +71,7 @@ $color-justificado: var(--attendance-justificado);
 
 .calendar-row {
 	display: grid;
-	grid-template-columns: 80px repeat(5, 1fr);
+	grid-template-columns: 80px repeat(var(--day-cols, 5), 1fr);
 	gap: 4px;
 }
 
@@ -226,7 +226,7 @@ $color-justificado: var(--attendance-justificado);
 	}
 
 	.calendar-row {
-		grid-template-columns: 60px repeat(5, 1fr);
+		grid-template-columns: 60px repeat(var(--day-cols, 5), 1fr);
 	}
 
 	.calendar-cell {
@@ -257,7 +257,7 @@ $color-justificado: var(--attendance-justificado);
 	}
 
 	.calendar-row {
-		grid-template-columns: repeat(5, 1fr);
+		grid-template-columns: repeat(var(--day-cols, 5), 1fr);
 	}
 
 	.calendar-cell {

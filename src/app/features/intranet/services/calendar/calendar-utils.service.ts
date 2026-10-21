@@ -83,10 +83,12 @@ export class CalendarUtilsService {
 
 	/**
 	 * Genera las semanas laborables (Lun-Vie) de un mes específico.
-	 * Retorna un array de semanas, donde cada semana es un array de 5 elementos (Lun-Vie).
+	 * Retorna un array de semanas, donde cada semana es un array de 5 elementos (Lun-Vie),
+	 * o de 6 (Lun-Sáb) cuando `incluirSabado` es true.
 	 * Los días que no pertenecen al mes son null.
 	 */
-	getWorkWeeksOfMonth(month: number, year: number): (Date | null)[][] {
+	getWorkWeeksOfMonth(month: number, year: number, incluirSabado = false): (Date | null)[][] {
+		const diasPorSemana = incluirSabado ? 6 : 5;
 		// month viene en formato 1-12, convertir a 0-11 para Date
 		const monthIndex = month - 1;
 		const firstDay = new Date(year, monthIndex, 1);
@@ -118,8 +120,8 @@ export class CalendarUtilsService {
 		while (currentMonday.getTime() <= lastDay.getTime()) {
 			const week: (Date | null)[] = [];
 
-			// Generar los 5 días laborables (Lun-Vie)
-			for (let dayOffset = 0; dayOffset < 5; dayOffset++) {
+			// Generar los días de la semana (Lun-Vie, o Lun-Sáb)
+			for (let dayOffset = 0; dayOffset < diasPorSemana; dayOffset++) {
 				const currentDate = new Date(currentMonday);
 				currentDate.setDate(currentMonday.getDate() + dayOffset);
 

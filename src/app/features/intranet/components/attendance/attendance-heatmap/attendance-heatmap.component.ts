@@ -9,6 +9,7 @@ import {
 	MonthOption,
 } from '@features/intranet/pages/cross-role/attendance-component/models/attendance.types';
 import {
+	DAY_HEADERS,
 	MONTH_OPTIONS,
 	getStatusClass,
 } from '@features/intranet/pages/cross-role/attendance-component/config/attendance.constants';
@@ -50,7 +51,8 @@ export class AttendanceHeatmapComponent {
 	readonly cellClick = output<HeatmapCellClick>();
 
 	readonly monthOptions: MonthOption[] = MONTH_OPTIONS;
-	readonly dayHeadersFull = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+	// * 5 columnas (lun-vie) o 6 si el mes tiene registro en sábado (INV-C14).
+	readonly dayHeadersFull = computed(() => this.table().dayHeaders ?? DAY_HEADERS);
 	monthSelectVisible = false;
 	readonly getStatusClass = getStatusClass;
 

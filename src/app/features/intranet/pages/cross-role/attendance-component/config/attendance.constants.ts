@@ -38,6 +38,11 @@ export const MONTH_OPTIONS: MonthOption[] = [
 export const DAY_HEADERS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
 
 /**
+ * INV-C14: la columna Sábado solo aparece cuando el mes tiene al menos un registro en sábado.
+ */
+export const DAY_HEADERS_CON_SABADO = [...DAY_HEADERS, 'Sábado'];
+
+/**
  * Configuración completa de cada estado de asistencia admin (entrada).
  * Fuente única para clase CSS, label y grupo (presente/tardanza/falta).
  */

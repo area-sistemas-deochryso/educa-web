@@ -121,6 +121,7 @@ export class AttendanceEstudianteComponent implements OnInit {
 						currentYear,
 						this.userName(),
 						resumen.conteoEstados,
+						resumen.feriados,
 					);
 					this.ingresos.set(ingresos);
 					this.salidas.set(salidas);
@@ -155,6 +156,7 @@ export class AttendanceEstudianteComponent implements OnInit {
 						currentYear,
 						this.userName(),
 						resumen.conteoEstados,
+						resumen.feriados,
 					);
 					this.ingresos.set(ingresos);
 					// Salidas mantienen su mes actual
@@ -192,6 +194,7 @@ export class AttendanceEstudianteComponent implements OnInit {
 						currentYear,
 						this.userName(),
 						resumen.conteoEstados,
+						resumen.feriados,
 					);
 					this.salidas.set(salidas);
 					// Ingresos mantienen su mes actual

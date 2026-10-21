@@ -88,10 +88,10 @@
 	<!-- #endregion -->
 
 	<!-- #region Calendar grid -->
-	<div class="calendar-grid">
+	<div class="calendar-grid" [style.--day-cols]="dayHeadersFull().length">
 		<div class="calendar-row calendar-header-row">
 			<span class="week-label"></span>
-			@for (header of dayHeadersFull; track header) {
+			@for (header of dayHeadersFull(); track header) {
 				<span class="calendar-header-cell">{{ header }}</span>
 			}
 		</div>

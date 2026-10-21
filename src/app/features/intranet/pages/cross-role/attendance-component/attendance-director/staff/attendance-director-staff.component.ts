@@ -328,6 +328,8 @@ export class AttendanceDirectorStaffComponent implements OnInit {
 			selectedMonth,
 			selectedYear,
 			person.nombreCompleto,
+			undefined,
+			person.feriados,
 		);
 		this.ingresos.set(tables.ingresos);
 		this.salidas.set(tables.salidas);

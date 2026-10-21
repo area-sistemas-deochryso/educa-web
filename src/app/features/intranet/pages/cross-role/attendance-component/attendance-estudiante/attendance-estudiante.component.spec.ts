@@ -119,6 +119,7 @@ describe('AttendanceEstudianteComponent', () => {
 			currentYear,
 			'Test User',
 			mockResumen.conteoEstados,
+			mockResumen.feriados,
 		);
 	});
 

@@ -393,6 +393,8 @@ export class AttendanceDirectorProfesoresComponent implements OnInit {
 			selectedMonth,
 			selectedYear,
 			profesor.nombreCompleto,
+			undefined,
+			profesor.feriados,
 		);
 		this.ingresos.set(tables.ingresos);
 		this.salidas.set(tables.salidas);

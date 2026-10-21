@@ -35,6 +35,8 @@ export interface AttendanceTable {
 	counts: StatusCounts;
 	columnTotals: string[];
 	grandTotal: string;
+	/** Encabezados de columna (5 = lun-vie, 6 = con sábado). Omitido → lun-vie. */
+	dayHeaders?: string[];
 }
 
 export interface MonthOption {

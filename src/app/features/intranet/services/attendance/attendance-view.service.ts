@@ -194,6 +194,7 @@ export class AttendanceViewController {
 		const { selectedMonth, selectedYear } = this.ingresos();
 		const tables = this.attendanceDataService.processAsistencias(
 			estudiante.asistencias, selectedMonth, selectedYear, estudiante.nombreCompleto,
+			undefined, estudiante.feriados,
 		);
 		this.ingresos.set(tables.ingresos);
 		this.salidas.set(tables.salidas);
@@ -252,6 +253,8 @@ export class AttendanceViewController {
 						selectedMonth,
 						selectedYear,
 						estudiante.nombreCompleto,
+						undefined,
+						estudiante.feriados,
 					);
 					if (kind === 'ingresos') this.ingresos.set(tables.ingresos);
 					else this.salidas.set(tables.salidas);

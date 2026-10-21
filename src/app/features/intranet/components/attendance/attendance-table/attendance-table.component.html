@@ -94,7 +94,7 @@
 		<ng-template pTemplate="header">
 			<tr>
 				<th class="week-col header-cell"></th>
-				@for (day of dayHeaders; track day) {
+				@for (day of table().dayHeaders ?? dayHeaders; track day) {
 					<th class="day-col">{{ day }}</th>
 				}
 				<th class="total-col">Total</th>

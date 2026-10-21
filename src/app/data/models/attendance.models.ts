@@ -54,6 +54,8 @@ export interface ResumenAsistencia {
 	// El FE lo compara contra UMBRAL_GRADO_ASISTENCIA_DIARIA para decidir
 	// si muestra el mensaje "este alumno aún no usa asistencia biométrica".
 	graOrden?: number | null;
+	// Feriados del rango consultado (fechas ISO). Un día hábil pasado sin registro es F salvo feriado.
+	feriados?: string[];
 }
 
 // Hijo del apoderado (HijoApoderadoDto)
@@ -76,6 +78,8 @@ export interface EstudianteAsistencia {
 	grado: string;
 	seccion: string;
 	asistencias: AsistenciaDetalle[];
+	// Feriados del rango consultado (fechas ISO).
+	feriados?: string[];
 }
 
 // Estudiante en lista de asistencia (EstudianteSalonDto)
@@ -128,6 +132,8 @@ export interface AsistenciaProfesorDto {
 	sedeId: number;
 	tipoPersona: TipoPersona;
 	asistencias: AsistenciaDetalle[];
+	// Feriados del rango consultado (fechas ISO).
+	feriados?: string[];
 }
 // #endregion
 
@@ -145,6 +151,8 @@ export interface AsistenciaAsistenteAdminDto {
 	sedeId: number;
 	tipoPersona: TipoPersona;
 	asistencias: AsistenciaDetalle[];
+	// Feriados del rango consultado (fechas ISO).
+	feriados?: string[];
 }
 /**
  * Generic staff daily attendance response (C/M/D roles).

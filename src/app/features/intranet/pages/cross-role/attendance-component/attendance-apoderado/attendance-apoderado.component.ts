@@ -151,6 +151,7 @@ export class AttendanceApoderadoComponent implements OnInit {
 							selectedYear,
 							hijo.nombreCompleto,
 							response.conteoEstados,
+							response.feriados,
 						);
 						this.ingresos.set(tables.ingresos);
 						this.salidas.set(tables.salidas);
@@ -193,6 +194,7 @@ export class AttendanceApoderadoComponent implements OnInit {
 							selectedYear,
 							hijo.nombreCompleto,
 							response.conteoEstados,
+							response.feriados,
 						);
 						this.ingresos.set(tables.ingresos);
 					}
@@ -219,6 +221,7 @@ export class AttendanceApoderadoComponent implements OnInit {
 							selectedYear,
 							hijo.nombreCompleto,
 							response.conteoEstados,
+							response.feriados,
 						);
 						this.salidas.set(tables.salidas);
 					}

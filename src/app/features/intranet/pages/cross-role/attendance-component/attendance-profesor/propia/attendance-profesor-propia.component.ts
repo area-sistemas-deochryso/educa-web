@@ -105,6 +105,8 @@ export class AttendanceProfesorPropiaComponent implements OnInit {
 							month,
 							year,
 							this.profesorNombre(),
+							undefined,
+							response.feriados,
 						);
 						if (target === 'ingresos') {
 							this.ingresos.set(ingresos);
