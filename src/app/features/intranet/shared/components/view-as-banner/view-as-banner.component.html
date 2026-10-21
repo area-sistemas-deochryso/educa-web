@@ -8,6 +8,14 @@
 					Viendo como: <strong>{{ activeContext()?.nombreCompleto }}</strong>
 					({{ activeContext()?.rol }})
 				</span>
+				@if (readOnly()) {
+					<span
+						class="view-as-banner__tag"
+						title="No tienes permiso para modificar datos mientras ves como otro usuario"
+					>
+						<i class="pi pi-lock" aria-hidden="true"></i> Solo lectura
+					</span>
+				}
 			</div>
 			<div class="view-as-banner__actions">
 				<edu-button

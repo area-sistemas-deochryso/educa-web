@@ -115,6 +115,13 @@ export const UI_ERROR_CODES: Record<string, string> = {
 	PERIODOACADEMICO_TRANSICION_INVALIDA:
 		'Transición de estado del periodo académico inválida.',
 
+	// "Ver como" (P115 F2)
+	ADMIN_VER_COMO_MUTACION_NO_AUTORIZADA:
+		'Estás viendo como otro usuario en modo solo lectura: no tienes permiso para modificar datos desde esta vista.',
+	ADMIN_VER_COMO_SOLO_LECTURA: 'Esta acción no está disponible mientras ves como otro usuario.',
+	ADMIN_VER_COMO_NO_AUTORIZADO: 'No tienes permiso para ver como otro usuario.',
+	ADMIN_VER_COMO_ROL_INVALIDO: 'Solo se puede ver como un profesor o un estudiante.',
+
 	// Horarios
 	HORARIO_NOT_FOUND: 'No se encontró el horario solicitado.',
 	HORARIO_DIA_INVALIDO: 'Día de la semana inválido (debe ser 1-7).',
