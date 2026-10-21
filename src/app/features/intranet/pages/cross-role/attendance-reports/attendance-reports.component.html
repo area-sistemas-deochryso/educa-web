@@ -67,11 +67,15 @@
 		[selectedFecha]="vm().filters.fecha"
 		[selectedSalones]="vm().filters.salonesSeleccionados"
 		[selectedTipoPersona]="vm().filters.tipoPersona"
+		[bimestres]="vm().bimestres"
+		[selectedBimestreId]="vm().filters.bimestreId ?? null"
 		(estadoChange)="onEstadoChange($event)"
 		(rangoChange)="onRangoChange($event)"
 		(fechaChange)="onFechaChange($event)"
 		(salonesChange)="onSalonesChange($event)"
 		(tipoPersonaChange)="onTipoPersonaChange($event)"
+		(bimestreChange)="onBimestreChange($event)"
+		(configurarBimestres)="onConfigurarBimestres()"
 		(generar)="onGenerar()"
 	/>
 	<!-- #endregion -->
@@ -103,3 +107,9 @@
 	}
 	<!-- #endregion -->
 }
+
+<app-bimestres-config-dialog
+	[(visible)]="bimestresDialogVisible"
+	[bimestres]="vm().bimestres"
+	[anio]="anioBimestres"
+/>

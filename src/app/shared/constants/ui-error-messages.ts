@@ -268,6 +268,13 @@ export const UI_ERROR_CODES: Record<string, string> = {
 	REPORTE_RANGO_INVALIDO: 'El rango de fechas del reporte es inválido.',
 	REPORTE_SALON_REQUERIDO: 'Debe seleccionar un salón para el reporte.',
 	REPORTE_FORMATO_SALON_INVALIDO: 'Formato de salón inválido en el reporte.',
+	REPORTE_BIMESTRE_REQUERIDO: 'Debe seleccionar un bimestre para el reporte.',
+	REPORTE_BIMESTRE_SOLO_ESTUDIANTES: 'El reporte por bimestre solo está disponible para estudiantes.',
+	BIMESTRE_NO_ENCONTRADO: 'El bimestre seleccionado ya no existe. Actualiza la página.',
+	BIMESTRE_RANGO_INVALIDO: 'La fecha de fin no puede ser anterior a la de inicio.',
+	BIMESTRE_FUERA_DEL_ANIO: 'Las fechas del bimestre deben estar dentro de su año.',
+	BIMESTRE_SOLAPADO: 'El rango se solapa con otro bimestre del año.',
+	BIMESTRE_DUPLICADO: 'Ya existe ese bimestre en el año.',
 
 	// Conversaciones
 	CONVERSACION_NOT_FOUND: 'No se encontró la conversación.',

@@ -22,7 +22,7 @@
 				<label for="rango">Rango</label>
 				<edu-select
 					inputId="rango"
-					[options]="rangoOptions"
+					[options]="rangoOptionsVisibles()"
 					[ngModel]="selectedRango()"
 					(ngModelChange)="rangoChange.emit($event)"
 					optionLabel="label"
@@ -31,17 +31,43 @@
 				/>
 			</div>
 
-			<div class="filter-item">
-				<label for="fecha">Fecha</label>
-				<edu-datepicker
-					inputId="fecha"
-					[ngModel]="selectedFecha()"
-					(ngModelChange)="fechaChange.emit($event)"
-					dateFormat="dd/mm/yy"
-					appendTo="body"
-					[showIcon]="true"
-				/>
-			</div>
+			@if (esBimestre()) {
+				<div class="filter-item filter-item--bimestre">
+					<label for="bimestre">Bimestre</label>
+					<div class="bimestre-control">
+						<edu-select
+							inputId="bimestre"
+							[options]="bimestreOptions()"
+							[ngModel]="selectedBimestreId()"
+							(ngModelChange)="bimestreChange.emit($event)"
+							optionLabel="label"
+							optionValue="value"
+							placeholder="Seleccionar bimestre"
+							appendTo="body"
+							class="bimestre-control__select"
+						/>
+						<edu-button
+							icon="pi pi-cog"
+							[outlined]="true"
+							severity="secondary"
+							(click)="configurarBimestres.emit()"
+							[pt]="{ root: { 'aria-label': 'Configurar rangos de bimestres' } }"
+						/>
+					</div>
+				</div>
+			} @else {
+				<div class="filter-item">
+					<label for="fecha">Fecha</label>
+					<edu-datepicker
+						inputId="fecha"
+						[ngModel]="selectedFecha()"
+						(ngModelChange)="fechaChange.emit($event)"
+						dateFormat="dd/mm/yy"
+						appendTo="body"
+						[showIcon]="true"
+					/>
+				</div>
+			}
 		</div>
 	</div>
 

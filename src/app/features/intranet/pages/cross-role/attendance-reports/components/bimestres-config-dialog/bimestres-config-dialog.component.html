@@ -1,0 +1,75 @@
+<edu-dialog
+	[header]="'Configurar bimestres ' + anio()"
+	[modal]="true"
+	[visible]="visible()"
+	(visibleChange)="visible.set($event)"
+	[style]="{ width: '560px' }"
+	[closable]="true"
+	appendTo="body"
+>
+	<div class="bimestres-form">
+		<p class="bimestres-form__hint">
+			Cambiar un rango modifica lo que muestra cualquier reporte por bimestre que se genere después. No cierra ni congela datos.
+		</p>
+
+		@for (fila of filas(); track fila.original.id) {
+			<section class="bimestre-row">
+				<header class="bimestre-row__header">
+					<strong>{{ fila.original.nombre }}</strong>
+					@if (diasDe(fila) > 0) {
+						<span class="bimestre-row__dias">{{ diasDe(fila) }} días</span>
+					}
+				</header>
+
+				<div class="bimestre-row__dates">
+					<div class="bimestre-row__field">
+						<span class="bimestre-row__label">Inicio</span>
+						<edu-datepicker
+							[pt]="{ root: { 'aria-label': 'Inicio del ' + fila.original.nombre } }"
+							[ngModel]="fila.inicio"
+							(ngModelChange)="onCambioFecha(fila, 'inicio', $event)"
+							dateFormat="dd/mm/yy"
+							[showIcon]="true"
+							appendTo="body"
+						/>
+					</div>
+					<div class="bimestre-row__field">
+						<span class="bimestre-row__label">Fin</span>
+						<edu-datepicker
+							[pt]="{ root: { 'aria-label': 'Fin del ' + fila.original.nombre } }"
+							[ngModel]="fila.fin"
+							(ngModelChange)="onCambioFecha(fila, 'fin', $event)"
+							dateFormat="dd/mm/yy"
+							[showIcon]="true"
+							appendTo="body"
+						/>
+					</div>
+					<edu-button
+						type="button"
+						label="Guardar"
+						icon="pi pi-check"
+						size="small"
+						[disabled]="!hayCambios(fila) || !!errores()[fila.original.id] || fila.saving"
+						[loading]="fila.saving"
+						(click)="onGuardar(fila)"
+						[pt]="{ root: { 'aria-label': 'Guardar el rango del ' + fila.original.nombre } }"
+					/>
+				</div>
+
+				@if (errores()[fila.original.id]; as err) {
+					<p class="bimestre-row__error">{{ err }}</p>
+				} @else if (fila.errorServidor) {
+					<p class="bimestre-row__error">{{ fila.errorServidor }}</p>
+				} @else {
+					<p class="bimestre-row__info">Guardado: {{ rangoGuardado(fila) }}</p>
+				}
+			</section>
+		} @empty {
+			<p class="bimestres-form__empty">No hay bimestres configurados para {{ anio() }}.</p>
+		}
+	</div>
+
+	<ng-template #footer>
+		<edu-button type="button" label="Cerrar" [text]="true" (click)="onCerrar()" />
+	</ng-template>
+</edu-dialog>

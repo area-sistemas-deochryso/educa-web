@@ -1,0 +1,77 @@
+.bimestres-form {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.bimestres-form__hint,
+.bimestres-form__empty {
+	margin: 0;
+	font-size: 0.8rem;
+	color: var(--text-color-secondary);
+}
+
+.bimestre-row {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	padding: 0.75rem;
+	border: 1px solid var(--surface-border);
+	border-radius: 8px;
+
+	&__header {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+	}
+
+	&__dias {
+		font-size: 0.8rem;
+		color: var(--text-color-secondary);
+	}
+
+	&__dates {
+		display: grid;
+		// minmax(0, 1fr): sin el 0 la pista toma el ancho mínimo del datepicker y desborda el diálogo.
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 0.75rem;
+		align-items: end;
+
+		edu-button {
+			grid-column: 1 / -1;
+			justify-self: end;
+		}
+	}
+
+	&__field {
+		display: flex;
+		flex-direction: column;
+		gap: 0.375rem;
+
+		.bimestre-row__label {
+			font-size: 0.875rem;
+			font-weight: 500;
+			color: var(--text-color);
+		}
+	}
+
+	&__error,
+	&__info {
+		margin: 0;
+		font-size: 0.8rem;
+	}
+
+	&__error {
+		color: var(--red-600);
+	}
+
+	&__info {
+		color: var(--text-color-secondary);
+	}
+}
+
+@media (max-width: 560px) {
+	.bimestre-row__dates {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}

@@ -13,6 +13,7 @@ export const RANGO_OPTIONS: SelectOption<RangoTipo>[] = [
 	{ label: 'Día', value: 'dia' },
 	{ label: 'Semana', value: 'semana' },
 	{ label: 'Mes', value: 'mes' },
+	{ label: 'Bimestre', value: 'bimestre' },
 ];
 
 export const TIPO_PERSONA_OPTIONS: SelectOption<TipoPersonaReporte>[] = [

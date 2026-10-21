@@ -10,6 +10,7 @@ import { ReportsFiltersComponent } from './components/reports-filters/reports-fi
 import { ReportsSummaryComponent } from './components/reports-summary/reports-summary.component';
 import { ReportsResultComponent } from './components/reports-result/reports-result.component';
 import { UsuarioReportComponent } from './components/usuario-report/usuario-report.component';
+import { BimestresConfigDialogComponent } from './components/bimestres-config-dialog/bimestres-config-dialog.component';
 import { AttendanceReportsFacade } from './services';
 import { EduButton, EduSelectButton } from '@edu-ui';
 import {
@@ -33,6 +34,7 @@ import {
 		ReportsSummaryComponent,
 		ReportsResultComponent,
 		UsuarioReportComponent,
+		BimestresConfigDialogComponent,
 		TableSkeletonComponent,
 		StatsSkeletonComponent,
 		ErrorStateComponent,
@@ -62,6 +64,19 @@ export class AttendanceReportsComponent implements OnInit {
 	}
 	// #endregion
 
+	// #region Configuración de bimestres (Plan xrepo-116)
+	readonly bimestresDialogVisible = signal(false);
+	readonly anioBimestres = new Date().getFullYear();
+
+	onBimestreChange(bimestreId: number | null): void {
+		this.facade.updateFilters({ bimestreId });
+	}
+
+	onConfigurarBimestres(): void {
+		this.bimestresDialogVisible.set(true);
+	}
+	// #endregion
+
 	// #region Computed locales
 	readonly salonOptions = computed(() =>
 		this.vm().salonesDisponibles.map(salonToOption),
@@ -73,6 +88,7 @@ export class AttendanceReportsComponent implements OnInit {
 	// #region Lifecycle
 	ngOnInit(): void {
 		this.facade.loadSalones();
+		this.facade.loadBimestres();
 		this.applyQueryParams();
 	}
 
@@ -120,6 +136,11 @@ export class AttendanceReportsComponent implements OnInit {
 	}
 
 	onTipoPersonaChange(tipoPersona: TipoPersonaReporte): void {
+		// El rango bimestre solo existe para estudiantes: al salir de "E" se vuelve a "mes".
+		if (tipoPersona !== 'E' && this.vm().filters.rango === 'bimestre') {
+			this.facade.updateFilters({ tipoPersona, rango: 'mes' });
+			return;
+		}
 		this.facade.updateFilters({ tipoPersona });
 	}
 

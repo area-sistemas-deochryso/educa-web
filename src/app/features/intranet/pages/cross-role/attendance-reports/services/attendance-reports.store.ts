@@ -2,6 +2,7 @@ import { computed, Injectable, signal } from '@angular/core';
 import type { SalonProfesor } from '@data/models';
 import {
 	getDefaultFilters,
+	type BimestreAsistencia,
 	type ReporteFiltrado,
 	type ReporteFilters,
 } from '../models';
@@ -14,6 +15,8 @@ export class AttendanceReportsStore {
 	private readonly _resultado = signal<ReporteFiltrado | null>(null);
 	private readonly _loading = signal(false);
 	private readonly _loadingSalones = signal(false);
+	private readonly _bimestres = signal<BimestreAsistencia[]>([]);
+	private readonly _loadingBimestres = signal(false);
 	private readonly _exportingPdf = signal(false);
 	private readonly _exportingExcel = signal(false);
 	private readonly _error = signal<string | null>(null);
@@ -25,6 +28,8 @@ export class AttendanceReportsStore {
 	readonly resultado = this._resultado.asReadonly();
 	readonly loading = this._loading.asReadonly();
 	readonly loadingSalones = this._loadingSalones.asReadonly();
+	readonly bimestres = this._bimestres.asReadonly();
+	readonly loadingBimestres = this._loadingBimestres.asReadonly();
 	readonly exportingPdf = this._exportingPdf.asReadonly();
 	readonly exportingExcel = this._exportingExcel.asReadonly();
 	readonly error = this._error.asReadonly();
@@ -47,6 +52,7 @@ export class AttendanceReportsStore {
 		resultado: this._resultado(),
 		loading: this._loading(),
 		loadingSalones: this._loadingSalones(),
+		bimestres: this._bimestres(),
 		exportingPdf: this._exportingPdf(),
 		exportingExcel: this._exportingExcel(),
 		error: this._error(),
@@ -70,6 +76,14 @@ export class AttendanceReportsStore {
 
 	setLoadingSalones(loading: boolean): void {
 		this._loadingSalones.set(loading);
+	}
+
+	setBimestres(bimestres: BimestreAsistencia[]): void {
+		this._bimestres.set(bimestres);
+	}
+
+	setLoadingBimestres(loading: boolean): void {
+		this._loadingBimestres.set(loading);
 	}
 
 	setExportingPdf(exporting: boolean): void {
