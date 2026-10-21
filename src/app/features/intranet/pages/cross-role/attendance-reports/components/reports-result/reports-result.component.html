@@ -35,32 +35,62 @@
 				<div class="matrix-container">
 					<table class="matrix-table">
 						<thead>
-							<tr>
-								<th class="matrix-frozen matrix-col-num" rowspan="2">#</th>
-								<th class="matrix-frozen matrix-col-name" rowspan="2">Nombre Completo</th>
-								@for (dia of diasColumnas(); track dia) {
-									<th class="matrix-col-day" [class.holiday-col]="feriadosSet().has(dia)">{{ dia }}</th>
-								}
-								<th class="matrix-col-total matrix-total-header" colspan="4">Resultados</th>
-							</tr>
-							<tr>
-								@for (label of diasSemanaLabels(); track $index) {
-									<th class="matrix-col-day matrix-weekday" [class.holiday-col]="feriadosSet().has(diasColumnas()[$index])">{{ label }}</th>
-								}
-								<th class="matrix-col-total total-A">A</th>
-								<th class="matrix-col-total total-F">F</th>
-								<th class="matrix-col-total total-T">T</th>
-								<th class="matrix-col-total total-J">J</th>
-							</tr>
+							@if (esBimestre()) {
+								<tr>
+									<th class="matrix-frozen matrix-col-num" rowspan="3">#</th>
+									<th class="matrix-frozen matrix-col-name" rowspan="3">Nombre Completo</th>
+									@for (mes of mesesBimestre(); track mes.clave) {
+										<th class="matrix-month" [attr.colspan]="mes.cantidad">{{ mes.label }}</th>
+									}
+									<th class="matrix-col-total matrix-total-header" colspan="4">Resultados</th>
+								</tr>
+								<tr>
+									@for (col of columnasBimestre(); track $index) {
+										<th class="matrix-col-day" [class.holiday-col]="col.esFeriado" [class.month-start]="col.inicioMes">{{ col.dia }}</th>
+									}
+									<th class="matrix-col-total total-A" rowspan="2">A</th>
+									<th class="matrix-col-total total-F" rowspan="2">F</th>
+									<th class="matrix-col-total total-T" rowspan="2">T</th>
+									<th class="matrix-col-total total-J" rowspan="2">J</th>
+								</tr>
+								<tr>
+									@for (col of columnasBimestre(); track $index) {
+										<th class="matrix-col-day matrix-weekday" [class.holiday-col]="col.esFeriado" [class.month-start]="col.inicioMes">{{ col.letra }}</th>
+									}
+								</tr>
+							} @else {
+								<tr>
+									<th class="matrix-frozen matrix-col-num" rowspan="2">#</th>
+									<th class="matrix-frozen matrix-col-name" rowspan="2">Nombre Completo</th>
+									@for (dia of diasColumnas(); track dia) {
+										<th class="matrix-col-day" [class.holiday-col]="feriadosSet().has(dia)">{{ dia }}</th>
+									}
+									<th class="matrix-col-total matrix-total-header" colspan="4">Resultados</th>
+								</tr>
+								<tr>
+									@for (label of diasSemanaLabels(); track $index) {
+										<th class="matrix-col-day matrix-weekday" [class.holiday-col]="feriadosSet().has(diasColumnas()[$index])">{{ label }}</th>
+									}
+									<th class="matrix-col-total total-A">A</th>
+									<th class="matrix-col-total total-F">F</th>
+									<th class="matrix-col-total total-T">T</th>
+									<th class="matrix-col-total total-J">J</th>
+								</tr>
+							}
 						</thead>
 						<tbody>
 							@for (est of paginatedEstudiantes(); track est.dni; let i = $index) {
 								<tr>
 									<td class="matrix-frozen matrix-col-num">{{ matrixPageOffset() + i + 1 }}</td>
 									<td class="matrix-frozen matrix-col-name nombre-cell">{{ est.nombreCompleto }}</td>
-									@for (dia of est.asistenciasDiarias ?? []; track dia.dia) {
-										<td class="matrix-col-day" [class.holiday-col]="dia.esFeriado">
-											<span class="matrix-badge" [class.matrix-cell-pending]="dia.estadoCodigo === '-' || dia.estadoCodigo === 'X'">{{ dia.estadoCodigo }}</span>
+									@for (dia of est.asistenciasDiarias ?? []; track dia.fecha ?? dia.dia; let c = $index) {
+										<td
+											class="matrix-col-day"
+											[class.holiday-col]="dia.esFeriado"
+											[class.weekend-col]="esBimestre() && columnasBimestre()[c]?.esFinSemana"
+											[class.month-start]="esBimestre() && columnasBimestre()[c]?.inicioMes"
+										>
+											<span class="matrix-badge" [class.matrix-cell-pending]="dia.estadoCodigo === '-' || dia.estadoCodigo === 'X'">{{ esBimestre() ? textoCeldaBimestre(dia, c) : dia.estadoCodigo }}</span>
 										</td>
 									}
 									<td class="matrix-col-total matrix-total">{{ est.totalAsistencias ?? 0 }}</td>

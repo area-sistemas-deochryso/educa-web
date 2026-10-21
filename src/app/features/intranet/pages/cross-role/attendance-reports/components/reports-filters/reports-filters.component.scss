@@ -97,6 +97,17 @@
 	.filter-action {
 		margin-left: 0;
 	}
+
+	// La tira "Reportar sobre" (6 segmentos) no se parte: sin este tope empuja los grupos más allá de la barra
+	// y deja cortados los selectores (y el engranaje de bimestres) en pantallas angostas.
+	.filters-bar > .filter-group {
+		max-width: 100%;
+	}
+
+	.filter-item--persona {
+		max-width: 100%;
+		overflow-x: auto;
+	}
 }
 
 @media (max-width: 600px) {
@@ -110,3 +121,14 @@
 	}
 }
 // #endregion
+
+.bimestre-control {
+	display: flex;
+	gap: 0.5rem;
+	align-items: center;
+
+	&__select {
+		flex: 1;
+		min-width: 0;
+	}
+}

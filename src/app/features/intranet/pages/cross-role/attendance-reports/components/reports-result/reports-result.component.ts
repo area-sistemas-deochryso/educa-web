@@ -2,14 +2,36 @@ import { ChangeDetectionStrategy, Component, computed, effect, input, signal } f
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
+import { isoToLocalDate } from '../../models';
 import type {
+	AsistenciaDiaMatriz,
 	PersonaAsistenteAdminReporte,
 	PersonaProfesorReporte,
 	ReporteFiltrado,
 	SalonReporteFiltrado,
 } from '../../models';
+import { formatDateLocalIso } from '@core/helpers';
 import { createClientPaging } from '@shared/utils';
 import { EduSelect, EduTable } from '@edu-ui';
+
+/** Columna de día del rango bimestre: se arma desde fechas reales porque `dia` (1-31) se repite al cruzar meses. */
+interface ColumnaDiaBimestre {
+	dia: number;
+	letra: string;
+	mes: number;
+	esFeriado: boolean;
+	esFinSemana: boolean;
+	inicioMes: boolean;
+}
+
+interface MesBimestre {
+	clave: string;
+	label: string;
+	cantidad: number;
+}
+
+const LETRAS_SEMANA = ['D', 'L', 'M', 'M', 'J', 'V', 'S'];
+const MESES_CORTOS = ['', 'ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
 
 interface SalonSelectOption {
 	label: string;
@@ -63,14 +85,48 @@ export class ReportsResultComponent {
 	// #region Computed
 	readonly esDia = computed(() => this.resultado().rangoTipo === 'dia');
 
+	readonly esBimestre = computed(() => this.resultado().rangoTipo === 'bimestre');
+
 	readonly esMatriz = computed(() => {
 		const r = this.resultado();
-		if (r.rangoTipo !== 'mes' && r.rangoTipo !== 'semana') return false;
+		if (r.rangoTipo !== 'mes' && r.rangoTipo !== 'semana' && r.rangoTipo !== 'bimestre') return false;
 		return r.salones.some(s => s.estudiantes.some(e => e.asistenciasDiarias != null))
 			|| r.profesores?.some(p => p.asistenciasDiarias != null) === true
 			|| r.asistentesAdmin?.some(a => a.asistenciasDiarias != null) === true
 			|| r.coordinadores?.some(a => a.asistenciasDiarias != null) === true
 			|| r.promotores?.some(a => a.asistenciasDiarias != null) === true;
+	});
+
+	readonly columnasBimestre = computed<ColumnaDiaBimestre[]>(() => {
+		const r = this.resultado();
+		if (r.rangoTipo !== 'bimestre') return [];
+		const inicio = isoToLocalDate(r.fechaInicio);
+		const feriados = new Set((r.fechasFeriados ?? []).map((f) => f.slice(0, 10)));
+
+		return Array.from({ length: r.totalDiasRango ?? 0 }, (_, i) => {
+			const d = new Date(inicio);
+			d.setDate(inicio.getDate() + i);
+			const dow = d.getDay();
+			return {
+				dia: d.getDate(),
+				letra: LETRAS_SEMANA[dow],
+				mes: d.getMonth() + 1,
+				esFeriado: feriados.has(formatDateLocalIso(d)),
+				esFinSemana: dow === 0 || dow === 6,
+				inicioMes: i > 0 && d.getDate() === 1,
+			};
+		});
+	});
+
+	/** Meses que cubre el rango, con la cantidad de columnas de cada uno (fila superior del encabezado). */
+	readonly mesesBimestre = computed<MesBimestre[]>(() => {
+		const meses: MesBimestre[] = [];
+		this.columnasBimestre().forEach((c, i) => {
+			const ultimo = meses[meses.length - 1];
+			if (ultimo && !this.columnasBimestre()[i].inicioMes) ultimo.cantidad++;
+			else meses.push({ clave: `${i}-${c.mes}`, label: MESES_CORTOS[c.mes], cantidad: 1 });
+		});
+		return meses;
 	});
 
 	readonly diasColumnas = computed<number[]>(() => {
@@ -205,6 +261,12 @@ export class ReportsResultComponent {
 
 	onMatrixPageChange(page: number): void {
 		this._matrixPage.set(page);
+	}
+
+	/** Sábado/domingo sin registro se dejan vacíos en el rango bimestre (el guion no aporta). */
+	textoCeldaBimestre(dia: AsistenciaDiaMatriz, indice: number): string {
+		const esFinSemana = this.columnasBimestre()[indice]?.esFinSemana ?? false;
+		return esFinSemana && dia.estadoCodigo === '-' ? '' : dia.estadoCodigo;
 	}
 	// #endregion
 

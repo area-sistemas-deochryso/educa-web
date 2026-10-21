@@ -4,7 +4,7 @@ import type { PersonaParaSeleccion, SalonProfesor } from '@data/models';
 export const ESTADO_FILTROS = ['todos', 'faltando', 'viniendo', 'tarde', 'temprano'] as const;
 export type EstadoFiltro = (typeof ESTADO_FILTROS)[number];
 
-export const RANGO_TIPOS = ['dia', 'semana', 'mes'] as const;
+export const RANGO_TIPOS = ['dia', 'semana', 'mes', 'bimestre'] as const;
 export type RangoTipo = (typeof RANGO_TIPOS)[number];
 
 export const TIPOS_PERSONA = ['E', 'P', 'A', 'C', 'M', 'todos'] as const;
@@ -49,6 +49,10 @@ export interface ReporteFiltrado {
 	diasFeriados?: number[] | null;
 	diasEnMes?: number | null;
 	nombreMes?: string | null;
+	/** Rango `bimestre` (Plan xrepo-116): nombre ("III Bimestre"), feriados como fechas completas y días calendario del rango. */
+	nombreBimestre?: string | null;
+	fechasFeriados?: string[] | null;
+	totalDiasRango?: number | null;
 }
 
 export interface SalonReporteFiltrado {
@@ -65,6 +69,8 @@ export interface SalonReporteFiltrado {
 
 export interface AsistenciaDiaMatriz {
 	dia: number;
+	/** ISO completo del día. Solo el rango bimestre lo necesita (cruza meses, `dia` se repite). */
+	fecha?: string | null;
 	estadoCodigo: string;
 	esFeriado: boolean;
 	horaEntrada?: string | null;
@@ -128,6 +134,8 @@ export interface ReporteFilters {
 	fecha: Date;
 	salonesSeleccionados: string[];
 	tipoPersona: TipoPersonaReporte;
+	/** Solo con `rango = 'bimestre'` (solo estudiantes): el BE resuelve el rango desde la configuración. */
+	bimestreId?: number | null;
 	/**
 	 * Sede a consultar. `null`/`undefined` = sede propia del usuario (comportamiento actual,
 	 * sin cambios). Un valor distinto a la sede propia requiere `Capability.ASISTENCIA_ADMIN_PAGE_VIEW`
@@ -143,6 +151,7 @@ export function getDefaultFilters(): ReporteFilters {
 		fecha: new Date(),
 		salonesSeleccionados: [],
 		tipoPersona: 'E',
+		bimestreId: null,
 		sedeId: null,
 	};
 }

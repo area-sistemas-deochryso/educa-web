@@ -257,3 +257,18 @@ thead .holiday-col {
 	}
 }
 // #endregion
+
+// #region Rango bimestre (Plan xrepo-116)
+.matrix-month {
+	letter-spacing: 0.04em;
+	border-left: 2px solid var(--surface-500);
+}
+
+.matrix-table .weekend-col {
+	background: var(--surface-200);
+}
+
+.matrix-table .month-start {
+	border-left: 2px solid var(--surface-500);
+}
+// #endregion

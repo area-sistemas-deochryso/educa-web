@@ -8,11 +8,17 @@ import {
 } from '@intranet-shared/services';
 import { isAdminRole } from '@shared/utils';
 import { esGradoAsistenciaDiaria } from '@shared/constants';
-import { forkJoin } from 'rxjs';
+import { forkJoin, tap, type Observable } from 'rxjs';
 import { AttendanceReportsApiService } from './attendance-reports-api.service';
 import { AttendanceReportsStore } from './attendance-reports.store';
 import { ESTADO_OPTIONS, RANGO_OPTIONS, TIPO_PERSONA_OPTIONS } from '../config/attendance-reports.config';
-import type { ReporteFilters, ReporteFiltrado } from '../models';
+import {
+	elegirBimestreDefault,
+	type ActualizarBimestrePayload,
+	type BimestreAsistencia,
+	type ReporteFilters,
+	type ReporteFiltrado,
+} from '../models';
 
 @Injectable({ providedIn: 'root' })
 export class AttendanceReportsFacade {
@@ -68,11 +74,55 @@ export class AttendanceReportsFacade {
 	}
 	// #endregion
 
+	// #region Bimestres (Plan xrepo-116)
+	/** Carga los bimestres del año en curso y preselecciona el vigente si el usuario aún no eligió uno. */
+	loadBimestres(): void {
+		if (this.store.loadingBimestres()) return;
+		this.store.setLoadingBimestres(true);
+
+		this.api
+			.getBimestres(new Date().getFullYear())
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (bimestres) => {
+					this.store.setBimestres(bimestres);
+					this.seleccionarBimestreSiFalta(bimestres);
+					this.store.setLoadingBimestres(false);
+				},
+				error: (err) => {
+					logger.error('[AttendanceReports] Error al cargar bimestres', err);
+					this.store.setLoadingBimestres(false);
+				},
+			});
+	}
+
+	/** Guarda el rango de un bimestre y refresca la lista; el reporte ya generado no se regenera solo. */
+	actualizarBimestre(id: number, payload: ActualizarBimestrePayload): Observable<BimestreAsistencia> {
+		return this.api.actualizarBimestre(id, payload).pipe(
+			tap((guardado) => {
+				const lista = this.store.bimestres().map((b) => (b.id === guardado.id ? guardado : b));
+				this.store.setBimestres(lista);
+			}),
+		);
+	}
+
+	private seleccionarBimestreSiFalta(bimestres: BimestreAsistencia[]): void {
+		const actual = this.store.filters().bimestreId;
+		if (actual != null && bimestres.some((b) => b.id === actual)) return;
+		this.store.updateFilters({ bimestreId: elegirBimestreDefault(bimestres, new Date())?.id ?? null });
+	}
+	// #endregion
+
 	// #region Generar reporte
 	generarReporte(): void {
 		if (this.store.loading()) return;
 
 		const filters = this.store.filters();
+
+		if (filters.rango === 'bimestre' && !filters.bimestreId) {
+			this.store.setError('Debe seleccionar un bimestre.');
+			return;
+		}
 
 		// Profesores y Asistentes administrativos no se agrupan por salón — BE ignora el selector
 		const requiereSalones =
@@ -187,6 +237,14 @@ export class AttendanceReportsFacade {
 			return resultado.nombreMes ? `${resultado.nombreMes}_${anio}` : inicio.slice(0, 7);
 		}
 		if (resultado.rangoTipo === 'semana') return `${inicio}_${fin}`;
+		if (resultado.rangoTipo === 'bimestre') {
+			const nombre = (resultado.nombreBimestre ?? 'Bimestre')
+				.split(/\s+/)
+				.map((palabra) => sanitizeFileNameSegment(palabra))
+				.filter(Boolean)
+				.join('_');
+			return `${nombre}_${inicio}_${fin}`;
+		}
 		return inicio;
 	}
 	// #endregion

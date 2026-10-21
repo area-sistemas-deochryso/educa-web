@@ -4,13 +4,22 @@ import { environment } from '@config';
 import type { Observable } from 'rxjs';
 import { formatDateLocalIso } from '@core/helpers';
 import type { PersonaParaSeleccion } from '@data/models';
-import type { ReporteFiltrado, ReporteFilters, TendenciaAsistencia, TendenciaRangoTipo, UsuarioReporteFilters } from '../models';
+import type {
+	ActualizarBimestrePayload,
+	BimestreAsistencia,
+	ReporteFiltrado,
+	ReporteFilters,
+	TendenciaAsistencia,
+	TendenciaRangoTipo,
+	UsuarioReporteFilters,
+} from '../models';
 
 @Injectable({ providedIn: 'root' })
 export class AttendanceReportsApiService {
 	private readonly http = inject(HttpClient);
 	private readonly apiUrl = `${environment.apiUrl}/api/ReportesAsistencia`;
 	private readonly personasUrl = `${environment.apiUrl}/api/asistencia-admin`;
+	private readonly bimestresUrl = `${environment.apiUrl}/api/BimestresAsistencia`;
 
 	// #region Consultas
 	getReporte(filters: ReporteFilters): Observable<ReporteFiltrado> {
@@ -43,6 +52,16 @@ export class AttendanceReportsApiService {
 			params,
 			responseType: 'blob',
 		});
+	}
+	// #endregion
+
+	// #region Bimestres (Plan xrepo-116) — rango editable por año
+	getBimestres(anio: number): Observable<BimestreAsistencia[]> {
+		return this.http.get<BimestreAsistencia[]>(this.bimestresUrl, { params: new HttpParams().set('anio', anio.toString()) });
+	}
+
+	actualizarBimestre(id: number, payload: ActualizarBimestrePayload): Observable<BimestreAsistencia> {
+		return this.http.put<BimestreAsistencia>(`${this.bimestresUrl}/${id}`, payload);
 	}
 	// #endregion
 
@@ -89,6 +108,9 @@ export class AttendanceReportsApiService {
 		if (filters.tipoPersona !== 'P' && filters.tipoPersona !== 'A'
 			&& filters.tipoPersona !== 'C' && filters.tipoPersona !== 'M') {
 			params = params.set('salones', filters.salonesSeleccionados.join(','));
+		}
+		if (filters.rango === 'bimestre' && filters.bimestreId) {
+			params = params.set('bimestreId', filters.bimestreId.toString());
 		}
 		if (filters.sedeId) {
 			params = params.set('sedeId', filters.sedeId.toString());
