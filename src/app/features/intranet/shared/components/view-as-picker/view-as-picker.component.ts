@@ -13,8 +13,14 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 
-import { PermissionsService, UsuarioBusqueda } from '@core/services/permissions';
-import { ViewAsContext, ViewAsFiltroOption, ViewAsFiltrosService, ViewAsRol } from '@core/services/view-as';
+import type { UsuarioBusqueda } from '@core/services/permissions';
+import {
+	ViewAsContext,
+	ViewAsFiltroOption,
+	ViewAsFiltrosService,
+	ViewAsRol,
+	ViewAsSujetosService,
+} from '@core/services/view-as';
 import { PickerGridComponent } from '../picker-grid';
 import { EduAutoComplete, EduTemplate } from '@edu-ui';
 import type { EduAutoCompleteCompleteEvent } from '@edu-ui';
@@ -26,13 +32,11 @@ import type { EduAutoCompleteCompleteEvent } from '@edu-ui';
  * full-page picker (`ViewAsGateComponent`) and inside the "Cambiar" dialog
  * of `ViewAsBannerComponent` — same UI, same rol filter, per decision #3.
  *
- * Calls `PermissionsService.searchUsers()` directly rather than going
- * through `PermissionsUsersDataFacade`/`PermissionsUsersStore` (decision
- * #4 says reuse the search *mechanism*, not the whole Permisos y Usuarios
- * feature) — that facade's store is a root singleton shared with the
- * admin capabilities page; routing this picker through it would mutate
- * `usuariosSugeridos` state that page also reads, which is an unrelated
- * side effect this component has no business causing.
+ * Searches through `ViewAsSujetosService` (P115 F3), whose endpoint is gated by the "ver como"
+ * capability alone — the previous Permisos-por-Usuario search required `PERMISOS_USUARIO_API_MANAGE`,
+ * which a role that merely needs to pick whom to view must not hold. It also keeps this picker away
+ * from `PermissionsUsersDataFacade`/`PermissionsUsersStore`, whose root-singleton state the admin
+ * capabilities page reads.
  *
  * `p-autoComplete` uses `appendTo="body"` (brief 505) — inside the
  * "Cambiar" dialog, the overlay used to nest under the dialog's scrollable
@@ -49,7 +53,7 @@ import type { EduAutoCompleteCompleteEvent } from '@edu-ui';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ViewAsPickerComponent implements OnInit {
-	private readonly api = inject(PermissionsService);
+	private readonly api = inject(ViewAsSujetosService);
 	private readonly filtrosApi = inject(ViewAsFiltrosService);
 	private readonly destroyRef = inject(DestroyRef);
 
@@ -110,7 +114,7 @@ export class ViewAsPickerComponent implements OnInit {
 		this.lastTermino = termino;
 		this.searching.set(true);
 		this.api
-			.searchUsers(termino, this.rol(), this.selectedSalonId() ?? undefined, this.selectedCursoId() ?? undefined)
+			.buscar(this.rol(), termino, this.selectedSalonId() ?? undefined, this.selectedCursoId() ?? undefined)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: (result) => {

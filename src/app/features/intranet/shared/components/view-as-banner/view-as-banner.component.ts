@@ -5,7 +5,8 @@ import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs';
 
 
-import { ViewAsContext, ViewAsContextService } from '@core/services/view-as';
+import { UserPermissionsService } from '@core/services/permissions';
+import { VIEW_AS_MUTATE_CAPABILITY, ViewAsContext, ViewAsContextService } from '@core/services/view-as';
 import { ViewAsPickerComponent } from '../view-as-picker';
 import { EduButton, EduDialog } from '@edu-ui';
 // #endregion
@@ -31,6 +32,7 @@ import { EduButton, EduDialog } from '@edu-ui';
 })
 export class ViewAsBannerComponent {
 	private readonly viewAsContext = inject(ViewAsContextService);
+	private readonly userPermissions = inject(UserPermissionsService);
 	private readonly router = inject(Router);
 	private readonly destroyRef = inject(DestroyRef);
 
@@ -52,6 +54,12 @@ export class ViewAsBannerComponent {
 		if (!context) return false;
 		return this.viewAsContext.isUrlWithinScope(this._currentUrl(), context.rol);
 	});
+
+	/**
+	 * Sin la capability de mutación el backend rechaza cada escritura bajo "ver como" (P115 F2); el
+	 * banner lo anticipa para que un 403 posterior no sorprenda. El BE sigue siendo la autoridad.
+	 */
+	readonly readOnly = computed(() => !this.userPermissions.ownCapabilities().has(VIEW_AS_MUTATE_CAPABILITY));
 
 	readonly pickerOpen = signal(false);
 
