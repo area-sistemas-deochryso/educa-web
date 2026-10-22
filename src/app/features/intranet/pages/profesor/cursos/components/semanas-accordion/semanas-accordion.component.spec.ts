@@ -323,7 +323,7 @@ describe('SemanasAccordionComponent — archivos nuevos en borrador (P113 F4)', 
 			],
 		},
 	];
-	const publicacion = { cambiarPublicacionArchivo: vi.fn(), cambiarPublicacionTareaArchivo: vi.fn() };
+	const publicacion = { cambiarPublicacionArchivo: vi.fn(), cambiarPublicacionTareaArchivo: vi.fn(), cambiarPublicacionTarea: vi.fn(), cambiarPublicacionSemana: vi.fn() };
 
 	function create() {
 		TestBed.configureTestingModule({
@@ -344,12 +344,24 @@ describe('SemanasAccordionComponent — archivos nuevos en borrador (P113 F4)', 
 
 	beforeEach(() => vi.clearAllMocks());
 
-	it('el docente ve la marca «Borrador» (texto, no solo color) solo en los archivos en borrador, de semana y de tarea', () => {
+	it('el docente ve «Borrador» solo en lo que está en borrador y «Publicada» en el resto (texto, no solo color)', () => {
 		const { el } = create();
-		const marcas = Array.from(el.querySelectorAll('.draft-tag'));
+		const borradores = Array.from(el.querySelectorAll('.pub-tag--draft'));
+		const publicados = Array.from(el.querySelectorAll('.pub-tag:not(.pub-tag--draft)'));
 
-		expect(marcas).toHaveLength(2);
-		expect(marcas.every((m) => m.textContent?.trim() === 'Borrador')).toBe(true);
+		expect(borradores).toHaveLength(2);
+		expect(borradores.every((m) => m.textContent?.trim() === 'Borrador')).toBe(true);
+		expect(publicados.length).toBeGreaterThan(0);
+		expect(publicados.every((m) => m.textContent?.trim() === 'Publicada')).toBe(true);
+	});
+
+	it('los controles de publicación tienen texto («Publicar» / «Despublicar»), no solo ícono', () => {
+		const { el } = create();
+		const textos = Array.from(el.querySelectorAll('.pub-toggle')).map((b) => b.textContent?.trim());
+
+		expect(textos).toContain('Publicar');
+		expect(textos).toContain('Despublicar');
+		expect(textos.every((t) => t === 'Publicar' || t === 'Despublicar')).toBe(true);
 	});
 
 	it('el archivo en borrador ofrece «Publicar» y el publicado «Pasar a borrador»', () => {
@@ -367,8 +379,25 @@ describe('SemanasAccordionComponent — archivos nuevos en borrador (P113 F4)', 
 		component.togglePublicacionTareaArchivo(1, 10, semanasBE[0].tareas[0].archivos[0]);
 		component.togglePublicacionTareaArchivo(1, 10, semanasBE[0].tareas[0].archivos[1]);
 
-		expect(publicacion.cambiarPublicacionTareaArchivo).toHaveBeenNthCalledWith(1, 1, 10, 3, true);
-		expect(publicacion.cambiarPublicacionTareaArchivo).toHaveBeenNthCalledWith(2, 1, 10, 4, false);
+		expect(publicacion.cambiarPublicacionTareaArchivo).toHaveBeenNthCalledWith(1, 1, 10, 3, true, expect.any(Function));
+		expect(publicacion.cambiarPublicacionTareaArchivo).toHaveBeenNthCalledWith(2, 1, 10, 4, false, expect.any(Function));
+	});
+
+	it('al confirmarse el servidor, avisa el efecto sobre los estudiantes y «Deshacer» revierte sin volver a avisar', () => {
+		const { fixture, component, el } = create();
+
+		component.togglePublicacionTarea(1, semanasBE[0].tareas[0] as never);
+		const [, , publicar, onCommitted] = publicacion.cambiarPublicacionTarea.mock.calls[0];
+		expect(publicar).toBe(false);
+		expect(el.querySelector('.publicacion-toast__summary')).toBeNull();
+
+		onCommitted();
+		fixture.detectChanges();
+		expect(el.querySelector('.publicacion-toast__summary')?.textContent?.trim()).toBe('Tarea en borrador');
+		expect(el.textContent).toContain('Los estudiantes ya no la ven.');
+
+		(Array.from(el.querySelectorAll('.edu-toast button')).find((b) => b.textContent?.trim() === 'Deshacer') as HTMLElement).click();
+		expect(publicacion.cambiarPublicacionTarea).toHaveBeenLastCalledWith(1, 10, true);
 	});
 
 	it('la vista estudiante no muestra archivos en borrador (ni de semana ni de tarea) ni las acciones de publicar', () => {
@@ -380,6 +409,7 @@ describe('SemanasAccordionComponent — archivos nuevos en borrador (P113 F4)', 
 		expect(el.textContent).not.toContain('adjunto-borrador.pdf');
 		expect(el.textContent).toContain('material-publicado.pdf');
 		expect(el.textContent).toContain('adjunto-publicado.pdf');
-		expect(el.querySelectorAll('.draft-tag')).toHaveLength(0);
+		expect(el.querySelectorAll('.pub-tag')).toHaveLength(0);
+		expect(el.querySelectorAll('.pub-toggle')).toHaveLength(0);
 	});
 });

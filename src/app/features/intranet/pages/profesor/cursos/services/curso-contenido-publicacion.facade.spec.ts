@@ -76,6 +76,19 @@ describe('CursoContenidoPublicacionFacade', () => {
 			expect(estadoArchivoSemana()).toBe(false);
 		});
 
+		it('avisa a la vista solo al confirmar el servidor, no en el cambio optimista ni al revertir', () => {
+			const onCommitted = vi.fn();
+			facade.cambiarPublicacionArchivo(1, 100, true, onCommitted);
+			const config = lastConfig();
+
+			config.optimistic.apply();
+			config.optimistic.rollback();
+			expect(onCommitted).not.toHaveBeenCalled();
+
+			config.onCommit({ publicado: true });
+			expect(onCommitted).toHaveBeenCalledOnce();
+		});
+
 		it('al confirmar toma el estado que devolvió el BE', () => {
 			facade.cambiarPublicacionArchivo(1, 100, true);
 

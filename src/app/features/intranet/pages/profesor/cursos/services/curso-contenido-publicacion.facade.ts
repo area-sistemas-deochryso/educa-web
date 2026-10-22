@@ -8,6 +8,8 @@ import { CursoContenidoStore } from './curso-contenido.store';
 /**
  * Publicar o pasar a borrador una semana, un archivo, una tarea o un adjunto de tarea. Un borrador no lo ven los estudiantes.
  *
+ * `onCommitted` se invoca solo cuando el servidor confirmó (no en el cambio optimista), para que la vista avise sin mentir si hay rollback.
+ *
  * Vive aparte de `CursoContenidoCrudFacade` porque no crea ni borra nada: solo cambia la visibilidad.
  */
 // WAL cross-tab refetch: el `CursoContenidoDataFacade` ya está suscripto a estos resourceTypes (ver brief 091 §E).
@@ -29,7 +31,7 @@ export class CursoContenidoPublicacionFacade {
 	/**
 	 * Publica o pasa a borrador una semana. Un borrador oculta la semana y todo su contenido a los estudiantes.
 	 */
-	cambiarPublicacionSemana(semanaId: number, publicado: boolean): void {
+	cambiarPublicacionSemana(semanaId: number, publicado: boolean, onCommitted?: () => void): void {
 		const anterior = this.store.vm().contenido?.semanas?.find((s) => s.id === semanaId)?.publicado;
 		const request = { publicado };
 		this.wal.execute({
@@ -44,13 +46,16 @@ export class CursoContenidoPublicacionFacade {
 				apply: () => this.store.updateSemana(semanaId, { publicado }),
 				rollback: () => this.store.updateSemana(semanaId, { publicado: anterior ?? true }),
 			},
-			onCommit: (semana) => this.store.updateSemana(semanaId, { publicado: semana.publicado }),
+			onCommit: (semana) => {
+				this.store.updateSemana(semanaId, { publicado: semana.publicado });
+				onCommitted?.();
+			},
 			onError: (err) => this.errHandler.handle(err, 'cambiar la publicación de la semana'),
 		});
 	}
 
 	/** Publica o pasa a borrador un archivo de la semana. */
-	cambiarPublicacionArchivo(semanaId: number, archivoId: number, publicado: boolean): void {
+	cambiarPublicacionArchivo(semanaId: number, archivoId: number, publicado: boolean, onCommitted?: () => void): void {
 		const anterior = this.store
 			.vm()
 			.contenido?.semanas?.find((s) => s.id === semanaId)
@@ -68,13 +73,16 @@ export class CursoContenidoPublicacionFacade {
 				apply: () => this.store.updateArchivoInSemana(semanaId, archivoId, { publicado }),
 				rollback: () => this.store.updateArchivoInSemana(semanaId, archivoId, { publicado: anterior ?? true }),
 			},
-			onCommit: (archivo) => this.store.updateArchivoInSemana(semanaId, archivoId, { publicado: archivo.publicado }),
+			onCommit: (archivo) => {
+				this.store.updateArchivoInSemana(semanaId, archivoId, { publicado: archivo.publicado });
+				onCommitted?.();
+			},
 			onError: (err) => this.errHandler.handle(err, 'cambiar la publicación del archivo'),
 		});
 	}
 
 	/** Publica o pasa a borrador un adjunto de tarea. */
-	cambiarPublicacionTareaArchivo(semanaId: number, tareaId: number, archivoId: number, publicado: boolean): void {
+	cambiarPublicacionTareaArchivo(semanaId: number, tareaId: number, archivoId: number, publicado: boolean, onCommitted?: () => void): void {
 		const anterior = this.store
 			.vm()
 			.contenido?.semanas?.find((s) => s.id === semanaId)
@@ -93,13 +101,16 @@ export class CursoContenidoPublicacionFacade {
 				apply: () => this.store.updateArchivoInTarea(semanaId, tareaId, archivoId, { publicado }),
 				rollback: () => this.store.updateArchivoInTarea(semanaId, tareaId, archivoId, { publicado: anterior ?? true }),
 			},
-			onCommit: (archivo) => this.store.updateArchivoInTarea(semanaId, tareaId, archivoId, { publicado: archivo.publicado }),
+			onCommit: (archivo) => {
+				this.store.updateArchivoInTarea(semanaId, tareaId, archivoId, { publicado: archivo.publicado });
+				onCommitted?.();
+			},
 			onError: (err) => this.errHandler.handle(err, 'cambiar la publicación del archivo de la tarea'),
 		});
 	}
 
 	/** Publica o pasa a borrador una tarea, actividad o examen. */
-	cambiarPublicacionTarea(semanaId: number, tareaId: number, publicado: boolean): void {
+	cambiarPublicacionTarea(semanaId: number, tareaId: number, publicado: boolean, onCommitted?: () => void): void {
 		const anterior = this.store
 			.vm()
 			.contenido?.semanas?.find((s) => s.id === semanaId)
@@ -117,7 +128,10 @@ export class CursoContenidoPublicacionFacade {
 				apply: () => this.store.updateTareaInSemana(semanaId, tareaId, { publicado }),
 				rollback: () => this.store.updateTareaInSemana(semanaId, tareaId, { publicado: anterior ?? true }),
 			},
-			onCommit: (tarea) => this.store.updateTareaInSemana(semanaId, tareaId, { publicado: tarea.publicado }),
+			onCommit: (tarea) => {
+				this.store.updateTareaInSemana(semanaId, tareaId, { publicado: tarea.publicado });
+				onCommitted?.();
+			},
 			onError: (err) => this.errHandler.handle(err, 'cambiar la publicación de la tarea'),
 		});
 	}

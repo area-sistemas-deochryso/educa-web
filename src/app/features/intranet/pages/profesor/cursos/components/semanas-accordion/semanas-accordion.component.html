@@ -91,8 +91,8 @@
 								@if (semana.id === semanaVigenteId()) {
 									<span class="week-vigente-tag">Semana actual</span>
 								}
-								@if (semana.publicado === false && !studentView()) {
-									<span class="draft-tag" eduTooltip="Los estudiantes no ven esta semana" eduTooltipPosition="top">Borrador</span>
+								@if (!studentView()) {
+									<span class="pub-tag" [class.pub-tag--draft]="semana.publicado === false" [eduTooltip]="semana.publicado === false ? 'Los estudiantes no ven esta semana' : 'Los estudiantes ven esta semana'" eduTooltipPosition="top">{{ semana.publicado === false ? 'Borrador' : 'Publicada' }}</span>
 								}
 								@if (semana.titulo) {
 									<span class="week-subtitle">{{ semana.titulo }}</span>
@@ -164,7 +164,8 @@
 								</div>
 								@if (!studentView()) {
 									<edu-button
-										class="edit-semana-link"
+										class="edit-semana-link pub-toggle"
+										[label]="semana.publicado === false ? 'Publicar' : 'Despublicar'"
 										[icon]="semana.publicado === false ? 'pi pi-eye-slash' : 'pi pi-eye'"
 										[text]="true"
 										[rounded]="true"
@@ -264,10 +265,10 @@
 														<span class="tipo-tag tipo-tag--compl">Complementario</span>
 													}
 													@if (!studentView()) {
-														@if (archivo.publicado === false) {
-															<span class="draft-tag" eduTooltip="Borrador: solo tú lo ves. Publícalo para que lo vean los estudiantes" eduTooltipPosition="top">Borrador</span>
-														}
+														<span class="pub-tag" [class.pub-tag--draft]="archivo.publicado === false" [eduTooltip]="archivo.publicado === false ? 'Borrador: solo tú lo ves. Publícalo para que lo vean los estudiantes' : 'Publicado: los estudiantes lo ven'" eduTooltipPosition="top">{{ archivo.publicado === false ? 'Borrador' : 'Publicada' }}</span>
 														<edu-button
+															class="pub-toggle"
+															[label]="archivo.publicado === false ? 'Publicar' : 'Despublicar'"
 															[icon]="archivo.publicado === false ? 'pi pi-eye-slash' : 'pi pi-eye'"
 															[text]="true"
 															[rounded]="true"
@@ -352,8 +353,8 @@
 												<div class="row-info">
 													<strong>
 														{{ tarea.titulo }}
-														@if (tarea.publicado === false && !studentView()) {
-															<span class="draft-tag">Borrador</span>
+														@if (!studentView()) {
+															<span class="pub-tag" [class.pub-tag--draft]="tarea.publicado === false" [eduTooltip]="tarea.publicado === false ? 'Los estudiantes no ven esta tarea' : 'Los estudiantes ven esta tarea'" eduTooltipPosition="top">{{ tarea.publicado === false ? 'Borrador' : 'Publicada' }}</span>
 														}
 													</strong>
 													<span class="row-meta">
@@ -382,6 +383,8 @@
 												<div class="row-actions">
 													@if (!studentView()) {
 														<edu-button
+															class="pub-toggle"
+															[label]="tarea.publicado === false ? 'Publicar' : 'Despublicar'"
 															[icon]="tarea.publicado === false ? 'pi pi-eye-slash' : 'pi pi-eye'"
 															[text]="true"
 															[rounded]="true"
@@ -478,10 +481,10 @@
 																>
 																	@if (!studentView()) {
 																		<span actions>
-																			@if (archivo.publicado === false) {
-																				<span class="draft-tag" eduTooltip="Borrador: solo tú lo ves. Publícalo para que lo vean los estudiantes" eduTooltipPosition="top">Borrador</span>
-																			}
+																			<span class="pub-tag" [class.pub-tag--draft]="archivo.publicado === false" [eduTooltip]="archivo.publicado === false ? 'Borrador: solo tú lo ves. Publícalo para que lo vean los estudiantes' : 'Publicado: los estudiantes lo ven'" eduTooltipPosition="top">{{ archivo.publicado === false ? 'Borrador' : 'Publicada' }}</span>
 																			<edu-button
+																				class="pub-toggle"
+																				[label]="archivo.publicado === false ? 'Publicar' : 'Despublicar'"
 																				[icon]="archivo.publicado === false ? 'pi pi-eye-slash' : 'pi pi-eye'"
 																				[text]="true"
 																				[rounded]="true"
@@ -529,3 +532,14 @@
 	</div>
 }
 <!-- #endregion -->
+
+<edu-toast key="publicacion" position="bottom-center">
+	<ng-template #message let-message>
+		<i class="pi pi-check-circle publicacion-toast__icon"></i>
+		<div class="publicacion-toast__content">
+			<div class="publicacion-toast__summary">{{ message.summary }}</div>
+			<div>{{ message.detail }}</div>
+		</div>
+		<edu-button label="Deshacer" size="small" [text]="true" (click)="deshacerPublicacion(message)" />
+	</ng-template>
+</edu-toast>

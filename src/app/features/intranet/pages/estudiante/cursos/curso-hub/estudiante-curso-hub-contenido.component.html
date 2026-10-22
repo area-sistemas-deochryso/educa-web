@@ -266,6 +266,8 @@ Sin fecha límite
 																									<span class="draft-tag" [eduTooltip]="tarea.esGrupal ? 'Borrador: solo tú lo ves. Publícalo para que lo vean tu profesor y tu grupo' : 'Borrador: solo tú lo ves. Publícalo para que lo vea tu profesor'" eduTooltipPosition="top">Borrador</span>
 																								}
 																								<edu-button
+																									class="pub-toggle"
+																									[label]="archivo.publicado ? 'Retirar entrega' : 'Publicar entrega'"
 																									[icon]="archivo.publicado ? 'pi pi-eye-slash' : 'pi pi-eye'"
 																									[text]="true"
 																									[rounded]="true"

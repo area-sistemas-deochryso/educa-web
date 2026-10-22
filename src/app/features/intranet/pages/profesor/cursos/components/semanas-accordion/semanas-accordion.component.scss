@@ -652,7 +652,7 @@
 	}
 }
 
-.draft-tag {
+.pub-tag {
 	display: inline-block;
 	width: fit-content;
 	margin-left: 0.4rem;
@@ -662,9 +662,19 @@
 	text-transform: uppercase;
 	padding: 0.08rem 0.4rem;
 	border-radius: 999px;
+	background: rgba(34, 197, 94, 0.14);
+	color: var(--green-700);
+	vertical-align: middle;
+}
+
+.pub-tag--draft {
 	background: rgba(245, 158, 11, 0.14);
 	color: var(--yellow-700);
-	vertical-align: middle;
+}
+
+// Reserva el ancho del texto más largo para que la fila no cambie al alternar Publicar/Despublicar
+.pub-toggle {
+	min-width: 7.5rem;
 }
 
 .tipo-tag {
@@ -747,4 +757,21 @@
 	font-size: 0.75rem;
 	line-height: 1.3;
 	color: var(--text-color-secondary);
+}
+
+.publicacion-toast {
+	&__icon {
+		color: var(--green-600);
+	}
+
+	&__content {
+		flex: 1;
+		min-width: 0;
+		font-size: 0.85rem;
+	}
+
+	&__summary {
+		font-weight: 600;
+		overflow-wrap: anywhere;
+	}
 }

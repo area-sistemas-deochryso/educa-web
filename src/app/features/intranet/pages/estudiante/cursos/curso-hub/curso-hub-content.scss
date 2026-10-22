@@ -792,3 +792,8 @@
 	background: rgba(99, 102, 241, 0.12);
 	color: var(--indigo-700, #4338ca);
 }
+
+// Reserva el ancho del texto más largo para que la fila no cambie al alternar Publicar/Retirar entrega
+.pub-toggle {
+	min-width: 9.5rem;
+}

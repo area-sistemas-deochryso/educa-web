@@ -8,7 +8,7 @@ import { CursoContenidoUiFacade } from '../../services/curso-contenido-ui.facade
 import { ContenidoArchivoTipo, CursoContenidoArchivoDto, CursoContenidoSemanaDto, CursoContenidoTareaDto, TareaArchivoDto } from '@features/intranet/pages/profesor/models';
 import { ErrorHandlerService } from '@core/services';
 import { FileRowComponent, UPLOAD_ACCEPT, UPLOAD_LIMITS, describeUploadLimits, validateUploadFile, FileViewerService, ViewableArchivo } from '@shared/components';
-import { EduAccordion, EduAccordionHeader, EduAccordionPanel, EduButton, EduConfirmationService, EduFileUpload, type EduFileUploadSelectEvent, EduMenu, type EduMenuItem, EduTooltip } from '@edu-ui';
+import { EduAccordion, EduAccordionHeader, EduAccordionPanel, EduButton, EduConfirmationService, EduFileUpload, type EduFileUploadSelectEvent, EduMenu, type EduMenuItem, EduMessageService, EduToast, EduTooltip } from '@edu-ui';
 
 // #region Tipos de la vista
 export type SemanaFiltro = 'all' | 'study' | 'deliver';
@@ -30,7 +30,8 @@ const MS_POR_DIA = 86_400_000;
 @Component({
 	selector: 'app-semanas-accordion',
 	standalone: true,
-	imports: [DatePipe, FormsModule, EduButton, EduAccordion, EduAccordionHeader, EduAccordionPanel, EduTooltip, EduFileUpload, EduMenu, FileRowComponent],
+	imports: [DatePipe, FormsModule, EduButton, EduAccordion, EduAccordionHeader, EduAccordionPanel, EduTooltip, EduToast, EduFileUpload, EduMenu, FileRowComponent],
+	providers: [EduMessageService],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './semanas-accordion.component.html',
 	styleUrl: './semanas-accordion.component.scss',
@@ -44,6 +45,7 @@ export class SemanasAccordionComponent {
 	private readonly uiFacade = inject(CursoContenidoUiFacade);
 	private readonly confirmationService = inject(EduConfirmationService);
 	private readonly errorHandler = inject(ErrorHandlerService);
+	private readonly messageService = inject(EduMessageService);
 	private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 	readonly uploadAccept = UPLOAD_ACCEPT;
 	readonly uploadMaxBytes = UPLOAD_LIMITS.maxFileSizeBytes;
@@ -223,19 +225,49 @@ export class SemanasAccordionComponent {
 
 	// #region Publicación (borrador / publicado)
 	togglePublicacionSemana(semana: CursoContenidoSemanaDto): void {
-		this.publicacionFacade.cambiarPublicacionSemana(semana.id, semana.publicado === false);
+		const publicado = semana.publicado === false;
+		this.publicacionFacade.cambiarPublicacionSemana(semana.id, publicado, () =>
+			this.avisarPublicacion(`Semana ${semana.numeroSemana}`, publicado, 'a', () => this.publicacionFacade.cambiarPublicacionSemana(semana.id, !publicado)),
+		);
 	}
 
 	togglePublicacionArchivo(semanaId: number, archivo: CursoContenidoArchivoDto): void {
-		this.publicacionFacade.cambiarPublicacionArchivo(semanaId, archivo.id, archivo.publicado === false);
+		const publicado = archivo.publicado === false;
+		this.publicacionFacade.cambiarPublicacionArchivo(semanaId, archivo.id, publicado, () =>
+			this.avisarPublicacion(archivo.nombreArchivo, publicado, 'o', () => this.publicacionFacade.cambiarPublicacionArchivo(semanaId, archivo.id, !publicado)),
+		);
 	}
 
 	togglePublicacionTareaArchivo(semanaId: number, tareaId: number, archivo: TareaArchivoDto): void {
-		this.publicacionFacade.cambiarPublicacionTareaArchivo(semanaId, tareaId, archivo.id, archivo.publicado === false);
+		const publicado = archivo.publicado === false;
+		this.publicacionFacade.cambiarPublicacionTareaArchivo(semanaId, tareaId, archivo.id, publicado, () =>
+			this.avisarPublicacion(archivo.nombreArchivo, publicado, 'o', () => this.publicacionFacade.cambiarPublicacionTareaArchivo(semanaId, tareaId, archivo.id, !publicado)),
+		);
 	}
 
 	togglePublicacionTarea(semanaId: number, tarea: CursoContenidoTareaDto): void {
-		this.publicacionFacade.cambiarPublicacionTarea(semanaId, tarea.id, tarea.publicado === false);
+		const publicado = tarea.publicado === false;
+		this.publicacionFacade.cambiarPublicacionTarea(semanaId, tarea.id, publicado, () =>
+			this.avisarPublicacion(tarea.titulo, publicado, 'a', () => this.publicacionFacade.cambiarPublicacionTarea(semanaId, tarea.id, !publicado)),
+		);
+	}
+
+	/** Confirma el efecto concreto sobre lo que ven los estudiantes y ofrece deshacer (el deshacer no vuelve a avisar). */
+	private avisarPublicacion(nombre: string, publicado: boolean, genero: 'a' | 'o', deshacer: () => void): void {
+		const pronombre = genero === 'a' ? 'la' : 'lo';
+		this.messageService.add({
+			key: 'publicacion',
+			severity: 'success',
+			summary: publicado ? `${nombre} publicad${genero}` : `${nombre} en borrador`,
+			detail: publicado ? `Los estudiantes ya ${pronombre} ven.` : `Los estudiantes ya no ${pronombre} ven.`,
+			life: 6000,
+			data: { deshacer },
+		});
+	}
+
+	deshacerPublicacion(message: { id: number; data?: unknown }): void {
+		(message.data as { deshacer: () => void }).deshacer();
+		this.messageService.remove(message.id);
 	}
 	// #endregion
 
