@@ -56,7 +56,9 @@ describe('MonitoreoHubBadgesFacade', () => {
 	});
 
 	it('se crea correctamente', () => {
-		expect(facade).toBeTruthy();
+		expect(facade).toBeDefined();
+		expect(facade.badges()).toBeDefined();
+		expect(facade.loading()).toBe(false);
 	});
 
 	it('un cacheUpdated$ de un endpoint relevante fuerza refetch', async () => {

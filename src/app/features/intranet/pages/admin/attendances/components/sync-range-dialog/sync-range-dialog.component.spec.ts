@@ -64,7 +64,11 @@ describe('SyncRangeDialogComponent', () => {
 	});
 
 	it('creates the component', () => {
-		expect(component).toBeTruthy();
+		expect(component).toBeDefined();
+		expect(component.fechaInicio()).toBeNull();
+		expect(component.fechaFin()).toBeNull();
+		expect(component.todosUsuarios()).toBe(true);
+		expect(component.selectedPersonIds()).toEqual([]);
 	});
 
 	describe('validation', () => {

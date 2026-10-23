@@ -54,7 +54,7 @@
 - `config/drift-map.md` (mapa doc↔código, meta-herramienta de `/drift-check`)
 - `debug/README.md`
 - `agents/README.md`, `agents/code-reviewer.md`
-- `commands/*.md` (36 archivos — definiciones de skills/comandos internos)
+- `commands/*.md` — definiciones de skills/comandos internos
 - `skills/README.md`, `skills/commit/SKILL.md`, `skills/pr-ready/SKILL.md`, `skills/validate-code/SKILL.md`, `skills/optimize-crud.md`
 - `rules/backend.md` (describe código de `Educa.API`, fuera del alcance de este registro local — ver registro cross-repo de `educa-coord` si necesita watch)
 - `rules/backlog-hygiene.md`, `rules/browsing.md`, `rules/chat-modes.md`, `rules/code-language.md`, `rules/code-style.md`, `rules/git.md`, `rules/one-repo-one-chat.md`, `rules/worktrees.md`
@@ -63,6 +63,9 @@
 - `reference/design-patterns-backend.md`, `reference/design-patterns-frontend.md` (planes prospectivos de patrones, no código vigente — el backend además está fuera de este repo)
 - `examples/lazy-rendering-usuarios-example.md` (ejemplo ilustrativo, redundante con el glob de `reference/lazy-rendering.md`)
 - `project-structure/architecture.md`, `project-structure/urls-and-repos.md`
+
+> **Puerto del backend local**: `localhost:5139` se declara en `proxy.conf.json` (FE) y `launchSettings.json` (BE). Cualquier cambio de puerto debe reflejarse en ambos archivos.
+
 
 ## Stable (excluidos del registro por completo)
 

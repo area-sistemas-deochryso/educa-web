@@ -116,7 +116,8 @@ describe('NotificacionesAdminFacade', () => {
 				await vi.advanceTimersByTimeAsync(30_000);
 
 				expect(errorHandler.showError).toHaveBeenCalled();
-				expect(store.error()).toBeTruthy();
+				expect(store.error()).not.toBeNull();
+				expect(store.error()).not.toBe('');
 			} finally {
 				vi.useRealTimers();
 			}

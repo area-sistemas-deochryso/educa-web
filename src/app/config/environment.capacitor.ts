@@ -7,6 +7,7 @@ export const environment = {
 	production: true,
 
 	// API Configuration - direct to Azure (no proxy in native app)
+	// URL debe coincidir con netlify.toml redirects y educa1.azurewebsites.net
 	apiUrl: 'https://educa1.azurewebsites.net',
 
 	// Feature flags

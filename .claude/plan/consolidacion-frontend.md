@@ -12,7 +12,7 @@
 
 ## Problem
 
-El frontend tiene buena cobertura de patrones (49 facades, 41 stores, 94 services) pero calidad superficial en tests, archivos que exceden la regla max-lines:300 (15+ en TS, 10+ en templates), y disonancia entre reglas documentadas y código real.
+El frontend tiene buena cobertura de patrones (múltiples facades, stores y services) pero calidad superficial en tests, archivos que exceden la regla max-lines:300 (varios en TS y templates), y disonancia entre reglas documentadas y código real.
 
 ---
 
@@ -32,7 +32,7 @@ El frontend tiene buena cobertura de patrones (49 facades, 41 stores, 94 service
 
 ### Fase 1 — Tests de Comportamiento ✅
 
-5/5 critical flows covered: CRUD usuarios (18+25 tests), login/session/permisos (11 tests), asistencia director (18 tests), horarios admin (16 tests), WAL optimistic (covered within CRUD).
+5/5 critical flows covered: CRUD usuarios, login/session/permisos, asistencia director, horarios admin, WAL optimistic (covered within CRUD).
 
 ### Fase 2 — Dividir Archivos TS Grandes (parcial ✅)
 
