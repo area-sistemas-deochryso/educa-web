@@ -23,6 +23,7 @@ export {
 	isNotaAprobada,
 	convertToLiteral,
 	formatNotaConConfig,
+	formatEquivalenteNumerico,
 	calcularPromedioParcial,
 	calcularCoberturaPorPesos,
 	getRotuloParcial,

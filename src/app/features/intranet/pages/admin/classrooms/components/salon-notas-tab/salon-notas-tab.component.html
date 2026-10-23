@@ -47,7 +47,7 @@
 				@for (eval of evaluacionColumns(); track eval.id) {
 					<th
 						class="text-center eval-header"
-						eduTooltip="{{ eval.titulo }} — {{ eval.tipo }} ({{ eval.peso * 100 | number: '1.0-0' }}%)"
+						eduTooltip="{{ eval.titulo }} — {{ tipoLabel(eval.tipo) }} ({{ eval.peso * 100 | number: '1.0-0' }}%)"
 						eduTooltipPosition="top"
 					>
 						<span class="eval-titulo">{{ eval.titulo }}</span>

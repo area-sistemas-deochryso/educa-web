@@ -2,9 +2,11 @@
 // #region Imports
 import { describe, expect, it } from 'vitest';
 
+import type { ConfiguracionCalificacionListDto } from '@data/models';
 import {
 	calcularCoberturaPorPesos,
 	calcularPromedioParcial,
+	formatEquivalenteNumerico,
 	getRotuloParcial,
 } from './calificacion-config.utils';
 // #endregion
@@ -60,5 +62,24 @@ describe('getRotuloParcial (INV-C12)', () => {
 
 	it('has no label at 100 % coverage', () => {
 		expect(getRotuloParcial(100)).toBeNull();
+	});
+});
+
+describe('formatEquivalenteNumerico', () => {
+	const literal = { tipoCalificacion: 'LITERAL', literales: [{ letra: 'A' }] } as unknown as ConfiguracionCalificacionListDto;
+	const numerica = { tipoCalificacion: 'NUMERICO', literales: [] } as unknown as ConfiguracionCalificacionListDto;
+
+	it('shows the number next to the letter on the literal scale', () => {
+		expect(formatEquivalenteNumerico(16.4, literal)).toBe('16.4');
+		expect(formatEquivalenteNumerico(15, literal)).toBe('15.0');
+	});
+
+	it('has no equivalent on the numeric scale or without config', () => {
+		expect(formatEquivalenteNumerico(16.4, numerica)).toBeNull();
+		expect(formatEquivalenteNumerico(16.4, null)).toBeNull();
+	});
+
+	it('has no equivalent without a grade', () => {
+		expect(formatEquivalenteNumerico(null, literal)).toBeNull();
 	});
 });

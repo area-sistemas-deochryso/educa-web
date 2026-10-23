@@ -176,4 +176,35 @@ describe('EduDatePicker', () => {
 			expect(document.querySelector('.edu-datepicker-panel')).not.toBeNull();
 		});
 	});
+
+	describe('initial month', () => {
+		const panelTitle = () => document.querySelector('.edu-datepicker-panel')?.textContent ?? '';
+
+		async function openCalendar(fixture: Awaited<ReturnType<typeof render>>) {
+			input(fixture).click();
+			fixture.detectChanges();
+			await fixture.whenStable();
+		}
+
+		it('opens on the allowed range when today falls outside it', async () => {
+			// Rango en el pasado: hoy siempre queda después de `maxDate`.
+			const fixture = await render({ minDate: new Date(2020, 2, 1), maxDate: new Date(2020, 2, 7) });
+
+			await openCalendar(fixture);
+
+			expect(panelTitle()).toContain('2020');
+		});
+
+		it('keeps opening on today when it is inside the range', async () => {
+			const hoy = new Date();
+			const fixture = await render({
+				minDate: new Date(hoy.getFullYear() - 1, 0, 1),
+				maxDate: new Date(hoy.getFullYear() + 1, 11, 31),
+			});
+
+			await openCalendar(fixture);
+
+			expect(panelTitle()).toContain(String(hoy.getFullYear()));
+		});
+	});
 });

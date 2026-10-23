@@ -83,7 +83,7 @@
 				<td class="font-semibold">{{ row.titulo }}</td>
 				<td>
 					<div class="tipo-cell">
-						<edu-tag [value]="row.tipo" styleClass="tag-neutral" />
+						<edu-tag [value]="tipoLabel(row.tipo)" styleClass="tag-neutral" />
 						@if (row.esGrupal) {
 							<i class="pi pi-users text-xs" title="Evaluación grupal"></i>
 						}
@@ -204,6 +204,9 @@
 										[class]="'promedio-value promedio-' + getPromedioItemSeverity(prom.periodo, prom.promedio, prom.simulated)"
 									>
 										{{ formatNota(prom.promedio) }}
+										@if (formatEquivalente(prom.promedio); as equivalente) {
+											<small class="promedio-equivalente">({{ equivalente }})</small>
+										}
 										@if (isPromedioItemProvisional(prom.periodo, prom.promedio, prom.simulated)) {
 											<i
 												class="pi pi-clock"
@@ -211,6 +214,13 @@
 											></i>
 										}
 									</span>
+									@if (getRotuloGeneral(prom.periodo, prom.promedio, prom.simulated); as rotulo) {
+										<small
+											class="promedio-rotulo"
+											eduTooltip="Promedio ponderado solo sobre las evaluaciones ya calificadas; se completa al calificar el resto."
+											eduTooltipPosition="top"
+										>{{ rotulo }}</small>
+									}
 								</div>
 							}
 						</div>

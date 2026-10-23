@@ -1,17 +1,27 @@
+import { DatePipe } from '@angular/common';
 import { Component, ChangeDetectionStrategy, inject, input, output, signal, computed, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { toLocalIso } from '@core/helpers';
+import { parseDateLocal, toLocalIso } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
 import {
 	CalificacionDto,
 	CrearCalificacionDto,
 	CursoContenidoSemanaDto,
 	TIPOS_EVALUACION,
+	TIPO_EVALUACION_LABEL,
 	TipoEvaluacion,
 } from '@features/intranet/pages/profesor/models';
 import { EduButton, EduDatePicker, EduDialog, EduInputNumber, EduInputText, EduSelect, EduToggle, EduTooltip } from '@edu-ui';
 import type { EduInputNumberInputEvent } from '@edu-ui';
 import { PORCENTAJE_MAXIMO, PORCENTAJE_MINIMO, pesoAPorcentaje, porcentajeAPeso } from './peso-porcentaje';
+
+const TITULO_PLACEHOLDER: Record<TipoEvaluacion, string> = {
+	Tarea: 'Ej: Práctica de fracciones',
+	Examen: 'Ej: Examen parcial de la unidad 1',
+	Exposicion: 'Ej: Exposición grupal sobre el ecosistema',
+	Participacion: 'Ej: Participación en clase',
+	Otro: 'Ej: Nombre de la evaluación',
+};
 
 interface FormData {
 	titulo: string;
@@ -27,7 +37,7 @@ interface FormData {
 @Component({
 	selector: 'app-evaluacion-form-dialog',
 	standalone: true,
-	imports: [FormsModule, EduDialog, EduButton, EduInputText, EduInputNumber, EduSelect, EduDatePicker, EduTooltip, EduToggle],
+	imports: [DatePipe, FormsModule, EduDialog, EduButton, EduInputText, EduInputNumber, EduSelect, EduDatePicker, EduTooltip, EduToggle],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './evaluacion-form-dialog.component.html',
 	styleUrl: './evaluacion-form-dialog.component.scss',
@@ -59,7 +69,7 @@ export class EvaluacionFormDialogComponent {
 		esGrupal: false,
 	});
 
-	readonly tiposOptions = TIPOS_EVALUACION.map((t) => ({ label: t, value: t }));
+	readonly tiposOptions = TIPOS_EVALUACION.map((t) => ({ label: TIPO_EVALUACION_LABEL[t], value: t }));
 	readonly PORCENTAJE_MINIMO = PORCENTAJE_MINIMO;
 	readonly PORCENTAJE_MAXIMO = PORCENTAJE_MAXIMO;
 
@@ -77,6 +87,16 @@ export class EvaluacionFormDialogComponent {
 			value: s.id,
 		})),
 	);
+
+	readonly tituloPlaceholder = computed(() => TITULO_PLACEHOLDER[this.formData().tipo]);
+
+	/** Rango de la semana elegida; sin semana o sin fechas derivables el datepicker queda libre. */
+	readonly rangoSemana = computed(() => {
+		const semana = this.semanas().find((s) => s.id === this.formData().semanaId);
+		const min = parseDateLocal(semana?.fechaInicio);
+		const max = parseDateLocal(semana?.fechaFin);
+		return min && max ? { min, max } : null;
+	});
 
 	/** Línea base = último valor cargado por el efecto (vacío al crear, la evaluación al editar). */
 	private readonly baseline = signal<FormData | null>(null);
@@ -159,6 +179,15 @@ export class EvaluacionFormDialogComponent {
 
 	updateField<K extends keyof FormData>(field: K, value: FormData[K]): void {
 		this.formData.update((f) => ({ ...f, [field]: value }));
+	}
+
+	onSemanaChange(semanaId: number | null): void {
+		this.updateField('semanaId', semanaId);
+		const fecha = this.formData().fechaEvaluacion;
+		const rango = this.rangoSemana();
+		if (fecha && rango && (fecha < rango.min || fecha > rango.max)) {
+			this.updateField('fechaEvaluacion', null);
+		}
 	}
 
 	onPesoInput(event: EduInputNumberInputEvent): void {

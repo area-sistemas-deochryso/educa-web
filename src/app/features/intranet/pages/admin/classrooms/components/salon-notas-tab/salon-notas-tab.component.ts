@@ -2,7 +2,7 @@ import { Component, ChangeDetectionStrategy, input, output, computed, signal } f
 import { DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { HorarioResponseDto, SalonNotasResumenDto, ConfiguracionCalificacionListDto } from '@data/models';
+import { HorarioResponseDto, SalonNotasResumenDto, ConfiguracionCalificacionListDto, tipoEvaluacionLabel } from '@data/models';
 import { isNotaAprobada, formatNotaConConfig } from '@intranet-shared/services/calificacion-config';
 import { EduSelect, EduTable, EduTooltip } from '@edu-ui';
 
@@ -15,6 +15,8 @@ import { EduSelect, EduTable, EduTooltip } from '@edu-ui';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ClassroomGradesTabComponent {
+	readonly tipoLabel = tipoEvaluacionLabel;
+
 	// #region Inputs / Outputs
 	readonly notasData = input<SalonNotasResumenDto | null>(null);
 	readonly loading = input(false);

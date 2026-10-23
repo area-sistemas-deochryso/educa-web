@@ -81,7 +81,7 @@
 					<th
 						rowspan="2"
 						class="general-header"
-						eduTooltip="Promedio ponderado por el peso de cada evaluación — no es un promedio simple de las notas."
+						eduTooltip="Promedio ponderado por el peso de cada evaluación ya calificada (parcial, según el % evaluado) — no es un promedio simple ni el cierre del periodo."
 						eduTooltipPosition="top"
 					>General</th>
 				</tr>
@@ -116,7 +116,7 @@
 					<th
 						rowspan="2"
 						class="general-header"
-						eduTooltip="Promedio ponderado por el peso de cada evaluación — no es un promedio simple de las notas."
+						eduTooltip="Promedio ponderado por el peso de cada evaluación ya calificada (parcial, según el % evaluado) — no es un promedio simple ni el cierre del periodo."
 						eduTooltipPosition="top"
 					>General</th>
 				</tr>
@@ -146,7 +146,7 @@
 					<th style="min-width: 160px">Estudiante</th>
 					<th
 						class="general-header"
-						eduTooltip="Promedio ponderado por el peso de cada evaluación — no es un promedio simple de las notas."
+						eduTooltip="Promedio ponderado por el peso de cada evaluación ya calificada (parcial, según el % evaluado) — no es un promedio simple ni el cierre del periodo."
 						eduTooltipPosition="top"
 					>General</th>
 				</tr>
@@ -197,6 +197,9 @@
 								[class]="'promedio-' + (prom?.severity ?? 'secondary')"
 							>
 								{{ prom?.text ?? '—' }}
+								@if (prom?.equivalente) {
+									<small class="promedio-equivalente">({{ prom?.equivalente }})</small>
+								}
 							</span>
 						</td>
 					}
@@ -210,6 +213,9 @@
 						[class]="'promedio-' + (gen?.severity ?? 'secondary')"
 					>
 						{{ gen?.text ?? '—' }}
+						@if (gen?.equivalente) {
+							<small class="promedio-equivalente">({{ gen?.equivalente }})</small>
+						}
 						@if (gen?.provisional) {
 							<i
 								class="pi pi-clock"
@@ -217,6 +223,9 @@
 							></i>
 						}
 					</span>
+					@if (gen?.rotulo) {
+						<small class="promedio-rotulo">{{ gen?.rotulo }}</small>
+					}
 				</td>
 			</tr>
 		</ng-template>

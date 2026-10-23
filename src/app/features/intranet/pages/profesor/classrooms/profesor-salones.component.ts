@@ -1,8 +1,12 @@
-import { Component, ChangeDetectionStrategy, inject, effect, signal, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, DestroyRef, inject, effect, signal, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { CursoChipComponent, PageHeaderComponent, PeriodToggleComponent } from '@intranet-shared/components';
 import { PluralizePipe } from '@intranet-shared/pipes';
+import { CalificacionConfigService } from '@intranet-shared/services/calificacion-config';
+import { detectarNivel } from '@core/helpers';
+import type { ConfiguracionCalificacionListDto } from '@data/models';
 import { buildCursoHubLink } from '@intranet-shared/helpers';
 import { SalonCursoInfo, VistaPromedio, ActualizarGrupoDto, ProfesorSalonConEstudiantes } from '../models';
 import { ProfesorFacade } from '../services/profesor.facade';
@@ -38,6 +42,8 @@ export class TeacherClassroomsComponent implements OnInit {
 	private readonly route = inject(ActivatedRoute);
 	readonly gruposFacade = inject(GruposFacade);
 	private readonly mensajeriaFacade = inject(SalonMensajeriaFacade);
+	private readonly calificacionConfigService = inject(CalificacionConfigService);
+	private readonly destroyRef = inject(DestroyRef);
 	readonly healthFacade = inject(HealthPermissionsFacade);
 	// #endregion
 
@@ -46,6 +52,8 @@ export class TeacherClassroomsComponent implements OnInit {
 	readonly gruposVm = this.gruposFacade.vm;
 	readonly healthVm = this.healthFacade.vm;
 	gruposCursoId: number | null = null;
+	/** Escala del nivel del salón: sin ella las notas se leen siempre como número aunque el curso use letras. */
+	readonly calificacionConfig = signal<ConfiguracionCalificacionListDto | null>(null);
 	// #endregion
 
 	// #region Deep-link desde vista de curso
@@ -115,9 +123,22 @@ export class TeacherClassroomsComponent implements OnInit {
 		const cursos = this.vm().cursosForSelectedSalon;
 		if (!salon || cursos.length === 0) return;
 
+		this.loadCalificacionConfig(salon.salonDescripcion);
 		if (!this.vm().notasCursoId) {
 			this.facade.loadNotasSalon(salon.salonId, cursos[0].value);
 		}
+	}
+
+	private loadCalificacionConfig(salonDescripcion: string): void {
+		const nivel = detectarNivel(salonDescripcion);
+		if (!nivel) {
+			this.calificacionConfig.set(null);
+			return;
+		}
+		this.calificacionConfigService
+			.getConfig(nivel)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe((config) => this.calificacionConfig.set(config));
 	}
 
 	onNotasCursoChange(cursoId: number): void {

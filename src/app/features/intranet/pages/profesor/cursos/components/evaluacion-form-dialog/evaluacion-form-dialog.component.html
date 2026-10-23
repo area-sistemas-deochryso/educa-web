@@ -17,7 +17,7 @@
 				id="eval-titulo"
 				[ngModel]="formData().titulo"
 				(ngModelChange)="updateField('titulo', $event)"
-				placeholder="Ej: Examen parcial, Exposición grupal..."
+				[placeholder]="tituloPlaceholder()"
 				class="w-full"
 			/>
 		</div>
@@ -90,7 +90,7 @@
 					data-info-anchor="profesor-evaluacion-semana-select"
 					[options]="semanaOptions()"
 					[ngModel]="formData().semanaId"
-					(ngModelChange)="updateField('semanaId', $event)"
+					(ngModelChange)="onSemanaChange($event)"
 					optionLabel="label"
 					optionValue="value"
 					placeholder="Seleccionar semana"
@@ -104,10 +104,15 @@
 					id="eval-fecha"
 					[ngModel]="formData().fechaEvaluacion"
 					(ngModelChange)="updateField('fechaEvaluacion', $event)"
+					[minDate]="rangoSemana()?.min"
+					[maxDate]="rangoSemana()?.max"
 					dateFormat="dd/mm/yy"
 					appendTo="body"
 					class="w-full"
 				/>
+				@if (rangoSemana(); as rango) {
+					<small class="field-hint">Dentro de la semana: {{ rango.min | date: 'dd/MM' }} – {{ rango.max | date: 'dd/MM' }}</small>
+				}
 			</div>
 		</div>
 		<!-- #endregion -->

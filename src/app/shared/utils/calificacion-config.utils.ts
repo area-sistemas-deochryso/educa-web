@@ -89,6 +89,19 @@ export function formatNotaConConfig(
 	const scale = createGradeScale(config);
 	return scale.format(nota);
 }
+
+/**
+ * Equivalente numerico de una nota mostrada como letra ("16.4" junto a "A"), para que la
+ * letra no se lea sin su conversion. `null` en escala numerica (la nota ya es el numero).
+ */
+export function formatEquivalenteNumerico(
+	nota: number | null,
+	config: ConfiguracionCalificacionListDto | null = null,
+): string | null {
+	if (nota === null || nota === undefined || Number.isNaN(nota)) return null;
+	if (config?.tipoCalificacion !== 'LITERAL') return null;
+	return nota.toFixed(1);
+}
 // #endregion
 
 // #region Promedio parcial (INV-C12)

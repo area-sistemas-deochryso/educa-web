@@ -624,6 +624,14 @@ export class EduDatePicker implements ControlValueAccessor, OnDestroy {
 			return;
 		}
 
+		// Sin valor, el calendario abre en "hoy"; si hoy queda fuera de min/max se abre en el rango válido.
+		const min = this.minDate();
+		const max = this.maxDate();
+		const view = this.viewDate();
+		if (!this.value() && isDateDisabled(view, min, max)) {
+			this.viewDate.set(min && view < min ? min : (max ?? view));
+		}
+
 		const portal = new TemplatePortal(template, this.viewContainerRef);
 		const positionStrategy = this.overlay
 			.position()

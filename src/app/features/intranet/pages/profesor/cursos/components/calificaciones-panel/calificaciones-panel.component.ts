@@ -24,6 +24,7 @@ import {
 } from '@features/intranet/pages/profesor/models';
 import { formatNotaConConfig } from '@intranet-shared/services/calificacion-config';
 import type { ConfiguracionCalificacionListDto } from '@data/models';
+import { tipoEvaluacionLabel } from '@data/models';
 import { SkeletonLoaderComponent } from '@shared/components';
 import { PluralizePipe } from '@intranet-shared/pipes';
 import { EduButton, EduMenu, EduMenuItem, EduTag, EduTooltip } from '@edu-ui';
@@ -50,6 +51,8 @@ function hoyComoDia(): string {
 	styleUrl: './calificaciones-panel.component.scss',
 })
 export class CalificacionesPanelComponent {
+	readonly tipoLabel = tipoEvaluacionLabel;
+
 	// #region Inputs
 	readonly calificacionesPorSemana = input.required<Map<number, CalificacionConNotasDto[]>>();
 	readonly periodos = input.required<PeriodoCalificacionDto[]>();

@@ -8,6 +8,19 @@ export const TIPOS_EVALUACION = [
 ] as const;
 
 export type TipoEvaluacion = (typeof TIPOS_EVALUACION)[number];
+
+// El valor sin tilde es el contrato con el BE (`ValidarTipoEvaluacion`); la tilde vive solo en el label.
+export const TIPO_EVALUACION_LABEL: Record<TipoEvaluacion, string> = {
+  Tarea: 'Tarea',
+  Examen: 'Examen',
+  Exposicion: 'Exposición',
+  Participacion: 'Participación',
+  Otro: 'Otro',
+};
+
+export function tipoEvaluacionLabel(tipo: string): string {
+  return TIPO_EVALUACION_LABEL[tipo as TipoEvaluacion] ?? tipo;
+}
 // #endregion
 
 // #region Response DTOs compartidos

@@ -51,3 +51,20 @@ describe('TareaDialogComponent — título obligatorio y cambios sin guardar', (
 		expect(component.dirty()).toBe(true);
 	});
 });
+
+describe('TareaDialogComponent — placeholder según el tipo (P114-F6 D2)', () => {
+	it('nombra el tipo elegido con su artículo', () => {
+		const fixture = TestBed.createComponent(TareaDialogComponent);
+		fixture.componentRef.setInput('visible', true);
+		fixture.componentRef.setInput('tarea', null);
+		fixture.detectChanges();
+		const component = fixture.componentInstance;
+
+		component.tipo = 'TAREA';
+		expect(component.deLaEtiqueta()).toBe('de la tarea');
+		component.tipo = 'ACTIVIDAD';
+		expect(component.deLaEtiqueta()).toBe('de la actividad');
+		component.tipo = 'EXAMEN';
+		expect(component.deLaEtiqueta()).toBe('del examen');
+	});
+});

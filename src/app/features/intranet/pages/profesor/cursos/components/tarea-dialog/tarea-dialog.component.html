@@ -64,7 +64,7 @@
 				[(ngModel)]="descripcion"
 				[rows]="4"
 				[maxlength]="2000"
-				placeholder="Descripción e instrucciones de la tarea..."
+				[placeholder]="'Descripción e instrucciones ' + deLaEtiqueta() + '...'"
 				[autoResize]="true"
 				class="w-full descripcion-field"
 			></textarea>

@@ -13,6 +13,7 @@ import {
 	GrupoNotaRow,
 } from '@features/intranet/pages/profesor/models';
 import type { ConfiguracionCalificacionListDto } from '@data/models';
+import { tipoEvaluacionLabel } from '@data/models';
 import {
 	buildNotaRows,
 	buildGrupoNotaRows,
@@ -41,6 +42,8 @@ import { EduButton, EduDialog, EduInputText, EduTag } from '@edu-ui';
 	styleUrl: './calificar-dialog.component.scss',
 })
 export class CalificarDialogComponent {
+	readonly tipoLabel = tipoEvaluacionLabel;
+
 	// #region Inputs
 	readonly visible = input(false);
 	readonly saving = input(false);

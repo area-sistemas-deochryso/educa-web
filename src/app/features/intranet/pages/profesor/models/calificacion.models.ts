@@ -19,7 +19,7 @@ export type {
   SalonNotasResumenDto,
   TipoEvaluacion,
 };
-export { TIPOS_EVALUACION } from '@data/models';
+export { TIPOS_EVALUACION, TIPO_EVALUACION_LABEL, tipoEvaluacionLabel } from '@data/models';
 // #endregion
 
 // #region Constants

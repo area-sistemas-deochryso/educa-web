@@ -55,6 +55,12 @@ export class TareaDialogComponent implements OnChanges {
 		return this.tipo === 'EXAMEN' ? 'el' : 'la';
 	}
 
+	/** Contracción para "instrucciones de la tarea / del examen". */
+	deLaEtiqueta(): string {
+		const etiqueta = this.etiqueta().toLowerCase();
+		return this.tipo === 'EXAMEN' ? `del ${etiqueta}` : `de la ${etiqueta}`;
+	}
+
 	headerText(): string {
 		const etiqueta = this.etiqueta();
 		if (this.tarea()) return `Editar ${etiqueta}`;

@@ -4,7 +4,8 @@ import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ErrorHandlerService } from '@core/services';
-import type { CalificacionDto, CrearCalificacionDto } from '@features/intranet/pages/profesor/models';
+import type { CalificacionDto, CrearCalificacionDto, CursoContenidoSemanaDto } from '@features/intranet/pages/profesor/models';
+import { TIPOS_EVALUACION, tipoEvaluacionLabel } from '@features/intranet/pages/profesor/models';
 import { EvaluacionFormDialogComponent } from './evaluacion-form-dialog.component';
 // #endregion
 
@@ -95,5 +96,82 @@ describe('EvaluacionFormDialogComponent — peso en porcentaje', () => {
 		component.onPesoBlur();
 
 		expect(showWarning).toHaveBeenCalledWith('Peso ajustado', 'El peso máximo es 100 %, se ajustó automáticamente.');
+	});
+});
+
+describe('EvaluacionFormDialogComponent — tipo y fecha de la semana', () => {
+	function semana(id: number, fechaInicio: string | null, fechaFin: string | null): CursoContenidoSemanaDto {
+		return { id, numeroSemana: id, titulo: null, fechaInicio, fechaFin } as unknown as CursoContenidoSemanaDto;
+	}
+
+	function create() {
+		TestBed.configureTestingModule({
+			imports: [EvaluacionFormDialogComponent],
+			providers: [{ provide: ErrorHandlerService, useValue: { showWarning: vi.fn() } }],
+		});
+		const fixture = TestBed.createComponent(EvaluacionFormDialogComponent);
+		fixture.componentRef.setInput('contenidoId', 5);
+		fixture.componentRef.setInput('semanas', [
+			semana(1, '2026-03-02T00:00:00', '2026-03-08T00:00:00'),
+			semana(2, '2026-03-09T00:00:00', '2026-03-15T00:00:00'),
+			semana(3, null, null),
+		]);
+		fixture.detectChanges();
+		return fixture.componentInstance;
+	}
+
+	it('labels types with accents while the value sent to the BE stays unaccented', () => {
+		const component = create();
+
+		const exposicion = component.tiposOptions.find((o) => o.value === 'Exposicion');
+		expect(exposicion).toEqual({ label: 'Exposición', value: 'Exposicion' });
+		expect(tipoEvaluacionLabel('Participacion')).toBe('Participación');
+		expect(tipoEvaluacionLabel('desconocido')).toBe('desconocido');
+		expect(component.tiposOptions).toHaveLength(TIPOS_EVALUACION.length);
+	});
+
+	it('bounds the datepicker to the selected week', () => {
+		const component = create();
+
+		component.onSemanaChange(2);
+
+		const rango = component.rangoSemana();
+		expect(rango?.min).toEqual(new Date(2026, 2, 9));
+		expect(rango?.max).toEqual(new Date(2026, 2, 15));
+	});
+
+	it('leaves the datepicker free when the week has no dates', () => {
+		const component = create();
+
+		component.onSemanaChange(3);
+
+		expect(component.rangoSemana()).toBeNull();
+	});
+
+	it('clears a date that falls outside the newly selected week', () => {
+		const component = create();
+		component.onSemanaChange(1);
+		component.updateField('fechaEvaluacion', new Date(2026, 2, 5));
+
+		component.onSemanaChange(2);
+
+		expect(component.formData().fechaEvaluacion).toBeNull();
+	});
+
+	it('keeps a date that is inside the newly selected week', () => {
+		const component = create();
+		component.updateField('fechaEvaluacion', new Date(2026, 2, 10));
+
+		component.onSemanaChange(2);
+
+		expect(component.formData().fechaEvaluacion).toEqual(new Date(2026, 2, 10));
+	});
+
+	it('changes the title placeholder with the type', () => {
+		const component = create();
+
+		component.updateField('tipo', 'Exposicion');
+
+		expect(component.tituloPlaceholder()).toContain('Exposición');
 	});
 });

@@ -1,5 +1,6 @@
 import { Component, ChangeDetectionStrategy, input, output, computed, signal } from '@angular/core';
 import { environment } from '@config/environment';
+import type { ConfiguracionCalificacionListDto } from '@data/models';
 import { ProfesorSalonConEstudiantes } from '@features/intranet/pages/profesor/models';
 import { ClassroomGradesTabComponent } from '../salon-notas-tab/salon-notas-tab.component';
 import { SalonNotasEstudianteTabComponent } from '../salon-notas-estudiante-tab/salon-notas-estudiante-tab.component';
@@ -55,6 +56,7 @@ export class SalonEstudiantesDialogComponent {
 	readonly notasError = input<string | null>(null);
 	readonly selectedCurso = input<number | null>(null);
 	readonly vistaActual = input<VistaPromedio>('semana');
+	readonly calificacionConfig = input<ConfiguracionCalificacionListDto | null>(null);
 	// #endregion
 
 	// #region Grupos inputs

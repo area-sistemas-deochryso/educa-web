@@ -14,6 +14,8 @@ import {
 import {
 	getNotaSeverity,
 	formatNotaConConfig,
+	formatEquivalenteNumerico,
+	getRotuloParcial,
 	calcularPorcentajeEvaluado,
 	getPromedioSeverity,
 	esPromedioProvisional,
@@ -189,7 +191,13 @@ export class ClassroomGradesTabComponent {
 		const coberturaLookup = this.porcentajeEvaluadoLookup();
 		const map = new Map<
 			string,
-			{ text: string; severity: 'success' | 'warn' | 'danger' | 'secondary'; provisional: boolean }
+			{
+				text: string;
+				severity: 'success' | 'warn' | 'danger' | 'secondary';
+				provisional: boolean;
+				equivalente: string | null;
+				rotulo: string | null;
+			}
 		>();
 		for (const [estId, inner] of lookup) {
 			const porcentajeEvaluado = coberturaLookup.get(estId) ?? 100;
@@ -201,6 +209,9 @@ export class ClassroomGradesTabComponent {
 						? getPromedioSeverity(promedio, porcentajeEvaluado, config)
 						: getNotaSeverity(promedio, config),
 					provisional: esGeneral && esPromedioProvisional(promedio, porcentajeEvaluado),
+					equivalente: formatEquivalenteNumerico(promedio, config),
+					// Solo presentacion (INV-C04): el General sigue siendo el mismo calculo, rotulado como parcial.
+					rotulo: esGeneral && promedio !== null ? getRotuloParcial(porcentajeEvaluado) : null,
 				});
 			}
 		}

@@ -13,6 +13,13 @@ export function formatDateLocalIso(fecha: Date): string {
 	return `${fecha.getFullYear()}-${pad(fecha.getMonth() + 1)}-${pad(fecha.getDate())}`;
 }
 
+/** Parsea el prefijo `YYYY-MM-DD` de un ISO como fecha local a medianoche; `null` si no tiene ese formato. */
+export function parseDateLocal(iso: string | null | undefined): Date | null {
+	const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso ?? '');
+	if (!match) return null;
+	return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+}
+
 /** Formatea un `Date` como `YYYY-MM-DDTHH:mm:ss.000` usando los componentes locales (sin sufijo Z). */
 export function toLocalIso(fecha: Date): string {
 	return `${formatDateLocalIso(fecha)}T${pad(fecha.getHours())}:${pad(fecha.getMinutes())}:00.000`;

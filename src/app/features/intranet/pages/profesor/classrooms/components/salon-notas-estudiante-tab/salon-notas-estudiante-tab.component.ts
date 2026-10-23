@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, computed, input, output, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, computed, effect, input, output, signal } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 
@@ -7,11 +7,14 @@ import { SalonNotasResumenDto, calcularPromedioPonderado, NOTA_MAXIMA } from '@f
 import {
 	getNotaSeverity,
 	formatNotaConConfig,
+	formatEquivalenteNumerico,
+	getRotuloParcial,
 	calcularPorcentajeEvaluado,
 	getPromedioSeverity,
 	esPromedioProvisional,
 } from '@intranet-shared/services/calificacion-config';
 import type { ConfiguracionCalificacionListDto } from '@data/models';
+import { tipoEvaluacionLabel } from '@data/models';
 import { ErrorStateComponent } from '@shared/components';
 import { EduButton, EduInputText, EduSelect, EduSkeleton, EduTable, EduTag, EduTooltip } from '@edu-ui';
 
@@ -39,6 +42,8 @@ interface EvaluacionRow {
 	styleUrl: './salon-notas-estudiante-tab.component.scss',
 })
 export class SalonNotasEstudianteTabComponent {
+	readonly tipoLabel = tipoEvaluacionLabel;
+
 	// #region Inputs
 	readonly notasData = input<SalonNotasResumenDto | null>(null);
 	readonly loading = input(false);
@@ -62,6 +67,16 @@ export class SalonNotasEstudianteTabComponent {
 	readonly editingCalificacionId = signal<number | null>(null);
 	editNotaValue: number | null = null;
 	// #endregion
+
+	constructor() {
+		// Con un solo estudiante no hay nada que elegir: se selecciona solo.
+		effect(() => {
+			const lista = this.estudiantes();
+			if (lista.length === 1 && this.selectedEstudianteId() === null) {
+				this.selectedEstudianteId.set(lista[0].estudianteId);
+			}
+		});
+	}
 
 	// #region Computed
 	readonly estudianteOptions = computed(() =>
@@ -273,6 +288,17 @@ export class SalonNotasEstudianteTabComponent {
 			return getPromedioSeverity(promedio, this.porcentajeEvaluado(), this.calificacionConfig());
 		}
 		return getNotaSeverity(promedio, this.calificacionConfig());
+	}
+
+	/** Equivalente numerico junto a la letra (solo escala LITERAL). */
+	formatEquivalente(nota: number | null): string | null {
+		return formatEquivalenteNumerico(nota, this.calificacionConfig());
+	}
+
+	/** El "General" real (no simulado) se rotula como parcial mientras haya evaluaciones sin nota. */
+	getRotuloGeneral(periodo: string, promedio: number | null, simulated: boolean): string | null {
+		if (periodo !== 'General' || simulated || promedio === null) return null;
+		return getRotuloParcial(this.porcentajeEvaluado());
 	}
 
 	isPromedioItemProvisional(periodo: string, promedio: number | null, simulated: boolean): boolean {
