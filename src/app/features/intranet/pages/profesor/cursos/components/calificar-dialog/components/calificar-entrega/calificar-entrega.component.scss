@@ -1,0 +1,20 @@
+.entrega {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	align-items: flex-start;
+}
+
+.entrega__estado {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	flex-wrap: wrap;
+}
+
+.entrega__fecha,
+.entrega__autor {
+	font-size: 0.75rem;
+	color: var(--text-color-secondary);
+	white-space: nowrap;
+}

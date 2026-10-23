@@ -15,6 +15,8 @@ interface CalificacionesState {
 	periodos: PeriodoCalificacionDto[];
 	salonEstudiantes: ProfesorEstudianteSalonDto[];
 	gruposForCalificar: GrupoContenidoDto[];
+	/** `gruposForCalificar` ya respondió: distingue «cargando» de «el curso no tiene grupos». */
+	gruposForCalificarCargados: boolean;
 	/** Config de escala/umbral del nivel del salón actual — null hasta resolverse o si no hay salón. */
 	calificacionConfig: ConfiguracionCalificacionListDto | null;
 	/** Grado y año del salón actual — null hasta resolverse o si no hay salón. */
@@ -37,6 +39,7 @@ const initialState: CalificacionesState = {
 	periodos: [],
 	salonEstudiantes: [],
 	gruposForCalificar: [],
+	gruposForCalificarCargados: false,
 	calificacionConfig: null,
 	salonContexto: null,
 	loading: false,
@@ -60,6 +63,7 @@ export class CalificacionesStore {
 	readonly periodos = computed(() => this._state().periodos);
 	readonly salonEstudiantes = computed(() => this._state().salonEstudiantes);
 	readonly gruposForCalificar = computed(() => this._state().gruposForCalificar);
+	readonly gruposForCalificarCargados = computed(() => this._state().gruposForCalificarCargados);
 	readonly calificacionConfig = computed(() => this._state().calificacionConfig);
 	readonly salonContexto = computed(() => this._state().salonContexto);
 	readonly loading = computed(() => this._state().loading);
@@ -95,6 +99,7 @@ export class CalificacionesStore {
 		periodos: this.periodos(),
 		salonEstudiantes: this.salonEstudiantes(),
 		gruposForCalificar: this.gruposForCalificar(),
+		gruposForCalificarCargados: this.gruposForCalificarCargados(),
 		calificacionConfig: this.calificacionConfig(),
 		loading: this.loading(),
 		saving: this.saving(),
@@ -122,7 +127,7 @@ export class CalificacionesStore {
 	}
 
 	setGruposForCalificar(grupos: GrupoContenidoDto[]): void {
-		this._state.update((s) => ({ ...s, gruposForCalificar: grupos }));
+		this._state.update((s) => ({ ...s, gruposForCalificar: grupos, gruposForCalificarCargados: true }));
 	}
 
 	setCalificacionConfig(config: ConfiguracionCalificacionListDto | null): void {
@@ -212,6 +217,8 @@ export class CalificacionesStore {
 			...s,
 			calificarDialogVisible: true,
 			selectedCalificacion: cal,
+			gruposForCalificar: [],
+			gruposForCalificarCargados: false,
 		}));
 	}
 
@@ -221,6 +228,7 @@ export class CalificacionesStore {
 			calificarDialogVisible: false,
 			selectedCalificacion: null,
 			gruposForCalificar: [],
+			gruposForCalificarCargados: false,
 		}));
 	}
 

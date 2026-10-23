@@ -141,9 +141,11 @@ import type { ActualizarTareaRequest, CalificacionDto, CrearCalificacionDto, Cre
 			[visible]="vm().taskSubmissionsDialogVisible"
 			[data]="vm().taskSubmissionsData"
 			[tarea]="vm().taskSubmissionsTarea"
+			[evaluacion]="evaluacionDeEntregas()"
 			[loading]="vm().taskSubmissionsLoading"
 			(visibleChange)="onTaskSubmissionsVisibleChange($event)"
-			(irACalificaciones)="onIrACalificaciones()"
+			(calificarEvaluacion)="onCalificarDesdeEntregas($event)"
+			(crearEvaluacion)="onCrearEvaluacionDesdeEntregas()"
 		/>
 
 		<app-curso-builder-dialog
@@ -190,15 +192,23 @@ export class ProfesorCursoHubContenidoComponent {
 		return tarea ? (this.evaluaciones().find((c) => c.tareaId === tarea.id) ?? null) : null;
 	});
 
+	/** Evaluación enlazada a la tarea cuyas entregas se ven; `null` si no tiene (se ofrece crearla). */
+	protected readonly evaluacionDeEntregas = computed<CalificacionDto | null>(() => {
+		const tarea = this.vm().taskSubmissionsTarea;
+		return tarea ? (this.evaluaciones().find((c) => c.tareaId === tarea.id) ?? null) : null;
+	});
+
 	/** Evaluaciones del curso sin tarea: candidatas a enlazar (una evaluación enlaza a lo sumo una tarea). */
 	protected readonly evaluacionesEnlazables = computed(() => this.evaluaciones().filter((c) => c.tareaId === null));
 	// #endregion
 
 	constructor() {
-		// Las calificaciones se piden solo si el profesor abre una tarea ya guardada (la pestaña no las paga antes).
+		// Las calificaciones se piden solo si el profesor abre una tarea ya guardada o sus entregas (la pestaña no las paga antes).
 		effect(() => {
 			const contenidoId = this.vm().contenido?.id ?? null;
-			if (contenidoId === null || !this.vm().tareaDialogVisible || !this.vm().selectedTarea) return;
+			const tareaAbierta = this.vm().tareaDialogVisible && !!this.vm().selectedTarea;
+			const entregasAbiertas = this.vm().taskSubmissionsDialogVisible;
+			if (contenidoId === null || (!tareaAbierta && !entregasAbiertas)) return;
 			untracked(() => this.calLoader.ensure(contenidoId));
 		});
 	}
@@ -280,11 +290,31 @@ export class ProfesorCursoHubContenidoComponent {
 		if (!visible) this.uiFacade.closeTaskSubmissionsDialog();
 	}
 
-	/** Cierra el diálogo de entregas y navega a Calificaciones conservando la franja. */
-	protected onIrACalificaciones(): void {
+	/** De la entrega a su nota: Calificaciones ubica la evaluación y abre su diálogo de calificar (`abrir=calificar`). */
+	protected onCalificarDesdeEntregas(evaluacionId: number): void {
 		this.uiFacade.closeTaskSubmissionsDialog();
 		const target = this.hubContext.tabTarget('profesor', 'calificaciones');
-		if (target) void this.router.navigate(target.commands, { queryParams: target.queryParams, replaceUrl: true });
+		if (target) {
+			void this.router.navigate(target.commands, {
+				queryParams: { ...target.queryParams, evaluacionId, abrir: 'calificar' },
+				replaceUrl: true,
+			});
+		}
+	}
+
+	/** La tarea no tiene evaluación: abre «Nueva evaluación» con los datos de la tarea (el peso lo elige el profesor). */
+	protected onCrearEvaluacionDesdeEntregas(): void {
+		const tarea = this.vm().taskSubmissionsTarea;
+		const semana = this.vm().contenido?.semanas?.find((s) => s.tareas?.some((t) => t.id === tarea?.id));
+		if (!tarea || !semana) return;
+		this.uiFacade.closeTaskSubmissionsDialog();
+		this.calFacade.openCalificacionDialog(null, {
+			titulo: tarea.titulo,
+			semanaId: semana.id,
+			fechaEvaluacion: tarea.fechaLimite,
+			tareaId: tarea.id,
+			esGrupal: tarea.esGrupal,
+		});
 	}
 	// #endregion
 

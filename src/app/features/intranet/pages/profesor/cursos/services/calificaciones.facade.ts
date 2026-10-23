@@ -133,6 +133,7 @@ export class CalificacionesFacade {
 				this.syncTareaEnlazada(cal);
 				this.store.setSaving(false);
 				this.store.closeCalificacionDialog();
+				this.refreshEntregasSiHayTarea(cal);
 			},
 			onError: (err) => {
 				if (this.isPeriodoCerrado(err)) {
@@ -302,6 +303,7 @@ export class CalificacionesFacade {
 				this.store.replaceCalificacion(cal);
 				this.syncTareaEnlazada(cal);
 				this.store.setSaving(false);
+				this.refreshEntregasSiHayTarea(cal);
 			},
 			onError: (err) => {
 				this.errHandler.handle(err, 'cambiar tipo de evaluación');
@@ -437,7 +439,10 @@ export class CalificacionesFacade {
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: (resumen) => this.store.setGruposForCalificar(resumen.grupos),
-				error: (err) => this.errHandler.handle(err, 'cargar grupos'),
+				error: (err) => {
+					// Sin respuesta no se sabe si hay grupos: no se afirma que no los hay.
+					this.errHandler.handle(err, 'cargar grupos');
+				},
 			});
 	}
 	// #endregion
@@ -474,6 +479,15 @@ export class CalificacionesFacade {
 	/** `EVALUACION_PERIODO_CERRADO`: el mensaje genérico del mapa no sabe nivel/año ni la acción. */
 	private isPeriodoCerrado(err: unknown): boolean {
 		return err instanceof HttpErrorResponse && err.error?.errorCode === 'EVALUACION_PERIODO_CERRADO';
+	}
+
+	/**
+	 * Crear y cambiar tipo devuelven `entregas: []` (contrato 858): con tarea enlazada la lista se recarga
+	 * para no mostrar a todos como «pendientes» (INV-C18).
+	 */
+	private refreshEntregasSiHayTarea(cal: CalificacionConNotasDto): void {
+		const contenidoId = this.contenidoStore.contenido()?.id;
+		if (cal.tareaId != null && contenidoId != null) this.refreshCalificaciones(contenidoId);
 	}
 
 	/** Refetch calificaciones after mutation (needed for nested notas). */

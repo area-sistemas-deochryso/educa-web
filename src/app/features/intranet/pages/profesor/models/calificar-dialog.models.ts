@@ -1,3 +1,5 @@
+import type { EntregaCalificacionDto } from './calificacion.models';
+
 export interface NotaRow {
 	estudianteId: number;
 	estudianteNombre: string;
@@ -5,6 +7,8 @@ export interface NotaRow {
 	observacion: string;
 	existingNotaId: number | null;
 	esEditable: boolean;
+	/** Entrega de la tarea enlazada; `null` si la evaluación no tiene tarea (INV-C18). */
+	entrega?: EntregaCalificacionDto | null;
 }
 
 export interface GrupoNotaRow {
@@ -13,6 +17,8 @@ export interface GrupoNotaRow {
 	nota: number | null;
 	observacion: string;
 	miembros: GrupoMiembroInfo[];
+	/** Entrega del grupo (estado, fecha y archivos de todos sus miembros); `null` sin tarea enlazada. */
+	entrega?: EntregaCalificacionDto | null;
 }
 
 export interface GrupoMiembroInfo {

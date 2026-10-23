@@ -47,6 +47,12 @@
 				</div>
 			</div>
 
+			@if (grupo.entrega; as entrega) {
+				<div class="grupo-entrega">
+					<app-calificar-entrega [entrega]="entrega" [autores]="grupo.miembros" />
+				</div>
+			}
+
 			<!-- Observacion -->
 			<div class="grupo-observacion">
 				<input

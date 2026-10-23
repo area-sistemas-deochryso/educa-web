@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, input, output, computed, inject } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { EstudianteTareaArchivosGroupDto, CursoContenidoTareaDto } from '@features/intranet/pages/profesor/models';
+import { CalificacionDto, EstudianteTareaArchivosGroupDto, CursoContenidoTareaDto } from '@features/intranet/pages/profesor/models';
 import { FileRowComponent, SkeletonLoaderComponent, FileViewerService, ViewableArchivo } from '@shared/components';
 import { EduButton, EduDialog, EduTag, EduTooltip } from '@edu-ui';
 
@@ -19,8 +19,13 @@ export class StudentTaskSubmissionsDialogComponent {
 	readonly data = input<EstudianteTareaArchivosGroupDto[]>([]);
 	readonly tarea = input<CursoContenidoTareaDto | null>(null);
 	readonly loading = input<boolean>(false);
+	/** Evaluación enlazada a la tarea (INV-C16); `null` si la tarea no es calificable todavía. */
+	readonly evaluacion = input<CalificacionDto | null>(null);
 	readonly visibleChange = output<boolean>();
-	readonly irACalificaciones = output<void>();
+	/** Calificar esa evaluación: lleva de la entrega a su nota. */
+	readonly calificarEvaluacion = output<number>();
+	/** La tarea no tiene evaluación: ofrecer crearla con sus datos. */
+	readonly crearEvaluacion = output<void>();
 	// #endregion
 
 	// #region Computed
@@ -53,8 +58,8 @@ export class StudentTaskSubmissionsDialogComponent {
 		this.viewer.openArchivo(archivo);
 	}
 
-	onIrACalificaciones(): void {
-		this.irACalificaciones.emit();
+	onCalificar(evaluacion: CalificacionDto): void {
+		this.calificarEvaluacion.emit(evaluacion.id);
 	}
 	// #endregion
 

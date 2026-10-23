@@ -89,6 +89,9 @@
 .actions-bar {
 	display: flex;
 	justify-content: flex-end;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 0.5rem;
 }
 // #endregion
 

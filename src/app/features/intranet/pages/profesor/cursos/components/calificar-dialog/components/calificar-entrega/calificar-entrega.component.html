@@ -1,0 +1,22 @@
+<div class="entrega">
+	<div class="entrega__estado">
+		<edu-tag [value]="ui().label" [severity]="ui().severity" [icon]="ui().icon" />
+		@if (entrega().fechaEntrega; as fecha) {
+			<span class="entrega__fecha">{{ fecha | date: 'dd/MM/yyyy HH:mm' }}</span>
+		}
+	</div>
+	@for (archivo of entrega().archivos; track archivo.id) {
+		<app-file-row
+			data-info-anchor="profesor-calificar-entrega-archivo"
+			[small]="true"
+			[name]="archivo.nombreArchivo"
+			[mimeType]="archivo.tipoArchivo"
+			[sizeBytes]="archivo.tamanoBytes"
+			(open)="openArchivo(archivo)"
+		>
+			@if (autorDe(archivo); as autor) {
+				<span actions class="entrega__autor">{{ autor }}</span>
+			}
+		</app-file-row>
+	}
+</div>

@@ -50,8 +50,41 @@ export interface CalificacionNotaDto {
   esEditable: boolean;
 }
 
+/** Estado de entrega derivado por el BE (INV-C18): no se persiste y los borradores no cuentan. */
+export const ESTADO_ENTREGA = {
+  Pendiente: 'PENDIENTE',
+  Entregado: 'ENTREGADO',
+  Tardio: 'TARDIO',
+} as const;
+export type EstadoEntrega = (typeof ESTADO_ENTREGA)[keyof typeof ESTADO_ENTREGA];
+
+export interface EntregaArchivoDto {
+  id: number;
+  /** Autor del archivo; en evaluación grupal los archivos del grupo conservan a su autor. */
+  estudianteId: number;
+  nombreArchivo: string;
+  urlArchivo: string;
+  tipoArchivo: string | null;
+  tamanoBytes: number | null;
+  fechaReg: string;
+}
+
+/** Una fila por alumno activo del horario. En evaluación grupal estado, fecha y archivos son los del grupo (INV-C18). */
+export interface EntregaCalificacionDto {
+  estudianteId: number;
+  estudianteNombre: string;
+  estudianteDni: string;
+  estado: EstadoEntrega;
+  fechaEntrega: string | null;
+  grupoId: number | null;
+  grupoNombre: string | null;
+  archivos: EntregaArchivoDto[];
+}
+
 export interface CalificacionConNotasDto extends CalificacionDto {
   notas: CalificacionNotaDto[];
+  /** Solo con `tareaId`; `[]` en las respuestas de crear y cambiar tipo (hay que recargar la lista). Ausente en un BE anterior. */
+  entregas?: EntregaCalificacionDto[];
 }
 // #endregion
 

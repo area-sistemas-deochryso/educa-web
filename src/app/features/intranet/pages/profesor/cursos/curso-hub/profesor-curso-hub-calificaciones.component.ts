@@ -3,7 +3,8 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { map } from 'rxjs';
 import { EduButton, EduConfirmDialog, EduConfirmationService, EduSpinner, EduTooltip } from '@edu-ui';
-import { EmptyStateComponent } from '@intranet-shared/components';
+import { CursoHubContextService, EmptyStateComponent } from '@intranet-shared/components';
+import { buildSalonesPageTarget } from '@intranet-shared/helpers';
 import type {
 	CalificacionConNotasDto,
 	CalificacionDto,
@@ -18,7 +19,9 @@ import { CalificacionesPanelComponent } from '../components/calificaciones-panel
 import { EvaluacionFormDialogComponent } from '../components/evaluacion-form-dialog/evaluacion-form-dialog.component';
 import { CalificarDialogComponent } from '../components/calificar-dialog/calificar-dialog.component';
 import { PeriodosConfigDialogComponent } from '../components/periodos-config-dialog/periodos-config-dialog.component';
+import { StudentTaskSubmissionsDialogComponent } from '../components/student-task-submissions-dialog/student-task-submissions-dialog.component';
 import { CursoHubCalificacionesLoader } from './curso-hub-calificaciones.loader';
+import { CursoHubEntregasService } from './curso-hub-entregas.service';
 import { buildImpactoCambioTipoMensaje } from './impacto-cambio-tipo';
 
 /**
@@ -42,6 +45,7 @@ import { buildImpactoCambioTipoMensaje } from './impacto-cambio-tipo';
 		EvaluacionFormDialogComponent,
 		CalificarDialogComponent,
 		PeriodosConfigDialogComponent,
+		StudentTaskSubmissionsDialogComponent,
 	],
 	providers: [EduConfirmationService],
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -126,9 +130,23 @@ import { buildImpactoCambioTipoMensaje } from './impacto-cambio-tipo';
 			[estudiantes]="estudiantesList()"
 			[grupos]="calVm().gruposForCalificar"
 			[calificacionConfig]="calVm().calificacionConfig"
+			[gruposCargados]="calVm().gruposForCalificarCargados"
+			[puedeVerEntregas]="true"
 			(visibleChange)="onCalificarDialogVisibleChange($event)"
 			(save)="onSaveCalificaciones($event)"
 			(saveGrupos)="onSaveCalificacionesGrupos($event)"
+			(verEntregas)="onVerEntregas()"
+			(irACrearGrupos)="onIrACrearGrupos()"
+		/>
+
+		<app-student-task-submissions-dialog
+			[visible]="vm().taskSubmissionsDialogVisible"
+			[data]="vm().taskSubmissionsData"
+			[tarea]="vm().taskSubmissionsTarea"
+			[evaluacion]="evaluacionDeEntregas()"
+			[loading]="vm().taskSubmissionsLoading"
+			(visibleChange)="onEntregasVisibleChange($event)"
+			(calificarEvaluacion)="onCalificarDesdeEntregas($event)"
 		/>
 
 		<app-periodos-config-dialog
@@ -154,7 +172,9 @@ export class ProfesorCursoHubCalificacionesComponent {
 	private readonly confirmationService = inject(EduConfirmationService);
 	private readonly route = inject(ActivatedRoute);
 	private readonly router = inject(Router);
-	// #endregion
+	private readonly hubContext = inject(CursoHubContextService);
+	private readonly entregas = inject(CursoHubEntregasService);
+// #endregion
 
 	// #region Estado
 	protected readonly vm = this.uiFacade.vm;
@@ -171,6 +191,15 @@ export class ProfesorCursoHubCalificacionesComponent {
 		{ initialValue: null },
 	);
 	protected readonly focusEvaluacionId = this.evaluacionIdQuery;
+
+	/** `?abrir=calificar` (desde las entregas): además de ubicar la evaluación, abre su diálogo de calificar. */
+	private readonly abrirCalificarQuery = toSignal(
+		this.route.queryParamMap.pipe(map((params) => params.get('abrir') === 'calificar')),
+		{ initialValue: false },
+	);
+
+	/** Evaluación enlazada a la tarea cuyas entregas se ven (`CalificacionDto.tareaId`, INV-C16). */
+	protected readonly evaluacionDeEntregas = this.entregas.evaluacionDeEntregas;
 
 	private readonly contenidoId = computed(() => this.vm().contenido?.id ?? null);
 
@@ -198,9 +227,14 @@ export class ProfesorCursoHubCalificacionesComponent {
 	// #region Foco
 	/** El panel ya ubicó (o no encontró) la evaluación: se quita el parámetro para que refrescar no re-enfoque. */
 	protected onFocusConsumed(): void {
+		const id = this.focusEvaluacionId();
+		if (this.abrirCalificarQuery() && id !== null) {
+			const cal = this.entregas.evaluacionPorId(id);
+			if (cal) this.calFacade.openCalificarDialog(cal);
+		}
 		void this.router.navigate([], {
 			relativeTo: this.route,
-			queryParams: { evaluacionId: null },
+			queryParams: { evaluacionId: null, abrir: null },
 			queryParamsHandling: 'merge',
 			replaceUrl: true,
 		});
@@ -278,6 +312,29 @@ export class ProfesorCursoHubCalificacionesComponent {
 		const cal = this.calVm().selectedCalificacion;
 		const contenidoId = this.contenidoId();
 		if (cal && contenidoId !== null) this.calFacade.calificarGruposLote(cal.id, dto, contenidoId);
+	}
+
+	/** Abre las entregas de la tarea enlazada encima de calificar: el diálogo de notas sigue abierto con sus ediciones. */
+	protected onVerEntregas(): void {
+		this.entregas.verEntregasDeLaSeleccionada();
+	}
+
+	/** Evaluación grupal sin grupos: Mis Salones abre el salón de la franja en Grupos. */
+	protected onIrACrearGrupos(): void {
+		const horarioId = this.hubContext.slot()?.id;
+		if (horarioId == null) return;
+		const target = buildSalonesPageTarget('profesor', horarioId);
+		this.calFacade.closeCalificarDialog();
+		void this.router.navigate(target.commands, { queryParams: target.queryParams });
+	}
+
+	protected onEntregasVisibleChange(visible: boolean): void {
+		if (!visible) this.uiFacade.closeTaskSubmissionsDialog();
+	}
+
+	/** Desde las entregas: cierra el diálogo y deja abierto (o abre) el de calificar de esa evaluación. */
+	protected onCalificarDesdeEntregas(evaluacionId: number): void {
+		this.entregas.calificarDesdeEntregas(evaluacionId);
 	}
 	// #endregion
 

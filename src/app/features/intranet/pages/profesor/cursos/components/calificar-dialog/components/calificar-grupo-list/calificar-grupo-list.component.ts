@@ -13,11 +13,12 @@ import {
 import type { ConfiguracionCalificacionListDto, ConfiguracionLiteralDto } from '@data/models';
 import { clampNota, literalMidpoint, sanitizeObservacion } from '../../calificar-dialog.helpers';
 import { EduButton, EduInputNumber, EduInputText, EduSelect, EduTag, EduTooltip } from '@edu-ui';
+import { CalificarEntregaComponent } from '../calificar-entrega/calificar-entrega.component';
 
 @Component({
 	selector: 'app-calificar-grupo-list',
 	standalone: true,
-	imports: [FormsModule, EduButton, EduInputNumber, EduInputText, EduSelect, EduTag, EduTooltip],
+	imports: [FormsModule, EduButton, EduInputNumber, EduInputText, EduSelect, EduTag, EduTooltip, CalificarEntregaComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './calificar-grupo-list.component.html',
 	styleUrl: './calificar-grupo-list.component.scss',

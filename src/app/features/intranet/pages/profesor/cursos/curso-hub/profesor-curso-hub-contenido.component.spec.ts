@@ -274,16 +274,16 @@ describe('ProfesorCursoHubContenidoComponent', () => {
 		});
 	});
 
-	describe('ir a calificaciones', () => {
-		it('closes the submissions dialog and navigates to the tab keeping the slot', () => {
+	describe('calificar desde las entregas', () => {
+		it('closes the submissions dialog and opens Calificaciones on that evaluation, ready to grade', () => {
 			const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
 			const fixture = create();
 
-			(fixture.componentInstance as unknown as { onIrACalificaciones(): void }).onIrACalificaciones();
+			(fixture.componentInstance as unknown as { onCalificarDesdeEntregas(id: number): void }).onCalificarDesdeEntregas(42);
 
 			expect(uiFacade.closeTaskSubmissionsDialog).toHaveBeenCalledOnce();
 			expect(navigate).toHaveBeenCalledWith(['/intranet', 'profesor', 'cursos', 24, 34, 'calificaciones'], {
-				queryParams: { horarioId: 1 },
+				queryParams: { horarioId: 1, evaluacionId: 42, abrir: 'calificar' },
 				replaceUrl: true,
 			});
 		});

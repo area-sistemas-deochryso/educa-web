@@ -9,6 +9,9 @@
 		<tr>
 			<th style="width: 44px">#</th>
 			<th style="min-width: 170px">Estudiante</th>
+			@if (conTarea()) {
+				<th style="min-width: 200px">Entrega</th>
+			}
 			<th style="width: 190px">{{ notaHeader() }}</th>
 			<th style="min-width: 160px">Observación</th>
 		</tr>
@@ -17,6 +20,15 @@
 		<tr>
 			<td class="text-center text-color-secondary">{{ rowIndex + 1 }}</td>
 			<td>{{ row.estudianteNombre }}</td>
+			@if (conTarea()) {
+				<td>
+					@if (row.entrega; as entrega) {
+						<app-calificar-entrega [entrega]="entrega" />
+					} @else {
+						<span class="text-sm text-color-secondary">–</span>
+					}
+				</td>
+			}
 			<td>
 				@if (row.esEditable) {
 					<div class="nota-cell">

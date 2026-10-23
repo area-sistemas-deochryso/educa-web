@@ -179,11 +179,42 @@ describe('ProfesorCursoHubCalificacionesComponent', () => {
 			expect(router.navigate).toHaveBeenCalledWith(
 				[],
 				expect.objectContaining({
-					queryParams: { evaluacionId: null },
+					queryParams: { evaluacionId: null, abrir: null },
 					queryParamsHandling: 'merge',
 					replaceUrl: true,
 				}),
 			);
+		});
+
+		it('opens the calificar dialog of the focused evaluation when the link says abrir=calificar', () => {
+			const cal = { id: 42, titulo: 'Práctica 1', tareaId: 7, notas: [] };
+			calVm.set({ ...baseCalVm, calificacionesPorSemana: new Map([[1, [cal]]]) as never });
+			queryParamMap$.next(convertToParamMap({ evaluacionId: '42', abrir: 'calificar' }));
+			const { handlers } = create();
+
+			handlers.onFocusConsumed();
+
+			expect(calFacade.openCalificarDialog).toHaveBeenCalledWith(cal);
+		});
+
+		it('only highlights (does not open the dialog) without abrir=calificar', () => {
+			const cal = { id: 42, titulo: 'Práctica 1', tareaId: 7, notas: [] };
+			calVm.set({ ...baseCalVm, calificacionesPorSemana: new Map([[1, [cal]]]) as never });
+			queryParamMap$.next(convertToParamMap({ evaluacionId: '42' }));
+			const { handlers } = create();
+
+			handlers.onFocusConsumed();
+
+			expect(calFacade.openCalificarDialog).not.toHaveBeenCalled();
+		});
+
+		it('does not open anything if the focused evaluation no longer exists', () => {
+			queryParamMap$.next(convertToParamMap({ evaluacionId: '999', abrir: 'calificar' }));
+			const { handlers } = create();
+
+			handlers.onFocusConsumed();
+
+			expect(calFacade.openCalificarDialog).not.toHaveBeenCalled();
 		});
 	});
 

@@ -364,6 +364,24 @@ describe('CalificacionesFacade', () => {
 			expect(store.replaceCalificacion).toBeDefined();
 			expect(store.calificaciones()[0]).toEqual(updatedCal);
 		});
+
+		it('reloads the list when the evaluation has a linked tarea (the PUT answers entregas: [], INV-C18)', () => {
+			const conTarea = { ...mockCalificacion, tareaId: 7, entregas: [] } as CalificacionConNotasDto;
+			wal.execute.mockImplementationOnce((config: { onCommit?: (cal: CalificacionConNotasDto) => void }) => config.onCommit?.(conTarea));
+
+			facade.cambiarTipo(1, dto);
+
+			expect(api.getCalificaciones).toHaveBeenCalledWith(mockContenido.id);
+		});
+
+		it('does not reload when the evaluation has no tarea', () => {
+			const sinTarea = { ...mockCalificacion, tareaId: null } as CalificacionConNotasDto;
+			wal.execute.mockImplementationOnce((config: { onCommit?: (cal: CalificacionConNotasDto) => void }) => config.onCommit?.(sinTarea));
+
+			facade.cambiarTipo(1, dto);
+
+			expect(api.getCalificaciones).not.toHaveBeenCalled();
+		});
 	});
 	// #endregion
 
@@ -433,6 +451,23 @@ describe('CalificacionesFacade', () => {
 			expect(api.getGrupos).toHaveBeenCalledWith(contenido!.id);
 			expect(store.calificarDialogVisible()).toBe(true);
 			expect(store.selectedCalificacion()).toEqual(calGrupal);
+		});
+
+		it('marks the grupos as loaded once they answer, even with none (empty state vs loading)', () => {
+			const calGrupal = { ...mockCalificacion, esGrupal: true } as never;
+
+			facade.openCalificarDialog(calGrupal);
+
+			expect(store.gruposForCalificar()).toEqual([]);
+			expect(store.gruposForCalificarCargados()).toBe(true);
+		});
+
+		it('does not claim there are no grupos when loading them failed', () => {
+			api.getGrupos.mockReturnValueOnce(throwError(() => new Error('boom')));
+
+			facade.openCalificarDialog({ ...mockCalificacion, esGrupal: true } as never);
+
+			expect(store.gruposForCalificarCargados()).toBe(false);
 		});
 
 		it('should NOT load grupos when calificacion is individual', () => {

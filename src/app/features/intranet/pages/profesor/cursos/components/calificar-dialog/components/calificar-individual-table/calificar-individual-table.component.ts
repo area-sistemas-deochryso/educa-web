@@ -8,11 +8,12 @@ import {
 import type { ConfiguracionCalificacionListDto, ConfiguracionLiteralDto } from '@data/models';
 import { clampNota, literalMidpoint, sanitizeObservacion } from '../../calificar-dialog.helpers';
 import { EduInputNumber, EduInputText, EduSelect, EduTable, EduTag, EduTooltip } from '@edu-ui';
+import { CalificarEntregaComponent } from '../calificar-entrega/calificar-entrega.component';
 
 @Component({
 	selector: 'app-calificar-individual-table',
 	standalone: true,
-	imports: [FormsModule, EduInputNumber, EduInputText, EduSelect, EduTable, EduTag, EduTooltip],
+	imports: [FormsModule, EduInputNumber, EduInputText, EduSelect, EduTable, EduTag, EduTooltip, CalificarEntregaComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './calificar-individual-table.component.html',
 	styleUrl: './calificar-individual-table.component.scss',
@@ -24,6 +25,8 @@ export class CalificarIndividualTableComponent {
 	readonly config = input<ConfiguracionCalificacionListDto | null>(null);
 	readonly isLiteral = input(false);
 	readonly literales = input<ConfiguracionLiteralDto[]>([]);
+	/** La evaluación tiene tarea enlazada: se muestra la columna de entrega (INV-C18). */
+	readonly conTarea = input(false);
 	// #endregion
 
 	/** Cabecera según la escala del salón (H17): "Nota (AD · A · B · C)" en LITERAL, "Nota (0-20)" en NUMERICO. */

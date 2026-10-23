@@ -1,6 +1,7 @@
 import {
 	CalificacionConNotasDto,
 	CalificarGrupoDto,
+	EntregaCalificacionDto,
 	esNotaEditable,
 	NOTA_MINIMA,
 	NOTA_MAXIMA,
@@ -32,6 +33,18 @@ export interface GruposPayload {
 	incompletos: string[];
 }
 
+/** Con tarea enlazada hay una fila de entrega por alumno (INV-C18); sin tarea no hay estado de entrega que mostrar. */
+function entregaDelAlumno(cal: CalificacionConNotasDto, estudianteId: number): EntregaCalificacionDto | null {
+	if (cal.tareaId === null) return null;
+	return cal.entregas?.find((e) => e.estudianteId === estudianteId) ?? null;
+}
+
+/** En evaluación grupal el estado, la fecha y los archivos son los del grupo: todas sus filas los comparten. */
+function entregaDelGrupo(cal: CalificacionConNotasDto, grupoId: number): EntregaCalificacionDto | null {
+	if (cal.tareaId === null) return null;
+	return cal.entregas?.find((e) => e.grupoId === grupoId) ?? null;
+}
+
 export function buildNotaRows(
 	cal: CalificacionConNotasDto,
 	estudiantes: { id: number; nombre: string }[],
@@ -45,6 +58,7 @@ export function buildNotaRows(
 			observacion: existingNota?.observacion ?? '',
 			existingNotaId: existingNota?.id ?? null,
 			esEditable: existingNota ? esNotaEditable(existingNota.fechaCalificacion) : true,
+			entrega: entregaDelAlumno(cal, est.id),
 		};
 	});
 }
@@ -81,6 +95,7 @@ export function buildGrupoNotaRows(
 			nota: grupoNota,
 			observacion: firstNotaWithObs?.observacion ?? '',
 			miembros,
+			entrega: entregaDelGrupo(cal, grupo.id),
 		};
 	});
 }

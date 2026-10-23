@@ -51,12 +51,20 @@ export class CalificarDialogComponent {
 	readonly estudiantes = input<{ id: number; nombre: string }[]>([]);
 	readonly grupos = input<GrupoContenidoDto[]>([]);
 	readonly calificacionConfig = input<ConfiguracionCalificacionListDto | null>(null);
+	/** Los grupos ya respondieron: sin esto «cargando» y «el curso no tiene grupos» serían iguales. */
+	readonly gruposCargados = input(false);
+	/** Quien aloja el diálogo sabe abrir las entregas de la tarea; sin esto el botón no se ofrece. */
+	readonly puedeVerEntregas = input(false);
 	// #endregion
 
 	// #region Outputs
 	readonly visibleChange = output<boolean>();
 	readonly save = output<CalificarLoteDto>();
 	readonly saveGrupos = output<CalificarGruposLoteDto>();
+	/** Abrir las entregas de la tarea enlazada sin cerrar este diálogo (no se pierden notas sin guardar). */
+	readonly verEntregas = output<void>();
+	/** Evaluación grupal sin grupos: llevar a Mis Salones a crearlos. */
+	readonly irACrearGrupos = output<void>();
 	// #endregion
 
 	// #region Estado local
@@ -69,6 +77,12 @@ export class CalificarDialogComponent {
 
 	// #region Computed
 	readonly isGrupal = computed(() => !!this.calificacion()?.esGrupal);
+
+	/** Solo con tarea enlazada existe el estado de entrega (INV-C18). */
+	readonly conTarea = computed(() => this.calificacion()?.tareaId != null);
+
+	/** Grupal, grupos ya cargados y ninguno creado: no hay a quién calificar. */
+	readonly sinGrupos = computed(() => this.isGrupal() && this.gruposCargados() && this.grupos().length === 0);
 
 	readonly isLiteral = computed(() => {
 		const config = this.calificacionConfig();

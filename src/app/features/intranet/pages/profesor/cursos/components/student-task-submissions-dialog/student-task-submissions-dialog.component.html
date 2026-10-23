@@ -42,16 +42,28 @@
 
 			<!-- #region Actions bar -->
 			<div class="actions-bar">
-				<edu-button
-					label="Ir a Calificaciones"
-					icon="pi pi-chart-bar"
-					[text]="true"
-					size="small"
-					data-info-anchor="profesor-submissions-ir-calificaciones"
-					(click)="onIrACalificaciones()"
-					eduTooltip="Calificar esta tarea en el tab de calificaciones"
-					eduTooltipPosition="top"
-				/>
+				@if (evaluacion(); as ev) {
+					<edu-button
+						label="Calificar esta tarea"
+						icon="pi pi-chart-bar"
+						[text]="true"
+						size="small"
+						data-info-anchor="profesor-submissions-calificar"
+						(click)="onCalificar(ev)"
+						[eduTooltip]="'Abre las notas de «' + ev.titulo + '»'"
+						eduTooltipPosition="top"
+					/>
+				} @else {
+					<span class="text-sm text-color-secondary">Esta tarea no tiene evaluación, así que no se puede calificar.</span>
+					<edu-button
+						label="Crear evaluación"
+						icon="pi pi-plus"
+						[text]="true"
+						size="small"
+						data-info-anchor="profesor-submissions-crear-evaluacion"
+						(click)="crearEvaluacion.emit()"
+					/>
+				}
 			</div>
 			<!-- #endregion -->
 

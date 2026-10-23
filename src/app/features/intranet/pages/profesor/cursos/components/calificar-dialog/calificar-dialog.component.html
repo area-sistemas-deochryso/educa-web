@@ -25,6 +25,16 @@
 				<i class="pi pi-bookmark"></i>
 				Semana {{ cal.numeroSemana }}
 			</span>
+			@if (conTarea() && puedeVerEntregas()) {
+				<edu-button
+					label="Ver entregas de la tarea"
+					icon="pi pi-inbox"
+					[text]="true"
+					size="small"
+					data-info-anchor="profesor-calificar-ver-entregas"
+					(click)="verEntregas.emit()"
+				/>
+			}
 		</div>
 	}
 	<!-- #endregion -->
@@ -102,6 +112,7 @@
 				[config]="calificacionConfig()"
 				[isLiteral]="isLiteral()"
 				[literales]="literalesOrdenados()"
+				[conTarea]="conTarea()"
 				(edited)="onEdited()"
 			/>
 		} @else {
@@ -115,7 +126,20 @@
 
 	<!-- #region Group mode -->
 	@if (isGrupal()) {
-		@if (filteredGrupoRows().length > 0) {
+		@if (sinGrupos()) {
+			<div class="empty-state" data-info-anchor="profesor-calificar-sin-grupos">
+				<i class="pi pi-users text-4xl text-color-secondary"></i>
+				<p class="mt-2">Esta evaluación es grupal y el curso todavía no tiene grupos.</p>
+				<p class="text-sm text-color-secondary">Crea los grupos en Mis Salones y vuelve a calificar.</p>
+				<edu-button
+					label="Crear grupos en Mis Salones"
+					icon="pi pi-arrow-right"
+					size="small"
+					data-info-anchor="profesor-calificar-crear-grupos"
+					(click)="irACrearGrupos.emit()"
+				/>
+			</div>
+		} @else if (filteredGrupoRows().length > 0) {
 			<app-calificar-grupo-list
 				[rows]="filteredGrupoRows()"
 				[config]="calificacionConfig()"
