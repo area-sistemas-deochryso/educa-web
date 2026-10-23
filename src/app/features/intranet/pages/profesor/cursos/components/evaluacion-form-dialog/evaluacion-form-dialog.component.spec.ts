@@ -175,3 +175,52 @@ describe('EvaluacionFormDialogComponent — tipo y fecha de la semana', () => {
 		expect(component.tituloPlaceholder()).toContain('Exposición');
 	});
 });
+
+describe('EvaluacionFormDialogComponent — alta desde una tarea (P114-F5b, INV-C16)', () => {
+	const semana = { id: 3, numeroSemana: 1, titulo: null, fechaInicio: '2026-10-05', fechaFin: '2026-10-11' } as CursoContenidoSemanaDto;
+
+	function create(fecha: string | null) {
+		const fixture = TestBed.createComponent(EvaluacionFormDialogComponent);
+		fixture.componentRef.setInput('contenidoId', 5);
+		fixture.componentRef.setInput('semanas', [semana]);
+		fixture.componentRef.setInput('prefill', { titulo: 'Ensayo', semanaId: 3, fechaEvaluacion: fecha, tareaId: 7, esGrupal: true });
+		fixture.detectChanges();
+		const emitted: CrearCalificacionDto[] = [];
+		fixture.componentInstance.save.subscribe((dto) => emitted.push(dto));
+		return { component: fixture.componentInstance, emitted };
+	}
+
+	beforeEach(() => {
+		TestBed.configureTestingModule({
+			imports: [EvaluacionFormDialogComponent],
+			providers: [{ provide: ErrorHandlerService, useValue: { showWarning: vi.fn() } }],
+		});
+	});
+
+	it('prellena título, semana, fecha, modalidad y tarea, pero no el peso', () => {
+		const { component } = create('2026-10-08T00:00:00');
+
+		const data = component.formData();
+		expect(data).toMatchObject({ titulo: 'Ensayo', semanaId: 3, tareaId: 7, esGrupal: true, tipo: 'Tarea', peso: null });
+		expect(data.fechaEvaluacion).not.toBeNull();
+		expect(component.isFormValid()).toBe(false);
+	});
+
+	it('descarta la fecha de la tarea si cae fuera de su semana', () => {
+		const { component } = create('2026-11-20T00:00:00');
+
+		expect(component.formData().fechaEvaluacion).toBeNull();
+	});
+
+	it('envía la evaluación enlazada una vez que el profesor elige el peso', () => {
+		const { component, emitted } = create('2026-10-08T00:00:00');
+
+		component.onSave();
+		expect(emitted).toEqual([]);
+
+		component.updateField('peso', 25);
+		component.onSave();
+		expect(emitted).toHaveLength(1);
+		expect(emitted[0]).toMatchObject({ tareaId: 7, semanaId: 3, esGrupal: true, peso: 0.25, titulo: 'Ensayo' });
+	});
+});

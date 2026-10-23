@@ -6,8 +6,6 @@ import {
 	CalificarLoteDto,
 	CalificarEstudianteDto,
 	CalificarGruposLoteDto,
-	CalificarGrupoDto,
-	OverrideMiembroDto,
 	GrupoContenidoDto,
 	NotaRow,
 	GrupoNotaRow,
@@ -17,8 +15,10 @@ import { tipoEvaluacionLabel } from '@data/models';
 import {
 	buildNotaRows,
 	buildGrupoNotaRows,
+	buildGruposPayload,
 	calcIndividualStats,
 	calcGrupoStats,
+	notasFueraDeGrupo,
 } from './calificar-dialog.helpers';
 import { CalificarIndividualTableComponent } from './components/calificar-individual-table/calificar-individual-table.component';
 import { CalificarGrupoListComponent } from './components/calificar-grupo-list/calificar-grupo-list.component';
@@ -109,15 +109,26 @@ export class CalificarDialogComponent {
 		return calcIndividualStats(this.notaRows(), this.calificacionConfig());
 	});
 
-	private readonly grupoStats = computed(() => {
+	readonly grupoStats = computed(() => {
 		this._editVersion();
-		return calcGrupoStats(this.grupoNotaRows(), this.calificacionConfig());
+		const cal = this.calificacion();
+		const rows = this.grupoNotaRows();
+		return calcGrupoStats(rows, this.calificacionConfig(), cal ? notasFueraDeGrupo(cal, rows) : []);
 	});
+
+	private readonly gruposPayload = computed(() => {
+		this._editVersion();
+		return buildGruposPayload(this.grupoNotaRows());
+	});
+
+	/** Grupos con excepciones que no se pueden guardar aún (faltan notas de otros miembros). */
+	readonly gruposIncompletos = computed(() => this.gruposPayload().incompletos);
 
 	readonly hasChanges = computed(() => {
 		this._editVersion();
 		if (this.isGrupal()) {
-			return this.grupoNotaRows().some((r) => r.nota !== null && r.nota !== undefined);
+			const { grupos, incompletos } = this.gruposPayload();
+			return grupos.length > 0 && incompletos.length === 0;
 		}
 		return this.notaRows().some((r) => r.nota !== null && r.nota !== undefined);
 	});
@@ -177,27 +188,8 @@ export class CalificarDialogComponent {
 	}
 
 	private onSaveGrupos(): void {
-		const rows = this.grupoNotaRows();
-		const grupos: CalificarGrupoDto[] = rows
-			.filter((r): r is GrupoNotaRow & { nota: number } => r.nota !== null && r.nota !== undefined)
-			.map((r) => {
-				const overrides: OverrideMiembroDto[] = r.miembros
-					.filter((m): m is typeof m & { overrideNota: number } => m.esOverride && m.overrideNota !== null)
-					.map((m) => ({
-						estudianteId: m.estudianteId,
-						nota: m.overrideNota,
-						observacion: null,
-					}));
-
-				return {
-					grupoId: r.grupoId,
-					nota: r.nota,
-					observacion: r.observacion || null,
-					...(overrides.length > 0 ? { overrides } : {}),
-				};
-			});
-
-		if (grupos.length === 0) return;
+		const { grupos, incompletos } = this.gruposPayload();
+		if (grupos.length === 0 || incompletos.length > 0) return;
 		this.saveGrupos.emit({ grupos });
 	}
 	// #endregion

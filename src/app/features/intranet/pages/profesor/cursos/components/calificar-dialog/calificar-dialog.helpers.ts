@@ -1,5 +1,6 @@
 import {
 	CalificacionConNotasDto,
+	CalificarGrupoDto,
 	esNotaEditable,
 	NOTA_MINIMA,
 	NOTA_MAXIMA,
@@ -22,6 +23,13 @@ export interface IndividualStats {
 
 export interface GrupoStats extends IndividualStats {
 	totalOverrides: number;
+	totalGrupos: number;
+}
+
+export interface GruposPayload {
+	grupos: CalificarGrupoDto[];
+	/** Grupos con excepciones pero con miembros sin nota: el BE exige una nota de grupo, así que no se pueden enviar. */
+	incompletos: string[];
 }
 
 export function buildNotaRows(
@@ -55,14 +63,16 @@ export function buildGrupoNotaRows(
 				notaActual: existingNota?.nota ?? null,
 				esOverride: isOverride,
 				overrideNota: isOverride ? (existingNota?.nota ?? null) : null,
+				observacion: existingNota?.observacion ?? '',
 			};
 		});
 
 		const nonOverrideMember = miembros.find((m) => !m.esOverride && m.notaActual !== null);
 		const grupoNota = nonOverrideMember?.notaActual ?? null;
 
+		// La observación del grupo es la de las notas que siguen al grupo; la de una excepción es del alumno.
 		const firstNotaWithObs = cal.notas.find(
-			(n) => n.grupoId === grupo.id && n.observacion,
+			(n) => n.grupoId === grupo.id && !n.esOverride && n.observacion,
 		);
 
 		return {
@@ -95,29 +105,71 @@ export function calcIndividualStats(
 	};
 }
 
+/** Nota que recibirá el miembro al guardar: su excepción si la tiene, si no la del grupo. */
+export function notaEfectivaMiembro(row: GrupoNotaRow, miembro: GrupoMiembroInfo): number | null {
+	return miembro.esOverride && miembro.overrideNota !== null ? miembro.overrideNota : row.nota;
+}
+
+/** Notas guardadas de alumnos que ningún grupo lista: el diálogo no las edita pero el panel sí las cuenta. */
+export function notasFueraDeGrupo(cal: CalificacionConNotasDto, rows: GrupoNotaRow[]): number[] {
+	const enGrupo = new Set(rows.flatMap((r) => r.miembros.map((m) => m.estudianteId)));
+	return cal.notas.filter((n) => !enGrupo.has(n.estudianteId)).map((n) => n.nota);
+}
+
+/** Cuenta alumnos (no grupos), igual que el panel de evaluaciones. */
 export function calcGrupoStats(
 	rows: GrupoNotaRow[],
 	config: ConfiguracionCalificacionListDto | null,
+	fueraDeGrupo: number[] = [],
 ): GrupoStats {
-	const conNota = rows.filter((r) => r.nota !== null && r.nota !== undefined);
+	const efectivas = rows.flatMap((r) => r.miembros.map((m) => notaEfectivaMiembro(r, m)));
+	const conNota = [...efectivas.filter((n): n is number => n !== null), ...fueraDeGrupo];
 	const promedio =
-		conNota.length > 0
-			? conNota.reduce((acc, r) => acc + (r.nota ?? 0), 0) / conNota.length
-			: 0;
-	const aprobados = conNota.filter((r) => isNotaAprobada(r.nota, config)).length;
+		conNota.length > 0 ? conNota.reduce((acc, n) => acc + n, 0) / conNota.length : 0;
+	const aprobados = conNota.filter((n) => isNotaAprobada(n, config)).length;
 	const totalOverrides = rows.reduce(
 		(acc, r) => acc + r.miembros.filter((m) => m.esOverride).length,
 		0,
 	);
 	return {
-		total: rows.length,
+		total: efectivas.length + fueraDeGrupo.length,
 		conNota: conNota.length,
 		promedio,
 		aprobados,
 		desaprobados: conNota.length - aprobados,
-		sinCalificar: rows.filter((r) => r.nota === null || r.nota === undefined).length,
+		sinCalificar: efectivas.length - (conNota.length - fueraDeGrupo.length),
 		totalOverrides,
+		totalGrupos: rows.length,
 	};
+}
+
+/**
+ * Arma lo que se envía al BE sin perder nada: las excepciones llevan la observación del alumno
+ * (el BE sobrescribe `CN_Observacion` con lo recibido) y un grupo sin nota propia se envía si todos
+ * sus miembros tienen excepción (la nota de grupo no se usa).
+ */
+export function buildGruposPayload(rows: GrupoNotaRow[]): GruposPayload {
+	const grupos: CalificarGrupoDto[] = [];
+	const incompletos: string[] = [];
+
+	for (const r of rows) {
+		const overrides = r.miembros
+			.filter((m): m is GrupoMiembroInfo & { overrideNota: number } => m.esOverride && m.overrideNota !== null)
+			.map((m) => ({ estudianteId: m.estudianteId, nota: m.overrideNota, observacion: m.observacion || null }));
+
+		const notaGrupo = r.nota ?? (overrides.length === r.miembros.length ? (overrides[0]?.nota ?? null) : null);
+		if (notaGrupo === null) {
+			if (overrides.length > 0) incompletos.push(r.grupoNombre);
+			continue;
+		}
+		grupos.push({
+			grupoId: r.grupoId,
+			nota: notaGrupo,
+			observacion: r.observacion || null,
+			...(overrides.length > 0 ? { overrides } : {}),
+		});
+	}
+	return { grupos, incompletos };
 }
 
 export function clampNota(nota: number): number {

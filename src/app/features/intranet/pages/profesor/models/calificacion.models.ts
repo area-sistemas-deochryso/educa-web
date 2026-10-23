@@ -93,6 +93,34 @@ export interface CrearPeriodoDto {
 export interface CambiarTipoCalificacionDto {
   esGrupal: boolean;
 }
+
+/** Vista previa de solo lectura del cambio de modalidad (INV-C17). Los números los calcula el BE; el FE no los recalcula. */
+export interface ImpactoCambioTipoDto {
+  esGrupalDestino: boolean;
+  notasConservadas: number;
+  /** Individual → grupal: notas que quedan como excepción de su grupo. */
+  notasQuePasanAExcepcion: number;
+  /** Individual → grupal: notas de alumnos que no están en ningún grupo. */
+  notasSinGrupo: number;
+  /** Grupal → individual: grupos cuya nota y observación dejan de tener fila propia. */
+  gruposQueDejanDeExistir: number;
+  tieneTareaEnlazada: boolean;
+  entregasPublicadasQueCambianDeVisibilidad: number;
+}
+
+/** Datos con los que se abre «Nueva evaluación» desde una tarea («Es calificable»). El peso no se prellena (INV-C04). */
+export interface EvaluacionPrefill {
+  titulo: string;
+  semanaId: number;
+  fechaEvaluacion: string | null;
+  tareaId: number;
+  esGrupal: boolean;
+}
+
+/** `tareaId: null` desenlaza (INV-C16). */
+export interface VincularTareaDto {
+  tareaId: number | null;
+}
 // #endregion
 
 // Salon view DTOs (PromedioDto, NotaResumenDto, EstudianteNotasResumenDto, SalonNotasResumenDto)

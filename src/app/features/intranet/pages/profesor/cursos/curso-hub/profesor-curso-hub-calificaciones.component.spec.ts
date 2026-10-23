@@ -61,6 +61,7 @@ describe('ProfesorCursoHubCalificacionesComponent', () => {
 		closeCalificacionDialog: vi.fn(),
 		eliminarCalificacion: vi.fn(),
 		cambiarTipo: vi.fn(),
+		cargarImpactoCambioTipo: vi.fn(),
 		calificarLote: vi.fn(),
 		calificarGruposLote: vi.fn(),
 		resetCalificaciones: vi.fn(),
@@ -242,12 +243,28 @@ describe('ProfesorCursoHubCalificacionesComponent', () => {
 			expect(calFacade.eliminarCalificacion).toHaveBeenCalledWith(5);
 		});
 
-		it('flips the type of the evaluation on confirm', () => {
+		it('asks the BE for the impact and confirms with it before flipping the type', () => {
 			const { handlers } = create();
+			const impacto = {
+				esGrupalDestino: true,
+				notasConservadas: 4,
+				notasQuePasanAExcepcion: 4,
+				notasSinGrupo: 0,
+				gruposQueDejanDeExistir: 0,
+				tieneTareaEnlazada: false,
+				entregasPublicadasQueCambianDeVisibilidad: 0,
+			};
 
 			handlers.onCambiarTipo({ id: 5, titulo: 'Examen', esGrupal: false });
-			confirmation.confirm.mock.calls[0][0].accept();
 
+			expect(calFacade.cargarImpactoCambioTipo).toHaveBeenCalledWith(5, true, expect.any(Function));
+			expect(confirmation.confirm).not.toHaveBeenCalled();
+
+			calFacade.cargarImpactoCambioTipo.mock.calls[0][2](impacto);
+			expect(confirmation.confirm.mock.calls[0][0].message).toContain('4 notas quedan como excepción de su grupo');
+			expect(calFacade.cambiarTipo).not.toHaveBeenCalled();
+
+			confirmation.confirm.mock.calls[0][0].accept();
 			expect(calFacade.cambiarTipo).toHaveBeenCalledWith(5, { esGrupal: true });
 		});
 

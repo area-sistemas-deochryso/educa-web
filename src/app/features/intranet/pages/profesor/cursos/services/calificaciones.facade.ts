@@ -20,6 +20,8 @@ import {
 	CalificacionDto,
 	CalificarGruposLoteDto,
 	CambiarTipoCalificacionDto,
+	EvaluacionPrefill,
+	ImpactoCambioTipoDto,
 	CursoContenidoDetalleDto,
 } from '../../models';
 
@@ -128,6 +130,7 @@ export class CalificacionesFacade {
 			http$: () => this.api.crearCalificacion(dto),
 			onCommit: (cal) => {
 				this.store.addCalificacion(cal);
+				this.syncTareaEnlazada(cal);
 				this.store.setSaving(false);
 				this.store.closeCalificacionDialog();
 			},
@@ -297,10 +300,57 @@ export class CalificacionesFacade {
 			http$: () => this.api.cambiarTipoCalificacion(calificacionId, dto),
 			onCommit: (cal) => {
 				this.store.replaceCalificacion(cal);
+				this.syncTareaEnlazada(cal);
 				this.store.setSaving(false);
 			},
 			onError: (err) => {
 				this.errHandler.handle(err, 'cambiar tipo de evaluación');
+				this.store.setSaving(false);
+			},
+			optimistic: {
+				apply: () => {},
+				rollback: () => {},
+			},
+		});
+	}
+
+	/**
+	 * Vista previa del cambio de modalidad (INV-C17): solo lectura, los números los calcula el BE.
+	 * `onLoaded` recibe el impacto; un error (p. ej. `EVALUACION_TIPO_SIN_CAMBIO`) lo informa el handler.
+	 */
+	cargarImpactoCambioTipo(calificacionId: number, esGrupal: boolean, onLoaded: (impacto: ImpactoCambioTipoDto) => void): void {
+		this.api
+			.getImpactoCambioTipo(calificacionId, esGrupal)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: onLoaded,
+				error: (err) => this.errHandler.handle(err, 'calcular el impacto del cambio'),
+			});
+	}
+
+	/**
+	 * Enlaza una evaluación con una tarea del mismo curso (o desenlaza con `null`) → server-confirmed.
+	 * La tarea toma la modalidad de la evaluación (INV-C16): el BE devuelve la evaluación ya enlazada.
+	 */
+	vincularTarea(calificacionId: number, tareaId: number | null): void {
+		this.store.setSaving(true);
+
+		this.wal.execute<CalificacionConNotasDto>({
+			operation: 'UPDATE',
+			resourceType: 'calificacion',
+			resourceId: calificacionId,
+			endpoint: `${this.calificacionUrl}/${calificacionId}/tarea`,
+			method: 'PUT',
+			payload: { tareaId },
+			consistencyLevel: 'server-confirmed',
+			http$: () => this.api.vincularTarea(calificacionId, { tareaId }),
+			onCommit: (cal) => {
+				this.store.replaceCalificacion(cal);
+				this.syncTareaEnlazada(cal);
+				this.store.setSaving(false);
+			},
+			onError: (err) => {
+				this.errHandler.handle(err, 'enlazar la evaluación con la tarea');
 				this.store.setSaving(false);
 			},
 			optimistic: {
@@ -368,8 +418,8 @@ export class CalificacionesFacade {
 	// #endregion
 
 	// #region Comandos de UI
-	openCalificacionDialog(editing: CalificacionDto | null = null): void {
-		this.store.openCalificacionDialog(editing);
+	openCalificacionDialog(editing: CalificacionDto | null = null, prefill: EvaluacionPrefill | null = null): void {
+		this.store.openCalificacionDialog(editing, prefill);
 	}
 	closeCalificacionDialog(): void { this.store.closeCalificacionDialog(); }
 	closeCalificarDialog(): void { this.store.closeCalificarDialog(); }
@@ -393,6 +443,16 @@ export class CalificacionesFacade {
 	// #endregion
 
 	// #region Helpers privados
+
+	/** Con tarea enlazada su modalidad sigue a la de la evaluación (INV-C16): se refleja en el contenido ya cargado. */
+	private syncTareaEnlazada(cal: CalificacionConNotasDto): void {
+		const tareaId = cal.tareaId;
+		if (tareaId === null) return;
+		// El contenido puede no estar cargado (o no traer la tarea): sin ella no hay nada que reflejar.
+		const semana = this.contenidoStore.contenido()?.semanas?.find((s) => s.id === cal.semanaId);
+		if (!semana?.tareas?.some((t) => t.id === tareaId)) return;
+		this.contenidoStore.updateTareaInSemana(cal.semanaId, tareaId, { esGrupal: cal.esGrupal });
+	}
 
 	/**
 	 * Resuelve el nivel educativo del salón (a partir del nombre de grado, ej. "1ro Primaria")

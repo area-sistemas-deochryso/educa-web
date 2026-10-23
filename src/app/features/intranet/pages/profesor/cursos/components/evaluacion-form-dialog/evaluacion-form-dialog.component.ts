@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, ChangeDetectionStrategy, inject, input, output, signal, computed, effect } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, input, output, signal, computed, effect, untracked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { parseDateLocal, toLocalIso } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
@@ -7,6 +7,7 @@ import {
 	CalificacionDto,
 	CrearCalificacionDto,
 	CursoContenidoSemanaDto,
+	EvaluacionPrefill,
 	TIPOS_EVALUACION,
 	TIPO_EVALUACION_LABEL,
 	TipoEvaluacion,
@@ -26,8 +27,8 @@ const TITULO_PLACEHOLDER: Record<TipoEvaluacion, string> = {
 interface FormData {
 	titulo: string;
 	tipo: TipoEvaluacion;
-	/** Porcentaje entero (1–100); se convierte a la fracción 0–1 del contrato al enviar. */
-	peso: number;
+	/** Porcentaje entero (1–100); se convierte a la fracción 0–1 del contrato al enviar. `null` = el profesor aún no lo eligió. */
+	peso: number | null;
 	fechaEvaluacion: Date | null;
 	semanaId: number | null;
 	tareaId: number | null;
@@ -49,6 +50,8 @@ export class EvaluacionFormDialogComponent {
 	readonly visible = input(false);
 	readonly saving = input(false);
 	readonly editing = input<CalificacionDto | null>(null);
+	/** Alta que nace de una tarea: prellena título, semana, fecha y enlace; el peso queda vacío. */
+	readonly prefill = input<EvaluacionPrefill | null>(null);
 	readonly semanas = input<CursoContenidoSemanaDto[]>([]);
 	readonly contenidoId = input<number | null>(null);
 	// #endregion
@@ -127,6 +130,7 @@ export class EvaluacionFormDialogComponent {
 		return (
 			data.titulo.trim().length > 0 &&
 			data.tipo &&
+			data.peso !== null &&
 			data.peso >= PORCENTAJE_MINIMO &&
 			data.peso <= PORCENTAJE_MAXIMO &&
 			data.fechaEvaluacion !== null &&
@@ -139,6 +143,7 @@ export class EvaluacionFormDialogComponent {
 		// Populate form when editing
 		effect(() => {
 			const edit = this.editing();
+			const prefill = this.prefill();
 			const initial: FormData = edit
 				? {
 						titulo: edit.titulo,
@@ -149,7 +154,17 @@ export class EvaluacionFormDialogComponent {
 						tareaId: edit.tareaId,
 						esGrupal: edit.esGrupal,
 					}
-				: {
+				: prefill
+					? {
+							titulo: prefill.titulo,
+							tipo: 'Tarea',
+							peso: null,
+							fechaEvaluacion: untracked(() => this.fechaDentroDeSemana(prefill.semanaId, prefill.fechaEvaluacion)),
+							semanaId: prefill.semanaId,
+							tareaId: prefill.tareaId,
+							esGrupal: prefill.esGrupal,
+						}
+					: {
 						titulo: '',
 						tipo: 'Examen',
 						peso: 20,
@@ -168,6 +183,17 @@ export class EvaluacionFormDialogComponent {
 				this.submitting.set(false);
 			}
 		});
+	}
+
+	/** La fecha de la tarea puede caer fuera de su semana; el datepicker la rechazaría, así que se descarta. */
+	private fechaDentroDeSemana(semanaId: number, fecha: string | null): Date | null {
+		if (!fecha) return null;
+		const semana = this.semanas().find((s) => s.id === semanaId);
+		const min = parseDateLocal(semana?.fechaInicio);
+		const max = parseDateLocal(semana?.fechaFin);
+		const date = new Date(fecha);
+		if (Number.isNaN(date.getTime())) return null;
+		return min && max && (date < min || date > max) ? null : date;
 	}
 
 	// #region Handlers
@@ -217,7 +243,7 @@ export class EvaluacionFormDialogComponent {
 
 		const data = this.formData();
 		const contenidoId = this.contenidoId();
-		if (!this.isFormValid() || !contenidoId || data.semanaId === null || data.fechaEvaluacion === null) return;
+		if (!this.isFormValid() || !contenidoId || data.peso === null || data.semanaId === null || data.fechaEvaluacion === null) return;
 
 		this.submitting.set(true);
 

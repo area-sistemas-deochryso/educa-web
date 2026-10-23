@@ -95,12 +95,23 @@
 					Modalidad
 				</label>
 				<div class="grupal-toggle">
-					<edu-toggle data-info-anchor="profesor-tarea-dialog-grupal-toggle" [(ngModel)]="esGrupal" />
+					<edu-toggle
+						data-info-anchor="profesor-tarea-dialog-grupal-toggle"
+						[(ngModel)]="esGrupal"
+						[disabled]="!!evaluacionEnlazada()"
+					/>
 					<span class="grupal-label">{{ esGrupal ? 'Grupal' : 'Individual' }}</span>
 				</div>
-				<span class="field-hint">
-					{{ esGrupal ? 'La nota aplica a todo el grupo' : 'Cada estudiante entrega individualmente' }}
-				</span>
+				@if (evaluacionEnlazada(); as ev) {
+					<span class="field-hint" data-info-anchor="profesor-tarea-dialog-modalidad-enlazada">
+						La define la evaluación enlazada.
+						<button type="button" class="task-eval__link" (click)="irAEvaluacion.emit(ev.id)">Ver evaluación</button>
+					</span>
+				} @else {
+					<span class="field-hint">
+						{{ esGrupal ? 'La nota aplica a todo el grupo' : 'Cada estudiante entrega individualmente' }}
+					</span>
+				}
 			</div>
 		</div>
 
@@ -124,10 +135,61 @@
 			</div>
 		}
 
-		<div class="task-eval-hint">
-			<i class="pi pi-info-circle"></i>
-			<span>Esto no se calificará automáticamente. Crea la evaluación correspondiente en Calificaciones.</span>
-		</div>
+		@if (puedeSerCalificable()) {
+			<div class="task-eval" data-info-anchor="profesor-tarea-dialog-calificable">
+				<span class="form-label">
+					<i class="pi pi-chart-line" style="font-size: 0.78rem"></i>
+					Es calificable
+				</span>
+				@if (calificacionesLoading()) {
+					<small class="field-hint">Cargando evaluaciones…</small>
+				} @else if (evaluacionEnlazada(); as ev) {
+					<div class="task-eval__linked">
+						<span><i class="pi pi-link"></i> Evaluación enlazada: «{{ ev.titulo }}» · peso {{ pesoLabel(ev) }}</span>
+						<button type="button" class="task-eval__link" (click)="irAEvaluacion.emit(ev.id)">Ver evaluación</button>
+					</div>
+				} @else {
+					<small class="field-hint">Esta {{ etiqueta().toLowerCase() }} aún no tiene nota. Crea su evaluación o enlaza una existente.</small>
+					<div class="task-eval__actions">
+						<edu-button
+							label="Crear evaluación"
+							icon="pi pi-plus"
+							size="small"
+							[outlined]="true"
+							data-info-anchor="profesor-tarea-dialog-crear-evaluacion"
+							(click)="crearEvaluacion.emit()"
+						/>
+						@if (evaluacionesEnlazables().length > 0) {
+							<edu-select
+								[options]="evaluacionesEnlazables()"
+								optionLabel="titulo"
+								optionValue="id"
+								[(ngModel)]="evaluacionAEnlazar"
+								placeholder="Enlazar una existente"
+								appendTo="body"
+								[style]="{ minWidth: '12rem' }"
+							/>
+							<edu-button
+								label="Enlazar"
+								size="small"
+								[disabled]="evaluacionAEnlazar === null"
+								data-info-anchor="profesor-tarea-dialog-enlazar-evaluacion"
+								(click)="onEnlazar()"
+							/>
+						}
+					</div>
+				}
+			</div>
+		} @else {
+			<div class="task-eval-hint">
+				<i class="pi pi-info-circle"></i>
+				<span>
+					{{ tipo === 'EXAMEN'
+						? 'Esto no se calificará automáticamente. Crea la evaluación correspondiente en Calificaciones.'
+						: 'Guarda la ' + etiqueta().toLowerCase() + ' para poder hacerla calificable.' }}
+				</span>
+			</div>
+		}
 	</div>
 
 	<ng-template #footer>

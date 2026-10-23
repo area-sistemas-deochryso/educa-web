@@ -35,6 +35,8 @@ import {
 	ConfigurarMaxEstudiantesDto,
 	CalificarGruposLoteDto,
 	CambiarTipoCalificacionDto,
+	ImpactoCambioTipoDto,
+	VincularTareaDto,
 } from '../models';
 
 /**
@@ -189,6 +191,16 @@ export class ProfesorCursosApiService {
 		return this.http.delete<void>(
 			`${this.calificacionUrl}/${calificacionId}/estudiante/${estudianteId}`,
 		);
+	}
+
+	getImpactoCambioTipo(calificacionId: number, esGrupal: boolean): Observable<ImpactoCambioTipoDto> {
+		return this.http.get<ImpactoCambioTipoDto>(`${this.calificacionUrl}/${calificacionId}/tipo/impacto`, {
+			params: { esGrupal },
+		});
+	}
+
+	vincularTarea(calificacionId: number, dto: VincularTareaDto): Observable<CalificacionConNotasDto> {
+		return this.http.put<CalificacionConNotasDto>(`${this.calificacionUrl}/${calificacionId}/tarea`, dto);
 	}
 
 	cambiarTipoCalificacion(

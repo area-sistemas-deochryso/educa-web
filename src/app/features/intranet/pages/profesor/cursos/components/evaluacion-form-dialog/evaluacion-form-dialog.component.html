@@ -57,6 +57,7 @@
 				</div>
 				<edu-input-number
 					id="eval-peso"
+					placeholder="Ej: 20"
 					[ngModel]="formData().peso"
 					(ngModelChange)="updateField('peso', $event)"
 					(onInput)="onPesoInput($event)"
@@ -135,6 +136,9 @@
 					eduTooltipPosition="top"
 				></i>
 			</div>
+			@if (formData().tareaId !== null && !isEditing()) {
+				<small class="field-hint">Queda enlazada a la tarea: la modalidad la define esta evaluación.</small>
+			}
 		</div>
 		<!-- #endregion -->
 	</div>

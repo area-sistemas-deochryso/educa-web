@@ -19,6 +19,7 @@ import { CalificacionesFacade } from '../cursos/services/calificaciones.facade';
 import { CalificacionesPanelComponent } from '../cursos/components/calificaciones-panel/calificaciones-panel.component';
 import { CalificarDialogComponent } from '../cursos/components/calificar-dialog/calificar-dialog.component';
 import { EvaluacionFormDialogComponent } from '../cursos/components/evaluacion-form-dialog/evaluacion-form-dialog.component';
+import { buildImpactoCambioTipoMensaje } from '../cursos/curso-hub/impacto-cambio-tipo';
 import { PeriodosConfigDialogComponent } from '../cursos/components/periodos-config-dialog/periodos-config-dialog.component';
 import {
 	CalificacionConNotasDto,
@@ -175,7 +176,17 @@ export class TeacherGradesComponent implements OnInit, OnDestroy {
 
 	onCambiarTipo(cal: CalificacionConNotasDto): void {
 		const dto: CambiarTipoCalificacionDto = { esGrupal: !cal.esGrupal };
-		this.calFacade.cambiarTipo(cal.id, dto);
+		// El impacto lo calcula el BE (INV-C17); sin esa respuesta no se confirma nada a ciegas.
+		this.calFacade.cargarImpactoCambioTipo(cal.id, dto.esGrupal, (impacto) => {
+			this.confirmationService.confirm({
+				message: buildImpactoCambioTipoMensaje(cal.titulo, impacto),
+				header: 'Cambiar tipo de evaluación',
+				icon: 'pi pi-info-circle',
+				acceptLabel: 'Cambiar',
+				rejectLabel: 'Cancelar',
+				accept: () => this.calFacade.cambiarTipo(cal.id, dto),
+			});
+		});
 	}
 	// #endregion
 

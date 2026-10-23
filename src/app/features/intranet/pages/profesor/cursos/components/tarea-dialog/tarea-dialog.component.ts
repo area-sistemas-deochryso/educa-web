@@ -2,8 +2,8 @@
 import { Component, ChangeDetectionStrategy, input, output, OnChanges, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { toLocalIso } from '@core/helpers';
-import { ContenidoTareaTipo, CursoContenidoTareaDto, CrearTareaRequest, ActualizarTareaRequest } from '@features/intranet/pages/profesor/models';
-import { EduButton, EduDatePicker, EduDialog, EduInputText, EduTextarea, EduToggle } from '@edu-ui';
+import { CalificacionDto, ContenidoTareaTipo, CursoContenidoTareaDto, CrearTareaRequest, ActualizarTareaRequest } from '@features/intranet/pages/profesor/models';
+import { EduButton, EduDatePicker, EduDialog, EduInputText, EduSelect, EduTextarea, EduToggle } from '@edu-ui';
 
 // #endregion
 // #region Implementation
@@ -17,6 +17,7 @@ import { EduButton, EduDatePicker, EduDialog, EduInputText, EduTextarea, EduTogg
 		EduInputText,
 		EduTextarea,
 		EduDatePicker,
+		EduSelect,
 		EduToggle],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './tarea-dialog.component.html',
@@ -28,10 +29,18 @@ export class TareaDialogComponent implements OnChanges {
 	readonly saving = input<boolean>(false);
 	/** Tipo preseleccionado al crear (el menú Agregar de la semana lo fija). */
 	readonly tipoInicial = input<ContenidoTareaTipo>('TAREA');
+	/** Evaluación enlazada a esta tarea (INV-C16); `null` si todavía no es calificable. */
+	readonly evaluacionEnlazada = input<CalificacionDto | null>(null);
+	/** Evaluaciones del mismo curso sin tarea, candidatas a enlazar. */
+	readonly evaluacionesEnlazables = input<CalificacionDto[]>([]);
+	readonly calificacionesLoading = input(false);
 
 	readonly visibleChange = output<boolean>();
 	readonly createTarea = output<CrearTareaRequest>();
 	readonly updateTarea = output<ActualizarTareaRequest>();
+	readonly crearEvaluacion = output<void>();
+	readonly enlazarEvaluacion = output<number>();
+	readonly irAEvaluacion = output<number>();
 
 	titulo = '';
 	descripcion = '';
@@ -39,6 +48,7 @@ export class TareaDialogComponent implements OnChanges {
 	esGrupal = false;
 	tipo: ContenidoTareaTipo = 'TAREA';
 	duracionMinutos: number | null = null;
+	evaluacionAEnlazar: number | null = null;
 
 	readonly tipoOptions: { value: ContenidoTareaTipo; label: string; hint: string; icon: string }[] = [
 		{ value: 'TAREA', label: 'Tarea', hint: 'Trabajo para casa', icon: 'pi-file-edit' },
@@ -122,6 +132,21 @@ export class TareaDialogComponent implements OnChanges {
 				};
 			}
 		}
+	}
+
+	/** Solo tareas y actividades ya guardadas pueden hacerse calificables; el examen queda fuera de F5. */
+	puedeSerCalificable(): boolean {
+		return !!this.tarea() && this.tipo !== 'EXAMEN';
+	}
+
+	pesoLabel(cal: CalificacionDto): string {
+		return `${Math.round(cal.peso * 100)}%`;
+	}
+
+	onEnlazar(): void {
+		if (this.evaluacionAEnlazar === null) return;
+		this.enlazarEvaluacion.emit(this.evaluacionAEnlazar);
+		this.evaluacionAEnlazar = null;
 	}
 
 	onVisibleChange(value: boolean): void {

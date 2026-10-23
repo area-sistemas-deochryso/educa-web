@@ -42,6 +42,8 @@ import {
 	ConfigurarMaxEstudiantesDto,
 	CalificarGruposLoteDto,
 	CambiarTipoCalificacionDto,
+	ImpactoCambioTipoDto,
+	VincularTareaDto,
 	AsistenciaCursoFechaDto,
 	RegistrarAsistenciaCursoDto,
 	AsistenciaCursoResumenDto,
@@ -155,6 +157,12 @@ export class ProfesorApiService {
 	}
 	cambiarTipoCalificacion(calificacionId: number, dto: CambiarTipoCalificacionDto): Observable<CalificacionConNotasDto> {
 		return this.cursos.cambiarTipoCalificacion(calificacionId, dto);
+	}
+	getImpactoCambioTipo(calificacionId: number, esGrupal: boolean): Observable<ImpactoCambioTipoDto> {
+		return this.cursos.getImpactoCambioTipo(calificacionId, esGrupal);
+	}
+	vincularTarea(calificacionId: number, dto: VincularTareaDto): Observable<CalificacionConNotasDto> {
+		return this.cursos.vincularTarea(calificacionId, dto);
 	}
 	getPeriodos(contenidoId: number): Observable<PeriodoCalificacionDto[]> {
 		return this.cursos.getPeriodos(contenidoId);

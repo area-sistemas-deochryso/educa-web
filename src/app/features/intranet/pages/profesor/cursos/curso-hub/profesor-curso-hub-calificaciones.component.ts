@@ -19,6 +19,7 @@ import { EvaluacionFormDialogComponent } from '../components/evaluacion-form-dia
 import { CalificarDialogComponent } from '../components/calificar-dialog/calificar-dialog.component';
 import { PeriodosConfigDialogComponent } from '../components/periodos-config-dialog/periodos-config-dialog.component';
 import { CursoHubCalificacionesLoader } from './curso-hub-calificaciones.loader';
+import { buildImpactoCambioTipoMensaje } from './impacto-cambio-tipo';
 
 /**
  * Pestaña Calificaciones del hub de curso del profesor (`…/calificaciones`).
@@ -111,6 +112,7 @@ import { CursoHubCalificacionesLoader } from './curso-hub-calificaciones.loader'
 			[visible]="calVm().calificacionDialogVisible"
 			[saving]="calVm().saving"
 			[editing]="calVm().editingCalificacion"
+			[prefill]="calVm().calificacionPrefill"
 			[semanas]="vm().semanas"
 			[contenidoId]="vm().contenido?.id ?? null"
 			(visibleChange)="onCalificacionDialogVisibleChange($event)"
@@ -238,14 +240,17 @@ export class ProfesorCursoHubCalificacionesComponent {
 	}
 
 	protected onCambiarTipo(cal: CalificacionConNotasDto): void {
-		const nuevoTipo = cal.esGrupal ? 'individual' : 'grupal';
-		this.confirmationService.confirm({
-			message: `¿Cambiar "${cal.titulo}" a ${nuevoTipo}? Las notas existentes se migrarán automáticamente.`,
-			header: 'Cambiar tipo de evaluación',
-			icon: 'pi pi-info-circle',
-			acceptLabel: 'Cambiar',
-			rejectLabel: 'Cancelar',
-			accept: () => this.calFacade.cambiarTipo(cal.id, { esGrupal: !cal.esGrupal }),
+		const esGrupalDestino = !cal.esGrupal;
+		// El impacto lo calcula el BE (INV-C17); sin esa respuesta no se confirma nada a ciegas.
+		this.calFacade.cargarImpactoCambioTipo(cal.id, esGrupalDestino, (impacto) => {
+			this.confirmationService.confirm({
+				message: buildImpactoCambioTipoMensaje(cal.titulo, impacto),
+				header: 'Cambiar tipo de evaluación',
+				icon: 'pi pi-info-circle',
+				acceptLabel: 'Cambiar',
+				rejectLabel: 'Cancelar',
+				accept: () => this.calFacade.cambiarTipo(cal.id, { esGrupal: esGrupalDestino }),
+			});
 		});
 	}
 

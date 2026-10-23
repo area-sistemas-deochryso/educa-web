@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { Router } from '@angular/router';
 import { EduButton, EduConfirmDialog, EduConfirmationService, EduMenu, EduSpinner, EduTooltip } from '@edu-ui';
 import type { EduMenuItem } from '@edu-ui';
@@ -6,13 +6,15 @@ import { CursoHubContextService, EmptyStateComponent } from '@intranet-shared/co
 import { CursoContenidoCrudFacade } from '../services/curso-contenido-crud.facade';
 import { CursoContenidoDataFacade } from '../services/curso-contenido-data.facade';
 import { CursoContenidoUiFacade } from '../services/curso-contenido-ui.facade';
+import { CalificacionesFacade } from '../services/calificaciones.facade';
 import { CursoHubCalificacionesLoader } from './curso-hub-calificaciones.loader';
 import { SemanasAccordionComponent } from '../components/semanas-accordion/semanas-accordion.component';
 import { SemanaEditDialogComponent } from '../components/semana-edit-dialog/semana-edit-dialog.component';
 import { TareaDialogComponent } from '../components/tarea-dialog/tarea-dialog.component';
+import { EvaluacionFormDialogComponent } from '../components/evaluacion-form-dialog/evaluacion-form-dialog.component';
 import { StudentTaskSubmissionsDialogComponent } from '../components/student-task-submissions-dialog/student-task-submissions-dialog.component';
 import { CursoBuilderDialogComponent } from '../components/curso-builder-dialog/curso-builder-dialog.component';
-import type { ActualizarTareaRequest, CrearTareaRequest } from '@features/intranet/pages/profesor/models';
+import type { ActualizarTareaRequest, CalificacionDto, CrearCalificacionDto, CrearTareaRequest } from '@features/intranet/pages/profesor/models';
 
 /**
  * Pestaña Contenido del hub de curso del profesor (`…/contenido`).
@@ -35,6 +37,7 @@ import type { ActualizarTareaRequest, CrearTareaRequest } from '@features/intran
 		SemanasAccordionComponent,
 		SemanaEditDialogComponent,
 		TareaDialogComponent,
+		EvaluacionFormDialogComponent,
 		StudentTaskSubmissionsDialogComponent,
 		CursoBuilderDialogComponent,
 	],
@@ -112,9 +115,26 @@ import type { ActualizarTareaRequest, CrearTareaRequest } from '@features/intran
 			[tarea]="vm().selectedTarea"
 			[tipoInicial]="vm().tareaTipoInicial"
 			[saving]="vm().saving"
+			[evaluacionEnlazada]="evaluacionEnlazada()"
+			[evaluacionesEnlazables]="evaluacionesEnlazables()"
+			[calificacionesLoading]="calVm().loading"
 			(visibleChange)="onTareaVisibleChange($event)"
 			(createTarea)="onCreateTarea($event)"
 			(updateTarea)="onUpdateTarea($event)"
+			(crearEvaluacion)="onCrearEvaluacionEnlazada()"
+			(enlazarEvaluacion)="onEnlazarEvaluacion($event)"
+			(irAEvaluacion)="onIrAEvaluacion($event)"
+		/>
+
+		<app-evaluacion-form-dialog
+			[visible]="calVm().calificacionDialogVisible"
+			[saving]="calVm().saving"
+			[editing]="calVm().editingCalificacion"
+			[prefill]="calVm().calificacionPrefill"
+			[semanas]="vm().semanas"
+			[contenidoId]="vm().contenido?.id ?? null"
+			(visibleChange)="onEvaluacionDialogVisibleChange($event)"
+			(save)="onSaveEvaluacion($event)"
 		/>
 
 		<app-student-task-submissions-dialog
@@ -146,11 +166,13 @@ export class ProfesorCursoHubContenidoComponent {
 	private readonly uiFacade = inject(CursoContenidoUiFacade);
 	private readonly router = inject(Router);
 	private readonly calLoader = inject(CursoHubCalificacionesLoader);
+	private readonly calFacade = inject(CalificacionesFacade);
 	private readonly confirmationService = inject(EduConfirmationService);
 	// #endregion
 
 	// #region Estado
 	protected readonly vm = this.uiFacade.vm;
+	protected readonly calVm = this.calFacade.vm;
 	protected readonly builderVisible = signal(false);
 
 	/** Menú ⋯ de la pestaña: hoy solo la zona destructiva (antes vivía en la pestaña Información). */
@@ -159,7 +181,27 @@ export class ProfesorCursoHubContenidoComponent {
 	];
 
 	private readonly slotId = computed(() => this.hubContext.slot()?.id ?? null);
+
+	private readonly evaluaciones = computed(() => [...this.calVm().calificacionesPorSemana.values()].flat());
+
+	/** Evaluación enlazada a la tarea abierta (`CalificacionDto.tareaId`, INV-C16). */
+	protected readonly evaluacionEnlazada = computed<CalificacionDto | null>(() => {
+		const tarea = this.vm().selectedTarea;
+		return tarea ? (this.evaluaciones().find((c) => c.tareaId === tarea.id) ?? null) : null;
+	});
+
+	/** Evaluaciones del curso sin tarea: candidatas a enlazar (una evaluación enlaza a lo sumo una tarea). */
+	protected readonly evaluacionesEnlazables = computed(() => this.evaluaciones().filter((c) => c.tareaId === null));
 	// #endregion
+
+	constructor() {
+		// Las calificaciones se piden solo si el profesor abre una tarea ya guardada (la pestaña no las paga antes).
+		effect(() => {
+			const contenidoId = this.vm().contenido?.id ?? null;
+			if (contenidoId === null || !this.vm().tareaDialogVisible || !this.vm().selectedTarea) return;
+			untracked(() => this.calLoader.ensure(contenidoId));
+		});
+	}
 
 	// #region Semana
 	protected onSemanaEditVisibleChange(visible: boolean): void {
@@ -191,6 +233,48 @@ export class ProfesorCursoHubContenidoComponent {
 		const tarea = this.vm().selectedTarea;
 		if (semanaId && tarea) this.crudFacade.actualizarTarea(semanaId, tarea.id, request);
 	}
+
+	// #region Tarea calificable (INV-C16)
+	/** Abre «Nueva evaluación» con los datos de la tarea; el peso lo elige el profesor. */
+	protected onCrearEvaluacionEnlazada(): void {
+		const tarea = this.vm().selectedTarea;
+		const semanaId = this.vm().activeSemanaId;
+		if (!tarea || !semanaId) return;
+		this.uiFacade.closeTareaDialog();
+		this.calFacade.openCalificacionDialog(null, {
+			titulo: tarea.titulo,
+			semanaId,
+			fechaEvaluacion: tarea.fechaLimite,
+			tareaId: tarea.id,
+			esGrupal: tarea.esGrupal,
+		});
+	}
+
+	protected onEnlazarEvaluacion(evaluacionId: number): void {
+		const tarea = this.vm().selectedTarea;
+		if (tarea) this.calFacade.vincularTarea(evaluacionId, tarea.id);
+	}
+
+	/** Cierra el diálogo y va a Calificaciones ubicando la evaluación enlazada. */
+	protected onIrAEvaluacion(evaluacionId: number): void {
+		this.uiFacade.closeTareaDialog();
+		const target = this.hubContext.tabTarget('profesor', 'calificaciones');
+		if (target) {
+			void this.router.navigate(target.commands, {
+				queryParams: { ...target.queryParams, evaluacionId },
+				replaceUrl: true,
+			});
+		}
+	}
+
+	protected onEvaluacionDialogVisibleChange(visible: boolean): void {
+		if (!visible) this.calFacade.closeCalificacionDialog();
+	}
+
+	protected onSaveEvaluacion(dto: CrearCalificacionDto): void {
+		this.calFacade.crearCalificacion(dto);
+	}
+	// #endregion
 
 	protected onTaskSubmissionsVisibleChange(visible: boolean): void {
 		if (!visible) this.uiFacade.closeTaskSubmissionsDialog();

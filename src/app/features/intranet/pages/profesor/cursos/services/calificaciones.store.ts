@@ -4,6 +4,7 @@ import {
 	CalificacionConNotasDto,
 	PeriodoCalificacionDto,
 	CalificacionDto,
+	EvaluacionPrefill,
 	ProfesorEstudianteSalonDto,
 	GrupoContenidoDto,
 } from '../../models';
@@ -26,6 +27,8 @@ interface CalificacionesState {
 	periodosDialogVisible: boolean;
 	selectedCalificacion: CalificacionConNotasDto | null;
 	editingCalificacion: CalificacionDto | null;
+	/** Evaluación nueva que nace de una tarea; `null` en el alta normal. */
+	calificacionPrefill: EvaluacionPrefill | null;
 	// #endregion
 }
 
@@ -43,6 +46,7 @@ const initialState: CalificacionesState = {
 	periodosDialogVisible: false,
 	selectedCalificacion: null,
 	editingCalificacion: null,
+	calificacionPrefill: null,
 };
 
 @Injectable({ providedIn: 'root' })
@@ -65,6 +69,7 @@ export class CalificacionesStore {
 	readonly periodosDialogVisible = computed(() => this._state().periodosDialogVisible);
 	readonly selectedCalificacion = computed(() => this._state().selectedCalificacion);
 	readonly editingCalificacion = computed(() => this._state().editingCalificacion);
+	readonly calificacionPrefill = computed(() => this._state().calificacionPrefill);
 	// #endregion
 
 	// #region Computed
@@ -99,6 +104,7 @@ export class CalificacionesStore {
 		periodosDialogVisible: this.periodosDialogVisible(),
 		selectedCalificacion: this.selectedCalificacion(),
 		editingCalificacion: this.editingCalificacion(),
+		calificacionPrefill: this.calificacionPrefill(),
 	}));
 	// #endregion
 
@@ -183,11 +189,12 @@ export class CalificacionesStore {
 	// #endregion
 
 	// #region Comandos de UI
-	openCalificacionDialog(editing: CalificacionDto | null = null): void {
+	openCalificacionDialog(editing: CalificacionDto | null = null, prefill: EvaluacionPrefill | null = null): void {
 		this._state.update((s) => ({
 			...s,
 			calificacionDialogVisible: true,
 			editingCalificacion: editing,
+			calificacionPrefill: prefill,
 		}));
 	}
 
@@ -196,6 +203,7 @@ export class CalificacionesStore {
 			...s,
 			calificacionDialogVisible: false,
 			editingCalificacion: null,
+			calificacionPrefill: null,
 		}));
 	}
 
