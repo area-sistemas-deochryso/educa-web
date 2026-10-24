@@ -56,6 +56,12 @@ export interface WalEntry {
 	schemaVersion?: number;
 	/** Consistency level for this operation (default: 'optimistic'). */
 	consistencyLevel?: WalConsistencyLevel;
+	/**
+	 * Id de correlación de la sesión del navegador que encoló la entrada (Plan 41 F6,
+	 * ADR-0009). Opcional: las entradas previas al despliegue no lo tienen y siguen
+	 * siendo válidas, por eso no sube `CURRENT_WAL_SCHEMA_VERSION` ni `DB_VERSION`.
+	 */
+	correlationId?: string;
 }
 // #endregion
 

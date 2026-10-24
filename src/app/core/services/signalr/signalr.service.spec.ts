@@ -3,6 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { HubConnectionState } from '@microsoft/signalr';
 
+import { SessionCorrelationService } from '@core/services/trace';
 import { SignalRService } from './signalr.service';
 // #endregion
 
@@ -22,6 +23,7 @@ interface MockHubConnection {
 }
 
 let mockConn: MockHubConnection;
+let hubUrls: string[] = [];
 
 function createMockConnection(): MockHubConnection {
 	const handlers = new Map<string, (...args: unknown[]) => void>();
@@ -58,7 +60,7 @@ vi.mock('@microsoft/signalr', () => {
 	};
 
 	class FakeHubConnectionBuilder {
-		withUrl() { return this; }
+		withUrl(url: string) { hubUrls.push(url); return this; }
 		withAutomaticReconnect() { return this; }
 		build() { return mockConn; }
 	}
@@ -97,6 +99,7 @@ describe('SignalRService', () => {
 
 	beforeEach(() => {
 		mockConn = createMockConnection();
+		hubUrls = [];
 
 		TestBed.configureTestingModule({
 			providers: [SignalRService],
@@ -114,6 +117,12 @@ describe('SignalRService', () => {
 
 			expect(mockConn.start).toHaveBeenCalledOnce();
 			expect(service.connected()).toBe(true);
+		});
+
+		it('opens the connection with the session correlation id in the query (ADR-0009)', async () => {
+			await service.connect();
+
+			expect(hubUrls).toEqual([`/chathub?correlationId=${TestBed.inject(SessionCorrelationService).id}`]);
 		});
 
 		it('no-ops if already connected', async () => {

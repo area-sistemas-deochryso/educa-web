@@ -1,8 +1,9 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { Subject } from 'rxjs';
 import { logger } from '@core/helpers';
 import { environment } from '@config/environment';
+import { SessionCorrelationService } from '@core/services/trace';
 
 // #region Types
 export interface SignalRAsistenciaEvent {
@@ -17,6 +18,7 @@ export interface SignalRAsistenciaEvent {
 @Injectable({ providedIn: 'root' })
 export class AttendanceSignalRService {
 	// #region Estado privado
+	private readonly sessionCorrelation = inject(SessionCorrelationService);
 	private connection: signalR.HubConnection | null = null;
 	private readonly _connected = signal(false);
 	private readonly _reconnecting = signal(false);
@@ -63,7 +65,7 @@ export class AttendanceSignalRService {
 			: undefined;
 
 		this.connection = new signalR.HubConnectionBuilder()
-			.withUrl('/asistenciahub', {
+			.withUrl(this.sessionCorrelation.hubUrl('/asistenciahub'), {
 				withCredentials: true,
 				transport,
 			})

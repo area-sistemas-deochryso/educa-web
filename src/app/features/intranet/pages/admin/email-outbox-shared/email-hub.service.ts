@@ -1,9 +1,10 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { Subject } from 'rxjs';
 
 import { environment } from '@config/environment';
 import { logger } from '@core/helpers';
+import { SessionCorrelationService } from '@core/services/trace';
 
 import {
 	BlacklistEntryCreatedEvent,
@@ -30,6 +31,7 @@ const HUB_GROUP = 'email-alerts';
 @Injectable({ providedIn: 'root' })
 export class EmailHubService {
 	// #region Estado privado
+	private readonly sessionCorrelation = inject(SessionCorrelationService);
 	private connection: signalR.HubConnection | null = null;
 	private readonly _connected = signal(false);
 	private readonly _reconnecting = signal(false);
@@ -64,7 +66,7 @@ export class EmailHubService {
 			: undefined;
 
 		this.connection = new signalR.HubConnectionBuilder()
-			.withUrl('/hubs/email-alerts', {
+			.withUrl(this.sessionCorrelation.hubUrl('/hubs/email-alerts'), {
 				withCredentials: true,
 				transport,
 			})

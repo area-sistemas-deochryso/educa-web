@@ -3,6 +3,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { WalService, WalStorageFullError } from './wal.service';
 import { WalDbService } from './wal-db.service';
 import { WalStatusStore } from './wal-status.store';
+import { SessionCorrelationService } from '@core/services/trace';
 import { WalEntry, WAL_DEFAULTS, CURRENT_WAL_SCHEMA_VERSION } from './models';
 
 function makeEntry(overrides: Partial<WalEntry> = {}): WalEntry {
@@ -103,6 +104,19 @@ describe('WalService', () => {
 			});
 
 			expect(entry.endpoint).toBe('/api/sistema/errors?correlationId=ABC123');
+		});
+
+		it('stamps the entry with the browser session correlation id (ADR-0009)', async () => {
+			const entry = await service.append({
+				operation: 'CREATE',
+				resourceType: 'usuarios',
+				endpoint: '/api/usuarios',
+				method: 'POST',
+				payload: {},
+			});
+
+			expect(entry.correlationId).toBe(TestBed.inject(SessionCorrelationService).id);
+			expect((db.put.mock.calls[0][0] as WalEntry).correlationId).toBe(entry.correlationId);
 		});
 
 		it('sets PENDING status, retries=0, and current schema version', async () => {
@@ -328,6 +342,17 @@ describe('WalService', () => {
 			const count = await service.checkSchemaMigrations();
 
 			expect(count).toBe(0);
+		});
+
+		it('keeps pre-correlationId entries valid: the optional field is not a schema bump', async () => {
+			const legacy = makeEntry({ id: 'legacy', schemaVersion: CURRENT_WAL_SCHEMA_VERSION });
+			delete legacy.correlationId;
+			db._store.set('legacy', legacy);
+
+			const count = await service.checkSchemaMigrations();
+
+			expect(count).toBe(0);
+			expect(db.put).not.toHaveBeenCalled();
 		});
 
 		it('discardMigrationEntries removes all REQUIRES_MIGRATION entries', async () => {

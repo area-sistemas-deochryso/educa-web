@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { logger } from '@core/helpers';
+import { SessionCorrelationService } from '@core/services/trace';
 import { WalDbService } from './wal-db.service';
 import { WalStatusStore } from './wal-status.store';
 import {
@@ -34,6 +35,7 @@ export class WalStorageFullError extends Error {
 export class WalService {
 	private db = inject(WalDbService);
 	private statusStore = inject(WalStatusStore);
+	private sessionCorrelation = inject(SessionCorrelationService);
 
 	// #region Append
 
@@ -51,7 +53,7 @@ export class WalService {
 	 * @throws {Error} When the WAL is in `'frozen'` mode.
 	 */
 	async append(
-		config: Omit<WalEntry, 'id' | 'timestamp' | 'status' | 'retries' | 'maxRetries' | 'schemaVersion'> & {
+		config: Omit<WalEntry, 'id' | 'timestamp' | 'status' | 'retries' | 'maxRetries' | 'schemaVersion' | 'correlationId'> & {
 			maxRetries?: number;
 			consistencyLevel?: WalConsistencyLevel;
 		},
@@ -68,6 +70,7 @@ export class WalService {
 			retries: 0,
 			maxRetries: config.maxRetries ?? WAL_DEFAULTS.MAX_RETRIES,
 			schemaVersion: CURRENT_WAL_SCHEMA_VERSION,
+			correlationId: this.sessionCorrelation.id,
 			consistencyLevel: config.consistencyLevel ?? 'optimistic',
 			endpoint: config.endpoint,
 		};

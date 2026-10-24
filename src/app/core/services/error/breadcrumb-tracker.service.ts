@@ -5,6 +5,7 @@ import { NavigationEnd, Router } from '@angular/router';
 import { filter, firstValueFrom } from 'rxjs';
 
 import { environment } from '@config/environment';
+import { SessionCorrelationService } from '../trace/session-correlation.service';
 import {
 	isReportableHttpStatus,
 	normalizeRoute,
@@ -39,7 +40,7 @@ export class BreadcrumbTrackerService {
 	private static readonly ENDPOINT = `${environment.apiUrl}/api/sistema/breadcrumbs`;
 
 	private readonly buffer: BreadcrumbEvent[] = [];
-	private readonly sessionId = BreadcrumbTrackerService.newId();
+	private readonly sessionId = inject(SessionCorrelationService).id;
 	private readonly sentCorrelationIds = new Set<string>();
 	private sendTimestamps: number[] = [];
 	private lastErrorRequestId: string | null = null;
@@ -154,11 +155,6 @@ export class BreadcrumbTrackerService {
 
 	private static ingestRoute(): string {
 		return normalizeRoute(BreadcrumbTrackerService.ENDPOINT);
-	}
-
-	private static newId(): string {
-		if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) return crypto.randomUUID();
-		return `s_${Date.now()}_${Math.floor(Math.random() * 1e9)}`;
 	}
 
 	// #endregion
