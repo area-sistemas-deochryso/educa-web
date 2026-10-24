@@ -12,13 +12,14 @@ import {
 	ErrorReporterService,
 	SKIP_BREADCRUMBS,
 } from '@core/services/error';
-import { RequestTraceFacade } from '@core/services/trace';
+import { RequestTraceFacade, SessionCorrelationService } from '@core/services/trace';
 import { inject } from '@angular/core';
 
 const SLOW_REQUEST_THRESHOLD_MS = 2_000;
 
 /**
- * Adds X-Request-Id to ALL requests (prod + dev) for backend correlation.
+ * Adds X-Request-Id to ALL requests (prod + dev) for backend correlation, and
+ * X-Session-Id (P41 F6c) so the backend can resolve request -> browser session.
  * Always feeds ActivityTracker with API breadcrumbs (prod + dev).
  * Records detailed timing only in dev mode via RequestTraceFacade.
  */
@@ -37,13 +38,14 @@ export const requestTraceInterceptor: HttpInterceptorFn = (req, next) => {
 	const activityTracker = inject(ActivityTrackerService);
 	const errorReporter = inject(ErrorReporterService);
 	const breadcrumbTracker = inject(BreadcrumbTrackerService);
+	const session = inject(SessionCorrelationService);
 
 	// Always send X-Request-Id for backend correlation (prod + dev).
 	// Plan 41 F3 — X-Platform identifica el origen del request para el
 	// lifecycle persistido en RequestLifecycleLog (hub de correlación).
 	const requestId = generateRequestId();
 	const tracedReq = req.clone({
-		setHeaders: { 'X-Request-Id': requestId, 'X-Platform': 'WEB' },
+		setHeaders: { 'X-Request-Id': requestId, 'X-Platform': 'WEB', 'X-Session-Id': session.id },
 	});
 
 	// Skip tracking requestIds for the feedback endpoint itself — when the user
