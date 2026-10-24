@@ -19,6 +19,8 @@ import { CorrelationEmailsSectionComponent } from './components/correlation-emai
 import { CorrelationTimelineSectionComponent } from './components/correlation-timeline-section';
 import { CorrelationRequestSectionComponent } from './components/correlation-request-section';
 import { CorrelationBreadcrumbsSectionComponent } from './components/correlation-breadcrumbs-section';
+import { CorrelationHubEventsSectionComponent } from './components/correlation-hub-events-section';
+import { CorrelationWalSectionComponent } from './components/correlation-wal-section';
 import { EduButton, EduTooltip } from '@edu-ui';
 // #endregion
 
@@ -38,7 +40,7 @@ import { EduButton, EduTooltip } from '@edu-ui';
 @Component({
 	selector: 'app-correlation',
 	standalone: true,
-	imports: [DatePipe, EduButton, EduTooltip, PageHeaderComponent, CorrelationTimelineSectionComponent, CorrelationErrorsSectionComponent, CorrelationRateLimitSectionComponent, CorrelationReportsSectionComponent, CorrelationEmailsSectionComponent, CorrelationRequestSectionComponent, CorrelationBreadcrumbsSectionComponent, CorrelationIdPillComponent],
+	imports: [DatePipe, EduButton, EduTooltip, PageHeaderComponent, CorrelationTimelineSectionComponent, CorrelationErrorsSectionComponent, CorrelationRateLimitSectionComponent, CorrelationReportsSectionComponent, CorrelationEmailsSectionComponent, CorrelationRequestSectionComponent, CorrelationBreadcrumbsSectionComponent, CorrelationHubEventsSectionComponent, CorrelationWalSectionComponent, CorrelationIdPillComponent],
 	templateUrl: './correlation.component.html',
 	styleUrl: './correlation.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -68,6 +70,9 @@ export class CorrelationComponent implements OnInit {
 		() => this.vm().snapshot?.relatedCorrelationIds ?? [],
 	);
 	readonly hasRelatedIds = computed(() => this.relatedIds().length > 0);
+
+	// Plan 41 F6 — sesión resuelta por el BE; sin ella solo hay eventos del id consultado.
+	readonly sessionId = computed(() => this.vm().snapshot?.sessionId ?? null);
 
 	// F-018 — gate del botón Exportar JSON: además de loading/sin snapshot,
 	// deshabilitar cuando el snapshot existe pero todas las secciones están vacías

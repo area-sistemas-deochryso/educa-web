@@ -1,0 +1,36 @@
+@use '../shared-section.scss';
+
+.correlation-hub-events-section {
+	&__list {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	&__row {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.6rem;
+		padding: 0.4rem 0.5rem;
+		border-radius: 6px;
+	}
+
+	&__hub {
+		min-width: 9rem;
+		font-weight: 600;
+	}
+
+	&__secondary {
+		color: var(--text-color-secondary);
+	}
+
+	&__date {
+		margin-left: auto;
+		font-size: 0.8rem;
+		color: var(--text-color-secondary);
+	}
+}

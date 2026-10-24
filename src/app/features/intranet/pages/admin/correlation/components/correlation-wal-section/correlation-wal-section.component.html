@@ -1,0 +1,60 @@
+<section class="correlation-section correlation-wal-section">
+	<header class="correlation-section__header">
+		<div class="correlation-section__title">
+			<i class="pi pi-database" aria-hidden="true"></i>
+			<h3>WAL</h3>
+		</div>
+		@if (entries().length > 0) {
+			<span class="correlation-section__count">{{ entries().length }}</span>
+		}
+	</header>
+
+	<p class="correlation-section__cap" role="note">
+		<i class="pi pi-info-circle" aria-hidden="true"></i>
+		{{ notice }}
+	</p>
+
+	@switch (state()) {
+		@case ('no-session') {
+			<div class="correlation-section__empty">
+				<i class="pi pi-info-circle" aria-hidden="true"></i>
+				<p>Sin sesión resuelta: no se consulta el WAL para este correlation id.</p>
+			</div>
+		}
+		@case ('loading') {
+			<div class="correlation-section__empty">
+				<i class="pi pi-spinner pi-spin" aria-hidden="true"></i>
+				<p>Leyendo el WAL de este navegador…</p>
+			</div>
+		}
+		@case ('error') {
+			<div class="correlation-section__empty">
+				<i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+				<p>No se pudo leer el WAL de este navegador.</p>
+			</div>
+		}
+		@default {
+			@if (entries().length === 0) {
+				<div class="correlation-section__empty">
+					<i class="pi pi-info-circle" aria-hidden="true"></i>
+					<p>Sin operaciones del WAL en este navegador para esta sesión.</p>
+				</div>
+			} @else {
+				<ol class="correlation-wal-section__list">
+					@for (entry of entries(); track entry.id) {
+						<li class="correlation-wal-section__row">
+							<span class="cell-mono">{{ entry.operation }} {{ entry.method }}</span>
+							<span class="correlation-wal-section__resource">{{ entry.resourceType }}</span>
+							<span class="cell-mono correlation-wal-section__endpoint">{{ entry.endpoint }}</span>
+							<edu-tag [value]="entry.status" [severity]="getStatusSeverity(entry.status)" />
+							@if (entry.retries > 0) {
+								<span class="correlation-wal-section__secondary">{{ entry.retries }} reintento(s)</span>
+							}
+							<span class="correlation-wal-section__date">{{ entry.timestamp | date: 'dd/MM/yyyy HH:mm:ss' }}</span>
+						</li>
+					}
+				</ol>
+			}
+		}
+	}
+</section>

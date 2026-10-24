@@ -1,0 +1,47 @@
+<section class="correlation-section correlation-hub-events-section">
+	<header class="correlation-section__header">
+		<div class="correlation-section__title">
+			<i class="pi pi-bolt" aria-hidden="true"></i>
+			<h3>Eventos de SignalR</h3>
+		</div>
+		@if (hasItems()) {
+			<span class="correlation-section__count">{{ items().length }}</span>
+		}
+	</header>
+
+	@if (!sessionResolved()) {
+		<p class="correlation-section__cap" role="status">
+			<i class="pi pi-info-circle" aria-hidden="true"></i>
+			Sin sesión resuelta: solo se muestran los eventos guardados con este id.
+		</p>
+	}
+
+	@if (!hasItems()) {
+		<div class="correlation-section__empty">
+			<i class="pi pi-info-circle" aria-hidden="true"></i>
+			<p>Sin eventos de SignalR registrados para este correlation id.</p>
+		</div>
+	} @else {
+		<ol class="correlation-hub-events-section__list">
+			@for (event of items(); track $index) {
+				<li class="correlation-hub-events-section__row">
+					<span class="cell-mono correlation-hub-events-section__hub">{{ event.hub }}</span>
+					<edu-tag
+						[value]="labelMap[event.tipo] ?? event.tipo"
+						[severity]="severityMap[event.tipo] ?? 'warn'"
+					/>
+					@if (event.metodo) {
+						<span class="cell-mono">{{ event.metodo }}</span>
+					}
+					@if (event.exceptionClass) {
+						<span class="cell-mono">{{ event.exceptionClass }}</span>
+					}
+					@if (event.connectionId) {
+						<span class="cell-mono correlation-hub-events-section__secondary">{{ event.connectionId }}</span>
+					}
+					<span class="correlation-hub-events-section__date">{{ event.fecha | date: 'dd/MM/yyyy HH:mm:ss' }}</span>
+				</li>
+			}
+		</ol>
+	}
+</section>

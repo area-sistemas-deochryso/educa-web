@@ -132,6 +132,16 @@ export class WalDbService {
 		return this.strategy.getByStatus(status);
 	}
 
+	/**
+	 * Entries enqueued under the given correlation id (Plan 41 F6). Read-only:
+	 * entries without `correlationId` (pre-F6b) never match.
+	 */
+	async getByCorrelationId(correlationId: string): Promise<WalEntry[]> {
+		if (!correlationId) return [];
+		const all = await this.getAll();
+		return all.filter((e) => e.correlationId === correlationId);
+	}
+
 	async getPending(): Promise<WalEntry[]> {
 		return this.getByStatus('PENDING');
 	}

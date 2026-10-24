@@ -113,6 +113,27 @@ export interface CorrelationBreadcrumbDto {
 
 export type BreadcrumbTipo = 'navigation' | 'http' | 'error';
 
+export type HubEventTipo =
+	| 'conexion_rechazada'
+	| 'conexion_fallida'
+	| 'desconexion_error'
+	| 'invocacion_error';
+
+/**
+ * Plan 41 F6 (ADR-0009) — evento anómalo de un hub de SignalR de la sesión.
+ * Solo forma: nunca payload ni texto de mensajes (INV-CORR04).
+ */
+export interface CorrelationHubEventDto {
+	hub: string;
+	tipo: HubEventTipo;
+	fecha: string;
+	// El BE omite los campos null del JSON: llegan ausentes, no como `null`.
+	metodo?: string | null;
+	connectionId?: string | null;
+	userId?: number | null;
+	exceptionClass?: string | null;
+}
+
 /**
  * Snapshot agregado de los 4 tipos de evento que comparten un CorrelationId.
  * Cada lista es independiente — el BE deja vacía la sección que falle (INV-S07)
@@ -147,6 +168,16 @@ export interface CorrelationSnapshot {
 	 * compatibilidad con BEs pre-F4.
 	 */
 	breadcrumbs?: CorrelationBreadcrumbDto[];
+	/**
+	 * Plan 41 F6 — id de sesión del navegador que el BE resolvió para el request
+	 * consultado. Ausente si ninguna fuente lo tiene (o BE pre-F6c).
+	 */
+	sessionId?: string | null;
+	/**
+	 * Plan 41 F6 — eventos de hub con `correlationId` ∈ {id consultado, `sessionId`}:
+	 * los 50 más recientes, del más antiguo al más reciente. Opcional para BEs pre-F6c.
+	 */
+	hubEvents?: CorrelationHubEventDto[];
 }
 // #endregion
 
@@ -237,6 +268,24 @@ export const BREADCRUMB_LABEL_MAP: Record<BreadcrumbTipo, string> = {
 	navigation: 'Navegación',
 	http: 'Request',
 	error: 'Error',
+};
+// #endregion
+
+// #region Eventos de SignalR (Plan 41 F6)
+/** Label humano por tipo de evento de hub. */
+export const HUB_EVENT_LABEL_MAP: Record<HubEventTipo, string> = {
+	conexion_rechazada: 'Conexión rechazada',
+	conexion_fallida: 'Conexión fallida',
+	desconexion_error: 'Desconexión con error',
+	invocacion_error: 'Invocación con error',
+};
+
+/** Severidad del tag por tipo de evento de hub. */
+export const HUB_EVENT_SEVERITY_MAP: Record<HubEventTipo, 'danger' | 'warn'> = {
+	conexion_rechazada: 'warn',
+	conexion_fallida: 'danger',
+	desconexion_error: 'warn',
+	invocacion_error: 'danger',
 };
 // #endregion
 

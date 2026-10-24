@@ -150,6 +150,13 @@
 
 	<app-correlation-breadcrumbs-section [items]="vm().snapshot?.breadcrumbs ?? []" />
 
+	<app-correlation-hub-events-section
+		[items]="vm().snapshot?.hubEvents ?? []"
+		[sessionResolved]="sessionId() !== null"
+	/>
+
+	<app-correlation-wal-section [sessionId]="sessionId()" />
+
 	@if (viewMode() === 'timeline') {
 		<app-correlation-timeline-section [events]="vm().timelineEvents" />
 	} @else {

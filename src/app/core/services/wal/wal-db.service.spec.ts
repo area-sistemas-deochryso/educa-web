@@ -137,6 +137,41 @@ describe('WalDbService', () => {
 		});
 	});
 
+	describe('getByCorrelationId (Plan 41 F6)', () => {
+		it('returns only entries with the matching correlationId and ignores those without it', async () => {
+			const { db } = setup({ indexedDbInit: () => Promise.resolve(false) });
+			await db.isAvailable();
+			await db.put(makeEntry('m1', { correlationId: 'sess-1' }));
+			await db.put(makeEntry('m2', { correlationId: 'sess-1', status: 'FAILED' }));
+			await db.put(makeEntry('o1', { correlationId: 'sess-2' }));
+			await db.put(makeEntry('legacy'));
+
+			const found = await db.getByCorrelationId('sess-1');
+
+			expect(found.map((e) => e.id).sort()).toEqual(['m1', 'm2']);
+		});
+
+		it('returns an empty list for an empty id and never matches entries lacking the field', async () => {
+			const { db } = setup({ indexedDbInit: () => Promise.resolve(false) });
+			await db.isAvailable();
+			await db.put(makeEntry('legacy'));
+
+			expect(await db.getByCorrelationId('')).toEqual([]);
+			expect(await db.getByCorrelationId('undefined')).toEqual([]);
+		});
+
+		it('does not mutate the stored entries', async () => {
+			const { db } = setup({ indexedDbInit: () => Promise.resolve(false) });
+			await db.isAvailable();
+			await db.put(makeEntry('m1', { correlationId: 'sess-1' }));
+
+			await db.getByCorrelationId('sess-1');
+
+			expect(await db.count()).toBe(1);
+			expect((await db.get('m1'))?.status).toBe('PENDING');
+		});
+	});
+
 	describe('getStorageUsageRatio', () => {
 		let originalStorage: StorageManager | undefined;
 

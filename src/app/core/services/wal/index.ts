@@ -10,5 +10,6 @@ export { WalStatusFacade } from './wal-status.facade';
 export { WalFacadeHelper } from './wal-facade-helper.service';
 export { WalStorageFullError } from './wal.service';
 export { WalCrossTabRefetchService } from './wal-cross-tab-refetch.service';
+export { WalCorrelationReader } from './wal-correlation-reader.service';
 export { isConflictError, isPermanentError } from './wal-error.utils';
 // #endregion

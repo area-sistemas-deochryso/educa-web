@@ -8,6 +8,7 @@ import { CorrelationComponent } from './correlation.component';
 import { CorrelationFacade } from './services';
 import { CorrelationSnapshot } from './models';
 import { StorageService } from '@core/services';
+import { WalCorrelationReader } from '@core/services/wal';
 
 class FakeParamMap {
 	constructor(private map: Record<string, string>) {}
@@ -47,8 +48,10 @@ describe('CorrelationComponent', () => {
 	let getCorrelationAutoRefresh: ReturnType<typeof vi.fn>;
 	let setCorrelationAutoRefresh: ReturnType<typeof vi.fn>;
 	let currentSnapshot: CorrelationSnapshot | null;
+	let getByCorrelationId: ReturnType<typeof vi.fn>;
 
 	beforeEach(async () => {
+		getByCorrelationId = vi.fn().mockResolvedValue([]);
 		loadSnapshot = vi.fn();
 		paramMap$ = new BehaviorSubject(new FakeParamMap({ id: 'abc-1' }));
 		getCorrelationViewMode = vi.fn().mockReturnValue('timeline');
@@ -88,6 +91,7 @@ describe('CorrelationComponent', () => {
 				provideRouter([]),
 				{ provide: CorrelationFacade, useValue: facadeMock },
 				{ provide: StorageService, useValue: storageMock },
+				{ provide: WalCorrelationReader, useValue: { getByCorrelationId } },
 				{
 					provide: ActivatedRoute,
 					useValue: {
@@ -239,6 +243,36 @@ describe('CorrelationComponent', () => {
 			} finally {
 				vi.useRealTimers();
 			}
+		});
+	});
+
+	describe('Plan 41 F6 — SignalR events and WAL sections', () => {
+		it('renders both sections with explicit notices when the snapshot has no sessionId or hubEvents (old BE)', () => {
+			currentSnapshot = createSnapshot();
+			fixture.detectChanges();
+
+			const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+			expect(text).toContain('Eventos de SignalR');
+			expect(text).toContain('Sin sesión resuelta: solo se muestran los eventos guardados con este id.');
+			expect(text).toContain('Sin sesión resuelta: no se consulta el WAL');
+			expect(getByCorrelationId).not.toHaveBeenCalled();
+		});
+
+		it('passes hubEvents and queries the WAL with the snapshot sessionId', async () => {
+			currentSnapshot = createSnapshot({
+				sessionId: 'sess-1',
+				hubEvents: [
+					{ hub: 'chathub', tipo: 'invocacion_error', fecha: '2026-10-24T10:00:00', metodo: 'Send', exceptionClass: 'HubException' },
+				],
+			});
+			fixture.detectChanges();
+			await fixture.whenStable();
+
+			const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+			expect(text).toContain('chathub');
+			expect(text).toContain('HubException');
+			expect(text).not.toContain('Sin sesión resuelta: solo se muestran');
+			expect(getByCorrelationId).toHaveBeenCalledWith('sess-1');
 		});
 	});
 
