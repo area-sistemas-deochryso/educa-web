@@ -16,8 +16,10 @@ export class ProfesorCursoApiService {
 	}
 
 	/** Cursos asignados a un profesor en un año. */
-	listarPorProfesor(profesorId: number, anio: number): Observable<ProfesorCursoListaDto[]> {
-		return this.http.get<ProfesorCursoListaDto[]>(`${this.apiUrl}/profesor/${profesorId}`, { params: { anio } });
+	listarPorProfesor(profesorId: number, anio?: number): Observable<ProfesorCursoListaDto[]> {
+		return this.http.get<ProfesorCursoListaDto[]>(`${this.apiUrl}/profesor/${profesorId}`, {
+			params: anio === undefined ? {} : { anio },
+		});
 	}
 
 	/** Asignar cursos a un profesor (batch, idempotente). */

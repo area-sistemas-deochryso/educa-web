@@ -66,9 +66,12 @@ export class SchedulesApiService {
   /**
    * Profesores candidatos para asignar a este horario: ya filtrados server-side
    * por modo de asignación (INV-AS01/AS02) y por conflicto de horario (INV-C06).
+   * En modo por curso incluye a los no habilitados (`habilitadoParaCurso: false`): asignarlos los habilita.
    */
   getProfesoresCandidatos(horarioId: number): Observable<ProfesorListDto[]> {
-    return this.http.get<ProfesorListDto[]>(`${this.apiUrl}/${horarioId}/profesores-candidatos`);
+    return this.http.get<ProfesorListDto[]>(`${this.apiUrl}/${horarioId}/profesores-candidatos`, {
+      params: { incluirNoHabilitados: true },
+    });
   }
 
   getEstudiantesDisponibles(horarioId: number): Observable<EstudianteHorarioDto[]> {

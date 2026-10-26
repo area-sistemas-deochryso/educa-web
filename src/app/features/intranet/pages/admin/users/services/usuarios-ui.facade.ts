@@ -148,11 +148,10 @@ export class UsersUiFacade {
 	asignarCursos(profesorId: number, cursoIds: number[]): void {
 		if (cursoIds.length === 0) return;
 
-		const anio = new Date().getFullYear();
 		this.store.setProfesorCursosLoading(true);
 
 		this.profesorCursoApi
-			.asignar({ profesorId, cursoIds, anio })
+			.asignar({ profesorId, cursoIds })
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: (result) => {
@@ -229,11 +228,10 @@ export class UsersUiFacade {
 			return;
 		}
 
-		const anio = new Date().getFullYear();
 		this.store.setProfesorCursosLoading(true);
 
 		forkJoin({
-			asignados: this.profesorCursoApi.listarPorProfesor(detalle.id, anio).pipe(
+			asignados: this.profesorCursoApi.listarPorProfesor(detalle.id).pipe(
 				catchError((err) => {
 					this.errHandler.handle(err, 'cargar cursos del profesor');
 					return of([] as ProfesorCursoListaDto[]);

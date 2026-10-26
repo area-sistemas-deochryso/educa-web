@@ -247,7 +247,7 @@
 	(edit)="onEdit($event)"
 	(delete)="onDelete($event)"
 	(toggleEstado)="onToggleEstado($event.id, $event.estadoActual)"
-	(asignarProfesor)="onAsignarProfesor($event.horarioId, $event.profesorId)"
+	(asignarProfesor)="onAsignarProfesor($event.horarioId, $event.profesorId, $event.habilitarCurso)"
 	(asignarTodosEstudiantes)="onOpenStudentSelection($event)"
 	(desasignarProfesor)="onDesasignarProfesor($event)"
 	(desasignarEstudiante)="onDesasignarEstudiante($event.horarioId, $event.estudianteId)"

@@ -114,7 +114,10 @@ export class SchedulesStore {
 	 * vía `GET /api/horario/{id}/profesores-candidatos`.
 	 */
 	readonly profesoresParaAsignacionDetalle = computed<ProfesorOption[]>(() =>
-		mapProfesToOptions(this._profesoresCandidatosDetalle()),
+		// Habilitados primero; el sort es estable, así que el resto conserva su orden.
+		mapProfesToOptions(this._profesoresCandidatosDetalle()).sort(
+			(a, b) => Number(!!a.requiereHabilitacion) - Number(!!b.requiereHabilitacion),
+		),
 	);
 	// #endregion
 

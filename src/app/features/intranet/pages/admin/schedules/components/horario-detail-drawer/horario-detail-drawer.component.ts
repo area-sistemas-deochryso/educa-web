@@ -35,7 +35,7 @@ export class ScheduleDetailDrawerComponent {
 	readonly edit = output<number>();
 	readonly delete = output<number>();
 	readonly toggleEstado = output<{ id: number; estadoActual: boolean }>();
-	readonly asignarProfesor = output<{ horarioId: number; profesorId: number }>();
+	readonly asignarProfesor = output<{ horarioId: number; profesorId: number; habilitarCurso: boolean }>();
 	readonly asignarTodosEstudiantes = output<number>();
 	readonly desasignarProfesor = output<number>();
 	readonly desasignarEstudiante = output<{ horarioId: number; estudianteId: number }>();
@@ -61,6 +61,12 @@ export class ScheduleDetailDrawerComponent {
 		const detalle = this.detalle();
 		return detalle ? detalle.estudiantes.length > 0 : false;
 	});
+
+	/** El profesor elegido aún no está habilitado para el curso: asignarlo lo habilita en la misma operación. */
+	requiereHabilitacionSeleccionado(): boolean {
+		const id = this.selectedProfesorId;
+		return id !== null && this.profesoresOptions().some((o) => o.value === id && o.requiereHabilitacion);
+	}
 
 	/** Único candidato a profesor disponible para un horario todavía sin asignar. */
 	readonly isSingleCandidate = computed(() => {
@@ -114,6 +120,7 @@ export class ScheduleDetailDrawerComponent {
 			this.asignarProfesor.emit({
 				horarioId: detalle.id,
 				profesorId: this.selectedProfesorId,
+				habilitarCurso: this.requiereHabilitacionSeleccionado(),
 			});
 			this.selectedProfesorId = null;
 			this.showProfesorEdit.set(false);

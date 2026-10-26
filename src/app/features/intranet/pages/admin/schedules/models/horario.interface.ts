@@ -40,6 +40,8 @@ export interface HorarioAsignarProfesorDto {
   horarioId: number;
   profesorId: number;
   usuarioMod: string;
+  /** Modo por curso: crea la habilitación del profesor en la misma operación (exige permiso de habilitar). */
+  habilitarCurso?: boolean;
 }
 
 export interface HorarioAsignarEstudiantesDto {

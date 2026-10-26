@@ -54,8 +54,9 @@ export function groupCursosByNivel(cursos: CursoOption[]): CursosPorNivel {
 export function mapProfesorToOption(profesor: ProfesorListDto): ProfesorOption {
 	return {
 		value: profesor.id,
-		label: formatFullName(profesor.apellidos, profesor.nombre),
+		label: formatFullName(profesor.apellidos, profesor.nombre) + (profesor.habilitadoParaCurso === false ? ' (no habilitado)' : ''),
 		dni: profesor.dni,
+		...(profesor.habilitadoParaCurso === false ? { requiereHabilitacion: true } : {}),
 	};
 }
 

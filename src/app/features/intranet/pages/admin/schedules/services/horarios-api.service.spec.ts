@@ -221,7 +221,8 @@ describe('SchedulesApiService', () => {
 				expect(profesores).toEqual([mockProfesor]);
 			});
 
-			const req = httpMock.expectOne('/api/horario/10/profesores-candidatos');
+			// P117: pide también a los no habilitados para ofrecer "habilitar y asignar" en modo por curso.
+			const req = httpMock.expectOne('/api/horario/10/profesores-candidatos?incluirNoHabilitados=true');
 			expect(req.request.method).toBe('GET');
 			req.flush([mockProfesor]);
 		});

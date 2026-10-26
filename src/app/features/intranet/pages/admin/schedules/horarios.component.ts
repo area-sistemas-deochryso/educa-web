@@ -294,7 +294,7 @@ export class SchedulesComponent implements OnInit {
 
 	// #endregion
 	// #region Event handlers - Asignaciones
-	onAsignarProfesor(horarioId: number, profesorId: number): void {
+	onAsignarProfesor(horarioId: number, profesorId: number, habilitarCurso: boolean): void {
 		const currentUser = this.vm().currentUser;
 		if (!currentUser) return;
 
@@ -302,6 +302,7 @@ export class SchedulesComponent implements OnInit {
 			horarioId,
 			profesorId,
 			usuarioMod: currentUser.dni || currentUser.nombreCompleto,
+			...(habilitarCurso ? { habilitarCurso: true } : {}),
 		});
 	}
 

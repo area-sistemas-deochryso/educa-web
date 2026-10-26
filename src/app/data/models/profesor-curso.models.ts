@@ -19,6 +19,7 @@ export interface ProfesorCursoListaDto {
 export interface AsignarProfesorCursoRequest {
   profesorId: number;
   cursoIds: number[];
-  anio: number;
+  /** Omitido = año vigente resuelto por el servidor (no por el reloj del navegador). */
+  anio?: number;
 }
 // #endregion

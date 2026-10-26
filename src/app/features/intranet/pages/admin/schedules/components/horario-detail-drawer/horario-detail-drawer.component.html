@@ -227,8 +227,15 @@
 								class="w-full"
 							/>
 
+							@if (requiereHabilitacionSeleccionado()) {
+								<div class="single-candidate-hint" data-info-anchor="admin-schedules-detail-habilitar-hint">
+									<i class="pi pi-info-circle"></i>
+									<span>Este profesor aún no está habilitado para <strong>{{ detalle()!.cursoNombre }}</strong>. Al asignarlo quedará habilitado.</span>
+								</div>
+							}
+
 							<edu-button
-								label="Cambiar Profesor"
+								[label]="requiereHabilitacionSeleccionado() ? 'Habilitar y cambiar' : 'Cambiar Profesor'"
 								icon="pi pi-refresh"
 								size="small"
 								class="w-full"
@@ -268,8 +275,15 @@
 										class="w-full"
 									/>
 
+									@if (requiereHabilitacionSeleccionado()) {
+										<div class="single-candidate-hint" data-info-anchor="admin-schedules-detail-habilitar-hint">
+											<i class="pi pi-info-circle"></i>
+											<span>Este profesor aún no está habilitado para <strong>{{ detalle()!.cursoNombre }}</strong>. Al asignarlo quedará habilitado.</span>
+										</div>
+									}
+
 									<edu-button
-										label="Asignar Profesor"
+										[label]="requiereHabilitacionSeleccionado() ? 'Habilitar y asignar' : 'Asignar Profesor'"
 										icon="pi pi-user-plus"
 										size="small"
 										class="w-full"
@@ -286,7 +300,7 @@
 									@if (modoAsignacion() === 'TutorPleno') {
 										<p>El salón <strong>{{ detalle()!.salonDescripcion }}</strong> no tiene tutor asignado. Asigna un profesor como tutor desde Gestión de Usuarios.</p>
 									} @else if (modoAsignacion() === 'PorCurso') {
-										<p>No hay profesores asignados al curso <strong>{{ detalle()!.cursoNombre }}</strong>. Asigna el curso a un profesor desde Gestión de Usuarios.</p>
+										<p>No hay profesores disponibles para el curso <strong>{{ detalle()!.cursoNombre }}</strong> en este horario (todos tienen cruce de horas o no hay profesores registrados). Registra profesores desde Gestión de Usuarios.</p>
 									} @else {
 										<p>No hay profesores disponibles. Registra profesores desde Gestión de Usuarios.</p>
 									}

@@ -8,6 +8,8 @@ export interface ProfesorListDto {
 	apellidos: string;
 	dni: string;
 	estado: boolean;
+	/** Solo candidatos de horario en modo por curso (INV-AS02). null/ausente = no aplica. */
+	habilitadoParaCurso?: boolean | null;
 }
 
 /**
@@ -17,6 +19,8 @@ export interface ProfesorOption {
 	label: string;
 	value: number;
 	dni?: string;
+	/** true = el profesor aún no está habilitado para el curso del horario: asignarlo lo habilita. */
+	requiereHabilitacion?: boolean;
 }
 
 /**
