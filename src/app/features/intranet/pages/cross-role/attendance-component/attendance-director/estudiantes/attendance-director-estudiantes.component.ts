@@ -17,6 +17,7 @@ import { AttendanceHeatmapComponent, HeatmapCellClick } from '@features/intranet
 import { AttendanceTemporalNavComponent } from '@features/intranet/components/attendance/attendance-temporal-nav/attendance-temporal-nav.component';
 import { JustificationDialogComponent, JustificationResult } from '@features/intranet/components/attendance/justification-dialog/justification-dialog.component';
 import { AttendanceTableSkeletonComponent } from '@features/intranet/components/attendance/attendance-table-skeleton/attendance-table-skeleton.component';
+import { AttendanceDateContext } from '../attendance-date-context';
 import { AttendanceViewController } from '@features/intranet/services/attendance/attendance-view.service';
 import { SelectorContext } from '@features/intranet/services/attendance/attendance-view.models';
 import { AttendancePdfService } from '@features/intranet/services/attendance/attendance-pdf.service';
@@ -64,6 +65,19 @@ export class AttendanceDirectorEstudiantesComponent implements OnInit {
 	private destroyRef = inject(DestroyRef);
 	private router = inject(Router);
 	readonly view = inject(AttendanceViewController);
+	private readonly dateContext = inject(AttendanceDateContext);
+
+	constructor() {
+		// * Fecha y mes arrancan desde el contexto compartido para no reiniciarse al cambiar de pestaña.
+		this.view.fechaDia.set(this.dateContext.fechaDia());
+		this.view.ingresos.update((t) => this.dateContext.withSharedMonth(t));
+		this.view.salidas.update((t) => this.dateContext.withSharedMonth(t));
+	}
+
+	private readonly shareDateWithTabs = effect(() => {
+		this.dateContext.fechaDia.set(this.view.fechaDia());
+		this.dateContext.shareMonthOf(this.view.ingresos());
+	});
 
 	// #region Tipo de reporte
 	readonly tipoReporteOptions: TipoReporteGroup[] = TIPO_REPORTE_OPTIONS;

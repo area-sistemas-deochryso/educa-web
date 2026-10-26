@@ -10,6 +10,7 @@ import { AttendanceDirectorProfesoresComponent } from './profesores/attendance-d
 import { AttendanceDirectorStaffComponent } from './staff/attendance-director-staff.component';
 import { AttendanceDirectorPersonaLoader } from './staff/attendance-director-persona-loader';
 import { AttendanceDashboardComponent } from '@features/intranet/components/attendance/attendance-dashboard/attendance-dashboard.component';
+import { AttendanceDateContext } from './attendance-date-context';
 
 type SubMenu = 'estudiantes' | 'profesores' | 'asistentes-admin' | 'coordinadores' | 'promotores' | 'directores' | 'administradores';
 
@@ -42,6 +43,7 @@ const SUBMENU_TO_TIPO: Record<SubMenu, TipoPersona> = {
 		AttendanceDirectorStaffComponent,
 		AttendanceDashboardComponent,
 	],
+	providers: [AttendanceDateContext],
 	templateUrl: './attendance-director.component.html',
 	styleUrl: './attendance-director.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

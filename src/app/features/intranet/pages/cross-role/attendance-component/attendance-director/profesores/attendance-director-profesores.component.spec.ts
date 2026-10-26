@@ -10,6 +10,7 @@ import { testProviders } from '@test';
 import { AsistenciaProfesorApiService } from '@intranet-shared/services';
 import { AttendanceDataService } from '@features/intranet/services/attendance/attendance-data.service';
 
+import { AttendanceDateContext } from '../attendance-date-context';
 import { AttendanceDirectorProfesoresComponent } from './attendance-director-profesores.component';
 // #endregion
 
@@ -55,6 +56,7 @@ describe('AttendanceDirectorProfesoresComponent', () => {
 		await TestBed.configureTestingModule({
 			imports: [AttendanceDirectorProfesoresComponent],
 			providers: [
+				AttendanceDateContext,
 				...testProviders,
 				{ provide: AsistenciaProfesorApiService, useValue: apiMock },
 				{ provide: AttendanceDataService, useValue: dataServiceMock },

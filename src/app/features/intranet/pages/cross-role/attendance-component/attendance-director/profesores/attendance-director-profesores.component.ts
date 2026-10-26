@@ -30,6 +30,7 @@ import {
 } from '@features/intranet/components/attendance/attendance-header/attendance-header.component';
 import { AttendanceDataService } from '@features/intranet/services/attendance/attendance-data.service';
 import { AttendanceTable } from '@features/intranet/pages/cross-role/attendance-component/models/attendance.types';
+import { AttendanceDateContext } from '../attendance-date-context';
 
 import {
 	AsistenciaProfesorDto,
@@ -69,6 +70,7 @@ export class AttendanceDirectorProfesoresComponent implements OnInit {
 	private errorHandler = inject(ErrorHandlerService);
 	private router = inject(Router);
 	private destroyRef = inject(DestroyRef);
+	private readonly dateContext = inject(AttendanceDateContext);
 
 	// #region Estado general
 	readonly loading = signal(false);
@@ -79,7 +81,8 @@ export class AttendanceDirectorProfesoresComponent implements OnInit {
 
 	// #region Modo día/mes + fecha
 	readonly viewMode = signal<ViewMode>(VIEW_MODE.Dia);
-	readonly fechaDia = signal<Date>(new Date());
+	// * Fecha y mes arrancan desde el contexto compartido para no reiniciarse al cambiar de pestaña.
+	readonly fechaDia = signal<Date>(this.dateContext.fechaDia());
 	// #endregion
 
 	// #region Modo día
@@ -121,11 +124,16 @@ export class AttendanceDirectorProfesoresComponent implements OnInit {
 		})),
 	);
 	readonly ingresos = signal<AttendanceTable>(
-		this.dataService.createEmptyTable('Ingresos'),
+		this.dateContext.withSharedMonth(this.dataService.createEmptyTable('Ingresos')),
 	);
 	readonly salidas = signal<AttendanceTable>(
-		this.dataService.createEmptyTable('Salidas'),
+		this.dateContext.withSharedMonth(this.dataService.createEmptyTable('Salidas')),
 	);
+
+	private readonly shareDateWithTabs = effect(() => {
+		this.dateContext.fechaDia.set(this.fechaDia());
+		this.dateContext.shareMonthOf(this.ingresos());
+	});
 	readonly hasMonthData = computed(() => {
 		const ing = this.ingresos().counts;
 		const sal = this.salidas().counts;

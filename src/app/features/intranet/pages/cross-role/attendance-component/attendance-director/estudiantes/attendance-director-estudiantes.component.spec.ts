@@ -10,6 +10,7 @@ import { StorageService } from '@core/services';
 import { AttendanceService } from '@intranet-shared/services';
 import { AttendanceDataService } from '@features/intranet/services/attendance/attendance-data.service';
 
+import { AttendanceDateContext } from '../attendance-date-context';
 import { AttendanceDirectorEstudiantesComponent } from './attendance-director-estudiantes.component';
 // #endregion
 
@@ -63,6 +64,7 @@ describe('AttendanceDirectorEstudiantesComponent', () => {
 		await TestBed.configureTestingModule({
 			imports: [AttendanceDirectorEstudiantesComponent],
 			providers: [
+				AttendanceDateContext,
 				...testProviders,
 				{ provide: AttendanceService, useValue: asistenciaServiceMock },
 				{ provide: StorageService, useValue: storageServiceMock },

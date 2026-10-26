@@ -12,6 +12,7 @@ import { ErrorHandlerService } from '@core/services';
 import { AsistenciaStaffApiService } from '@intranet-shared/services';
 import { AttendanceDataService } from '@features/intranet/services/attendance/attendance-data.service';
 
+import { AttendanceDateContext } from '../attendance-date-context';
 import { AttendanceDirectorStaffComponent } from './attendance-director-staff.component';
 import { AttendanceDirectorPersonaLoader } from './attendance-director-persona-loader';
 // #endregion
@@ -61,6 +62,7 @@ describe('AttendanceDirectorStaffComponent', () => {
 		await TestBed.configureTestingModule({
 			imports: [AttendanceDirectorStaffComponent],
 			providers: [
+				AttendanceDateContext,
 				...testProviders,
 				provideRouter([]),
 				{ provide: AsistenciaStaffApiService, useValue: staffApiMock },
@@ -92,5 +94,37 @@ describe('AttendanceDirectorStaffComponent', () => {
 
 		expect(loader.dia).toHaveBeenCalled();
 		expect(staffApiMock.obtenerAsistenciaDiaStaffDirector).not.toHaveBeenCalled();
+	});
+
+	// * El director cambia de pestaña (otro tipo de persona) y la fecha/mes no deben volver a "hoy".
+	describe('fecha compartida entre pestañas', () => {
+		it('should keep the selected day when the tab is destroyed and another one is created', () => {
+			const diaElegido = new Date(2026, 2, 10);
+			fixture.componentRef.setInput('tipoPersona', 'C');
+			fixture.detectChanges();
+
+			fixture.componentInstance.fechaDia.set(diaElegido);
+			fixture.detectChanges();
+			fixture.destroy();
+
+			const otraPestana = TestBed.createComponent(AttendanceDirectorStaffComponent);
+
+			expect(otraPestana.componentInstance.fechaDia()).toEqual(diaElegido);
+		});
+
+		it('should keep the selected month in ingresos and salidas', () => {
+			fixture.componentRef.setInput('tipoPersona', 'C');
+			fixture.detectChanges();
+
+			fixture.componentInstance.ingresos.update((t) => ({ ...t, selectedMonth: 4, selectedYear: 2026 }));
+			fixture.detectChanges();
+			fixture.destroy();
+
+			const otraPestana = TestBed.createComponent(AttendanceDirectorStaffComponent);
+
+			expect(otraPestana.componentInstance.ingresos().selectedMonth).toBe(4);
+			expect(otraPestana.componentInstance.salidas().selectedMonth).toBe(4);
+			expect(otraPestana.componentInstance.ingresos().selectedYear).toBe(2026);
+		});
 	});
 });

@@ -5,6 +5,7 @@ import {
 	Input,
 	OnInit,
 	computed,
+	effect,
 	inject,
 	signal,
 } from '@angular/core';
@@ -42,6 +43,7 @@ import { AsistenciaStaffApiService } from '@intranet-shared/services';
 import { formatDateLocalIso } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
 
+import { AttendanceDateContext } from '../attendance-date-context';
 import { MonthSearchState } from '../month-search-state';
 import { AttendanceDirectorPersonaLoader } from './attendance-director-persona-loader';
 import { EduButton, EduInputText, EduTooltip } from '@edu-ui';
@@ -72,11 +74,13 @@ export class AttendanceDirectorStaffComponent implements OnInit {
 	private errorHandler = inject(ErrorHandlerService);
 	private router = inject(Router);
 	private destroyRef = inject(DestroyRef);
+	private readonly dateContext = inject(AttendanceDateContext);
 
 	readonly loading = signal(false);
 	readonly activeStatus = signal<ModelAttendanceStatus | null>(null);
 	readonly viewMode = signal<ViewMode>(VIEW_MODE.Dia);
-	readonly fechaDia = signal<Date>(new Date());
+	// * Fecha y mes arrancan desde el contexto compartido para no reiniciarse al cambiar de pestaña.
+	readonly fechaDia = signal<Date>(this.dateContext.fechaDia());
 
 	// #region Modo día
 	readonly personasDiaRaw = signal<AsistenciaAsistenteAdminDto[]>([]);
@@ -116,8 +120,17 @@ export class AttendanceDirectorStaffComponent implements OnInit {
 			relacion: TIPO_LABELS[this.tipoPersona] ?? '',
 		})),
 	);
-	readonly ingresos = signal<AttendanceTable>(this.dataService.createEmptyTable('Ingresos'));
-	readonly salidas = signal<AttendanceTable>(this.dataService.createEmptyTable('Salidas'));
+	readonly ingresos = signal<AttendanceTable>(
+		this.dateContext.withSharedMonth(this.dataService.createEmptyTable('Ingresos')),
+	);
+	readonly salidas = signal<AttendanceTable>(
+		this.dateContext.withSharedMonth(this.dataService.createEmptyTable('Salidas')),
+	);
+
+	private readonly shareDateWithTabs = effect(() => {
+		this.dateContext.fechaDia.set(this.fechaDia());
+		this.dateContext.shareMonthOf(this.ingresos());
+	});
 	readonly tableReady = signal(false);
 	readonly hasMonthData = computed(() => {
 		const ing = this.ingresos().counts;
