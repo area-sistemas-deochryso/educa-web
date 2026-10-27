@@ -6,6 +6,7 @@ import { UI_SUMMARIES, UI_ATTACHMENT_MESSAGES } from '@shared/constants';
 import { environment } from '@config';
 import { ProfesorApiService } from '../../services/profesor-api.service';
 import { CursoContenidoStore } from './curso-contenido.store';
+import { CursoContenidoEvaluacionFacade } from './curso-contenido-evaluacion.facade';
 import {
 	ActualizarSemanaRequest,
 	ContenidoArchivoTipo,
@@ -34,6 +35,7 @@ export class CursoContenidoCrudFacade {
 	private readonly store = inject(CursoContenidoStore);
 	private readonly errorHandler = inject(ErrorHandlerService);
 	private readonly wal = inject(WalFacadeHelper);
+	private readonly evaluacionFacade = inject(CursoContenidoEvaluacionFacade);
 	private readonly destroyRef = inject(DestroyRef);
 	private readonly contenidoUrl = `${environment.apiUrl}/api/CursoContenido`;
 	private readonly errHandler = facadeErrorHandler({
@@ -254,8 +256,14 @@ export class CursoContenidoCrudFacade {
 	 *
 	 * @param semanaId Week id.
 	 * @param request Task creation payload.
+	 * @param onEvaluacionCreada Solo con `request.evaluacion`: se invoca al confirmar el servidor.
 	 */
-	crearTarea(semanaId: number, request: CrearTareaRequest): void {
+	crearTarea(semanaId: number, request: CrearTareaRequest, onEvaluacionCreada?: () => void): void {
+		if (request.evaluacion) {
+			this.evaluacionFacade.crearTareaConEvaluacion(semanaId, request, onEvaluacionCreada);
+			return;
+		}
+
 		this.wal.execute({
 			operation: 'CREATE',
 			resourceType: 'cursoContenidoTarea',

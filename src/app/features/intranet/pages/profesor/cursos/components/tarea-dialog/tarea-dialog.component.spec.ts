@@ -35,6 +35,7 @@ describe('TareaDialogComponent — título obligatorio y cambios sin guardar', (
 		const { component, created } = create();
 
 		component.titulo = 'Ensayo';
+		component.pesoPct = 20;
 		component.onSave();
 
 		expect(created).toHaveLength(1);
@@ -136,13 +137,116 @@ describe('TareaDialogComponent — es calificable y modalidad enlazada (P114-F5b
 		expect(component.evaluacionAEnlazar).toBeNull();
 	});
 
-	it('una tarea nueva todavía no puede ser calificable', () => {
+	it('una tarea nueva no usa el flujo de editar (crear/enlazar evaluación)', () => {
 		const fixture = TestBed.createComponent(TareaDialogComponent);
 		fixture.componentRef.setInput('visible', true);
 		fixture.componentRef.setInput('tarea', null);
 		fixture.detectChanges();
 
 		expect(fixture.componentInstance.puedeSerCalificable()).toBe(false);
-		expect(document.body.textContent).toContain('Guarda la tarea para poder hacerla calificable.');
+		expect(document.body.textContent).not.toContain('Guarda la tarea para poder hacerla calificable.');
+	});
+});
+
+describe('TareaDialogComponent — «Es calificable» activo al crear (P118-F2, INV-C04, INV-C16)', () => {
+	function create(tipoInicial: 'TAREA' | 'ACTIVIDAD' | 'EXAMEN' = 'TAREA', inputs: Record<string, unknown> = {}) {
+		const fixture = TestBed.createComponent(TareaDialogComponent);
+		fixture.componentRef.setInput('visible', true);
+		fixture.componentRef.setInput('tarea', null);
+		fixture.componentRef.setInput('tipoInicial', tipoInicial);
+		for (const [k, v] of Object.entries(inputs)) fixture.componentRef.setInput(k, v);
+		fixture.detectChanges();
+		const created: CrearTareaRequest[] = [];
+		fixture.componentInstance.createTarea.subscribe((r) => created.push(r));
+		return { fixture, component: fixture.componentInstance, created };
+	}
+
+	beforeEach(() => TestBed.configureTestingModule({ imports: [TareaDialogComponent] }));
+
+	it.each(['TAREA', 'ACTIVIDAD'] as const)('%s nueva: calificable activo y peso vacío; sin peso no crea', (tipo) => {
+		const { fixture, component, created } = create(tipo);
+		component.titulo = 'Ensayo';
+
+		expect(component.esCalificable).toBe(true);
+		expect(component.pesoPct).toBeNull();
+
+		document.querySelector<HTMLElement>('[data-info-anchor="profesor-tarea-dialog-guardar"]')?.click();
+		fixture.detectChanges();
+
+		expect(created).toEqual([]);
+		expect(component.errorPeso()).toBe('Escribe el peso (entre 1 % y 100 %).');
+		expect(document.body.textContent).toContain('Escribe el peso');
+	});
+
+	it('examen nuevo: sin control de calificable, mantiene su aviso y envía lo de siempre', () => {
+		const { component, created } = create('EXAMEN');
+		component.titulo = 'Parcial';
+		component.duracionMinutos = 45;
+
+		expect(component.mostrarCalificableAlCrear()).toBe(false);
+		expect(document.body.textContent).toContain('Esto no se calificará automáticamente.');
+
+		component.onSave();
+
+		expect(created).toHaveLength(1);
+		expect(created[0]).not.toHaveProperty('evaluacion');
+	});
+
+	it('apagar el control crea sin bloque de evaluación', () => {
+		const { component, created } = create();
+		component.titulo = 'Ensayo';
+		component.esCalificable = false;
+
+		component.onSave();
+
+		expect(created).toHaveLength(1);
+		expect(created[0]).not.toHaveProperty('evaluacion');
+	});
+
+	it('con el control activo manda el peso como fracción en la misma petición', () => {
+		const { component, created } = create();
+		component.titulo = 'Ensayo';
+		component.pesoPct = 25;
+
+		component.onSave();
+
+		expect(created).toEqual([expect.objectContaining({ titulo: 'Ensayo', evaluacion: { peso: 0.25 } })]);
+	});
+
+	it('el peso no puede salir del rango 1–100 ni superar el cupo conocido', () => {
+		const { component, created } = create('TAREA', { cupo: { pesoUsado: 0.8, cupoRestante: 0.2 } });
+		component.titulo = 'Ensayo';
+
+		component.pesoPct = 0;
+		expect(component.errorPeso()).toBe('El peso debe estar entre 1 % y 100 %.');
+		component.pesoPct = 30;
+		expect(component.errorPeso()).toBe('El peso no puede superar el cupo disponible (20 %).');
+		component.onSave();
+		expect(created).toEqual([]);
+
+		component.pesoPct = 20;
+		expect(component.errorPeso()).toBeNull();
+		component.onSave();
+		expect(created).toHaveLength(1);
+	});
+
+	it('sin cupo restante explica que hay que apagar el control', () => {
+		const { component } = create('TAREA', { cupo: { pesoUsado: 1, cupoRestante: 0 } });
+		component.pesoPct = 5;
+
+		expect(component.errorPeso()).toContain('ya no tiene cupo');
+	});
+
+	it('muestra el rechazo del servidor sin vaciar lo escrito', () => {
+		const { fixture, component } = create();
+		component.titulo = 'Ensayo';
+		component.pesoPct = 25;
+
+		fixture.componentRef.setInput('errorServidor', 'El peso supera el cupo de evaluaciones del curso.');
+		fixture.detectChanges();
+
+		expect(document.body.textContent).toContain('El peso supera el cupo de evaluaciones del curso.');
+		expect(component.titulo).toBe('Ensayo');
+		expect(component.pesoPct).toBe(25);
 	});
 });

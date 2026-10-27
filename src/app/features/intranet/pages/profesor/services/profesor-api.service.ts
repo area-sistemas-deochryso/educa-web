@@ -21,6 +21,7 @@ import {
 	RegistrarArchivoRequest,
 	CursoContenidoArchivoDto,
 	CrearTareaRequest,
+	CupoPesoDto,
 	ActualizarTareaRequest,
 	CursoContenidoTareaDto,
 	SemanaEstudianteArchivosDto,
@@ -137,6 +138,9 @@ export class ProfesorApiService {
 	// #endregion
 
 	// #region Calificaciones
+	getCupoPeso(contenidoId: number): Observable<CupoPesoDto> {
+		return this.cursos.getCupoPeso(contenidoId);
+	}
 	getCalificaciones(contenidoId: number): Observable<CalificacionConNotasDto[]> {
 		return this.cursos.getCalificaciones(contenidoId);
 	}

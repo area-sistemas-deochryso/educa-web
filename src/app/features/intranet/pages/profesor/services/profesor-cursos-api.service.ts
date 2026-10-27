@@ -37,6 +37,7 @@ import {
 	CambiarTipoCalificacionDto,
 	ImpactoCambioTipoDto,
 	VincularTareaDto,
+	CupoPesoDto,
 } from '../models';
 
 /**
@@ -163,6 +164,10 @@ export class ProfesorCursosApiService {
 
 	getCalificacionesPendientes(): Observable<CalificacionPendienteDto[]> {
 		return this.http.get<CalificacionPendienteDto[]>(`${this.calificacionUrl}/pendientes`);
+	}
+
+	getCupoPeso(contenidoId: number): Observable<CupoPesoDto> {
+		return this.http.get<CupoPesoDto>(`${this.calificacionUrl}/contenido/${contenidoId}/cupo-peso`);
 	}
 
 	getCalificaciones(contenidoId: number): Observable<CalificacionConNotasDto[]> {
