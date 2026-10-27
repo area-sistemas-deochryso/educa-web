@@ -10,7 +10,7 @@ import { UserProfileService } from '@core/services/user';
 import { environment } from '@config/environment';
 import { canModerateVideoconference, getHorarioEndpoint } from '@shared/models';
 import { VideoconferenciasStore } from './videoconferencias.store';
-import { VideoconferenciaItem } from './videoconferencias.models';
+import { AperturaSalaRequest, VideoconferenciaItem } from './videoconferencias.models';
 
 // #endregion
 
@@ -31,6 +31,9 @@ interface HorarioDto {
 	profesorNombreCompleto: string | null;
 	cantidadEstudiantes: number;
 	habilitada: boolean;
+	aperturaFueraDeHorario: boolean;
+	aperturaDesde: string | null;
+	aperturaHasta: string | null;
 }
 
 // #region Implementation
@@ -79,6 +82,20 @@ export class VideoconferenciasFacade {
 				},
 			});
 	}
+
+	/**
+	 * Recarga los horarios sin spinner ni limpiar el error: el estado de apertura fuera de horario lo evalúa
+	 * el BE (presencia del profesor, intervalo vigente) y cambia mientras la página está abierta.
+	 */
+	refreshCursos(): void {
+		if (this.store.loading()) return;
+
+		this.getHorariosByRole()
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (horarios) => this.store.setItems(this.mapToItems(horarios)),
+			});
+	}
 	// #endregion
 
 	// #region Comandos de sala
@@ -104,12 +121,28 @@ export class VideoconferenciasFacade {
 			.pipe(withRetry({ tag: 'VideoconferenciasFacade:getJaaSToken' }));
 	}
 
-	/** Habilita/deshabilita la sala de un horario (solo rol moderador — el backend re-valida). */
-	setHabilitacion(horarioId: number, habilitada: boolean): Observable<boolean> {
+	/**
+	 * Habilita/deshabilita la sala de un horario (solo rol moderador — el backend re-valida).
+	 * `apertura` es obligatoria al habilitar fuera del horario de clase: motivo + intervalo opcional.
+	 */
+	setHabilitacion(horarioId: number, habilitada: boolean, apertura?: AperturaSalaRequest): Observable<boolean> {
 		return this.http.put<boolean>(
 			`${this.baseUrl}/api/Videoconferencia/${horarioId}/habilitacion`,
-			{ habilitada },
+			{ habilitada, desde: apertura?.desde ?? null, hasta: apertura?.hasta ?? null, motivo: apertura?.motivo ?? null },
 		);
+	}
+
+	/**
+	 * Latido de presencia del moderador dentro de la sala: mientras llegue, la sala habilitada queda abierta
+	 * a los estudiantes fuera de horario. Falla en silencio — un latido perdido solo adelanta el cierre.
+	 */
+	sendPresencia(horarioId: number): Observable<boolean> {
+		return this.http
+			.post<boolean>(`${this.baseUrl}/api/Videoconferencia/${horarioId}/presencia`, {})
+			.pipe(catchError((err) => {
+				logger.warn('[Videoconferencias] presencia failed:', err);
+				return of(false);
+			}));
 	}
 
 	/** Excepción auditada del moderador para entrar fuera de la ventana horaria (motivo obligatorio). */
@@ -170,6 +203,9 @@ export class VideoconferenciasFacade {
 			profesorNombreCompleto: h.profesorNombreCompleto,
 			cantidadEstudiantes: h.cantidadEstudiantes,
 			habilitada: h.habilitada,
+			aperturaFueraDeHorario: h.aperturaFueraDeHorario ?? false,
+			aperturaDesde: h.aperturaDesde ?? null,
+			aperturaHasta: h.aperturaHasta ?? null,
 		}));
 	}
 	// #endregion

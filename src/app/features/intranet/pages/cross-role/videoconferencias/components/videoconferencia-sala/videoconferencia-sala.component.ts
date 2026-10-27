@@ -32,6 +32,7 @@ import {
 	renameParticipant,
 	setParticipantModerator,
 } from './jitsi-api.types';
+import { startPresenciaHeartbeat } from './presencia-heartbeat';
 import { EduButton, EduSpinner } from '@edu-ui';
 
 // #endregion
@@ -62,6 +63,8 @@ export class VideoconferenciaSalaComponent implements OnInit, OnDestroy {
 	readonly profesorNombreCompleto = input<string | null>(null);
 	/** Token ya emitido vía excepción del moderador — si viene seteado, se salta el GET normal (que volvería a fallar por la misma razón que disparó la excepción). */
 	readonly preFetchedToken = input<{ jwt: string; appId: string } | null>(null);
+	/** Horario de la sala: el moderador reporta su presencia contra este id mientras está dentro. */
+	readonly horarioId = input.required<number>();
 	// #endregion
 
 	// #region Estado local
@@ -74,6 +77,7 @@ export class VideoconferenciaSalaComponent implements OnInit, OnDestroy {
 
 	private jitsiApi: JitsiApi | null = null;
 	private expiryWarningTimer: ReturnType<typeof setTimeout> | null = null;
+	private stopPresencia: (() => void) | null = null;
 	// #endregion
 
 	// #region Participantes
@@ -296,6 +300,7 @@ export class VideoconferenciaSalaComponent implements OnInit, OnDestroy {
 		this.jitsiApi.addEventListener('videoConferenceJoined', () => {
 			this.connecting.set(false);
 			this._selfJoined.set(true);
+			this.startPresencia();
 			// Sincronizar roles de participantes ya presentes en la sala
 			this.syncParticipantRoles(1500);
 		});
@@ -360,8 +365,19 @@ export class VideoconferenciaSalaComponent implements OnInit, OnDestroy {
 		}
 	}
 
+	/**
+	 * Mientras el moderador está dentro de la sala avisa al BE (latido): con la sala habilitada, eso mantiene abierto el
+	 * ingreso de estudiantes fuera de horario. Solo el rol moderador — el BE rechaza el latido de cualquier otro.
+	 */
+	private startPresencia(): void {
+		if (!this.facade.isModerator() || this.stopPresencia) return;
+		this.stopPresencia = startPresenciaHeartbeat(() => this.facade.sendPresencia(this.horarioId()).subscribe());
+	}
+
 	private disposeJitsi(): void {
 		this.clearExpiryTimer();
+		this.stopPresencia?.();
+		this.stopPresencia = null;
 
 		if (this.jitsiApi) {
 			try {

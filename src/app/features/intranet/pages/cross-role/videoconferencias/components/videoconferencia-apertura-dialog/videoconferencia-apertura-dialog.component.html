@@ -1,0 +1,99 @@
+<edu-dialog
+	[visible]="visible()"
+	(visibleChange)="onVisibleChange($event)"
+	[modal]="true"
+	[draggable]="false"
+	[resizable]="false"
+	[closable]="true"
+	header="Abrir sala fuera de horario"
+	styleClass="apertura-dialog"
+	[style]="{ width: '480px' }"
+	appendTo="body"
+>
+	@if (context(); as ctx) {
+		<div class="dialog-content">
+			<div class="warning-banner">
+				<i class="pi pi-exclamation-triangle"></i>
+				<span>
+					Vas a abrir <strong>{{ ctx.cursoNombre }}</strong> a los estudiantes fuera del horario de clase.
+					Podrán entrar mientras tú estés dentro de la sala o durante el intervalo que indiques.
+					Queda registrado con tu nombre y el motivo.
+				</span>
+			</div>
+
+			<div class="field">
+				<label for="apertura-motivo">Motivo <span class="required">*</span></label>
+				<textarea
+					eduTextarea
+					id="apertura-motivo"
+					rows="3"
+					[ngModel]="motivoText()"
+					(ngModelChange)="motivoText.set($event)"
+					placeholder="Ej: clase de recuperación, reunión extraordinaria"
+					class="w-full"
+				></textarea>
+			</div>
+
+			<div class="field">
+				<div class="interval-toggle">
+					<label for="apertura-intervalo">Fijar un intervalo de apertura</label>
+					<edu-toggle
+						inputId="apertura-intervalo"
+						[ngModel]="usarIntervalo()"
+						(ngModelChange)="onUsarIntervaloChange($event)"
+					/>
+				</div>
+				@if (!usarIntervalo()) {
+					<p class="hint">Sin intervalo, la sala solo está abierta mientras tú estés dentro.</p>
+				}
+			</div>
+
+			@if (usarIntervalo()) {
+				<div class="interval-fields">
+					<div class="field">
+						<label>Desde</label>
+						<edu-datepicker
+							[ngModel]="desde()"
+							(ngModelChange)="desde.set($event)"
+							[showTime]="true"
+							[showIcon]="true"
+							dateFormat="dd/mm/yy"
+							hourFormat="24"
+						/>
+					</div>
+					<div class="field">
+						<label>Hasta</label>
+						<edu-datepicker
+							[ngModel]="hasta()"
+							(ngModelChange)="hasta.set($event)"
+							[showTime]="true"
+							[showIcon]="true"
+							dateFormat="dd/mm/yy"
+							hourFormat="24"
+						/>
+					</div>
+				</div>
+				@if (intervaloError(); as error) {
+					<p class="error-text">{{ error }}</p>
+				}
+			}
+
+			<div class="dialog-footer">
+				<edu-button
+					label="Cancelar"
+					severity="secondary"
+					[text]="true"
+					[disabled]="saving()"
+					(click)="close()"
+				/>
+				<edu-button
+					label="Abrir sala"
+					icon="pi pi-unlock"
+					[loading]="saving()"
+					[disabled]="!puedeConfirmar()"
+					(click)="confirmarClick()"
+				/>
+			</div>
+		</div>
+	}
+</edu-dialog>

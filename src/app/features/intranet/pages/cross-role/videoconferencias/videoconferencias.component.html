@@ -5,6 +5,7 @@
 		[cursoNombre]="vm().activeSala!.cursoNombre"
 		[profesorNombreCompleto]="vm().activeSala!.profesorNombreCompleto"
 		[preFetchedToken]="vm().exceptionToken"
+		[horarioId]="vm().activeSala!.horarioId"
 	/>
 	<!-- #endregion -->
 } @else {
@@ -89,11 +90,16 @@
 									<label for="habilitada-{{ item.horarioId }}">Sala habilitada</label>
 									<edu-toggle
 										inputId="habilitada-{{ item.horarioId }}"
-										[ngModel]="item.habilitada"
+										[ngModel]="toggleValue(item)"
 										[disabled]="isSavingHabilitacion(item)"
 										(ngModelChange)="onToggleHabilitacion(item, $event)"
 									/>
 								</div>
+								@if (item.habilitada && item.aperturaDesde && item.aperturaHasta) {
+									<small class="text-color-secondary">
+										Intervalo: {{ item.aperturaDesde | date: 'dd/MM HH:mm' }} – {{ item.aperturaHasta | date: 'dd/MM HH:mm' }}
+									</small>
+								}
 							}
 
 							@if (estadoDe(item) === 'disponible') {
@@ -133,5 +139,11 @@
 	<app-videoconferencia-excepcion-dialog
 		[saving]="excepcionSaving()"
 		(confirmar)="onConfirmarExcepcion($event)"
+	/>
+
+	<app-videoconferencia-apertura-dialog
+		[saving]="aperturaSaving()"
+		(confirmar)="onConfirmarApertura($event)"
+		(cerrado)="onCerrarApertura()"
 	/>
 }

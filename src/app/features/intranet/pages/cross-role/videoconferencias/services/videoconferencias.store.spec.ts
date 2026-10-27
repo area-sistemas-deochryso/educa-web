@@ -9,8 +9,8 @@ import { VideoconferenciasStore, VideoconferenciaItem } from './videoconferencia
 
 // #region Test fixtures
 const mockItems: VideoconferenciaItem[] = [
-	{ horarioId: 1, cursoId: 10, cursoNombre: 'Matemática', salonDescripcion: '1A', diaSemana: 1, diaSemanaDescripcion: 'Lunes', horaInicio: '08:00', horaFin: '09:30', profesorNombreCompleto: 'Prof A', cantidadEstudiantes: 30, habilitada: true },
-	{ horarioId: 2, cursoId: 20, cursoNombre: 'Comunicación', salonDescripcion: '1A', diaSemana: 2, diaSemanaDescripcion: 'Martes', horaInicio: '10:00', horaFin: '11:30', profesorNombreCompleto: null, cantidadEstudiantes: 28, habilitada: false },
+	{ horarioId: 1, cursoId: 10, cursoNombre: 'Matemática', salonDescripcion: '1A', diaSemana: 1, diaSemanaDescripcion: 'Lunes', horaInicio: '08:00', horaFin: '09:30', profesorNombreCompleto: 'Prof A', cantidadEstudiantes: 30, habilitada: true, aperturaFueraDeHorario: false, aperturaDesde: null, aperturaHasta: null },
+	{ horarioId: 2, cursoId: 20, cursoNombre: 'Comunicación', salonDescripcion: '1A', diaSemana: 2, diaSemanaDescripcion: 'Martes', horaInicio: '10:00', horaFin: '11:30', profesorNombreCompleto: null, cantidadEstudiantes: 28, habilitada: false, aperturaFueraDeHorario: false, aperturaDesde: null, aperturaHasta: null },
 ];
 // #endregion
 
