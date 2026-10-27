@@ -2,7 +2,7 @@
 import { Component, ChangeDetectionStrategy, input, output, OnChanges, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { toLocalIso } from '@core/helpers';
-import { CalificacionDto, ContenidoTareaTipo, CursoContenidoTareaDto, CrearTareaRequest, ActualizarTareaRequest } from '@features/intranet/pages/profesor/models';
+import { CalificacionDto, ContenidoTareaTipo, CupoPesoDto, CursoContenidoTareaDto, CrearTareaRequest, ActualizarTareaRequest } from '@features/intranet/pages/profesor/models';
 import { EduButton, EduDatePicker, EduDialog, EduInputText, EduSelect, EduTextarea, EduToggle } from '@edu-ui';
 
 // #endregion
@@ -34,6 +34,10 @@ export class TareaDialogComponent implements OnChanges {
 	/** Evaluaciones del mismo curso sin tarea, candidatas a enlazar. */
 	readonly evaluacionesEnlazables = input<CalificacionDto[]>([]);
 	readonly calificacionesLoading = input(false);
+	/** Cupo de peso del curso al crear (fracciones 0–1); `null` mientras carga o si falló. */
+	readonly cupo = input<CupoPesoDto | null>(null);
+	/** Rechazo del servidor al crear con evaluación; el diálogo sigue abierto. */
+	readonly errorServidor = input<string | null>(null);
 
 	readonly visibleChange = output<boolean>();
 	readonly createTarea = output<CrearTareaRequest>();
@@ -49,6 +53,10 @@ export class TareaDialogComponent implements OnChanges {
 	tipo: ContenidoTareaTipo = 'TAREA';
 	duracionMinutos: number | null = null;
 	evaluacionAEnlazar: number | null = null;
+	/** Al crear una tarea o actividad nace activo (INV-C16); apagarlo la crea sin evaluación. */
+	esCalificable = true;
+	/** Peso en % (la API lo recibe como fracción); sin valor por defecto (INV-C04). */
+	pesoPct: number | null = null;
 
 	readonly tipoOptions: { value: ContenidoTareaTipo; label: string; hint: string; icon: string }[] = [
 		{ value: 'TAREA', label: 'Tarea', hint: 'Trabajo para casa', icon: 'pi-file-edit' },
@@ -82,7 +90,7 @@ export class TareaDialogComponent implements OnChanges {
 	/** El título falta y el docente ya intentó crear: se explica en vez de dejar el botón mudo. */
 	intentoGuardar = false;
 
-	private baseline = { titulo: '', descripcion: '', fecha: null as number | null, esGrupal: false, tipo: 'TAREA' as ContenidoTareaTipo, duracion: null as number | null };
+	private baseline = { titulo: '', descripcion: '', fecha: null as number | null, esGrupal: false, tipo: 'TAREA' as ContenidoTareaTipo, duracion: null as number | null, esCalificable: true, peso: null as number | null };
 
 	mostrarErrorTitulo(): boolean {
 		return this.intentoGuardar && !this.titulo.trim();
@@ -96,7 +104,9 @@ export class TareaDialogComponent implements OnChanges {
 			(this.fechaLimite?.getTime() ?? null) !== b.fecha ||
 			this.esGrupal !== b.esGrupal ||
 			this.tipo !== b.tipo ||
-			this.duracionMinutos !== b.duracion
+			this.duracionMinutos !== b.duracion ||
+			this.esCalificable !== b.esCalificable ||
+			this.pesoPct !== b.peso
 		);
 	}
 
@@ -121,6 +131,8 @@ export class TareaDialogComponent implements OnChanges {
 					this.duracionMinutos = null;
 					this.minFechaLimite = new Date();
 				}
+				this.esCalificable = true;
+				this.pesoPct = null;
 				this.intentoGuardar = false;
 				this.baseline = {
 					titulo: this.titulo,
@@ -129,6 +141,8 @@ export class TareaDialogComponent implements OnChanges {
 					esGrupal: this.esGrupal,
 					tipo: this.tipo,
 					duracion: this.duracionMinutos,
+					esCalificable: true,
+					peso: null,
 				};
 			}
 		}
@@ -137,6 +151,36 @@ export class TareaDialogComponent implements OnChanges {
 	/** Solo tareas y actividades ya guardadas pueden hacerse calificables; el examen queda fuera de F5. */
 	puedeSerCalificable(): boolean {
 		return !!this.tarea() && this.tipo !== 'EXAMEN';
+	}
+
+	/** Control «Es calificable» al crear: tarea y actividad (el examen mantiene su aviso). */
+	mostrarCalificableAlCrear(): boolean {
+		return !this.tarea() && this.tipo !== 'EXAMEN';
+	}
+
+	/** Tope del campo de peso en %: el cupo restante si ya se conoce, si no 100. */
+	pesoMaxPct(): number {
+		const cupo = this.cupo();
+		return cupo ? Math.min(100, Math.round(cupo.cupoRestante * 10000) / 100) : 100;
+	}
+
+	/** Peso ya usado en %, sin el ruido de coma flotante de la fracción del servidor. */
+	pesoUsadoPct(): number {
+		return Math.round((this.cupo()?.pesoUsado ?? 0) * 10000) / 100;
+	}
+
+	/** Explica el peso antes de que el servidor lo rechace; `null` si es válido. */
+	errorPeso(): string | null {
+		if (!this.mostrarCalificableAlCrear() || !this.esCalificable) return null;
+		const peso = this.pesoPct;
+		if (peso === null || Number.isNaN(peso)) return this.intentoGuardar ? 'Escribe el peso (entre 1 % y 100 %).' : null;
+		if (peso < 1 || peso > 100) return 'El peso debe estar entre 1 % y 100 %.';
+		if (peso > this.pesoMaxPct()) {
+			return this.pesoMaxPct() <= 0
+				? 'El curso ya no tiene cupo de peso. Desactiva «Es calificable» para crearla sin evaluación.'
+				: `El peso no puede superar el cupo disponible (${this.pesoMaxPct()} %).`;
+		}
+		return null;
 	}
 
 	pesoLabel(cal: CalificacionDto): string {
@@ -161,6 +205,12 @@ export class TareaDialogComponent implements OnChanges {
 			return;
 		}
 
+		const conEvaluacion = !this.tarea() && this.mostrarCalificableAlCrear() && this.esCalificable;
+		if (conEvaluacion && (this.pesoPct === null || this.errorPeso() !== null)) {
+			this.intentoGuardar = true;
+			return;
+		}
+
 		const fechaStr = this.fechaLimite ? toLocalIso(this.fechaLimite) : null;
 
 		if (this.tarea()) {
@@ -180,6 +230,7 @@ export class TareaDialogComponent implements OnChanges {
 				esGrupal: this.esGrupal,
 				tipo: this.tipo,
 				duracionMinutos: this.tipo === 'EXAMEN' ? this.duracionMinutos : null,
+				...(conEvaluacion && this.pesoPct !== null ? { evaluacion: { peso: Math.round(this.pesoPct * 100) / 10000 } } : {}),
 			});
 		}
 	}

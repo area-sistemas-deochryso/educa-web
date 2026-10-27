@@ -5,6 +5,7 @@ import { ErrorHandlerService } from '@core/services';
 import { UI_SUMMARIES, UI_ATTACHMENT_MESSAGES } from '@shared/constants';
 import { ProfesorApiService } from '../../services/profesor-api.service';
 import { CursoContenidoStore } from './curso-contenido.store';
+import { CursoContenidoEvaluacionFacade } from './curso-contenido-evaluacion.facade';
 import { ContenidoTareaTipo, CursoContenidoSemanaDto, CursoContenidoTareaDto } from '../../models';
 
 /**
@@ -21,6 +22,7 @@ export class CursoContenidoUiFacade {
 	private readonly store = inject(CursoContenidoStore);
 	private readonly errorHandler = inject(ErrorHandlerService);
 	private readonly destroyRef = inject(DestroyRef);
+	private readonly evaluacionFacade = inject(CursoContenidoEvaluacionFacade);
 	// #endregion
 
 	// #region Estado expuesto
@@ -42,6 +44,7 @@ export class CursoContenidoUiFacade {
 	/** Open the task dialog with an existing task or null for create. */
 	openTareaDialog(tarea: CursoContenidoTareaDto | null, tipoInicial: ContenidoTareaTipo = 'TAREA'): void {
 		this.store.openTareaDialog(tarea, tipoInicial);
+		if (!tarea) this.evaluacionFacade.cargarCupoPeso();
 	}
 
 	/** Close the task dialog and clear selection. */

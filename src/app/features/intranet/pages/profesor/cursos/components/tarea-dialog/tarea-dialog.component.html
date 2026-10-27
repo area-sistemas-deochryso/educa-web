@@ -180,14 +180,48 @@
 					</div>
 				}
 			</div>
+		} @else if (mostrarCalificableAlCrear()) {
+			<div class="task-eval" data-info-anchor="profesor-tarea-dialog-calificable">
+				<span class="form-label">
+					<i class="pi pi-chart-line" style="font-size: 0.78rem"></i>
+					Es calificable
+				</span>
+				<div class="grupal-toggle">
+					<edu-toggle data-info-anchor="profesor-tarea-dialog-calificable-toggle" [(ngModel)]="esCalificable" />
+					<span class="grupal-label">{{ esCalificable ? 'Con evaluación' : 'Sin evaluación' }}</span>
+				</div>
+				@if (esCalificable) {
+					<label for="tareaPeso" class="form-label">Peso (%) <span class="required-hint">(obligatorio)</span></label>
+					<input
+						eduInputText
+						id="tareaPeso"
+						type="number"
+						min="1"
+						[max]="pesoMaxPct()"
+						[(ngModel)]="pesoPct"
+						placeholder="Ej: 20"
+						[attr.aria-invalid]="errorPeso() ? 'true' : null"
+						aria-describedby="tareaPesoHint"
+						class="w-full"
+					/>
+					@if (errorPeso(); as errPeso) {
+						<small id="tareaPesoHint" class="field-error" role="alert">{{ errPeso }}</small>
+					} @else if (cupo()) {
+						<small id="tareaPesoHint" class="field-hint">Cupo disponible: {{ pesoMaxPct() }} % (usado: {{ pesoUsadoPct() }} %).</small>
+					} @else {
+						<small id="tareaPesoHint" class="field-hint">Se crea junto con la {{ etiqueta().toLowerCase() }} y aparece en Calificaciones.</small>
+					}
+				} @else {
+					<small class="field-hint">Se creará solo la {{ etiqueta().toLowerCase() }}, sin evaluación.</small>
+				}
+				@if (errorServidor(); as errSrv) {
+					<small class="field-error" role="alert">{{ errSrv }}</small>
+				}
+			</div>
 		} @else {
 			<div class="task-eval-hint">
 				<i class="pi pi-info-circle"></i>
-				<span>
-					{{ tipo === 'EXAMEN'
-						? 'Esto no se calificará automáticamente. Crea la evaluación correspondiente en Calificaciones.'
-						: 'Guarda la ' + etiqueta().toLowerCase() + ' para poder hacerla calificable.' }}
-				</span>
+				<span>Esto no se calificará automáticamente. Crea la evaluación correspondiente en Calificaciones.</span>
 			</div>
 		}
 	</div>

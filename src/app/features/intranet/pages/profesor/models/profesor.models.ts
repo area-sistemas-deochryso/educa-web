@@ -328,6 +328,20 @@ export interface CrearTareaRequest {
 	tipo?: ContenidoTareaTipo;
 	/** Duración en minutos; solo se guarda si el tipo es EXAMEN. */
 	duracionMinutos?: number | null;
+	/** Con el bloque, una sola petición crea la tarea y su evaluación enlazada (INV-C16); solo TAREA y ACTIVIDAD. */
+	evaluacion?: CrearTareaEvaluacionRequest;
+}
+
+/** Evaluación que se crea junto con la tarea. */
+export interface CrearTareaEvaluacionRequest {
+	/** Fracción 0,01–1 (la UI muestra %). */
+	peso: number;
+}
+
+/** Peso ya usado y cupo restante del curso, en fracciones 0–1 (INV-C04). */
+export interface CupoPesoDto {
+	pesoUsado: number;
+	cupoRestante: number;
 }
 
 /**

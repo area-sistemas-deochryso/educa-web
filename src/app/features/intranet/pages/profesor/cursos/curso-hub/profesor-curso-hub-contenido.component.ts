@@ -118,6 +118,8 @@ import type { ActualizarTareaRequest, CalificacionDto, CrearCalificacionDto, Cre
 			[evaluacionEnlazada]="evaluacionEnlazada()"
 			[evaluacionesEnlazables]="evaluacionesEnlazables()"
 			[calificacionesLoading]="calVm().loading"
+			[cupo]="vm().tareaCupo"
+			[errorServidor]="vm().tareaDialogError"
 			(visibleChange)="onTareaVisibleChange($event)"
 			(createTarea)="onCreateTarea($event)"
 			(updateTarea)="onUpdateTarea($event)"
@@ -235,7 +237,9 @@ export class ProfesorCursoHubContenidoComponent {
 
 	protected onCreateTarea(request: CrearTareaRequest): void {
 		const semanaId = this.vm().activeSemanaId;
-		if (semanaId) this.crudFacade.crearTarea(semanaId, request);
+		const contenidoId = this.vm().contenido?.id;
+		// La evaluación nueva debe verse en Calificaciones sin recargar la página.
+		if (semanaId) this.crudFacade.crearTarea(semanaId, request, () => contenidoId && this.calLoader.refresh(contenidoId));
 	}
 
 	protected onUpdateTarea(request: ActualizarTareaRequest): void {

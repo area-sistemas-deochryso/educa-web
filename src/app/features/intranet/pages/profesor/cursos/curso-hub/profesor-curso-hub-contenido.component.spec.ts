@@ -155,7 +155,16 @@ describe('ProfesorCursoHubContenidoComponent', () => {
 
 			component(create()).onCreateTarea(request);
 
-			expect(crudFacade.crearTarea).toHaveBeenCalledWith(3, request);
+			expect(crudFacade.crearTarea).toHaveBeenCalledWith(3, request, expect.any(Function));
+		});
+
+		it('tras crear con evaluación refresca las evaluaciones del curso', () => {
+			vm.set({ ...baseVm, activeSemanaId: 3, contenido: { id: 8 } });
+
+			component(create()).onCreateTarea({ titulo: 'Tarea', evaluacion: { peso: 0.2 } });
+			crudFacade.crearTarea.mock.lastCall?.[2]();
+
+			expect(calLoader.refresh).toHaveBeenCalledWith(8);
 		});
 
 		it('updates the selected tarea in the active semana', () => {
