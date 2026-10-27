@@ -37,7 +37,7 @@ public async Task AprobarEstudianteAsync(int id)
 {
     var periodo = await _repo.GetPeriodoAsync(salonId);
     if (periodo.EstadoCierre != "CERRADO")
-        throw new BusinessRuleException("INV-T02: Periodo no cerrado"); // Esto no es una excepción
+        throw new BusinessRuleException(ErrorCodes.Periodo.NoCerrado, "Periodo no cerrado"); // INV-T02. Esto no es una excepción
     // ...
 }
 ```
@@ -80,7 +80,7 @@ public async Task<Result<AprobacionDto>> AprobarEstudianteAsync(int id)
 {
     var periodo = await _repo.GetPeriodoAsync(salonId);
     if (periodo.EstadoCierre != "CERRADO")
-        return Result<AprobacionDto>.Fail("INV-T02", "No se puede aprobar con periodo abierto");
+        return Result<AprobacionDto>.Fail(ErrorCodes.Periodo.NoCerrado, "No se puede aprobar con periodo abierto"); // INV-T02
 
     // ... lógica
     return Result<AprobacionDto>.Ok(dto);
