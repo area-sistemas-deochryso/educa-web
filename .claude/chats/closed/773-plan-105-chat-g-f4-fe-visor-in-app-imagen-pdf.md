@@ -1,7 +1,7 @@
 # 773 — FE: P105 G F4 — visor in-app de imagen y PDF para `app-file-row`
 
 > **Repo destino**: `educa-web` (frontend, branch `main`). Abrir el chat nuevo en este repo.
-> **Validación prod**: ⏳ pendiente desde 2026-10-06 — smoke en vivo de imagen/PDF/.docx (curso, attachments-modal, entrega). Commit `05719ff1` en `chat/773-p105-g-f4-visor-in-app-imagen-pdf`, sin push.
+> **Validación prod**: ⏭️ cerrado sin verificar en prod (2026-10-27, decisión del usuario) — antes: ⏳ pendiente desde 2026-10-06 — smoke en vivo de imagen/PDF/.docx (curso, attachments-modal, entrega). Commit `05719ff1` en `chat/773-p105-g-f4-visor-in-app-imagen-pdf`, sin push.
 > **Verificación local parcial 2026-10-07**: parcial. ✅ PDF (`TEST-747-material.pdf`, horario 26): abre en visor in-app con barra de PDF (el render congela las capturas del navegador; verificado por DOM). Sin verificar: imagen y .docx (necesitan subir archivos), entrega de estudiante.
 > **Plan**: 105 · **Chat**: G-F4 · **Fase**: F4 · **Creado**: 2026-10-06 · **Estado**: ✅ cerrado localmente 2026-10-06
 > **Origen**: cierre del brief 772 (commit `355f6759`, integrado en `main` local, **sin push**). G F1-F3 terminaron: todos los sitios de archivos usan `app-file-row`. F4 es lo único que queda de G y el usuario lo dejó **firme** el 2026-10-01 (G2: «visor in-app: imagen y PDF inline; resto descarga»).
@@ -123,3 +123,7 @@ Pedir feedback con `/feedback`.
 | `reference/a11y.md` | `file-viewer.component.html` (img/iframe/botón) |
 | `reference/dialogs-sync.md` | nuevo diálogo `app-file-viewer` |
 | `reference/eslint.md`, `reference/enforcement-reglas.md` | excepción puntual `security/no-bypass-security-trust` en `eslint.config.js` |
+
+## Cierre sin verificación en prod
+
+Cerrado el 2026-10-27 **por decisión del usuario**, sin `/verify-prod` ni corrida contra prod (limpieza de `awaiting-prod/`, mismo criterio que P110/P113/P115/P116). El código ya estaba en `origin/main`; la verificación en vivo, si existió, es la registrada arriba.

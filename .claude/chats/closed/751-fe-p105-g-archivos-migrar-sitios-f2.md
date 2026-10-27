@@ -5,7 +5,7 @@
 > **Origen**: brief 747 (P105 G F1) · commit `8ef429b1` · 2026-10-01
 > **Plan file**: `educa-coord/plans/xrepo/100-119/xrepo-105-backlog-ux-sesion-20260820.md` § Diseños → G (F2: "migrar cursos/entregas/resumen")
 > **depends_on**: 747 (F1) — ya integrado en `main`
-> **Validación prod**: ⏳ pendiente desde 2026-10-01 — falta verificar en vivo `student-task-submissions-dialog`, `student-files-dialog` (necesitan estudiantes asignados al horario 26) y `archivos-summary-dialog` (vista del estudiante).
+> **Validación prod**: ⏭️ cerrado sin verificar en prod (2026-10-27, decisión del usuario) — antes: ⏳ pendiente desde 2026-10-01 — falta verificar en vivo `student-task-submissions-dialog`, `student-files-dialog` (necesitan estudiantes asignados al horario 26) y `archivos-summary-dialog` (vista del estudiante).
 > **Verificación local parcial 2026-10-07**: sin verificar. Subir archivos exige el selector nativo del navegador (la herramienta solo sube rutas compartidas; asignar el archivo por JS no dispara la subida). Pendiente en TEST: `student-task-submissions-dialog`, `student-files-dialog` (estudiantes asignados al horario) y `archivos-summary-dialog` (vista estudiante). Requiere archivos de prueba pequeños.
 > **MODO SUGERIDO**: `/design` (ver "Decisiones abiertas", ~10 min) → `/execute` → `/validate`
 > **exclusive**: `false`
@@ -114,3 +114,7 @@ El profesor y el estudiante comparten la lógica de subida: `edu-file-upload` (`
 ## CIERRE
 
 Al cerrar, dejar anotado si la Decisión abierta 2 (trigger de subida) requirió tocar `edu-ui`, para reflejarlo en `educa-libs`.
+
+## Cierre sin verificación en prod
+
+Cerrado el 2026-10-27 **por decisión del usuario**, sin `/verify-prod` ni corrida contra prod (limpieza de `awaiting-prod/`, mismo criterio que P110/P113/P115/P116). El código ya estaba en `origin/main`; la verificación en vivo, si existió, es la registrada arriba.

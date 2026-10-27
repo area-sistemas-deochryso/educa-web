@@ -2,7 +2,7 @@
 
 > **Repo destino**: `educa-web` (frontend, branch `main`). Abrir el chat nuevo en este repo.
 > **Origen**: pasada de verificación local 2026-10-07 (brief 754) · BBDD de prueba, sesión real de estudiante.
-> **Validación prod**: ⏳ pendiente desde 2026-10-07 (smoke local con sesión de estudiante; depende del brief 778 BE)
+> **Validación prod**: ⏭️ cerrado sin verificar en prod (2026-10-27, decisión del usuario) — antes: ⏳ pendiente desde 2026-10-07 (smoke local con sesión de estudiante; depende del brief 778 BE)
 > **Created**: 2026-10-07
 > **MODO SUGERIDO**: `/execute` (arreglo pequeño; `/investigate` corto si se quiere confirmar el contrato)
 > **exclusive**: `false` · **modules**: `home`, `estudiante`
@@ -30,3 +30,7 @@ Prueba: con la respuesta real interceptada (Biología, 11/08/2026, estado `J`) e
 - [x] Con `fecha: "…T00:00:00"` del BE, el widget muestra el estado de hoy.
 - [x] Spec nuevo verde; lint y build verdes.
 - [ ] Smoke local con sesión de estudiante y asistencia de hoy (requiere poder guardar asistencia: ver brief 778 del BE; hasta entonces, probar con la respuesta interceptada).
+
+## Cierre sin verificación en prod
+
+Cerrado el 2026-10-27 **por decisión del usuario**, sin `/verify-prod` ni corrida contra prod (limpieza de `awaiting-prod/`, mismo criterio que P110/P113/P115/P116). El código ya estaba en `origin/main`; la verificación en vivo, si existió, es la registrada arriba.

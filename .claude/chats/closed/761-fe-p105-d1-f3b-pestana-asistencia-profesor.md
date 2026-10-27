@@ -113,7 +113,7 @@ Standalone + `OnPush`, `inject()`, signals, alias `@app/@core/@data/@config/...`
 
 ## RESULTADO (2026-10-03)
 
-> **Validación prod**: ⏳ pendiente desde 2026-10-03
+> **Validación prod**: ⏭️ cerrado sin verificar en prod (2026-10-27, decisión del usuario) — antes: ⏳ pendiente desde 2026-10-03
 > **Verificación local parcial 2026-10-07**: pestaña Asistencia del profesor carga y el guard de salida funciona (ver 769); **no se pudo guardar**: `POST /api/AsistenciaCurso/horario/{id}/registrar` da 500 por transacción fuera de la estrategia de reintentos (brief 778, Educa.API). Cerrar tras corregir 778 y probar guardar + ver en Resumen.
 
 - **Alcance**: pestaña Asistencia del profesor (ruta hija `…/asistencia`) que embebe los paneles de registro y resumen con la franja del shell. Cierra F3 del plan 105 (estudiante en 760).
@@ -128,3 +128,7 @@ Standalone + `OnPush`, `inject()`, signals, alias `@app/@core/@data/@config/...`
 
 ## CIERRE
 Pedir feedback con `/feedback`.
+
+## Cierre sin verificación en prod
+
+Cerrado el 2026-10-27 **por decisión del usuario**, sin `/verify-prod` ni corrida contra prod (limpieza de `awaiting-prod/`, mismo criterio que P110/P113/P115/P116). El código ya estaba en `origin/main`; la verificación en vivo, si existió, es la registrada arriba.

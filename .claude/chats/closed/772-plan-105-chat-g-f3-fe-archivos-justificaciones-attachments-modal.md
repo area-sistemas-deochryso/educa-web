@@ -6,7 +6,7 @@
 > **Plan file**: `educa-coord/plans/xrepo/100-119/xrepo-105-backlog-ux-sesion-20260820.md` § Diseños → G (F3: "migrar justificaciones/horario"). Solo intención y decisiones.
 > **depends_on**: brief 747 (G F1) ✅ y 751 (G F2) ✅ integrados en `main` local (ambos en `awaiting-prod/`).
 > **MODO SUGERIDO**: `/investigate` (corto: inventariar los sitios y confirmar qué consume `getFileType`) → `/execute` → `/validate`. Sin `/design`: el patrón (`app-file-row`, `UPLOAD_*`, `validateUploadFile`) lo fijó F1 y F2 lo aplicó.
-> **Validación prod**: ⏳ pendiente desde 2026-10-06 — smoke en local (`UseTestEnv: true`): justificar inasistencia con archivo válido y con uno rechazado (docx / >10 MB); abrir `attachments-modal` de un horario y abrir/eliminar cada fila.
+> **Validación prod**: ⏭️ cerrado sin verificar en prod (2026-10-27, decisión del usuario) — antes: ⏳ pendiente desde 2026-10-06 — smoke en local (`UseTestEnv: true`): justificar inasistencia con archivo válido y con uno rechazado (docx / >10 MB); abrir `attachments-modal` de un horario y abrir/eliminar cada fila.
 > **Verificación local parcial 2026-10-07**: sin verificar. Mismo límite de subida de archivos. Pendiente: justificar inasistencia con archivo válido y con uno rechazado (docx / >10 MB) — sin enviar justificaciones válidas más allá de lo mínimo (SMTP real heredado) — y abrir/eliminar filas en `attachments-modal`.
 > **exclusive**: `false` · **isolation**: `worktree`
 > **touches** (a re-verificar): `justificar-inasistencia-dialog`, `health-justification-dialog`, `attachments-modal` (horario), `BlobStorageService` (retiro del adaptador `getFileType`) y sus specs/scss.
@@ -95,3 +95,7 @@ Pedir feedback con `/feedback`.
 - `attachments-modal`: se eliminó el botón «Descargar» (la fila ya abre en pestaña); tope de subida 50 → 100 MB.
 - Validación: eslint, build y vitest (308 archivos / 3104 tests) en verde. Grep de `getFileType`/`getFileIcon`/`getFileIconClass` = 0.
 - Pendiente: `/wt-merge` + promover a `main` con `--ff-only` + `/wt-clean`; `/verify 772`.
+
+## Cierre sin verificación en prod
+
+Cerrado el 2026-10-27 **por decisión del usuario**, sin `/verify-prod` ni corrida contra prod (limpieza de `awaiting-prod/`, mismo criterio que P110/P113/P115/P116). El código ya estaba en `origin/main`; la verificación en vivo, si existió, es la registrada arriba.
