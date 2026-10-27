@@ -106,6 +106,9 @@ export function buildJitsiOptions(params: {
 		configOverwrite: {
 			startWithAudioMuted: true,
 			startWithVideoMuted: true,
+			// JaaS actual ignora `prejoinPageEnabled` (deprecado) y muestra "Entrar a la reunión": sin `prejoinConfig`
+			// no hay `videoConferenceJoined` y el fallback de la sala tapa el botón. Se mantiene el viejo por compatibilidad.
+			prejoinConfig: { enabled: false },
 			prejoinPageEnabled: false,
 			disableDeepLinking: true,
 			toolbarButtons: params.toolbarButtons,
