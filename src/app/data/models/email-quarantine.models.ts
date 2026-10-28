@@ -52,18 +52,19 @@ export interface EmailQuarantineListaDto {
 	retryAfter: string;
 	estado: boolean;
 	observacion: string | null;
+	/** Cierre de la cuarentena (`null` mientras sigue activa). */
+	fechaLiberacion: string | null;
+	/** `AUTO_EXPIRED` | `MANUAL_RELEASE` | `PROMOTED_BLACKLIST` (lo fija el BE). */
+	motivoLiberacion: string | null;
 	fechaReg: string;
 	fechaMod: string | null;
 	usuarioReg: string;
 	usuarioMod: string | null;
-	rowVersion: string;
 }
 
 export interface EmailQuarantineDetalleDto extends EmailQuarantineListaDto {
-	eventoOrigenId: number | null;
-	eventoOrigenTipo: string | null;
-	eventoOrigenDiagnostic: string | null;
-	historial: EmailQuarantineListaDto[];
+	/** Id del defer event que abrió la cuarentena (`null` en altas manuales). */
+	originEventId: number | null;
 	/** Plan 43 Chat 3.1 — respuesta SMTP original que motivó la cuarentena. */
 	originalSmtpResponse?: string | null;
 	originalSmtpResponseSource?: OriginalSmtpResponseSource;
@@ -88,7 +89,6 @@ export interface CrearEmailQuarantineDto {
 }
 
 export interface LiberarEmailQuarantineDto {
-	rowVersion: string;
 	motivoLiberacion: MotivoLiberacion;
 	observacion: string;
 }
