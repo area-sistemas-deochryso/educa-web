@@ -111,7 +111,7 @@ export interface HeatmapCell {
 	dayOfWeek: number;
 	hour: number;
 	count: number;
-	avgDuration: number;
+	avgDurationMs: number;
 }
 
 /**

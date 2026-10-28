@@ -4,6 +4,7 @@ import { map, Observable } from 'rxjs';
 
 import { environment } from '@config/environment';
 import {
+	EmailOutboxDetalle,
 	EmailOutboxEstadisticas,
 	EmailOutboxLista,
 	EmailOutboxTendencia,
@@ -98,6 +99,10 @@ export class EmailOutboxApiService {
 		if (hasta) params = params.set('hasta', hasta);
 
 		return this.http.get<EmailOutboxTendencia[]>(`${this.baseUrl}/tendencias`, { params });
+	}
+
+	obtenerDetalle(id: number): Observable<EmailOutboxDetalle> {
+		return this.http.get<EmailOutboxDetalle>(`${this.baseUrl}/${id}`);
 	}
 
 	obtenerHtml(id: number): Observable<string | null> {

@@ -203,28 +203,28 @@
 					Diagnóstico técnico
 				</summary>
 				<div class="section-body">
-					@if (item.remitente) {
+					@if (vm().detalle?.remitente) {
 						<div class="detail-row">
 							<span class="detail-label">Remitente</span>
-							<span class="detail-value">{{ item.remitente }}</span>
+							<span class="detail-value">{{ vm().detalle?.remitente }}</span>
 						</div>
 					}
-					@if (item.lastSmtpCode) {
+					@if (vm().detalle?.lastSmtpCode) {
 						<div class="detail-row">
 							<span class="detail-label">SMTP</span>
-							<span class="detail-value smtp-code">{{ item.lastSmtpCode }} — {{ item.lastSmtpMessage }}</span>
+							<span class="detail-value smtp-code">{{ vm().detalle?.lastSmtpCode }} — {{ vm().detalle?.lastSmtpMessage }}</span>
 						</div>
 					}
-					@if (item.lastAttemptAt) {
+					@if (vm().detalle?.lastAttemptAt) {
 						<div class="detail-row">
 							<span class="detail-label">Último intento</span>
-							<span class="detail-value">{{ item.lastAttemptAt }}</span>
+							<span class="detail-value">{{ vm().detalle?.lastAttemptAt }}</span>
 						</div>
 					}
-					@if (item.bounceSource) {
+					@if (vm().detalle?.bounceSource) {
 						<div class="detail-row">
 							<span class="detail-label">Bounce source</span>
-							<span class="detail-value">{{ item.bounceSource }}</span>
+							<span class="detail-value">{{ vm().detalle?.bounceSource }}</span>
 						</div>
 					}
 					<div class="detail-row">

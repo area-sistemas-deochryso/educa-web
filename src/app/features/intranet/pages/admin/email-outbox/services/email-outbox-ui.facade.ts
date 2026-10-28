@@ -21,12 +21,25 @@ export class EmailOutboxUiFacade {
 	// #region Drawer detalle
 	openDetail(item: EmailOutboxLista): void {
 		this.store.openDrawer(item);
+		this.loadDetalle(item.id);
 		this.loadPreview(item.id);
 		this.loadManualAttempts(item.id);
 	}
 
 	closeDrawer(): void {
 		this.store.closeDrawer();
+	}
+
+	// Diagnóstico SMTP: solo lo sirve el detalle, no la lista. Falla en silencio (sección opcional del drawer).
+	private loadDetalle(id: number): void {
+		this.api
+			.obtenerDetalle(id)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (detalle) => {
+					if (this.store.selectedItem()?.id === id) this.store.setDetalle(detalle);
+				},
+			});
 	}
 
 	private loadPreview(id: number): void {
