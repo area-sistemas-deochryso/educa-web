@@ -51,6 +51,7 @@ Cada línea: `- ruta/archivo.md — <trigger>`. Leé el archivo cuando el trigge
 - [.claude/project-structure/](project-structure/) — agregás módulo/feature nuevo (layering), editás `angular.json` / `tsconfig*.json` / `netlify.toml` / `_redirects`, o necesitás URL de prod/dev/Azure
 - [.claude/reference/architecture.md](reference/architecture.md) — diseñás servicio/componente nuevo (taxonomía de 6 servicios + 6 componentes, multi-facade, dónde vive cada uno)
 - [.claude/reference/templates.md](reference/templates.md) — editás template Angular y necesitás reglas de OnPush/control flow/track
+- [.claude/reference/signal-forms.md](reference/signal-forms.md) — vas a crear un formulario **nuevo** (convención de Signal Forms: `form()`/`submit()`, errores del BE vía `parseProblemDetails`, `aria-invalid` a mano, compat con controles `edu-ui`) o a elegir entre Reactive Forms, `ngModel` y Signal Forms
 - [.claude/reference/testing.md](reference/testing.md) — escribís test nuevo o configurás Vitest
 
 > Reglas niche del FE: `reference/eslint.md` (cuando tira error de capa/import), `reference/regions.md` (refactor >100 ln colapsables), `reference/debug.md` (DebugService/tags), `reference/feature-flags.md` (toggle por entorno) — leelos directo cuando aparezca el trigger del nombre.
