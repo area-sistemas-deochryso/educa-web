@@ -105,7 +105,7 @@ export class ErrorHeatmapComponent {
 			for (let hour = 0; hour < 24; hour++) {
 				const cell = isoLookup.get(`${day}-${hour}`);
 				const count = cell?.count ?? 0;
-				const avgDuration = cell?.avgDuration ?? 0;
+				const avgDuration = cell?.avgDurationMs ?? 0;
 				const intensity = count / maxCount;
 				const tooltip = count > 0
 					? `${DAY_LABELS[day]} ${hour}:00 — ${count} error${count !== 1 ? 'es' : ''}, ${Math.round(avgDuration)}ms prom.`

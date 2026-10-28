@@ -25,6 +25,7 @@ function registro(dia: number, estado: 'A' | 'T' | 'F' = 'A'): AsistenciaDetalle
 		horaSalida: `2026-10-${String(dia).padStart(2, '0')}T14:40:00`,
 		estado: 'Completa',
 		observacion: null,
+		tipoPersona: 'E',
 		estadoCodigo: estado,
 		estadoDescripcion: '',
 		puedeJustificar: false,
