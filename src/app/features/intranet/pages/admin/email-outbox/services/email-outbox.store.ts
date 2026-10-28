@@ -6,6 +6,7 @@ import { computed, Injectable, signal } from '@angular/core';
 import {
 	EmailOutboxEstadisticas,
 	EmailOutboxEstado,
+	EmailOutboxDetalle,
 	EmailOutboxLista,
 	EmailOutboxTendencia,
 	EmailOutboxTipo,
@@ -50,6 +51,7 @@ export class EmailOutboxStore {
 	// UI
 	private readonly _drawerVisible = signal(false);
 	private readonly _selectedItem = signal<EmailOutboxLista | null>(null);
+	private readonly _detalle = signal<EmailOutboxDetalle | null>(null);
 	private readonly _previewHtml = signal<string | null>(null);
 	private readonly _previewLoading = signal(false);
 
@@ -105,6 +107,7 @@ export class EmailOutboxStore {
 	readonly filterCorrelationId = this._filterCorrelationId.asReadonly();
 	readonly drawerVisible = this._drawerVisible.asReadonly();
 	readonly selectedItem = this._selectedItem.asReadonly();
+	readonly detalle = this._detalle.asReadonly();
 	readonly previewHtml = this._previewHtml.asReadonly();
 	readonly previewLoading = this._previewLoading.asReadonly();
 	readonly tendencias = this._tendencias.asReadonly();
@@ -162,6 +165,7 @@ export class EmailOutboxStore {
 		filterCorrelationId: this._filterCorrelationId(),
 		drawerVisible: this._drawerVisible(),
 		selectedItem: this._selectedItem(),
+		detalle: this._detalle(),
 		previewHtml: this._previewHtml(),
 		previewLoading: this._previewLoading(),
 		tendencias: this._tendencias(),
@@ -310,6 +314,7 @@ export class EmailOutboxStore {
 	// #region Comandos de UI
 	openDrawer(item: EmailOutboxLista): void {
 		this._selectedItem.set(item);
+		this._detalle.set(null);
 		this._drawerVisible.set(true);
 		this._previewHtml.set(null);
 	}
@@ -317,6 +322,7 @@ export class EmailOutboxStore {
 	closeDrawer(): void {
 		this._drawerVisible.set(false);
 		this._selectedItem.set(null);
+		this._detalle.set(null);
 		this._previewHtml.set(null);
 		this._manualRetryDialogVisible.set(false);
 		this._manualRetryResult.set(null);
@@ -343,6 +349,9 @@ export class EmailOutboxStore {
 	}
 	setManualRetryResult(result: ManualRetryResultDto | null): void {
 		this._manualRetryResult.set(result);
+	}
+	setDetalle(detalle: EmailOutboxDetalle | null): void {
+		this._detalle.set(detalle);
 	}
 	setManualAttempts(attempts: EmailOutboxManualAttemptDto[]): void {
 		this._manualAttempts.set(attempts);

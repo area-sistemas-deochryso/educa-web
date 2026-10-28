@@ -67,6 +67,7 @@ const miAsistenciaDetalle: AsistenciaDetalle = {
 	horaSalida: '14:05',
 	estado: 'Completa',
 	observacion: null,
+	tipoPersona: 'P',
 	estadoCodigo: 'A',
 	estadoDescripcion: 'Asistió',
 	puedeJustificar: false,

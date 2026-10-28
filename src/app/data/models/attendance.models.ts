@@ -13,6 +13,8 @@ export interface AsistenciaDetalle {
 	horaSalida: string | null;
 	estado: 'Completa' | 'Incompleta';
 	observacion: string | null;
+	/** Discriminador polimórfico: umbral de asistencia correcto por tipo de persona (INV-C01). */
+	tipoPersona: TipoPersona;
 
 	// Estados calculados (agregados para mover lógica al backend)
 	estadoCodigo: AttendanceStatus;
