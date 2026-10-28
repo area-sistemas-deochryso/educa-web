@@ -48,7 +48,6 @@ export class RecipientViewActionsFacade {
 			}
 			await firstValueFrom(
 				this.quarantineApi.liberar(entry.id, {
-					rowVersion: entry.rowVersion,
 					motivoLiberacion: 'OTRO',
 					observacion: 'Liberado desde Recipient View.',
 				}),

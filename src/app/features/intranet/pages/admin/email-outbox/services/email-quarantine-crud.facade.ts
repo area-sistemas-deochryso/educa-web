@@ -89,7 +89,6 @@ export class EmailQuarantineCrudFacade {
 		const snapshot = entry;
 		const previousIndex = this.store.items().findIndex((i) => i.id === entry.id);
 		const dto: LiberarEmailQuarantineDto = {
-			rowVersion: entry.rowVersion,
 			motivoLiberacion: motivoLiberacion as LiberarEmailQuarantineDto['motivoLiberacion'],
 			observacion,
 		};
