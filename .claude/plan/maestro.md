@@ -35,7 +35,7 @@
 
 ## 📋 Cola priorizada
 
-**Briefs en `open/` (2026-10-26)**: 852 (piloto de Signal Forms, P70 F4, baja). 847 (bucle de POST `/vista`, P110 F14) ✅ cerrado 2026-10-20, mergeado y en `origin/main` (`36a7cb70`). Resto de la cola vacío — todos los planes Tier 0 (BAudit2, BAudit3) cerraron en 2026-09-22. `xP50` (todas sus fases FE) cerró completo el 2026-09-25. Siguientes candidatos:
+**Briefs en `open/` (2026-10-26)**: 852 (piloto de Signal Forms, P70 F4) ✅ cerrado localmente 2026-10-28 → `awaiting-prod/` (decisión: adoptar para formularios nuevos, ver `reference/signal-forms.md`). 847 (bucle de POST `/vista`, P110 F14) ✅ cerrado 2026-10-20, mergeado y en `origin/main` (`36a7cb70`). Resto de la cola vacío — todos los planes Tier 0 (BAudit2, BAudit3) cerraron en 2026-09-22. `xP50` (todas sus fases FE) cerró completo el 2026-09-25. Siguientes candidatos:
 
 1. **xP41** — puntero `educa-coord`. F4b (849), F6b (851) y F6d (866) ✅ en `origin/main`; solo resta `/verify-prod`
 2. **F1 F4.4-F4.5** (INV-T*, INV-M* tests) — bloqueado por Plan 2/B BE
