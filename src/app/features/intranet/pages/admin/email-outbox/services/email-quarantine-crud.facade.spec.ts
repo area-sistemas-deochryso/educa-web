@@ -21,11 +21,12 @@ const mockEntry = (
 	retryAfter: '2026-05-01T12:00:00',
 	estado: true,
 	observacion: null,
+	fechaLiberacion: null,
+	motivoLiberacion: null,
 	fechaReg: '2026-04-29T12:00:00',
 	fechaMod: null,
 	usuarioReg: 'admin',
 	usuarioMod: null,
-	rowVersion: 'AAAA',
 	...overrides,
 });
 
