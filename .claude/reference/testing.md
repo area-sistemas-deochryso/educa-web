@@ -5,9 +5,9 @@ Framework: **Vitest** con jsdom
 ## Comandos
 
 ```bash
-npm test               # Vitest run
-npm run test:watch     # Vitest watch mode
-npm run test:coverage  # Con cobertura
+bun run test               # Vitest run
+bun run test:watch     # Vitest watch mode
+bun run test:coverage  # Con cobertura
 ```
 
 ## Ejemplo de Test
@@ -37,7 +37,7 @@ describe('MiService', () => {
 });
 ```
 
-Un solo archivo o carpeta: `bunx vitest run <ruta>` (local) o `npx vitest run <ruta>`. La config de Vitest (jsdom, `setupFiles`) vive en `vite.config.ts`.
+Un solo archivo o carpeta: `bunx vitest run <ruta>`. La config de Vitest (jsdom, `setupFiles`) vive en `vite.config.ts`.
 
 ## Convenciones
 

@@ -46,7 +46,7 @@ Dominios: `UI`, `API`, `STORE`, `FACADE`, `KARDEX`, `ASISTENCIA`. Niveles: ERROR
 
 ## Quirk: Angular 22 + esbuild — `isDevMode()` retorna `false` en `ng serve`
 
-> **`logger.log()` y `logger.warn()` están gateados por `isDevMode() && !environment.production`. En Angular 22 con builder `@angular-devkit/build-angular:application` (esbuild), `ngDevMode` no se setea como global → `isDevMode()` retorna `false` incluso con `npm run start` (ng serve dev). Resultado: `logger.log()` es no-op silencioso en dev.**
+> **`logger.log()` y `logger.warn()` están gateados por `isDevMode() && !environment.production`. En Angular 22 con builder `@angular-devkit/build-angular:application` (esbuild), `ngDevMode` no se setea como global → `isDevMode()` retorna `false` incluso con `bun run start` (ng serve dev). Resultado: `logger.log()` es no-op silencioso en dev.**
 
 ### Síntoma
 

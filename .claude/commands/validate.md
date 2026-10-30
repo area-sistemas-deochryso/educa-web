@@ -13,9 +13,9 @@ description: Modo Validar — verificar que el cambio funciona o auditar código
 **Frontend (`educa-web/`)**:
 
 ```text
-Agent(description: "Lint check FE", prompt: "Corré `npm run lint` en cwd. Reportá pasó/falló + warnings count. <100 palabras.")
-Agent(description: "Build check FE", prompt: "Corré `npm run build`. Reportá éxito/falla + último error si falló. <100 palabras.")
-Agent(description: "Test suite FE", prompt: "Corré `npm test`. Reportá `N pass / M fail` + nombres de los que fallaron. <100 palabras.")
+Agent(description: "Lint check FE", prompt: "Corré `bun run lint` en cwd. Reportá pasó/falló + warnings count. <100 palabras.")
+Agent(description: "Build check FE", prompt: "Corré `bun run build`. Reportá éxito/falla + último error si falló. <100 palabras.")
+Agent(description: "Test suite FE", prompt: "Corré `bun run test`. Reportá `N pass / M fail` + nombres de los que fallaron. <100 palabras.")
 ```
 
 **Backend (`Educa.API/`)**:

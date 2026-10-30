@@ -10,10 +10,10 @@
 ## Comandos
 
 ```bash
-npm run build:cap          # Build Angular con config capacitor (sin SSR)
-npm run cap:sync           # Sync assets a Android/iOS
-npm run cap:android        # Build + sync + abrir Android Studio
-npm run cap:ios            # Build + sync + abrir Xcode
+bun run build:cap          # Build Angular con config capacitor (sin SSR)
+bun run cap:sync           # Sync assets a Android/iOS
+bun run cap:android        # Build + sync + abrir Android Studio
+bun run cap:ios            # Build + sync + abrir Xcode
 ```
 
 APK manual: Android Studio → Build → Generate App Bundles or APKs → APK(s)

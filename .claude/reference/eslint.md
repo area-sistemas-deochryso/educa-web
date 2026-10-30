@@ -5,8 +5,8 @@ El proyecto usa **ESLint 9** con flat config (`eslint.config.js`).
 ## Comandos
 
 ```bash
-npm run lint           # Ejecutar ESLint
-npm run lint:fix       # ESLint con auto-fix
+bun run lint           # Ejecutar ESLint
+bun run lint:fix       # ESLint con auto-fix
 ```
 
 ## Reglas generales

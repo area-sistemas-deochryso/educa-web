@@ -2,7 +2,7 @@
 
 Aplicacion Angular 22 para gestion educativa con portal publico e intranet privada.
 
-**Stack**: Angular 22, TypeScript 6.0, NgRx Signals, edu-ui (reemplazó PrimeNG, ver P79), Vitest | ASP.NET Core 9, EF Core 9, SQL Server (Azure) | PWA (SWR único — siempre cache inmediato + revalidación en background) + Capacitor (Android/iOS nativo)
+**Stack**: Angular 22, TypeScript 6.0, NgRx Signals, edu-ui (reemplazó PrimeNG, ver P79), Vitest | ASP.NET Core 10, EF Core 10, SQL Server (Azure) | PWA (SWR único — siempre cache inmediato + revalidación en background) + Capacitor (Android/iOS nativo)
 
 ---
 
@@ -11,7 +11,7 @@ Aplicacion Angular 22 para gestion educativa con portal publico e intranet priva
 > **`rules/`** es directorio mágico — todo `.md` ahí se auto-carga en cada chat.
 > **`reference/`** no es mágico — se lee on-demand con `Read` cuando el trigger aplica.
 
-**Always-on** (en `rules/`): `code-style`, `code-language`, `git`, `chat-modes`, `backlog-hygiene`, `one-repo-one-chat`.
+**Always-on**: todo `.md` bajo `rules/` (listar el directorio; no se enumeran acá para no desfasarse).
 
 ---
 
@@ -21,7 +21,7 @@ Cada línea: `- ruta/archivo.md — <trigger>`. Leé el archivo cuando el trigge
 
 ### Reglas always-on (en `rules/`, se auto-cargan)
 
-`code-style`, `code-language`, `git`, `chat-modes`, `backlog-hygiene`, `one-repo-one-chat` — no necesitan trigger, siempre disponibles.
+Todo `.md` de `rules/` — no necesita trigger, siempre disponible.
 
 ### Contexto del negocio
 
@@ -37,7 +37,7 @@ Cada línea: `- ruta/archivo.md — <trigger>`. Leé el archivo cuando el trigge
 - [../educa-coord/contracts/auth.md](../../educa-coord/contracts/auth.md) — tocás cookies de auth, refresh flow, query-string fallback para SignalR
 - [../educa-coord/glossary/db-fields.md](../../educa-coord/glossary/db-fields.md) — tocás `@data/models`, mapeás campos BD con prefijos `EST_/PRO_/ASI_`, o consultás convenciones DNI/RowVersion/auditoría
 - [../educa-coord/CHARTER.md](../../educa-coord/CHARTER.md) — vas a aceptar un plan grande, escribir un ADR, o resolver un trade-off entre principios (latencia vs consistencia, simplicidad vs flexibilidad). Responde los 10 puntos del marco para educa concretamente: función objetivo (matriz por rol), restricciones, trade-offs aceptados, invariante existencial INV-EX01, boundaries, volatilidad, horizonte post-2027, capacidad operacional. Si tu decisión contradice §N, **se actualiza el CHARTER primero**. Ratificado en `decisions/0003-charter-ratificacion.md`
-- [../educa-coord/fitness/README.md](../../educa-coord/fitness/README.md) — sospechás drift arquitectónico, vas a agregar un chequeo medible nuevo, o querés saber qué FIT-* observa un cambio. Catálogo de 27 funciones (`FIT-01..FIT-61`) ancladas al CHARTER, clasificadas por estado (`enforced` / `monitored` / `manual` / `aspirational`)
+- [../educa-coord/fitness/README.md](../../educa-coord/fitness/README.md) — sospechás drift arquitectónico, vas a agregar un chequeo medible nuevo, o querés saber qué FIT-* observa un cambio. Catálogo de funciones `FIT-*` ancladas al CHARTER, clasificadas por estado (`enforced` / `monitored` / `manual` / `aspirational`)
 - [../educa-coord/principles/README.md](../../educa-coord/principles/README.md) — vas a tomar una decisión arquitectónica no trivial (tradeoffs, boundaries, abstracción, dependencias). El README rutea a los 17 elementos del marco; cada uno tiene su `claude.md` con regla operativa ≤40 ln
 - [../educa-coord/invariants/README.md](../../educa-coord/invariants/README.md) — vas a tocar dominio educativo (asistencia, calificaciones, aprobación, horarios, matrícula, periodos, permisos, concurrencia, correos, feedback, error-tracing, reportes, estructura académica, DNI/auditoría). El README rutea al `INV-*` específico por dominio
 

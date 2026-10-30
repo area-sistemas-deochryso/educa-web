@@ -1,4 +1,4 @@
-# Plan de Patrones de Diseño — Backend (ASP.NET Core 9)
+# Plan de Patrones de Diseño — Backend (ASP.NET Core 10)
 
 > **Estado**: Pendiente
 > **Prioridad**: Media-alta (mejora robustez y desacoplamiento)

@@ -4,7 +4,7 @@ Validar que lint y tests pasen antes de pushear. **BLOQUEA el push si hay errore
 
 ## Pasos
 
-1. Ejecutar `npm run lint` y `npm test` en paralelo
+1. Ejecutar `bun run lint` y `bun run test` en paralelo
 2. Evaluar resultados:
    - **Lint warnings** (sin errors): OK, no bloquean
    - **Lint errors** o **tests fallidos**: BLOQUEAR — ir a paso 3

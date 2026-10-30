@@ -66,7 +66,7 @@ Registrar un SW en una página fuera de su scope crea un registro "huérfano" qu
 
 ### Decisión: SW activo también en desarrollo
 
-El registro **no** distingue entre `localhost` y producción. El mismo SW corre con `npm run start` (dev server) y con el bundle desplegado.
+El registro **no** distingue entre `localhost` y producción. El mismo SW corre con `bun run start` (dev server) y con el bundle desplegado.
 
 **Tradeoff aceptado**:
 

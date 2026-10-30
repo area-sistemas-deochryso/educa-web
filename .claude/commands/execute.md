@@ -13,11 +13,11 @@ description: Modo Ejecutar — implementar el plan acordado sin scope creep.
 **Frontend (`educa-web/`)**:
 
 ```bash
-npm install                       # Si cambió package.json
-npm run lint                      # ESLint, debe pasar
-npm run build                     # Build producción
-npx tsc --noEmit                  # Typecheck rápido durante implementación
-npm test                          # Tests (si aplica)
+bun install                       # Si cambió package.json
+bun run lint                      # ESLint, debe pasar
+bun run build                     # Build producción
+bunx tsc --noEmit                  # Typecheck rápido durante implementación
+bun run test                          # Tests (si aplica)
 ```
 
 **Backend (`Educa.API/`)** — solo si el chat es BE o cross-repo:

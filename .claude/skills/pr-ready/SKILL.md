@@ -1,7 +1,7 @@
 ---
 name: pr-ready
 description: Pre-PR checklist - runs lint, tests, and validates code before creating a pull request
-allowed-tools: Bash(npm:*), Bash(git:*), Grep, Glob, Read
+allowed-tools: Bash(bun:*), Bash(bunx:*), Bash(git:*), Grep, Glob, Read
 ---
 
 Run the complete pre-PR checklist to ensure code is ready for review.
@@ -16,15 +16,15 @@ Run the complete pre-PR checklist to ensure code is ready for review.
 ### 2. Linting
 Run ESLint and report issues:
 ```bash
-npm run lint
+bun run lint
 ```
 
-If there are auto-fixable issues, suggest running `npm run lint:fix`.
+If there are auto-fixable issues, suggest running `bun run lint:fix`.
 
 ### 3. Tests
 Run Vitest and verify all tests pass:
 ```bash
-npm test
+bun run test
 ```
 
 Report any failing tests with details.

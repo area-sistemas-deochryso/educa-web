@@ -91,7 +91,7 @@ Los params se ordenan alfabéticamente para generar cache keys determinísticas.
 
 ## SW activo en dev — bundle stale al iterar código
 
-> **`SwService.registerServiceWorker()` registra el SW siempre que `location.pathname.startsWith('/intranet/')`, sin guard de modo desarrollo. Esto significa que `npm run start` (`ng serve --port=4201`) tiene el SW prod-style activo igual que prod, cacheando chunks JS agresivamente.**
+> **`SwService.registerServiceWorker()` registra el SW siempre que `location.pathname.startsWith('/intranet/')`, sin guard de modo desarrollo. Esto significa que `bun run start` (`ng serve --port=4201`) tiene el SW prod-style activo igual que prod, cacheando chunks JS agresivamente.**
 
 ### Síntoma típico
 

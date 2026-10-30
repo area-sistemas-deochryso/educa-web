@@ -15,7 +15,7 @@ Create a semantic commit for the staged changes in educa-web.
 rm -rf dist/*
 
 # 2. Build fresh
-npx ng build --configuration production
+bunx ng build --configuration production
 ```
 
 If the build fails, fix the errors before proceeding. Do NOT commit with a broken build.
@@ -56,7 +56,7 @@ type(scope): description
 ## Steps
 
 1. Run `rm -rf dist/*` to delete old build contents
-2. Run `npx ng build --configuration production` to build fresh
+2. Run `bunx ng build --configuration production` to build fresh
 3. If build fails, fix the errors and rebuild
 3. Run `git status` to see all changes (including updated dist)
 4. Run `git diff --cached` or `git diff` to understand what changed

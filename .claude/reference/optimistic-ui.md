@@ -344,7 +344,7 @@ SERVER-CONFIRMED (si aplica)
 [ ] Documentado por qué un rollback local sería inseguro
 
 ESLINT
-[ ] `npx eslint src/app/features/**/*.facade.ts` limpio
+[ ] `bunx eslint src/app/features/**/*.facade.ts` limpio
 [ ] Ningún eslint-disable sin justificación ni sin referencia a invariante o TODO de migración
 ```
 

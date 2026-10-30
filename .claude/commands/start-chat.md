@@ -28,7 +28,7 @@ Si el brief dice `Repo destino: Educa.API` pero estás en `educa-web` (o vicever
 ### Pre-work típico del dominio
 
 - Scripts SQL pendientes (FE depende de columnas/tablas del BE).
-- `npm install` si cambió `package.json`.
+- `bun install` si cambió `package.json`.
 - Confirmaciones de OPS (jefe, deploy, datos prod).
 
 ### "Ya está activo"
