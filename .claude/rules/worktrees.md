@@ -2,7 +2,7 @@
 
 **Path sibling concreto**: worktrees de chat viven en `EducaWeb/WT/educa-web/<NNN>-<slug>` (no en `<parent>/educa-web-wt/`).
 
-**Growth path**: worktrees de `/growth-hands-on` viven en `EducaWeb/Growth/educa-web/<fecha>` (no en `<parent>/educa-web-wt-growth/`).
+**Growth path** *(obsoleto desde 2026-10-30)*: `/growth-hands-on` está retirado y su reemplazo `/growth-spec` no usa worktrees. Se conserva solo para identificar worktrees viejos en `EducaWeb/Growth/educa-web/<fecha>` (no en `<parent>/educa-web-wt-growth/`); borrar esta línea cuando no queden.
 
 **Repo principal**: vive en `EducaWeb/WD/educa-web` (no en `EducaWeb/educa-web`).
 

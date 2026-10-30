@@ -47,6 +47,10 @@ Remove-Item -Path "$wtPath\<carpeta>" -Force   # SIN -Recurse: en Windows esto b
 
 **Por qué es obligatorio, no opcional**: `git worktree remove` sobre un directorio que contiene un junction puede recorrerlo y borrar el contenido real del *target* en vez de solo el punto de enlace — confirmado en vivo, vació el `node_modules` real del checkout principal de este repo. Sin este paso, limpiar un worktree puede destruir datos del repo principal que nada tiene que ver con el worktree.
 
+### 3c. Preparar la pregunta de comprensión (antes de borrar)
+
+Si el chat cerró trabajo en este worktree, elegir **ahora** el elemento de la pregunta (regla «Closing question» de `rules/growth-mode.md`) y guardar su evidencia: commit sha + `archivo:línea`, tomados de `git diff <base>..chat/<NNN>-<slug>`. El paso 4 borra el worktree y la branch; sin esta evidencia guardada no se puede contrastar la respuesta con el código real (después solo queda en la rama donde se mergeó). No preguntar todavía.
+
 ### 4. Eliminar worktree + branches
 
 ```powershell
@@ -69,6 +73,10 @@ Si `-d` falla por no-merged → preguntar antes de `-D`.
 | Branch `chat/<NNN>-<slug>` | eliminada |
 | Branch `integration/<NNN>-<slug>` | eliminada (o no existía) |
 ```
+
+### 6. Pregunta de comprensión (growth-mode)
+
+Cierra la cadena `/end` → `/wt-merge` → `/wt-clean`. Después de reportar, hacer la pregunta del elemento elegido en 3c, contrastando contra la evidencia guardada. Registrar en `growth/gaps.md`. `//directo` la omite. Si el chat no cerró trabajo en este worktree (limpieza de un worktree ajeno o huérfano), no hay nada que preguntar.
 
 ## Qué NO hago
 

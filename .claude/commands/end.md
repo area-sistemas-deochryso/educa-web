@@ -70,6 +70,12 @@ bash .claude/scripts/progress.sh
 |---|---|
 | Verificar chat en `awaiting-prod/` post-deploy | `/verify <NNN>` |
 
+## Paso 14 — Pregunta de comprensión (growth-mode)
+
+Corre **después** del paso 11 (commit hecho, banner y siguiente sesión ya renderizados), solo en caso ship. Sin delta de contenido: regla completa en el paso 14 de `~/.claude/commands/end.md` y en «Closing question» de `~/.claude/rules/growth-mode.md`. Registro en `growth/gaps.md` (repo `claude-config`). `//directo` lo omite.
+
+**En un worktree** (ver abajo) no se pregunta desde `/end`: el worktree sigue vivo hasta `/wt-merge` → `/wt-clean`, y la pregunta la hace `/wt-clean` §6, al final de la cadena.
+
 ## Worktree-awareness
 
 Si estamos en un worktree (detectar con `git rev-parse --git-common-dir` ≠ `.git`):
