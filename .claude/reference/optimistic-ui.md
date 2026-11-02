@@ -40,7 +40,8 @@ this.wal.execute({
   onCommit: (result) => {
     this.store.updateItem(item.id, { rowVersion: result.rowVersion });
   },
-  // onError NO hace nada: el engine llama rollback() automáticamente.
+  // onError NO hace nada: el engine llama rollback() automáticamente
+  // (excepto VERIFICACION_PENDIENTE: 409 en curso agotado, sin rollback).
   // Solo loggear + mensaje al usuario.
   onError: (err) => this.errorHandler.showError('Error', 'No se pudo guardar'),
 });

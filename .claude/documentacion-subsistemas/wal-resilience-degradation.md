@@ -166,7 +166,8 @@ readonly isDegraded = computed(() =>
 
 **No** se cuentan como fallos para el circuit:
 - Errores 4xx permanentes (es problema del payload, no del servidor)
-- 409 conflicts (problema de concurrencia)
+- 409 de datos (conflicto de RowVersion, INV-S05)
+- 409 `IDEMPOTENCIA_EN_CURSO`: la operación sigue en curso, no es un fallo del servidor. La rama `in-flight` de `handleError` sale antes de `recordFailure()` (`wal-sync-engine.service.ts:367`, `:401`)
 - Errores cuando el navegador está offline (`!sw.isOnline`)
 
 ### Componente UI: `WalDegradedBanner`

@@ -46,7 +46,7 @@ Facade → wal.execute({ optimistic: { apply, rollback }, http$, onCommit })
     ├── apply: muta el store INMEDIATO (UI no espera al server)
     ├── http$: dispara request al BE
     ├── onCommit: reconcilia campos derivados del server (rowVersion, ID real)
-    └── onError: el engine llama rollback() automático
+    └── onError: el engine llama rollback() automático (excepto `VERIFICACION_PENDIENTE`: 409 en curso agotado, sin rollback)
     ↓
 Estrategia por operación:
     ├── CREAR: Refetch items only (necesita ID del servidor) + stats incremental

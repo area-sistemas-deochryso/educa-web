@@ -71,6 +71,7 @@ Si el servidor rechaza la operación, la UI debe volver al estado anterior sin d
 
 - Al aplicar el optimistic update, guardar un **snapshot** del estado previo
 - Si `onError` se dispara, ejecutar `rollback()` con el snapshot
+- Excepción: un 409 `IDEMPOTENCIA_EN_CURSO` agotado deja la entry en `VERIFICACION_PENDIENTE`. `onError` se dispara **sin** rollback, porque no se sabe si la mutación confirmó (`wal-in-flight.utils.ts:25`, INV-S06)
 - El rollback es una función que restaura el estado exacto (no "recalcular de nuevo")
 - El usuario ve un toast de error claro explicando qué pasó
 
@@ -106,7 +107,7 @@ Si el usuario está sin red, la operación se persiste y se envía cuando vuelve
 - Las operaciones en el log sobreviven a: refresh de página, cierre del browser, reinicio del sistema
 - Al detectar conexión restaurada, el engine drena el log (envía lo pendiente)
 - El usuario no se entera de que estaba offline — solo ve que las acciones funcionaron
-- Si el servidor rechaza al reintentar (por ejemplo, conflicto), aplicar rollback y notificar
+- Si el servidor rechaza al reintentar con un 409 de datos (conflicto de RowVersion, INV-S05), aplicar rollback y notificar. Un 409 `IDEMPOTENCIA_EN_CURSO` no es un rechazo: se reintenta con la misma clave, sin rollback (ver §9)
 
 ### Límite
 
@@ -197,7 +198,7 @@ Si el usuario hace clicks rápidos en el mismo botón (double-click, impaciencia
 - El engine serializa operaciones sobre el **mismo recurso** (UPDATE producto #5)
 - Operaciones sobre **recursos diferentes** pueden correr en paralelo
 - Los reintentos usan **idempotency keys** (UUID) para que el servidor deduplique
-- El servidor rechaza operaciones duplicadas con 409 Conflict (o acepta sin efecto)
+- Un reintento con la misma clave tras un 2xx recibe la respuesta cacheada (replay, INV-S06). Si la primera petición sigue en curso, el servidor responde `409 IDEMPOTENCIA_EN_CURSO`: el cliente reintenta con la **misma** clave, nunca con una nueva. Un 409 de datos (INV-S05) es otro caso
 
 ---
 
@@ -251,7 +252,7 @@ Sin feedback, el usuario no sabe si sus cambios están a salvo o si hay un probl
 ENGINE
 [ ] Log persistente (IndexedDB / SQLite / archivo)
 [ ] Operaciones con tipo, recurso, payload, timestamp, estado
-[ ] Estados: PENDING, IN_FLIGHT, COMMITTED, FAILED
+[ ] Estados: PENDING, IN_FLIGHT, COMMITTED, FAILED, CONFLICT, REQUIRES_MIGRATION, VERIFICACION_PENDIENTE
 [ ] Callbacks registrados por sesión (onCommit, onError, rollback)
 
 EJECUCIÓN
