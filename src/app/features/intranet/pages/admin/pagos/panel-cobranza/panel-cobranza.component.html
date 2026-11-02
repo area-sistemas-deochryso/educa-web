@@ -1,0 +1,99 @@
+<div class="panel">
+	<header class="panel__header">
+		<h2 class="panel__title">Panel de cobranza</h2>
+		<p class="panel__date" data-testid="fecha-foto">
+			Foto al <strong>{{ formatFecha(fechaVisible()) }}</strong>
+			@if (seleccion() === hoyValue) {
+				(hoy)
+			}
+		</p>
+	</header>
+
+	<section class="controls" aria-label="Fecha de la foto">
+		<label class="field">
+			<span>Foto de</span>
+			<select
+				data-testid="selector-foto"
+				[value]="seleccion()"
+				(change)="onSelect($any($event.target).value)"
+			>
+				<option [value]="hoyValue">Hoy</option>
+				@for (c of cortesOrdenados(); track c.mes) {
+					<option [value]="c.fecha.slice(0, 10)" [disabled]="esFutura(c.fecha)">
+						Corte de {{ nombreMes(c.mes) }}: {{ formatFecha(c.fecha) }}{{ esFutura(c.fecha) ? ' (aún no llega)' : '' }}
+					</option>
+				}
+			</select>
+		</label>
+
+		<details class="edit">
+			<summary>Editar fecha de corte</summary>
+			<p class="edit__warn" role="note">
+				Editar un corte cambia a propósito la foto de ese mes: los cortes ya presentados con esa fecha dejarán de
+				coincidir.
+			</p>
+			<div class="edit__row">
+				<label class="field">
+					<span>Mes</span>
+					<select [value]="editMes()" (change)="onEditMes(+$any($event.target).value)">
+						@for (m of meses; track m) {
+							<option [value]="m">{{ nombreMes(m) }}</option>
+						}
+					</select>
+				</label>
+				<label class="field">
+					<span>Fecha del corte</span>
+					<input
+						type="date"
+						data-testid="edit-fecha"
+						[value]="editFecha()"
+						[attr.min]="anio + '-01-01'"
+						[attr.max]="hoy"
+						(input)="editFecha.set($any($event.target).value)"
+					/>
+				</label>
+				<button type="button" class="btn" [disabled]="guardando()" (click)="saveCorte()">
+					{{ guardando() ? 'Guardando…' : 'Guardar corte' }}
+				</button>
+			</div>
+			@if (editError(); as err) {
+				<p class="error" role="alert" data-testid="edit-error">{{ err }}</p>
+			}
+		</details>
+	</section>
+
+	@switch (state().status) {
+		@case ('loading') {
+			<div class="skeletons" role="status" aria-busy="true" aria-label="Cargando el panel de cobranza">
+				<div class="skeletons__kpis">
+					@for (i of [1, 2, 3, 4, 5]; track i) {
+						<edu-skeleton height="7rem" />
+					}
+				</div>
+				<edu-skeleton height="6rem" />
+				<edu-skeleton height="12rem" />
+			</div>
+		}
+		@case ('error') {
+			<div class="error-box" role="alert">
+				<p>{{ $any(state()).message }}</p>
+				<button type="button" class="btn" (click)="retry()">Reintentar</button>
+			</div>
+		}
+		@case ('ok') {
+			@let p = $any(state()).panel;
+			@if (p.anioSinParametros) {
+				<div class="banner" role="alert" data-testid="banner-sin-parametros">
+					Faltan los parámetros de cobranza del año: no se calcula deuda.
+				</div>
+			}
+			<app-cobranza-kpis [panel]="p" />
+			<app-cobranza-conteos [conteos]="p.conteos" />
+			<app-cobranza-desglose [porNivel]="p.porNivel" [aging]="p.aging" [oportuna]="p.oportuna" />
+		}
+	}
+
+	<app-cobranza-calculo />
+
+	<app-quienes-deben [fecha]="fechaFoto()" />
+</div>

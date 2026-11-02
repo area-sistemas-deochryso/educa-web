@@ -1,0 +1,70 @@
+<div class="table-wrap">
+	<table class="deben-table">
+		<caption class="sr-only">Alumnos con deuda vencida</caption>
+		<thead>
+			<tr>
+				<th scope="col" class="col-expand"><span class="sr-only">Detalle</span></th>
+				@for (col of columns; track col.key) {
+					<th scope="col" [class.num]="col.numeric" [attr.aria-sort]="ariaSort(col.key)">
+						<button type="button" class="sort-btn" (click)="sort.emit(col.key)">
+							{{ col.label }}
+							<i [class]="sortIcon(col.key)" aria-hidden="true"></i>
+						</button>
+					</th>
+				}
+				<th scope="col">Último pago</th>
+			</tr>
+		</thead>
+		<tbody>
+			@for (fila of filas(); track fila.estudianteId) {
+				@let cat = categoria(fila.categoria);
+				@let open = expanded().has(fila.estudianteId);
+				<tr>
+					<td class="col-expand">
+						<button
+							type="button"
+							class="expand-btn"
+							[attr.aria-expanded]="open"
+							[attr.aria-label]="(open ? 'Ocultar' : 'Ver') + ' cuotas de ' + fila.estudiante"
+							(click)="toggle(fila.estudianteId)"
+						>
+							<i [class]="open ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" aria-hidden="true"></i>
+						</button>
+					</td>
+					<td>{{ fila.estudiante }}</td>
+					<td>{{ fila.salon }}</td>
+					<td><edu-tag [value]="cat.label" [severity]="cat.severity" [icon]="cat.icon" /></td>
+					<td class="num">{{ fila.cuotasVencidas }}</td>
+					<td class="num">{{ fila.diasAtrasoMaximo }}</td>
+					<td class="num strong">{{ soles(fila.deudaVencida) }}</td>
+					<td class="ultimo-pago">
+						@if (fila.ultimoPago; as pago) {
+							<span>{{ fecha(pago.fecha) }}</span>
+							<small>{{ soles(pago.monto) }}</small>
+						} @else {
+							<span class="muted">Sin pagos</span>
+						}
+					</td>
+				</tr>
+				@if (open) {
+					<tr class="detail-row">
+						<td></td>
+						<td [attr.colspan]="columns.length + 1">
+							<app-quienes-deben-cuotas [cuotas]="fila.cuotas" />
+						</td>
+					</tr>
+				}
+			}
+		</tbody>
+	</table>
+</div>
+
+<edu-paginator
+	[rows]="pageSize()"
+	[first]="first()"
+	[totalRecords]="total()"
+	[rowsPerPageOptions]="[10, 20, 50, 100]"
+	[showCurrentPageReport]="true"
+	currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} alumnos"
+	(onPageChange)="onPage($event)"
+/>
