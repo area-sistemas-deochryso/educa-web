@@ -570,6 +570,16 @@ export const INTRANET_ROUTES: Routes = [
 				data: { permissionPath: 'intranet/admin/asistencias' },
 				title: 'Intranet - Gestión de Asistencias',
 			},
+			// xrepo-119 F5a — Pagos y cobranza. Mismo mecanismo que `admin/asistencias`: shell con
+			// `data.permissionPath` y rutas hijas reales. `PAGOS_API_MANAGE` debe tener `CAP_Ruta` = 'intranet/admin/pagos'
+			// (SQL manual; el seed de F2 la dejó en NULL a propósito).
+			{
+				path: 'admin/pagos',
+				loadComponent: () => import('./pages/admin/pagos').then((m) => m.PagosShellComponent),
+				loadChildren: () => import('./pages/admin/pagos/pagos.routes').then((m) => m.default),
+				data: { permissionPath: 'intranet/admin/pagos' },
+				title: 'Intranet - Pagos',
+			},
 			{
 				// P91 F2 (brief 495) — gateado por `RENDIMIENTO_ADMIN_PAGE_VIEW` (capability de página,
 				// separada de `REPORTES_RENDIMIENTO` que valida el endpoint). Ver

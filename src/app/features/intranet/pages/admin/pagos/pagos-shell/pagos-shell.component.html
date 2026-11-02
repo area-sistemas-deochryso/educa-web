@@ -1,0 +1,12 @@
+<app-page-header icon="pi pi-wallet" title="Pagos" subtitle="Cobranza, morosidad y estado de cuenta de los alumnos" />
+
+<edu-tabs [value]="activeTab()" (valueChange)="onTabChange($event)">
+	@for (tab of tabs; track tab.value) {
+		<edu-tab [value]="tab.value">
+			<i [class]="tab.icon + ' mr-2'"></i>
+			{{ tab.label }}
+		</edu-tab>
+	}
+</edu-tabs>
+
+<router-outlet />
