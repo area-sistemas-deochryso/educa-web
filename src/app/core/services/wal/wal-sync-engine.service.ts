@@ -25,6 +25,7 @@ import { WalReconciler } from './wal-reconciler.service';
 import { WalCircuitBreaker } from './wal-circuit-breaker.service';
 import { WalStorageMonitor } from './wal-storage-monitor.service';
 import { classifyWalError } from './wal-error.utils';
+import { handleInFlight } from './wal-in-flight.utils';
 import {
 	WalEntry,
 	WalProcessResult,
@@ -362,7 +363,12 @@ export class WalSyncEngine {
 	): Promise<WalProcessResult> {
 		const classified = classifyWalError(error);
 
-		// 409 Conflict → mark conflict, no retry, surface to the user like a permanent error
+		// 409 IDEMPOTENCIA_EN_CURSO → reintento con la misma clave, sin conflicto ni rollback (INV-S06)
+		if (classified.kind === 'in-flight') {
+			return handleInFlight(this.wal, this._entryProcessed$, entry, error, cb, this.callbacks);
+		}
+
+		// 409 Conflict (INV-S05) → mark conflict, no retry, surface to the user like a permanent error
 		if (classified.kind === 'conflict') {
 			await this.wal.markConflict(entry.id);
 			await this.cacheInvalidator.invalidateForEntry(entry);

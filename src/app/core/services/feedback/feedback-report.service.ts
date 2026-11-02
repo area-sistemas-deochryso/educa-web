@@ -27,11 +27,9 @@ export class FeedbackReportService {
 
 	// #region POST — Registrar reporte (anónimo permitido)
 	/**
-	 * Envía un reporte. Si la llamada va envuelta en `WalFacadeHelper.execute`,
-	 * el sync engine del WAL inyecta su propio `X-Idempotency-Key` con el UUID
-	 * de la entry (garantía de dedup cross-retry y cross-reload). Pasar
-	 * `idempotencyKey` manualmente solo tiene sentido para call-sites que NO
-	 * usan WAL (por ejemplo, tests).
+	 * Envía un reporte. Sin `idempotencyKey` no se envía `X-Idempotency-Key`: el BE no
+	 * deduplica y un reenvío manual crea otro reporte. El facade usa `server-confirmed`,
+	 * que no pasa por el WAL, así que hoy no envía clave.
 	 */
 	crear(dto: CrearReporteRequest, idempotencyKey?: string): Observable<{ id: number }> {
 		const options = idempotencyKey

@@ -208,6 +208,44 @@ export class WalService {
 	}
 
 	/**
+	 * Reintento de una entry cuyo 409 fue `IDEMPOTENCIA_EN_CURSO` (INV-S06).
+	 * Conserva la clave (entry.id) y el callback. Tras `IN_FLIGHT_MAX_RETRIES` pasa a
+	 * VERIFICACION_PENDIENTE: no es FAILED ni CONFLICT, y no se hace rollback porque
+	 * no se sabe si la mutación confirmó.
+	 *
+	 * @param id Entry id.
+	 * @returns Updated entry or null when not found.
+	 */
+	async scheduleInFlightRetry(id: string): Promise<WalEntry | null> {
+		const entry = await this.db.get(id);
+		if (!entry) return null;
+
+		entry.retries++;
+
+		if (entry.retries > WAL_DEFAULTS.IN_FLIGHT_MAX_RETRIES) {
+			entry.status = 'VERIFICACION_PENDIENTE';
+			entry.nextRetryAt = undefined;
+			entry.error = 'Operación en curso en el servidor (IDEMPOTENCIA_EN_CURSO)';
+			await this.db.put(entry);
+			logger.warn(`[WAL] Verificación pendiente para ${id}`);
+			return entry;
+		}
+
+		const backoffMs = Math.min(
+			WAL_DEFAULTS.BASE_BACKOFF_MS * Math.pow(2, entry.retries),
+			WAL_DEFAULTS.MAX_BACKOFF_MS,
+		);
+		entry.status = 'PENDING';
+		entry.nextRetryAt = Date.now() + backoffMs;
+		await this.db.put(entry);
+
+		logger.log(
+			`[WAL] En curso en el servidor: reintento ${entry.retries}/${WAL_DEFAULTS.IN_FLIGHT_MAX_RETRIES} con la misma clave, en ${backoffMs}ms`,
+		);
+		return entry;
+	}
+
+	/**
 	 * Manual retry for a FAILED entry (reset counters to PENDING).
 	 *
 	 * @param id Entry id.
@@ -292,14 +330,15 @@ export class WalService {
 	 * Get current WAL counts by status.
 	 */
 	async getStats(): Promise<WalStats> {
-		const [pending, inFlight, failed, committed, conflict] = await Promise.all([
+		const [pending, inFlight, failed, committed, conflict, verificationPending] = await Promise.all([
 			this.db.count('PENDING'),
 			this.db.count('IN_FLIGHT'),
 			this.db.count('FAILED'),
 			this.db.count('COMMITTED'),
 			this.db.count('CONFLICT'),
+			this.db.count('VERIFICACION_PENDIENTE'),
 		]);
-		return { pending, inFlight, failed, committed, conflict };
+		return { pending, inFlight, failed, committed, conflict, verificationPending };
 	}
 
 	// #endregion

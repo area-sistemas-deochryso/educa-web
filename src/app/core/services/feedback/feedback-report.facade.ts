@@ -17,10 +17,9 @@ import { FeedbackReportStore } from './feedback-report.store';
  * Facade del dialog de reporte de usuario. Orquesta validación + envío + ciclo UI.
  * Los componentes solo consumen este facade — nunca el service directo ni el store crudo.
  *
- * Idempotencia: delegada al WAL. Cada `wal.execute` crea una entry con UUID
- * propio que se envía como `X-Idempotency-Key`, garantizando dedup ante
- * retries y reloads. El doble-click rápido se bloquea con el guard
- * `store.submitting()`.
+ * Sin idempotencia en el envío: es `server-confirmed` (sin WAL, sin `X-Idempotency-Key`),
+ * así que un reenvío manual crea otro reporte. El doble-click rápido se bloquea con el
+ * guard `store.submitting()`.
  */
 // WAL cross-tab refetch: NO aplica. Dialog ephemeral (botón flotante de reporte).
 // La página admin que sí lista reportes (FeedbackReportsFacade) ya está suscripta

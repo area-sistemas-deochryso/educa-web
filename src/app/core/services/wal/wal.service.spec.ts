@@ -324,6 +324,45 @@ describe('WalService', () => {
 	// #endregion
 
 	// #region Schema Migration
+	describe('scheduleInFlightRetry — IDEMPOTENCIA_EN_CURSO', () => {
+		it('reintenta con backoff y deja la entry PENDING con la misma id (clave)', async () => {
+			db._store.set('f1', makeEntry({ id: 'f1', retries: 0, maxRetries: 2 }));
+
+			const updated = await service.scheduleInFlightRetry('f1');
+
+			expect(updated?.id).toBe('f1');
+			expect(updated?.retries).toBe(1);
+			expect(updated?.status).toBe('PENDING');
+			expect(updated?.nextRetryAt).toBeGreaterThan(Date.now());
+		});
+
+		it('no se marca FAILED aunque supere maxRetries de la entry', async () => {
+			db._store.set('f2', makeEntry({ id: 'f2', retries: 2, maxRetries: 2 }));
+
+			const updated = await service.scheduleInFlightRetry('f2');
+
+			expect(updated?.status).toBe('PENDING');
+			expect(updated?.failedAt).toBeUndefined();
+		});
+
+		it('pasa a VERIFICACION_PENDIENTE al superar IN_FLIGHT_MAX_RETRIES, sin nextRetryAt', async () => {
+			db._store.set(
+				'f3',
+				makeEntry({ id: 'f3', retries: WAL_DEFAULTS.IN_FLIGHT_MAX_RETRIES, nextRetryAt: 999 }),
+			);
+
+			const updated = await service.scheduleInFlightRetry('f3');
+
+			expect(updated?.status).toBe('VERIFICACION_PENDIENTE');
+			expect(updated?.nextRetryAt).toBeUndefined();
+			expect(updated?.error).toContain('IDEMPOTENCIA_EN_CURSO');
+		});
+
+		it('no-op cuando la entry no existe', async () => {
+			expect(await service.scheduleInFlightRetry('missing')).toBeNull();
+		});
+	});
+
 	describe('schema migration', () => {
 		it('marks old-version entries as REQUIRES_MIGRATION', async () => {
 			const old = makeEntry({ id: 'old', schemaVersion: 0 });
@@ -394,13 +433,27 @@ describe('WalService', () => {
 	describe('queries', () => {
 		it('getStats aggregates counts by status', async () => {
 			db.count.mockImplementation((status: string) => {
-				const counts: Record<string, number> = { PENDING: 3, IN_FLIGHT: 1, FAILED: 2, COMMITTED: 10, CONFLICT: 0 };
+				const counts: Record<string, number> = {
+					PENDING: 3,
+					IN_FLIGHT: 1,
+					FAILED: 2,
+					COMMITTED: 10,
+					CONFLICT: 0,
+					VERIFICACION_PENDIENTE: 4,
+				};
 				return Promise.resolve(counts[status] ?? 0);
 			});
 
 			const stats = await service.getStats();
 
-			expect(stats).toEqual({ pending: 3, inFlight: 1, failed: 2, committed: 10, conflict: 0 });
+			expect(stats).toEqual({
+				pending: 3,
+				inFlight: 1,
+				failed: 2,
+				committed: 10,
+				conflict: 0,
+				verificationPending: 4,
+			});
 		});
 
 		it('hasPendingForResource delegates to db', async () => {

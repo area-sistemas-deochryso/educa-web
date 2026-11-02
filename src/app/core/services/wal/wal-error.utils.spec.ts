@@ -5,6 +5,24 @@ import { describe, expect, it } from 'vitest';
 import { classifyWalError, extractErrorMessage } from './wal-error.utils';
 
 describe('classifyWalError', () => {
+	it('clasifica 409 IDEMPOTENCIA_EN_CURSO como kind=in-flight, no como conflicto', () => {
+		const err = new HttpErrorResponse({
+			status: 409,
+			statusText: 'Conflict',
+			error: { errorCode: 'IDEMPOTENCIA_EN_CURSO' },
+		});
+		expect(classifyWalError(err)).toEqual({ kind: 'in-flight' });
+	});
+
+	it('clasifica 409 sin errorCode IDEMPOTENCIA_EN_CURSO como kind=conflict (INV-S05)', () => {
+		const err = new HttpErrorResponse({
+			status: 409,
+			statusText: 'Conflict',
+			error: { errorCode: 'CONCURRENCY_CONFLICT' },
+		});
+		expect(classifyWalError(err)).toEqual({ kind: 'conflict' });
+	});
+
 	it('clasifica 409 Conflict como kind=conflict', () => {
 		const err = new HttpErrorResponse({ status: 409, statusText: 'Conflict' });
 		expect(classifyWalError(err)).toEqual({ kind: 'conflict' });

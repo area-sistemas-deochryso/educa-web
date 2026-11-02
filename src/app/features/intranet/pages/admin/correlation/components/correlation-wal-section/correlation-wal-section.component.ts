@@ -18,6 +18,7 @@ const STATUS_SEVERITY: Record<WalEntryStatus, 'info' | 'warn' | 'success' | 'dan
 	FAILED: 'danger',
 	CONFLICT: 'warn',
 	REQUIRES_MIGRATION: 'warn',
+	VERIFICACION_PENDIENTE: 'warn',
 };
 
 /**

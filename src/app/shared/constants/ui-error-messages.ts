@@ -63,6 +63,8 @@ export const UI_HTTP_ERROR_MESSAGES: Record<number, string> = {
  */
 export const UI_ERROR_CODES: Record<string, string> = {
 	// Concurrencia
+	IDEMPOTENCIA_EN_CURSO:
+		'La operación sigue en proceso en el servidor. Verifique antes de volver a intentarla.',
 	CONCURRENCY_CONFLICT:
 		'El registro fue modificado por otro usuario. Recargue los datos e intente nuevamente.',
 

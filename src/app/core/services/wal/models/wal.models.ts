@@ -12,7 +12,9 @@ export type WalEntryStatus =
 	| 'COMMITTED'
 	| 'FAILED'
 	| 'CONFLICT'
-	| 'REQUIRES_MIGRATION';
+	| 'REQUIRES_MIGRATION'
+	/** El BE sigue procesando la clave (409 IDEMPOTENCIA_EN_CURSO) y se agotaron los reintentos. Verificar antes de reenviar. */
+	| 'VERIFICACION_PENDIENTE';
 /** Consistency level for WAL operations. */
 export type WalConsistencyLevel =
 	| 'optimistic'
@@ -165,6 +167,7 @@ export type WalProcessResult =
 	| { status: 'RETRYING'; entryId: string; retries: number; nextRetryAt: number }
 	| { status: 'FAILED'; entryId: string; error: string }
 	| { status: 'CONFLICT'; entryId: string }
+	| { status: 'VERIFICATION_PENDING'; entryId: string }
 	| { status: 'REQUIRES_MIGRATION'; entryId: string; fromVersion: number };
 // #endregion
 
@@ -176,6 +179,7 @@ export interface WalStats {
 	failed: number;
 	committed: number;
 	conflict: number;
+	verificationPending: number;
 }
 // #endregion
 
@@ -243,6 +247,11 @@ export const WAL_DEFAULTS = {
 	CIRCUIT_COOLDOWN_MS: 30_000,
 	/** HTTP timeout for WAL sync-engine requests (15 seconds) */
 	HTTP_TIMEOUT_MS: 15_000,
+	/**
+	 * Reintentos con la misma clave ante 409 IDEMPOTENCIA_EN_CURSO antes de pasar a
+	 * VERIFICACION_PENDIENTE. Con el backoff del WAL suman ~60 s, por encima del timeout HTTP.
+	 */
+	IN_FLIGHT_MAX_RETRIES: 5,
 } as const;
 // #endregion
 

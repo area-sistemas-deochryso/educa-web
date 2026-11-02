@@ -53,6 +53,7 @@ interface EngineMocks {
 		markFailed: ReturnType<typeof vi.fn>;
 		markConflict: ReturnType<typeof vi.fn>;
 		incrementRetry: ReturnType<typeof vi.fn>;
+		scheduleInFlightRetry: ReturnType<typeof vi.fn>;
 		retryEntry: ReturnType<typeof vi.fn>;
 		getEntry: ReturnType<typeof vi.fn>;
 		getRetryableEntries: ReturnType<typeof vi.fn>;
@@ -110,6 +111,7 @@ function setupEngine(opts: SetupOptions = {}): {
 			markFailed: vi.fn().mockResolvedValue(undefined),
 			markConflict: vi.fn().mockResolvedValue(undefined),
 			incrementRetry: vi.fn(),
+			scheduleInFlightRetry: vi.fn(),
 			retryEntry: vi.fn().mockResolvedValue(undefined),
 			getEntry: vi.fn().mockResolvedValue(undefined),
 			getRetryableEntries,
@@ -794,6 +796,85 @@ describe('WalSyncEngine', () => {
 	});
 
 	// #endregion
+
+	describe('IDEMPOTENCIA_EN_CURSO — reintento con la misma clave (INV-S06)', () => {
+		const enCurso = () =>
+			new HttpErrorResponse({
+				status: 409,
+				statusText: 'Conflict',
+				error: { errorCode: 'IDEMPOTENCIA_EN_CURSO' },
+			});
+
+		it('reintenta la misma entry: sin markConflict, sin rollback, sin onError', async () => {
+			const { engine, mocks } = setupEngine();
+			await flushAsync();
+			const entry = makeEntry({ id: 'fly-1' });
+			const onError = vi.fn();
+			const rollback = vi.fn();
+			engine.registerCallbacks(entry.id, {
+				http$: () => of(null),
+				onCommit: vi.fn(),
+				onError,
+				rollback,
+			});
+			sendSpy.mockRejectedValueOnce(enCurso());
+			mocks.wal.scheduleInFlightRetry.mockResolvedValueOnce({
+				...entry,
+				status: 'PENDING',
+				retries: 1,
+				nextRetryAt: 123,
+			});
+
+			const result = await engine.processEntry(entry);
+
+			expect(mocks.wal.scheduleInFlightRetry).toHaveBeenCalledWith('fly-1');
+			expect(mocks.wal.markConflict).not.toHaveBeenCalled();
+			expect(mocks.wal.markFailed).not.toHaveBeenCalled();
+			expect(rollback).not.toHaveBeenCalled();
+			expect(onError).not.toHaveBeenCalled();
+			expect(result).toEqual({ status: 'RETRYING', entryId: 'fly-1', retries: 1, nextRetryAt: 123 });
+		});
+
+		it('no registra fallo en el circuit breaker', async () => {
+			const { engine, mocks } = setupEngine();
+			await flushAsync();
+			const entry = makeEntry({ id: 'fly-breaker' });
+			sendSpy.mockRejectedValueOnce(enCurso());
+			mocks.wal.scheduleInFlightRetry.mockResolvedValueOnce({ ...entry, status: 'PENDING', retries: 1 });
+
+			await engine.processEntry(entry);
+
+			expect(mocks.breaker.recordFailure).not.toHaveBeenCalled();
+		});
+
+		it('agotados los reintentos pasa a VERIFICATION_PENDING: onError sin rollback, sin FAILED', async () => {
+			const { engine, mocks } = setupEngine();
+			await flushAsync();
+			const entry = makeEntry({ id: 'fly-2' });
+			const onError = vi.fn();
+			const rollback = vi.fn();
+			engine.registerCallbacks(entry.id, {
+				http$: () => of(null),
+				onCommit: vi.fn(),
+				onError,
+				rollback,
+			});
+			sendSpy.mockRejectedValueOnce(enCurso());
+			mocks.wal.scheduleInFlightRetry.mockResolvedValueOnce({
+				...entry,
+				status: 'VERIFICACION_PENDIENTE',
+				retries: 6,
+			});
+
+			const result = await engine.processEntry(entry);
+
+			expect(result).toEqual({ status: 'VERIFICATION_PENDING', entryId: 'fly-2' });
+			expect(onError).toHaveBeenCalledTimes(1);
+			expect(rollback).not.toHaveBeenCalled();
+			expect(mocks.wal.markFailed).not.toHaveBeenCalled();
+			expect(mocks.wal.markConflict).not.toHaveBeenCalled();
+		});
+	});
 
 	// Sanity: SYNC_INTERVAL_MS still imports cleanly and is a positive number.
 	it('SYNC_INTERVAL_MS is configured', () => {
