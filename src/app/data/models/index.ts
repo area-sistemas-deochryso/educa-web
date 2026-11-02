@@ -23,3 +23,4 @@ export * from './schedule.models';
 export * from './rol.models';
 export * from './rol-lookup.token';
 export * from './user.models';
+export * from './pagos.models';

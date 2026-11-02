@@ -1,0 +1,33 @@
+.filters {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+	align-items: flex-end;
+
+	&__field {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+		min-width: 220px;
+		flex: 1 1 220px;
+		max-width: 360px;
+	}
+
+	&__label {
+		font-size: 0.8125rem;
+		color: var(--text-color-secondary);
+	}
+
+	&__input {
+		padding: 0.5rem 0.75rem;
+		border: 1px solid var(--surface-border);
+		border-radius: var(--border-radius, 6px);
+		background: var(--surface-card);
+		color: var(--text-color);
+		font: inherit;
+	}
+
+	&__select {
+		width: 100%;
+	}
+}

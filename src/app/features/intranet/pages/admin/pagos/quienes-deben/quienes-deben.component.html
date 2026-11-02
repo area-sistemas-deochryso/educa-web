@@ -1,0 +1,81 @@
+<section class="deben" aria-labelledby="deben-title">
+	<header class="deben__header">
+		<h2 id="deben-title" class="deben__title">¿Quiénes deben?</h2>
+		<edu-button
+			label="Exportar a Excel"
+			icon="pi pi-file-excel"
+			[outlined]="true"
+			[loading]="facade.exporting()"
+			[disabled]="facade.exporting() || facade.loading()"
+			(click)="facade.exportExcel()"
+		/>
+	</header>
+
+	@if (facade.data(); as data) {
+		@if (data.anioSinParametros) {
+			<p class="deben__alert" role="alert">
+				<i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+				Faltan los parámetros de cobranza del año: no se calcula deuda.
+			</p>
+		}
+		<dl class="deben__totals" aria-label="Totales del conjunto filtrado completo">
+			<div>
+				<dt>Alumnos que deben</dt>
+				<dd>{{ data.totales.alumnos }}</dd>
+			</div>
+			<div>
+				<dt>Cuotas vencidas</dt>
+				<dd>{{ data.totales.cuotas }}</dd>
+			</div>
+			<div>
+				<dt>Deuda vencida</dt>
+				<dd>{{ soles(data.totales.deuda) }}</dd>
+			</div>
+		</dl>
+		<p class="deben__note">Totales de todo el conjunto filtrado, no solo de la página visible.</p>
+	}
+
+	@if (facade.exportError()) {
+		<p class="deben__alert" role="alert">
+			<i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+			No se pudo exportar el Excel. Inténtalo de nuevo con el botón.
+		</p>
+	}
+
+	<app-quienes-deben-filters
+		[buscar]="facade.buscar()"
+		[salonId]="facade.salonId()"
+		[salones]="facade.salones()"
+		(searchChange)="facade.onSearchInput($event)"
+		(salonChange)="facade.setSalon($event)"
+	/>
+
+	@if (facade.error()) {
+		<app-error-state message="No se pudo cargar la lista de deudores." (retry)="facade.reload()" />
+	} @else if (facade.loading() && !facade.data()) {
+		<app-table-skeleton [columns]="skeletonColumns" [rows]="8" />
+	} @else if (facade.data(); as data) {
+		@if (data.filas.total === 0) {
+			<p class="deben__empty">
+				@if (facade.hasFilters()) {
+					Sin resultados para el filtro aplicado.
+				} @else {
+					Nadie debe a esta fecha.
+				}
+			</p>
+		} @else {
+			<div class="deben__table" [class.deben__table--loading]="facade.loading()" [attr.aria-busy]="facade.loading()">
+				<app-quienes-deben-table
+					[filas]="facade.filas()"
+					[total]="facade.total()"
+					[first]="facade.first()"
+					[pageSize]="facade.pageSize()"
+					[orden]="facade.orden()"
+					[descendente]="facade.descendente()"
+					(sort)="facade.toggleSort($event)"
+					(pageChange)="facade.setPage($event.page, $event.pageSize)"
+				/>
+			</div>
+		}
+	}
+</section>

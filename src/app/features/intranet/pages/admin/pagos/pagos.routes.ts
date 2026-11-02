@@ -1,0 +1,15 @@
+import { Routes } from '@angular/router';
+
+/**
+ * Rutas hijas del shell de Pagos (`PagosShellComponent`). Heredan la autorización de
+ * `PAGOS_API_MANAGE` vía `permissionPath` declarado en el padre (`intranet.routes.ts`) — ver
+ * `.claude/reference/route-permission-sharing.md`. F5b (registrar pago) y F5c (estado de cuenta, sin dato) suman hijas acá.
+ */
+export default [
+	{ path: '', redirectTo: 'panel', pathMatch: 'full' },
+	{
+		path: 'panel',
+		loadComponent: () => import('./panel-cobranza/panel-cobranza.component').then((m) => m.PanelCobranzaComponent),
+		title: 'Intranet - Pagos: Panel de cobranza',
+	},
+] satisfies Routes;
