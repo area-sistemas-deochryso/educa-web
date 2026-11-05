@@ -4,7 +4,7 @@ import { StudentAttendanceComponent } from './student-attendance.component';
 import { EstudianteFacade } from '../services/estudiante.facade';
 import { DestroyRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { SecurityContext } from '@angular/core';
 
 const mockEstudianteFacade = {

@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { AttendancePdfService } from './attendance-pdf.service';
 import { AttendanceService } from '@intranet-shared/services';
 import { DestroyRef } from '@angular/core';
-import { of, throwError } from 'rxjs';
+import { of, Subject, throwError } from 'rxjs';
 
 // Mock de AttendanceService
 const mockAttendanceService = {
@@ -20,15 +20,25 @@ const mockDestroyRef = {
 	onDestroy: vi.fn(),
 };
 
-// Helpers globales mockeados
-const mockViewBlobInNewTab = vi.fn();
-const mockDownloadBlob = vi.fn();
-
-// Re-exportar helpers mockeados para que el servicio los use
-vi.mock('@core/helpers', () => ({
-	viewBlobInNewTab: mockViewBlobInNewTab,
-	downloadBlob: mockDownloadBlob,
+// Helpers globales mockeados (declarados con vi.hoisted para que vi.mock
+// pueda referenciarlos — vi.mock se eleva al inicio del archivo y no puede
+// acceder a variables del scope exterior).
+const mocks = vi.hoisted(() => ({
+	viewBlobInNewTab: vi.fn(),
+	downloadBlob: vi.fn(),
 }));
+
+// Re-exportar helpers mockeados para que el servicio los use.
+// Usamos importOriginal para no romper otros módulos que importan
+// de @core/helpers (p. ej. Duration).
+vi.mock(import('@core/helpers'), async (importOriginal) => {
+	const actual = await importOriginal();
+	return {
+		...actual,
+		viewBlobInNewTab: mocks.viewBlobInNewTab,
+		downloadBlob: mocks.downloadBlob,
+	};
+});
 
 describe('AttendancePdfService', () => {
 	let service: AttendancePdfService;
@@ -37,8 +47,8 @@ describe('AttendancePdfService', () => {
 
 	beforeEach(() => {
 		vi.clearAllMocks();
-		mockViewBlobInNewTab.mockClear();
-		mockDownloadBlob.mockClear();
+		mocks.viewBlobInNewTab.mockClear();
+		mocks.downloadBlob.mockClear();
 
 		TestBed.configureTestingModule({
 			providers: [
@@ -80,7 +90,7 @@ describe('AttendancePdfService', () => {
 			service.verPdfAsistenciaDia(fecha);
 
 			expect(mockAttendanceService.descargarPdfAsistenciaDia).toHaveBeenCalledWith('1ro', 'A', fecha);
-			expect(mockViewBlobInNewTab).toHaveBeenCalledWith(blob);
+			expect(mocks.viewBlobInNewTab).toHaveBeenCalledWith(blob);
 		});
 
 		it('no debe hacer nada si no hay contexto', () => {
@@ -100,7 +110,7 @@ describe('AttendancePdfService', () => {
 
 			service.descargarPdfAsistenciaDia(fecha);
 
-			expect(mockDownloadBlob).toHaveBeenCalledWith(
+			expect(mocks.downloadBlob).toHaveBeenCalledWith(
 				blob,
 				'Asistencia_1ro_A_2026-03-15.pdf'
 			);
@@ -109,7 +119,7 @@ describe('AttendancePdfService', () => {
 		it('no debe hacer nada si no hay contexto', () => {
 			service['getSelectorContext'] = () => null;
 			service.descargarPdfAsistenciaDia(new Date());
-			expect(mockDownloadBlob).not.toHaveBeenCalled();
+			expect(mocks.downloadBlob).not.toHaveBeenCalled();
 		});
 	});
 
@@ -121,7 +131,7 @@ describe('AttendancePdfService', () => {
 			service.verPdfAsistenciaMes('1ro', 'A', 3, 2026);
 
 			expect(mockAttendanceService.descargarPdfAsistenciaMes).toHaveBeenCalledWith('1ro', 'A', 3, 2026);
-			expect(mockViewBlobInNewTab).toHaveBeenCalledWith(blob);
+			expect(mocks.viewBlobInNewTab).toHaveBeenCalledWith(blob);
 		});
 	});
 
@@ -132,7 +142,7 @@ describe('AttendancePdfService', () => {
 
 			service.descargarPdfAsistenciaMes('1ro', 'A', 3, 2026);
 
-			expect(mockDownloadBlob).toHaveBeenCalledWith(
+			expect(mocks.downloadBlob).toHaveBeenCalledWith(
 				blob,
 				'Asistencia_1ro_A_2026-03.pdf'
 			);
@@ -149,7 +159,7 @@ describe('AttendancePdfService', () => {
 			expect(mockAttendanceService.descargarPdfAsistenciaPeriodo).toHaveBeenCalledWith(
 				'1ro', 'A', 3, 2026, 5, 2026
 			);
-			expect(mockViewBlobInNewTab).toHaveBeenCalledWith(blob);
+			expect(mocks.viewBlobInNewTab).toHaveBeenCalledWith(blob);
 		});
 	});
 
@@ -160,7 +170,7 @@ describe('AttendancePdfService', () => {
 
 			service.descargarPdfAsistenciaPeriodo('1ro', 'A', 3, 2026, 5, 2026);
 
-			expect(mockDownloadBlob).toHaveBeenCalledWith(
+			expect(mocks.downloadBlob).toHaveBeenCalledWith(
 				blob,
 				'Asistencia_1ro_A_Periodo_2026-03_a_2026-05.pdf'
 			);
@@ -180,7 +190,7 @@ describe('AttendancePdfService', () => {
 			expect(mockAttendanceService.descargarPdfAsistenciaMes).toHaveBeenCalledWith(
 				'2do', 'B', 4, 2026
 			);
-			expect(mockViewBlobInNewTab).toHaveBeenCalledWith(blob);
+			expect(mocks.viewBlobInNewTab).toHaveBeenCalledWith(blob);
 		});
 
 		it('no debe hacer nada si no hay contexto', () => {
@@ -200,7 +210,7 @@ describe('AttendancePdfService', () => {
 
 			service.descargarPdfSalonMes(fecha);
 
-			expect(mockDownloadBlob).toHaveBeenCalledWith(
+			expect(mocks.downloadBlob).toHaveBeenCalledWith(
 				blob,
 				'Asistencia_2do_B_2026-04.pdf'
 			);
@@ -217,11 +227,13 @@ describe('AttendancePdfService', () => {
 
 			service.verPdfSalonAnio(fecha);
 
-			// mesFin = mes actual (6), anio = 2026
+			// mesFin = mes actual, anio = 2026 (valor dinámico según la fecha del sistema)
+			const hoy = new Date();
+			const mesFinEsperado = hoy.getFullYear() === 2026 ? hoy.getMonth() + 1 : 12;
 			expect(mockAttendanceService.descargarPdfAsistenciaPeriodo).toHaveBeenCalledWith(
-				'3ro', 'C', 1, 2026, 6, 2026
+				'3ro', 'C', 1, 2026, mesFinEsperado, 2026
 			);
-			expect(mockViewBlobInNewTab).toHaveBeenCalledWith(blob);
+			expect(mocks.viewBlobInNewTab).toHaveBeenCalledWith(blob);
 		});
 
 		it('no debe hacer nada si no hay contexto', () => {
@@ -241,7 +253,7 @@ describe('AttendancePdfService', () => {
 
 			service.descargarPdfSalonAnio(fecha);
 
-			expect(mockDownloadBlob).toHaveBeenCalledWith(
+			expect(mocks.downloadBlob).toHaveBeenCalledWith(
 				blob,
 				'Asistencia_3ro_C_Anio_2026.pdf'
 			);
@@ -258,7 +270,7 @@ describe('AttendancePdfService', () => {
 			service.verMesFromContext(5, 2026);
 
 			expect(mockAttendanceService.descargarPdfAsistenciaMes).toHaveBeenCalledWith('4to', 'D', 5, 2026);
-			expect(mockViewBlobInNewTab).toHaveBeenCalledWith(blob);
+			expect(mocks.viewBlobInNewTab).toHaveBeenCalledWith(blob);
 		});
 
 		it('descargarMesFromContext debe llamar al servicio con contexto', () => {
@@ -269,7 +281,7 @@ describe('AttendancePdfService', () => {
 
 			service.descargarMesFromContext(5, 2026);
 
-			expect(mockDownloadBlob).toHaveBeenCalledWith(
+			expect(mocks.downloadBlob).toHaveBeenCalledWith(
 				blob,
 				'Asistencia_4to_D_2026-05.pdf'
 			);
@@ -288,7 +300,7 @@ describe('AttendancePdfService', () => {
 			expect(mockAttendanceService.descargarPdfAsistenciaPeriodo).toHaveBeenCalledWith(
 				'5to', 'E', 2, 2026, 4, 2026
 			);
-			expect(mockViewBlobInNewTab).toHaveBeenCalledWith(blob);
+			expect(mocks.viewBlobInNewTab).toHaveBeenCalledWith(blob);
 		});
 
 		it('descargarPeriodoFromContext debe llamar al servicio con contexto', () => {
@@ -299,7 +311,7 @@ describe('AttendancePdfService', () => {
 
 			service.descargarPeriodoFromContext(2, 2026, 4, 2026);
 
-			expect(mockDownloadBlob).toHaveBeenCalledWith(
+			expect(mocks.downloadBlob).toHaveBeenCalledWith(
 				blob,
 				'Asistencia_5to_E_Periodo_2026-02_a_2026-04.pdf'
 			);
@@ -316,7 +328,7 @@ describe('AttendancePdfService', () => {
 
 			service.descargarExcelAsistenciaDia(fecha);
 
-			expect(mockDownloadBlob).toHaveBeenCalledWith(
+			expect(mocks.downloadBlob).toHaveBeenCalledWith(
 				blob,
 				'Asistencia_6to_F_2026-01-20.xlsx'
 			);
@@ -330,7 +342,7 @@ describe('AttendancePdfService', () => {
 
 			service.descargarExcelAsistenciaMes('6to', 'F', 2, 2026);
 
-			expect(mockDownloadBlob).toHaveBeenCalledWith(
+			expect(mocks.downloadBlob).toHaveBeenCalledWith(
 				blob,
 				'Asistencia_6to_F_2026-02.xlsx'
 			);
@@ -344,7 +356,7 @@ describe('AttendancePdfService', () => {
 
 			service.descargarExcelAsistenciaPeriodo('6to', 'F', 1, 2026, 3, 2026);
 
-			expect(mockDownloadBlob).toHaveBeenCalledWith(
+			expect(mocks.downloadBlob).toHaveBeenCalledWith(
 				blob,
 				'Asistencia_6to_F_Periodo_2026-01_a_2026-03.xlsx'
 			);
@@ -361,7 +373,7 @@ describe('AttendancePdfService', () => {
 
 			service.descargarExcelSalonMes(fecha);
 
-			expect(mockDownloadBlob).toHaveBeenCalledWith(
+			expect(mocks.downloadBlob).toHaveBeenCalledWith(
 				blob,
 				'Asistencia_7mo_G_2026-07.xlsx'
 			);
@@ -378,7 +390,7 @@ describe('AttendancePdfService', () => {
 
 			service.descargarExcelSalonAnio(fecha);
 
-			expect(mockDownloadBlob).toHaveBeenCalledWith(
+			expect(mocks.downloadBlob).toHaveBeenCalledWith(
 				blob,
 				'Asistencia_8vo_H_Anio_2026.xlsx'
 			);
@@ -394,7 +406,7 @@ describe('AttendancePdfService', () => {
 
 			service.descargarExcelMesFromContext(4, 2026);
 
-			expect(mockDownloadBlob).toHaveBeenCalledWith(
+			expect(mocks.downloadBlob).toHaveBeenCalledWith(
 				blob,
 				'Asistencia_9no_I_2026-04.xlsx'
 			);
@@ -408,7 +420,7 @@ describe('AttendancePdfService', () => {
 
 			service.descargarExcelPeriodoFromContext(1, 2026, 6, 2026);
 
-			expect(mockDownloadBlob).toHaveBeenCalledWith(
+			expect(mocks.downloadBlob).toHaveBeenCalledWith(
 				blob,
 				'Asistencia_1ro_A_Periodo_2026-01_a_2026-06.xlsx'
 			);
@@ -419,7 +431,8 @@ describe('AttendancePdfService', () => {
 		it('debe establecer downloadingPdf en true durante la ejecución', async () => {
 			const ctx = { grado: '1ro', seccion: 'A' } as any;
 			const blob = new Blob(['pdf'], { type: 'application/pdf' });
-			vi.mocked(mockAttendanceService.descargarPdfAsistenciaDia).mockReturnValue(of(blob));
+			const subject = new Subject<Blob>();
+			vi.mocked(mockAttendanceService.descargarPdfAsistenciaDia).mockReturnValue(subject);
 			service['getSelectorContext'] = () => ctx;
 
 			// Iniciar descarga (asíncrona)
@@ -428,7 +441,9 @@ describe('AttendancePdfService', () => {
 			// Inmediatamente después de iniciar, downloadingPdf debe ser true
 			expect(service.downloadingPdf()).toBe(true);
 
-			// Esperar a que se complete
+			// Completar el observable y esperar a que se procese
+			subject.next(blob);
+			subject.complete();
 			await new Promise(resolve => setTimeout(resolve, 10));
 			expect(service.downloadingPdf()).toBe(false);
 		});
