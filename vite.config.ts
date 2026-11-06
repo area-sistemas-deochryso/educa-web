@@ -27,6 +27,12 @@ export default defineConfig({
 		include: ['src/**/*.spec.ts'],
 		exclude: ['**/dist/**', 'node_modules/**'],
 		setupFiles: ['src/test-setup.ts'],
+		coverage: {
+			provider: 'v8',
+			include: ['src/**/*.ts'],
+			exclude: ['**/*.spec.ts', 'src/app/shared/edu-ui/**'],
+			reporter: ['text-summary', 'json-summary'],
+		},
 		server: {
 			deps: {
 				inline: [/@angular/],
