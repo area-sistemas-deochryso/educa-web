@@ -9,12 +9,15 @@ import { EduTab, EduTabs } from '@edu-ui';
 // #endregion
 
 interface ShellTab {
-	value: 'panel';
+	value: 'panel' | 'registrar';
 	label: string;
 	icon: string;
 }
 
-const TABS: ShellTab[] = [{ value: 'panel', label: 'Panel de cobranza', icon: 'pi pi-chart-pie' }];
+const TABS: ShellTab[] = [
+	{ value: 'panel', label: 'Panel de cobranza', icon: 'pi pi-chart-pie' },
+	{ value: 'registrar', label: 'Registrar pago', icon: 'pi pi-plus-circle' },
+];
 
 /**
  * Shell del módulo Pagos: rutas hijas reales por pestaña (mismo patrón que `AttendancesShellComponent`).

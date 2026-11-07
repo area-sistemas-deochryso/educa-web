@@ -127,3 +127,49 @@ export interface PagoCorte {
 	fecha: string;
 }
 // #endregion
+
+// #region Registrar pago
+export type PagoMedio = 'EFECTIVO' | 'TRANSFERENCIA' | 'DEPOSITO' | 'YAPE' | 'PLIN' | 'OTRO';
+
+/** Aplicación propuesta por el servidor (`POST /api/pagos/reparto/proponer`). Editable en cliente. */
+export interface RepartoAplicacion {
+	cargoId: number;
+	estudianteId: number;
+	estudiante: string;
+	concepto: string;
+	cuota: string | null;
+	vencimiento: string | null;
+	montoBase: number;
+	montoRecargo: number;
+}
+
+export interface RepartoPropuesto {
+	aplicaciones: RepartoAplicacion[];
+	sobrante: number;
+}
+
+/** Alumno del grupo familiar (`GET /api/pagos/estudiantes/{id}/familia`). */
+export interface MiembroFamilia {
+	estudianteId: number;
+	nombreCompleto: string;
+}
+
+export interface RegistrarPagoAplicacion {
+	cargoId: number;
+	montoBase: number;
+	montoRecargo: number;
+}
+
+/** Cuerpo de `POST /api/pagos`. El reparto va ya confirmado por la persona. */
+export interface RegistrarPagoPayload {
+	monto: number;
+	fechaPago: string;
+	horaPago: string | null;
+	medio: PagoMedio;
+	bancoOrigen: string | null;
+	numeroOperacion: string | null;
+	comprobante: string;
+	observaciones: string | null;
+	aplicaciones: RegistrarPagoAplicacion[];
+}
+// #endregion

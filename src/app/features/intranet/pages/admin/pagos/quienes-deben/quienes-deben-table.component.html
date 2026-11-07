@@ -13,6 +13,7 @@
 					</th>
 				}
 				<th scope="col">Último pago</th>
+				<th scope="col"><span class="sr-only">Acciones</span></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -45,11 +46,20 @@
 							<span class="muted">Sin pagos</span>
 						}
 					</td>
+					<td>
+						<a
+							[routerLink]="['/intranet/admin/pagos/registrar']"
+							[queryParams]="{ estudianteId: fila.estudianteId, nombre: fila.estudiante }"
+							[attr.aria-label]="'Registrar pago de ' + fila.estudiante"
+						>
+							Registrar pago
+						</a>
+					</td>
 				</tr>
 				@if (open) {
 					<tr class="detail-row">
 						<td></td>
-						<td [attr.colspan]="columns.length + 1">
+						<td [attr.colspan]="columns.length + 2">
 							<app-quienes-deben-cuotas [cuotas]="fila.cuotas" />
 						</td>
 					</tr>

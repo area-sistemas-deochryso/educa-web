@@ -12,4 +12,10 @@ export default [
 		loadComponent: () => import('./panel-cobranza/panel-cobranza.component').then((m) => m.PanelCobranzaComponent),
 		title: 'Intranet - Pagos: Panel de cobranza',
 	},
+	{
+		path: 'registrar',
+		loadComponent: () =>
+			import('./registrar-pago/registrar-pago.component').then((m) => m.RegistrarPagoComponent),
+		title: 'Intranet - Pagos: Registrar pago',
+	},
 ] satisfies Routes;

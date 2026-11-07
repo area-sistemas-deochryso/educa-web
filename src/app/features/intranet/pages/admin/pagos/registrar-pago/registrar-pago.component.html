@@ -1,0 +1,136 @@
+<section class="registrar-pago">
+	@if (!facade.estudiante()) {
+		<edu-message severity="info" text="Para registrar un pago, elegí al alumno desde «Quiénes deben»." />
+	} @else if (facade.pagoRegistrado(); as pagoId) {
+		<edu-message severity="success" [text]="'Pago registrado (N.º ' + pagoId + ').'" />
+		<div class="mt-4">
+			<edu-button label="Registrar otro pago" icon="pi pi-plus" (click)="facade.nuevoPago()" />
+		</div>
+	} @else {
+		<h3 class="mb-2">Alumno que paga: {{ facade.estudiante()?.nombre }}</h3>
+
+		<fieldset class="mb-4">
+			<legend class="font-semibold mb-2">Alumnos que cubre el pago</legend>
+			@if (facade.loadingFamilia()) {
+				<p>Cargando grupo familiar…</p>
+			} @else {
+				@for (miembro of facade.familia(); track miembro.estudianteId) {
+					<label class="flex items-center gap-2 mb-1">
+						<input
+							type="checkbox"
+							[checked]="facade.seleccionados().has(miembro.estudianteId)"
+							(change)="facade.toggleMiembro(miembro.estudianteId)"
+						/>
+						{{ miembro.nombreCompleto }}
+					</label>
+				}
+			}
+		</fieldset>
+
+		<div class="grid gap-4 mb-4">
+			<label class="flex flex-col gap-1">
+				<span>Monto (S/)</span>
+				<edu-input-number [ngModel]="monto()" (ngModelChange)="monto.set($event)" [min]="0" [showButtons]="false" />
+			</label>
+			<label class="flex flex-col gap-1">
+				<span>Fecha del pago</span>
+				<edu-datepicker [ngModel]="fecha()" (ngModelChange)="fecha.set($event)" [maxDate]="hoy" />
+			</label>
+			<label class="flex flex-col gap-1">
+				<span>Hora (opcional)</span>
+				<input type="time" [value]="hora() ?? ''" (input)="hora.set($any($event.target).value || null)" />
+			</label>
+			<label class="flex flex-col gap-1">
+				<span>Medio</span>
+				<edu-select [options]="medios" [ngModel]="medio()" (ngModelChange)="medio.set($event)" optionLabel="label" optionValue="value" />
+			</label>
+			<label class="flex flex-col gap-1">
+				<span>Banco de origen (opcional)</span>
+				<input type="text" [value]="banco()" (input)="banco.set($any($event.target).value)" />
+			</label>
+			<label class="flex flex-col gap-1">
+				<span>Número de operación (opcional)</span>
+				<input type="text" [value]="operacion()" (input)="operacion.set($any($event.target).value)" />
+			</label>
+			<label class="flex flex-col gap-1">
+				<span>Comprobante</span>
+				<input type="text" maxlength="50" [value]="comprobante()" (input)="comprobante.set($any($event.target).value)" />
+				<small>Máximo 50 caracteres. «S/N» solo en efectivo.</small>
+			</label>
+			<label class="flex flex-col gap-1">
+				<span>Observaciones (opcional)</span>
+				<input type="text" maxlength="500" [value]="observaciones()" (input)="observaciones.set($any($event.target).value)" />
+			</label>
+		</div>
+
+		<div class="mb-4">
+			<edu-button
+				label="Proponer reparto"
+				icon="pi pi-calculator"
+				[outlined]="true"
+				[loading]="facade.loadingReparto()"
+				[disabled]="!puedeProponer()"
+				(click)="proponer()"
+			/>
+		</div>
+
+		@if (facade.errorReparto(); as errorReparto) {
+			<edu-message severity="danger" [text]="errorReparto" class="mb-4" />
+		}
+
+		@if (facade.reparto().length > 0) {
+			<table class="w-full mb-2">
+				<thead>
+					<tr>
+						<th scope="col">Alumno</th>
+						<th scope="col">Concepto</th>
+						<th scope="col">Vencimiento</th>
+						<th scope="col" class="text-right">Base (S/)</th>
+						<th scope="col" class="text-right">Recargo (S/)</th>
+					</tr>
+				</thead>
+				<tbody>
+					@for (a of facade.reparto(); track a.cargoId; let i = $index) {
+						<tr>
+							<td>{{ a.estudiante }}</td>
+							<td>{{ a.concepto }}{{ a.cuota ? ' · cuota ' + a.cuota : '' }}</td>
+							<td>{{ a.vencimiento ?? '—' }}</td>
+							<td class="text-right">
+								<input type="number" min="0" step="0.01" class="w-28 text-right" [value]="a.montoBase" (input)="editar(i, 'montoBase', $event)" />
+							</td>
+							<td class="text-right">
+								<input type="number" min="0" step="0.01" class="w-28 text-right" [value]="a.montoRecargo" (input)="editar(i, 'montoRecargo', $event)" />
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+
+			@if (facade.sobrante() > 0) {
+				<p class="mb-2">Sobrante sin repartir: {{ soles(facade.sobrante()) }}</p>
+			}
+
+			<p class="mb-4" [attr.data-testid]="'diferencia'">
+				@if (diferencia() === 0) {
+					Reparto cuadrado con el monto.
+				} @else if (diferencia() > 0) {
+					Faltan {{ soles(diferencia() / 100) }} para cuadrar con el monto.
+				} @else {
+					Sobran {{ soles(-diferencia() / 100) }} sobre el monto.
+				}
+			</p>
+		}
+
+		@if (facade.errorRegistro(); as errorRegistro) {
+			<edu-message severity="danger" [text]="errorRegistro" class="mb-4" />
+		}
+
+		<edu-button
+			label="Registrar pago"
+			icon="pi pi-check"
+			[loading]="facade.guardando()"
+			[disabled]="!facade.puedeRegistrar(montoValor())"
+			(click)="registrar()"
+		/>
+	}
+</section>

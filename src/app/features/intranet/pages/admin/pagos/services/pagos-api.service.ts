@@ -5,10 +5,13 @@ import { Observable, map } from 'rxjs';
 
 import { environment } from '@config/environment';
 import type {
+	MiembroFamilia,
 	PagoCorte,
 	PanelCobranza,
 	QuienesDeben,
 	QuienesDebenFiltros,
+	RegistrarPagoPayload,
+	RepartoPropuesto,
 } from '@data/models';
 // #endregion
 
@@ -54,6 +57,25 @@ export class PagosApiService {
 	guardarCorte(corte: PagoCorte): Observable<PagoCorte> {
 		return this.http.put<PagoCorte>(`${this.apiUrl}/cortes`, corte);
 	}
+
+	// #region Registrar pago
+	/** Propone el reparto entre los alumnos indicados. No persiste nada. */
+	proponerReparto(monto: number, fechaPago: string, estudianteIds: number[]): Observable<RepartoPropuesto> {
+		return this.http.post<RepartoPropuesto>(`${this.apiUrl}/reparto/proponer`, { monto, fechaPago, estudianteIds });
+	}
+
+	/** Grupo familiar por correo de apoderado. Sin correo, devuelve solo el alumno. */
+	familia(estudianteId: number): Observable<MiembroFamilia[]> {
+		return this.http.get<MiembroFamilia[]>(`${this.apiUrl}/estudiantes/${estudianteId}/familia`);
+	}
+
+	/** Registra el pago. La clave de idempotencia la decide el llamador (un intento = una clave). */
+	registrarPago(payload: RegistrarPagoPayload, claveIdempotencia: string): Observable<{ id: number }> {
+		return this.http.post<{ id: number }>(this.apiUrl, payload, {
+			headers: { 'X-Idempotency-Key': claveIdempotencia },
+		});
+	}
+	// #endregion
 
 	// #region Helpers
 	private debenParams(f: QuienesDebenFiltros): HttpParams {
