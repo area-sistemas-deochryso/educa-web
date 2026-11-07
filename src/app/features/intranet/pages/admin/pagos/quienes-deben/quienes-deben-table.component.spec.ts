@@ -1,8 +1,14 @@
 import { TestBed } from '@angular/core/testing';
-import { describe, expect, it } from 'vitest';
+import { provideRouter } from '@angular/router';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import type { QuienDebeFila } from '@data/models';
 import { QuienesDebenTableComponent } from './quienes-deben-table.component';
+
+beforeEach(() => {
+	// La tabla enlaza «Registrar pago» con routerLink, así que necesita un Router.
+	TestBed.configureTestingModule({ providers: [provideRouter([])] });
+});
 
 function fila(over: Partial<QuienDebeFila>): QuienDebeFila {
 	return {

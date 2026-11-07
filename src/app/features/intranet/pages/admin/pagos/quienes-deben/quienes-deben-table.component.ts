@@ -1,5 +1,6 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 import type { PagosCategoria, QuienDebeFila, QuienesDebenOrden } from '@data/models';
 import { EduPaginator, EduTag } from '@edu-ui';
@@ -30,7 +31,7 @@ interface SortableColumn {
 @Component({
 	selector: 'app-quienes-deben-table',
 	standalone: true,
-	imports: [EduTag, EduPaginator, QuienesDebenCuotasComponent],
+	imports: [EduTag, EduPaginator, QuienesDebenCuotasComponent, RouterLink],
 	templateUrl: './quienes-deben-table.component.html',
 	styleUrl: './quienes-deben-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
