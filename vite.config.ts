@@ -32,6 +32,15 @@ export default defineConfig({
 			include: ['src/**/*.ts'],
 			exclude: ['**/*.spec.ts', 'src/app/shared/edu-ui/**'],
 			reporter: ['text-summary', 'json-summary'],
+			// P121 F3 — pisos de cobertura (F2): baseline medido menos 1 punto.
+			// statements/branches son las métricas del plan; functions/lines se declaran para consistencia.
+			// Un umbral por glob excluiría esos archivos del umbral global (ver observación F2 §6),
+			// por lo tanto se aplica un único umbral global; la verificación por categoría (logica/componentes/resto)
+			// corre aparte mediante scripts/check-coverage-floors.mjs en CI.
+			thresholds: {
+				statements: 47,
+				branches: 38,
+			},
 		},
 		server: {
 			deps: {
