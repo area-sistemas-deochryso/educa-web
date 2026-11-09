@@ -1,9 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router, convertToParamMap } from '@angular/router';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { describe, expect, it, vi } from 'vitest';
 
-import type { CuentaCargo, CuentaPago, EstadoCuenta } from '@data/models';
+import type { CuentaAjuste, CuentaCargo, CuentaPago, EstadoCuenta } from '@data/models';
 import { PagosApiService } from '../services/pagos-api.service';
 import { EstadoCuentaComponent } from './estado-cuenta.component';
 
@@ -83,15 +83,31 @@ const cuenta: EstadoCuenta = {
 	salon: null,
 };
 
-function crear(estudianteId: string | null = '280') {
+const ajusteVigente: CuentaAjuste = {
+	ajusteId: 31,
+	cargoId: 1,
+	tipo: 'DESCUENTO',
+	monto: 50,
+	motivo: 'Hermano en el colegio',
+	vigente: true,
+	motivoAnulacion: null,
+	usuarioAnulacion: null,
+	fechaAnulacion: null,
+	usuarioReg: '::TEST',
+	fechaReg: '2026-11-04T10:00:00',
+};
+
+type ApiAcciones = Partial<Record<'anularPago' | 'registrarAjuste' | 'anularAjuste', unknown>>;
+
+function crear(estudianteId: string | null = '280', api: ApiAcciones = {}, datos: EstadoCuenta = cuenta) {
 	const navigate = vi.fn(() => Promise.resolve(true));
-	const estadoCuenta = vi.fn(() => of(cuenta));
+	const estadoCuenta = vi.fn(() => of(datos));
 	TestBed.configureTestingModule({
 		imports: [EstadoCuentaComponent],
 		providers: [
 			{ provide: ActivatedRoute, useValue: { paramMap: of(convertToParamMap(estudianteId ? { estudianteId } : {})) } },
 			{ provide: Router, useValue: { navigate } },
-			{ provide: PagosApiService, useValue: { estadoCuenta, buscarEstudiantes: () => of([]) } },
+			{ provide: PagosApiService, useValue: { estadoCuenta, buscarEstudiantes: () => of([]), ...api } },
 		],
 	});
 	const fixture = TestBed.createComponent(EstadoCuentaComponent);
@@ -150,5 +166,113 @@ describe('EstadoCuentaComponent', () => {
 
 		expect(estadoCuenta).not.toHaveBeenCalled();
 		expect(texto()).toContain('Busca al alumno');
+	});
+
+	describe('acciones sobre la cuenta', () => {
+		const botones = (root: ParentNode, etiqueta: string): HTMLButtonElement[] =>
+			Array.from(root.querySelectorAll('button')).filter((b) => b.textContent?.trim().startsWith(etiqueta));
+
+		const escribirMotivo = (fixture: { detectChanges(): void }, texto: string): void => {
+			const area = document.body.querySelector('textarea') as HTMLTextAreaElement;
+			area.value = texto;
+			area.dispatchEvent(new Event('input'));
+			fixture.detectChanges();
+		};
+
+		it('un cargo sin dato no ofrece ajuste y uno con saldo sí', () => {
+			const { fixture } = crear();
+			const filas = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('tbody tr'));
+			const marzo = filas.find((tr) => tr.textContent?.includes('Marzo')) as HTMLElement;
+			const abril = filas.find((tr) => tr.textContent?.includes('Abril')) as HTMLElement;
+
+			expect(botones(marzo, 'Ajustar')).toHaveLength(1);
+			expect(botones(abril, 'Ajustar')).toHaveLength(0);
+		});
+
+		it('solo un pago vigente se puede anular', () => {
+			const { fixture } = crear();
+			const filas = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('tbody tr'));
+			const vigente = filas.find((tr) => tr.textContent?.includes('Vigente')) as HTMLElement;
+			const anulado = filas.find((tr) => tr.classList.contains('anulada')) as HTMLElement;
+
+			expect(botones(vigente, 'Anular')).toHaveLength(1);
+			expect(botones(anulado, 'Anular')).toHaveLength(0);
+		});
+
+		it('anular un pago: pide motivo, llama al servidor y recarga la cuenta completa', () => {
+			const anularPago = vi.fn(() => of({}));
+			const { fixture, estadoCuenta } = crear('280', { anularPago });
+			const root = fixture.nativeElement as HTMLElement;
+
+			botones(root, 'Anular')[0].click();
+			fixture.detectChanges();
+			const confirmar = botones(document.body, 'Anular').find((b) => b.className.includes('edu-button') && b.closest('[role="dialog"]')) as HTMLButtonElement;
+			expect(confirmar.disabled).toBe(true);
+
+			escribirMotivo(fixture, 'Pago duplicado');
+			expect(confirmar.disabled).toBe(false);
+			confirmar.click();
+			fixture.detectChanges();
+
+			expect(anularPago).toHaveBeenCalledWith(11, 'Pago duplicado');
+			expect(estadoCuenta).toHaveBeenCalledTimes(2);
+		});
+
+		it('un rechazo del servidor se muestra con su regla y la cuenta se recarga si quedó vieja', () => {
+			const anularPago = vi.fn(() => throwError(() => ({ status: 400, error: { errorCode: 'PAGO_YA_ANULADO' } })));
+			const { fixture, estadoCuenta } = crear('280', { anularPago });
+
+			botones(fixture.nativeElement as HTMLElement, 'Anular')[0].click();
+			fixture.detectChanges();
+			escribirMotivo(fixture, 'x');
+			(botones(document.body, 'Anular').find((b) => b.closest('[role="dialog"]')) as HTMLButtonElement).click();
+			fixture.detectChanges();
+
+			expect(document.body.textContent).toContain('El pago ya estaba anulado');
+			expect(estadoCuenta).toHaveBeenCalledTimes(2);
+		});
+
+		it('anular un ajuste vigente llama al servidor con su motivo', () => {
+			const anularAjuste = vi.fn(() => of({}));
+			const { fixture, estadoCuenta } = crear('280', { anularAjuste }, { ...cuenta, ajustes: [ajusteVigente] });
+			const tablaAjustes = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('tbody tr')).find((tr) =>
+				tr.textContent?.includes('Hermano en el colegio'),
+			) as HTMLElement;
+
+			botones(tablaAjustes, 'Anular')[0].click();
+			fixture.detectChanges();
+			escribirMotivo(fixture, 'Error de digitación');
+			(botones(document.body, 'Anular').find((b) => b.closest('[role="dialog"]')) as HTMLButtonElement).click();
+			fixture.detectChanges();
+
+			expect(anularAjuste).toHaveBeenCalledWith(31, 'Error de digitación');
+			expect(estadoCuenta).toHaveBeenCalledTimes(2);
+		});
+
+		it('registrar un ajuste: un descuento exige motivo y envía el cuerpo del contrato', () => {
+			const registrarAjuste = vi.fn(() => of({ id: 40 }));
+			const { fixture, estadoCuenta } = crear('280', { registrarAjuste });
+			const marzo = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('tbody tr')).find((tr) =>
+				tr.textContent?.includes('Marzo'),
+			) as HTMLElement;
+
+			botones(marzo, 'Ajustar')[0].click();
+			fixture.detectChanges();
+			const monto = document.body.querySelector('edu-input-number input') as HTMLInputElement;
+			monto.value = '25.50';
+			monto.dispatchEvent(new Event('input'));
+			monto.dispatchEvent(new Event('blur'));
+			fixture.detectChanges();
+			const guardar = botones(document.body, 'Registrar ajuste').find((b) => b.closest('[role="dialog"]')) as HTMLButtonElement;
+			expect(guardar.disabled).toBe(true);
+
+			escribirMotivo(fixture, 'Hermano');
+			expect(guardar.disabled).toBe(false);
+			guardar.click();
+			fixture.detectChanges();
+
+			expect(registrarAjuste).toHaveBeenCalledWith({ cargoId: 1, tipo: 'DESCUENTO', monto: 25.5, motivo: 'Hermano' });
+			expect(estadoCuenta).toHaveBeenCalledTimes(2);
+		});
 	});
 });

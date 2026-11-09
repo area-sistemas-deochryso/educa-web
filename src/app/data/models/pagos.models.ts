@@ -242,6 +242,14 @@ export interface CuentaAjuste {
 	fechaReg: string;
 }
 
+/** Cuerpo de `POST /api/pagos/ajustes`. El motivo es obligatorio solo en `DESCUENTO` (INV-PG08). */
+export interface RegistrarAjustePayload {
+	cargoId: number;
+	tipo: CuentaAjuste['tipo'];
+	monto: number;
+	motivo: string | null;
+}
+
 /** `GET /api/pagos/estudiantes/{id}/estado-cuenta`. No excluye `::TEST` (INV-PG12). */
 export interface EstadoCuenta {
 	estudianteId: number;

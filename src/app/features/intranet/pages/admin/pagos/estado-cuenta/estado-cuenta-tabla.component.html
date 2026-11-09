@@ -14,6 +14,9 @@
 							</button>
 						</th>
 					}
+					@if (acciones()) {
+						<th scope="col">Acciones</th>
+					}
 				</tr>
 			</thead>
 			<tbody>
@@ -22,10 +25,15 @@
 						@for (col of columnas(); track col.key) {
 							<td [class.num]="col.numeric">{{ col.texto(fila) }}</td>
 						}
+						@if (acciones(); as plantilla) {
+							<td>
+								<ng-container [ngTemplateOutlet]="plantilla" [ngTemplateOutletContext]="{ $implicit: fila }" />
+							</td>
+						}
 					</tr>
 					@if (detalle()(fila); as texto) {
 						<tr class="detalle">
-							<td [attr.colspan]="columnas().length">{{ texto }}</td>
+							<td [attr.colspan]="totalColumnas()">{{ texto }}</td>
 						</tr>
 					}
 				}
