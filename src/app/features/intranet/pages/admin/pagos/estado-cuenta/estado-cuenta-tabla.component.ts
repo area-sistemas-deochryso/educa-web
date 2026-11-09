@@ -1,5 +1,6 @@
 // #region Imports
-import { ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
+import { ChangeDetectionStrategy, Component, type TemplateRef, computed, input, signal } from '@angular/core';
 
 import { type Orden, ordenar, siguienteOrden } from './estado-cuenta.logic';
 // #endregion
@@ -21,6 +22,7 @@ export interface ColumnaTabla<T> {
 @Component({
 	selector: 'app-estado-cuenta-tabla',
 	standalone: true,
+	imports: [NgTemplateOutlet],
 	templateUrl: './estado-cuenta-tabla.component.html',
 	styleUrl: './estado-cuenta-tabla.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -34,6 +36,9 @@ export class EstadoCuentaTablaComponent<T> {
 	readonly anulada = input<(fila: T) => boolean>(() => false);
 	/** Texto bajo la fila (motivo de anulación). Vacío = nada. */
 	readonly detalle = input<(fila: T) => string>(() => '');
+	/** Plantilla de la columna «Acciones» (botones por fila). Sin ella no hay columna. */
+	readonly acciones = input<TemplateRef<{ $implicit: T }> | null>(null);
+	protected readonly totalColumnas = computed(() => this.columnas().length + (this.acciones() ? 1 : 0));
 
 	protected readonly orden = signal<Orden>(null);
 

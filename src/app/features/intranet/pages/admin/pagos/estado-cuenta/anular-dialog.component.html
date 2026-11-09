@@ -1,0 +1,50 @@
+<edu-dialog
+	[visible]="visible()"
+	(visibleChange)="onVisibleChange($event)"
+	[modal]="true"
+	[draggable]="false"
+	[resizable]="false"
+	[closable]="!guardando()"
+	[header]="contexto()?.titulo ?? ''"
+	[style]="{ width: '480px' }"
+	appendTo="body"
+>
+	@if (contexto(); as ctx) {
+		<div class="flex flex-col gap-3">
+			<ul class="m-0 pl-4">
+				@for (linea of ctx.resumen; track $index) {
+					<li>{{ linea }}</li>
+				}
+			</ul>
+			@if (ctx.aviso; as aviso) {
+				<edu-message severity="warn" [text]="aviso" />
+			}
+			<label class="flex flex-col gap-1">
+				<span>Motivo de la anulación <span aria-hidden="true">*</span></span>
+				<textarea
+					eduTextarea
+					rows="3"
+					maxlength="500"
+					[ngModel]="motivo()"
+					(ngModelChange)="motivo.set($event)"
+					placeholder="Por qué se anula"
+					class="w-full"
+				></textarea>
+			</label>
+			@if (error(); as mensaje) {
+				<edu-message severity="danger" [text]="mensaje" />
+			}
+			<div class="flex justify-end gap-2">
+				<edu-button label="Cancelar" severity="secondary" [text]="true" [disabled]="guardando()" (click)="onVisibleChange(false)" />
+				<edu-button
+					label="Anular"
+					severity="danger"
+					icon="pi pi-ban"
+					[loading]="guardando()"
+					[disabled]="!motivo().trim()"
+					(click)="aceptar()"
+				/>
+			</div>
+		</div>
+	}
+</edu-dialog>

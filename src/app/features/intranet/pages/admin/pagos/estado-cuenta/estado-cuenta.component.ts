@@ -1,13 +1,17 @@
 // #region Imports
-import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import type { CuentaAjuste, CuentaCargo, CuentaPago, EstudianteBusqueda } from '@data/models';
-import { EduAutoComplete, EduMessage, EduTag, EduTemplate } from '@edu-ui';
+import type { CuentaAjuste, CuentaCargo, CuentaPago, EstudianteBusqueda, RegistrarAjustePayload } from '@data/models';
+import { EduAutoComplete, EduButton, EduMessage, EduTag, EduTemplate } from '@edu-ui';
 import { ErrorStateComponent } from '@shared/components';
 import { formatSoles } from '../utils/pagos-format.util';
+import { AccionesCuentaFacade, type ResultadoAccion } from './acciones-cuenta.facade';
+import { admiteAjuste, avisoAnularPago, topeAjuste } from './acciones-cuenta.logic';
+import { AjusteDialogComponent } from './ajuste-dialog.component';
+import { AnularDialogComponent } from './anular-dialog.component';
 import { EstadoCuentaFacade } from './estado-cuenta.facade';
 import {
 	CATEGORIAS,
@@ -42,20 +46,37 @@ const conceptoDe = (c: Pick<CuentaCargo, 'concepto' | 'cuota'>): string => (c.cu
 @Component({
 	selector: 'app-estado-cuenta',
 	standalone: true,
-	imports: [FormsModule, EduAutoComplete, EduMessage, EduTag, EduTemplate, ErrorStateComponent, EstadoCuentaTablaComponent],
-	providers: [EstadoCuentaFacade],
+	imports: [
+		FormsModule,
+		AjusteDialogComponent,
+		AnularDialogComponent,
+		EduAutoComplete,
+		EduButton,
+		EduMessage,
+		EduTag,
+		EduTemplate,
+		ErrorStateComponent,
+		EstadoCuentaTablaComponent,
+	],
+	providers: [EstadoCuentaFacade, AccionesCuentaFacade],
 	templateUrl: './estado-cuenta.component.html',
 	styleUrl: './estado-cuenta.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EstadoCuentaComponent {
 	protected readonly facade = inject(EstadoCuentaFacade);
+	protected readonly acciones = inject(AccionesCuentaFacade);
 	private readonly route = inject(ActivatedRoute);
 	private readonly router = inject(Router);
 	private readonly destroyRef = inject(DestroyRef);
 
 	protected readonly soles = formatSoles;
 	protected readonly seleccionado = signal<EstudianteBusqueda | null>(null);
+
+	private readonly anularDialog = viewChild.required(AnularDialogComponent);
+	private readonly ajusteDialog = viewChild.required(AjusteDialogComponent);
+	/** Qué se está anulando mientras el diálogo de anulación está abierto. */
+	private pendiente: { tipo: 'pago' | 'ajuste'; id: number } | null = null;
 
 	protected readonly categoria = computed(() => {
 		const c = this.facade.cuenta();
@@ -115,6 +136,7 @@ export class EstadoCuentaComponent {
 	protected readonly ajusteAnulado = (a: CuentaAjuste): boolean => !a.vigente;
 	protected readonly detallePago = (p: CuentaPago): string => detalleAnulacion(p);
 	protected readonly detalleAjuste = (a: CuentaAjuste): string => detalleAnulacion(a);
+	protected readonly admiteAjuste = admiteAjuste;
 
 	constructor() {
 		this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
@@ -127,6 +149,64 @@ export class EstadoCuentaComponent {
 			}
 		});
 	}
+
+	// #region Acciones sobre la cuenta
+	protected abrirAnularPago(pago: CuentaPago): void {
+		this.acciones.limpiarError();
+		this.pendiente = { tipo: 'pago', id: pago.pagoId };
+		this.anularDialog().open({
+			titulo: `Anular pago N.º ${pago.pagoId}`,
+			resumen: [`${fechaPagoDe(pago)} · ${MEDIOS[pago.medio] ?? pago.medio}`, `Monto: ${montoPagoDe(pago)}`, `Comprobante: ${pago.comprobante}`],
+			aviso: avisoAnularPago(pago),
+		});
+	}
+
+	protected abrirAnularAjuste(ajuste: CuentaAjuste): void {
+		this.acciones.limpiarError();
+		this.pendiente = { tipo: 'ajuste', id: ajuste.ajusteId };
+		const cargo = this.facade.cuenta()?.cargos.find((c) => c.cargoId === ajuste.cargoId);
+		this.anularDialog().open({
+			titulo: 'Anular ajuste',
+			resumen: [
+				`${TIPOS_AJUSTE[ajuste.tipo] ?? ajuste.tipo} de ${formatSoles(ajuste.monto)}`,
+				`Cargo: ${cargo ? conceptoDe(cargo) : `Cargo ${ajuste.cargoId}`}`,
+				...(ajuste.motivo ? [`Motivo del ajuste: ${ajuste.motivo}`] : []),
+			],
+			aviso: null,
+		});
+	}
+
+	protected abrirAjuste(cargo: CuentaCargo): void {
+		this.acciones.limpiarError();
+		this.ajusteDialog().open({ cargoId: cargo.cargoId, cargo: conceptoDe(cargo), tope: topeAjuste(cargo) });
+	}
+
+	protected confirmarAnulacion(motivo: string): void {
+		const objetivo = this.pendiente;
+		if (!objetivo) return;
+		const alTerminar = (r: ResultadoAccion): void => this.terminar(r, this.anularDialog());
+		if (objetivo.tipo === 'pago') this.acciones.anularPago(objetivo.id, motivo, alTerminar);
+		else this.acciones.anularAjuste(objetivo.id, motivo, alTerminar);
+	}
+
+	protected confirmarAjuste(payload: RegistrarAjustePayload): void {
+		this.acciones.registrarAjuste(payload, (r) => this.terminar(r, this.ajusteDialog()));
+	}
+
+	/** Éxito: cierra el diálogo. Éxito o cuenta desactualizada: recarga la cuenta completa, no una fila. */
+	private terminar(r: ResultadoAccion, dialogo: { close(): void }): void {
+		if (r.exito) {
+			dialogo.close();
+			this.pendiente = null;
+		}
+		if (r.recargar) this.facade.recargar();
+	}
+
+	protected cancelarAccion(): void {
+		this.pendiente = null;
+		this.acciones.limpiarError();
+	}
+	// #endregion
 
 	protected buscarEstudiantes(evento: { query: string }): void {
 		this.facade.buscarEstudiantes(evento.query);

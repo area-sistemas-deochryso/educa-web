@@ -12,6 +12,7 @@ import type {
 	PanelCobranza,
 	QuienesDeben,
 	QuienesDebenFiltros,
+	RegistrarAjustePayload,
 	RegistrarPagoPayload,
 	RepartoPropuesto,
 	SinDato,
@@ -102,6 +103,21 @@ export class PagosApiService {
 		return this.http.post<{ id: number }>(this.apiUrl, payload, {
 			headers: { 'X-Idempotency-Key': claveIdempotencia },
 		});
+	}
+	// #endregion
+
+	// #region Acciones sobre la cuenta
+	/** Anula un pago con motivo. Libera el recargo que ese pago congeló. */
+	anularPago(pagoId: number, motivo: string): Observable<unknown> {
+		return this.http.post(`${this.apiUrl}/${pagoId}/anular`, { motivo });
+	}
+
+	registrarAjuste(payload: RegistrarAjustePayload): Observable<{ id: number }> {
+		return this.http.post<{ id: number }>(`${this.apiUrl}/ajustes`, payload);
+	}
+
+	anularAjuste(ajusteId: number, motivo: string): Observable<unknown> {
+		return this.http.post(`${this.apiUrl}/ajustes/${ajusteId}/anular`, { motivo });
 	}
 	// #endregion
 

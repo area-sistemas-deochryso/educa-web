@@ -70,6 +70,7 @@
 				caption="Cargos del alumno"
 				[columnas]="columnasCargos"
 				[filas]="cuenta.cargos"
+				[acciones]="accionesCargo"
 				vacio="El alumno no tiene cargos."
 			/>
 
@@ -80,6 +81,7 @@
 				[filas]="cuenta.pagos"
 				[anulada]="pagoAnulado"
 				[detalle]="detallePago"
+				[acciones]="accionesPago"
 				vacio="Sin pagos registrados."
 			/>
 
@@ -90,10 +92,68 @@
 				[filas]="cuenta.ajustes"
 				[anulada]="ajusteAnulado"
 				[detalle]="detalleAjuste"
+				[acciones]="accionesAjuste"
 				vacio="Sin ajustes."
 			/>
 		</div>
 	} @else {
 		<edu-message severity="info" text="Busca al alumno para ver su cuenta, o entra desde «Quiénes deben» o «Sin dato»." />
 	}
+
+	<ng-template #accionesCargo let-cargo>
+		@if (admiteAjuste(cargo)) {
+			<edu-button
+				label="Ajustar"
+				icon="pi pi-percentage"
+				size="small"
+				[text]="true"
+				(click)="abrirAjuste(cargo)"
+			>
+				<span class="sr-only"> en {{ cargo.concepto }}{{ cargo.cuota ? ' · ' + cargo.cuota : '' }}</span>
+			</edu-button>
+		}
+	</ng-template>
+
+	<ng-template #accionesPago let-pago>
+		@if (pago.vigente) {
+			<edu-button
+				label="Anular"
+				icon="pi pi-ban"
+				severity="danger"
+				size="small"
+				[text]="true"
+				(click)="abrirAnularPago(pago)"
+			>
+				<span class="sr-only"> el pago N.º {{ pago.pagoId }}</span>
+			</edu-button>
+		}
+	</ng-template>
+
+	<ng-template #accionesAjuste let-ajuste>
+		@if (ajuste.vigente) {
+			<edu-button
+				label="Anular"
+				icon="pi pi-ban"
+				severity="danger"
+				size="small"
+				[text]="true"
+				(click)="abrirAnularAjuste(ajuste)"
+			>
+				<span class="sr-only"> el ajuste de {{ soles(ajuste.monto) }}</span>
+			</edu-button>
+		}
+	</ng-template>
+
+	<app-anular-dialog
+		[guardando]="acciones.guardando()"
+		[error]="acciones.error()"
+		(confirmar)="confirmarAnulacion($event)"
+		(cancelar)="cancelarAccion()"
+	/>
+	<app-ajuste-dialog
+		[guardando]="acciones.guardando()"
+		[error]="acciones.error()"
+		(confirmar)="confirmarAjuste($event)"
+		(cancelar)="cancelarAccion()"
+	/>
 </section>
