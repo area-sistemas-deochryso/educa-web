@@ -1,8 +1,10 @@
 // #region Imports
-import { Injectable, computed, inject, signal } from '@angular/core';
+import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Subject, catchError, of, switchMap } from 'rxjs';
 
 import { logger } from '@core/helpers';
-import type { MiembroFamilia, PagoMedio, RepartoAplicacion } from '@data/models';
+import type { EstudianteBusqueda, MiembroFamilia, PagoMedio, RepartoAplicacion } from '@data/models';
 import { PagosApiService } from '../services/pagos-api.service';
 import {
 	type IntentoPago,
@@ -28,7 +30,7 @@ export interface DatosPago {
 
 /**
  * Estado de «Registrar pago». Se provee a nivel de componente.
- * - El alumno que paga llega por la ruta (`?estudianteId=`). El buscador está pausado (decisión 1-A, gap G2).
+ * - El alumno que paga se elige con el buscador o llega por la ruta (`?estudianteId=`, desde «Quiénes deben»).
  * - El reparto lo propone el servidor y la persona lo edita; el cliente debe cuadrar con el monto antes de enviar.
  * - Un intento = una clave de idempotencia. Se reusa solo si no hubo respuesta y el payload no cambió.
  */
@@ -50,13 +52,52 @@ export class RegistrarPagoFacade {
 	readonly errorRegistro = signal<string | null>(null);
 	readonly pagoRegistrado = signal<number | null>(null);
 
+	readonly sugerencias = signal<EstudianteBusqueda[]>([]);
+	readonly errorBusqueda = signal<string | null>(null);
+
+	private readonly destroyRef = inject(DestroyRef);
+	private readonly consulta$ = new Subject<string>();
 	private intento: IntentoPago | null = null;
 	private sinRespuesta = false;
 
 	readonly idsSeleccionados = computed(() => [...this.seleccionados()]);
 
+	constructor() {
+		// switchMap descarta la respuesta de la búsqueda anterior si ya hay una más nueva.
+		this.consulta$
+			.pipe(
+				switchMap((texto) =>
+					this.api.buscarEstudiantes(texto).pipe(
+						catchError((err: unknown) => {
+							logger.error('[RegistrarPagoFacade] Error al buscar alumnos', err);
+							this.errorBusqueda.set('No se pudo buscar alumnos. Intentá de nuevo.');
+							return of<EstudianteBusqueda[]>([]);
+						}),
+					),
+				),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe((lista) => this.sugerencias.set(lista));
+	}
+
+	/** Busca por nombre o DNI. Con menos de 2 caracteres no consulta (el servidor lo rechaza). */
+	buscarEstudiantes(texto: string): void {
+		const limpio = texto.trim();
+		if (limpio.length < 2) {
+			this.sugerencias.set([]);
+			return;
+		}
+		this.errorBusqueda.set(null);
+		this.consulta$.next(limpio);
+	}
+
 	/** Fija el alumno que paga y carga su grupo familiar. Todos los del grupo arrancan seleccionados. */
 	iniciar(estudiante: { id: number; nombre: string }): void {
+		// Cambiar de alumno invalida el reparto, el resultado y el intento en curso.
+		this.pagoRegistrado.set(null);
+		this.limpiarReparto();
+		this.intento = null;
+		this.sinRespuesta = false;
 		this.estudiante.set(estudiante);
 		this.loadingFamilia.set(true);
 		this.api.familia(estudiante.id).subscribe({
@@ -92,6 +133,7 @@ export class RegistrarPagoFacade {
 		if (ids.length === 0 || monto <= 0) return;
 		this.loadingReparto.set(true);
 		this.errorReparto.set(null);
+		this.limpiarRegistro();
 		this.api.proponerReparto(monto, fechaPago, ids).subscribe({
 			next: (propuesta) => {
 				this.reparto.set(propuesta.aplicaciones);
@@ -111,6 +153,11 @@ export class RegistrarPagoFacade {
 		this.reparto.update((apps) =>
 			apps.map((a, i) => (i === index ? { ...a, [campo]: Math.max(0, valor ?? 0) } : a)),
 		);
+		this.limpiarRegistro();
+	}
+
+	/** El error del intento anterior deja de aplicar cuando cambian los datos del pago. */
+	descartarErrorRegistro(): void {
 		this.limpiarRegistro();
 	}
 

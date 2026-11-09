@@ -154,6 +154,13 @@ export interface MiembroFamilia {
 	nombreCompleto: string;
 }
 
+/** Resultado del buscador de alumnos (`GET /api/pagos/estudiantes?buscar=`). `salon` es null sin matrícula activa. */
+export interface EstudianteBusqueda {
+	estudianteId: number;
+	nombreCompleto: string;
+	salon: { nombre: string } | null;
+}
+
 export interface RegistrarPagoAplicacion {
 	cargoId: number;
 	montoBase: number;

@@ -1,6 +1,32 @@
 <section class="registrar-pago">
+	<label class="flex flex-col gap-1 mb-4">
+		<span>Buscar alumno (nombre o DNI)</span>
+		<edu-autocomplete
+			[suggestions]="facade.sugerencias()"
+			[ngModel]="seleccionado()"
+			(completeMethod)="buscarEstudiantes($event)"
+			(onSelect)="elegirEstudiante($event.value)"
+			optionLabel="nombreCompleto"
+			placeholder="Escribí al menos 2 letras o el DNI completo"
+			[minLength]="2"
+			[delay]="300"
+			[style]="{ width: '100%' }"
+			[inputStyle]="{ width: '100%' }"
+		>
+			<ng-template let-alumno pTemplate="item">
+				<div class="flex gap-2 items-center">
+					<span class="font-semibold">{{ alumno.nombreCompleto }}</span>
+					<span>{{ alumno.salon?.nombre ?? 'Sin matrícula activa' }}</span>
+				</div>
+			</ng-template>
+		</edu-autocomplete>
+		@if (facade.errorBusqueda(); as errorBusqueda) {
+			<small role="alert">{{ errorBusqueda }}</small>
+		}
+	</label>
+
 	@if (!facade.estudiante()) {
-		<edu-message severity="info" text="Para registrar un pago, elegí al alumno desde «Quiénes deben»." />
+		<edu-message severity="info" text="Buscá al alumno que paga, o elegilo desde «Quiénes deben»." />
 	} @else if (facade.pagoRegistrado(); as pagoId) {
 		<edu-message severity="success" [text]="'Pago registrado (N.º ' + pagoId + ').'" />
 		<div class="mt-4">
@@ -29,11 +55,20 @@
 
 		<div class="grid gap-4 mb-4">
 			<label class="flex flex-col gap-1">
-				<span>Monto (S/)</span>
-				<edu-input-number [ngModel]="monto()" (ngModelChange)="monto.set($event)" [min]="0" [showButtons]="false" />
+				<span>Monto (S/) <span aria-hidden="true">*</span></span>
+				<edu-input-number
+					[ngModel]="monto()"
+					(ngModelChange)="cambiarMonto($event)"
+					(keydown)="filtrarTeclaMonto($event)"
+					placeholder="0.00"
+					[min]="0"
+					[minFractionDigits]="2"
+					[maxFractionDigits]="2"
+					[showButtons]="false"
+				/>
 			</label>
 			<label class="flex flex-col gap-1">
-				<span>Fecha del pago</span>
+				<span>Fecha del pago <span aria-hidden="true">*</span></span>
 				<edu-datepicker [ngModel]="fecha()" (ngModelChange)="fecha.set($event)" [maxDate]="hoy" />
 			</label>
 			<label class="flex flex-col gap-1">
@@ -53,7 +88,7 @@
 				<input type="text" [value]="operacion()" (input)="operacion.set($any($event.target).value)" />
 			</label>
 			<label class="flex flex-col gap-1">
-				<span>Comprobante</span>
+				<span>Comprobante <span aria-hidden="true">*</span></span>
 				<input type="text" maxlength="50" [value]="comprobante()" (input)="comprobante.set($any($event.target).value)" />
 				<small>Máximo 50 caracteres. «S/N» solo en efectivo.</small>
 			</label>
@@ -94,7 +129,7 @@
 						<tr>
 							<td>{{ a.estudiante }}</td>
 							<td>{{ a.concepto }}{{ a.cuota ? ' · cuota ' + a.cuota : '' }}</td>
-							<td>{{ a.vencimiento ?? '—' }}</td>
+							<td>{{ a.vencimiento ? fechaConDia(a.vencimiento) : '—' }}</td>
 							<td class="text-right">
 								<input type="number" min="0" step="0.01" class="w-28 text-right" [value]="a.montoBase" (input)="editar(i, 'montoBase', $event)" />
 							</td>
@@ -129,8 +164,11 @@
 			label="Registrar pago"
 			icon="pi pi-check"
 			[loading]="facade.guardando()"
-			[disabled]="!facade.puedeRegistrar(montoValor())"
+			[disabled]="!puedeRegistrar()"
 			(click)="registrar()"
 		/>
+		@if (!puedeRegistrar() && motivoBloqueo(); as motivo) {
+			<p class="mt-2" data-testid="motivo-bloqueo">{{ motivo }}</p>
+		}
 	}
 </section>
