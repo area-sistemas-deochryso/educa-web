@@ -5,6 +5,7 @@ import { Observable, map } from 'rxjs';
 
 import { environment } from '@config/environment';
 import type {
+	EstudianteBusqueda,
 	MiembroFamilia,
 	PagoCorte,
 	PanelCobranza,
@@ -62,6 +63,13 @@ export class PagosApiService {
 	/** Propone el reparto entre los alumnos indicados. No persiste nada. */
 	proponerReparto(monto: number, fechaPago: string, estudianteIds: number[]): Observable<RepartoPropuesto> {
 		return this.http.post<RepartoPropuesto>(`${this.apiUrl}/reparto/proponer`, { monto, fechaPago, estudianteIds });
+	}
+
+	/** Alumnos activos por nombre o DNI completo, sin exigir deuda. El servidor pide al menos 2 caracteres. */
+	buscarEstudiantes(buscar: string, limite = 20): Observable<EstudianteBusqueda[]> {
+		return this.http.get<EstudianteBusqueda[]>(`${this.apiUrl}/estudiantes`, {
+			params: this.params({ buscar: buscar.trim(), limite }),
+		});
 	}
 
 	/** Grupo familiar por correo de apoderado. Sin correo, devuelve solo el alumno. */

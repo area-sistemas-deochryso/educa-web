@@ -32,6 +32,22 @@ export function repartoCuadra(monto: number, aplicaciones: readonly RepartoAplic
 }
 // #endregion
 
+// #region Validación del formulario
+/** Obligatorios del contrato que aún faltan, redactados para «Falta completar: …». Vacío = se puede enviar. */
+export function camposFaltantes(datos: { monto: number; comprobante: string; fechaValida: boolean }): string[] {
+	const faltan: string[] = [];
+	if (toCentavos(datos.monto) <= 0) faltan.push('el monto');
+	if (!datos.fechaValida) faltan.push('la fecha');
+	if (!datos.comprobante.trim()) faltan.push('el comprobante');
+	return faltan;
+}
+
+/** Filtro de teclado del monto: deja pasar teclas con nombre (Backspace, Tab, flechas…), atajos y `0-9 . ,`. */
+export function teclaPermitidaEnMonto(tecla: string, conAtajo: boolean): boolean {
+	return conAtajo || tecla.length > 1 || /^[0-9.,]$/.test(tecla);
+}
+// #endregion
+
 // #region Payload
 /** Arma el cuerpo de `POST /api/pagos` a partir del formulario. La hora se envía como `HH:mm:ss` (TimeSpan). */
 export function armarPayload(datos: {

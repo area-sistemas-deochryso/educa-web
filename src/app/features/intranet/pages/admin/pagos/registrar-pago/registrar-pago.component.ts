@@ -1,14 +1,14 @@
 // #region Imports
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
-import type { PagoMedio } from '@data/models';
-import { EduButton, EduDatePicker, EduInputNumber, EduMessage, EduSelect } from '@edu-ui';
-import { formatSoles } from '../utils/pagos-format.util';
+import type { EstudianteBusqueda, PagoMedio } from '@data/models';
+import { EduAutoComplete, EduButton, EduDatePicker, EduInputNumber, EduMessage, EduSelect, EduTemplate } from '@edu-ui';
+import { formatFechaConDia, formatSoles } from '../utils/pagos-format.util';
 import { RegistrarPagoFacade } from './registrar-pago.facade';
-import { diferenciaCentavos } from './registrar-pago.logic';
+import { camposFaltantes, diferenciaCentavos, teclaPermitidaEnMonto } from './registrar-pago.logic';
 // #endregion
 
 const MEDIOS: { label: string; value: PagoMedio }[] = [
@@ -29,13 +29,13 @@ function isoLocal(fecha: Date): string {
 }
 
 /**
- * «Registrar pago»: el alumno que paga llega por `?estudianteId=&nombre=` (buscador pausado, gap G2).
+ * «Registrar pago»: el alumno que paga se elige con el buscador o llega por `?estudianteId=&nombre=` (desde «Quiénes deben»).
  * Muestra el grupo familiar, pide el reparto propuesto, lo deja editar y registra solo si cuadra con el monto.
  */
 @Component({
 	selector: 'app-registrar-pago',
 	standalone: true,
-	imports: [FormsModule, EduButton, EduDatePicker, EduInputNumber, EduMessage, EduSelect],
+	imports: [FormsModule, EduAutoComplete, EduButton, EduDatePicker, EduInputNumber, EduMessage, EduSelect, EduTemplate],
 	providers: [RegistrarPagoFacade],
 	templateUrl: './registrar-pago.component.html',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -47,10 +47,14 @@ export class RegistrarPagoComponent {
 
 	protected readonly medios = MEDIOS;
 	protected readonly soles = formatSoles;
+	protected readonly fechaConDia = formatFechaConDia;
 	protected readonly hoy = new Date();
 
+	/** Alumno elegido en el buscador (o el precargado por la ruta); el autocomplete lo muestra como texto. */
+	protected readonly seleccionado = signal<EstudianteBusqueda | null>(null);
+
 	protected readonly monto = signal<number | null>(null);
-	protected readonly fecha = signal<Date>(new Date());
+	protected readonly fecha = signal<Date | null>(new Date());
 	protected readonly hora = signal<string | null>(null);
 	protected readonly medio = signal<PagoMedio>('TRANSFERENCIA');
 	protected readonly banco = signal('');
@@ -62,9 +66,25 @@ export class RegistrarPagoComponent {
 		this.route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
 			const id = Number(params.get('estudianteId'));
 			const nombre = params.get('nombre') ?? '';
-			if (Number.isInteger(id) && id > 0) this.facade.iniciar({ id, nombre });
+			if (Number.isInteger(id) && id > 0) {
+				this.seleccionado.set({ estudianteId: id, nombreCompleto: nombre, salon: null });
+				this.facade.iniciar({ id, nombre });
+			}
 		});
 	}
+
+	/** Obligatorios del contrato que faltan. Se muestra junto al botón y bloquea el registro. */
+	protected readonly faltantes = computed(() =>
+		camposFaltantes({ monto: this.monto() ?? 0, comprobante: this.comprobante(), fechaValida: this.fecha() !== null }),
+	);
+
+	/** Por qué «Registrar pago» está deshabilitado. `null` = habilitado o guardando. */
+	protected readonly motivoBloqueo = computed(() => {
+		const faltan = this.faltantes();
+		if (faltan.length > 0) return `Falta completar: ${faltan.join(', ')}.`;
+		if (this.facade.reparto().length === 0) return 'Proponé el reparto antes de registrar.';
+		return null;
+	});
 
 	protected montoValor(): number {
 		return this.monto() ?? 0;
@@ -75,11 +95,41 @@ export class RegistrarPagoComponent {
 	}
 
 	protected puedeProponer(): boolean {
-		return this.montoValor() > 0 && this.facade.idsSeleccionados().length > 0 && !this.facade.loadingReparto();
+		return (
+			this.montoValor() > 0 &&
+			this.fecha() !== null &&
+			this.facade.idsSeleccionados().length > 0 &&
+			!this.facade.loadingReparto()
+		);
+	}
+
+	protected puedeRegistrar(): boolean {
+		return this.faltantes().length === 0 && this.facade.puedeRegistrar(this.montoValor());
+	}
+
+	/** Solo dígitos, punto y coma en el monto; el resto de teclas se descarta antes de llegar al input. */
+	protected filtrarTeclaMonto(evento: KeyboardEvent): void {
+		const conAtajo = evento.ctrlKey || evento.metaKey || evento.altKey;
+		if (!teclaPermitidaEnMonto(evento.key, conAtajo)) evento.preventDefault();
+	}
+
+	protected buscarEstudiantes(evento: { query: string }): void {
+		this.facade.buscarEstudiantes(evento.query);
+	}
+
+	protected elegirEstudiante(estudiante: EstudianteBusqueda): void {
+		this.seleccionado.set(estudiante);
+		this.facade.iniciar({ id: estudiante.estudianteId, nombre: estudiante.nombreCompleto });
+	}
+
+	protected cambiarMonto(valor: number | null): void {
+		this.monto.set(valor);
+		this.facade.descartarErrorRegistro();
 	}
 
 	protected proponer(): void {
-		this.facade.proponer(this.montoValor(), isoLocal(this.fecha()));
+		const fecha = this.fecha();
+		if (fecha) this.facade.proponer(this.montoValor(), isoLocal(fecha));
 	}
 
 	protected editar(index: number, campo: 'montoBase' | 'montoRecargo', evento: Event): void {
@@ -88,9 +138,11 @@ export class RegistrarPagoComponent {
 	}
 
 	protected registrar(): void {
+		const fecha = this.fecha();
+		if (!fecha || !this.puedeRegistrar()) return;
 		this.facade.registrar({
 			monto: this.montoValor(),
-			fechaPago: isoLocal(this.fecha()),
+			fechaPago: isoLocal(fecha),
 			horaPago: this.hora(),
 			medio: this.medio(),
 			bancoOrigen: this.banco().trim() || null,

@@ -3,11 +3,13 @@ import { describe, expect, it } from 'vitest';
 import type { RegistrarPagoPayload, RepartoAplicacion } from '@data/models';
 import {
 	armarPayload,
+	camposFaltantes,
 	claveParaEnvio,
 	diferenciaCentavos,
 	huellaDe,
 	mensajeDeError,
 	repartoCuadra,
+	teclaPermitidaEnMonto,
 	toCentavos,
 	totalCentavos,
 } from './registrar-pago.logic';
@@ -149,5 +151,45 @@ describe('registrar-pago.logic — clave de idempotencia por intento', () => {
 		const otraHuella = huellaDe({ ...payload, monto: 99 });
 		const siguiente = claveParaEnvio(primero, otraHuella, true, generar);
 		expect(siguiente.clave).not.toBe(primero.clave);
+	});
+});
+
+describe('camposFaltantes', () => {
+	const completo = { monto: 100, comprobante: 'B001-123', fechaValida: true };
+
+	it('no reporta nada cuando monto, fecha y comprobante están completos', () => {
+		expect(camposFaltantes(completo)).toEqual([]);
+	});
+
+	it('reporta el monto en cero, el que se redondea a cero y el vacío', () => {
+		expect(camposFaltantes({ ...completo, monto: 0 })).toEqual(['el monto']);
+		expect(camposFaltantes({ ...completo, monto: 0.004 })).toEqual(['el monto']);
+	});
+
+	it('trata un comprobante solo de espacios como faltante', () => {
+		expect(camposFaltantes({ ...completo, comprobante: '   ' })).toEqual(['el comprobante']);
+	});
+
+	it('reporta varios faltantes en el orden en que aparecen en el formulario', () => {
+		expect(camposFaltantes({ monto: 0, comprobante: '', fechaValida: false })).toEqual([
+			'el monto',
+			'la fecha',
+			'el comprobante',
+		]);
+	});
+});
+
+describe('teclaPermitidaEnMonto', () => {
+	it('deja pasar dígitos, punto y coma', () => {
+		for (const tecla of ['0', '5', '9', '.', ',']) expect(teclaPermitidaEnMonto(tecla, false)).toBe(true);
+	});
+
+	it('descarta letras y signos que no forman parte de un monto', () => {
+		for (const tecla of ['a', 'e', 'E', '-', '+', ' ', '$']) expect(teclaPermitidaEnMonto(tecla, false)).toBe(false);
+	});
+
+	it('deja pasar teclas con nombre y atajos de teclado', () => {
+		for (const tecla of ['Backspace', 'Tab', 'ArrowLeft', 'Enter']) expect(teclaPermitidaEnMonto(tecla, false)).toBe(true);
+		expect(teclaPermitidaEnMonto('v', true)).toBe(true);
 	});
 });
