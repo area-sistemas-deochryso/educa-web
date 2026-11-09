@@ -1,0 +1,35 @@
+@if (filas().length === 0) {
+	<p class="tabla__vacio">{{ vacio() }}</p>
+} @else {
+	<div class="tabla__wrap">
+		<table class="tabla">
+			<caption class="sr-only">{{ caption() }}</caption>
+			<thead>
+				<tr>
+					@for (col of columnas(); track col.key) {
+						<th scope="col" [class.num]="col.numeric" [attr.aria-sort]="ariaSort(col.key)">
+							<button type="button" class="sort-btn" (click)="alternar(col.key)">
+								{{ col.label }}
+								<i [class]="sortIcon(col.key)" aria-hidden="true"></i>
+							</button>
+						</th>
+					}
+				</tr>
+			</thead>
+			<tbody>
+				@for (fila of ordenadas(); track $index) {
+					<tr [class.anulada]="anulada()(fila)">
+						@for (col of columnas(); track col.key) {
+							<td [class.num]="col.numeric">{{ col.texto(fila) }}</td>
+						}
+					</tr>
+					@if (detalle()(fila); as texto) {
+						<tr class="detalle">
+							<td [attr.colspan]="columnas().length">{{ texto }}</td>
+						</tr>
+					}
+				}
+			</tbody>
+		</table>
+	</div>
+}

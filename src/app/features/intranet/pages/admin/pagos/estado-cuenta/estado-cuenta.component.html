@@ -1,0 +1,99 @@
+<section class="cuenta" aria-labelledby="cuenta-title">
+	<h2 id="cuenta-title" class="cuenta__title">Estado de cuenta</h2>
+
+	<label class="cuenta__buscar">
+		<span>Buscar alumno (nombre o DNI)</span>
+		<edu-autocomplete
+			[suggestions]="facade.sugerencias()"
+			[ngModel]="seleccionado()"
+			(completeMethod)="buscarEstudiantes($event)"
+			(onSelect)="elegirEstudiante($event.value)"
+			optionLabel="nombreCompleto"
+			placeholder="Escribe al menos 2 letras o el DNI completo"
+			[minLength]="2"
+			[delay]="300"
+			[style]="{ width: '100%' }"
+			[inputStyle]="{ width: '100%' }"
+		>
+			<ng-template let-alumno pTemplate="item">
+				<div class="cuenta__opcion">
+					<span class="cuenta__opcion-nombre">{{ alumno.nombreCompleto }}</span>
+					<span>{{ alumno.salon?.nombre ?? 'Sin matrícula activa' }}</span>
+				</div>
+			</ng-template>
+		</edu-autocomplete>
+		@if (facade.errorBusqueda(); as errorBusqueda) {
+			<small role="alert">{{ errorBusqueda }}</small>
+		}
+	</label>
+
+	@if (facade.error(); as mensaje) {
+		<app-error-state [message]="mensaje" (retry)="facade.recargar()" />
+	} @else if (facade.loading() && !facade.cuenta()) {
+		<p class="cuenta__estado" role="status">Cargando la cuenta…</p>
+	} @else if (facade.cuenta(); as cuenta) {
+		<div [attr.aria-busy]="facade.loading()" [class.cuenta--loading]="facade.loading()">
+			<header class="cuenta__header">
+				<h3 class="cuenta__alumno">{{ cuenta.estudiante }}</h3>
+				<span class="cuenta__salon">{{ cuenta.salon ?? 'Sin matrícula activa' }}</span>
+				@if (categoria(); as cat) {
+					<edu-tag [value]="cat.label" [severity]="cat.severity" />
+				}
+			</header>
+
+			@if (anioSinParametros()) {
+				<edu-message
+					severity="warn"
+					text="Faltan los parámetros de cobranza de algún año: no se calcula recargo ni deuda de esos cargos."
+				/>
+			}
+			@if (cuenta.tieneDatosSinConfirmar) {
+				<edu-message
+					severity="info"
+					[text]="cuenta.cargosSinDato + ' cargo(s) sin dato confirmado: no se cuentan como deuda ni admiten pagos.'"
+				/>
+			}
+
+			<dl class="cuenta__totales" aria-label="Totales de la cuenta">
+				<div>
+					<dt>Deuda vencida</dt>
+					<dd>{{ soles(cuenta.deudaVencida) }}</dd>
+				</div>
+				<div>
+					<dt>Pendiente total</dt>
+					<dd>{{ soles(cuenta.pendienteTotal) }}</dd>
+				</div>
+			</dl>
+
+			<h3 class="cuenta__seccion">Cargos</h3>
+			<app-estado-cuenta-tabla
+				caption="Cargos del alumno"
+				[columnas]="columnasCargos"
+				[filas]="cuenta.cargos"
+				vacio="El alumno no tiene cargos."
+			/>
+
+			<h3 class="cuenta__seccion">Pagos</h3>
+			<app-estado-cuenta-tabla
+				caption="Pagos que tocaron cargos del alumno, vigentes y anulados"
+				[columnas]="columnasPagos"
+				[filas]="cuenta.pagos"
+				[anulada]="pagoAnulado"
+				[detalle]="detallePago"
+				vacio="Sin pagos registrados."
+			/>
+
+			<h3 class="cuenta__seccion">Ajustes</h3>
+			<app-estado-cuenta-tabla
+				caption="Descuentos y entregas en especie, vigentes y anulados"
+				[columnas]="columnasAjustes()"
+				[filas]="cuenta.ajustes"
+				[anulada]="ajusteAnulado"
+				[detalle]="detalleAjuste"
+				vacio="Sin ajustes."
+			/>
+		</div>
+	} @else {
+		<edu-message severity="info" text="Busca al alumno para ver su cuenta, o entra desde «Quiénes deben» o «Sin dato»." />
+	}
+</section>

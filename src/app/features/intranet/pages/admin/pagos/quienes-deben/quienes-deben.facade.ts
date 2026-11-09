@@ -6,10 +6,10 @@ import { Subject, catchError, debounceTime, distinctUntilChanged, map, of, switc
 import { downloadBlob, logger } from '@core/helpers';
 import type { PagosSalonOpcion, QuienesDeben, QuienesDebenFiltros, QuienesDebenOrden } from '@data/models';
 import { PagosApiService } from '../services/pagos-api.service';
+import { DEFAULT_PAGE_SIZE, SEARCH_DEBOUNCE_MS } from '../utils/pagos-reports.util';
 // #endregion
 
-export const SEARCH_DEBOUNCE_MS = 300;
-export const DEFAULT_PAGE_SIZE = 20;
+export { SEARCH_DEBOUNCE_MS };
 
 type DebenResult = { ok: true; data: QuienesDeben } | { ok: false };
 

@@ -148,6 +148,29 @@ describe('RegistrarPagoComponent — rechazo del servidor', () => {
 		clic(fixture, 'edu-button[label="Proponer reparto"]');
 		expect(fixture.nativeElement.textContent).not.toContain('El monto no alcanza el mínimo');
 	});
+
+	it('ante 409 IDEMPOTENCIA_EN_CURSO ofrece abrir el estado de cuenta del alumno y reenvía con la misma clave', () => {
+		const enCurso = { status: 409, error: { errorCode: 'IDEMPOTENCIA_EN_CURSO' } };
+		const registrarPago = vi.fn().mockReturnValueOnce(throwError(() => enCurso)).mockReturnValue(of({ id: 5 }));
+		const { fixture, estado } = crearComponente(registrarPago as never);
+		estado.monto.set(100);
+		estado.comprobante.set('B001-123');
+		fixture.detectChanges();
+
+		clic(fixture, 'edu-button[label="Proponer reparto"]');
+		clic(fixture, 'edu-button[label="Registrar pago"]');
+
+		const enlace = fixture.nativeElement.querySelector('[data-testid="verificar-estado-cuenta"]') as HTMLAnchorElement | null;
+		expect(enlace, 'falta el enlace al estado de cuenta').toBeTruthy();
+		expect(enlace?.getAttribute('href')).toBe('/intranet/admin/pagos/estado-cuenta/280');
+		expect(enlace?.getAttribute('target')).toBe('_blank');
+		expect(fixture.nativeElement.textContent).not.toContain('mismo cargo');
+
+		clic(fixture, 'edu-button[label="Registrar pago"]');
+		const claves = registrarPago.mock.calls.map((llamada: unknown[]) => llamada[1]);
+		expect(claves).toHaveLength(2);
+		expect(claves[1]).toBe(claves[0]);
+	});
 });
 
 describe('RegistrarPagoComponent — buscador de alumnos', () => {

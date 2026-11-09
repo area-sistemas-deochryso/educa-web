@@ -1,0 +1,103 @@
+<section class="sin-dato" aria-labelledby="sin-dato-title">
+	<header>
+		<h2 id="sin-dato-title" class="sin-dato__title">Cargos sin dato</h2>
+		<p class="sin-dato__nota">
+			Cargos cuya deuda aún no está confirmada. No se cuentan como deuda, no tienen saldo ni recargo y no admiten pagos.
+		</p>
+	</header>
+
+	@if (facade.data(); as data) {
+		<dl class="sin-dato__totales" aria-label="Totales del conjunto filtrado completo">
+			<div>
+				<dt>Alumnos</dt>
+				<dd>{{ data.alumnos }}</dd>
+			</div>
+			<div>
+				<dt>Cargos sin dato</dt>
+				<dd>{{ data.cargos }}</dd>
+			</div>
+		</dl>
+	}
+
+	<app-quienes-deben-filters
+		[buscar]="facade.buscar()"
+		[salonId]="facade.salonId()"
+		[salones]="facade.salones()"
+		(searchChange)="facade.onSearchInput($event)"
+		(salonChange)="facade.setSalon($event)"
+	/>
+
+	@if (facade.error()) {
+		<app-error-state message="No se pudo cargar la lista de cargos sin dato." (retry)="facade.reload()" />
+	} @else if (facade.loading() && !facade.data()) {
+		<app-table-skeleton [columns]="skeletonColumns" [rows]="8" />
+	} @else if (facade.data()) {
+		@if (facade.total() === 0) {
+			<p class="sin-dato__vacio">
+				@if (facade.hasFilters()) {
+					Sin resultados para el filtro aplicado.
+				} @else {
+					No hay cargos sin dato.
+				}
+			</p>
+		} @else {
+			<div class="sin-dato__tabla" [class.sin-dato__tabla--loading]="facade.loading()" [attr.aria-busy]="facade.loading()">
+				<div class="sin-dato__wrap">
+					<table class="tabla">
+						<caption class="sr-only">Alumnos con cargos sin dato</caption>
+						<thead>
+							<tr>
+								<th scope="col">Alumno</th>
+								<th scope="col">Salón</th>
+								<th scope="col" class="num">Cargos</th>
+								<th scope="col">Detalle</th>
+								<th scope="col"><span class="sr-only">Acciones</span></th>
+							</tr>
+						</thead>
+						<tbody>
+							@for (fila of facade.filas(); track fila.estudianteId) {
+								<tr>
+									<td>{{ fila.estudiante }}</td>
+									<td>{{ fila.salon }}</td>
+									<td class="num">{{ fila.cargos }}</td>
+									<td>
+										<ul class="detalle">
+											@for (cargo of fila.detalle; track cargo.cargoId) {
+												<li>
+													{{ cargo.concepto }}@if (cargo.cuota) {
+														· {{ cargo.cuota }}
+													}
+													@if (cargo.vencimiento) {
+														· vence {{ fecha(cargo.vencimiento) }}
+													}
+													· base {{ soles(cargo.montoBase) }}
+												</li>
+											}
+										</ul>
+									</td>
+									<td>
+										<a
+											[routerLink]="['/intranet/admin/pagos/estado-cuenta', fila.estudianteId]"
+											[attr.aria-label]="'Ver el estado de cuenta de ' + fila.estudiante"
+										>
+											Estado de cuenta
+										</a>
+									</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				</div>
+				<edu-paginator
+					[rows]="facade.pageSize()"
+					[first]="facade.first()"
+					[totalRecords]="facade.total()"
+					[rowsPerPageOptions]="[10, 20, 50, 100]"
+					[showCurrentPageReport]="true"
+					currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} alumnos"
+					(onPageChange)="onPage($event)"
+				/>
+			</div>
+		}
+	}
+</section>

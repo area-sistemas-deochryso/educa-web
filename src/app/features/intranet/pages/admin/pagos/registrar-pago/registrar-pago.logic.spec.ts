@@ -5,6 +5,8 @@ import {
 	armarPayload,
 	camposFaltantes,
 	claveParaEnvio,
+	esIdempotenciaEnCurso,
+	resultadoDesconocido,
 	diferenciaCentavos,
 	huellaDe,
 	mensajeDeError,
@@ -106,6 +108,33 @@ describe('registrar-pago.logic — mapeo de errores', () => {
 
 	it('status 0 indica falta de respuesta', () => {
 		expect(mensajeDeError({ status: 0 })).toContain('No hubo respuesta');
+	});
+
+	it('409 IDEMPOTENCIA_EN_CURSO manda a verificar el estado de cuenta, no a hablar de competencia', () => {
+		const msg = mensajeDeError({ status: 409, error: { errorCode: 'IDEMPOTENCIA_EN_CURSO' } });
+		expect(msg).toContain('estado de cuenta');
+		expect(msg).not.toContain('mismo cargo');
+	});
+
+	it('un 409 con otro errorCode sigue siendo competencia por el cargo', () => {
+		expect(mensajeDeError({ status: 409, error: { errorCode: 'OTRO' } })).toContain('mismo cargo');
+	});
+});
+
+describe('registrar-pago.logic — resultado desconocido', () => {
+	it('solo 409 con IDEMPOTENCIA_EN_CURSO cuenta como en curso', () => {
+		expect(esIdempotenciaEnCurso({ status: 409, error: { errorCode: 'IDEMPOTENCIA_EN_CURSO' } })).toBe(true);
+		expect(esIdempotenciaEnCurso({ status: 409 })).toBe(false);
+		expect(esIdempotenciaEnCurso({ status: 400, error: { errorCode: 'IDEMPOTENCIA_EN_CURSO' } })).toBe(false);
+		expect(esIdempotenciaEnCurso(null)).toBe(false);
+	});
+
+	it('el resultado es desconocido sin respuesta o en curso, y en ningún otro caso', () => {
+		expect(resultadoDesconocido({ status: 0 })).toBe(true);
+		expect(resultadoDesconocido({ status: 409, error: { errorCode: 'IDEMPOTENCIA_EN_CURSO' } })).toBe(true);
+		expect(resultadoDesconocido({ status: 409 })).toBe(false);
+		expect(resultadoDesconocido({ status: 400, error: { errorCode: 'PAGO_MONTO_INVALIDO' } })).toBe(false);
+		expect(resultadoDesconocido({ status: 500 })).toBe(false);
 	});
 });
 

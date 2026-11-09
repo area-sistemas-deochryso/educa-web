@@ -12,8 +12,10 @@ import {
 	claveParaEnvio,
 	diferenciaCentavos,
 	huellaDe,
+	esIdempotenciaEnCurso,
 	mensajeDeError,
 	repartoCuadra,
+	resultadoDesconocido,
 } from './registrar-pago.logic';
 // #endregion
 
@@ -32,7 +34,8 @@ export interface DatosPago {
  * Estado de «Registrar pago». Se provee a nivel de componente.
  * - El alumno que paga se elige con el buscador o llega por la ruta (`?estudianteId=`, desde «Quiénes deben»).
  * - El reparto lo propone el servidor y la persona lo edita; el cliente debe cuadrar con el monto antes de enviar.
- * - Un intento = una clave de idempotencia. Se reusa solo si no hubo respuesta y el payload no cambió.
+ * - Un intento = una clave de idempotencia. Se reusa solo si el resultado es desconocido (sin respuesta o
+ *   `409 IDEMPOTENCIA_EN_CURSO`) y el payload no cambió.
  */
 @Injectable()
 export class RegistrarPagoFacade {
@@ -51,6 +54,8 @@ export class RegistrarPagoFacade {
 	readonly guardando = signal(false);
 	readonly errorRegistro = signal<string | null>(null);
 	readonly pagoRegistrado = signal<number | null>(null);
+	/** El último envío quedó `IDEMPOTENCIA_EN_CURSO`: la pantalla ofrece verificar el estado de cuenta. */
+	readonly pagoEnCurso = signal(false);
 
 	readonly sugerencias = signal<EstudianteBusqueda[]>([]);
 	readonly errorBusqueda = signal<string | null>(null);
@@ -58,7 +63,7 @@ export class RegistrarPagoFacade {
 	private readonly destroyRef = inject(DestroyRef);
 	private readonly consulta$ = new Subject<string>();
 	private intento: IntentoPago | null = null;
-	private sinRespuesta = false;
+	private reusarClave = false;
 
 	readonly idsSeleccionados = computed(() => [...this.seleccionados()]);
 
@@ -97,7 +102,7 @@ export class RegistrarPagoFacade {
 		this.pagoRegistrado.set(null);
 		this.limpiarReparto();
 		this.intento = null;
-		this.sinRespuesta = false;
+		this.reusarClave = false;
 		this.estudiante.set(estudiante);
 		this.loadingFamilia.set(true);
 		this.api.familia(estudiante.id).subscribe({
@@ -175,21 +180,23 @@ export class RegistrarPagoFacade {
 		if (!this.puedeRegistrar(datos.monto)) return;
 
 		const payload = armarPayload({ ...datos, aplicaciones: this.reparto() });
-		this.intento = claveParaEnvio(this.intento, huellaDe(payload), this.sinRespuesta);
+		this.intento = claveParaEnvio(this.intento, huellaDe(payload), this.reusarClave);
 		this.guardando.set(true);
 		this.errorRegistro.set(null);
+		this.pagoEnCurso.set(false);
 
 		this.api.registrarPago(payload, this.intento.clave).subscribe({
 			next: ({ id }) => {
-				this.sinRespuesta = false;
+				this.reusarClave = false;
 				this.intento = null;
 				this.pagoRegistrado.set(id);
 				this.guardando.set(false);
 			},
 			error: (err: { status?: number; error?: { errorCode?: string } }) => {
-				// Solo la falta de respuesta (red o timeout) permite reusar la clave en el siguiente envío.
-				this.sinRespuesta = err?.status === 0;
-				if (!this.sinRespuesta) this.intento = null;
+				// Solo un resultado desconocido (sin respuesta o `IDEMPOTENCIA_EN_CURSO`) permite reusar la clave.
+				this.reusarClave = resultadoDesconocido(err);
+				if (!this.reusarClave) this.intento = null;
+				this.pagoEnCurso.set(esIdempotenciaEnCurso(err));
 				logger.error('[RegistrarPagoFacade] Error al registrar el pago', err);
 				this.errorRegistro.set(mensajeDeError(err));
 				this.guardando.set(false);
@@ -212,5 +219,6 @@ export class RegistrarPagoFacade {
 
 	private limpiarRegistro(): void {
 		this.errorRegistro.set(null);
+		this.pagoEnCurso.set(false);
 	}
 }

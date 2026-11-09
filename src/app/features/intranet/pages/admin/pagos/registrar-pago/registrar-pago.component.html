@@ -158,6 +158,18 @@
 
 		@if (facade.errorRegistro(); as errorRegistro) {
 			<edu-message severity="danger" [text]="errorRegistro" class="mb-4" />
+			@if (facade.pagoEnCurso() && facade.estudiante(); as pagador) {
+				<p class="mb-4">
+					<a
+						[routerLink]="['/intranet/admin/pagos/estado-cuenta', pagador.id]"
+						target="_blank"
+						rel="noopener"
+						data-testid="verificar-estado-cuenta"
+					>
+						Ver el estado de cuenta de {{ pagador.nombre }} (se abre en otra pestaña)
+					</a>
+				</p>
+			}
 		}
 
 		<edu-button

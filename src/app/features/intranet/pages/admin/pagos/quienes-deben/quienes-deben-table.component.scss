@@ -63,6 +63,12 @@
 	font-weight: inherit;
 }
 
+.acciones {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+}
+
 .ultimo-pago {
 	display: flex;
 	flex-direction: column;

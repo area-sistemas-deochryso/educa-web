@@ -5,6 +5,7 @@ import { Observable, map } from 'rxjs';
 
 import { environment } from '@config/environment';
 import type {
+	EstadoCuenta,
 	EstudianteBusqueda,
 	MiembroFamilia,
 	PagoCorte,
@@ -13,6 +14,8 @@ import type {
 	QuienesDebenFiltros,
 	RegistrarPagoPayload,
 	RepartoPropuesto,
+	SinDato,
+	SinDatoFiltros,
 } from '@data/models';
 // #endregion
 
@@ -57,6 +60,23 @@ export class PagosApiService {
 
 	guardarCorte(corte: PagoCorte): Observable<PagoCorte> {
 		return this.http.put<PagoCorte>(`${this.apiUrl}/cortes`, corte);
+	}
+
+	/** Cuenta completa del alumno a hoy (cargos, pagos y ajustes, incluidos los anulados). */
+	estadoCuenta(estudianteId: number): Observable<EstadoCuenta> {
+		return this.http.get<EstadoCuenta>(`${this.apiUrl}/estudiantes/${estudianteId}/estado-cuenta`);
+	}
+
+	/** Cargos «sin dato» agrupados por alumno. Política `reports`: el llamador aplica debounce. */
+	sinDato(filtros: SinDatoFiltros): Observable<SinDato> {
+		return this.http.get<SinDato>(`${this.apiUrl}/sin-dato`, {
+			params: this.params({
+				buscar: filtros.buscar?.trim(),
+				salonId: filtros.salonId,
+				page: filtros.page,
+				pageSize: filtros.pageSize,
+			}),
+		});
 	}
 
 	// #region Registrar pago
