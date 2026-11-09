@@ -180,3 +180,117 @@ export interface RegistrarPagoPayload {
 	aplicaciones: RegistrarPagoAplicacion[];
 }
 // #endregion
+
+// #region Estado de cuenta y sin dato
+export type CargoEstado = 'Pagado' | 'Vencida' | 'EnPlazo' | 'Pendiente' | 'SinDato';
+
+export interface CuentaCargo {
+	cargoId: number;
+	concepto: string;
+	cuota: string | null;
+	anio: number;
+	vencimiento: string | null;
+	fueraDeFechaDesde: string | null;
+	montoBase: number;
+	ajuste: number;
+	pagadoBase: number;
+	pagadoRecargo: number;
+	recargo: number;
+	recargoCongelado: boolean;
+	recargoOrigen: 'Ninguno' | 'Calculado' | 'Congelado' | 'ExentoPorPagoATiempo';
+	/** Un cargo `SinDato` nunca trae saldo ni recargo (INV-PG14). */
+	saldo: number;
+	estado: CargoEstado;
+	datoConfirmado: boolean;
+	anioSinParametros: boolean;
+}
+
+export interface CuentaPago {
+	pagoId: number;
+	fechaPago: string;
+	/** `HH:mm:ss` (TimeSpan del servidor). */
+	horaPago: string | null;
+	/** Total del pago; en un pago de familia puede cubrir a otros alumnos. */
+	monto: number;
+	montoAplicadoAlumno: number;
+	medio: string;
+	bancoOrigen: string | null;
+	numeroOperacion: string | null;
+	comprobante: string;
+	observaciones: string | null;
+	/** `false` = anulado: sigue en la lista, con motivo, usuario y fecha. */
+	vigente: boolean;
+	motivoAnulacion: string | null;
+	usuarioAnulacion: string | null;
+	fechaAnulacion: string | null;
+	usuarioReg: string;
+	fechaReg: string;
+	aplicaciones: { cargoId: number; montoBase: number; montoRecargo: number }[];
+}
+
+export interface CuentaAjuste {
+	ajusteId: number;
+	cargoId: number;
+	tipo: 'DESCUENTO' | 'ESPECIE';
+	monto: number;
+	motivo: string | null;
+	vigente: boolean;
+	motivoAnulacion: string | null;
+	usuarioAnulacion: string | null;
+	fechaAnulacion: string | null;
+	usuarioReg: string;
+	fechaReg: string;
+}
+
+/** `GET /api/pagos/estudiantes/{id}/estado-cuenta`. No excluye `::TEST` (INV-PG12). */
+export interface EstadoCuenta {
+	estudianteId: number;
+	estudiante: string;
+	fecha: string;
+	categoria: PagosCategoria;
+	/** Transversal: no reemplaza la categoría. */
+	tieneDatosSinConfirmar: boolean;
+	cargosSinDato: number;
+	deudaVencida: number;
+	pendienteTotal: number;
+	cargos: CuentaCargo[];
+	pagos: CuentaPago[];
+	ajustes: CuentaAjuste[];
+	/** `null` sin matrícula activa: la cuenta se devuelve completa igual. */
+	salonId: number | null;
+	salon: string | null;
+}
+
+export interface SinDatoCargo {
+	cargoId: number;
+	concepto: string;
+	cuota: string | null;
+	vencimiento: string | null;
+	montoBase: number;
+}
+
+export interface SinDatoFila {
+	estudianteId: number;
+	estudiante: string;
+	salonId: number;
+	salon: string;
+	cargos: number;
+	detalle: SinDatoCargo[];
+}
+
+/** `GET /api/pagos/sin-dato`. Refleja hoy, sin fecha. */
+export interface SinDato {
+	fecha: string;
+	alumnos: number;
+	cargos: number;
+	salones: PagosSalonOpcion[];
+	filas: { data: SinDatoFila[]; total: number; page: number; pageSize: number };
+}
+
+export interface SinDatoFiltros {
+	buscar?: string;
+	salonId?: number | null;
+	page?: number;
+	pageSize?: number;
+}
+// #endregion

@@ -2,7 +2,7 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import type { EstudianteBusqueda, PagoMedio } from '@data/models';
 import { EduAutoComplete, EduButton, EduDatePicker, EduInputNumber, EduMessage, EduSelect, EduTemplate } from '@edu-ui';
@@ -35,7 +35,7 @@ function isoLocal(fecha: Date): string {
 @Component({
 	selector: 'app-registrar-pago',
 	standalone: true,
-	imports: [FormsModule, EduAutoComplete, EduButton, EduDatePicker, EduInputNumber, EduMessage, EduSelect, EduTemplate],
+	imports: [FormsModule, RouterLink, EduAutoComplete, EduButton, EduDatePicker, EduInputNumber, EduMessage, EduSelect, EduTemplate],
 	providers: [RegistrarPagoFacade],
 	templateUrl: './registrar-pago.component.html',
 	changeDetection: ChangeDetectionStrategy.OnPush,

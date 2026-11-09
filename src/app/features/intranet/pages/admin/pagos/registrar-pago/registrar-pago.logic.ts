@@ -101,6 +101,11 @@ const MENSAJES_POR_CODIGO: Readonly<Record<string, string>> = {
 const MENSAJE_CONFLICTO =
 	'Otro pago se registró sobre el mismo cargo al mismo tiempo. Revisá el reparto y volvé a proponerlo.';
 
+const CODIGO_EN_CURSO = 'IDEMPOTENCIA_EN_CURSO';
+
+const MENSAJE_EN_CURSO =
+	'El pago anterior sigue en curso o no se sabe si se registró. Verificá su estado de cuenta antes de reenviar; si reenviás desde esta pantalla se usa el mismo intento y no se duplica.';
+
 const MENSAJE_RED =
 	'No hubo respuesta del servidor. Si reenviás, el pago no se duplica: se usa el mismo intento.';
 
@@ -111,10 +116,24 @@ export interface ErrorHttpLike {
 	error?: { errorCode?: string } | null;
 }
 
+/**
+ * `409 IDEMPOTENCIA_EN_CURSO`: el pago sigue en curso o su resultado es desconocido (INV-S06). No es el `409` por
+ * cargo en competencia (INV-S05): ese sí es una respuesta definitiva y descarta el intento.
+ */
+export function esIdempotenciaEnCurso(err: ErrorHttpLike | null | undefined): boolean {
+	return err?.status === 409 && err.error?.errorCode === CODIGO_EN_CURSO;
+}
+
+/** Tras estos errores el resultado del intento es desconocido, así que el reenvío debe llevar la misma clave. */
+export function resultadoDesconocido(err: ErrorHttpLike | null | undefined): boolean {
+	return err?.status === 0 || esIdempotenciaEnCurso(err);
+}
+
 /** Traduce el error HTTP de `POST /api/pagos` a un mensaje de regla de negocio. */
 export function mensajeDeError(err: ErrorHttpLike | null | undefined): string {
 	if (!err) return MENSAJE_GENERICO;
 	if (err.status === 0) return MENSAJE_RED;
+	if (esIdempotenciaEnCurso(err)) return MENSAJE_EN_CURSO;
 	if (err.status === 409) return MENSAJE_CONFLICTO;
 	const codigo = err.error?.errorCode;
 	return (codigo && MENSAJES_POR_CODIGO[codigo]) || MENSAJE_GENERICO;
@@ -135,16 +154,16 @@ export interface IntentoPago {
 export const huellaDe = (payload: RegistrarPagoPayload): string => JSON.stringify(payload);
 
 /**
- * Devuelve la clave a enviar. Se reusa la del intento anterior solo si no hubo respuesta
- * (red o timeout) y el payload no cambió. En cualquier otro caso se genera una clave nueva.
+ * Devuelve la clave a enviar. Se reusa la del intento anterior solo si su resultado es desconocido
+ * (sin respuesta, o `409 IDEMPOTENCIA_EN_CURSO`) y el payload no cambió. En cualquier otro caso se genera una clave nueva.
  */
 export function claveParaEnvio(
 	previo: IntentoPago | null,
 	huella: string,
-	sinRespuesta: boolean,
+	resultadoDesconocido: boolean,
 	generarClave: () => string = () => crypto.randomUUID(),
 ): IntentoPago {
-	if (previo && sinRespuesta && previo.huella === huella) return previo;
+	if (previo && resultadoDesconocido && previo.huella === huella) return previo;
 	return { clave: generarClave(), huella };
 }
 // #endregion

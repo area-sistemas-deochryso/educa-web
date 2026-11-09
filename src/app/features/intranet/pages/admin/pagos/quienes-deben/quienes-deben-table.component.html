@@ -46,7 +46,13 @@
 							<span class="muted">Sin pagos</span>
 						}
 					</td>
-					<td>
+					<td class="acciones">
+						<a
+							[routerLink]="['/intranet/admin/pagos/estado-cuenta', fila.estudianteId]"
+							[attr.aria-label]="'Ver el estado de cuenta de ' + fila.estudiante"
+						>
+							Estado de cuenta
+						</a>
 						<a
 							[routerLink]="['/intranet/admin/pagos/registrar']"
 							[queryParams]="{ estudianteId: fila.estudianteId, nombre: fila.estudiante }"
