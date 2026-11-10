@@ -1,37 +1,19 @@
+@use '../styles/pagos' as pagos;
+
 .tabla__wrap {
 	overflow-x: auto;
 }
 
 .tabla__vacio {
 	margin: 0;
+	padding: 1rem 1.125rem;
 	color: var(--text-color-secondary);
 }
 
 .tabla {
-	width: 100%;
-	border-collapse: collapse;
-	font-size: 0.9375rem;
+	@include pagos.tabla;
 
-	th,
-	td {
-		padding: 0.5rem 0.75rem;
-		text-align: left;
-		border-bottom: 1px solid var(--surface-border);
-		vertical-align: top;
-	}
-
-	th {
-		font-size: 0.8125rem;
-		color: var(--text-color-secondary);
-		font-weight: 600;
-		white-space: nowrap;
-	}
-
-	.num {
-		text-align: right;
-		font-variant-numeric: tabular-nums;
-	}
-
+	// Fila anulada: texto gris y tachado; el motivo (fila `.detalle`) queda legible.
 	.anulada td {
 		color: var(--text-color-secondary);
 		text-decoration: line-through;
@@ -53,6 +35,8 @@
 	border: 0;
 	color: inherit;
 	font: inherit;
+	text-transform: inherit;
+	letter-spacing: inherit;
 	cursor: pointer;
 	padding: 0.25rem;
 	border-radius: 4px;

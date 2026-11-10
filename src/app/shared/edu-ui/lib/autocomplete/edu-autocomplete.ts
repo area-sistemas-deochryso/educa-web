@@ -216,7 +216,7 @@ export class EduAutoComplete<T = unknown> implements ControlValueAccessor, OnDes
 			(opt) => resolveOptionValue(opt, this.optionValue()) === (this.value as unknown),
 		);
 		this.query.set(
-			found ? this.resolveLabel(found) : this.value === null ? '' : String(this.value),
+			found ? this.resolveLabel(found) : this.value === null ? '' : this.resolveLabel(this.value),
 		);
 	}
 

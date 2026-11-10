@@ -2,7 +2,8 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
-import { EduButton, EduPaginator } from '@edu-ui';
+import { getPersonInitials } from '@core/helpers';
+import { EduAvatar, EduButton, EduPaginator } from '@edu-ui';
 import type { EduPaginatorPageEvent } from '@edu-ui';
 import { ErrorStateComponent } from '@shared/components';
 import { TableSkeletonComponent } from '@intranet-shared/components';
@@ -20,7 +21,7 @@ import { SinDatoFacade } from './sin-dato.facade';
 @Component({
 	selector: 'app-sin-dato',
 	standalone: true,
-	imports: [ConfirmarLoteDialogComponent, EduButton, EduPaginator, ErrorStateComponent, QuienesDebenFiltersComponent, RouterLink, TableSkeletonComponent],
+	imports: [ConfirmarLoteDialogComponent, EduAvatar, EduButton, EduPaginator, ErrorStateComponent, QuienesDebenFiltersComponent, RouterLink, TableSkeletonComponent],
 	providers: [SinDatoFacade],
 	templateUrl: './sin-dato.component.html',
 	styleUrl: './sin-dato.component.scss',
@@ -33,6 +34,7 @@ export class SinDatoComponent implements OnInit {
 
 	protected readonly soles = formatSoles;
 	protected readonly fecha = formatFechaConDia;
+	protected readonly iniciales = getPersonInitials;
 
 	protected readonly skeletonColumns: SkeletonColumnDef[] = [
 		{ width: 'flex', cellType: 'text' },

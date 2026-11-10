@@ -10,7 +10,7 @@ import { formatPorcentaje, formatSoles } from '../utils/pagos-format.util';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
 		<div class="grid">
-			<section aria-labelledby="h-nivel">
+			<section class="card" aria-labelledby="h-nivel">
 				<h3 id="h-nivel">Al día por nivel</h3>
 				@for (n of porNivel(); track n.nivel) {
 					<div class="bar">
@@ -34,10 +34,10 @@ import { formatPorcentaje, formatSoles } from '../utils/pagos-format.util';
 				}
 			</section>
 
-			<section aria-labelledby="h-aging">
-				<h3 id="h-aging">Antigüedad de la deuda</h3>
+			<section class="card card--flush" aria-labelledby="h-aging">
+				<h3 id="h-aging" class="flush-title">Antigüedad de la deuda</h3>
 				<table class="table">
-					<caption class="sr-only">
+					<caption>
 						Saldo vencido por tramo de días de atraso
 					</caption>
 					<thead>
@@ -51,7 +51,7 @@ import { formatPorcentaje, formatSoles } from '../utils/pagos-format.util';
 					<tbody>
 						@for (t of aging(); track t.etiqueta) {
 							<tr>
-								<th scope="row">{{ t.etiqueta }}</th>
+								<th scope="row" class="row-head">{{ t.etiqueta }}</th>
 								<td class="num">{{ soles(t.saldo) }}</td>
 								<td class="num">{{ t.cuotas }}</td>
 								<td class="num">{{ t.alumnos }}</td>
@@ -61,7 +61,7 @@ import { formatPorcentaje, formatSoles } from '../utils/pagos-format.util';
 				</table>
 			</section>
 
-			<section aria-labelledby="h-oportuna">
+			<section class="card" aria-labelledby="h-oportuna">
 				<h3 id="h-oportuna">Recaudación oportuna</h3>
 				<p class="big">{{ pct(oportuna().porcentaje) }}</p>
 				<p class="muted">
@@ -71,67 +71,7 @@ import { formatPorcentaje, formatSoles } from '../utils/pagos-format.util';
 			</section>
 		</div>
 	`,
-	styles: `
-		.grid {
-			display: grid;
-			grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
-			gap: 1.5rem;
-		}
-		h3 {
-			margin: 0 0 0.75rem;
-			font-size: 1rem;
-		}
-		.bar {
-			margin-bottom: 0.75rem;
-		}
-		.bar__head {
-			display: flex;
-			justify-content: space-between;
-			gap: 0.5rem;
-			font-size: 0.8125rem;
-		}
-		.bar__track {
-			height: 0.625rem;
-			border-radius: 999px;
-			background: var(--surface-200, #e5e7eb);
-			overflow: hidden;
-		}
-		.bar__fill {
-			height: 100%;
-			background: var(--green-500, #22c55e);
-		}
-		.table {
-			width: 100%;
-			border-collapse: collapse;
-			font-size: 0.875rem;
-		}
-		.table th,
-		.table td {
-			padding: 0.375rem 0.5rem;
-			border-bottom: 1px solid var(--surface-border, #e5e7eb);
-			text-align: left;
-		}
-		.table .num {
-			text-align: right;
-		}
-		.big {
-			margin: 0;
-			font-size: 2rem;
-			font-weight: 700;
-		}
-		.muted {
-			margin: 0.25rem 0 0;
-			font-size: 0.8125rem;
-			color: var(--text-color-secondary, #6b7280);
-		}
-		.sr-only {
-			position: absolute;
-			width: 1px;
-			height: 1px;
-			overflow: hidden;
-			clip: rect(0 0 0 0);
-		}
-	`,
+	styleUrl: './cobranza-desglose.component.scss',
 })
 export class CobranzaDesgloseComponent {
 	readonly porNivel = input.required<PagosPorNivel[]>();

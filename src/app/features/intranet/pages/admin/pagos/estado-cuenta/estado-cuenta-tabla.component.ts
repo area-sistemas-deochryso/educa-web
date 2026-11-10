@@ -2,7 +2,8 @@
 import { NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, type TemplateRef, computed, input, signal } from '@angular/core';
 
-import { type Orden, ordenar, siguienteOrden } from './estado-cuenta.logic';
+import { EduTag } from '@edu-ui';
+import { type EtiquetaView, type Orden, ordenar, siguienteOrden } from './estado-cuenta.logic';
 // #endregion
 
 export interface ColumnaTabla<T> {
@@ -13,6 +14,8 @@ export interface ColumnaTabla<T> {
 	texto: (fila: T) => string;
 	/** Valor para ordenar; si falta se usa el texto. */
 	valor?: (fila: T) => string | number | null;
+	/** Si está, la celda se pinta como insignia de estado en vez de texto plano (el texto sigue siendo `texto`). */
+	etiqueta?: (fila: T) => EtiquetaView;
 }
 
 /**
@@ -22,7 +25,7 @@ export interface ColumnaTabla<T> {
 @Component({
 	selector: 'app-estado-cuenta-tabla',
 	standalone: true,
-	imports: [NgTemplateOutlet],
+	imports: [NgTemplateOutlet, EduTag],
 	templateUrl: './estado-cuenta-tabla.component.html',
 	styleUrl: './estado-cuenta-tabla.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

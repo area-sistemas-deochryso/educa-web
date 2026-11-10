@@ -1,30 +1,39 @@
 <div class="panel">
-	<header class="panel__header">
-		<h2 class="panel__title">Panel de cobranza</h2>
-		<p class="panel__date" data-testid="fecha-foto">
+	<section class="toolbar" aria-label="Fecha de la foto">
+		<edu-select-button
+			class="toolbar__modo"
+			[options]="modoOpciones"
+			optionLabel="label"
+			optionValue="value"
+			[allowEmpty]="false"
+			[ngModel]="modo()"
+			(ngModelChange)="onModo($event)"
+			aria-label="Tipo de foto"
+		/>
+
+		@if (modo() === 'corte') {
+			<label class="field">
+				<span>Corte</span>
+				<select
+					data-testid="selector-foto"
+					[value]="seleccion()"
+					(change)="onSelect($any($event.target).value)"
+				>
+					@for (c of cortesOrdenados(); track c.mes) {
+						<option [value]="c.fecha.slice(0, 10)" [disabled]="esFutura(c.fecha)">
+							Corte de {{ nombreMes(c.mes) }}: {{ formatFecha(c.fecha) }}{{ esFutura(c.fecha) ? ' (aún no llega)' : '' }}
+						</option>
+					}
+				</select>
+			</label>
+		}
+
+		<p class="toolbar__fecha" data-testid="fecha-foto">
 			Foto al <strong>{{ formatFecha(fechaVisible()) }}</strong>
 			@if (seleccion() === hoyValue) {
 				(hoy)
 			}
 		</p>
-	</header>
-
-	<section class="controls" aria-label="Fecha de la foto">
-		<label class="field">
-			<span>Foto de</span>
-			<select
-				data-testid="selector-foto"
-				[value]="seleccion()"
-				(change)="onSelect($any($event.target).value)"
-			>
-				<option [value]="hoyValue">Hoy</option>
-				@for (c of cortesOrdenados(); track c.mes) {
-					<option [value]="c.fecha.slice(0, 10)" [disabled]="esFutura(c.fecha)">
-						Corte de {{ nombreMes(c.mes) }}: {{ formatFecha(c.fecha) }}{{ esFutura(c.fecha) ? ' (aún no llega)' : '' }}
-					</option>
-				}
-			</select>
-		</label>
 
 		<details class="edit">
 			<summary>Editar fecha de corte</summary>
@@ -52,9 +61,14 @@
 						(input)="editFecha.set($any($event.target).value)"
 					/>
 				</label>
-				<button type="button" class="btn" [disabled]="guardando()" (click)="saveCorte()">
-					{{ guardando() ? 'Guardando…' : 'Guardar corte' }}
-				</button>
+				<edu-button
+					label="Guardar corte"
+					icon="pi pi-save"
+					severity="success"
+					size="small"
+					[loading]="guardando()"
+					(click)="saveCorte()"
+				/>
 			</div>
 			@if (editError(); as err) {
 				<p class="error" role="alert" data-testid="edit-error">{{ err }}</p>
@@ -77,18 +91,19 @@
 		@case ('error') {
 			<div class="error-box" role="alert">
 				<p>{{ $any(state()).message }}</p>
-				<button type="button" class="btn" (click)="retry()">Reintentar</button>
+				<edu-button label="Reintentar" icon="pi pi-refresh" [outlined]="true" size="small" (click)="retry()" />
 			</div>
 		}
 		@case ('ok') {
 			@let p = $any(state()).panel;
 			@if (p.anioSinParametros) {
 				<div class="banner" role="alert" data-testid="banner-sin-parametros">
+					<i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
 					Faltan los parámetros de cobranza del año: no se calcula deuda.
 				</div>
 			}
-			<app-cobranza-kpis [panel]="p" />
 			<app-cobranza-conteos [conteos]="p.conteos" />
+			<app-cobranza-kpis [panel]="p" />
 			<app-cobranza-desglose [porNivel]="p.porNivel" [aging]="p.aging" [oportuna]="p.oportuna" />
 		}
 	}

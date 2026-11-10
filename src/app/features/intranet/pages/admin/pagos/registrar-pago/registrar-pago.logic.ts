@@ -88,28 +88,28 @@ const MENSAJES_POR_CODIGO: Readonly<Record<string, string>> = {
 	PAGO_MEDIO_INVALIDO: 'El medio de pago no es válido.',
 	PAGO_OPERACION_DUPLICADA: 'Ya hay un pago activo con ese número de operación en el mismo banco.',
 	PAGO_IDENTIFICACION_INCOMPLETA:
-		'Faltan datos para identificar el pago: sin número de operación, indicá fecha, hora, monto y banco de origen.',
+		'Faltan datos para identificar el pago: sin número de operación, indica fecha, hora, monto y banco de origen.',
 	PAGO_APLICACION_SIN_CARGOS: 'El reparto no tiene cargos a los que aplicar el pago.',
 	PAGO_APLICACION_SUMA_INVALIDA: 'La suma del reparto debe ser igual al monto del pago.',
 	PAGO_APLICACION_EXCEDE_SALDO: 'Un cargo recibe más de lo que le queda pendiente.',
 	PAGO_CARGO_NO_APLICABLE: 'Un cargo no se puede pagar todavía: tiene datos sin confirmar.',
 	PAGO_MINIMO_NO_ALCANZADO: 'El monto no alcanza el mínimo que exige la regla de pago.',
 	PAGO_PARAMETRO_ANIO_INEXISTENTE: 'Falta la configuración del año de este pago. Pedila a administración.',
-	PAGO_CLAVE_IDEMPOTENCIA_REQUERIDA: 'Falta la clave del intento. Volvé a enviar el formulario.',
+	PAGO_CLAVE_IDEMPOTENCIA_REQUERIDA: 'Falta la clave del intento. Vuelve a enviar el formulario.',
 };
 
 const MENSAJE_CONFLICTO =
-	'Otro pago se registró sobre el mismo cargo al mismo tiempo. Revisá el reparto y volvé a proponerlo.';
+	'Otro pago se registró sobre el mismo cargo al mismo tiempo. Revisa el reparto y vuelve a proponerlo.';
 
 const CODIGO_EN_CURSO = 'IDEMPOTENCIA_EN_CURSO';
 
 const MENSAJE_EN_CURSO =
-	'El pago anterior sigue en curso o no se sabe si se registró. Verificá su estado de cuenta antes de reenviar; si reenviás desde esta pantalla se usa el mismo intento y no se duplica.';
+	'El pago anterior sigue en curso o no se sabe si se registró. Verifica su estado de cuenta antes de reenviar; si reenvías desde esta pantalla se usa el mismo intento y no se duplica.';
 
 const MENSAJE_RED =
-	'No hubo respuesta del servidor. Si reenviás, el pago no se duplica: se usa el mismo intento.';
+	'No hubo respuesta del servidor. Si reenvías, el pago no se duplica: se usa el mismo intento.';
 
-const MENSAJE_GENERICO = 'No se pudo registrar el pago. Revisá los datos e intentá de nuevo.';
+const MENSAJE_GENERICO = 'No se pudo registrar el pago. Revisa los datos e inténtalo de nuevo.';
 
 export interface ErrorHttpLike {
 	status?: number;

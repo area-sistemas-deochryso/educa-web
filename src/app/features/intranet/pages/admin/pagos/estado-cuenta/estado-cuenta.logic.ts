@@ -28,6 +28,26 @@ export const ESTADOS_CARGO: Record<CargoEstado, string> = {
 	Pendiente: 'Pendiente',
 	SinDato: 'Sin dato',
 };
+
+/** Color del estado de un cargo: el semáforo (verde/rojo/amarillo) para lo que se escanea buscando problemas. */
+const SEVERIDAD_CARGO: Record<CargoEstado, EduTagSeverity> = {
+	Pagado: 'success',
+	Vencida: 'danger',
+	EnPlazo: 'secondary',
+	Pendiente: 'warn',
+	SinDato: 'info',
+};
+
+export const etiquetaCargo = (cargo: Pick<CuentaCargo, 'estado'>): EtiquetaView => ({
+	label: ESTADOS_CARGO[cargo.estado],
+	severity: SEVERIDAD_CARGO[cargo.estado],
+});
+
+/** Pagos y ajustes: vigente en verde, anulado en gris. */
+export const etiquetaVigencia = (r: { vigente: boolean }): EtiquetaView => ({
+	label: r.vigente ? 'Vigente' : 'Anulado',
+	severity: r.vigente ? 'success' : 'secondary',
+});
 // #endregion
 
 // #region Celdas

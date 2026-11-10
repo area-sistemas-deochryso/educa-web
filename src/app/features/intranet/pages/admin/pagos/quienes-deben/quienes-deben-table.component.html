@@ -1,6 +1,6 @@
 <div class="table-wrap">
 	<table class="deben-table">
-		<caption class="sr-only">Alumnos con deuda vencida</caption>
+		<caption>Alumnos con deuda vencida</caption>
 		<thead>
 			<tr>
 				<th scope="col" class="col-expand"><span class="sr-only">Detalle</span></th>
@@ -32,21 +32,26 @@
 							<i [class]="open ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" aria-hidden="true"></i>
 						</button>
 					</td>
-					<td>{{ fila.estudiante }}</td>
+					<td>
+						<span class="alumno">
+							<edu-avatar [label]="iniciales(fila.estudiante)" shape="circle" aria-hidden="true" />
+							{{ fila.estudiante }}
+						</span>
+					</td>
 					<td>{{ fila.salon }}</td>
 					<td><edu-tag [value]="cat.label" [severity]="cat.severity" [icon]="cat.icon" /></td>
 					<td class="num">{{ fila.cuotasVencidas }}</td>
 					<td class="num">{{ fila.diasAtrasoMaximo }}</td>
 					<td class="num strong">{{ soles(fila.deudaVencida) }}</td>
-					<td class="ultimo-pago">
+					<td><div class="ultimo-pago">
 						@if (fila.ultimoPago; as pago) {
 							<span>{{ fecha(pago.fecha) }}</span>
 							<small>{{ soles(pago.monto) }}</small>
 						} @else {
 							<span class="muted">Sin pagos</span>
 						}
-					</td>
-					<td class="acciones">
+					</div></td>
+					<td><div class="acciones">
 						<a
 							[routerLink]="['/intranet/admin/pagos/estado-cuenta', fila.estudianteId]"
 							[attr.aria-label]="'Ver el estado de cuenta de ' + fila.estudiante"
@@ -60,7 +65,7 @@
 						>
 							Registrar pago
 						</a>
-					</td>
+					</div></td>
 				</tr>
 				@if (open) {
 					<tr class="detail-row">

@@ -1,8 +1,12 @@
+// B6: barra de filtros con borde y sin fondo propio. También la usa «Sin dato».
 .filters {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 1rem;
 	align-items: flex-end;
+	padding: 0.75rem 1rem;
+	border: 1px solid var(--surface-300);
+	border-radius: 10px;
 
 	&__field {
 		display: flex;
@@ -15,7 +19,7 @@
 
 	&__label {
 		font-size: 0.8125rem;
-		color: var(--text-color-secondary);
+		font-weight: 600;
 	}
 
 	&__input {

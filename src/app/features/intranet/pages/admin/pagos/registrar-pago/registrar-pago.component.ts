@@ -38,6 +38,7 @@ function isoLocal(fecha: Date): string {
 	imports: [FormsModule, RouterLink, EduAutoComplete, EduButton, EduDatePicker, EduInputNumber, EduMessage, EduSelect, EduTemplate],
 	providers: [RegistrarPagoFacade],
 	templateUrl: './registrar-pago.component.html',
+	styleUrl: './registrar-pago.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RegistrarPagoComponent {
@@ -82,7 +83,7 @@ export class RegistrarPagoComponent {
 	protected readonly motivoBloqueo = computed(() => {
 		const faltan = this.faltantes();
 		if (faltan.length > 0) return `Falta completar: ${faltan.join(', ')}.`;
-		if (this.facade.reparto().length === 0) return 'Proponé el reparto antes de registrar.';
+		if (this.facade.reparto().length === 0) return 'Propón el reparto antes de registrar.';
 		return null;
 	});
 

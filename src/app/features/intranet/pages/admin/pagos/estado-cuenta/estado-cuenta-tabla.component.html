@@ -3,7 +3,7 @@
 } @else {
 	<div class="tabla__wrap">
 		<table class="tabla">
-			<caption class="sr-only">{{ caption() }}</caption>
+			<caption>{{ caption() }}</caption>
 			<thead>
 				<tr>
 					@for (col of columnas(); track col.key) {
@@ -23,7 +23,13 @@
 				@for (fila of ordenadas(); track $index) {
 					<tr [class.anulada]="anulada()(fila)">
 						@for (col of columnas(); track col.key) {
-							<td [class.num]="col.numeric">{{ col.texto(fila) }}</td>
+							<td [class.num]="col.numeric">
+								@if (col.etiqueta; as etiqueta) {
+									<edu-tag [value]="col.texto(fila)" [severity]="etiqueta(fila).severity" />
+								} @else {
+									{{ col.texto(fila) }}
+								}
+							</td>
 						}
 						@if (acciones(); as plantilla) {
 							<td>
