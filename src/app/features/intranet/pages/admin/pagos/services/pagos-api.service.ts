@@ -5,18 +5,27 @@ import { Observable, map } from 'rxjs';
 
 import { environment } from '@config/environment';
 import type {
+	ConfirmarSinDatoPayload,
 	EstadoCuenta,
 	EstudianteBusqueda,
+	FiltroSinDato,
+	GenerarCargosPayload,
+	GuardarParametroAnioPayload,
 	MiembroFamilia,
 	PagoCorte,
+	ParametroAnio,
 	PanelCobranza,
 	QuienesDeben,
 	QuienesDebenFiltros,
 	RegistrarAjustePayload,
 	RegistrarPagoPayload,
 	RepartoPropuesto,
+	ResultadoConfirmacion,
+	ResultadoGeneracion,
 	SinDato,
 	SinDatoFiltros,
+	VistaPreviaConfirmacion,
+	VistaPreviaGeneracion,
 } from '@data/models';
 // #endregion
 
@@ -118,6 +127,37 @@ export class PagosApiService {
 
 	anularAjuste(ajusteId: number, motivo: string): Observable<unknown> {
 		return this.http.post(`${this.apiUrl}/ajustes/${ajusteId}/anular`, { motivo });
+	}
+	// #endregion
+
+	// #region Carga inicial (F6a)
+	/** Parámetros del año. `404 PAGO_PARAMETRO_ANIO_INEXISTENTE` si todavía no existen. */
+	parametrosAnio(anio: number): Observable<ParametroAnio> {
+		return this.http.get<ParametroAnio>(`${this.apiUrl}/parametros/${anio}`);
+	}
+
+	/** Crea o edita los parámetros del año; `rowVersion` nulo solo al crear. */
+	guardarParametrosAnio(payload: GuardarParametroAnioPayload): Observable<ParametroAnio> {
+		return this.http.put<ParametroAnio>(`${this.apiUrl}/parametros`, payload);
+	}
+
+	/** Cuántos cargos nacerían y cuántos se omiten. No escribe. */
+	vistaPreviaGeneracion(payload: GenerarCargosPayload): Observable<VistaPreviaGeneracion> {
+		return this.http.post<VistaPreviaGeneracion>(`${this.apiUrl}/cargos/generar/vista-previa`, payload);
+	}
+
+	/** Genera los cargos (idempotente). `crearEsperados` es el `aCrear` de la vista previa; si ya no coincide, `409`. */
+	generarCargos(payload: GenerarCargosPayload, crearEsperados: number): Observable<ResultadoGeneracion> {
+		return this.http.post<ResultadoGeneracion>(`${this.apiUrl}/cargos/generar`, { ...payload, crearEsperados });
+	}
+
+	vistaPreviaConfirmacion(filtro: FiltroSinDato): Observable<VistaPreviaConfirmacion> {
+		return this.http.post<VistaPreviaConfirmacion>(`${this.apiUrl}/cargos/sin-dato/vista-previa`, filtro);
+	}
+
+	/** Confirma en bloque lo «sin dato». `cargosEsperados` es el conteo de la vista previa; si ya no coincide, `409`. */
+	confirmarSinDato(payload: ConfirmarSinDatoPayload): Observable<ResultadoConfirmacion> {
+		return this.http.post<ResultadoConfirmacion>(`${this.apiUrl}/cargos/sin-dato/confirmar`, payload);
 	}
 	// #endregion
 

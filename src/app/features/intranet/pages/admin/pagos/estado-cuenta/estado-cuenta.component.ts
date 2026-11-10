@@ -35,7 +35,11 @@ const MEDIOS: Record<string, string> = {
 	OTRO: 'Otro',
 };
 
-const TIPOS_AJUSTE: Record<string, string> = { DESCUENTO: 'Descuento', ESPECIE: 'En especie' };
+const TIPOS_AJUSTE: Record<string, string> = {
+	DESCUENTO: 'Descuento',
+	ESPECIE: 'En especie',
+	SALDADO_PREVIO: 'Saldado antes del arranque',
+};
 
 const conceptoDe = (c: Pick<CuentaCargo, 'concepto' | 'cuota'>): string => (c.cuota ? `${c.concepto} · ${c.cuota}` : c.concepto);
 

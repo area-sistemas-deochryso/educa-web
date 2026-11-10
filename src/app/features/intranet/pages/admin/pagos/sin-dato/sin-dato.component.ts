@@ -1,13 +1,14 @@
 // #region Imports
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
-import { EduPaginator } from '@edu-ui';
+import { EduButton, EduPaginator } from '@edu-ui';
 import type { EduPaginatorPageEvent } from '@edu-ui';
 import { ErrorStateComponent } from '@shared/components';
 import { TableSkeletonComponent } from '@intranet-shared/components';
 import type { SkeletonColumnDef } from '@intranet-shared/components';
 import { QuienesDebenFiltersComponent } from '../quienes-deben/quienes-deben-filters.component';
+import { ConfirmarLoteDialogComponent } from './confirmar-lote-dialog.component';
 import { formatFechaConDia, formatSoles } from '../utils/pagos-format.util';
 import { SinDatoFacade } from './sin-dato.facade';
 // #endregion
@@ -19,7 +20,7 @@ import { SinDatoFacade } from './sin-dato.facade';
 @Component({
 	selector: 'app-sin-dato',
 	standalone: true,
-	imports: [EduPaginator, ErrorStateComponent, QuienesDebenFiltersComponent, RouterLink, TableSkeletonComponent],
+	imports: [ConfirmarLoteDialogComponent, EduButton, EduPaginator, ErrorStateComponent, QuienesDebenFiltersComponent, RouterLink, TableSkeletonComponent],
 	providers: [SinDatoFacade],
 	templateUrl: './sin-dato.component.html',
 	styleUrl: './sin-dato.component.scss',
@@ -27,6 +28,8 @@ import { SinDatoFacade } from './sin-dato.facade';
 })
 export class SinDatoComponent implements OnInit {
 	protected readonly facade = inject(SinDatoFacade);
+
+	private readonly dialogoLote = viewChild.required(ConfirmarLoteDialogComponent);
 
 	protected readonly soles = formatSoles;
 	protected readonly fecha = formatFechaConDia;
@@ -41,6 +44,14 @@ export class SinDatoComponent implements OnInit {
 
 	ngOnInit(): void {
 		this.facade.reload();
+	}
+
+	protected abrirConfirmarLote(): void {
+		this.dialogoLote().open();
+	}
+
+	protected onLoteCerrado(huboCambios: boolean): void {
+		if (huboCambios) this.facade.reload();
 	}
 
 	protected onPage(event: EduPaginatorPageEvent): void {

@@ -231,7 +231,8 @@ export interface CuentaPago {
 export interface CuentaAjuste {
 	ajusteId: number;
 	cargoId: number;
-	tipo: 'DESCUENTO' | 'ESPECIE';
+	/** `SALDADO_PREVIO` lo crea solo «Saldado antes del arranque»; no se registra a mano. */
+	tipo: 'DESCUENTO' | 'ESPECIE' | 'SALDADO_PREVIO';
 	monto: number;
 	motivo: string | null;
 	vigente: boolean;
@@ -245,7 +246,7 @@ export interface CuentaAjuste {
 /** Cuerpo de `POST /api/pagos/ajustes`. El motivo es obligatorio solo en `DESCUENTO` (INV-PG08). */
 export interface RegistrarAjustePayload {
 	cargoId: number;
-	tipo: CuentaAjuste['tipo'];
+	tipo: 'DESCUENTO' | 'ESPECIE';
 	monto: number;
 	motivo: string | null;
 }

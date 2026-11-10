@@ -3,7 +3,7 @@ import { Routes } from '@angular/router';
 /**
  * Rutas hijas del shell de Pagos (`PagosShellComponent`). Heredan la autorización de
  * `PAGOS_API_MANAGE` vía `permissionPath` declarado en el padre (`intranet.routes.ts`) — ver
- * `.claude/reference/route-permission-sharing.md`. F5b (registrar pago) y F5c (estado de cuenta, sin dato) suman hijas acá; el estado de cuenta tiene dos rutas (landing con buscador y `:estudianteId`).
+ * `.claude/reference/route-permission-sharing.md`. F5b (registrar pago), F5c (estado de cuenta, sin dato) y F6b (configurar año) suman hijas acá; el estado de cuenta tiene dos rutas (landing con buscador y `:estudianteId`).
  */
 export default [
 	{ path: '', redirectTo: 'panel', pathMatch: 'full' },
@@ -32,5 +32,11 @@ export default [
 		path: 'sin-dato',
 		loadComponent: () => import('./sin-dato/sin-dato.component').then((m) => m.SinDatoComponent),
 		title: 'Intranet - Pagos: Sin dato',
+	},
+	{
+		path: 'configurar-anio',
+		loadComponent: () =>
+			import('./configurar-anio/configurar-anio.component').then((m) => m.ConfigurarAnioComponent),
+		title: 'Intranet - Pagos: Configurar año',
 	},
 ] satisfies Routes;
