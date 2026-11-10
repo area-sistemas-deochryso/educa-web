@@ -1,0 +1,25 @@
+@use '../styles/pagos' as pagos;
+
+.calc {
+	@include pagos.card;
+	@include pagos.banner(var(--blue-500));
+	flex-direction: column;
+	gap: 0;
+
+	h3 {
+		@include pagos.card-title;
+		margin-bottom: 0.5rem;
+	}
+
+	ul {
+		margin: 0;
+		padding-left: 1.25rem;
+		font-size: 0.875rem;
+		line-height: 1.5;
+	}
+
+	// Un estilo global fija `li` en 20px: se hereda el tamaño de la lista.
+	li {
+		font-size: inherit;
+	}
+}

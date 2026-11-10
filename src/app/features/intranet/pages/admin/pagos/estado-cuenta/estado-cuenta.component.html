@@ -1,6 +1,4 @@
-<section class="cuenta" aria-labelledby="cuenta-title">
-	<h2 id="cuenta-title" class="cuenta__title">Estado de cuenta</h2>
-
+<section class="cuenta" aria-label="Estado de cuenta">
 	<label class="cuenta__buscar">
 		<span>Buscar alumno (nombre o DNI)</span>
 		<edu-autocomplete
@@ -32,13 +30,44 @@
 	} @else if (facade.loading() && !facade.cuenta()) {
 		<p class="cuenta__estado" role="status">Cargando la cuenta…</p>
 	} @else if (facade.cuenta(); as cuenta) {
-		<div [attr.aria-busy]="facade.loading()" [class.cuenta--loading]="facade.loading()">
-			<header class="cuenta__header">
-				<h3 class="cuenta__alumno">{{ cuenta.estudiante }}</h3>
-				<span class="cuenta__salon">{{ cuenta.salon ?? 'Sin matrícula activa' }}</span>
-				@if (categoria(); as cat) {
-					<edu-tag [value]="cat.label" [severity]="cat.severity" />
-				}
+		<div class="cuenta__cuerpo" [attr.aria-busy]="facade.loading()" [class.cuenta--loading]="facade.loading()">
+			<header class="alumno">
+				<edu-avatar [label]="iniciales(cuenta.estudiante)" shape="circle" size="xlarge" aria-hidden="true" />
+				<div class="alumno__datos">
+					<h3 class="cuenta__alumno">{{ cuenta.estudiante }}</h3>
+					<span class="cuenta__salon">{{ cuenta.salon ?? 'Sin matrícula activa' }}</span>
+				</div>
+				<edu-button
+					class="alumno__accion"
+					label="Registrar un pago"
+					icon="pi pi-plus"
+					severity="success"
+					size="small"
+					(click)="registrarPago(cuenta.estudianteId, cuenta.estudiante)"
+				/>
+
+				<dl class="cuenta__totales" aria-label="Totales de la cuenta">
+					@if (categoria(); as cat) {
+						<div>
+							<dt>Estado</dt>
+							<dd><edu-tag [value]="cat.label" [severity]="cat.severity" /></dd>
+						</div>
+					}
+					<div>
+						<dt>Deuda vencida</dt>
+						<dd [class.cifra--deuda]="cuenta.deudaVencida > 0" [class.cifra--ok]="cuenta.deudaVencida === 0">
+							{{ soles(cuenta.deudaVencida) }}
+						</dd>
+					</div>
+					<div>
+						<dt>Pendiente total</dt>
+						<dd>{{ soles(cuenta.pendienteTotal) }}</dd>
+					</div>
+					<div>
+						<dt>Cargos sin dato</dt>
+						<dd>{{ cuenta.cargosSinDato }}</dd>
+					</div>
+				</dl>
 			</header>
 
 			@if (anioSinParametros()) {
@@ -54,47 +83,44 @@
 				/>
 			}
 
-			<dl class="cuenta__totales" aria-label="Totales de la cuenta">
-				<div>
-					<dt>Deuda vencida</dt>
-					<dd>{{ soles(cuenta.deudaVencida) }}</dd>
-				</div>
-				<div>
-					<dt>Pendiente total</dt>
-					<dd>{{ soles(cuenta.pendienteTotal) }}</dd>
-				</div>
-			</dl>
+			<section class="bloque" aria-labelledby="h-cargos">
+				<h3 id="h-cargos" class="bloque__titulo">Cargos</h3>
+				<app-estado-cuenta-tabla
+					caption="Cargos del alumno"
+					[columnas]="columnasCargos"
+					[filas]="cuenta.cargos"
+					[acciones]="accionesCargo"
+					vacio="El alumno no tiene cargos."
+				/>
+			</section>
 
-			<h3 class="cuenta__seccion">Cargos</h3>
-			<app-estado-cuenta-tabla
-				caption="Cargos del alumno"
-				[columnas]="columnasCargos"
-				[filas]="cuenta.cargos"
-				[acciones]="accionesCargo"
-				vacio="El alumno no tiene cargos."
-			/>
+			<div class="duo">
+				<section class="bloque" aria-labelledby="h-pagos">
+					<h3 id="h-pagos" class="bloque__titulo">Pagos</h3>
+					<app-estado-cuenta-tabla
+						caption="Pagos que tocaron cargos del alumno, vigentes y anulados"
+						[columnas]="columnasPagos"
+						[filas]="cuenta.pagos"
+						[anulada]="pagoAnulado"
+						[detalle]="detallePago"
+						[acciones]="accionesPago"
+						vacio="Sin pagos registrados."
+					/>
+				</section>
 
-			<h3 class="cuenta__seccion">Pagos</h3>
-			<app-estado-cuenta-tabla
-				caption="Pagos que tocaron cargos del alumno, vigentes y anulados"
-				[columnas]="columnasPagos"
-				[filas]="cuenta.pagos"
-				[anulada]="pagoAnulado"
-				[detalle]="detallePago"
-				[acciones]="accionesPago"
-				vacio="Sin pagos registrados."
-			/>
-
-			<h3 class="cuenta__seccion">Ajustes</h3>
-			<app-estado-cuenta-tabla
-				caption="Descuentos y entregas en especie, vigentes y anulados"
-				[columnas]="columnasAjustes()"
-				[filas]="cuenta.ajustes"
-				[anulada]="ajusteAnulado"
-				[detalle]="detalleAjuste"
-				[acciones]="accionesAjuste"
-				vacio="Sin ajustes."
-			/>
+				<section class="bloque" aria-labelledby="h-ajustes">
+					<h3 id="h-ajustes" class="bloque__titulo">Ajustes</h3>
+					<app-estado-cuenta-tabla
+						caption="Descuentos y entregas en especie, vigentes y anulados"
+						[columnas]="columnasAjustes()"
+						[filas]="cuenta.ajustes"
+						[anulada]="ajusteAnulado"
+						[detalle]="detalleAjuste"
+						[acciones]="accionesAjuste"
+						vacio="Sin ajustes."
+					/>
+				</section>
+			</div>
 		</div>
 	} @else {
 		<edu-message severity="info" text="Busca al alumno para ver su cuenta, o entra desde «Quiénes deben» o «Sin dato»." />

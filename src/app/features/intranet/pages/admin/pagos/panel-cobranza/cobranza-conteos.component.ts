@@ -15,13 +15,13 @@ import { totalExclusivo } from './panel-cobranza.logic';
 		<section aria-label="Alumnos por situación de pago">
 			<h3 class="title">Alumnos por situación de pago</h3>
 			<ul class="row" aria-label="Categorías exclusivas">
+				<li class="chip chip--total" data-testid="total"><strong>{{ total() }}</strong> Total</li>
 				<li class="chip chip--ok"><strong>{{ conteos().alDia }}</strong> Al día</li>
 				<li class="chip chip--partial">
 					<strong>{{ conteos().pagoParcial }}</strong> Pago parcial
 					<small>Incluye adelanto parcial de una cuota que aún no vence.</small>
 				</li>
 				<li class="chip chip--debt"><strong>{{ conteos().conDeuda }}</strong> Con deuda</li>
-				<li class="chip" data-testid="total"><strong>{{ total() }}</strong> Total</li>
 			</ul>
 			<p class="note">Aparte, sin sumar al total (un mismo alumno puede estar en ambos):</p>
 			<ul class="row" aria-label="Conteos transversales">
@@ -39,42 +39,54 @@ import { totalExclusivo } from './panel-cobranza.logic';
 	styles: `
 		.title {
 			margin: 0 0 0.5rem;
-			font-size: 1rem;
+			font-size: 1.0625rem;
+			font-weight: 600;
 		}
 		.row {
 			display: flex;
 			flex-wrap: wrap;
-			gap: 0.75rem;
+			gap: 0.625rem;
+			align-items: flex-start;
 			list-style: none;
 			margin: 0 0 0.5rem;
 			padding: 0;
 		}
 		.chip {
 			display: flex;
-			flex-direction: column;
-			min-width: 9rem;
-			max-width: 16rem;
-			padding: 0.75rem 1rem;
-			border-radius: 0.75rem;
-			border: 1px solid var(--surface-border, #e5e7eb);
-			background: var(--surface-card, #fff);
+			flex-wrap: wrap;
+			align-items: baseline;
+			gap: 0.375rem;
+			max-width: 18rem;
+			padding: 0.375rem 0.875rem;
+			border-radius: 16px;
+			border: 1px solid var(--surface-300);
+			font-size: 0.875rem;
 		}
 		.chip strong {
-			font-size: 1.5rem;
+			font-size: 1rem;
+			font-variant-numeric: tabular-nums;
 		}
 		.chip small {
-			margin-top: 0.25rem;
+			flex-basis: 100%;
 			font-size: 0.75rem;
-			color: var(--text-color-secondary, #6b7280);
+			color: var(--text-color-secondary);
+		}
+		.chip--total {
+			border-color: var(--blue-700, #1d4ed8);
+			background: var(--blue-700, #1d4ed8);
+			color: #fff;
 		}
 		.chip--ok {
-			border-left: 4px solid var(--green-500, #22c55e);
+			border-color: var(--green-500);
+			background: color-mix(in srgb, var(--green-500) 15%, transparent);
 		}
 		.chip--partial {
-			border-left: 4px solid var(--yellow-500, #eab308);
+			border-color: var(--yellow-500);
+			background: color-mix(in srgb, var(--yellow-500) 15%, transparent);
 		}
 		.chip--debt {
-			border-left: 4px solid var(--red-500, #ef4444);
+			border-color: var(--red-500);
+			background: color-mix(in srgb, var(--red-500) 15%, transparent);
 		}
 		.chip--aside {
 			border-style: dashed;
@@ -82,7 +94,7 @@ import { totalExclusivo } from './panel-cobranza.logic';
 		.note {
 			margin: 0.5rem 0;
 			font-size: 0.8125rem;
-			color: var(--text-color-secondary, #6b7280);
+			color: var(--text-color-secondary);
 		}
 	`,
 })

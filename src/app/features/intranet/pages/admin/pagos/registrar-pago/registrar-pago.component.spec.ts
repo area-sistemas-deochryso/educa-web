@@ -81,6 +81,17 @@ describe('RegistrarPagoComponent — acción principal', () => {
 	});
 });
 
+describe('RegistrarPagoComponent — alumno precargado desde la ruta', () => {
+	it('muestra el nombre del alumno en el buscador, no «[object Object]»', async () => {
+		const { fixture } = crearComponente();
+		await fixture.whenStable();
+		fixture.detectChanges();
+
+		const entrada = fixture.nativeElement.querySelector('edu-autocomplete input') as HTMLInputElement;
+		expect(entrada.value).toBe('Ana Pérez');
+	});
+});
+
 describe('RegistrarPagoComponent — por qué no se puede registrar', () => {
 	const motivo = (fixture: { nativeElement: HTMLElement }) =>
 		fixture.nativeElement.querySelector('[data-testid="motivo-bloqueo"]')?.textContent?.trim();
@@ -91,7 +102,7 @@ describe('RegistrarPagoComponent — por qué no se puede registrar', () => {
 		estado.comprobante.set('B001-123');
 		fixture.detectChanges();
 
-		expect(motivo(fixture)).toBe('Proponé el reparto antes de registrar.');
+		expect(motivo(fixture)).toBe('Propón el reparto antes de registrar.');
 	});
 
 	it('nombra los obligatorios que faltan y no envía nada al hacer clic', () => {

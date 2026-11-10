@@ -4,7 +4,8 @@ import { catchError, map, of, startWith, switchMap } from 'rxjs';
 
 import { logger } from '@core/helpers';
 import type { PagoCorte, PanelCobranza } from '@data/models';
-import { EduSkeleton } from '@edu-ui';
+import { FormsModule } from '@angular/forms';
+import { EduButton, EduSelectButton, EduSkeleton } from '@edu-ui';
 import { PanelCobranzaFacade } from './panel-cobranza.facade';
 import { formatFechaConDia } from '../utils/pagos-format.util';
 import { QuienesDebenComponent } from '../quienes-deben/quienes-deben.component';
@@ -36,6 +37,9 @@ const MESES = Array.from({ length: 12 }, (_, i) => i + 1);
 	selector: 'app-panel-cobranza',
 	standalone: true,
 	imports: [
+		FormsModule,
+		EduButton,
+		EduSelectButton,
 		EduSkeleton,
 		CobranzaKpisComponent,
 		CobranzaConteosComponent,
@@ -57,7 +61,15 @@ export class PanelCobranzaComponent {
 	protected readonly anio = Number(this.hoy.slice(0, 4));
 	protected readonly hoyValue = HOY;
 
+	protected readonly modoOpciones = [
+		{ label: 'Al corte', value: 'corte' },
+		{ label: 'A hoy', value: 'hoy' },
+	];
+
 	protected readonly seleccion = signal<string>(HOY);
+	/** Último corte mirado: «Al corte» vuelve a él tras pasar por «A hoy». */
+	private readonly ultimoCorte = signal<string | null>(null);
+	protected readonly modo = computed(() => (this.seleccion() === HOY ? 'hoy' : 'corte'));
 	protected readonly cortes = signal<PagoCorte[]>([]);
 	private readonly reload = signal(0);
 
@@ -100,6 +112,18 @@ export class PanelCobranzaComponent {
 	protected onSelect(value: string): void {
 		if (value !== HOY && this.esFutura(value)) return;
 		this.seleccion.set(value);
+		if (value !== HOY) this.ultimoCorte.set(value);
+	}
+
+	/** «A hoy» = sin fecha; «Al corte» = el último corte mirado o, si no hay, el más reciente que ya llegó. */
+	protected onModo(modo: string): void {
+		if (modo === 'hoy') {
+			this.seleccion.set(HOY);
+			return;
+		}
+		const alcanzados = this.cortesOrdenados().filter((c) => !this.esFutura(c.fecha));
+		const destino = this.ultimoCorte() ?? alcanzados.map((c) => c.fecha.slice(0, 10)).sort().at(-1);
+		if (destino) this.onSelect(destino);
 	}
 
 	protected retry(): void {

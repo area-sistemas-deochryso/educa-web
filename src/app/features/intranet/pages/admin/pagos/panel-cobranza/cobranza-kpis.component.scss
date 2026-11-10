@@ -1,0 +1,65 @@
+@use '../styles/pagos' as pagos;
+
+.kpis {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+	gap: 1rem;
+}
+
+.kpi {
+	@include pagos.card;
+	display: flex;
+	align-items: flex-start;
+	gap: 0.75rem;
+
+	&--warn {
+		border-color: var(--orange-500);
+	}
+
+	&__icon {
+		font-size: 1.5rem;
+		color: var(--text-color-secondary);
+		margin-top: 0.125rem;
+	}
+
+	&--warn &__icon {
+		color: var(--orange-500);
+	}
+
+	&__body {
+		flex: 1 1 auto;
+		min-width: 0;
+	}
+
+	&__title {
+		margin: 0;
+		font-size: 0.8125rem;
+		font-weight: 600;
+		color: var(--text-color-secondary);
+	}
+
+	&__value {
+		margin: 0.125rem 0 0.5rem;
+		font-size: 2rem;
+		font-weight: 700;
+		line-height: 1.15;
+		font-variant-numeric: tabular-nums;
+	}
+
+	&__track {
+		@include pagos.barra-pista;
+		margin-bottom: 0.5rem;
+	}
+
+	&__fill {
+		@include pagos.barra-relleno(var(--primary-color));
+
+		&--warn {
+			background: var(--orange-500);
+		}
+	}
+
+	&__hint {
+		@include pagos.hint;
+	}
+}

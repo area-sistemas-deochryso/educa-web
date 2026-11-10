@@ -4,8 +4,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
+import { getPersonInitials } from '@core/helpers';
 import type { CuentaAjuste, CuentaCargo, CuentaPago, EstudianteBusqueda, RegistrarAjustePayload } from '@data/models';
-import { EduAutoComplete, EduButton, EduMessage, EduTag, EduTemplate } from '@edu-ui';
+import { EduAutoComplete, EduAvatar, EduButton, EduMessage, EduTag, EduTemplate } from '@edu-ui';
 import { ErrorStateComponent } from '@shared/components';
 import { formatSoles } from '../utils/pagos-format.util';
 import { AccionesCuentaFacade, type ResultadoAccion } from './acciones-cuenta.facade';
@@ -17,6 +18,8 @@ import {
 	CATEGORIAS,
 	ESTADOS_CARGO,
 	detalleAnulacion,
+	etiquetaCargo,
+	etiquetaVigencia,
 	fechaOVacio,
 	fechaPagoDe,
 	montoPagoDe,
@@ -55,6 +58,7 @@ const conceptoDe = (c: Pick<CuentaCargo, 'concepto' | 'cuota'>): string => (c.cu
 		AjusteDialogComponent,
 		AnularDialogComponent,
 		EduAutoComplete,
+		EduAvatar,
 		EduButton,
 		EduMessage,
 		EduTag,
@@ -105,7 +109,7 @@ export class EstadoCuentaComponent {
 		},
 		{ key: 'recargo', label: 'Recargo', numeric: true, texto: recargoDe, valor: (c) => (c.estado === 'SinDato' ? null : c.recargo) },
 		{ key: 'saldo', label: 'Saldo', numeric: true, texto: saldoDe, valor: (c) => (c.estado === 'SinDato' ? null : c.saldo) },
-		{ key: 'estado', label: 'Estado', texto: (c) => ESTADOS_CARGO[c.estado] },
+		{ key: 'estado', label: 'Estado', texto: (c) => ESTADOS_CARGO[c.estado], etiqueta: etiquetaCargo },
 	];
 
 	protected readonly columnasPagos: ColumnaTabla<CuentaPago>[] = [
@@ -118,7 +122,7 @@ export class EstadoCuentaComponent {
 			texto: (p) => (p.numeroOperacion ? `${p.comprobante} · op. ${p.numeroOperacion}` : p.comprobante),
 		},
 		{ key: 'monto', label: 'Monto', numeric: true, texto: montoPagoDe, valor: (p) => p.monto },
-		{ key: 'estado', label: 'Estado', texto: (p) => (p.vigente ? 'Vigente' : 'Anulado') },
+		{ key: 'estado', label: 'Estado', texto: (p) => (p.vigente ? 'Vigente' : 'Anulado'), etiqueta: etiquetaVigencia },
 	];
 
 	protected readonly columnasAjustes = computed<ColumnaTabla<CuentaAjuste>[]>(() => {
@@ -132,7 +136,7 @@ export class EstadoCuentaComponent {
 			{ key: 'tipo', label: 'Tipo', texto: (a) => TIPOS_AJUSTE[a.tipo] ?? a.tipo },
 			{ key: 'monto', label: 'Monto', numeric: true, texto: (a) => formatSoles(a.monto), valor: (a) => a.monto },
 			{ key: 'motivo', label: 'Motivo', texto: (a) => a.motivo ?? '—' },
-			{ key: 'estado', label: 'Estado', texto: (a) => (a.vigente ? 'Vigente' : 'Anulado') },
+			{ key: 'estado', label: 'Estado', texto: (a) => (a.vigente ? 'Vigente' : 'Anulado'), etiqueta: etiquetaVigencia },
 		];
 	});
 
@@ -215,6 +219,13 @@ export class EstadoCuentaComponent {
 	protected buscarEstudiantes(evento: { query: string }): void {
 		this.facade.buscarEstudiantes(evento.query);
 	}
+
+	/** Lleva al formulario de «Registrar pago» con este alumno ya elegido (mismos query params que «Quiénes deben»). */
+	protected registrarPago(estudianteId: number, nombre: string): void {
+		void this.router.navigate(['/intranet/admin/pagos/registrar'], { queryParams: { estudianteId, nombre } });
+	}
+
+	protected readonly iniciales = getPersonInitials;
 
 	protected elegirEstudiante(estudiante: EstudianteBusqueda): void {
 		this.seleccionado.set(estudiante);

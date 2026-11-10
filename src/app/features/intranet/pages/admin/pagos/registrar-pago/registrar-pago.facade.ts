@@ -75,7 +75,7 @@ export class RegistrarPagoFacade {
 					this.api.buscarEstudiantes(texto).pipe(
 						catchError((err: unknown) => {
 							logger.error('[RegistrarPagoFacade] Error al buscar alumnos', err);
-							this.errorBusqueda.set('No se pudo buscar alumnos. Intentá de nuevo.');
+							this.errorBusqueda.set('No se pudo buscar alumnos. Inténtalo de nuevo.');
 							return of<EstudianteBusqueda[]>([]);
 						}),
 					),
@@ -147,7 +147,7 @@ export class RegistrarPagoFacade {
 			},
 			error: (err: unknown) => {
 				logger.error('[RegistrarPagoFacade] Error al proponer el reparto', err);
-				this.errorReparto.set('No se pudo calcular el reparto. Intentá de nuevo.');
+				this.errorReparto.set('No se pudo calcular el reparto. Inténtalo de nuevo.');
 				this.loadingReparto.set(false);
 			},
 		});

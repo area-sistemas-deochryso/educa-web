@@ -1,16 +1,20 @@
-<section class="sin-dato" aria-labelledby="sin-dato-title">
-	<header>
-		<h2 id="sin-dato-title" class="sin-dato__title">Cargos sin dato</h2>
-		<p class="sin-dato__nota">
+<section class="sin-dato" aria-label="Cargos sin dato">
+	<div class="sin-dato__banner" role="note">
+		<i class="pi pi-info-circle" aria-hidden="true"></i>
+		<p>
 			Cargos cuya deuda aún no está confirmada. No se cuentan como deuda, no tienen saldo ni recargo y no admiten pagos.
 		</p>
+	</div>
+
+	<div class="sin-dato__acciones">
 		<edu-button
 			label="Confirmar en bloque…"
 			icon="pi pi-check-square"
-			severity="secondary"
+			[outlined]="true"
+			size="small"
 			(click)="abrirConfirmarLote()"
 		/>
-	</header>
+	</div>
 
 	<app-confirmar-lote-dialog [salones]="facade.salones()" (cerrado)="onLoteCerrado($event.huboCambios)" />
 
@@ -52,7 +56,7 @@
 			<div class="sin-dato__tabla" [class.sin-dato__tabla--loading]="facade.loading()" [attr.aria-busy]="facade.loading()">
 				<div class="sin-dato__wrap">
 					<table class="tabla">
-						<caption class="sr-only">Alumnos con cargos sin dato</caption>
+						<caption>Alumnos con cargos sin dato</caption>
 						<thead>
 							<tr>
 								<th scope="col">Alumno</th>
@@ -65,7 +69,12 @@
 						<tbody>
 							@for (fila of facade.filas(); track fila.estudianteId) {
 								<tr>
-									<td>{{ fila.estudiante }}</td>
+									<td>
+										<span class="alumno">
+											<edu-avatar [label]="iniciales(fila.estudiante)" shape="circle" aria-hidden="true" />
+											{{ fila.estudiante }}
+										</span>
+									</td>
 									<td>{{ fila.salon }}</td>
 									<td class="num">{{ fila.cargos }}</td>
 									<td>
@@ -85,9 +94,11 @@
 									</td>
 									<td>
 										<a
+											class="ver"
 											[routerLink]="['/intranet/admin/pagos/estado-cuenta', fila.estudianteId]"
 											[attr.aria-label]="'Ver el estado de cuenta de ' + fila.estudiante"
 										>
+											<i class="pi pi-eye" aria-hidden="true"></i>
 											Estado de cuenta
 										</a>
 									</td>

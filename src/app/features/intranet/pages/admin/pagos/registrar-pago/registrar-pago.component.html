@@ -1,186 +1,218 @@
-<section class="registrar-pago">
-	<label class="flex flex-col gap-1 mb-4">
-		<span>Buscar alumno (nombre o DNI)</span>
-		<edu-autocomplete
-			[suggestions]="facade.sugerencias()"
-			[ngModel]="seleccionado()"
-			(completeMethod)="buscarEstudiantes($event)"
-			(onSelect)="elegirEstudiante($event.value)"
-			optionLabel="nombreCompleto"
-			placeholder="Escribí al menos 2 letras o el DNI completo"
-			[minLength]="2"
-			[delay]="300"
-			[style]="{ width: '100%' }"
-			[inputStyle]="{ width: '100%' }"
-		>
-			<ng-template let-alumno pTemplate="item">
-				<div class="flex gap-2 items-center">
-					<span class="font-semibold">{{ alumno.nombreCompleto }}</span>
-					<span>{{ alumno.salon?.nombre ?? 'Sin matrícula activa' }}</span>
-				</div>
-			</ng-template>
-		</edu-autocomplete>
-		@if (facade.errorBusqueda(); as errorBusqueda) {
-			<small role="alert">{{ errorBusqueda }}</small>
-		}
-	</label>
-
-	@if (!facade.estudiante()) {
-		<edu-message severity="info" text="Buscá al alumno que paga, o elegilo desde «Quiénes deben»." />
-	} @else if (facade.pagoRegistrado(); as pagoId) {
-		<edu-message severity="success" [text]="'Pago registrado (N.º ' + pagoId + ').'" />
-		<div class="mt-4">
-			<edu-button label="Registrar otro pago" icon="pi pi-plus" (click)="facade.nuevoPago()" />
-		</div>
-	} @else {
-		<h3 class="mb-2">Alumno que paga: {{ facade.estudiante()?.nombre }}</h3>
-
-		<fieldset class="mb-4">
-			<legend class="font-semibold mb-2">Alumnos que cubre el pago</legend>
-			@if (facade.loadingFamilia()) {
-				<p>Cargando grupo familiar…</p>
-			} @else {
-				@for (miembro of facade.familia(); track miembro.estudianteId) {
-					<label class="flex items-center gap-2 mb-1">
-						<input
-							type="checkbox"
-							[checked]="facade.seleccionados().has(miembro.estudianteId)"
-							(change)="facade.toggleMiembro(miembro.estudianteId)"
-						/>
-						{{ miembro.nombreCompleto }}
-					</label>
-				}
+<section
+	class="registrar"
+	[class.registrar--solo]="!facade.estudiante() || facade.pagoRegistrado()"
+	aria-label="Registrar pago"
+>
+	<div class="card">
+		<h3 class="card__title">1. Buscar alumno</h3>
+		<label class="campo">
+			<span>Nombre o DNI del alumno que paga</span>
+			<edu-autocomplete
+				[suggestions]="facade.sugerencias()"
+				[ngModel]="seleccionado()"
+				(completeMethod)="buscarEstudiantes($event)"
+				(onSelect)="elegirEstudiante($event.value)"
+				optionLabel="nombreCompleto"
+				placeholder="Escribe al menos 2 letras o el DNI completo"
+				[minLength]="2"
+				[delay]="300"
+				[style]="{ width: '100%' }"
+				[inputStyle]="{ width: '100%' }"
+			>
+				<ng-template let-alumno pTemplate="item">
+					<div class="opcion">
+						<span class="opcion__nombre">{{ alumno.nombreCompleto }}</span>
+						<span class="opcion__salon">{{ alumno.salon?.nombre ?? 'Sin matrícula activa' }}</span>
+					</div>
+				</ng-template>
+			</edu-autocomplete>
+			@if (facade.errorBusqueda(); as errorBusqueda) {
+				<small class="campo__error" role="alert">{{ errorBusqueda }}</small>
 			}
-		</fieldset>
+		</label>
 
-		<div class="grid gap-4 mb-4">
-			<label class="flex flex-col gap-1">
-				<span>Monto (S/) <span aria-hidden="true">*</span></span>
-				<edu-input-number
-					[ngModel]="monto()"
-					(ngModelChange)="cambiarMonto($event)"
-					(keydown)="filtrarTeclaMonto($event)"
-					placeholder="0.00"
-					[min]="0"
-					[minFractionDigits]="2"
-					[maxFractionDigits]="2"
-					[showButtons]="false"
-				/>
-			</label>
-			<label class="flex flex-col gap-1">
-				<span>Fecha del pago <span aria-hidden="true">*</span></span>
-				<edu-datepicker [ngModel]="fecha()" (ngModelChange)="fecha.set($event)" [maxDate]="hoy" />
-			</label>
-			<label class="flex flex-col gap-1">
-				<span>Hora (opcional)</span>
-				<input type="time" [value]="hora() ?? ''" (input)="hora.set($any($event.target).value || null)" />
-			</label>
-			<label class="flex flex-col gap-1">
-				<span>Medio</span>
-				<edu-select [options]="medios" [ngModel]="medio()" (ngModelChange)="medio.set($event)" optionLabel="label" optionValue="value" />
-			</label>
-			<label class="flex flex-col gap-1">
-				<span>Banco de origen (opcional)</span>
-				<input type="text" [value]="banco()" (input)="banco.set($any($event.target).value)" />
-			</label>
-			<label class="flex flex-col gap-1">
-				<span>Número de operación (opcional)</span>
-				<input type="text" [value]="operacion()" (input)="operacion.set($any($event.target).value)" />
-			</label>
-			<label class="flex flex-col gap-1">
-				<span>Comprobante <span aria-hidden="true">*</span></span>
-				<input type="text" maxlength="50" [value]="comprobante()" (input)="comprobante.set($any($event.target).value)" />
-				<small>Máximo 50 caracteres. «S/N» solo en efectivo.</small>
-			</label>
-			<label class="flex flex-col gap-1">
-				<span>Observaciones (opcional)</span>
-				<input type="text" maxlength="500" [value]="observaciones()" (input)="observaciones.set($any($event.target).value)" />
-			</label>
-		</div>
-
-		<div class="mb-4">
-			<edu-button
-				label="Proponer reparto"
-				icon="pi pi-calculator"
-				[outlined]="true"
-				[loading]="facade.loadingReparto()"
-				[disabled]="!puedeProponer()"
-				(click)="proponer()"
-			/>
-		</div>
-
-		@if (facade.errorReparto(); as errorReparto) {
-			<edu-message severity="danger" [text]="errorReparto" class="mb-4" />
-		}
-
-		@if (facade.reparto().length > 0) {
-			<table class="w-full mb-2">
-				<thead>
-					<tr>
-						<th scope="col">Alumno</th>
-						<th scope="col">Concepto</th>
-						<th scope="col">Vencimiento</th>
-						<th scope="col" class="text-right">Base (S/)</th>
-						<th scope="col" class="text-right">Recargo (S/)</th>
-					</tr>
-				</thead>
-				<tbody>
-					@for (a of facade.reparto(); track a.cargoId; let i = $index) {
-						<tr>
-							<td>{{ a.estudiante }}</td>
-							<td>{{ a.concepto }}{{ a.cuota ? ' · cuota ' + a.cuota : '' }}</td>
-							<td>{{ a.vencimiento ? fechaConDia(a.vencimiento) : '—' }}</td>
-							<td class="text-right">
-								<input type="number" min="0" step="0.01" class="w-28 text-right" [value]="a.montoBase" (input)="editar(i, 'montoBase', $event)" />
-							</td>
-							<td class="text-right">
-								<input type="number" min="0" step="0.01" class="w-28 text-right" [value]="a.montoRecargo" (input)="editar(i, 'montoRecargo', $event)" />
-							</td>
-						</tr>
-					}
-				</tbody>
-			</table>
-
-			@if (facade.sobrante() > 0) {
-				<p class="mb-2">Sobrante sin repartir: {{ soles(facade.sobrante()) }}</p>
-			}
-
-			<p class="mb-4" [attr.data-testid]="'diferencia'">
-				@if (diferencia() === 0) {
-					Reparto cuadrado con el monto.
-				} @else if (diferencia() > 0) {
-					Faltan {{ soles(diferencia() / 100) }} para cuadrar con el monto.
-				} @else {
-					Sobran {{ soles(-diferencia() / 100) }} sobre el monto.
-				}
+		@if (!facade.estudiante()) {
+			<edu-message severity="info" text="Busca al alumno que paga, o elígelo desde «Quiénes deben»." />
+		} @else if (facade.pagoRegistrado(); as pagoId) {
+			<edu-message severity="success" [text]="'Pago registrado (N.º ' + pagoId + ').'" />
+			<div class="acciones">
+				<edu-button label="Registrar otro pago" icon="pi pi-plus" (click)="facade.nuevoPago()" />
+			</div>
+		} @else {
+			<h3 class="card__title card__title--sub">2. Alumnos que cubre este pago</h3>
+			<p class="paga">
+				Alumno que paga: <strong>{{ facade.estudiante()?.nombre }}</strong>
 			</p>
-		}
 
-		@if (facade.errorRegistro(); as errorRegistro) {
-			<edu-message severity="danger" [text]="errorRegistro" class="mb-4" />
-			@if (facade.pagoEnCurso() && facade.estudiante(); as pagador) {
-				<p class="mb-4">
-					<a
-						[routerLink]="['/intranet/admin/pagos/estado-cuenta', pagador.id]"
-						target="_blank"
-						rel="noopener"
-						data-testid="verificar-estado-cuenta"
-					>
-						Ver el estado de cuenta de {{ pagador.nombre }} (se abre en otra pestaña)
-					</a>
+			@if (facade.loadingFamilia()) {
+				<p class="ayuda">Cargando grupo familiar…</p>
+			} @else {
+				<fieldset class="miembros">
+					<legend class="sr-only">Alumnos que cubre el pago</legend>
+					@for (miembro of facade.familia(); track miembro.estudianteId) {
+						<label class="miembro" [class.miembro--on]="facade.seleccionados().has(miembro.estudianteId)">
+							<input
+								type="checkbox"
+								class="sr-only"
+								[checked]="facade.seleccionados().has(miembro.estudianteId)"
+								(change)="facade.toggleMiembro(miembro.estudianteId)"
+							/>
+							<i
+								[class]="facade.seleccionados().has(miembro.estudianteId) ? 'pi pi-check-circle' : 'pi pi-circle'"
+								aria-hidden="true"
+							></i>
+							{{ miembro.nombreCompleto }}
+						</label>
+					}
+				</fieldset>
+			}
+
+			@if (facade.reparto().length > 0) {
+				<h3 class="card__title card__title--sub">Reparto propuesto (la cuota más antigua primero)</h3>
+				<div class="tabla-wrap">
+					<table class="tabla">
+						<caption>
+							Reparto del pago entre los cargos de los alumnos
+						</caption>
+						<thead>
+							<tr>
+								<th scope="col">Alumno</th>
+								<th scope="col">Concepto</th>
+								<th scope="col">Vencimiento</th>
+								<th scope="col" class="num">Base (S/)</th>
+								<th scope="col" class="num">Recargo (S/)</th>
+							</tr>
+						</thead>
+						<tbody>
+							@for (a of facade.reparto(); track a.cargoId; let i = $index) {
+								<tr>
+									<td>{{ a.estudiante }}</td>
+									<td>{{ a.concepto }}{{ a.cuota ? ' · cuota ' + a.cuota : '' }}</td>
+									<td>{{ a.vencimiento ? fechaConDia(a.vencimiento) : '—' }}</td>
+									<td class="num">
+										<input type="number" min="0" step="0.01" class="importe" [value]="a.montoBase" (input)="editar(i, 'montoBase', $event)" />
+									</td>
+									<td class="num">
+										<input type="number" min="0" step="0.01" class="importe" [value]="a.montoRecargo" (input)="editar(i, 'montoRecargo', $event)" />
+									</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				</div>
+
+				@if (facade.sobrante() > 0) {
+					<p class="ayuda">Sobrante sin repartir: {{ soles(facade.sobrante()) }}</p>
+				}
+
+				<p
+					class="diferencia"
+					[class.diferencia--ok]="diferencia() === 0"
+					[class.diferencia--mal]="diferencia() !== 0"
+					[attr.data-testid]="'diferencia'"
+				>
+					@if (diferencia() === 0) {
+						Reparto cuadrado con el monto.
+					} @else if (diferencia() > 0) {
+						Faltan {{ soles(diferencia() / 100) }} para cuadrar con el monto.
+					} @else {
+						Sobran {{ soles(-diferencia() / 100) }} sobre el monto.
+					}
 				</p>
 			}
 		}
+	</div>
 
-		<edu-button
-			label="Registrar pago"
-			icon="pi pi-check"
-			[loading]="facade.guardando()"
-			[disabled]="!puedeRegistrar()"
-			(click)="registrar()"
-		/>
-		@if (!puedeRegistrar() && motivoBloqueo(); as motivo) {
-			<p class="mt-2" data-testid="motivo-bloqueo">{{ motivo }}</p>
-		}
+	@if (facade.estudiante() && !facade.pagoRegistrado()) {
+		<div class="card">
+			<h3 class="card__title">3. Datos del pago</h3>
+
+			<div class="grilla">
+				<label class="campo">
+					<span>Monto (S/) <span aria-hidden="true">*</span></span>
+					<edu-input-number
+						[ngModel]="monto()"
+						(ngModelChange)="cambiarMonto($event)"
+						(keydown)="filtrarTeclaMonto($event)"
+						placeholder="0.00"
+						[min]="0"
+						[minFractionDigits]="2"
+						[maxFractionDigits]="2"
+						[showButtons]="false"
+					/>
+				</label>
+				<label class="campo">
+					<span>Fecha del pago <span aria-hidden="true">*</span></span>
+					<edu-datepicker [ngModel]="fecha()" (ngModelChange)="fecha.set($event)" [maxDate]="hoy" />
+				</label>
+				<label class="campo">
+					<span>Medio</span>
+					<edu-select [options]="medios" [ngModel]="medio()" (ngModelChange)="medio.set($event)" optionLabel="label" optionValue="value" />
+				</label>
+				<label class="campo">
+					<span>Hora (opcional)</span>
+					<input type="time" [value]="hora() ?? ''" (input)="hora.set($any($event.target).value || null)" />
+				</label>
+				<label class="campo">
+					<span>Banco de origen (opcional)</span>
+					<input type="text" [value]="banco()" (input)="banco.set($any($event.target).value)" />
+				</label>
+				<label class="campo">
+					<span>N.º de operación (opcional)</span>
+					<input type="text" [value]="operacion()" (input)="operacion.set($any($event.target).value)" />
+				</label>
+				<label class="campo">
+					<span>Comprobante <span aria-hidden="true">*</span></span>
+					<input type="text" maxlength="50" [value]="comprobante()" (input)="comprobante.set($any($event.target).value)" />
+					<small>Máximo 50 caracteres. «S/N» solo en efectivo.</small>
+				</label>
+				<label class="campo">
+					<span>Observaciones (opcional)</span>
+					<input type="text" maxlength="500" [value]="observaciones()" (input)="observaciones.set($any($event.target).value)" />
+				</label>
+			</div>
+
+			@if (facade.errorReparto(); as errorReparto) {
+				<edu-message severity="danger" [text]="errorReparto" />
+			}
+
+			@if (facade.errorRegistro(); as errorRegistro) {
+				<edu-message severity="danger" [text]="errorRegistro" />
+				@if (facade.pagoEnCurso() && facade.estudiante(); as pagador) {
+					<p class="ayuda">
+						<a
+							[routerLink]="['/intranet/admin/pagos/estado-cuenta', pagador.id]"
+							target="_blank"
+							rel="noopener"
+							data-testid="verificar-estado-cuenta"
+						>
+							Ver el estado de cuenta de {{ pagador.nombre }} (se abre en otra pestaña)
+						</a>
+					</p>
+				}
+			}
+
+			<div class="acciones">
+				<edu-button
+					label="Proponer reparto"
+					icon="pi pi-calculator"
+					[outlined]="true"
+					[loading]="facade.loadingReparto()"
+					[disabled]="!puedeProponer()"
+					(click)="proponer()"
+				/>
+				<edu-button
+					label="Registrar pago"
+					icon="pi pi-check"
+					severity="success"
+					[loading]="facade.guardando()"
+					[disabled]="!puedeRegistrar()"
+					(click)="registrar()"
+				/>
+			</div>
+			@if (!puedeRegistrar() && motivoBloqueo(); as motivo) {
+				<p class="ayuda" data-testid="motivo-bloqueo">{{ motivo }}</p>
+			}
+		</div>
 	}
 </section>

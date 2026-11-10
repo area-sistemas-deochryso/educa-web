@@ -2,8 +2,9 @@
 import { ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
+import { getPersonInitials } from '@core/helpers';
 import type { PagosCategoria, QuienDebeFila, QuienesDebenOrden } from '@data/models';
-import { EduPaginator, EduTag } from '@edu-ui';
+import { EduAvatar, EduPaginator, EduTag } from '@edu-ui';
 import type { EduPaginatorPageEvent, EduTagSeverity } from '@edu-ui';
 import { formatFechaConDia, formatSoles } from '../utils/pagos-format.util';
 import { QuienesDebenCuotasComponent } from './quienes-deben-cuotas.component';
@@ -31,7 +32,7 @@ interface SortableColumn {
 @Component({
 	selector: 'app-quienes-deben-table',
 	standalone: true,
-	imports: [EduTag, EduPaginator, QuienesDebenCuotasComponent, RouterLink],
+	imports: [EduAvatar, EduTag, EduPaginator, QuienesDebenCuotasComponent, RouterLink],
 	templateUrl: './quienes-deben-table.component.html',
 	styleUrl: './quienes-deben-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -60,6 +61,7 @@ export class QuienesDebenTableComponent {
 
 	protected readonly soles = formatSoles;
 	protected readonly fecha = formatFechaConDia;
+	protected readonly iniciales = getPersonInitials;
 
 	protected categoria(c: PagosCategoria): CategoriaView {
 		return CATEGORIAS[c];

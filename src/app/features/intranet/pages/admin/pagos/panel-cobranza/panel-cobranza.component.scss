@@ -1,56 +1,48 @@
+@use '../styles/pagos' as pagos;
+
 .panel {
 	display: flex;
 	flex-direction: column;
 	gap: 1.25rem;
 }
 
-.panel__header {
+.toolbar {
 	display: flex;
 	flex-wrap: wrap;
-	align-items: baseline;
-	justify-content: space-between;
-	gap: 0.5rem;
-}
-
-.panel__title {
-	margin: 0;
-	font-size: 1.25rem;
-}
-
-.panel__date {
-	margin: 0;
-	color: var(--text-color-secondary, #6b7280);
-}
-
-.controls {
-	display: flex;
-	flex-wrap: wrap;
+	align-items: flex-end;
 	gap: 1rem;
-	align-items: flex-start;
+
+	&__fecha {
+		@include pagos.hint;
+		align-self: center;
+		font-size: 0.875rem;
+	}
 }
 
 .field {
 	display: flex;
 	flex-direction: column;
 	gap: 0.25rem;
-	font-size: 0.875rem;
+	font-size: 0.8125rem;
+	font-weight: 600;
 }
 
 .edit {
 	flex: 1 1 22rem;
 	padding: 0.5rem 0.75rem;
-	border: 1px solid var(--surface-border, #e5e7eb);
-	border-radius: 0.75rem;
+	border: 1px solid var(--surface-300);
+	border-radius: 10px;
 
 	summary {
 		cursor: pointer;
 		font-weight: 600;
+		font-size: 0.875rem;
 	}
 }
 
 .edit__warn {
+	@include pagos.hint;
 	margin: 0.5rem 0;
-	font-size: 0.8125rem;
 	color: var(--orange-700, #c2410c);
 }
 
@@ -61,20 +53,6 @@
 	gap: 0.75rem;
 }
 
-.btn {
-	padding: 0.5rem 1rem;
-	border: 0;
-	border-radius: 0.5rem;
-	background: var(--primary-color, #2563eb);
-	color: #fff;
-	cursor: pointer;
-
-	&:disabled {
-		opacity: 0.6;
-		cursor: not-allowed;
-	}
-}
-
 .error {
 	margin: 0.5rem 0 0;
 	color: var(--red-600, #dc2626);
@@ -82,23 +60,18 @@
 }
 
 .error-box {
-	display: flex;
+	@include pagos.banner(var(--red-500));
 	align-items: center;
-	gap: 1rem;
-	padding: 1rem;
-	border: 1px solid var(--red-300, #fca5a5);
-	border-radius: 0.75rem;
+	justify-content: space-between;
 
 	p {
 		margin: 0;
+		font-size: inherit;
 	}
 }
 
 .banner {
-	padding: 0.75rem 1rem;
-	border-radius: 0.75rem;
-	background: var(--yellow-100, #fef9c3);
-	border: 1px solid var(--yellow-500, #eab308);
+	@include pagos.banner(var(--yellow-500));
 	font-weight: 600;
 }
 
