@@ -4,7 +4,15 @@
 		<p class="sin-dato__nota">
 			Cargos cuya deuda aún no está confirmada. No se cuentan como deuda, no tienen saldo ni recargo y no admiten pagos.
 		</p>
+		<edu-button
+			label="Confirmar en bloque…"
+			icon="pi pi-check-square"
+			severity="secondary"
+			(click)="abrirConfirmarLote()"
+		/>
 	</header>
+
+	<app-confirmar-lote-dialog [salones]="facade.salones()" (cerrado)="onLoteCerrado($event.huboCambios)" />
 
 	@if (facade.data(); as data) {
 		<dl class="sin-dato__totales" aria-label="Totales del conjunto filtrado completo">

@@ -9,7 +9,7 @@ import { EduTab, EduTabs } from '@edu-ui';
 // #endregion
 
 interface ShellTab {
-	value: 'panel' | 'registrar' | 'estado-cuenta' | 'sin-dato';
+	value: 'panel' | 'registrar' | 'estado-cuenta' | 'sin-dato' | 'configurar-anio';
 	label: string;
 	icon: string;
 }
@@ -19,6 +19,7 @@ const TABS: ShellTab[] = [
 	{ value: 'registrar', label: 'Registrar pago', icon: 'pi pi-plus-circle' },
 	{ value: 'estado-cuenta', label: 'Estado de cuenta', icon: 'pi pi-file' },
 	{ value: 'sin-dato', label: 'Sin dato', icon: 'pi pi-question-circle' },
+	{ value: 'configurar-anio', label: 'Configurar año', icon: 'pi pi-cog' },
 ];
 
 /**
