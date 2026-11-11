@@ -1,24 +1,32 @@
-<edu-accordion [multiple]="true">
-	@for (faq of faqs(); track faq.id) {
-		<edu-accordion-panel [value]="faq.id.toString()">
-			<edu-accordion-header>
-				<span class="faq-question">{{ faq.pregunta }}</span>
-				@if (faq.categoria) {
-					<span class="faq-category">{{ faq.categoria }}</span>
-				}
-				@if (faq.wizard) {
-					<edu-button
-						label="Ver guía paso a paso"
-						icon="pi pi-arrow-right"
-						iconPos="right"
-						size="small"
-						(click)="onOpenWizard(faq, $event)"
-					/>
-				}
-			</edu-accordion-header>
+@for (grupo of faqsPorCategoria(); track grupo.categoria) {
+	<section class="faq-categoria">
+		<div class="faq-categoria__header">
+			<i [class]="categoriaIconMap()[grupo.categoria]?.icon || 'pi pi-users'" class="faq-categoria__icon"></i>
+			<span class="faq-categoria__titulo">{{ grupo.categoria }}</span>
+			<span class="faq-categoria__badge">{{ grupo.faqs.length }}</span>
+		</div>
+		<div class="faq-categoria__tarjetas">
+			<edu-accordion [multiple]="true">
+				@for (faq of grupo.faqs; track faq.id) {
+					<edu-accordion-panel [value]="faq.id.toString()">
+						<edu-accordion-header class="faq-header">
+							<span class="faq-question">{{ faq.pregunta }}</span>
+							<span class="faq-badge-rol">{{ grupo.categoria }}</span>
+							@if (faq.wizard) {
+								<edu-button
+									label="Ver guía paso a paso"
+									icon="pi pi-arrow-right"
+									iconPos="right"
+									size="small"
+									(click)="onOpenWizard(faq, $event)"
+								/>
+							}
+						</edu-accordion-header>
 
-				<p class="faq-answer">{{ faq.respuesta }}</p>
-
-		</edu-accordion-panel>
-	}
-</edu-accordion>
+						<p class="faq-answer">{{ faq.respuesta }}</p>
+					</edu-accordion-panel>
+				}
+			</edu-accordion>
+		</div>
+	</section>
+}

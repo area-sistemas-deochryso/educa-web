@@ -1,8 +1,14 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 
 import { FaqDto } from '@features/intranet/pages/cross-role/ayuda/models/faq.models';
 import { EduAccordion, EduAccordionHeader, EduAccordionPanel, EduButton } from '@edu-ui';
-/** Lista presentacional de FAQ — el botón "ir→" solo aparece si `faq.wizard` no es null. */
+/** Lista presentacional de FAQ — muestra tarjetas agrupadas por categoría con iconos y badge de rol.
+ * El botón "ir→" solo aparece si `faq.wizard` no es null. */
+interface CategoriaGrupo {
+	categoria: string;
+	faqs: FaqDto[];
+}
+
 @Component({
 	selector: 'app-faq-list',
 	standalone: true,
@@ -14,6 +20,25 @@ import { EduAccordion, EduAccordionHeader, EduAccordionPanel, EduButton } from '
 export class FaqListComponent {
 	readonly faqs = input.required<FaqDto[]>();
 	readonly openWizard = output<FaqDto>();
+
+	readonly categoriaIconMap = computed<Record<string, { icon: string; color: string }>>(() => ({
+		Común: { icon: 'pi pi-users', color: 'var(--primary-color)' },
+		Profesor: { icon: 'pi pi-chalkboard-teacher', color: 'var(--primary-color)' },
+		Estudiante: { icon: 'pi pi-student', color: 'var(--primary-color)' },
+		'Asistente Administrativo': { icon: 'pi pi-user-shield', color: 'var(--primary-color)' },
+	}));
+
+	readonly faqsPorCategoria = computed<CategoriaGrupo[]>(() => {
+		const grouped = new Map<string, FaqDto[]>();
+		for (const faq of this.faqs()) {
+			const cat = faq.categoria ?? 'Común';
+			if (!grouped.has(cat)) grouped.set(cat, []);
+			grouped.get(cat)!.push(faq);
+		}
+		return Array.from(grouped.entries())
+			.map(([categoria, faqs]) => ({ categoria, faqs }))
+			.sort((a, b) => a.categoria.localeCompare(b.categoria, 'es'));
+	});
 
 	onOpenWizard(faq: FaqDto, event: Event): void {
 		event.stopPropagation();
