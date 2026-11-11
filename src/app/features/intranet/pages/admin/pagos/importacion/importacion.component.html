@@ -1,0 +1,201 @@
+<section class="importacion" aria-label="Importar saldos, pagos y descuentos">
+	<div class="importacion__banner" role="note">
+		<i class="pi pi-info-circle" aria-hidden="true"></i>
+		<p>
+			Carga inicial desde la plantilla de Excel: saldos, pagos hechos antes del arranque y descuentos. Antes de importar, los cargos del año
+			tienen que existir (pestaña «Configurar año»). Nada se guarda hasta que confirmes, y volver a subir el mismo archivo no duplica nada.
+		</p>
+	</div>
+
+	<div class="seccion">
+		<h3 class="seccion__title">1. Plantilla y archivo</h3>
+		<div class="campos">
+			<label class="campo campo--anio">
+				<span>Año</span>
+				<edu-select
+					[options]="anios"
+					[ngModel]="facade.anio()"
+					(ngModelChange)="facade.cambiarAnio($event)"
+					[disabled]="facade.ocupado()"
+					appendTo="body"
+				/>
+			</label>
+			<label class="campo campo--archivo">
+				<span>Archivo Excel (.xlsx)</span>
+				<input
+					type="file"
+					class="campo__archivo"
+					accept=".xlsx"
+					[disabled]="facade.ocupado()"
+					(change)="onArchivo($event)"
+				/>
+				<small>Una fila por hecho, hasta 3000 filas. Fechas en dd/mm/aaaa y horas en HH:mm.</small>
+			</label>
+		</div>
+		<div class="acciones">
+			<edu-button label="Descargar plantilla" icon="pi pi-download" severity="secondary" [outlined]="true" size="small" (click)="facade.descargarPlantilla()" />
+			@if (facade.archivo()) {
+				<edu-button label="Quitar archivo" icon="pi pi-times" severity="secondary" [text]="true" size="small" [disabled]="facade.ocupado()" (click)="reiniciar()" />
+			}
+		</div>
+
+		@if (facade.errorLectura(); as mensaje) {
+			<edu-message severity="danger" [text]="mensaje" />
+		}
+	</div>
+
+	@if (facade.leidas().length > 0 && !facade.resultado()) {
+		<div class="seccion" aria-live="polite" [attr.aria-busy]="facade.calculando()">
+			<h3 class="seccion__title">2. Vista previa de «{{ facade.archivo() }}»</h3>
+
+			@if (facade.error(); as mensaje) {
+				<edu-message severity="danger" [text]="mensaje" />
+			}
+
+			@if (facade.calculando()) {
+				<p class="seccion__nota">Calculando la vista previa…</p>
+			}
+
+			@if (facade.vistaPrevia(); as vp) {
+				<dl class="totales" aria-label="Totales de la vista previa">
+					<div>
+						<dt>Filas leídas</dt>
+						<dd>{{ facade.leidas().length }}</dd>
+					</div>
+					<div>
+						<dt>Se aplicarán</dt>
+						<dd>{{ vp.aplicables }}</dd>
+					</div>
+					@if (pendientes() > 0) {
+						<div>
+							<dt>Sin resolver</dt>
+							<dd>{{ pendientes() }}</dd>
+						</div>
+					}
+				</dl>
+			}
+
+			@if (chips().length > 0) {
+				<div class="chips" role="group" aria-label="Filtrar por estado">
+					@for (chip of chips(); track chip.value) {
+						<button
+							type="button"
+							class="chip"
+							[class.chip--activo]="filtro() === chip.value"
+							[attr.aria-pressed]="filtro() === chip.value"
+							(click)="elegirFiltro(chip.value)"
+						>
+							{{ chip.label }} <strong>{{ chip.cantidad }}</strong>
+						</button>
+					}
+				</div>
+
+				<div class="tabla-wrap">
+					<table class="tabla">
+						<caption>Estado de cada fila del archivo</caption>
+						<thead>
+							<tr>
+								<th scope="col" class="num">Fila</th>
+								<th scope="col">Alumno</th>
+								<th scope="col">Concepto</th>
+								<th scope="col">Tipo</th>
+								<th scope="col">Estado</th>
+								<th scope="col">Detalle</th>
+							</tr>
+						</thead>
+						<tbody>
+							@for (fila of pagina(); track fila.numero) {
+								<tr>
+									<td class="num">{{ fila.numero }}</td>
+									<td>
+										{{ fila.alumnoResuelto ?? fila.alumno }}
+										@if (fila.alumnoResuelto && fila.alumnoResuelto !== fila.alumno) {
+											<small class="muted">en el archivo: {{ fila.alumno }}</small>
+										}
+									</td>
+									<td>{{ fila.concepto }}@if (fila.cuota) { · cuota {{ fila.cuota }} }</td>
+									<td>{{ fila.tipo }}</td>
+									<td><edu-tag [value]="etiqueta(fila.estado)" [severity]="severidad[fila.estado]" /></td>
+									<td>
+										@if (fila.mensaje) {
+											<span class="detalle">{{ fila.mensaje }}</span>
+										}
+										@if (fila.estado === 'SIN_RESOLVER') {
+											<div class="resolver">
+												@if (fila.candidatos.length > 0) {
+													<edu-select
+														[options]="fila.candidatos"
+														[ngModel]="null"
+														(ngModelChange)="facade.resolver(fila.numero, $event)"
+														optionLabel="label"
+														optionValue="value"
+														placeholder="Elige el alumno"
+														[disabled]="facade.ocupado()"
+														appendTo="body"
+														[attr.aria-label]="'Elegir el alumno de la fila ' + fila.numero"
+													/>
+												}
+												<edu-button
+													label="Descartar fila"
+													severity="secondary"
+													[text]="true"
+													size="small"
+													[disabled]="facade.ocupado()"
+													(click)="facade.descartar(fila.numero)"
+												/>
+											</div>
+										}
+									</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				</div>
+				<edu-paginator
+					[rows]="filasPorPagina"
+					[first]="first()"
+					[totalRecords]="filtradas().length"
+					[showCurrentPageReport]="true"
+					currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} filas"
+					(onPageChange)="onPage($event)"
+				/>
+			}
+
+			@if (facade.vistaPrevia(); as vp) {
+				<div class="acciones acciones--fin">
+					@if (pendientes() > 0) {
+						<small class="muted">Las filas sin resolver no se importan hasta que elijas el alumno.</small>
+					}
+					<edu-button
+						[label]="'Confirmar ' + cantidad(vp.aplicables)"
+						icon="pi pi-check"
+						[loading]="facade.confirmando()"
+						[disabled]="!facade.puedeConfirmar()"
+						(click)="facade.confirmar()"
+					/>
+				</div>
+			}
+		</div>
+	}
+
+	@if (facade.resultado(); as res) {
+		<div class="seccion" aria-live="polite">
+			<h3 class="seccion__title">3. Resultado</h3>
+			<edu-message severity="success" [text]="resumen(res)" />
+			@if (res.fallidas.length > 0) {
+				<div class="fallidas" role="alert">
+					<p><strong>{{ cantidad(res.fallidas.length) }} no se pudieron aplicar</strong> y las demás siguieron:</p>
+					<ul>
+						@for (f of res.fallidas; track f.numero) {
+							<li>Fila {{ f.numero }}: {{ f.mensaje }}</li>
+						}
+					</ul>
+				</div>
+			}
+			<div class="acciones">
+				<edu-button label="Volver a calcular" icon="pi pi-refresh" severity="secondary" [outlined]="true" size="small" (click)="facade.calcular()" />
+				<edu-button label="Importar otro archivo" severity="secondary" [text]="true" size="small" (click)="reiniciar()" />
+			</div>
+		</div>
+	}
+</section>
