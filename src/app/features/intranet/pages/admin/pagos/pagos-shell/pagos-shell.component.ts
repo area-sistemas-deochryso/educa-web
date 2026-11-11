@@ -9,7 +9,7 @@ import { EduTab, EduTabs } from '@edu-ui';
 // #endregion
 
 interface ShellTab {
-	value: 'panel' | 'registrar' | 'estado-cuenta' | 'sin-dato' | 'configurar-anio';
+	value: 'panel' | 'registrar' | 'estado-cuenta' | 'sin-dato' | 'configurar-anio' | 'importar';
 	label: string;
 	icon: string;
 }
@@ -20,6 +20,7 @@ const TABS: ShellTab[] = [
 	{ value: 'estado-cuenta', label: 'Estado de cuenta', icon: 'pi pi-file' },
 	{ value: 'sin-dato', label: 'Sin dato', icon: 'pi pi-question-circle' },
 	{ value: 'configurar-anio', label: 'Configurar año', icon: 'pi pi-cog' },
+	{ value: 'importar', label: 'Importar', icon: 'pi pi-upload' },
 ];
 
 interface ShellHeader {
@@ -54,6 +55,11 @@ const HEADERS: Record<ShellTab['value'], ShellHeader> = {
 		icon: 'pi pi-cog',
 		title: 'Configurar año',
 		subtitle: 'Parámetros de cobranza del año y generación de sus cargos',
+	},
+	importar: {
+		icon: 'pi pi-upload',
+		title: 'Importar',
+		subtitle: 'Saldos, pagos anteriores y descuentos desde la plantilla de Excel',
 	},
 };
 

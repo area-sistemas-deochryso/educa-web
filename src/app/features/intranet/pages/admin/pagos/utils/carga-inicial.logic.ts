@@ -189,7 +189,7 @@ export interface ErrorHttpLike {
 	error?: { errorCode?: string } | null;
 }
 
-export type AccionCargaInicial = 'cargar-parametros' | 'guardar-parametros' | 'vista-previa' | 'generar' | 'confirmar';
+export type AccionCargaInicial = 'cargar-parametros' | 'guardar-parametros' | 'vista-previa' | 'generar' | 'confirmar' | 'importar-vista-previa' | 'importar-confirmar';
 
 const MENSAJES_POR_CODIGO: Readonly<Record<string, string>> = {
 	PAGO_PARAMETRO_VALOR_INVALIDO: 'Los valores no pueden ser negativos y admiten como máximo dos decimales.',
@@ -201,6 +201,9 @@ const MENSAJES_POR_CODIGO: Readonly<Record<string, string>> = {
 	CARGO_GENERACION_VISTA_PREVIA_DESACTUALIZADA: 'Los datos cambiaron desde la vista previa. Se recalculó: revisa los números y confirma de nuevo.',
 	CARGO_CONFIRMACION_DESENLACE_INVALIDO: 'Elige si los cargos quedan como «Debe» o «Saldado antes del arranque».',
 	CARGO_CONFIRMACION_SIN_FILTRO: 'Elige al menos un filtro además del año (salón, concepto o cuotas).',
+	IMPORTACION_SIN_FILAS: 'El archivo no tiene filas para importar.',
+	IMPORTACION_EXCEDE_LIMITE: 'El archivo supera las 3000 filas permitidas por carga. Divídelo en varios archivos.',
+	IMPORTACION_VISTA_PREVIA_DESACTUALIZADA: 'Los datos cambiaron desde la vista previa. Se recalculó: revisa los números y confirma de nuevo.',
 	CARGO_CONFIRMACION_VISTA_PREVIA_DESACTUALIZADA: 'Los datos cambiaron desde la vista previa. Se recalculó: revisa los números y confirma de nuevo.',
 };
 
@@ -210,6 +213,8 @@ const MENSAJE_RED: Readonly<Record<AccionCargaInicial, string>> = {
 	'vista-previa': 'No hubo respuesta del servidor. Intenta de nuevo.',
 	generar: 'No hubo respuesta del servidor. Vuelve a calcular la vista previa: si los cargos ya se crearon, aparecerán como «ya existen».',
 	confirmar: 'No hubo respuesta del servidor. Vuelve a calcular la vista previa: si ya se confirmaron, el conteo bajará.',
+	'importar-vista-previa': 'No hubo respuesta del servidor. Intenta de nuevo.',
+	'importar-confirmar': 'No hubo respuesta del servidor. Vuelve a calcular la vista previa: lo que ya se aplicó aparecerá como «ya existe».',
 };
 
 const MENSAJE_GENERICO: Readonly<Record<AccionCargaInicial, string>> = {
@@ -218,6 +223,8 @@ const MENSAJE_GENERICO: Readonly<Record<AccionCargaInicial, string>> = {
 	'vista-previa': 'No se pudo calcular la vista previa.',
 	generar: 'No se pudieron generar los cargos. Intenta de nuevo.',
 	confirmar: 'No se pudieron confirmar los cargos. Intenta de nuevo.',
+	'importar-vista-previa': 'No se pudo calcular la vista previa de la importación.',
+	'importar-confirmar': 'No se pudo confirmar la importación. Vuelve a calcular la vista previa e intenta de nuevo.',
 };
 
 /** Mensaje en español por `errorCode`. Nunca se muestra el texto crudo del servidor. */

@@ -1,0 +1,153 @@
+@use '../styles/pagos' as pagos;
+
+.importacion {
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+
+	&__banner {
+		@include pagos.banner(var(--blue-500));
+		align-items: center;
+
+		p {
+			margin: 0;
+			font-size: inherit;
+		}
+	}
+}
+
+.seccion {
+	@include pagos.card;
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.seccion__title {
+	@include pagos.card-title;
+	margin: 0;
+}
+
+.seccion__nota {
+	@include pagos.hint;
+}
+
+.campos {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+}
+
+.campo {
+	@include pagos.campo;
+	min-width: 220px;
+	flex: 1 1 220px;
+	max-width: 420px;
+}
+
+.campo--anio {
+	max-width: 160px;
+	min-width: 120px;
+	flex: 0 0 auto;
+}
+
+.campo__archivo {
+	@include pagos.input-nativo;
+}
+
+.acciones {
+	@include pagos.toolbar-acciones;
+	justify-content: flex-start;
+}
+
+.acciones--fin {
+	justify-content: flex-end;
+}
+
+.totales {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1.5rem;
+	margin: 0;
+
+	dt {
+		font-size: 0.8125rem;
+		color: var(--text-color-secondary);
+	}
+
+	dd {
+		margin: 0;
+		font-size: 1.25rem;
+		font-weight: 600;
+		font-variant-numeric: tabular-nums;
+	}
+}
+
+.chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+.chip {
+	padding: 0.25rem 0.75rem;
+	border: 1px solid var(--surface-300);
+	border-radius: 999px;
+	background: transparent;
+	color: var(--text-color);
+	font: inherit;
+	font-size: 0.875rem;
+	cursor: pointer;
+
+	&--activo {
+		border-color: var(--primary-color);
+		background: color-mix(in srgb, var(--primary-color) 15%, transparent);
+	}
+}
+
+.tabla-wrap {
+	@include pagos.card-flush;
+	overflow-x: auto;
+}
+
+.tabla {
+	@include pagos.tabla;
+
+	.num {
+		text-align: right;
+		font-variant-numeric: tabular-nums;
+	}
+}
+
+.muted {
+	display: block;
+	color: var(--text-color-secondary);
+	font-size: 0.8125rem;
+}
+
+.detalle {
+	display: block;
+	font-size: 0.875rem;
+}
+
+.resolver {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.5rem;
+	margin-top: 0.375rem;
+}
+
+.fallidas {
+	@include pagos.banner(var(--red-500));
+	flex-direction: column;
+
+	p,
+	ul {
+		margin: 0;
+	}
+
+	ul {
+		padding-left: 1.25rem;
+	}
+}

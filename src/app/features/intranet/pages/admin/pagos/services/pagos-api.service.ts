@@ -5,12 +5,14 @@ import { Observable, map } from 'rxjs';
 
 import { environment } from '@config/environment';
 import type {
+	ConfirmarImportacionPayload,
 	ConfirmarSinDatoPayload,
 	EstadoCuenta,
 	EstudianteBusqueda,
 	FiltroSinDato,
 	GenerarCargosPayload,
 	GuardarParametroAnioPayload,
+	ImportacionPayload,
 	MiembroFamilia,
 	PagoCorte,
 	ParametroAnio,
@@ -21,11 +23,13 @@ import type {
 	RegistrarPagoPayload,
 	RepartoPropuesto,
 	ResultadoConfirmacion,
+	ResultadoImportacion,
 	ResultadoGeneracion,
 	SinDato,
 	SinDatoFiltros,
 	VistaPreviaConfirmacion,
 	VistaPreviaGeneracion,
+	VistaPreviaImportacion,
 } from '@data/models';
 // #endregion
 
@@ -158,6 +162,18 @@ export class PagosApiService {
 	/** Confirma en bloque lo «sin dato». `cargosEsperados` es el conteo de la vista previa; si ya no coincide, `409`. */
 	confirmarSinDato(payload: ConfirmarSinDatoPayload): Observable<ResultadoConfirmacion> {
 		return this.http.post<ResultadoConfirmacion>(`${this.apiUrl}/cargos/sin-dato/confirmar`, payload);
+	}
+	// #endregion
+
+	// #region Importación (F6c)
+	/** Evalúa cada fila sin escribir. Política `reports`: hasta 3000 filas por vez, sin reintentos. */
+	vistaPreviaImportacion(payload: ImportacionPayload): Observable<VistaPreviaImportacion> {
+		return this.http.post<VistaPreviaImportacion>(`${this.apiUrl}/importacion/vista-previa`, payload);
+	}
+
+	/** Aplica las filas (saldos, descuentos y pagos). `filasEsperadas` es el `aplicables` de la vista previa; si ya no coincide, `409`. */
+	confirmarImportacion(payload: ConfirmarImportacionPayload): Observable<ResultadoImportacion> {
+		return this.http.post<ResultadoImportacion>(`${this.apiUrl}/importacion/confirmar`, payload);
 	}
 	// #endregion
 
