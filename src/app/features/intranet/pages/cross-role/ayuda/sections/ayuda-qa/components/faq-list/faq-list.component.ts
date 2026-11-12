@@ -1,12 +1,16 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 
 import { FaqDto } from '@features/intranet/pages/cross-role/ayuda/models/faq.models';
 import { EduAccordion, EduAccordionHeader, EduAccordionPanel, EduButton } from '@edu-ui';
 /** Lista presentacional de FAQ — muestra tarjetas agrupadas por categoría con iconos y badge de rol.
- * El botón "ir→" solo aparece si `faq.wizard` no es null. */
+ * El botón "ir→" solo aparece si `faq.wizard` no es null. Incluye feedback "¿Fue útil?" por FAQ. */
 interface CategoriaGrupo {
 	categoria: string;
 	faqs: FaqDto[];
+}
+
+interface FeedbackEstado {
+	tipo: 'util' | 'no-util';
 }
 
 @Component({
@@ -40,8 +44,25 @@ export class FaqListComponent {
 			.sort((a, b) => a.categoria.localeCompare(b.categoria, 'es'));
 	});
 
+	private readonly _feedbackEstado = signal<Record<number, FeedbackEstado>>({});
+	readonly feedbackEstado = this._feedbackEstado.asReadonly();
+
 	onOpenWizard(faq: FaqDto, event: Event): void {
 		event.stopPropagation();
 		this.openWizard.emit(faq);
+	}
+
+	registrarFeedback(faqId: number, tipo: 'util' | 'no-util'): void {
+		this._feedbackEstado.update((estados) => ({
+			...estados,
+			[faqId]: { tipo },
+		}));
+		setTimeout(() => {
+			this._feedbackEstado.update((estados) => {
+				const nuevo = { ...estados };
+				delete nuevo[faqId];
+				return nuevo;
+			});
+		}, 3000);
 	}
 }

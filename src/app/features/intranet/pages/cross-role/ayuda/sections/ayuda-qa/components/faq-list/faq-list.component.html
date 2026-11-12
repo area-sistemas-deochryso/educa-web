@@ -24,6 +24,33 @@
 						</edu-accordion-header>
 
 						<p class="faq-answer">{{ faq.respuesta }}</p>
+
+						<div class="faq-feedback">
+							@if (feedbackEstado()[faq.id]) {
+								@if (feedbackEstado()[faq.id].tipo === 'util') {
+									<span class="feedback-confirm feedback-confirm--util">¡Gracias por tu feedback!</span>
+								} @else {
+									<span class="feedback-confirm feedback-confirm--no-util">Gracias. Trabajamos para mejorar esta respuesta.</span>
+								}
+							} @else {
+								<div class="feedback-botones">
+									<edu-button
+										label="Útil"
+										icon="pi pi-thumbs-up"
+										size="small"
+										(click)="registrarFeedback(faq.id, 'util')"
+									/>
+									<edu-button
+										label="No útil"
+										icon="pi pi-thumbs-down"
+										iconPos="left"
+										size="small"
+										severity="secondary"
+										(click)="registrarFeedback(faq.id, 'no-util')"
+									/>
+								</div>
+							}
+						</div>
 					</edu-accordion-panel>
 				}
 			</edu-accordion>

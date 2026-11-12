@@ -76,3 +76,36 @@
 	white-space: pre-line;
 	margin: 0 0 0.75rem;
 }
+
+.faq-feedback {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	margin-top: 0.75rem;
+	padding-top: 0.5rem;
+	border-top: 1px solid var(--surface-200);
+}
+
+.feedback-botones {
+	display: flex;
+	gap: 0.5rem;
+	flex: 1;
+}
+
+.feedback-botones .p-button {
+	flex: 1;
+}
+
+.feedback-confirm {
+	font-size: 0.875rem;
+	font-weight: 600;
+	flex: 1;
+}
+
+.feedback-confirm--util {
+	color: var(--success-color);
+}
+
+.feedback-confirm--no-util {
+	color: var(--text-color-secondary);
+}
