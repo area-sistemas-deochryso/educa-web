@@ -8,19 +8,9 @@
 	<p class="faq-detail__respuesta">{{ faq().respuesta }}</p>
 
 	@if (faq().wizard; as wizard) {
-		<div class="faq-detail__guia">
-			<span class="faq-detail__guia-info">
-				<strong>Guía paso a paso</strong>
-				<span>{{ wizard.pasos.length }} pasos</span>
-			</span>
-			<edu-button
-				label="Abrir guía"
-				icon="pi pi-arrow-right"
-				iconPos="right"
-				size="small"
-				(click)="openWizard.emit(faq())"
-			/>
-		</div>
+		@if (wizard.pasos.length > 0) {
+			<app-faq-guide [faqId]="faq().id" [wizard]="wizard" />
+		}
 	}
 
 	<div class="faq-detail__feedback">
@@ -28,7 +18,13 @@
 			@if (tipo === 'util') {
 				<span class="faq-detail__confirm faq-detail__confirm--util">¡Gracias por tu feedback!</span>
 			} @else {
-				<span class="faq-detail__confirm">Gracias. Trabajamos para mejorar esta respuesta.</span>
+				<span class="faq-detail__confirm">Lamentamos que no te haya servido. ¿Quieres consultarlo con soporte?</span>
+				<edu-button
+					label="Generar ticket"
+					icon="pi pi-ticket"
+					size="small"
+					(click)="ticketRequested.emit(faq())"
+				/>
 			}
 		} @else {
 			<span class="faq-detail__feedback-label">¿Te sirvió esta respuesta?</span>
@@ -47,4 +43,19 @@
 			/>
 		}
 	</div>
+
+	@if (relacionadas().length > 0) {
+		<nav class="faq-detail__related" aria-label="Preguntas relacionadas">
+			<strong class="faq-detail__related-title">Preguntas relacionadas</strong>
+			<ul class="faq-detail__related-list">
+				@for (rel of relacionadas(); track rel.id) {
+					<li>
+						<button type="button" class="faq-detail__related-link" (click)="relatedSelected.emit(rel.id)">
+							{{ rel.pregunta }}
+						</button>
+					</li>
+				}
+			</ul>
+		</nav>
+	}
 </article>

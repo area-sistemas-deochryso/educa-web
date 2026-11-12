@@ -25,6 +25,7 @@ interface FaqFilter {
 }
 
 const POPULARES_MAX = 3;
+const RELACIONADAS_MAX = 3;
 
 /**
  * Estado + carga de la sección QA. Scoped al componente (no `providedIn: 'root'`)
@@ -109,6 +110,15 @@ export class AyudaQaFacade {
 	readonly selectedFaq = computed(() => {
 		const id = this._selectedId();
 		return id === null ? null : (this._faqs().find((f) => f.id === id) ?? null);
+	});
+
+	/** Misma categoría que la pregunta abierta, sin ella, en el orden de la lista (máx. `RELACIONADAS_MAX`). */
+	readonly relacionadas = computed(() => {
+		const selected = this.selectedFaq();
+		if (!selected) return [];
+		return this._faqs()
+			.filter((f) => f.id !== selected.id && f.categoria === selected.categoria)
+			.slice(0, RELACIONADAS_MAX);
 	});
 
 	readonly categoria = this._categoria.asReadonly();

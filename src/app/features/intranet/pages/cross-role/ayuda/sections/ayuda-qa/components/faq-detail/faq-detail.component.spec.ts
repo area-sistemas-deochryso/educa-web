@@ -18,6 +18,7 @@ describe('FaqDetailComponent', () => {
 	let fixture: ComponentFixture<FaqDetailComponent>;
 
 	beforeEach(() => {
+		localStorage.clear();
 		TestBed.configureTestingModule({ imports: [FaqDetailComponent] });
 		fixture = TestBed.createComponent(FaqDetailComponent);
 	});
@@ -26,18 +27,15 @@ describe('FaqDetailComponent', () => {
 		fixture.componentRef.setInput('faq', FAQ_SIN_WIZARD);
 		fixture.detectChanges();
 
-		expect(fixture.debugElement.query(By.css('.faq-detail__guia'))).toBeNull();
+		expect(fixture.debugElement.query(By.css('app-faq-guide'))).toBeNull();
 	});
 
-	it('una FAQ con wizard muestra la guía y emite la FAQ al abrirla', () => {
-		let emitted: FaqDto | null = null;
-		fixture.componentInstance.openWizard.subscribe((f) => (emitted = f));
+	it('una FAQ con wizard muestra la guía en la misma página, sin modal', () => {
 		fixture.componentRef.setInput('faq', FAQ_CON_WIZARD);
 		fixture.detectChanges();
 
-		fixture.debugElement.query(By.css('.faq-detail__guia button')).nativeElement.click();
-
-		expect(emitted).toEqual(FAQ_CON_WIZARD);
+		expect(fixture.debugElement.query(By.css('app-faq-guide'))).not.toBeNull();
+		expect(fixture.debugElement.query(By.css('edu-dialog'))).toBeNull();
 	});
 
 	it('«Volver a la lista» emite back', () => {
@@ -51,7 +49,7 @@ describe('FaqDetailComponent', () => {
 		expect(backs).toBe(1);
 	});
 
-	it('registrar feedback reemplaza los botones por el agradecimiento', () => {
+	it('registrar feedback útil reemplaza los botones por el agradecimiento', () => {
 		fixture.componentRef.setInput('faq', FAQ_SIN_WIZARD);
 		fixture.detectChanges();
 
@@ -59,5 +57,39 @@ describe('FaqDetailComponent', () => {
 		fixture.detectChanges();
 
 		expect(fixture.debugElement.query(By.css('.faq-detail__confirm--util'))).not.toBeNull();
+	});
+
+	it('«No útil» ofrece «Generar ticket» y lo emite con la pregunta', () => {
+		let emitted: FaqDto | null = null;
+		fixture.componentInstance.ticketRequested.subscribe((f) => (emitted = f));
+		fixture.componentRef.setInput('faq', FAQ_SIN_WIZARD);
+		fixture.detectChanges();
+
+		fixture.componentInstance.registrarFeedback(1, 'no-util');
+		fixture.detectChanges();
+		const button = fixture.debugElement.query(By.css('.faq-detail__feedback button'));
+		button.nativeElement.click();
+
+		expect(button.nativeElement.textContent).toContain('Generar ticket');
+		expect(emitted).toEqual(FAQ_SIN_WIZARD);
+	});
+
+	it('muestra las preguntas relacionadas y emite la elegida', () => {
+		let selected: number | null = null;
+		fixture.componentInstance.relatedSelected.subscribe((id) => (selected = id));
+		fixture.componentRef.setInput('faq', FAQ_SIN_WIZARD);
+		fixture.componentRef.setInput('relacionadas', [FAQ_CON_WIZARD]);
+		fixture.detectChanges();
+
+		fixture.debugElement.query(By.css('.faq-detail__related-link')).nativeElement.click();
+
+		expect(selected).toBe(2);
+	});
+
+	it('sin relacionadas no muestra el bloque', () => {
+		fixture.componentRef.setInput('faq', FAQ_SIN_WIZARD);
+		fixture.detectChanges();
+
+		expect(fixture.debugElement.query(By.css('.faq-detail__related'))).toBeNull();
 	});
 });

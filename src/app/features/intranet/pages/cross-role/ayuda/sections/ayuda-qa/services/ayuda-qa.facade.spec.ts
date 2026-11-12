@@ -177,4 +177,22 @@ describe('AyudaQaFacade', () => {
 		expect(facade.error()).toBe(true);
 		expect(facade.faqs()).toEqual([]);
 	});
+
+	it('relacionadas: misma categoría que la pregunta abierta, sin ella y con tope de 3', () => {
+		const comunes = [1, 2, 3, 4, 5].map((id) => ({ ...FAQS[0], id, pregunta: `Común ${id}` }));
+		load([...comunes, FAQS[1]]);
+
+		facade.select(1);
+
+		expect(facade.relacionadas().map((f) => f.id)).toEqual([2, 3, 4]);
+	});
+
+	it('relacionadas: vacío sin pregunta abierta o sin otras de su categoría', () => {
+		load();
+		expect(facade.relacionadas()).toEqual([]);
+
+		facade.select(2);
+
+		expect(facade.relacionadas()).toEqual([]);
+	});
 });

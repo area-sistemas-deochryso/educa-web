@@ -120,4 +120,17 @@ describe('AyudaQaComponent', () => {
 		expect(decodeURIComponent(router.url)).toContain('«zzz»');
 	});
 
+	it('«No útil» ofrece «Generar ticket» con la pregunta citada en el formulario', async () => {
+		await open('/ayuda/qa?faq=1');
+		const view = root();
+
+		const feedbackButtons = view.queryAll(By.css('.faq-detail__feedback button'));
+		feedbackButtons[feedbackButtons.length - 1].nativeElement.click();
+		harness.detectChanges();
+		view.query(By.css('.faq-detail__feedback button')).nativeElement.click();
+		await harness.fixture.whenStable();
+
+		expect(router.url).toContain('/ayuda/ticket');
+		expect(decodeURIComponent(router.url)).toContain('«¿Cómo cambio mi contraseña?»');
+	});
 });

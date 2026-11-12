@@ -7,7 +7,6 @@ import {
 	computed,
 	effect,
 	inject,
-	signal,
 	untracked,
 	viewChild,
 } from '@angular/core';
@@ -19,7 +18,6 @@ import { FaqDto } from '../../models/faq.models';
 import { FaqDetailComponent } from './components/faq-detail/faq-detail.component';
 import { FaqHeaderComponent } from './components/faq-header/faq-header.component';
 import { FaqListComponent } from './components/faq-list/faq-list.component';
-import { FaqWizardDialogComponent } from './components/faq-wizard-dialog/faq-wizard-dialog.component';
 import { AyudaQaFacade, ModoVista } from './services/ayuda-qa.facade';
 import { EduButton, EduSpinner } from '@edu-ui';
 // #endregion
@@ -41,7 +39,6 @@ const FAQ_QUERY_PARAM = 'faq';
 		FaqHeaderComponent,
 		FaqListComponent,
 		FaqDetailComponent,
-		FaqWizardDialogComponent,
 	],
 	providers: [AyudaQaFacade],
 	templateUrl: './ayuda-qa.component.html',
@@ -67,15 +64,11 @@ export class AyudaQaComponent implements OnInit {
 	readonly todasCount = this.facade.todasCount;
 	readonly populares = this.facade.populares;
 	readonly selectedFaq = this.facade.selectedFaq;
+	readonly relacionadas = this.facade.relacionadas;
 	readonly selectedId = this.facade.selectedId;
 	readonly headerCompact = this.facade.isFiltering;
 
 	readonly detailOpen = computed(() => this.selectedFaq() !== null);
-	// #endregion
-
-	// #region Estado local — wizard
-	readonly wizardFaq = signal<FaqDto | null>(null);
-	readonly wizardVisible = computed(() => this.wizardFaq() !== null);
 	// #endregion
 
 	// #region Enlace directo (?faq=<id>)
@@ -139,19 +132,21 @@ export class AyudaQaComponent implements OnInit {
 		});
 	}
 
-	onOpenWizard(faq: FaqDto): void {
-		if (faq.wizard) this.wizardFaq.set(faq);
-	}
-
-	onWizardVisibleChange(visible: boolean): void {
-		if (!visible) this.wizardFaq.set(null);
+	/** «No útil» → ticket con la pregunta citada (el formulario la precarga desde `?descripcion=`). */
+	onFaqTicketRequested(faq: FaqDto): void {
+		void this.router.navigate(['../ticket'], {
+			relativeTo: this.route,
+			queryParams: {
+				descripcion: `Consulta sobre la pregunta frecuente «${faq.pregunta}»: la respuesta no me resolvió el problema.`,
+			},
+		});
 	}
 	// #endregion
 
 	// #region Atajos de lista
 	@HostListener('document:keydown', ['$event'])
 	onKeydown(event: KeyboardEvent): void {
-		if (this.wizardVisible() || event.ctrlKey || event.metaKey || event.altKey) return;
+		if (event.ctrlKey || event.metaKey || event.altKey) return;
 
 		if (event.key === 'Escape' && this.detailOpen()) {
 			this.onFaqSelected(null);

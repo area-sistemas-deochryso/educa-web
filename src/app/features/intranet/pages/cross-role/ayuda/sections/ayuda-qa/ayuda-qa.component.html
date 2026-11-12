@@ -70,7 +70,9 @@
 				@if (selectedFaq(); as faq) {
 					<app-faq-detail
 						[faq]="faq"
-						(openWizard)="onOpenWizard($event)"
+						[relacionadas]="relacionadas()"
+						(relatedSelected)="onFaqSelected($event)"
+						(ticketRequested)="onFaqTicketRequested($event)"
 						(back)="onFaqSelected(null)"
 					/>
 				} @else {
@@ -81,11 +83,3 @@
 	}
 	<!-- #endregion -->
 </div>
-
-<!-- #region Wizard -->
-<app-faq-wizard-dialog
-	[visible]="wizardVisible()"
-	[wizard]="wizardFaq()?.wizard ?? null"
-	(visibleChange)="onWizardVisibleChange($event)"
-/>
-<!-- #endregion -->

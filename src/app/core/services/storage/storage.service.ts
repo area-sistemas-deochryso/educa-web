@@ -9,6 +9,7 @@ import {
 	NotificationStorageData,
 	AttendanceMonthData,
 	PermisosStorageData,
+	AyudaGuideProgress,
 } from './storage.models';
 import { SessionStorageService } from './session-storage.service';
 import {
@@ -291,6 +292,16 @@ export class StorageService {
 
 	setAyudaFabPosition(position: { x: number; y: number }): void {
 		this.preferences.setAyudaFabPosition(position);
+	}
+	// #endregion
+
+	// #region AYUDA GUIDE PROGRESS (P122 F5)
+	getAyudaGuideProgress(faqId: number): AyudaGuideProgress | null {
+		return this.preferences.getAyudaGuideProgress(faqId);
+	}
+
+	setAyudaGuideProgress(faqId: number, progress: AyudaGuideProgress): void {
+		this.preferences.setAyudaGuideProgress(faqId, progress);
 	}
 	// #endregion
 

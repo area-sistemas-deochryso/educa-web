@@ -2,7 +2,7 @@ import { Injectable, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { logger } from '@app/core/helpers';
 import { QuickAccessLayout } from '@data/models';
-import { AttendanceMonthData } from './storage.models';
+import { AttendanceMonthData, AyudaGuideProgress } from './storage.models';
 import { SessionStorageService } from './session-storage.service';
 
 /**
@@ -62,6 +62,9 @@ const PREFERENCES_KEYS = {
 
 	// Brief 485 — draggable "Ayuda" FAB position
 	AYUDA_FAB_POSITION: 'educa_pref_ayuda_fab_position',
+
+	// P122 F5 — avance de las guías de Preguntas frecuentes (sufijo: id de la pregunta)
+	AYUDA_GUIDE_PROGRESS_PREFIX: 'educa_pref_ayuda_guia_',
 
 	// Fusión FAB Ayuda+Reportar — ocultar/mostrar manual
 	FAB_MENU_HIDDEN: 'educa_pref_fab_menu_hidden',
@@ -681,6 +684,18 @@ export class PreferencesStorageService {
 
 	setAyudaFabPosition(position: { x: number; y: number }): void {
 		this.setJSON(PREFERENCES_KEYS.AYUDA_FAB_POSITION, position);
+	}
+
+	// #endregion
+	// #region AYUDA GUIDE PROGRESS (P122 F5)
+
+	/** Avance guardado de la guía de una pregunta frecuente. `null` si nunca se trabajó. */
+	getAyudaGuideProgress(faqId: number): AyudaGuideProgress | null {
+		return this.getJSON<AyudaGuideProgress>(`${PREFERENCES_KEYS.AYUDA_GUIDE_PROGRESS_PREFIX}${faqId}`);
+	}
+
+	setAyudaGuideProgress(faqId: number, progress: AyudaGuideProgress): void {
+		this.setJSON(`${PREFERENCES_KEYS.AYUDA_GUIDE_PROGRESS_PREFIX}${faqId}`, progress);
 	}
 
 	// #endregion

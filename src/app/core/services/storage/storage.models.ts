@@ -54,3 +54,11 @@ export interface PermisosStorageData {
 /** Re-export AuthUser for convenience. */
 export type { AuthUser };
 // #endregion
+
+/** Avance de una guía de Ayuda > Preguntas frecuentes (por pregunta). */
+export interface AyudaGuideProgress {
+	/** Posición (desde 0) de los pasos marcados como hechos. */
+	done: number[];
+	/** Posición (desde 0) del último paso trabajado, o `null` si todavía no hay ninguno. */
+	current: number | null;
+}

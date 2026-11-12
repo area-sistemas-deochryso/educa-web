@@ -1,0 +1,60 @@
+<section class="faq-guide" aria-label="Guía paso a paso">
+	<header class="faq-guide__header">
+		<strong class="faq-guide__title">Guía paso a paso</strong>
+		<span class="faq-guide__meta">{{ total() }} {{ total() === 1 ? 'paso' : 'pasos' }} · unos {{ minutes() }} min</span>
+	</header>
+
+	<div class="faq-guide__progress">
+		<div
+			class="faq-guide__bar"
+			role="progressbar"
+			aria-label="Progreso de la guía"
+			aria-valuemin="0"
+			[attr.aria-valuemax]="total()"
+			[attr.aria-valuenow]="doneCount()"
+		>
+			<div class="faq-guide__bar-fill" [style.width.%]="percent()"></div>
+		</div>
+		<span class="faq-guide__count">
+			@if (finished()) {
+				¡Guía completa!
+			} @else {
+				{{ doneCount() }} de {{ total() }} pasos
+			}
+		</span>
+	</div>
+
+	<ol class="faq-guide__steps">
+		@for (step of steps(); track step.index) {
+			<li
+				class="faq-guide__step"
+				[class.faq-guide__step--done]="step.done"
+				[class.faq-guide__step--current]="current() === step.index"
+			>
+				<button
+					type="button"
+					class="faq-guide__check"
+					[attr.aria-pressed]="step.done"
+					[attr.aria-current]="current() === step.index ? 'step' : null"
+					(click)="toggle(step.index)"
+					(focus)="onStepFocus(step.index)"
+				>
+					<span class="faq-guide__box" aria-hidden="true">
+						@if (step.done) {
+							<i class="pi pi-check"></i>
+						} @else {
+							{{ step.index + 1 }}
+						}
+					</span>
+					<span class="faq-guide__step-title">{{ step.title }}</span>
+				</button>
+				<div class="faq-guide__body">
+					<p class="faq-guide__text">{{ step.texto }}</p>
+					@if (step.imagenUrl) {
+						<img [src]="step.imagenUrl" alt="" class="faq-guide__image" loading="lazy" />
+					}
+				</div>
+			</li>
+		}
+	</ol>
+</section>
