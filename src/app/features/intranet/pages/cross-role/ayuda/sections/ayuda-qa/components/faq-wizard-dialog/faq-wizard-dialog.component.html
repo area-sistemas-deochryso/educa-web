@@ -8,10 +8,16 @@
 	(onHide)="onHide()"
 >
 	@if (wizard(); as w) {
+		<div class="wizard-progreso">
+			<span class="wizard-progreso__texto">Paso {{ activeStep() + 1 }} de {{ totalPasos() }}</span>
+			<div class="wizard-progreso__barra">
+				<div class="wizard-progreso__relleno" [style.width.%]="progresoPorcentaje()"></div>
+			</div>
+		</div>
 		<edu-stepper [value]="activeStep()" (valueChange)="goToStep(+$event)">
 			<edu-step-list>
 				@for (paso of w.pasos; track paso.orden; let i = $index) {
-					<edu-step [value]="i">Paso {{ i + 1 }}</edu-step>
+					<edu-step [value]="i">Paso {{ i + 1 }} de {{ totalPasos() }}</edu-step>
 				}
 			</edu-step-list>
 

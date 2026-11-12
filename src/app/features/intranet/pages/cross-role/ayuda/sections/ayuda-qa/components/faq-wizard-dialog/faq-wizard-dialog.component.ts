@@ -30,6 +30,12 @@ export class FaqWizardDialogComponent {
 	readonly activeStep = signal(0);
 
 	readonly pasos = computed(() => this.wizard()?.pasos ?? []);
+	readonly totalPasos = computed(() => this.pasos().length);
+	readonly progresoPorcentaje = computed(() => {
+		const total = this.totalPasos();
+		if (total === 0) return 0;
+		return Math.round(((this.activeStep() + 1) / total) * 100);
+	});
 	readonly isLastStep = computed(() => this.activeStep() >= this.pasos().length - 1);
 	// #endregion
 
