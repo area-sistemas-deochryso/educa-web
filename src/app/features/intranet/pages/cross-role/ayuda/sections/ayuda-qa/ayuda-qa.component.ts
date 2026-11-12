@@ -14,7 +14,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { map } from 'rxjs/operators';
 
-import { FaqDto } from '../../models/faq.models';
+import { FaqDto, FaqMotivo } from '../../models/faq.models';
 import { FaqDetailComponent } from './components/faq-detail/faq-detail.component';
 import { FaqHeaderComponent } from './components/faq-header/faq-header.component';
 import { FaqListComponent } from './components/faq-list/faq-list.component';
@@ -65,6 +65,7 @@ export class AyudaQaComponent implements OnInit {
 	readonly populares = this.facade.populares;
 	readonly selectedFaq = this.facade.selectedFaq;
 	readonly relacionadas = this.facade.relacionadas;
+	readonly selectedVote = this.facade.selectedVote;
 	readonly selectedId = this.facade.selectedId;
 	readonly headerCompact = this.facade.isFiltering;
 
@@ -130,6 +131,10 @@ export class AyudaQaComponent implements OnInit {
 			relativeTo: this.route,
 			queryParams: { descripcion },
 		});
+	}
+
+	onVoted(faqId: number, vote: { util: boolean; motivo: FaqMotivo | null }): void {
+		this.facade.vote(faqId, vote.util, vote.motivo);
 	}
 
 	/** «No útil» → ticket con la pregunta citada (el formulario la precarga desde `?descripcion=`). */

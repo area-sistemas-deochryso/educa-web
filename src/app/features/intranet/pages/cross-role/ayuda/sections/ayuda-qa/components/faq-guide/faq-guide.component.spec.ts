@@ -145,4 +145,22 @@ describe('FaqGuideComponent', () => {
 		expect(checks()[0].getAttribute('aria-pressed')).toBe('true');
 		expect(checks()[1].getAttribute('aria-pressed')).toBe('false');
 	});
+
+	it('usa el título real del paso y deriva el del texto cuando no hay', () => {
+		fixture = TestBed.createComponent(FaqGuideComponent);
+		fixture.componentRef.setInput('faqId', 11);
+		fixture.componentRef.setInput('wizard', {
+			titulo: null,
+			pasos: [
+				{ orden: 1, texto: 'Abre el menú. Elige Asistencias.', imagenUrl: null, titulo: 'Entrar a Asistencias' },
+				{ orden: 2, texto: 'Marca a cada estudiante.', imagenUrl: null, titulo: null },
+				{ orden: 3, texto: 'Guarda los cambios.', imagenUrl: null, titulo: '   ' },
+			],
+		});
+		fixture.detectChanges();
+
+		const titles = fixture.debugElement.queryAll(By.css('.faq-guide__step-title')).map((d) => d.nativeElement.textContent.trim());
+
+		expect(titles).toEqual(['Entrar a Asistencias', 'Marca a cada estudiante', 'Guarda los cambios']);
+	});
 });

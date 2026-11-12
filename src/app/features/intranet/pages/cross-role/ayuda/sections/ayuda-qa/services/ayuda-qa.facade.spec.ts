@@ -195,4 +195,109 @@ describe('AyudaQaFacade', () => {
 
 		expect(facade.relacionadas()).toEqual([]);
 	});
+
+	// #region F6 — integración con el servidor
+	const consultasReq = (): ReturnType<HttpTestingController['expectOne']> =>
+		httpMock.expectOne((r) => r.url === FAQ_API && r.params.get('orden') === 'consultas');
+	const aperturaUrl = (id: number): string => `${FAQ_API}/${id}/apertura`;
+
+	it('populares sigue el orden de «más consultadas» del servidor', () => {
+		load();
+		consultasReq().flush([FAQS[1], FAQS[0], FAQS[2]]);
+
+		expect(facade.populares().map((f) => f.id)).toEqual([2, 1]);
+	});
+
+	it('populares usa las primeras del rol si falla el orden del servidor', () => {
+		load();
+		consultasReq().flush('fail', { status: 500, statusText: 'Server Error' });
+
+		expect(facade.populares().map((f) => f.id)).toEqual([1, 2]);
+	});
+
+	it('pinta el voto guardado en el servidor al volver a la pregunta', () => {
+		load();
+		httpMock.expectOne(`${FAQ_API}/feedback/mios`).flush([{ faqId: 2, util: false, motivo: 'DESACTUALIZADA' }]);
+
+		facade.select(2);
+
+		expect(facade.selectedVote()).toEqual({ util: false, motivo: 'DESACTUALIZADA' });
+	});
+
+	it('votar se refleja al instante y envía el voto con su motivo', () => {
+		load();
+		facade.select(1);
+
+		facade.vote(1, false, 'INCOMPLETA');
+
+		expect(facade.selectedVote()).toEqual({ util: false, motivo: 'INCOMPLETA' });
+		const req = httpMock.expectOne(`${FAQ_API}/1/feedback`);
+		expect(req.request.method).toBe('PUT');
+		expect(req.request.body).toEqual({ util: false, motivo: 'INCOMPLETA' });
+	});
+
+	it('un voto «útil» no envía motivo y reemplaza al anterior', () => {
+		load();
+		facade.select(1);
+		facade.vote(1, false, 'INCOMPLETA');
+		httpMock.expectOne(`${FAQ_API}/1/feedback`);
+
+		facade.vote(1, true, 'INCOMPLETA');
+
+		expect(facade.selectedVote()).toEqual({ util: true, motivo: null });
+		expect(httpMock.expectOne(`${FAQ_API}/1/feedback`).request.body).toEqual({ util: true });
+	});
+
+	it('si el servidor rechaza el voto, se descarta sin romper nada', () => {
+		load();
+		facade.select(1);
+		facade.vote(1, true);
+
+		httpMock.expectOne(`${FAQ_API}/1/feedback`).flush('fail', { status: 429, statusText: 'Too Many Requests' });
+
+		expect(facade.error()).toBe(false);
+		expect(facade.faqs().length).toBe(3);
+	});
+
+	it('cuenta la apertura una sola vez por pregunta y por visita', () => {
+		load();
+
+		facade.select(1);
+		httpMock.expectOne(aperturaUrl(1)).flush(null, { status: 204, statusText: 'No Content' });
+		facade.select(null);
+		facade.select(1);
+		httpMock.expectNone(aperturaUrl(1));
+
+		facade.select(2);
+		expect(httpMock.expectOne(aperturaUrl(2)).request.method).toBe('POST');
+	});
+
+	it('un enlace directo cuenta la apertura cuando las preguntas ya cargaron', () => {
+		facade.init();
+		facade.select(1);
+		httpMock.expectNone(aperturaUrl(1));
+
+		httpMock.expectOne(FAQ_API).flush(FAQS);
+
+		httpMock.expectOne(aperturaUrl(1));
+	});
+
+	it('una pregunta que no existe no registra apertura', () => {
+		load();
+
+		facade.select(999);
+
+		httpMock.expectNone(aperturaUrl(999));
+	});
+
+	it('si falla el registro de la apertura, la lectura sigue', () => {
+		load();
+		facade.select(1);
+
+		httpMock.expectOne(aperturaUrl(1)).flush('fail', { status: 500, statusText: 'Server Error' });
+
+		expect(facade.error()).toBe(false);
+		expect(facade.selectedFaq()?.id).toBe(1);
+	});
+	// #endregion
 });

@@ -71,6 +71,8 @@
 					<app-faq-detail
 						[faq]="faq"
 						[relacionadas]="relacionadas()"
+						[vote]="selectedVote()"
+						(voted)="onVoted(faq.id, $event)"
 						(relatedSelected)="onFaqSelected($event)"
 						(ticketRequested)="onFaqTicketRequested($event)"
 						(back)="onFaqSelected(null)"

@@ -127,10 +127,26 @@ describe('AyudaQaComponent', () => {
 		const feedbackButtons = view.queryAll(By.css('.faq-detail__feedback button'));
 		feedbackButtons[feedbackButtons.length - 1].nativeElement.click();
 		harness.detectChanges();
-		view.query(By.css('.faq-detail__feedback button')).nativeElement.click();
+		view.query(By.css('.faq-detail__ticket button')).nativeElement.click();
 		await harness.fixture.whenStable();
 
 		expect(router.url).toContain('/ayuda/ticket');
 		expect(decodeURIComponent(router.url)).toContain('«¿Cómo cambio mi contraseña?»');
+	});
+
+	it('«No útil» envía el voto al servidor y el motivo lo reemplaza', async () => {
+		await open('/ayuda/qa?faq=1');
+		const view = root();
+
+		const buttons = view.queryAll(By.css('.faq-detail__feedback button'));
+		buttons[buttons.length - 1].nativeElement.click();
+		const voto = httpMock.expectOne(`${FAQ_API}/1/feedback`);
+		expect(voto.request.body).toEqual({ util: false });
+
+		harness.detectChanges();
+		view.queryAll(By.css('.faq-detail__motivo'))[0].nativeElement.click();
+
+		const conMotivo = httpMock.expectOne(`${FAQ_API}/1/feedback`);
+		expect(conMotivo.request.body).toEqual({ util: false, motivo: 'INCOMPLETA' });
 	});
 });

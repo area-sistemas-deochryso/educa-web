@@ -41,7 +41,7 @@ export class FaqGuideComponent {
 	readonly steps = computed(() =>
 		this.wizard().pasos.map((paso, index) => ({
 			index,
-			title: deriveStepTitle(paso.texto),
+			title: paso.titulo?.trim() || deriveStepTitle(paso.texto),
 			texto: paso.texto,
 			imagenUrl: paso.imagenUrl,
 			done: this.done().has(index),

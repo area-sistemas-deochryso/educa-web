@@ -13,36 +13,54 @@
 		}
 	}
 
-	<div class="faq-detail__feedback">
-		@if (feedback()[faq().id]; as tipo) {
-			@if (tipo === 'util') {
-				<span class="faq-detail__confirm faq-detail__confirm--util">¡Gracias por tu feedback!</span>
+	<div class="faq-detail__feedback" role="group" aria-label="¿Te sirvió esta respuesta?">
+		<span class="faq-detail__feedback-label">¿Te sirvió esta respuesta?</span>
+		<edu-button
+			label="Útil"
+			icon="pi pi-thumbs-up"
+			size="small"
+			[outlined]="vote()?.util !== true"
+			(click)="votar(true)"
+		/>
+		<edu-button
+			label="No útil"
+			icon="pi pi-thumbs-down"
+			size="small"
+			severity="secondary"
+			[outlined]="vote()?.util !== false"
+			(click)="votar(false, vote()?.motivo ?? null)"
+		/>
+	</div>
+
+	@if (vote(); as v) {
+		<div class="faq-detail__voto" aria-live="polite">
+			@if (v.util) {
+				<span class="faq-detail__confirm faq-detail__confirm--util">¡Gracias por tu voto!</span>
 			} @else {
-				<span class="faq-detail__confirm">Lamentamos que no te haya servido. ¿Quieres consultarlo con soporte?</span>
+				<span class="faq-detail__confirm">Gracias. ¿Qué faltó?</span>
+				<div class="faq-detail__motivos" role="group" aria-label="Motivo">
+					@for (m of motivos; track m.value) {
+						<button
+							type="button"
+							class="faq-detail__motivo"
+							[class.faq-detail__motivo--activo]="v.motivo === m.value"
+							[attr.aria-pressed]="v.motivo === m.value"
+							(click)="votar(false, m.value)"
+						>
+							{{ m.label }}
+						</button>
+					}
+				</div>
 				<edu-button
+					class="faq-detail__ticket"
 					label="Generar ticket"
 					icon="pi pi-ticket"
 					size="small"
 					(click)="ticketRequested.emit(faq())"
 				/>
 			}
-		} @else {
-			<span class="faq-detail__feedback-label">¿Te sirvió esta respuesta?</span>
-			<edu-button
-				label="Útil"
-				icon="pi pi-thumbs-up"
-				size="small"
-				(click)="registrarFeedback(faq().id, 'util')"
-			/>
-			<edu-button
-				label="No útil"
-				icon="pi pi-thumbs-down"
-				size="small"
-				severity="secondary"
-				(click)="registrarFeedback(faq().id, 'no-util')"
-			/>
-		}
-	</div>
+		</div>
+	}
 
 	@if (relacionadas().length > 0) {
 		<nav class="faq-detail__related" aria-label="Preguntas relacionadas">

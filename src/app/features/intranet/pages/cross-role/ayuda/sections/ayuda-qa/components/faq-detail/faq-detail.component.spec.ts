@@ -3,7 +3,7 @@ import { By } from '@angular/platform-browser';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { FaqDto } from '@features/intranet/pages/cross-role/ayuda/models/faq.models';
-import { FaqDetailComponent } from './faq-detail.component';
+import { FaqDetailComponent, FaqVoteEvent } from './faq-detail.component';
 
 const FAQ_SIN_WIZARD: FaqDto = { id: 1, pregunta: '¿Cómo cambio mi contraseña?', respuesta: 'Ve a tu perfil.', categoria: 'Común', wizard: null };
 const FAQ_CON_WIZARD: FaqDto = {
@@ -16,6 +16,10 @@ const FAQ_CON_WIZARD: FaqDto = {
 
 describe('FaqDetailComponent', () => {
 	let fixture: ComponentFixture<FaqDetailComponent>;
+
+	function feedbackButtons(): HTMLButtonElement[] {
+		return fixture.debugElement.queryAll(By.css('.faq-detail__feedback button')).map((d) => d.nativeElement);
+	}
 
 	beforeEach(() => {
 		localStorage.clear();
@@ -49,25 +53,70 @@ describe('FaqDetailComponent', () => {
 		expect(backs).toBe(1);
 	});
 
-	it('registrar feedback útil reemplaza los botones por el agradecimiento', () => {
+	it('sin voto no muestra agradecimiento ni motivos', () => {
 		fixture.componentRef.setInput('faq', FAQ_SIN_WIZARD);
 		fixture.detectChanges();
 
-		fixture.componentInstance.registrarFeedback(1, 'util');
+		expect(fixture.debugElement.query(By.css('.faq-detail__voto'))).toBeNull();
+	});
+
+	it('«Útil» y «No útil» emiten el voto', () => {
+		const votos: FaqVoteEvent[] = [];
+		fixture.componentInstance.voted.subscribe((v) => votos.push(v));
+		fixture.componentRef.setInput('faq', FAQ_SIN_WIZARD);
+		fixture.detectChanges();
+
+		feedbackButtons()[0].click();
+		feedbackButtons()[1].click();
+
+		expect(votos).toEqual([
+			{ util: true, motivo: null },
+			{ util: false, motivo: null },
+		]);
+	});
+
+	it('con voto «útil» agradece y no pide motivo', () => {
+		fixture.componentRef.setInput('faq', FAQ_SIN_WIZARD);
+		fixture.componentRef.setInput('vote', { util: true, motivo: null });
 		fixture.detectChanges();
 
 		expect(fixture.debugElement.query(By.css('.faq-detail__confirm--util'))).not.toBeNull();
+		expect(fixture.debugElement.query(By.css('.faq-detail__motivo'))).toBeNull();
+	});
+
+	it('con voto «No útil» pide el motivo y emite el elegido', () => {
+		let emitted: FaqVoteEvent | null = null;
+		fixture.componentInstance.voted.subscribe((v) => (emitted = v));
+		fixture.componentRef.setInput('faq', FAQ_SIN_WIZARD);
+		fixture.componentRef.setInput('vote', { util: false, motivo: null });
+		fixture.detectChanges();
+
+		const motivos = fixture.debugElement.queryAll(By.css('.faq-detail__motivo'));
+		motivos[1].nativeElement.click();
+
+		expect(motivos.length).toBe(3);
+		expect(emitted).toEqual({ util: false, motivo: 'NO_ES_LO_QUE_BUSCO' });
+	});
+
+	it('marca el motivo vigente', () => {
+		fixture.componentRef.setInput('faq', FAQ_SIN_WIZARD);
+		fixture.componentRef.setInput('vote', { util: false, motivo: 'DESACTUALIZADA' });
+		fixture.detectChanges();
+
+		const activos = fixture.debugElement.queryAll(By.css('.faq-detail__motivo--activo'));
+
+		expect(activos.length).toBe(1);
+		expect(activos[0].nativeElement.textContent).toContain('desactualizada');
 	});
 
 	it('«No útil» ofrece «Generar ticket» y lo emite con la pregunta', () => {
 		let emitted: FaqDto | null = null;
 		fixture.componentInstance.ticketRequested.subscribe((f) => (emitted = f));
 		fixture.componentRef.setInput('faq', FAQ_SIN_WIZARD);
+		fixture.componentRef.setInput('vote', { util: false, motivo: null });
 		fixture.detectChanges();
 
-		fixture.componentInstance.registrarFeedback(1, 'no-util');
-		fixture.detectChanges();
-		const button = fixture.debugElement.query(By.css('.faq-detail__feedback button'));
+		const button = fixture.debugElement.query(By.css('.faq-detail__ticket button'));
 		button.nativeElement.click();
 
 		expect(button.nativeElement.textContent).toContain('Generar ticket');

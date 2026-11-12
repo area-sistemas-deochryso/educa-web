@@ -1,12 +1,12 @@
 // #region Imports
 import { DestroyRef, Injectable, inject, signal, computed } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { catchError, of } from 'rxjs';
+import { EMPTY, catchError, of } from 'rxjs';
 
 import { AuthService } from '@core/services';
 import { logger } from '@core/helpers';
 
-import { FaqDto } from '@features/intranet/pages/cross-role/ayuda/models/faq.models';
+import { FaqDto, FaqMotivo, FaqVoto } from '@features/intranet/pages/cross-role/ayuda/models/faq.models';
 import { FaqService } from '@features/intranet/pages/cross-role/ayuda/services/faq.service';
 // #endregion
 
@@ -52,6 +52,12 @@ export class AyudaQaFacade {
 	private readonly _selectedId = signal<number | null>(null);
 	private readonly _loading = signal(false);
 	private readonly _error = signal(false);
+	/** Votos vigentes por pregunta (`faqId`). */
+	private readonly _votes = signal<Record<number, FaqVoto>>({});
+	/** Ids en el orden de «más consultadas» del servidor; `null` mientras no llegó o si falló. */
+	private readonly _consultadasIds = signal<number[] | null>(null);
+	/** Preguntas cuya apertura ya se contó en esta visita a la sección. */
+	private readonly openedIds = new Set<number>();
 
 	readonly rolUsuario = computed(() => this.authService.currentUser?.rol);
 
@@ -99,11 +105,19 @@ export class AyudaQaFacade {
 		() => this._searchTerm().trim() !== '' || this._categoria() !== null,
 	);
 
-	/** Sustituto de «más consultadas» hasta F6: primeras preguntas del rol. */
+	/**
+	 * «Más consultadas»: las primeras del rol según el orden del servidor. Si ese orden no llegó
+	 * (falló o aún carga), se usan las primeras del rol en el orden de siempre.
+	 */
 	readonly populares = computed(() => {
 		const permitidas = this.categoriasPermitidas();
-		return this._faqs()
-			.filter((f) => permitidas.includes(f.categoria ?? 'Común'))
+		const visibles = this._faqs().filter((f) => permitidas.includes(f.categoria ?? 'Común'));
+		const ids = this._consultadasIds();
+		if (!ids) return visibles.slice(0, POPULARES_MAX);
+
+		const posicion = new Map(ids.map((id, i) => [id, i]));
+		return [...visibles]
+			.sort((a, b) => (posicion.get(a.id) ?? ids.length) - (posicion.get(b.id) ?? ids.length))
 			.slice(0, POPULARES_MAX);
 	});
 
@@ -119,6 +133,12 @@ export class AyudaQaFacade {
 		return this._faqs()
 			.filter((f) => f.id !== selected.id && f.categoria === selected.categoria)
 			.slice(0, RELACIONADAS_MAX);
+	});
+
+	/** Voto vigente de la pregunta abierta, o `null`. */
+	readonly selectedVote = computed(() => {
+		const id = this._selectedId();
+		return id === null ? null : (this._votes()[id] ?? null);
 	});
 
 	readonly categoria = this._categoria.asReadonly();
@@ -148,7 +168,10 @@ export class AyudaQaFacade {
 				this._faqs.set(faqs);
 				this._loading.set(false);
 				this.revealSelected();
+				this.trackOpening();
 			});
+
+		this.loadSecondary();
 	}
 
 	setCategoria(categoria: string | null): void {
@@ -172,10 +195,71 @@ export class AyudaQaFacade {
 	select(id: number | null): void {
 		this._selectedId.set(id);
 		this.revealSelected();
+		this.trackOpening();
+	}
+
+	/**
+	 * Guarda el voto: la UI lo refleja al instante y el envío es fire-and-forget. Si el servidor
+	 * lo rechaza se descarta sin avisar (la lectura nunca depende del voto).
+	 */
+	vote(faqId: number, util: boolean, motivo: FaqMotivo | null = null): void {
+		const voto: FaqVoto = { util, motivo: util ? null : motivo };
+		this._votes.update((votes) => ({ ...votes, [faqId]: voto }));
+
+		this.faqService
+			.votar(faqId, voto.util, voto.motivo)
+			.pipe(
+				catchError((err) => {
+					logger.warn('[AyudaQaFacade] Voto de FAQ descartado', err?.status);
+					return EMPTY;
+				}),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe();
 	}
 	// #endregion
 
 	// #region Private helpers
+	/** Votos propios y orden de «más consultadas»: si fallan, la sección funciona igual sin ellos. */
+	private loadSecondary(): void {
+		this.faqService
+			.misVotos()
+			.pipe(
+				catchError(() => of([])),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe((votos) => {
+				const porPregunta: Record<number, FaqVoto> = {};
+				for (const v of votos) porPregunta[v.faqId] = { util: v.util, motivo: v.util ? null : (v.motivo ?? null) };
+				// Un voto dado mientras cargaba prevalece sobre el guardado en el servidor.
+				this._votes.update((actuales) => ({ ...porPregunta, ...actuales }));
+			});
+
+		this.faqService
+			.getFaqsMasConsultadas()
+			.pipe(
+				catchError(() => of(null)),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe((faqs) => this._consultadasIds.set(faqs ? faqs.map((f) => f.id) : null));
+	}
+
+	/** Cuenta la apertura de la pregunta elegida, una vez por pregunta y por visita a la sección. */
+	private trackOpening(): void {
+		const id = this._selectedId();
+		if (id === null || this.openedIds.has(id)) return;
+		if (!this._faqs().some((f) => f.id === id)) return;
+
+		this.openedIds.add(id);
+		this.faqService
+			.registrarApertura(id)
+			.pipe(
+				catchError(() => EMPTY),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe();
+	}
+
 	/** Una pregunta elegida por enlace directo debe verse en la lista aunque haya filtros activos. */
 	private revealSelected(): void {
 		const id = this._selectedId();

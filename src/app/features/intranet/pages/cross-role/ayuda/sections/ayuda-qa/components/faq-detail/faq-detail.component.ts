@@ -1,18 +1,25 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 
-import { FaqDto } from '@features/intranet/pages/cross-role/ayuda/models/faq.models';
+import { FaqDto, FaqMotivo, FaqVoto } from '@features/intranet/pages/cross-role/ayuda/models/faq.models';
 import { EduButton } from '@edu-ui';
 import { FaqGuideComponent } from '../faq-guide/faq-guide.component';
 
-type FeedbackTipo = 'util' | 'no-util';
+export interface FaqVoteEvent {
+	util: boolean;
+	motivo: FaqMotivo | null;
+}
 
-const FEEDBACK_VISIBLE_MS = 3000;
+const MOTIVOS: readonly { value: FaqMotivo; label: string }[] = [
+	{ value: 'INCOMPLETA', label: 'Está incompleta' },
+	{ value: 'NO_ES_LO_QUE_BUSCO', label: 'No es lo que busco' },
+	{ value: 'DESACTUALIZADA', label: 'Está desactualizada' },
+];
 
 /**
  * Detalle de una FAQ (columna derecha del maestro-detalle): categoría, respuesta, guía en checklist,
- * preguntas relacionadas y feedback «¿Te sirvió?» (en memoria hasta que F6 lo envíe al servidor).
- * «No útil» ofrece generar un ticket con la pregunta citada. En móvil ocupa la pantalla completa
- * y `back` vuelve a la lista.
+ * voto «¿Te sirvió?» y preguntas relacionadas. El voto vigente llega por `vote` y los cambios salen por
+ * `voted` (quien lo persiste es el facade). «No útil» pide el motivo (opcional) y ofrece generar un
+ * ticket con la pregunta citada. En móvil ocupa la pantalla completa y `back` vuelve a la lista.
  */
 @Component({
 	selector: 'app-faq-detail',
@@ -23,36 +30,17 @@ const FEEDBACK_VISIBLE_MS = 3000;
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FaqDetailComponent {
-	private readonly destroyRef = inject(DestroyRef);
-
 	readonly faq = input.required<FaqDto>();
 	readonly relacionadas = input<FaqDto[]>([]);
+	readonly vote = input<FaqVoto | null>(null);
+	readonly voted = output<FaqVoteEvent>();
 	readonly relatedSelected = output<number>();
 	readonly ticketRequested = output<FaqDto>();
 	readonly back = output<void>();
 
-	private readonly _feedback = signal<Record<number, FeedbackTipo>>({});
-	readonly feedback = this._feedback.asReadonly();
+	readonly motivos = MOTIVOS;
 
-	private readonly timers = new Set<ReturnType<typeof setTimeout>>();
-
-	constructor() {
-		this.destroyRef.onDestroy(() => this.timers.forEach((t) => clearTimeout(t)));
-	}
-
-	registrarFeedback(faqId: number, tipo: FeedbackTipo): void {
-		this._feedback.update((estados) => ({ ...estados, [faqId]: tipo }));
-		// «No útil» queda visible: ofrece el ticket hasta que la persona cambie de pregunta.
-		if (tipo === 'no-util') return;
-
-		const timer = setTimeout(() => {
-			this.timers.delete(timer);
-			this._feedback.update((estados) => {
-				const nuevo = { ...estados };
-				delete nuevo[faqId];
-				return nuevo;
-			});
-		}, FEEDBACK_VISIBLE_MS);
-		this.timers.add(timer);
+	votar(util: boolean, motivo: FaqMotivo | null = null): void {
+		this.voted.emit({ util, motivo });
 	}
 }
