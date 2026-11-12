@@ -1,3 +1,26 @@
+.qa-modo-vista {
+	display: flex;
+	gap: 0.5rem;
+	margin-bottom: 0.75rem;
+
+	.p-button {
+		min-width: 9rem;
+		justify-content: center;
+	}
+
+	.p-button-outlined {
+		background: var(--surface-100);
+		border-color: var(--surface-200);
+		color: var(--text-color-secondary);
+	}
+
+	.p-button:not(.p-button-outlined) {
+		background: var(--primary-color);
+		border-color: var(--primary-color);
+		color: var(--primary-color-text);
+	}
+}
+
 .qa-filters {
 	display: flex;
 	flex-wrap: wrap;

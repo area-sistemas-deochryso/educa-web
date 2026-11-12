@@ -6,7 +6,7 @@ import { FaqDto } from '../../models/faq.models';
 import { FaqListComponent } from './components/faq-list/faq-list.component';
 import { FaqWizardDialogComponent } from './components/faq-wizard-dialog/faq-wizard-dialog.component';
 import { AyudaQaFacade } from './services/ayuda-qa.facade';
-import { EduInputText, EduSelect, EduSpinner } from '@edu-ui';
+import { EduButton, EduInputText, EduSelect, EduSpinner } from '@edu-ui';
 // #endregion
 
 interface CategoriaOption {
@@ -24,6 +24,7 @@ interface CategoriaOption {
 	standalone: true,
 	imports: [
 		FormsModule,
+		EduButton,
 		EduInputText,
 		EduSelect,
 		EduSpinner,
@@ -46,6 +47,7 @@ export class AyudaQaComponent implements OnInit {
 	readonly searchTerm = this.facade.searchTerm;
 	readonly loading = this.facade.loading;
 	readonly error = this.facade.error;
+	readonly modoVista = this.facade.modoVista;
 
 	readonly categoriaOptions = computed<CategoriaOption[]>(() => [
 		{ label: 'Todas las categorías', value: null },
@@ -69,6 +71,10 @@ export class AyudaQaComponent implements OnInit {
 
 	onSearchChange(value: string): void {
 		this.facade.setSearchTerm(value);
+	}
+
+	onModoVistaChange(modo: 'para-ti' | 'todas'): void {
+		this.facade.setModoVista(modo);
 	}
 
 	onOpenWizard(faq: FaqDto): void {

@@ -1,8 +1,9 @@
 // #region Imports
-import { DestroyRef, Injectable, inject, signal } from '@angular/core';
+import { DestroyRef, Injectable, inject, signal, computed } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Subject, catchError, debounceTime, distinctUntilChanged, of } from 'rxjs';
 
+import { AuthService } from '@core/services';
 import { logger } from '@core/helpers';
 
 import { FaqDto } from '@features/intranet/pages/cross-role/ayuda/models/faq.models';
@@ -30,13 +31,46 @@ export class AyudaQaFacade {
 	private readonly _categorias = signal<string[]>([]);
 	private readonly _categoria = signal<string | null>(null);
 	private readonly _searchTerm = signal('');
+	private readonly _modoVista = signal<'para-ti' | 'todas'>('todas');
 	private readonly _loading = signal(false);
 	private readonly _error = signal(false);
 
-	readonly faqs = this._faqs.asReadonly();
+	private readonly authService = inject(AuthService);
+
+	readonly rolUsuario = computed(() => this.authService.currentUser?.rol);
+
+	readonly categoriasPermitidas = computed(() => {
+		const rol = this.rolUsuario();
+		switch (rol) {
+			case 'Estudiante': return ['Estudiante', 'Común'];
+			case 'Profesor': return ['Profesor', 'Común'];
+			default: return ['Asistente Administrativo', 'Común'];
+		}
+	});
+
+	readonly faqsFiltradas = computed(() => {
+		let resultado = this._faqs();
+		const cat = this._categoria();
+		if (cat) resultado = resultado.filter((f) => f.categoria === cat);
+		const term = this._searchTerm();
+		if (term) {
+			const t = term.toLowerCase();
+			resultado = resultado.filter(
+				(f) => f.pregunta.toLowerCase().includes(t) || f.respuesta.toLowerCase().includes(t),
+			);
+		}
+		if (this._modoVista() === 'para-ti') {
+			const permitidas = this.categoriasPermitidas();
+			resultado = resultado.filter((f) => permitidas.includes(f.categoria ?? 'Común'));
+		}
+		return resultado;
+	});
+
+	readonly faqs = this.faqsFiltradas;
 	readonly categorias = this._categorias.asReadonly();
 	readonly categoria = this._categoria.asReadonly();
 	readonly searchTerm = this._searchTerm.asReadonly();
+	readonly modoVista = this._modoVista.asReadonly();
 	readonly loading = this._loading.asReadonly();
 	readonly error = this._error.asReadonly();
 	// #endregion
@@ -54,6 +88,10 @@ export class AyudaQaFacade {
 	setCategoria(categoria: string | null): void {
 		this._categoria.set(categoria);
 		this.loadFaqs();
+	}
+
+	setModoVista(modo: 'para-ti' | 'todas'): void {
+		this._modoVista.set(modo);
 	}
 
 	/** Búsqueda de texto libre con debounce vía Subject — mismo patrón que `UsersDataFacade`. */

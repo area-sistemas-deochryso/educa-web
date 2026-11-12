@@ -1,3 +1,18 @@
+<!-- #region Modo de vista -->
+<div class="qa-modo-vista">
+	<edu-button
+		label="Para ti"
+		[class.p-button-outlined]="modoVista() !== 'para-ti'"
+		(click)="onModoVistaChange('para-ti')"
+	/>
+	<edu-button
+		label="Todas"
+		[class.p-button-outlined]="modoVista() !== 'todas'"
+		(click)="onModoVistaChange('todas')"
+	/>
+</div>
+<!-- #endregion -->
+
 <!-- #region Filtros -->
 <div class="qa-filters">
 	<input
