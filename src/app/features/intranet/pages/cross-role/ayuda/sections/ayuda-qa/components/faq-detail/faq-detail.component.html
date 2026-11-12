@@ -1,0 +1,50 @@
+<article class="faq-detail">
+	<button type="button" class="faq-detail__back" (click)="back.emit()">
+		<i class="pi pi-arrow-left" aria-hidden="true"></i> Volver a la lista
+	</button>
+
+	<span class="faq-detail__categoria">{{ faq().categoria ?? 'Común' }}</span>
+	<h3 class="faq-detail__pregunta">{{ faq().pregunta }}</h3>
+	<p class="faq-detail__respuesta">{{ faq().respuesta }}</p>
+
+	@if (faq().wizard; as wizard) {
+		<div class="faq-detail__guia">
+			<span class="faq-detail__guia-info">
+				<strong>Guía paso a paso</strong>
+				<span>{{ wizard.pasos.length }} pasos</span>
+			</span>
+			<edu-button
+				label="Abrir guía"
+				icon="pi pi-arrow-right"
+				iconPos="right"
+				size="small"
+				(click)="openWizard.emit(faq())"
+			/>
+		</div>
+	}
+
+	<div class="faq-detail__feedback">
+		@if (feedback()[faq().id]; as tipo) {
+			@if (tipo === 'util') {
+				<span class="faq-detail__confirm faq-detail__confirm--util">¡Gracias por tu feedback!</span>
+			} @else {
+				<span class="faq-detail__confirm">Gracias. Trabajamos para mejorar esta respuesta.</span>
+			}
+		} @else {
+			<span class="faq-detail__feedback-label">¿Te sirvió esta respuesta?</span>
+			<edu-button
+				label="Útil"
+				icon="pi pi-thumbs-up"
+				size="small"
+				(click)="registrarFeedback(faq().id, 'util')"
+			/>
+			<edu-button
+				label="No útil"
+				icon="pi pi-thumbs-down"
+				size="small"
+				severity="secondary"
+				(click)="registrarFeedback(faq().id, 'no-util')"
+			/>
+		}
+	</div>
+</article>

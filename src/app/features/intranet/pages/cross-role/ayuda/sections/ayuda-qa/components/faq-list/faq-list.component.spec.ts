@@ -23,37 +23,50 @@ const FAQ_CON_WIZARD: FaqDto = {
 
 describe('FaqListComponent', () => {
 	let fixture: ComponentFixture<FaqListComponent>;
-	let component: FaqListComponent;
 
 	beforeEach(() => {
 		TestBed.configureTestingModule({ imports: [FaqListComponent] });
 		fixture = TestBed.createComponent(FaqListComponent);
-		component = fixture.componentInstance;
+		fixture.componentRef.setInput('faqs', [FAQ_SIN_WIZARD, FAQ_CON_WIZARD]);
 	});
 
-	it('una FAQ sin wizard no muestra el botón "ir"', () => {
-		fixture.componentRef.setInput('faqs', [FAQ_SIN_WIZARD]);
+	it('agrupa por categoría y solo marca con indicador de guía a la FAQ con wizard', () => {
 		fixture.detectChanges();
 
-		const button = fixture.debugElement.query(By.css('edu-button'));
-		expect(button).toBeNull();
+		expect(fixture.debugElement.queryAll(By.css('.faq-categoria'))).toHaveLength(2);
+		expect(fixture.debugElement.queryAll(By.css('.faq-item__guia'))).toHaveLength(1);
 	});
 
-	it('una FAQ con wizard muestra el botón "ir"', () => {
-		fixture.componentRef.setInput('faqs', [FAQ_CON_WIZARD]);
+	it('emite el id de la pregunta elegida', () => {
+		let emitted: number | null = null;
+		fixture.componentInstance.faqSelected.subscribe((id) => (emitted = id));
 		fixture.detectChanges();
 
-		const button = fixture.debugElement.query(By.css('edu-button'));
-		expect(button).not.toBeNull();
+		const items = fixture.debugElement.queryAll(By.css('.faq-item'));
+		items.find((d) => d.nativeElement.textContent.includes('registro asistencia'))?.nativeElement.click();
+
+		expect(emitted).toBe(2);
 	});
 
-	it('onOpenWizard emite la FAQ y detiene la propagación del click', () => {
-		let emitted: FaqDto | null = null;
-		component.openWizard.subscribe((faq) => (emitted = faq));
-		const event = { stopPropagation: () => {} } as Event;
+	it('solo la pregunta seleccionada queda marcada y la lista conserva su orden', () => {
+		fixture.componentRef.setInput('selectedId', 2);
+		fixture.detectChanges();
+		const antes = fixture.debugElement.queryAll(By.css('.faq-item')).map((d) => d.nativeElement.textContent.trim());
 
-		component.onOpenWizard(FAQ_CON_WIZARD, event);
+		fixture.componentRef.setInput('selectedId', 1);
+		fixture.detectChanges();
+		const items = fixture.debugElement.queryAll(By.css('.faq-item'));
 
-		expect(emitted).toEqual(FAQ_CON_WIZARD);
+		expect(items.filter((d) => d.nativeElement.classList.contains('faq-item--on'))).toHaveLength(1);
+		expect(items.map((d) => d.nativeElement.textContent.trim())).toEqual(antes);
+	});
+
+	it('resalta las coincidencias del término en la pregunta', () => {
+		fixture.componentRef.setInput('term', 'contraseña');
+		fixture.detectChanges();
+
+		const marks = fixture.debugElement.queryAll(By.css('.faq-item__mark'));
+		expect(marks).toHaveLength(1);
+		expect(marks[0].nativeElement.textContent).toBe('contraseña');
 	});
 });

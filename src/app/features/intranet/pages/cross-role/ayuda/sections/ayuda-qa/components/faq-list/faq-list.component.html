@@ -1,59 +1,38 @@
 @for (grupo of faqsPorCategoria(); track grupo.categoria) {
 	<section class="faq-categoria">
 		<div class="faq-categoria__header">
-			<i [class]="categoriaIconMap()[grupo.categoria]?.icon || 'pi pi-users'" class="faq-categoria__icon"></i>
-			<span class="faq-categoria__titulo">{{ grupo.categoria }}</span>
+			<i [class]="categoriaIconMap[grupo.categoria] || 'pi pi-users'" class="faq-categoria__icon" aria-hidden="true"></i>
+			<h4 class="faq-categoria__titulo">{{ grupo.categoria }}</h4>
 			<span class="faq-categoria__badge">{{ grupo.faqs.length }}</span>
 		</div>
-		<div class="faq-categoria__tarjetas">
-			<edu-accordion [multiple]="true">
-				@for (faq of grupo.faqs; track faq.id) {
-					<edu-accordion-panel [value]="faq.id.toString()">
-						<edu-accordion-header class="faq-header">
-							<span class="faq-question">{{ faq.pregunta }}</span>
-							<span class="faq-badge-rol">{{ grupo.categoria }}</span>
-							@if (faq.wizard) {
-								<edu-button
-									label="Ver guía paso a paso"
-									icon="pi pi-arrow-right"
-									iconPos="right"
-									size="small"
-									(click)="onOpenWizard(faq, $event)"
-								/>
-							}
-						</edu-accordion-header>
-
-						<p class="faq-answer">{{ faq.respuesta }}</p>
-
-						<div class="faq-feedback">
-							@if (feedbackEstado()[faq.id]) {
-								@if (feedbackEstado()[faq.id].tipo === 'util') {
-									<span class="feedback-confirm feedback-confirm--util">¡Gracias por tu feedback!</span>
+		<ul class="faq-categoria__items">
+			@for (faq of grupo.faqs; track faq.id) {
+				<li>
+					<button
+						type="button"
+						class="faq-item"
+						[class.faq-item--on]="faq.id === selectedId()"
+						[attr.aria-current]="faq.id === selectedId() ? 'true' : null"
+						(click)="faqSelected.emit(faq.id)"
+					>
+						<span class="faq-item__pregunta">
+							@for (seg of segments(faq.pregunta); track $index) {
+								@if (seg.match) {
+									<mark class="faq-item__mark">{{ seg.text }}</mark>
 								} @else {
-									<span class="feedback-confirm feedback-confirm--no-util">Gracias. Trabajamos para mejorar esta respuesta.</span>
+									{{ seg.text }}
 								}
-							} @else {
-								<div class="feedback-botones">
-									<edu-button
-										label="Útil"
-										icon="pi pi-thumbs-up"
-										size="small"
-										(click)="registrarFeedback(faq.id, 'util')"
-									/>
-									<edu-button
-										label="No útil"
-										icon="pi pi-thumbs-down"
-										iconPos="left"
-										size="small"
-										severity="secondary"
-										(click)="registrarFeedback(faq.id, 'no-util')"
-									/>
-								</div>
 							}
-						</div>
-					</edu-accordion-panel>
-				}
-			</edu-accordion>
-		</div>
+						</span>
+						@if (faq.wizard) {
+							<span class="faq-item__guia" title="Incluye guía paso a paso">
+								<i class="pi pi-list" aria-hidden="true"></i>
+								{{ faq.wizard.pasos.length }} pasos
+							</span>
+						}
+					</button>
+				</li>
+			}
+		</ul>
 	</section>
 }

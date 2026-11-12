@@ -1,0 +1,96 @@
+<header class="faq-header" [class.faq-header--compact]="compact()">
+	@if (!compact()) {
+		<div class="faq-header__hero">
+			<div class="faq-header__intro">
+				<h3 class="faq-header__title">¿Qué necesitas resolver hoy?</h3>
+				<p class="faq-header__lead">
+					Busca por palabra clave o elige una de las consultas más frecuentes de tu rol.
+				</p>
+			</div>
+		</div>
+	}
+
+	<div class="faq-header__bar">
+		<label class="faq-search" [class.faq-search--big]="!compact()">
+			<i class="pi pi-search faq-search__icon" aria-hidden="true"></i>
+			<input
+				#searchInput
+				type="text"
+				class="faq-search__input"
+				[placeholder]="compact() ? 'Buscar en preguntas frecuentes' : 'Ej.: corregir asistencia, alta de usuario…'"
+				aria-label="Buscar en preguntas frecuentes"
+				[value]="searchTerm()"
+				(input)="onSearchInput($event)"
+			/>
+			@if (compact()) {
+				<kbd class="faq-search__kbd" title="Presiona / para buscar">/</kbd>
+			}
+		</label>
+
+		<div class="faq-seg" role="group" aria-label="Modo de vista">
+			<button
+				type="button"
+				class="faq-seg__btn"
+				[class.faq-seg__btn--on]="modoVista() === 'para-ti'"
+				[attr.aria-pressed]="modoVista() === 'para-ti'"
+				(click)="modoChange.emit('para-ti')"
+			>
+				Para ti <em class="faq-seg__count">{{ paraTiCount() }}</em>
+			</button>
+			<button
+				type="button"
+				class="faq-seg__btn"
+				[class.faq-seg__btn--on]="modoVista() === 'todas'"
+				[attr.aria-pressed]="modoVista() === 'todas'"
+				(click)="modoChange.emit('todas')"
+			>
+				Todas <em class="faq-seg__count">{{ todasCount() }}</em>
+			</button>
+		</div>
+	</div>
+
+	<div class="faq-chips" role="group" aria-label="Categorías">
+		@for (chip of chips(); track chip.value) {
+			<button
+				type="button"
+				class="faq-chip"
+				[class.faq-chip--on]="categoria() === chip.value"
+				[attr.aria-pressed]="categoria() === chip.value"
+				(click)="categoriaChange.emit(chip.value)"
+			>
+				{{ chip.value ?? 'Todas' }}<em class="faq-chip__count">{{ chip.count }}</em>
+			</button>
+		}
+	</div>
+
+	@if (compact()) {
+		<p class="faq-header__meta" aria-live="polite">
+			{{ resultCount() === 1 ? '1 resultado' : resultCount() + ' resultados' }}
+		</p>
+	} @else {
+		<div class="faq-header__extras">
+			@if (populares().length > 0) {
+				<div class="faq-popular">
+					<h4 class="faq-popular__title">Más consultadas</h4>
+					@for (faq of populares(); track faq.id) {
+						<button type="button" class="faq-popular__item" (click)="faqSelected.emit(faq.id)">
+							<span>{{ faq.pregunta }}</span>
+							<i class="pi pi-arrow-right" aria-hidden="true"></i>
+						</button>
+					}
+				</div>
+			}
+			<aside class="faq-aside">
+				<h4 class="faq-aside__title">¿No encuentras tu respuesta?</h4>
+				<p class="faq-aside__text">Cuéntanos qué pasó y el equipo de soporte te responde.</p>
+				<edu-button
+					label="Generar ticket"
+					icon="pi pi-ticket"
+					severity="secondary"
+					size="small"
+					(click)="ticketRequested.emit()"
+				/>
+			</aside>
+		</div>
+	}
+</header>

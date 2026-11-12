@@ -2,6 +2,7 @@
 import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 
 import {
 	TICKET_DESCRIPCION_MAX,
@@ -50,6 +51,7 @@ export class AyudaTicketComponent implements OnInit {
 	// #region Dependencies
 	private readonly facade = inject(AyudaTicketFacade);
 	private readonly messageService = inject(EduMessageService);
+	private readonly route = inject(ActivatedRoute, { optional: true });
 	// #endregion
 
 	// #region State del facade
@@ -94,6 +96,13 @@ export class AyudaTicketComponent implements OnInit {
 
 	ngOnInit(): void {
 		this.facade.init();
+		this.prefillDescripcion();
+	}
+
+	/** Preguntas frecuentes puede llegar con la búsqueda sin respuesta (`?descripcion=`). */
+	private prefillDescripcion(): void {
+		const prefill = this.route?.snapshot.queryParamMap.get('descripcion')?.trim();
+		if (prefill) this.descripcion.set(prefill.slice(0, TICKET_DESCRIPCION_MAX));
 	}
 
 	onRetryTickets(): void {

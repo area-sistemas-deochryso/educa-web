@@ -1,54 +1,86 @@
-<!-- #region Modo de vista -->
-<div class="qa-modo-vista">
-	<edu-button
-		label="Para ti"
-		[class.p-button-outlined]="modoVista() !== 'para-ti'"
-		(click)="onModoVistaChange('para-ti')"
-	/>
-	<edu-button
-		label="Todas"
-		[class.p-button-outlined]="modoVista() !== 'todas'"
-		(click)="onModoVistaChange('todas')"
-	/>
-</div>
-<!-- #endregion -->
-
-<!-- #region Filtros -->
-<div class="qa-filters">
-	<input
-		type="text"
-		eduInputText
-		class="qa-filters__search"
-		placeholder="Buscar en preguntas frecuentes..."
-		[ngModel]="searchTerm()"
-		(ngModelChange)="onSearchChange($event)"
-	/>
-
-	<edu-select
-		[options]="categoriaOptions()"
-		optionLabel="label"
-		optionValue="value"
-		[ngModel]="categoria()"
-		(ngModelChange)="onCategoriaChange($event)"
-		placeholder="Todas las categorías"
-		[showClear]="false"
-	/>
-</div>
-<!-- #endregion -->
-
-<!-- #region Contenido -->
-@if (loading()) {
-	<div class="qa-loading">
-		<edu-spinner styleClass="w-3rem h-3rem" strokeWidth="4" />
+<div class="qa" [class.qa--detail-open]="detailOpen()">
+	<!-- #region Cabecera -->
+	<div class="qa__header">
+		<app-faq-header
+			[compact]="headerCompact()"
+			[searchTerm]="searchTerm()"
+			[modoVista]="modoVista()"
+			[categoria]="categoria()"
+			[chips]="chips()"
+			[paraTiCount]="paraTiCount()"
+			[todasCount]="todasCount()"
+			[resultCount]="faqs().length"
+			[populares]="populares()"
+			(searchChange)="onSearchChange($event)"
+			(modoChange)="onModoVistaChange($event)"
+			(categoriaChange)="onCategoriaChange($event)"
+			(faqSelected)="onFaqSelected($event)"
+			(ticketRequested)="onTicketRequested()"
+		/>
 	</div>
-} @else if (error()) {
-	<p class="qa-error">No se pudieron cargar las preguntas frecuentes. Intenta de nuevo más tarde.</p>
-} @else if (faqs().length === 0) {
-	<p class="qa-empty">No hay preguntas frecuentes para este filtro.</p>
-} @else {
-	<app-faq-list [faqs]="faqs()" (openWizard)="onOpenWizard($event)" />
-}
-<!-- #endregion -->
+	<!-- #endregion -->
+
+	<!-- #region Contenido -->
+	@if (loading()) {
+		<div class="qa-loading">
+			<edu-spinner styleClass="w-3rem h-3rem" strokeWidth="4" />
+		</div>
+	} @else if (error()) {
+		<p class="qa-error">No se pudieron cargar las preguntas frecuentes. Intenta de nuevo más tarde.</p>
+	} @else if (faqs().length === 0) {
+		<section class="qa-empty" aria-live="polite">
+			<h3 class="qa-empty__title">
+				@if (searchTerm().trim()) {
+					No encontramos resultados para «{{ searchTerm().trim() }}»
+				} @else {
+					No hay preguntas frecuentes para este filtro
+				}
+			</h3>
+			<ul class="qa-empty__tips">
+				<li>Revisa la ortografía o prueba con una sola palabra clave.</li>
+				<li>Cambia a «Todas» o quita la categoría para ampliar la búsqueda.</li>
+			</ul>
+			<div class="qa-empty__actions">
+				<edu-button
+					label="Limpiar búsqueda y filtros"
+					icon="pi pi-filter-slash"
+					severity="secondary"
+					size="small"
+					(click)="onClearFilters()"
+				/>
+				<edu-button
+					label="Generar ticket"
+					icon="pi pi-ticket"
+					size="small"
+					(click)="onTicketRequested()"
+				/>
+			</div>
+		</section>
+	} @else {
+		<div class="qa__layout">
+			<div class="qa__list">
+				<app-faq-list
+					[faqs]="faqs()"
+					[selectedId]="selectedId()"
+					[term]="searchTerm()"
+					(faqSelected)="onFaqSelected($event)"
+				/>
+			</div>
+			<div class="qa__detail">
+				@if (selectedFaq(); as faq) {
+					<app-faq-detail
+						[faq]="faq"
+						(openWizard)="onOpenWizard($event)"
+						(back)="onFaqSelected(null)"
+					/>
+				} @else {
+					<p class="qa__detail-hint">Elige una pregunta de la lista para ver su respuesta.</p>
+				}
+			</div>
+		</div>
+	}
+	<!-- #endregion -->
+</div>
 
 <!-- #region Wizard -->
 <app-faq-wizard-dialog
