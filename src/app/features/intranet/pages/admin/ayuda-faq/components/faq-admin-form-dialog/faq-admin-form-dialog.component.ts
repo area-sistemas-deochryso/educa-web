@@ -11,7 +11,11 @@ import {
 	WizardPasoInput,
 } from '../../models/faq-admin.models';
 import { EduButton, EduDialog, EduInputText, EduSelect, EduTextarea, EduTooltip } from '@edu-ui';
+import { deriveStepTitle } from '@features/intranet/pages/cross-role/ayuda/sections/ayuda-qa/helpers/faq-guide';
 // #endregion
+
+/** Máximo de caracteres del título de un paso (contrato `wizard.pasos[].titulo`). */
+export const PASO_TITULO_MAX_LENGTH = 120;
 
 interface CapabilityOption {
 	label: string;
@@ -52,6 +56,8 @@ export class FaqAdminFormDialogComponent {
 	readonly wizardTitulo = signal('');
 	readonly pasos = signal<WizardPasoInput[]>([]);
 
+	readonly pasoTituloMaxLength = PASO_TITULO_MAX_LENGTH;
+
 	readonly isEditing = computed(() => this.faq() !== null);
 	readonly headerLabel = computed(() => (this.isEditing() ? 'Editar FAQ' : 'Nueva FAQ'));
 
@@ -81,7 +87,7 @@ export class FaqAdminFormDialogComponent {
 	// #region Wizard steps
 	addPaso(): void {
 		const nextOrden = this.pasos().length + 1;
-		this.pasos.update((list) => [...list, { orden: nextOrden, texto: '', imagenUrl: null }]);
+		this.pasos.update((list) => [...list, { orden: nextOrden, titulo: null, texto: '', imagenUrl: null }]);
 	}
 
 	removePaso(index: number): void {
@@ -96,6 +102,15 @@ export class FaqAdminFormDialogComponent {
 		if (target < 0 || target >= list.length) return;
 		[list[index], list[target]] = [list[target], list[index]];
 		this.pasos.set(list.map((p, i) => ({ ...p, orden: i + 1 })));
+	}
+
+	updatePasoTitulo(index: number, titulo: string): void {
+		this.pasos.update((list) => list.map((p, i) => (i === index ? { ...p, titulo } : p)));
+	}
+
+	/** Título que la guía mostraría hoy si el paso no tiene uno propio. */
+	derivedTitulo(paso: WizardPasoInput): string {
+		return deriveStepTitle(paso.texto);
 	}
 
 	updatePasoTexto(index: number, texto: string): void {
@@ -124,7 +139,7 @@ export class FaqAdminFormDialogComponent {
 
 		const wizard =
 			this.pasos().length > 0
-				? { titulo: this.wizardTitulo().trim() || null, pasos: this.pasos() }
+				? { titulo: this.wizardTitulo().trim() || null, pasos: this.buildPasos() }
 				: null;
 
 		const base = {
@@ -148,6 +163,15 @@ export class FaqAdminFormDialogComponent {
 	// #endregion
 
 	// #region Private helpers
+	/** El PUT reemplaza el wizard en bloque: cada paso viaja con su título (vacío → null) y `orden` 1..N. */
+	private buildPasos(): WizardPasoInput[] {
+		return this.pasos().map((p, i) => ({
+			...p,
+			orden: i + 1,
+			titulo: p.titulo?.trim() || null,
+		}));
+	}
+
 	private resetForm(): void {
 		this.pregunta.set('');
 		this.respuesta.set('');

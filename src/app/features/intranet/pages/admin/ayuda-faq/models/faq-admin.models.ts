@@ -5,6 +5,8 @@
 /** Paso del wizard tal como lo envía/recibe el admin (editable). */
 export interface WizardPasoInput {
 	orden: number;
+	/** Título corto del paso (máx. 120). `null`/ausente → la guía deriva uno del texto. */
+	titulo?: string | null;
 	texto: string;
 	imagenUrl: string | null;
 }

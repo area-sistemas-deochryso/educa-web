@@ -100,6 +100,17 @@
 					<div class="wizard-step">
 						<div class="wizard-step-order">{{ $index + 1 }}</div>
 						<div class="wizard-step-fields">
+							<input
+								type="text"
+								eduInputText
+								class="w-full"
+								[placeholder]="derivedTitulo(paso) || 'Título del paso (opcional)'"
+								[attr.aria-label]="'Título del paso ' + ($index + 1)"
+								[ngModel]="paso.titulo ?? ''"
+								(ngModelChange)="updatePasoTitulo($index, $event)"
+								[attr.maxlength]="pasoTituloMaxLength"
+								data-info-anchor="admin-faq-form-paso-titulo-input"
+							/>
 							<textarea
 								eduTextarea
 								class="w-full"
