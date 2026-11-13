@@ -344,8 +344,12 @@ app-user-profile-menu {
 		width: 105px;
 	}
 
+	// Móvil: margen lateral mínimo de 20 px (antes 16 px, el contenido quedaba pegado a los bordes) y
+	// respeta las áreas seguras del teléfono (notch, barra lateral en horizontal).
 	.intranet-content {
-		padding: 1rem;
+		padding: 1rem 1.25rem;
+		padding-left: max(1.25rem, env(safe-area-inset-left, 0px));
+		padding-right: max(1.25rem, env(safe-area-inset-right, 0px));
 	}
 }
 // #endregion
