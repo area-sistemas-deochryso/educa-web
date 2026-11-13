@@ -7,7 +7,7 @@ import { PageHeaderComponent, KpiStatsComponent, type KpiStatItem } from '@intra
 import { EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleIconPipe, EstadoToggleLabelPipe } from '@intranet-shared/pipes';
 import { buildDeleteCursoMessage } from '@app/shared/constants';
 import { createClientPaging } from '@shared/utils';
-import { CardActionsComponent, CardRowComponent, MobileCardListComponent, injectIsMobile } from '@shared/components';
+import { CardActionsComponent, CardRowComponent, MobileCardListComponent, StickyFilterBarComponent, injectIsMobile } from '@shared/components';
 
 import { CursosFacade } from './services';
 import type { Curso } from './models';
@@ -16,7 +16,7 @@ import { EduButton, EduConfirmDialog, EduConfirmationService, EduDialog, EduInpu
 @Component({
 	selector: 'app-cursos',
 	standalone: true,
-	imports: [FormsModule, NgTemplateOutlet, MobileCardListComponent, CardRowComponent, CardActionsComponent, EduTable, EduButton, EduDialog, EduTooltip, EduTag, EduInputText, EduSelect, EduToggle, EduConfirmDialog, PageHeaderComponent, KpiStatsComponent, EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleIconPipe, EstadoToggleLabelPipe, EduSortableColumn],
+	imports: [FormsModule, NgTemplateOutlet, StickyFilterBarComponent, MobileCardListComponent, CardRowComponent, CardActionsComponent, EduTable, EduButton, EduDialog, EduTooltip, EduTag, EduInputText, EduSelect, EduToggle, EduConfirmDialog, PageHeaderComponent, KpiStatsComponent, EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleIconPipe, EstadoToggleLabelPipe, EduSortableColumn],
 	providers: [EduConfirmationService],
 	templateUrl: './cursos.component.html',
 	styleUrl: './cursos.component.scss',
@@ -38,6 +38,12 @@ export class CursosComponent implements OnInit {
 	readonly cursosPaging = createClientPaging(computed(() => this.vm().cursos));
 	/** En pantallas angostas la tabla se reemplaza por cards con paginación compartida (`cursosPaging`). */
 	readonly isMobile = injectIsMobile();
+
+	/** Filtros activos sin contar el buscador (lo muestra el botón «Filtros» de la barra compacta). */
+	readonly activeFilterCount = computed(() => {
+		const { filterEstado, filterNivel, filterCompletitud } = this.vm();
+		return [filterEstado, filterNivel, filterCompletitud].filter((v) => v !== null && v !== undefined).length;
+	});
 	// #endregion
 
 	// #region Stats KPI

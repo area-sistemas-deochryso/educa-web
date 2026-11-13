@@ -27,7 +27,7 @@
 	<app-kpi-stats [items]="statsItems()" />
 
 	<!-- * Filters -->
-	<section class="filters-section">
+	<section class="filters-section" #filtersEl>
 		<div class="search-box">
 			<i class="pi pi-search"></i>
 			<input
@@ -99,6 +99,45 @@
 			(click)="openNew()"
 		/>
 	</section>
+
+	<!-- Barra compacta: buscador y filtros siguen a mano cuando el bloque de arriba sale de la pantalla -->
+	<app-sticky-filter-bar
+		[watch]="filtersEl"
+		[searchTerm]="vm().searchTerm"
+		placeholder="Buscar por nombre..."
+		[activeFilters]="activeFilterCount()"
+		(searchChange)="onSearchTermChange($event)"
+		(clearFilters)="clearFilters()"
+	>
+		<edu-select
+			[options]="estadoOptions"
+			[optionLabel]="'label'"
+			[optionValue]="'value'"
+			[ngModel]="vm().filterEstado"
+			(ngModelChange)="onFilterEstadoChange($event)"
+			placeholder="Estado"
+			appendTo="body"
+		/>
+		<edu-select
+			[options]="nivelOptions"
+			[optionLabel]="'label'"
+			[optionValue]="'value'"
+			[ngModel]="vm().filterNivel"
+			(ngModelChange)="onFilterNivelChange($event)"
+			placeholder="Nivel educativo"
+			appendTo="body"
+		/>
+		<edu-select
+			[options]="completitudOptions"
+			[optionLabel]="'label'"
+			[optionValue]="'value'"
+			[ngModel]="vm().filterCompletitud"
+			(ngModelChange)="onFilterCompletitudChange($event)"
+			placeholder="Completitud"
+			appendTo="body"
+		/>
+		<edu-button sfbActions label="Nuevo Curso" icon="pi pi-plus" severity="success" (click)="openNew()" />
+	</app-sticky-filter-bar>
 
 	<!-- Table -->
 	<section class="table-section">
