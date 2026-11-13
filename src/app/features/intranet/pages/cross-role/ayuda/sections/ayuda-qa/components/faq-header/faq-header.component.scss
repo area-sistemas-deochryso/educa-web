@@ -21,7 +21,9 @@
 
 	&__lead {
 		margin: 0;
-		color: var(--text-color-secondary);
+		font-size: 1.0625rem;
+		font-weight: 400;
+		color: var(--faq-text-muted);
 	}
 
 	&__bar {
@@ -34,7 +36,7 @@
 	&__meta {
 		margin: 0;
 		font-size: 0.8125rem;
-		color: var(--text-color-secondary);
+		color: var(--faq-text-muted);
 	}
 
 	&__extras {
@@ -55,7 +57,7 @@
 	background: var(--surface-card, var(--surface-0));
 	border: 1px solid var(--surface-300);
 	border-radius: 0.75rem;
-	color: var(--text-color-secondary);
+	color: var(--faq-text-muted);
 
 	&:focus-within {
 		border-color: var(--primary-color);
@@ -105,21 +107,21 @@
 		border: 0;
 		border-radius: 0.5rem;
 		background: transparent;
-		color: var(--text-color-secondary);
+		color: var(--faq-text-muted);
 		font: inherit;
 		font-weight: 600;
 		cursor: pointer;
 
 		&--on {
-			background: var(--primary-color);
-			color: var(--primary-color-text);
+			background: var(--faq-accent-strong);
+			color: #fff;
 		}
 	}
 
 	&__count {
 		font-style: normal;
 		font-size: 0.75rem;
-		opacity: 0.85;
+		opacity: 1;
 	}
 }
 
@@ -134,22 +136,21 @@
 	border: 1px solid var(--surface-300);
 	border-radius: 999px;
 	background: transparent;
-	color: var(--text-color-secondary);
+	color: var(--faq-text-muted);
 	font: inherit;
 	font-size: 0.84rem;
 	cursor: pointer;
 
 	&--on {
-		border-color: var(--primary-color);
-		background: color-mix(in srgb, var(--primary-color) 12%, transparent);
-		color: var(--primary-color);
+		border-color: var(--faq-accent-strong);
+		background: color-mix(in srgb, var(--primary-color) 14%, transparent);
+		color: var(--faq-accent-strong);
 		font-weight: 600;
 	}
 
 	&__count {
 		margin-left: 0.35rem;
 		font-style: normal;
-		opacity: 0.7;
 	}
 }
 
@@ -162,7 +163,7 @@
 		font-size: 0.75rem;
 		letter-spacing: 0.1em;
 		text-transform: uppercase;
-		color: var(--text-color-secondary);
+		color: var(--faq-text-muted);
 	}
 
 	&__item {
@@ -170,6 +171,8 @@
 		align-items: center;
 		justify-content: space-between;
 		gap: 0.75rem;
+		/* El texto alinea con el borde del título y el buscador; el fondo de hover sobresale. */
+		margin-inline: -0.625rem;
 		padding: 0.5rem 0.625rem;
 		border: 0;
 		border-radius: 0.5rem;
@@ -199,7 +202,7 @@
 	&__text {
 		margin: 0 0 0.75rem;
 		font-size: 0.875rem;
-		color: var(--text-color-secondary);
+		color: var(--faq-text-muted);
 	}
 }
 

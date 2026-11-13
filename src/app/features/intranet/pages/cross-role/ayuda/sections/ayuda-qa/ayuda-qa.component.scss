@@ -1,3 +1,9 @@
+:host {
+	/* Acento oscurecido para texto y estados activos: --primary-color es un celeste pálido (ratio 1.4 sobre fondo claro). */
+	--faq-accent-strong: color-mix(in srgb, var(--primary-color) 45%, black);
+	--faq-text-muted: #475569;
+}
+
 .qa {
 	&__layout {
 		display: grid;
@@ -12,9 +18,12 @@
 	}
 
 	&__detail-hint {
+		display: grid;
+		place-items: center;
+		min-height: 16rem;
 		padding: 2rem 1rem;
 		text-align: center;
-		color: var(--text-color-secondary);
+		color: var(--faq-text-muted);
 		border: 1px dashed var(--surface-300);
 		border-radius: 0.875rem;
 	}

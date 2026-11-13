@@ -29,9 +29,9 @@ export class FaqListComponent {
 
 	readonly categoriaIconMap: Record<string, string> = {
 		Común: 'pi pi-users',
-		Profesor: 'pi pi-chalkboard-teacher',
-		Estudiante: 'pi pi-student',
-		'Asistente Administrativo': 'pi pi-user-shield',
+		Profesor: 'pi pi-book',
+		Estudiante: 'pi pi-graduation-cap',
+		'Asistente Administrativo': 'pi pi-briefcase',
 	};
 
 	readonly faqsPorCategoria = computed<CategoriaGrupo[]>(() => {
