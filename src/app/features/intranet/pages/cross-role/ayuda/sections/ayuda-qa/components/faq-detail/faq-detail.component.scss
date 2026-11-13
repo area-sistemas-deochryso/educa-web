@@ -15,7 +15,7 @@
 		padding: 0;
 		border: 0;
 		background: transparent;
-		color: var(--primary-color);
+		color: var(--faq-accent-strong);
 		font: inherit;
 		font-weight: 600;
 		cursor: pointer;
@@ -26,7 +26,7 @@
 		padding: 0.15rem 0.6rem;
 		border-radius: 999px;
 		background: var(--surface-100);
-		color: var(--text-color-secondary);
+		color: var(--faq-text-muted);
 		font-size: 0.75rem;
 		font-weight: 600;
 	}
@@ -58,13 +58,13 @@
 		flex: 1;
 		min-width: 10rem;
 		font-size: 0.875rem;
-		color: var(--text-color-secondary);
+		color: var(--faq-text-muted);
 	}
 
 	&__confirm {
 		font-size: 0.875rem;
 		font-weight: 600;
-		color: var(--text-color-secondary);
+		color: var(--faq-text-muted);
 
 		&--util {
 			color: var(--success-color, var(--primary-color));
@@ -95,7 +95,7 @@
 		cursor: pointer;
 
 		&--activo {
-			border-color: var(--primary-color);
+			border-color: var(--faq-accent-strong);
 			background: color-mix(in srgb, var(--primary-color) 12%, transparent);
 			font-weight: 600;
 		}
@@ -126,7 +126,7 @@
 		background: transparent;
 		font: inherit;
 		text-align: left;
-		color: var(--primary-color);
+		color: var(--faq-accent-strong);
 		cursor: pointer;
 
 		&:hover {

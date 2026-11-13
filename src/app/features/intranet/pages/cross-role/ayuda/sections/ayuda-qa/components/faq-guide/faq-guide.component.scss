@@ -19,7 +19,7 @@
 
 	&__meta {
 		font-size: 0.8125rem;
-		color: var(--text-color-secondary);
+		color: var(--faq-text-muted);
 	}
 
 	&__progress {
@@ -47,7 +47,7 @@
 		font-size: 0.8125rem;
 		font-weight: 600;
 		white-space: nowrap;
-		color: var(--text-color-secondary);
+		color: var(--faq-text-muted);
 	}
 
 	&__steps {
@@ -65,18 +65,18 @@
 		background: var(--surface-card, var(--surface-0));
 
 		&--current {
-			border-color: var(--primary-color);
+			border-color: var(--faq-accent-strong);
 		}
 
 		&--done .faq-guide__step-title {
 			text-decoration: line-through;
-			color: var(--text-color-secondary);
+			color: var(--faq-text-muted);
 		}
 
 		&--done .faq-guide__box {
-			border-color: var(--primary-color);
-			background: var(--primary-color);
-			color: var(--primary-color-text, #fff);
+			border-color: var(--faq-accent-strong);
+			background: var(--faq-accent-strong);
+			color: var(--faq-on-accent, #fff);
 		}
 	}
 
@@ -127,6 +127,7 @@
 
 	&__text {
 		margin: 0;
+		color: var(--faq-text-muted);
 		max-width: 68ch;
 		line-height: 1.6;
 		white-space: pre-line;
