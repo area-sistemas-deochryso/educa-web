@@ -23,6 +23,9 @@
 	&__detail {
 		position: sticky;
 		top: 8rem;
+		/* Una guía larga es más alta que la ventana: el panel scrollea por dentro. */
+		max-height: calc(100vh - 9rem);
+		overflow-y: auto;
 	}
 
 	&__detail-hint {
@@ -85,6 +88,8 @@
 
 	.qa__detail {
 		position: static;
+		max-height: none;
+		overflow-y: visible;
 		display: none;
 	}
 
