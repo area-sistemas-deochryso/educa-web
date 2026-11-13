@@ -1,18 +1,54 @@
-// Brief 485 (punto de mejora post-cierre): separación visual explícita entre el
-// concepto "crear" (formulario, acento azul de acción) y "presentación de lo ya
-// creado" (historial, acento neutro) -- antes ambos eran secciones sin borde,
-// indistinguibles en el scroll salvo por el texto del h3.
+// Rediseño de la pestaña «Generar ticket»: tarjetas neutras (sin el borde superior de color
+// que competía con el acento de la marca), jerarquía tipográfica clara, y colores por los
+// tokens de contraste del shell (`--faq-accent-strong`, `--faq-text-muted`, ratio >= 5.5).
 %ayuda-card {
-	padding: 1.25rem 1.5rem;
-	border: 1px solid var(--surface-300);
-	border-top: 3px solid var(--surface-300);
-	border-radius: 12px;
-	background: var(--surface-0, #fff);
+	padding: 1.5rem;
+	border: 1px solid var(--surface-200);
+	border-radius: 14px;
+	background: var(--surface-card, var(--surface-0, #fff));
 }
 
-// Dos columnas en desktop (formulario + vista previa en vivo, hallazgo 06 de
-// la auditoría /intranet/ayuda -- antes el formulario dejaba vacía la mitad
-// del viewport); colapsa a una columna por debajo de 1100px.
+.ticket-card__title {
+	margin: 0 0 0.25rem;
+	font-size: 1.25rem;
+	font-weight: 700;
+	color: var(--text-color);
+}
+
+.ticket-card__hint {
+	margin: 0 0 1.25rem;
+	font-size: 0.875rem;
+	color: var(--faq-text-muted);
+}
+
+// Intro: contexto y salida hacia las preguntas frecuentes antes de crear el ticket.
+.ticket-intro {
+	max-width: 48rem;
+	margin-bottom: 1.25rem;
+
+	&__title {
+		margin: 0 0 0.25rem;
+		font-size: 1.375rem;
+		font-weight: 700;
+		color: var(--text-color);
+	}
+
+	&__text {
+		margin: 0;
+		font-size: 1rem;
+		line-height: 1.5;
+		color: var(--faq-text-muted);
+	}
+
+	&__link {
+		font-weight: 600;
+		color: var(--faq-accent-strong);
+		text-decoration: underline;
+		text-underline-offset: 2px;
+	}
+}
+
+// Dos columnas en desktop (formulario + vista previa en vivo); una columna bajo 1100px.
 .ticket-layout {
 	display: grid;
 	grid-template-columns: minmax(0, 1fr);
@@ -23,68 +59,144 @@
 
 @media (min-width: 1100px) {
 	.ticket-layout {
-		grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+		grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+	}
+
+	.ticket-preview {
+		position: sticky;
+		top: 8rem;
 	}
 }
 
 .ticket-form {
 	@extend %ayuda-card;
-	border-top-color: var(--blue-500, #3b82f6);
 
-	h3 {
-		margin-top: 0;
-	}
-
-	&__eyebrow {
-		margin: 0 0 0.25rem;
-		font-size: 0.75rem;
+	&__req {
+		color: var(--red-600, #dc2626);
 		font-weight: 700;
-		letter-spacing: 0.04em;
-		text-transform: uppercase;
-		color: var(--blue-600, #2563eb);
 	}
 
 	&__field {
 		display: flex;
 		flex-direction: column;
-		gap: 0.35rem;
-		margin-bottom: 1rem;
+		gap: 0.4rem;
+		margin-bottom: 1.25rem;
 
 		label {
+			font-size: 0.9375rem;
 			font-weight: 600;
+			color: var(--text-color);
 		}
 	}
 
 	&__textarea {
 		width: 100%;
 		resize: vertical;
+		font-size: 1rem;
+		line-height: 1.5;
 	}
 
 	&__counter {
 		align-self: flex-end;
-		font-size: 0.8rem;
-		color: var(--text-color-secondary);
+		font-size: 0.8125rem;
+		color: var(--faq-text-muted);
 
 		&--invalid {
-			color: var(--red-500, #ef4444);
+			color: var(--red-700, #b91c1c);
 		}
+	}
+
+	&__actions {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.75rem 1rem;
+		padding-top: 0.25rem;
+	}
+
+	// Explica por qué «Enviar» está deshabilitado (el botón apagado no lo dice).
+	&__why {
+		margin: 0;
+		font-size: 0.875rem;
+		color: var(--faq-text-muted);
+	}
+}
+
+.ticket-preview {
+	@extend %ayuda-card;
+	background: var(--surface-50, var(--surface-card, #fff));
+
+	&__eyebrow {
+		margin: 0 0 0.25rem;
+		font-size: 0.75rem;
+		font-weight: 700;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--faq-text-muted);
+	}
+
+	&__body {
+		margin: 1rem 0 0;
+		display: flex;
+		flex-direction: column;
+		gap: 1.125rem;
+	}
+
+	&__row {
+		dt {
+			margin-bottom: 0.35rem;
+			font-size: 0.8125rem;
+			font-weight: 600;
+			color: var(--faq-text-muted);
+		}
+
+		dd {
+			margin: 0;
+			font-size: 1rem;
+			line-height: 1.5;
+			white-space: pre-wrap;
+			overflow-wrap: break-word;
+			color: var(--text-color);
+		}
+	}
+
+	&__chip {
+		display: inline-flex;
+		padding: 0.15rem 0.7rem;
+		border-radius: 999px;
+		background: color-mix(in srgb, var(--primary-color) 16%, transparent);
+		color: var(--faq-accent-strong);
+		font-size: 0.875rem;
+		font-weight: 600;
+	}
+
+	&__placeholder {
+		color: var(--faq-text-muted);
+		font-style: italic;
 	}
 }
 
 .ticket-history {
 	@extend %ayuda-card;
 
-	h3 {
-		margin-top: 0;
+	&__head {
+		display: flex;
+		align-items: center;
+		gap: 0.625rem;
+		margin-bottom: 1rem;
+
+		.ticket-card__title {
+			margin: 0;
+		}
 	}
 
-	&__eyebrow {
-		margin: 0 0 0.25rem;
-		font-size: 0.75rem;
-		font-weight: 700;
-		letter-spacing: 0.04em;
-		text-transform: uppercase;
-		color: var(--text-color-secondary);
+	&__count {
+		padding: 0.1rem 0.6rem;
+		border-radius: 999px;
+		background: var(--surface-100);
+		color: var(--faq-text-muted);
+		font-size: 0.8125rem;
+		font-weight: 600;
 	}
 
 	&__loading {
@@ -93,61 +205,37 @@
 		padding: 2rem 0;
 	}
 
-	&__error,
 	&__empty {
-		color: var(--text-color-secondary);
+		display: grid;
+		justify-items: center;
+		gap: 0.25rem;
+		padding: 2rem 1rem;
 		text-align: center;
-		padding: 2rem 0;
+		border: 1px dashed var(--surface-300);
+		border-radius: 12px;
+	}
+
+	&__empty-icon {
+		margin-bottom: 0.25rem;
+		font-size: 1.75rem;
+		color: var(--faq-accent-strong);
+	}
+
+	&__empty-title {
+		margin: 0;
+		font-weight: 600;
+		color: var(--text-color);
+	}
+
+	&__empty-text {
+		margin: 0;
+		font-size: 0.9375rem;
+		color: var(--faq-text-muted);
 	}
 
 	&__descripcion {
 		max-width: 24rem;
 		white-space: pre-wrap;
 		overflow-wrap: break-word;
-	}
-}
-
-.ticket-preview {
-	@extend %ayuda-card;
-	border-top-color: var(--blue-500, #3b82f6);
-
-	h3 {
-		margin-top: 0;
-	}
-
-	&__eyebrow {
-		margin: 0 0 0.25rem;
-		font-size: 0.75rem;
-		font-weight: 700;
-		letter-spacing: 0.04em;
-		text-transform: uppercase;
-		color: var(--blue-600, #2563eb);
-	}
-
-	&__body {
-		margin: 0;
-		display: flex;
-		flex-direction: column;
-		gap: 1rem;
-	}
-
-	&__row {
-		dt {
-			font-size: 0.8rem;
-			font-weight: 600;
-			color: var(--text-color-secondary);
-			margin-bottom: 0.25rem;
-		}
-
-		dd {
-			margin: 0;
-			white-space: pre-wrap;
-			overflow-wrap: break-word;
-		}
-	}
-
-	&__placeholder {
-		color: var(--text-color-secondary);
-		font-style: italic;
 	}
 }

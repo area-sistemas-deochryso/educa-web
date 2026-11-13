@@ -2,7 +2,7 @@
 import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import {
 	TICKET_DESCRIPCION_MAX,
@@ -41,7 +41,7 @@ const ESTADO_SEVERITY: Record<TicketEstado, 'warn' | 'info' | 'success'> = {
 @Component({
 	selector: 'app-ayuda-ticket',
 	standalone: true,
-	imports: [DatePipe, FormsModule, EduSelect, EduTextarea, EduButton, EduSpinner, EduTable, EduTag, EduToast, ErrorStateComponent, EduTemplate],
+	imports: [DatePipe, FormsModule, RouterLink, EduSelect, EduTextarea, EduButton, EduSpinner, EduTable, EduTag, EduToast, ErrorStateComponent, EduTemplate],
 	providers: [AyudaTicketFacade, EduMessageService],
 	templateUrl: './ayuda-ticket.component.html',
 	styleUrl: './ayuda-ticket.component.scss',

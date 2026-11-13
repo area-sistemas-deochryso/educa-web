@@ -1,6 +1,7 @@
 // #region Imports
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
+import { provideRouter } from '@angular/router';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture } from '@angular/core/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
@@ -20,7 +21,7 @@ describe('AyudaTicketComponent — validación de formulario', () => {
 	beforeEach(() => {
 		TestBed.configureTestingModule({
 			imports: [AyudaTicketComponent],
-			providers: [provideHttpClient(), provideHttpClientTesting()],
+			providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
 		});
 
 		fixture = TestBed.createComponent(AyudaTicketComponent);

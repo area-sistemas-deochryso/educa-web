@@ -1,13 +1,21 @@
 <edu-toast />
 
+<header class="ticket-intro">
+	<h3 class="ticket-intro__title">¿Algo no funciona? Cuéntanos qué pasó</h3>
+	<p class="ticket-intro__text">
+		El equipo de soporte revisará tu solicitud. Antes de enviarla, mira si las
+		<a routerLink="../qa" class="ticket-intro__link">preguntas frecuentes</a> ya lo resuelven.
+	</p>
+</header>
+
 <div class="ticket-layout">
 	<!-- #region Formulario de creación -->
 	<section class="ticket-form">
-		<p class="ticket-form__eyebrow">Crear</p>
-		<h3>Generar ticket</h3>
+		<h3 class="ticket-card__title">Generar ticket</h3>
+		<p class="ticket-card__hint">Los campos con <span class="ticket-form__req" aria-hidden="true">*</span> son obligatorios.</p>
 
 		<div class="ticket-form__field">
-			<label for="ticket-tipo">Tipo de problema</label>
+			<label for="ticket-tipo">Tipo de problema <span class="ticket-form__req" aria-hidden="true">*</span></label>
 			<edu-select
 				inputId="ticket-tipo"
 				[options]="tipoOptions()"
@@ -22,7 +30,7 @@
 		</div>
 
 		<div class="ticket-form__field">
-			<label for="ticket-descripcion">Descripción</label>
+			<label for="ticket-descripcion">Descripción <span class="ticket-form__req" aria-hidden="true">*</span></label>
 			<textarea
 				id="ticket-descripcion"
 				eduTextarea
@@ -52,25 +60,33 @@
 			></textarea>
 		</div>
 
-		<edu-button
-			label="Enviar ticket"
-			icon="pi pi-send"
-			[disabled]="!canSubmit()"
-			[loading]="submitting()"
-			(click)="onSubmit()"
-		/>
+		<div class="ticket-form__actions">
+			<edu-button
+				label="Enviar ticket"
+				icon="pi pi-send"
+				[disabled]="!canSubmit()"
+				[loading]="submitting()"
+				(click)="onSubmit()"
+			/>
+			@if (!canSubmit() && !submitting()) {
+				<p class="ticket-form__why">
+					{{ tipoId() === null ? 'Elige un tipo de problema' : 'Escribe al menos ' + descripcionMin + ' caracteres en la descripción' }}
+					para poder enviar.
+				</p>
+			}
+		</div>
 	</section>
 	<!-- #endregion -->
 
 	<!-- #region Vista previa en vivo -->
 	<aside class="ticket-preview">
 		<p class="ticket-preview__eyebrow">Vista previa</p>
-		<h3>Así lo verá soporte</h3>
+		<h3 class="ticket-card__title">Así lo verá soporte</h3>
 
 		<dl class="ticket-preview__body">
 			<div class="ticket-preview__row">
 				<dt>Tipo</dt>
-				<dd>{{ tipoLabel() }}</dd>
+				<dd><span class="ticket-preview__chip">{{ tipoLabel() }}</span></dd>
 			</div>
 			<div class="ticket-preview__row">
 				<dt>Descripción</dt>
@@ -91,8 +107,12 @@
 
 <!-- #region Historial -->
 <section class="ticket-history">
-	<p class="ticket-history__eyebrow">Presentación</p>
-	<h3>Mis tickets</h3>
+	<div class="ticket-history__head">
+		<h3 class="ticket-card__title">Mis tickets</h3>
+		@if (!loading() && !error() && tickets().length > 0) {
+			<span class="ticket-history__count">{{ tickets().length }}</span>
+		}
+	</div>
 
 	@if (loading()) {
 		<div class="ticket-history__loading">
@@ -104,7 +124,11 @@
 			(retry)="onRetryTickets()"
 		/>
 	} @else if (tickets().length === 0) {
-		<p class="ticket-history__empty">Todavía no generaste ningún ticket.</p>
+		<div class="ticket-history__empty">
+			<i class="pi pi-ticket ticket-history__empty-icon" aria-hidden="true"></i>
+			<p class="ticket-history__empty-title">Todavía no generaste ningún ticket.</p>
+			<p class="ticket-history__empty-text">Cuando envíes uno, podrás seguir aquí su estado.</p>
+		</div>
 	} @else {
 		<edu-table [value]="tickets()" styleClass="ticket-history__table">
 			<ng-template pTemplate="header">
