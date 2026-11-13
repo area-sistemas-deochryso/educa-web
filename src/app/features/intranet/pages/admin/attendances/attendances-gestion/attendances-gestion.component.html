@@ -150,7 +150,7 @@
 <!-- #endregion -->
 
 <!-- #region Filtros -->
-<div class="filters-bar">
+<div class="filters-bar" #filtersEl>
 	<edu-datepicker
 		[(ngModel)]="fechaCalendar"
 		(ngModelChange)="onFechaChange($event)"
@@ -176,12 +176,64 @@
 </div>
 <!-- #endregion -->
 
+<app-sticky-filter-bar
+	[watch]="filtersEl"
+	[searchTerm]="vm().searchTerm"
+	placeholder="Buscar por nombre/apellido o DNI completo"
+	(searchChange)="onSearchTerm($event)"
+>
+	<edu-datepicker
+		[(ngModel)]="fechaCalendar"
+		(ngModelChange)="onFechaChange($event)"
+		dateFormat="yy-mm-dd"
+		[showIcon]="true"
+		appendTo="body"
+		placeholder="Fecha"
+	/>
+</app-sticky-filter-bar>
+
 <!-- #region Tabla -->
 @if (!vm().tableReady) {
 	<app-table-skeleton [columns]="tableColumns" [rows]="10" minHeight="420px" />
 } @else if (vm().error) {
 	<app-error-state [message]="vm().error!" (retry)="dataFacade.loadData()" />
 } @else {
+	@if (isMobile()) {
+		@if (itemsPaging.totalRecords() === 0) {
+			<p class="cards-state">No hay registros de asistencia para esta fecha con el filtro activo</p>
+		} @else {
+			<app-mobile-card-list [paging]="itemsPaging" [pageSize]="5">
+				<ng-template let-item>
+					<div>
+						<app-card-row label="Persona">
+							<span class="student-name">{{ item.nombreCompleto }}</span>
+							<edu-tag [value]="getTipoPersonaLabel(item.tipoPersona)" styleClass="tag-neutral" />
+						</app-card-row>
+						<app-card-row label="DNI">{{ item.dni }}</app-card-row>
+						<app-card-row label="Contexto">{{ item.contextoPersona }}</app-card-row>
+						<app-card-row label="Entrada">{{ item.horaEntrada ? (item.horaEntrada | date: 'HH:mm') : '—' }}</app-card-row>
+						<app-card-row label="Salida">{{ item.horaSalida ? (item.horaSalida | date: 'HH:mm') : '—' }}</app-card-row>
+						<app-card-row label="Estado"><edu-tag [value]="item.estado" [severity]="getEstadoSeverity(item.estado)" /></app-card-row>
+						<app-card-row label="Origen"><edu-tag [value]="getOrigenLabel(item)" [severity]="getOrigenSeverity(item)" /></app-card-row>
+						<app-card-row label="Seleccionar">
+							<edu-checkbox
+								[binary]="true"
+								[ngModel]="vm().selectedIds.has(item.asistenciaId)"
+								(ngModelChange)="store.toggleSelection(item.asistenciaId)"
+							/>
+						</app-card-row>
+						<app-card-actions>
+							@if (item.estado === 'Incompleta' && !item.horaSalida) {
+								<edu-button icon="pi pi-sign-out" [text]="true" [rounded]="true" aria-label="Agregar salida" (click)="onAgregarSalida(item)" />
+							}
+							<edu-button icon="pi pi-pencil" [text]="true" [rounded]="true" aria-label="Editar horas" (click)="onEditar(item)" />
+							<edu-button icon="pi pi-trash" [text]="true" [rounded]="true" severity="danger" aria-label="Eliminar registro" (click)="onEliminar(item)" />
+						</app-card-actions>
+					</div>
+				</ng-template>
+			</app-mobile-card-list>
+		}
+	} @else {
 	<edu-table
 		[value]="itemsPaging.value()"
 		[dataKey]="'asistenciaId'"
@@ -310,6 +362,7 @@
 			</tr>
 		</ng-template>
 	</edu-table>
+	}
 }
 <!-- #endregion -->
 

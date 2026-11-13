@@ -6,7 +6,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { logger } from '@core/helpers';
-import { ErrorStateComponent } from '@shared/components';
+import { CardActionsComponent, CardRowComponent, ErrorStateComponent, MobileCardListComponent, StickyFilterBarComponent, injectIsMobile } from '@shared/components';
 import { createClientPaging } from '@shared/utils';
 import { SkeletonColumnDef, TableSkeletonComponent, StatsSkeletonComponent, KpiStatsComponent, type KpiStatItem } from '@intranet-shared/components';
 import { CrossChexSyncStatusService } from '@core/services/signalr';
@@ -63,7 +63,11 @@ import { EduButton, EduCheckbox, EduConfirmDialog, EduConfirmationService, EduDa
 		CrossChexSyncBannerComponent,
 		CrossChexIntegrationStatusBadgeComponent,
 		SyncRangeDialogComponent,
-		ErrorStateComponent],
+		ErrorStateComponent,
+		StickyFilterBarComponent,
+		MobileCardListComponent,
+		CardRowComponent,
+		CardActionsComponent],
 	providers: [EduConfirmationService, EduMessageService],
 	templateUrl: './attendances-gestion.component.html',
 	styleUrl: './attendances-gestion.component.scss',
@@ -91,6 +95,7 @@ export class AttendancesGestionComponent implements OnInit {
 	/** `true` mientras hay un job de sync activo (QUEUED o RUNNING). */
 	readonly syncActive = this.syncService.isActive;
 	readonly itemsPaging = createClientPaging(computed(() => this.vm().items));
+	readonly isMobile = injectIsMobile();
 	// #endregion
 
 	// #region Stats KPI
@@ -253,6 +258,10 @@ export class AttendancesGestionComponent implements OnInit {
 		this.fechaCalendar.set(date);
 		const iso = date.toISOString().split('T')[0];
 		this.dataFacade.onFechaChange(iso);
+	}
+
+	onSearchTerm(term: string): void {
+		this.dataFacade.onSearch(term);
 	}
 
 	onSearch(event: Event): void {
