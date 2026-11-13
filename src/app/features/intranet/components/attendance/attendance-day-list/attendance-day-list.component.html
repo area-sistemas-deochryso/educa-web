@@ -1,5 +1,5 @@
 <!-- #region Filters bar -->
-<div class="filters-bar">
+<div class="filters-bar" #filtersEl>
 	<div class="search-box">
 		<i class="pi pi-search"></i>
 		<input
@@ -74,6 +74,13 @@
 </div>
 <!-- #endregion -->
 
+<app-sticky-filter-bar
+	[watch]="filtersEl"
+	[searchTerm]="searchTerm()"
+	placeholder="Buscar por nombre o DNI..."
+	(searchChange)="searchTerm.set($event)"
+/>
+
 <ng-content select="[subHeaderSlot]" />
 
 <!-- #region Pending closure banner (F7) -->
@@ -91,8 +98,39 @@
 } @else if (estudiantesDelDia().length === 0 || !hasDayData()) {
 	<app-empty-state message="No hay registros de asistencia para esta fecha." />
 } @else {
-	<!-- FIX #3: Tabla directa sin responsive-table (pragmático) -->
-	<edu-table [value]="filteredEstudiantes()" class="p-datatable-sm asistencia-table">
+	@if (isMobile()) {
+		<app-mobile-card-list [items]="filteredEstudiantes()" [pageSize]="8">
+			<ng-template let-estudiante>
+				<div
+					class="mobile-card-inner"
+					[class.row-clickable]="allowJustify() && estudiante.puedeJustificar"
+					(click)="onEstudianteClick(estudiante)"
+				>
+					<div class="mobile-card-title">
+						<div class="estudiante-info">
+							<span class="nombre">{{ estudiante.nombreCompleto }}</span>
+							<span class="dni">DNI: {{ estudiante.dni }}</span>
+						</div>
+						<span class="estado-box" [class]="getStatusClass(estudiante.estadoCodigo)">
+							{{ estudiante.estadoCodigo }}
+						</span>
+					</div>
+					<app-card-row label="Entrada">
+						<span class="hora" [class.hora-empty]="!estudiante.horaEntrada">{{ estudiante.horaEntrada | formatTime }}</span>
+					</app-card-row>
+					<app-card-row label="Salida">
+						<span class="hora" [class.hora-empty]="!estudiante.horaSalida">{{ estudiante.horaSalida | formatTime }}</span>
+					</app-card-row>
+					@if (estudiante.observacion) {
+						<div class="mobile-card-observacion">
+							<span class="observacion"><i class="pi pi-info-circle"></i> {{ estudiante.observacion }}</span>
+						</div>
+					}
+				</div>
+			</ng-template>
+		</app-mobile-card-list>
+	} @else {
+		<edu-table [value]="filteredEstudiantes()" class="p-datatable-sm asistencia-table">
 		<ng-template #header>
 			<tr>
 				<th style="width: 50px">#</th>
@@ -158,6 +196,7 @@
 			</tr>
 		</ng-template>
 	</edu-table>
+	}
 }
 <!-- #endregion -->
 

@@ -218,26 +218,7 @@ $color-pendiente: var(--attendance-pendiente);
 }
 // #endregion
 
-// #region Mobile card (app-responsive-table)
-:host ::ng-deep .rt-card-list .rt-card {
-	border-radius: 0;
-	border-left: none;
-	border-right: none;
-	border-bottom: 1px solid var(--intranet-alternative-text-color);
-
-	&:first-child {
-		border-top: none;
-	}
-
-	&:last-child {
-		border-bottom: none;
-	}
-}
-
-:host ::ng-deep .rt-card-list {
-	gap: 0;
-}
-
+// #region Mobile card
 .mobile-card-inner {
 	display: flex;
 	flex-direction: column;

@@ -12,6 +12,7 @@ import { SlicePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EstudianteAsistencia, EstadisticasAsistenciaDia } from '@data/models';
 import { TableSkeletonComponent } from '@intranet-shared/components';
+import { CardRowComponent, MobileCardListComponent, StickyFilterBarComponent, injectIsMobile } from '@shared/components';
 import type { SkeletonColumnDef } from '@intranet-shared/components';
 import { FormatTimePipe, InitialsPipe } from '@intranet-shared/pipes';
 import { getStatusClass } from '@features/intranet/pages/cross-role/attendance-component/config/attendance.constants';
@@ -46,6 +47,9 @@ export interface JustificacionEvent {
 		FormsModule,
 		EduTable,
 		TableSkeletonComponent,
+		MobileCardListComponent,
+		CardRowComponent,
+		StickyFilterBarComponent,
 		EduButton,
 		EduMenu,
 		EduTooltip,
@@ -98,6 +102,7 @@ export class AttendanceDayListComponent {
 	// * Local state for the datepicker model (signal for OnPush reactivity)
 	readonly fechaValue = signal<Date>(new Date());
 	readonly searchTerm = signal('');
+	readonly isMobile = injectIsMobile();
 
 	// #region Estado del diálogo de justificación
 	readonly dialogVisible = signal(false);

@@ -1,5 +1,5 @@
 <!-- #region Filters bar -->
-<div class="filters-bar">
+<div class="filters-bar" #filtersEl>
 	<div class="search-box">
 		<i class="pi pi-search"></i>
 		<input
@@ -73,6 +73,13 @@
 	</div>
 </div>
 <!-- #endregion -->
+
+<app-sticky-filter-bar
+	[watch]="filtersEl"
+	[searchTerm]="searchTerm()"
+	placeholder="Buscar por nombre o DNI..."
+	(searchChange)="searchTerm.set($event)"
+/>
 
 <ng-content select="[subHeaderSlot]" />
 

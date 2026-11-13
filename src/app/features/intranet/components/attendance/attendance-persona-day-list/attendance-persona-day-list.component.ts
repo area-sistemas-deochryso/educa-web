@@ -17,7 +17,7 @@ import {
 	TipoPersona,
 } from '@data/models';
 import { TableSkeletonComponent } from '@intranet-shared/components';
-import { CardActionsComponent, CardRowComponent, MobileCardListComponent, injectIsMobile } from '@shared/components';
+import { CardActionsComponent, CardRowComponent, MobileCardListComponent, StickyFilterBarComponent, injectIsMobile } from '@shared/components';
 import type { SkeletonColumnDef } from '@intranet-shared/components';
 import { FormatTimePipe, InitialsPipe } from '@intranet-shared/pipes';
 import { getStatusClass } from '@features/intranet/pages/cross-role/attendance-component/config/attendance.constants';
@@ -56,6 +56,7 @@ export interface JustificacionPersonaEvent {
 		MobileCardListComponent,
 		CardRowComponent,
 		CardActionsComponent,
+		StickyFilterBarComponent,
 		EduButton,
 		EduMenu,
 		EduTooltip,
