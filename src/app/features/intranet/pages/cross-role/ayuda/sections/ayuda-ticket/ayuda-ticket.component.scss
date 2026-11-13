@@ -239,3 +239,18 @@
 		overflow-wrap: break-word;
 	}
 }
+
+// Móvil: el historial se muestra como cards, así que pierde su marco exterior (las cards ya tienen el suyo)
+// y las demás tarjetas usan menos relleno para aprovechar el ancho.
+@media (max-width: 767px) {
+	.ticket-form,
+	.ticket-preview {
+		padding: 1.25rem;
+	}
+
+	.ticket-history {
+		padding: 0;
+		border: 0;
+		background: transparent;
+	}
+}

@@ -1,0 +1,31 @@
+<ul class="mcl__list">
+	@for (item of pageItems(); track $index) {
+		<li class="mcl__card">
+			<ng-container *ngTemplateOutlet="cardTemplate(); context: { $implicit: item }" />
+		</li>
+	}
+</ul>
+
+@if (pageCount() > 1) {
+	<nav class="mcl__pager" aria-label="Paginación de la lista">
+		<button
+			type="button"
+			class="mcl__pagebtn"
+			[disabled]="page() === 0"
+			aria-label="Página anterior"
+			(click)="previous()"
+		>
+			<i class="pi pi-chevron-left" aria-hidden="true"></i>
+		</button>
+		<span class="mcl__status" aria-live="polite">{{ page() + 1 }} de {{ pageCount() }}</span>
+		<button
+			type="button"
+			class="mcl__pagebtn"
+			[disabled]="page() === pageCount() - 1"
+			aria-label="Página siguiente"
+			(click)="next()"
+		>
+			<i class="pi pi-chevron-right" aria-hidden="true"></i>
+		</button>
+	</nav>
+}

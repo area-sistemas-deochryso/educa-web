@@ -10,7 +10,7 @@ import {
 	TICKET_PROPUESTA_MAX,
 	TicketEstado,
 } from '../../models/ticket.models';
-import { ErrorStateComponent } from '@shared/components';
+import { CardRowComponent, ErrorStateComponent, MobileCardListComponent, injectIsMobile } from '@shared/components';
 import { AyudaTicketFacade } from './services/ayuda-ticket.facade';
 import { EduButton, EduMessageService, EduSelect, EduSpinner, EduTable, EduTag, EduTemplate, EduTextarea, EduToast } from '@edu-ui';
 
@@ -41,7 +41,7 @@ const ESTADO_SEVERITY: Record<TicketEstado, 'warn' | 'info' | 'success'> = {
 @Component({
 	selector: 'app-ayuda-ticket',
 	standalone: true,
-	imports: [DatePipe, FormsModule, RouterLink, EduSelect, EduTextarea, EduButton, EduSpinner, EduTable, EduTag, EduToast, ErrorStateComponent, EduTemplate],
+	imports: [DatePipe, FormsModule, RouterLink, EduSelect, EduTextarea, EduButton, EduSpinner, EduTable, EduTag, EduToast, ErrorStateComponent, EduTemplate, MobileCardListComponent, CardRowComponent],
 	providers: [AyudaTicketFacade, EduMessageService],
 	templateUrl: './ayuda-ticket.component.html',
 	styleUrl: './ayuda-ticket.component.scss',
@@ -53,6 +53,9 @@ export class AyudaTicketComponent implements OnInit {
 	private readonly messageService = inject(EduMessageService);
 	private readonly route = inject(ActivatedRoute, { optional: true });
 	// #endregion
+
+	/** En pantallas angostas el historial se muestra como cards con paginación en lugar de tabla. */
+	readonly isMobile = injectIsMobile();
 
 	// #region State del facade
 	readonly tickets = this.facade.tickets;

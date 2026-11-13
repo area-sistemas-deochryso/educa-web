@@ -1,0 +1,57 @@
+:host {
+	display: block;
+}
+
+.mcl__list {
+	display: grid;
+	gap: 0.875rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.mcl__card {
+	padding: 0.5rem 1rem;
+	border: 1px solid var(--surface-200);
+	border-radius: 14px;
+	background: var(--surface-card, var(--surface-0, #fff));
+}
+
+.mcl__pager {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 1rem;
+	margin-top: 1rem;
+}
+
+.mcl__pagebtn {
+	display: grid;
+	place-items: center;
+	width: 2.75rem;
+	height: 2.75rem;
+	border: 1px solid var(--surface-300);
+	border-radius: 0.75rem;
+	background: var(--surface-card, var(--surface-0, #fff));
+	color: var(--text-color);
+	cursor: pointer;
+
+	&:disabled {
+		opacity: 0.4;
+		cursor: not-allowed;
+	}
+
+	&:focus-visible {
+		outline: 2px solid var(--faq-accent-strong, var(--primary-color));
+		outline-offset: 2px;
+	}
+}
+
+.mcl__status {
+	min-width: 4.5rem;
+	text-align: center;
+	font-size: 0.9375rem;
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+	color: var(--text-color);
+}

@@ -129,6 +129,17 @@
 			<p class="ticket-history__empty-title">Todavía no generaste ningún ticket.</p>
 			<p class="ticket-history__empty-text">Cuando envíes uno, podrás seguir aquí su estado.</p>
 		</div>
+	} @else if (isMobile()) {
+		<app-mobile-card-list [items]="tickets()" [pageSize]="5">
+			<ng-template let-ticket>
+				<app-card-row label="Tipo">{{ ticket.tipoNombre }}</app-card-row>
+				<app-card-row label="Descripción">{{ ticket.descripcion }}</app-card-row>
+				<app-card-row label="Estado">
+					<edu-tag [value]="estadoLabel(ticket.estado)" [severity]="estadoTagSeverity(ticket.estado)" />
+				</app-card-row>
+				<app-card-row label="Fecha">{{ ticket.fechaReg | date: 'dd/MM/yyyy HH:mm' }}</app-card-row>
+			</ng-template>
+		</app-mobile-card-list>
 	} @else {
 		<edu-table [value]="tickets()" styleClass="ticket-history__table">
 			<ng-template pTemplate="header">
