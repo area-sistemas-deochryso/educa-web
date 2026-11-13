@@ -102,7 +102,7 @@
 	<!-- #endregion -->
 
 	<!-- #region Filtros -->
-	<div class="filters-bar">
+	<div class="filters-bar" #filtersEl>
 		<div class="filter-dropdowns">
 			<span class="p-input-icon-left search-input">
 				<i class="pi pi-search"></i>
@@ -169,10 +169,87 @@
 			data-info-anchor="admin-feedback-reports-limpiar-filtros-btn"
 		/>
 	</div>
+	<app-sticky-filter-bar
+		[watch]="filtersEl"
+		[searchTerm]="vm().searchQuery"
+		placeholder="Buscar por descripción, usuario…"
+		[activeFilters]="activeFilterCount()"
+		(searchChange)="onSearchChange($event)"
+		(clearFilters)="onClearFilters()"
+	>
+		<edu-select
+			[options]="tipoOptions"
+			optionLabel="label"
+			optionValue="value"
+			placeholder="Todos los tipos"
+			[showClear]="true"
+			appendTo="body"
+			[ngModel]="vm().filterTipo"
+			(ngModelChange)="onFilterTipoChange($event)"
+		></edu-select>
+		<edu-select
+			[options]="estadoOptions"
+			optionLabel="label"
+			optionValue="value"
+			placeholder="Todos los estados"
+			[showClear]="true"
+			appendTo="body"
+			[ngModel]="vm().filterEstado"
+			(ngModelChange)="onFilterEstadoChange($event)"
+		></edu-select>
+		<edu-datepicker
+			[ngModel]="vm().filterDesde"
+			(ngModelChange)="onFilterDesdeChange($event)"
+			placeholder="Desde"
+			appendTo="body"
+			[showIcon]="true"
+			dateFormat="dd/mm/yy"
+		></edu-datepicker>
+		<edu-datepicker
+			[ngModel]="vm().filterHasta"
+			(ngModelChange)="onFilterHastaChange($event)"
+			placeholder="Hasta"
+			appendTo="body"
+			[showIcon]="true"
+			dateFormat="dd/mm/yy"
+		></edu-datepicker>
+	</app-sticky-filter-bar>
 	<!-- #endregion -->
 
 	<!-- #region Tabla -->
 	<section class="table-section">
+		@if (isMobile()) {
+			@if (vm().loading) {
+				<p class="cards-state" aria-live="polite">Cargando reportes…</p>
+			} @else if (vm().items.length === 0) {
+				<p class="cards-state">No hay reportes que coincidan con los filtros.</p>
+			} @else {
+				<app-mobile-card-list
+					[items]="vm().items"
+					[serverTotal]="vm().total"
+					[serverPage]="vm().page - 1"
+					[pageSize]="vm().pageSize"
+					(pageChange)="onCardsPage($event)"
+				>
+					<ng-template let-item>
+						<div class="report-card" (click)="onRowClick(item)">
+							<app-card-row label="Fecha">{{ item.fechaReg | date: 'dd/MM/yyyy HH:mm' }}</app-card-row>
+							<app-card-row label="Tipo">{{ tipoLabel(item.tipo) }}</app-card-row>
+							<app-card-row label="Detalle">{{ item.descripcionResumen }}</app-card-row>
+							<app-card-row label="Usuario">{{ item.usuarioNombre ?? 'Anónimo' }}</app-card-row>
+							<app-card-row label="Estado">
+								<edu-tag [value]="estadoLabel(item.estado)" [severity]="estadoSeverity(item.estado)"></edu-tag>
+							</app-card-row>
+							<app-card-actions>
+								<button type="button" class="report-card__action" aria-label="Ver detalle del reporte" (click)="onRowClick(item); $event.stopPropagation()">
+									<i class="pi pi-eye" aria-hidden="true"></i>
+								</button>
+							</app-card-actions>
+						</div>
+					</ng-template>
+				</app-mobile-card-list>
+			}
+		} @else {
 		<edu-table
 			[value]="vm().items"
 			[lazy]="true"
@@ -244,6 +321,7 @@
 				</tr>
 			</ng-template>
 		</edu-table>
+		}
 	</section>
 	<!-- #endregion -->
 </div>

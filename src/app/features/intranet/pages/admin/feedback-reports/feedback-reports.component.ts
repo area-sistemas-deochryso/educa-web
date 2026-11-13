@@ -1,5 +1,5 @@
 // #region Imports
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, computed, OnInit, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -13,6 +13,7 @@ import {
 	ReporteUsuarioListaDto,
 } from '@core/services/feedback';
 import { PageHeaderComponent } from '@intranet-shared/components';
+import { CardActionsComponent, CardRowComponent, MobileCardListComponent, StickyFilterBarComponent, injectIsMobile } from '@shared/components';
 import { CorrelationIdPillComponent } from '@intranet-shared/components';
 
 import { HubContextBannerComponent, readHubContext } from '../hub-context-shared';
@@ -46,6 +47,10 @@ interface EstadoOption {
 		EduTooltip,
 		CorrelationIdPillComponent,
 		PageHeaderComponent,
+		StickyFilterBarComponent,
+		MobileCardListComponent,
+		CardRowComponent,
+		CardActionsComponent,
 		HubContextBannerComponent],
 	providers: [EduConfirmationService],
 	templateUrl: './feedback-reports.component.html',
@@ -69,6 +74,12 @@ export class FeedbackReportsComponent implements OnInit {
 	// Estado local del formulario de cambio de estado en el drawer
 	readonly nuevoEstado = signal<ReporteEstado | null>(null);
 	readonly observacionCambio = signal<string>('');
+	readonly isMobile = injectIsMobile();
+	/** Filtros activos sin contar el buscador (los muestra el botón «Filtros» de la barra compacta). */
+	readonly activeFilterCount = computed(() => {
+		const { filterTipo, filterEstado, filterDesde, filterHasta } = this.vm();
+		return [filterTipo, filterEstado, filterDesde, filterHasta].filter((v) => v !== null && v !== undefined && v !== '').length;
+	});
 	readonly hubFiltered = signal(false);
 	readonly hubFilterMessage = signal('');
 
@@ -88,6 +99,8 @@ export class FeedbackReportsComponent implements OnInit {
 				if (correlationId) {
 					this.facade.setFilterCorrelationId(correlationId);
 					this.facade.loadEstadisticas();
+					// La tabla pide su primera página sola (lazy); las cards no, así que se carga acá.
+					if (this.isMobile()) this.facade.loadPage(1, this.vm().pageSize);
 				} else {
 					this.facade.loadAll();
 				}
@@ -133,6 +146,10 @@ export class FeedbackReportsComponent implements OnInit {
 		const first = event.first ?? 0;
 		const page = Math.floor(first / rows) + 1;
 		this.facade.loadPage(page, rows);
+	}
+
+	onCardsPage(event: { page: number; rows: number }): void {
+		this.facade.loadPage(event.page + 1, event.rows);
 	}
 
 	onExportCsv(): void {

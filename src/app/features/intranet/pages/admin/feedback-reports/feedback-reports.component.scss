@@ -348,3 +348,38 @@
 	}
 }
 // #endregion
+
+// #region Cards móvil
+.cards-state {
+	margin: 0;
+	padding: 1.5rem 1rem;
+	text-align: center;
+	color: var(--faq-text-muted, var(--text-color-secondary));
+}
+
+.report-card {
+	display: grid;
+	gap: 0.25rem;
+	cursor: pointer;
+}
+
+.report-card__action {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 2.75rem;
+	height: 2.75rem;
+	border: 0;
+	border-radius: 50%;
+	background: transparent;
+	color: var(--faq-accent-strong, var(--primary-color));
+	font-size: 1.1rem;
+	cursor: pointer;
+}
+
+@media (max-width: 767px) {
+	.table-section {
+		border: 0;
+	}
+}
+// #endregion

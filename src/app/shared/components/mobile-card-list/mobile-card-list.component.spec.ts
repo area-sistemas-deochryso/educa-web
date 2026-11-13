@@ -116,3 +116,39 @@ describe('MobileCardListComponent', () => {
 		expect(root().querySelector('.mcl__pager')).toBeNull();
 	});
 });
+
+@Component({
+	standalone: true,
+	imports: [MobileCardListComponent, CardRowComponent],
+	template: `
+		<app-mobile-card-list
+			[items]="items()"
+			[serverTotal]="7"
+			[serverPage]="page()"
+			[pageSize]="3"
+			(pageChange)="requested.push($event)"
+		>
+			<ng-template let-item>
+				<app-card-row label="Nombre">{{ item }}</app-card-row>
+			</ng-template>
+		</app-mobile-card-list>
+	`,
+})
+class ServerHostComponent {
+	items = signal(['uno', 'dos', 'tres']);
+	page = signal(0);
+	requested: { page: number; rows: number }[] = [];
+}
+
+describe('MobileCardListComponent con paginación de servidor', () => {
+	it('muestra los items recibidos, calcula las páginas con el total y pide la siguiente al servidor', () => {
+		const fixture = TestBed.createComponent(ServerHostComponent);
+		fixture.detectChanges();
+		const el = fixture.nativeElement as HTMLElement;
+		expect(el.querySelectorAll('.mcl__card').length).toBe(3);
+		expect(el.querySelector('.mcl__status')?.textContent?.trim()).toBe('1 de 3');
+
+		el.querySelector<HTMLButtonElement>('button[aria-label="Página siguiente"]')!.click();
+		expect(fixture.componentInstance.requested).toEqual([{ page: 1, rows: 3 }]);
+	});
+});
