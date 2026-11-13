@@ -102,8 +102,10 @@ export class AyudaQaComponent implements OnInit, AfterViewInit {
 	private readonly headerEl = viewChild<ElementRef<HTMLElement>>('headerEl');
 
 	// #region Barra compacta al hacer scroll
-	/** Alto aproximado del encabezado fijo de la app: la cabecera «sale» cuando pasa por debajo de él. */
-	private static readonly APP_HEADER_PX = 80;
+	/** Alto de respaldo del encabezado fijo de la app (escritorio) si no se puede medir. */
+	private static readonly APP_HEADER_FALLBACK_PX = 80;
+
+	private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
 	/** `true` cuando la cabecera ya salió de la pantalla por arriba. */
 	private readonly headerGone = signal(false);
@@ -118,6 +120,13 @@ export class AyudaQaComponent implements OnInit, AfterViewInit {
 			if (this.stickyBar()?.hasFocus()) this.header()?.focusSearch();
 		});
 	});
+
+	/** Borde inferior del encabezado fijo de la app: cambia con el ancho (en móvil es más alto). */
+	private appHeaderBottom(): number {
+		const header = document.querySelector('header.intranet-header');
+		const bottom = header?.getBoundingClientRect().bottom ?? 0;
+		return bottom > 0 ? Math.round(bottom) : AyudaQaComponent.APP_HEADER_FALLBACK_PX;
+	}
 	// #endregion
 
 	ngOnInit(): void {
@@ -127,13 +136,26 @@ export class AyudaQaComponent implements OnInit, AfterViewInit {
 	ngAfterViewInit(): void {
 		const el = this.headerEl()?.nativeElement;
 		if (!el || typeof IntersectionObserver === 'undefined') return;
-		const observer = new IntersectionObserver(
-			([entry]) =>
-				this.headerGone.set(!entry.isIntersecting && entry.boundingClientRect.top < 0),
-			{ rootMargin: `-${AyudaQaComponent.APP_HEADER_PX}px 0px 0px 0px` },
-		);
-		observer.observe(el);
-		this.destroyRef.onDestroy(() => observer.disconnect());
+
+		let observer: IntersectionObserver | null = null;
+		const observe = (): void => {
+			const top = this.appHeaderBottom();
+			this.host.nativeElement.style.setProperty('--ayuda-sticky-top', `${top}px`);
+			observer?.disconnect();
+			observer = new IntersectionObserver(
+				([entry]) =>
+					this.headerGone.set(!entry.isIntersecting && entry.boundingClientRect.top < 0),
+				{ rootMargin: `-${top}px 0px 0px 0px` },
+			);
+			observer.observe(el);
+		};
+		observe();
+
+		window.addEventListener('resize', observe);
+		this.destroyRef.onDestroy(() => {
+			window.removeEventListener('resize', observe);
+			observer?.disconnect();
+		});
 	}
 
 	// #region Handlers
