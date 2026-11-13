@@ -1,5 +1,5 @@
 <!-- #region Template -->
-<div class="filters-bar">
+<div class="filters-bar" #filtersEl>
 	<div class="search-box">
 		<i class="pi pi-search"></i>
 		<input
@@ -65,4 +65,45 @@
 		/>
 	}
 </div>
+
+<app-sticky-filter-bar
+	[watch]="filtersEl"
+	[searchTerm]="searchTerm()"
+	placeholder="Buscar por nombre, DNI o correo..."
+	[activeFilters]="activeFilterCount()"
+	(searchChange)="onSearchChange($event)"
+	(clearFilters)="onClearFilters()"
+>
+	<edu-select
+		[options]="options().estadoOptions"
+		[optionLabel]="'label'"
+		[optionValue]="'value'"
+		[ngModel]="filterEstado()"
+		(ngModelChange)="onFilterEstadoChange($event)"
+		placeholder="Estado"
+		appendTo="body"
+	/>
+	@if (showSalonFilter()) {
+		<edu-select
+			[options]="salonOptions()"
+			[optionLabel]="'label'"
+			[optionValue]="'value'"
+			[ngModel]="filterSalonId()"
+			(ngModelChange)="onFilterSalonIdChange($event)"
+			placeholder="Salón"
+			appendTo="body"
+		/>
+	}
+	@if (showContactFilter()) {
+		<label class="contact-filter" for="sfb-sin-correo-apoderado">
+			<edu-checkbox
+				inputId="sfb-sin-correo-apoderado"
+				[binary]="true"
+				[ngModel]="filterSinCorreoApoderado()"
+				(ngModelChange)="onFilterSinCorreoApoderadoChange($event)"
+			/>
+			<span>Contacto incompleto</span>
+		</label>
+	}
+</app-sticky-filter-bar>
 <!-- #endregion -->

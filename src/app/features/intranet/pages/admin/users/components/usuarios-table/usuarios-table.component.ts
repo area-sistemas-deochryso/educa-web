@@ -7,6 +7,7 @@ import { hasMissingGuardianEmail, MISSING_GUARDIAN_EMAIL_LABEL } from '../../hel
 import { getInitialsFromParts } from '@core/helpers';
 import { UiMappingService } from '@intranet-shared/services';
 import { FullNamePipe } from '@shared/pipes';
+import { CardActionsComponent, CardRowComponent, MobileCardListComponent, injectIsMobile } from '@shared/components';
 import { TableLoadingDirective } from '@intranet-shared/directives';
 import { EduAvatar, EduButton, EduDialog, EduSortableColumn, EduTable, EduTag, EduTooltip } from '@edu-ui';
 import type { EduTableLazyLoadEvent } from '@edu-ui';
@@ -14,13 +15,14 @@ import type { EduTableLazyLoadEvent } from '@edu-ui';
 @Component({
 	selector: 'app-users-table',
 	standalone: true,
-	imports: [EduAvatar, DatePipe, EduTable, EduButton, EduDialog, EduTag, EduTooltip, TableLoadingDirective, FullNamePipe, EduSortableColumn],
+	imports: [MobileCardListComponent, CardRowComponent, CardActionsComponent, EduAvatar, DatePipe, EduTable, EduButton, EduDialog, EduTag, EduTooltip, TableLoadingDirective, FullNamePipe, EduSortableColumn],
 	templateUrl: './usuarios-table.component.html',
 	styleUrl: './usuarios-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UsersTableComponent {
 	readonly uiMapping = inject(UiMappingService);
+	readonly isMobile = injectIsMobile();
 
 	readonly usuarios = input.required<UsuarioLista[]>();
 	readonly loading = input.required<boolean>();
@@ -105,6 +107,11 @@ export class UsersTableComponent {
 
 	onCopyDni(dni: string): void {
 		this.copyDni.emit(dni);
+	}
+
+	/** Las cards no ordenan: se conserva el orden vigente y solo cambia la página. */
+	onCardsPage(event: { page: number; rows: number }): void {
+		this.lazyLoad.emit({ page: event.page + 1, pageSize: event.rows, sortField: this.sortField(), sortOrder: this.sortOrder() });
 	}
 
 	onLazyLoad(event: EduTableLazyLoadEvent): void {

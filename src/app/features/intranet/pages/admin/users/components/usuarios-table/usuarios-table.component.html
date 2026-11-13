@@ -7,6 +7,47 @@
 	[minHeightPx]="420"
 	[blurPx]="2"
 >
+	@if (isMobile()) {
+		@if (!loading() && usuarios().length === 0) {
+			<p class="cards-state">No se encontraron usuarios. Intenta ajustar los filtros de búsqueda.</p>
+		} @else {
+			<app-mobile-card-list
+				[items]="usuarios()"
+				[serverTotal]="totalRecords()"
+				[serverPage]="first() / rows()"
+				[pageSize]="rows()"
+				(pageChange)="onCardsPage($event)"
+			>
+				<ng-template let-usuario>
+					<div [class.row-inactive]="!usuario.estado">
+						<app-card-row label="Nombre">
+							<span class="user-name">{{ usuario.apellidos | fullName: usuario.nombres }}</span>
+							@if (hasMissingGuardianEmail(usuario)) {
+								<i class="pi pi-exclamation-triangle missing-contact-hint" role="img" [attr.aria-label]="missingGuardianEmailLabel"></i>
+							}
+						</app-card-row>
+						<app-card-row label="DNI"><span class="dni-text">{{ usuario.dni }}</span></app-card-row>
+						@if (usuario.correo) {
+							<app-card-row label="Correo">{{ usuario.correo }}</app-card-row>
+						}
+						@if (activeTab() === null) {
+							<app-card-row label="Rol"><edu-tag [value]="usuario.rol" [severity]="uiMapping.getRolSeverity(usuario.rol)" styleClass="tag-neutral" /></app-card-row>
+						}
+						@if (activeTab() === 'estudiantes') {
+							<app-card-row label="Salón">{{ usuario.salonNombre ?? '—' }}</app-card-row>
+						}
+						<app-card-row label="Fecha">{{ usuario.fechaRegistro | date: 'dd/MM/yyyy' }}</app-card-row>
+						<app-card-actions>
+							<edu-button icon="pi pi-eye" [text]="true" severity="secondary" [disabled]="isSavePending(usuario)" aria-label="Ver detalles del usuario" (click)="onView(usuario)" />
+							<edu-button icon="pi pi-pencil" [text]="true" severity="success" [loading]="isSavePending(usuario)" [disabled]="isSavePending(usuario)" aria-label="Editar usuario" (click)="onEdit(usuario)" />
+							<edu-button [icon]="usuario.estado ? 'pi pi-ban' : 'pi pi-check'" [text]="true" [severity]="usuario.estado ? 'warn' : 'info'" [attr.aria-label]="usuario.estado ? 'Desactivar usuario' : 'Activar usuario'" (click)="onToggleEstado(usuario)" />
+							<edu-button icon="pi pi-copy" [text]="true" severity="secondary" aria-label="Copiar DNI al portapapeles" (click)="onCopyDni(usuario.dni)" />
+						</app-card-actions>
+					</div>
+				</ng-template>
+			</app-mobile-card-list>
+		}
+	} @else {
 	<edu-table
 		[value]="usuarios()"
 		[lazy]="true"
@@ -159,6 +200,7 @@
 			</tr>
 		</ng-template>
 	</edu-table>
+	}
 
 	<!-- Salon detail dialog (professors only) -->
 	<edu-dialog

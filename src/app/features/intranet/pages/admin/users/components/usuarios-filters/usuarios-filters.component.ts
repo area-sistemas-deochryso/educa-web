@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { periodoActual, filtrarPorPeriodoAcademico } from '@shared/models';
 import { SalonListDto } from '@features/intranet/pages/admin/schedules/models/salon.interface';
 import { RoleTab } from '../../models';
+import { StickyFilterBarComponent } from '@shared/components';
 import { EduButton, EduCheckbox, EduInputText, EduSelect, EduTooltip } from '@edu-ui';
 
 export interface FilterOptions {
@@ -12,7 +13,7 @@ export interface FilterOptions {
 @Component({
 	selector: 'app-users-filters',
 	standalone: true,
-	imports: [FormsModule, EduButton, EduCheckbox, EduInputText, EduSelect, EduTooltip],
+	imports: [FormsModule, StickyFilterBarComponent, EduButton, EduCheckbox, EduInputText, EduSelect, EduTooltip],
 	templateUrl: './usuarios-filters.component.html',
 	styleUrl: './usuarios-filters.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -57,6 +58,11 @@ export class UsersFiltersComponent {
 			{ label: 'Todos los salones', value: null as number | null, gradoOrden: 0 },
 			...opts];
 	});
+
+	/** Filtros activos sin contar el buscador (los muestra el botón «Filtros» de la barra compacta). */
+	readonly activeFilterCount = computed(
+		() => (this.filterEstado() !== null ? 1 : 0) + (this.filterSalonId() !== null ? 1 : 0) + (this.filterSinCorreoApoderado() ? 1 : 0),
+	);
 
 	readonly hasActiveFilters = computed(() =>
 		this.filterEstado() !== null ||
