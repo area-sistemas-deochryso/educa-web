@@ -2,6 +2,14 @@
 	/* Acento oscurecido para texto y estados activos: --primary-color es un celeste pálido (ratio 1.4 sobre fondo claro). */
 	--faq-accent-strong: color-mix(in srgb, var(--primary-color) 45%, black);
 	--faq-text-muted: #475569;
+	--faq-on-accent: #fff;
+}
+
+:host-context(.dark-mode) {
+	/* En oscuro el acento se aclara (texto sobre fondo oscuro) y el texto sobre acento pasa a oscuro. */
+	--faq-accent-strong: color-mix(in srgb, var(--primary-color) 75%, white);
+	--faq-text-muted: #cbd5e1;
+	--faq-on-accent: #0b1220;
 }
 
 .qa {
