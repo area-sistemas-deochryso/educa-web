@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 
 import { FaqAdminDto } from '../../models/faq-admin.models';
+import { CardActionsComponent, CardRowComponent, MobileCardListComponent, injectIsMobile } from '@shared/components';
 import { EduButton, EduTable, EduTag, EduTemplate, EduTooltip } from '@edu-ui';
 
 /**
@@ -11,7 +12,7 @@ import { EduButton, EduTable, EduTag, EduTemplate, EduTooltip } from '@edu-ui';
 @Component({
 	selector: 'app-faq-admin-table',
 	standalone: true,
-	imports: [EduButton, EduTable, EduTag, EduTooltip, EduTemplate],
+	imports: [MobileCardListComponent, CardRowComponent, CardActionsComponent, EduButton, EduTable, EduTag, EduTooltip, EduTemplate],
 	templateUrl: './faq-admin-table.component.html',
 	styleUrl: './faq-admin-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -19,6 +20,7 @@ import { EduButton, EduTable, EduTag, EduTemplate, EduTooltip } from '@edu-ui';
 export class FaqAdminTableComponent {
 	readonly items = input.required<FaqAdminDto[]>();
 	readonly loading = input(false);
+	readonly isMobile = injectIsMobile();
 
 	readonly edit = output<FaqAdminDto>();
 	readonly remove = output<FaqAdminDto>();

@@ -1,3 +1,30 @@
+@if (isMobile()) {
+	@if (!loading() && items().length === 0) {
+		<p class="cards-state">No hay FAQ registradas.</p>
+	} @else {
+		<app-mobile-card-list [items]="items()" [pageSize]="5">
+			<ng-template let-faq>
+				<div>
+					<app-card-row label="Pregunta">{{ faq.pregunta }}</app-card-row>
+					<app-card-row label="Categoría">{{ faq.categoria || '—' }}</app-card-row>
+					<app-card-row label="Capability">{{ faq.capabilityCodigo || 'Todos' }}</app-card-row>
+					<app-card-row label="Wizard">
+						@if (pasosCount(faq) > 0) {
+							<edu-tag severity="info" [value]="pasosCount(faq) + ' pasos'" />
+						} @else {
+							<span>—</span>
+						}
+					</app-card-row>
+					<app-card-row label="Estado"><edu-tag [severity]="faq.estado ? 'success' : 'danger'" [value]="faq.estado ? 'Activa' : 'Inactiva'" /></app-card-row>
+					<app-card-actions>
+						<edu-button icon="pi pi-pencil" [text]="true" [rounded]="true" [attr.aria-label]="'Editar ' + faq.pregunta" (click)="edit.emit(faq)" />
+						<edu-button icon="pi pi-trash" [text]="true" [rounded]="true" severity="danger" [attr.aria-label]="'Eliminar ' + faq.pregunta" (click)="remove.emit(faq)" />
+					</app-card-actions>
+				</div>
+			</ng-template>
+		</app-mobile-card-list>
+	}
+} @else {
 <edu-table [value]="items()" [loading]="loading()" dataKey="id" responsiveLayout="scroll" styleClass="faq-admin-table">
 	<ng-template pTemplate="header">
 		<tr>
@@ -55,3 +82,4 @@
 		</tr>
 	</ng-template>
 </edu-table>
+}

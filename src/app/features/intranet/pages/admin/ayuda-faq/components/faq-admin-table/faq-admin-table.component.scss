@@ -3,3 +3,10 @@
 		display: block;
 	}
 }
+
+.cards-state {
+	margin: 0;
+	padding: 1.5rem 1rem;
+	text-align: center;
+	color: var(--faq-text-muted, var(--text-color-secondary));
+}
