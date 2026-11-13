@@ -32,8 +32,11 @@
 	}
 }
 
+// `edu-tabs` es el selector real (p-tabs ya no existe en el template): sin este margen el contenido
+// de cada pestaña quedaba pegado a la línea de la barra.
+edu-tabs,
 p-tabs {
 	display: block;
-	margin-bottom: 1rem;
+	margin-bottom: 1.5rem;
 }
 // #endregion
