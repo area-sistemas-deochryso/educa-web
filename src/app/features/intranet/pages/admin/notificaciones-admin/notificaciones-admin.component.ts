@@ -9,6 +9,7 @@ import { NotificacionesAdminFacade, NotificacionesAdminStore } from './services'
 import type { NotificacionFormData } from './services';
 import { NotificacionLista } from '@data/models';
 import { createClientPaging } from '@shared/utils';
+import { CardActionsComponent, CardRowComponent, MobileCardListComponent, StickyFilterBarComponent, injectIsMobile } from '@shared/components';
 import { EduButton, EduConfirmDialog, EduConfirmationService, EduDatePicker, EduDialog, EduIconField, EduInputIcon, EduInputText, EduSelect, EduTable, EduTag, EduTextarea, EduToggle, EduTooltip } from '@edu-ui';
 
 // #endregion
@@ -36,12 +37,23 @@ import { EduButton, EduConfirmDialog, EduConfirmationService, EduDatePicker, Edu
 		KpiStatsComponent,
 		EstadoLabelPipe,
 		EstadoSeverityPipe,
-		EstadoToggleLabelPipe],
+		EstadoToggleLabelPipe,
+		StickyFilterBarComponent,
+		MobileCardListComponent,
+		CardRowComponent,
+		CardActionsComponent],
 	providers: [EduConfirmationService],
 	templateUrl: './notificaciones-admin.component.html',
 	styleUrl: './notificaciones-admin.component.scss',
 })
 export class NotificacionesAdminComponent implements OnInit {
+	readonly isMobile = injectIsMobile();
+	/** Filtros activos sin contar el buscador (los muestra el botón «Filtros» de la barra compacta). */
+	readonly activeFilterCount = computed(() => {
+		const { filterTipo, filterEstado } = this.vm();
+		return [filterTipo, filterEstado].filter((v) => v !== null && v !== undefined && v !== '').length;
+	});
+
 	// #region Dependencias
 	private facade = inject(NotificacionesAdminFacade);
 	private store = inject(NotificacionesAdminStore);

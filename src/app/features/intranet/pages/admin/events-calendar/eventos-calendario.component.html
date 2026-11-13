@@ -31,7 +31,7 @@
 <!-- #endregion -->
 
 <!-- #region Filtros -->
-<div class="filters-bar">
+<div class="filters-bar" #filtersEl>
 	<edu-icon-field>
 		<edu-input-icon styleClass="pi pi-search" />
 		<input
@@ -75,7 +75,62 @@
 </div>
 <!-- #endregion -->
 
+<app-sticky-filter-bar
+	[watch]="filtersEl"
+	[searchTerm]="vm().searchTerm"
+	placeholder="Buscar por título o descripción..."
+	[activeFilters]="activeFilterCount()"
+	(searchChange)="onSearch($event)"
+	(clearFilters)="onClearFiltros()"
+>
+	<edu-select
+		[options]="tipoOptions"
+		[optionLabel]="'label'"
+		[optionValue]="'value'"
+		[ngModel]="vm().filterTipo"
+		(ngModelChange)="onFilterTipo($event)"
+		appendTo="body"
+		placeholder="Tipo"
+	/>
+	<edu-select
+		[options]="estadoOptions"
+		[optionLabel]="'label'"
+		[optionValue]="'value'"
+		[ngModel]="vm().filterEstado"
+		(ngModelChange)="onFilterEstado($event)"
+		appendTo="body"
+		placeholder="Estado"
+	/>
+</app-sticky-filter-bar>
+
 <!-- #region Tabla -->
+@if (isMobile()) {
+	@if (vm().loading) {
+		<p class="cards-state" aria-live="polite">Cargando…</p>
+	} @else if (itemsPaging.totalRecords() === 0) {
+		<p class="cards-state">No se encontraron eventos.</p>
+	} @else {
+		<app-mobile-card-list [paging]="itemsPaging" [pageSize]="5">
+			<ng-template let-item>
+				<div>
+					<app-card-row label="Título">{{ item.titulo }}</app-card-row>
+					@if (item.ubicacion) {
+						<app-card-row label="Lugar">{{ item.ubicacion }}</app-card-row>
+					}
+					<app-card-row label="Tipo"><edu-tag [value]="uiMapping.getEventoTipoLabel(item.tipo)" styleClass="tag-neutral" /></app-card-row>
+					<app-card-row label="Fecha">{{ item.fechaInicio | date: 'dd/MM/yyyy' }}{{ item.fechaFin ? ' – ' + (item.fechaFin | date: 'dd/MM/yyyy') : '' }}</app-card-row>
+					<app-card-row label="Hora">{{ item.hora || '—' }}</app-card-row>
+					<app-card-row label="Estado"><edu-tag [value]="item.estado | estadoLabel" [severity]="item.estado | estadoSeverity" /></app-card-row>
+					<app-card-actions>
+						<edu-button icon="pi pi-pencil" [text]="true" [rounded]="true" aria-label="Editar" (click)="onEdit(item)" />
+						<edu-button [icon]="item.estado ? 'pi pi-eye-slash' : 'pi pi-eye'" [text]="true" [rounded]="true" [severity]="item.estado ? 'warn' : 'success'" [attr.aria-label]="item.estado | estadoToggleLabel" (click)="onToggleEstado(item)" />
+						<edu-button icon="pi pi-trash" [text]="true" [rounded]="true" severity="danger" aria-label="Eliminar" (click)="onDelete(item)" />
+					</app-card-actions>
+				</div>
+			</ng-template>
+		</app-mobile-card-list>
+	}
+} @else {
 <edu-table
 	[value]="itemsPaging.value()"
 	[dataKey]="'id'"
@@ -177,6 +232,7 @@
 		</tr>
 	</ng-template>
 </edu-table>
+}
 <!-- #endregion -->
 
 <!-- #region Dialog Crear/Editar -->

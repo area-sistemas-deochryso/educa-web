@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 
 import type { CapabilityCatalogItem } from '@core/services';
 import { createClientPaging } from '@shared/utils';
+import { CardActionsComponent, CardRowComponent, MobileCardListComponent, StickyFilterBarComponent, injectIsMobile } from '@shared/components';
 
 import { VistasFacade } from './services';
 import { EduButton, EduConfirmDialog, EduConfirmationService, EduDialog, EduInputText, EduSelect, EduTable, EduTag, EduTooltip } from '@edu-ui';
@@ -19,7 +20,11 @@ import { EduButton, EduConfirmDialog, EduConfirmationService, EduDialog, EduInpu
 		EduInputText,
 		EduSelect,
 		EduTag,
-		EduConfirmDialog],
+		EduConfirmDialog,
+		StickyFilterBarComponent,
+		MobileCardListComponent,
+		CardRowComponent,
+		CardActionsComponent],
 	providers: [EduConfirmationService],
 	templateUrl: './vistas.component.html',
 	styleUrl: './vistas.component.scss',
@@ -35,6 +40,12 @@ export class VistasComponent implements OnInit {
 	readonly vm = this.facade.vm;
 	showValidation = signal(false);
 	readonly itemsPaging = createClientPaging(computed(() => this.vm().items));
+	readonly isMobile = injectIsMobile();
+	/** Filtros activos sin contar el buscador (los muestra el botón «Filtros» de la barra compacta). */
+	readonly activeFilterCount = computed(() => {
+		const { filterModulo, filterRuta } = this.vm();
+		return (filterModulo ? 1 : 0) + (filterRuta !== 'all' ? 1 : 0);
+	});
 	// #endregion
 
 	// #region Lifecycle

@@ -34,7 +34,7 @@
 	<!-- #endregion -->
 
 	<!-- #region Filters -->
-	<section class="filters-section">
+	<section class="filters-section" #filtersEl>
 		<div class="search-box">
 			<i class="pi pi-search"></i>
 			<input
@@ -98,8 +98,66 @@
 	</section>
 	<!-- #endregion -->
 
+	<app-sticky-filter-bar
+		[watch]="filtersEl"
+		[searchTerm]="vm().searchTerm"
+		placeholder="Buscar por nombre o código..."
+		[activeFilters]="activeFilterCount()"
+		(searchChange)="onSearchTermChange($event)"
+		(clearFilters)="clearFilters()"
+	>
+		<edu-select
+			[options]="vm().modulosOptions"
+			[optionLabel]="'label'"
+			[optionValue]="'value'"
+			[ngModel]="vm().filterModulo"
+			(ngModelChange)="onFilterModuloChange($event)"
+			placeholder="Todos los módulos"
+			appendTo="body"
+		/>
+		<edu-select
+			[options]="vm().rutaFilterOptions"
+			[optionLabel]="'label'"
+			[optionValue]="'value'"
+			[ngModel]="vm().filterRuta"
+			(ngModelChange)="onFilterRutaChange($event)"
+			appendTo="body"
+		/>
+		<edu-button sfbActions label="Nueva Capability" icon="pi pi-plus" severity="success" (click)="openNew()" />
+	</app-sticky-filter-bar>
+
 	<!-- #region Table -->
 	<section class="table-section">
+		@if (isMobile()) {
+			@if (vm().loading) {
+				<p class="cards-state" aria-live="polite">Cargando capabilities…</p>
+			} @else if (itemsPaging.totalRecords() === 0) {
+				<p class="cards-state">No se encontraron capabilities. Intenta ajustar los filtros de búsqueda.</p>
+			} @else {
+				<app-mobile-card-list [paging]="itemsPaging" [pageSize]="5">
+					<ng-template let-cap>
+						<div class="cap-card">
+							<app-card-row label="Módulo"><span class="modulo-badge"><i class="pi pi-folder"></i> {{ cap.modulo }}</span></app-card-row>
+							<app-card-row label="Código"><span class="ruta-text">{{ cap.codigo }}</span></app-card-row>
+							<app-card-row label="Nombre"><span class="nombre-text">{{ cap.nombre }}</span></app-card-row>
+							<app-card-row label="Ruta">
+								@if (cap.ruta) {
+									<code class="ruta-text">/{{ cap.ruta }}</code>
+								} @else if (cap.descripcion) {
+									<span class="text-muted">{{ cap.descripcion }}</span>
+								} @else {
+									<span class="text-muted">—</span>
+								}
+							</app-card-row>
+							<app-card-actions>
+								<edu-button icon="pi pi-pencil" [text]="true" [rounded]="true" severity="info" aria-label="Editar" (click)="editCapability(cap)" />
+								<edu-button icon="pi pi-trash" [text]="true" [rounded]="true" severity="danger" aria-label="Eliminar" (click)="deleteCapability(cap)" />
+							</app-card-actions>
+						</div>
+					</ng-template>
+				</app-mobile-card-list>
+			}
+		} @else {
 		<edu-table
 			[value]="itemsPaging.value()"
 			dataKey="id"
@@ -199,6 +257,7 @@
 					</tr>
 				</ng-template>
 			</edu-table>
+		}
 	</section>
 	<!-- #endregion -->
 </div>
