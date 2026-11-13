@@ -1,6 +1,6 @@
-<div class="qa" [class.qa--detail-open]="detailOpen()">
+<div class="qa" [class.qa--detail-open]="detailOpen()" [class.qa--bar]="stickyBarOn()">
 	<!-- #region Cabecera -->
-	<div class="qa__header">
+	<div class="qa__header" #headerEl>
 		<app-faq-header
 			[compact]="headerCompact()"
 			[searchTerm]="searchTerm()"
@@ -17,6 +17,24 @@
 			(faqSelected)="onFaqSelected($event)"
 			(ticketRequested)="onTicketRequested()"
 		/>
+	</div>
+	<!-- #endregion -->
+
+	<!-- #region Barra compacta (aparece al salir la cabecera) -->
+	<div class="qa__stickybar" [class.qa__stickybar--on]="stickyBarOn()">
+		<div class="qa__stickybar-inner">
+			<app-faq-sticky-bar
+				[searchTerm]="searchTerm()"
+				[modoVista]="modoVista()"
+				[categoria]="categoria()"
+				[chips]="chips()"
+				[paraTiCount]="paraTiCount()"
+				[todasCount]="todasCount()"
+				(searchChange)="onSearchChange($event)"
+				(modoChange)="onModoVistaChange($event)"
+				(categoriaChange)="onCategoriaChange($event)"
+			/>
+		</div>
 	</div>
 	<!-- #endregion -->
 

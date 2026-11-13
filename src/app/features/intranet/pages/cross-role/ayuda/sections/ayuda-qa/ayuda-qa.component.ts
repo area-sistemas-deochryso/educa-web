@@ -1,12 +1,16 @@
 // #region Imports
 import {
+	AfterViewInit,
 	ChangeDetectionStrategy,
 	Component,
+	DestroyRef,
+	ElementRef,
 	HostListener,
 	OnInit,
 	computed,
 	effect,
 	inject,
+	signal,
 	untracked,
 	viewChild,
 } from '@angular/core';
@@ -18,6 +22,7 @@ import { FaqDto, FaqMotivo } from '../../models/faq.models';
 import { FaqDetailComponent } from './components/faq-detail/faq-detail.component';
 import { FaqHeaderComponent } from './components/faq-header/faq-header.component';
 import { FaqListComponent } from './components/faq-list/faq-list.component';
+import { FaqStickyBarComponent } from './components/faq-sticky-bar/faq-sticky-bar.component';
 import { AyudaQaFacade, ModoVista } from './services/ayuda-qa.facade';
 import { EduButton, EduSpinner } from '@edu-ui';
 // #endregion
@@ -37,6 +42,7 @@ const FAQ_QUERY_PARAM = 'faq';
 		EduButton,
 		EduSpinner,
 		FaqHeaderComponent,
+		FaqStickyBarComponent,
 		FaqListComponent,
 		FaqDetailComponent,
 	],
@@ -45,11 +51,12 @@ const FAQ_QUERY_PARAM = 'faq';
 	styleUrl: './ayuda-qa.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AyudaQaComponent implements OnInit {
+export class AyudaQaComponent implements OnInit, AfterViewInit {
 	// #region Dependencies
 	private readonly facade = inject(AyudaQaFacade);
 	private readonly route = inject(ActivatedRoute);
 	private readonly router = inject(Router);
+	private readonly destroyRef = inject(DestroyRef);
 	// #endregion
 
 	// #region State del facade
@@ -91,9 +98,42 @@ export class AyudaQaComponent implements OnInit {
 	// #endregion
 
 	private readonly header = viewChild(FaqHeaderComponent);
+	private readonly stickyBar = viewChild(FaqStickyBarComponent);
+	private readonly headerEl = viewChild<ElementRef<HTMLElement>>('headerEl');
+
+	// #region Barra compacta al hacer scroll
+	/** Alto aproximado del encabezado fijo de la app: la cabecera «sale» cuando pasa por debajo de él. */
+	private static readonly APP_HEADER_PX = 80;
+
+	/** `true` cuando la cabecera ya salió de la pantalla por arriba. */
+	private readonly headerGone = signal(false);
+
+	/** La barra compacta solo aparece si la cabecera no está compacta (con filtros activos ya lo está). */
+	readonly stickyBarOn = computed(() => this.headerGone() && !this.headerCompact());
+
+	/** Si la barra se oculta con el foco dentro (porque el filtrado encogió la página), el foco vuelve a la cabecera. */
+	private readonly restoreFocus = effect(() => {
+		if (this.stickyBarOn()) return;
+		untracked(() => {
+			if (this.stickyBar()?.hasFocus()) this.header()?.focusSearch();
+		});
+	});
+	// #endregion
 
 	ngOnInit(): void {
 		this.facade.init();
+	}
+
+	ngAfterViewInit(): void {
+		const el = this.headerEl()?.nativeElement;
+		if (!el || typeof IntersectionObserver === 'undefined') return;
+		const observer = new IntersectionObserver(
+			([entry]) =>
+				this.headerGone.set(!entry.isIntersecting && entry.boundingClientRect.top < 0),
+			{ rootMargin: `-${AyudaQaComponent.APP_HEADER_PX}px 0px 0px 0px` },
+		);
+		observer.observe(el);
+		this.destroyRef.onDestroy(() => observer.disconnect());
 	}
 
 	// #region Handlers
@@ -160,7 +200,8 @@ export class AyudaQaComponent implements OnInit {
 
 		if (event.key === '/' && !this.isTypingTarget(event.target)) {
 			event.preventDefault();
-			this.header()?.focusSearch();
+			if (this.stickyBarOn()) this.stickyBar()?.focusSearch();
+			else this.header()?.focusSearch();
 		}
 	}
 

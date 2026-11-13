@@ -1,0 +1,66 @@
+<div class="sbar" role="search">
+	<label class="sbar__search">
+		<i class="pi pi-search sbar__icon" aria-hidden="true"></i>
+		<input
+			#searchInput
+			type="text"
+			class="sbar__input"
+			placeholder="Buscar en preguntas frecuentes"
+			aria-label="Buscar en preguntas frecuentes"
+			[value]="searchTerm()"
+			(input)="onSearchInput($event)"
+		/>
+	</label>
+
+	<div class="sbar__seg" role="group" aria-label="Modo de vista">
+		<button
+			type="button"
+			class="sbar__segbtn"
+			[class.sbar__segbtn--on]="modoVista() === 'para-ti'"
+			[attr.aria-pressed]="modoVista() === 'para-ti'"
+			(click)="modoChange.emit('para-ti')"
+		>
+			Para ti <em class="sbar__count">{{ paraTiCount() }}</em>
+		</button>
+		<button
+			type="button"
+			class="sbar__segbtn"
+			[class.sbar__segbtn--on]="modoVista() === 'todas'"
+			[attr.aria-pressed]="modoVista() === 'todas'"
+			(click)="modoChange.emit('todas')"
+		>
+			Todas <em class="sbar__count">{{ todasCount() }}</em>
+		</button>
+	</div>
+
+	<div class="sbar__cats">
+		<button
+			type="button"
+			class="sbar__catbtn"
+			[class.sbar__catbtn--active]="categoria() !== null"
+			aria-haspopup="true"
+			[attr.aria-expanded]="menuOpen()"
+			(click)="toggleMenu()"
+		>
+			<i class="pi pi-filter" aria-hidden="true"></i>
+			<span class="sbar__catlabel">{{ categoria() ?? 'Categorías' }}</span>
+			<i class="pi pi-chevron-down sbar__chev" aria-hidden="true"></i>
+		</button>
+
+		@if (menuOpen()) {
+			<div class="sbar__menu" role="group" aria-label="Categorías">
+				@for (chip of chips(); track chip.value) {
+					<button
+						type="button"
+						class="sbar__item"
+						[class.sbar__item--on]="categoria() === chip.value"
+						[attr.aria-pressed]="categoria() === chip.value"
+						(click)="onCategoria(chip.value)"
+					>
+						{{ chip.value ?? 'Todas' }}<em class="sbar__count">{{ chip.count }}</em>
+					</button>
+				}
+			</div>
+		}
+	</div>
+</div>

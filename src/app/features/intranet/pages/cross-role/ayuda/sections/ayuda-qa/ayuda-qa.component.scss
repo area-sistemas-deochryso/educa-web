@@ -14,6 +14,41 @@
 		overflow-y: auto;
 	}
 
+	// Barra compacta: contenedor pegajoso de alto 0 (no ocupa espacio) con la barra absoluta dentro.
+	&__stickybar {
+		position: sticky;
+		top: var(--ayuda-sticky-top, 4.9rem);
+		z-index: 6;
+		height: 0;
+		pointer-events: none;
+	}
+
+	&__stickybar-inner {
+		position: absolute;
+		inset: 0 0 auto;
+		visibility: hidden;
+		opacity: 0;
+		transform: translateY(-0.75rem);
+		transition:
+			transform 0.2s ease,
+			opacity 0.2s ease,
+			visibility 0s linear 0.2s;
+	}
+
+	&__stickybar--on &__stickybar-inner {
+		visibility: visible;
+		opacity: 1;
+		transform: none;
+		pointer-events: auto;
+		transition-delay: 0s;
+	}
+
+	// Con la barra visible, el detalle pegajoso baja para no quedar tapado por ella.
+	&--bar &__detail {
+		top: 9.75rem;
+		max-height: calc(100vh - 10.75rem);
+	}
+
 	&__detail-hint {
 		display: grid;
 		place-items: center;
@@ -83,6 +118,10 @@
 		display: none;
 	}
 
+	.qa--detail-open .qa__stickybar {
+		display: none;
+	}
+
 	.qa--detail-open {
 		.qa__header,
 		.qa__list {
@@ -92,5 +131,11 @@
 		.qa__detail {
 			display: block;
 		}
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.qa__stickybar-inner {
+		transition: none;
 	}
 }
