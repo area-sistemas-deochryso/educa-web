@@ -5,6 +5,8 @@ export interface ClientPaging<T> {
 	readonly value: Signal<readonly T[]>;
 	readonly totalRecords: Signal<number>;
 	readonly first: Signal<number>;
+	/** Filas por página vigentes (lo usan las vistas que paginan por su cuenta, como las cards móviles). */
+	readonly rows: Signal<number>;
 	onPageChange(event: EduPaginatorPageEvent): void;
 }
 
@@ -25,5 +27,5 @@ export function createClientPaging<T>(source: Signal<readonly T[]>, initialRows 
 		rows.set(event.rows);
 	}
 
-	return { value, totalRecords, first: first.asReadonly(), onPageChange };
+	return { value, totalRecords, first: first.asReadonly(), rows: rows.asReadonly(), onPageChange };
 }

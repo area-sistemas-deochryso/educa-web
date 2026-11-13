@@ -102,6 +102,50 @@
 
 	<!-- Table -->
 	<section class="table-section">
+	@if (isMobile()) {
+			@if (vm().loading) {
+				<p class="cards-state" aria-live="polite">Cargando cursos…</p>
+			} @else if (cursosPaging.totalRecords() === 0) {
+				<div class="empty-state">
+					<i class="pi pi-inbox"></i>
+					<p>No se encontraron cursos</p>
+					<span>Intenta ajustar los filtros de busqueda</span>
+				</div>
+			} @else {
+				<app-mobile-card-list [paging]="cursosPaging" [pageSize]="5">
+					<ng-template let-curso>
+						<div class="curso-card" [class.curso-card--inactive]="!curso.estado">
+							<app-card-row label="ID"><span class="id-badge">{{ curso.id }}</span></app-card-row>
+							<app-card-row label="Nombre"><span class="nombre-text">{{ curso.nombre }}</span></app-card-row>
+							<app-card-row label="Grados">
+								@if (curso.grados && curso.grados.length > 0) {
+									<edu-button
+										[label]="curso.grados.length + ' grado' + (curso.grados.length > 1 ? 's' : '')"
+										icon="pi pi-eye"
+										size="small"
+										[outlined]="true"
+										severity="secondary"
+										(click)="showGrados(curso)"
+										[pt]="{ root: { 'aria-label': 'Ver grados' } }"
+									/>
+								} @else {
+									<span class="text-muted">Sin grados</span>
+								}
+							</app-card-row>
+							<app-card-row label="Estado">
+								<edu-tag [value]="curso.estado | estadoLabel" [severity]="curso.estado | estadoSeverity" />
+							</app-card-row>
+							<app-card-row label="Completitud">
+								<ng-container *ngTemplateOutlet="completitudTpl; context: { $implicit: curso }" />
+							</app-card-row>
+							<app-card-actions>
+								<ng-container *ngTemplateOutlet="accionesTpl; context: { $implicit: curso }" />
+							</app-card-actions>
+						</div>
+					</ng-template>
+				</app-mobile-card-list>
+			}
+		} @else {
 		<edu-table
 			[value]="cursosPaging.value()"
 			[dataKey]="'id'"
@@ -169,7 +213,34 @@
 						/>
 					</td>
 					<td class="text-left">
-						<div class="completitud-badges">
+						<ng-container *ngTemplateOutlet="completitudTpl; context: { $implicit: curso }" />
+					</td>
+					<td>
+						<div class="actions">
+							<ng-container *ngTemplateOutlet="accionesTpl; context: { $implicit: curso }" />
+						</div>
+					</td>
+				</tr>
+			</ng-template>
+
+			<ng-template #emptymessage>
+				<tr>
+					<td colspan="6" class="empty-message">
+						<div class="empty-state">
+							<i class="pi pi-inbox"></i>
+							<p>No se encontraron cursos</p>
+							<span>Intenta ajustar los filtros de busqueda</span>
+						</div>
+					</td>
+				</tr>
+			</ng-template>
+		</edu-table>
+		}
+	</section>
+
+	<!-- Plantillas compartidas por la tabla y las cards móviles -->
+	<ng-template #completitudTpl let-curso>
+		<div class="completitud-badges">
 							@if (!vm().completitudPorCurso.get(curso.id)) {
 								<span class="text-muted">—</span>
 							} @else {
@@ -208,9 +279,9 @@
 								}
 							}
 						</div>
-					</td>
-					<td>
-						<div class="actions">
+	</ng-template>
+
+	<ng-template #accionesTpl let-curso>
 							<!-- Editar -->
 							<edu-button
 								icon="pi pi-pencil"
@@ -258,24 +329,8 @@
 									},
 								}"
 							/>
-						</div>
-					</td>
-				</tr>
-			</ng-template>
+	</ng-template>
 
-			<ng-template #emptymessage>
-				<tr>
-					<td colspan="6" class="empty-message">
-						<div class="empty-state">
-							<i class="pi pi-inbox"></i>
-							<p>No se encontraron cursos</p>
-							<span>Intenta ajustar los filtros de busqueda</span>
-						</div>
-					</td>
-				</tr>
-			</ng-template>
-		</edu-table>
-	</section>
 </div>
 
 <!-- Edit/Create Dialog -->

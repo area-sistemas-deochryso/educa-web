@@ -2,12 +2,17 @@ import { NgTemplateOutlet } from '@angular/common';
 import {
 	ChangeDetectionStrategy,
 	Component,
+	OnDestroy,
+	OnInit,
 	TemplateRef,
 	computed,
 	contentChild,
+	effect,
 	input,
-	signal,
+	untracked,
 } from '@angular/core';
+
+import { ClientPaging, createClientPaging } from '@shared/utils/client-paging.utils';
 
 /**
  * Lista de cards con paginación compacta (anterior / siguiente + «1 de N»), pensada para reemplazar una
@@ -22,7 +27,11 @@ import {
  * </app-mobile-card-list>
  * ```
  *
- * La paginación es local (corta `items`): no sirve para tablas paginadas por servidor.
+ * Dos modos de paginación (ambos del lado del cliente):
+ * - **Local**: se pasa `[items]` con la lista completa y el componente la corta por página.
+ * - **Compartido**: se pasa `[paging]` con el `ClientPaging` de la tabla de escritorio, así que tabla y
+ *   cards comparten la página actual. El tamaño de página pasa a `pageSize` mientras las cards están
+ *   montadas y se restaura al desmontarlas.
  */
 @Component({
 	selector: 'app-mobile-card-list',
@@ -32,30 +41,63 @@ import {
 	templateUrl: './mobile-card-list.component.html',
 	styleUrl: './mobile-card-list.component.scss',
 })
-export class MobileCardListComponent<T> {
-	readonly items = input.required<readonly T[]>();
+export class MobileCardListComponent<T> implements OnInit, OnDestroy {
+	readonly items = input<readonly T[]>([]);
+	readonly paging = input<ClientPaging<T> | null>(null);
 	readonly pageSize = input(5);
 
 	protected readonly cardTemplate = contentChild.required(TemplateRef);
 
-	private readonly requestedPage = signal(0);
+	private readonly local = createClientPaging<T>(computed(() => this.items()), 5);
+	private readonly active = computed(() => this.paging() ?? this.local);
+	private rowsToRestore: number | null = null;
 
-	readonly pageCount = computed(() => Math.max(1, Math.ceil(this.items().length / this.pageSize())));
+	private readonly rows = computed(() => this.active().rows());
+	private readonly total = computed(() => this.active().totalRecords());
 
-	/** Página efectiva (0-based): si la lista se acorta, no queda apuntando a una página que ya no existe. */
-	readonly page = computed(() => Math.min(this.requestedPage(), this.pageCount() - 1));
+	readonly pageCount = computed(() => Math.max(1, Math.ceil(this.total() / this.rows())));
+	readonly page = computed(() =>
+		Math.min(Math.floor(this.active().first() / this.rows()), this.pageCount() - 1),
+	);
+	readonly pageItems = computed(() => this.active().value());
 
-	readonly pageItems = computed(() => {
-		const size = this.pageSize();
-		const start = this.page() * size;
-		return this.items().slice(start, start + size);
+	/** Si la lista se acorta (p. ej. por un filtro), no queda apuntando a una página que ya no existe. */
+	private readonly clampPage = effect(() => {
+		const total = this.total();
+		const rows = this.rows();
+		if (total > 0 && this.active().first() >= total) {
+			untracked(() => this.goTo(Math.ceil(total / rows) - 1));
+		}
 	});
 
+	ngOnInit(): void {
+		const wanted = this.pageSize();
+		const current = this.rows();
+		if (wanted === current) return;
+		if (this.paging()) this.rowsToRestore = current;
+		this.setRows(wanted);
+	}
+
+	ngOnDestroy(): void {
+		if (this.rowsToRestore !== null) this.setRows(this.rowsToRestore);
+	}
+
 	previous(): void {
-		this.requestedPage.set(Math.max(0, this.page() - 1));
+		this.goTo(this.page() - 1);
 	}
 
 	next(): void {
-		this.requestedPage.set(Math.min(this.pageCount() - 1, this.page() + 1));
+		this.goTo(this.page() + 1);
+	}
+
+	private goTo(page: number): void {
+		const rows = this.rows();
+		const target = Math.min(Math.max(0, page), this.pageCount() - 1);
+		this.active().onPageChange({ first: target * rows, rows, page: target, pageCount: this.pageCount() });
+	}
+
+	private setRows(rows: number): void {
+		const pageCount = Math.max(1, Math.ceil(this.total() / rows));
+		this.active().onPageChange({ first: 0, rows, page: 0, pageCount });
 	}
 }

@@ -519,3 +519,51 @@
 	}
 }
 // #endregion
+
+// #region CARDS MÓVILES
+.cards-state {
+	padding: 2rem 0;
+	text-align: center;
+	color: var(--faq-text-muted, var(--text-color-secondary));
+}
+
+.curso-card {
+	&--inactive {
+		opacity: 0.7;
+	}
+
+	.id-badge {
+		display: inline-block;
+		padding: 0.25rem 0.5rem;
+		background: var(--surface-100);
+		border-radius: 6px;
+		font-size: 0.85rem;
+		font-weight: 600;
+	}
+
+	.nombre-text {
+		font-weight: 600;
+	}
+
+	.text-muted {
+		opacity: 0.7;
+		font-size: 0.85rem;
+		font-style: italic;
+	}
+}
+// #endregion
+
+// #region MÓVIL
+// El layout de la intranet ya aporta el margen lateral (20 px): sin esto la página sumaba 24 px más por lado,
+// y las cards (que ya tienen su propio marco) no necesitan el de la sección.
+@media (max-width: 767px) {
+	.cursos-container {
+		padding: 0.5rem 0;
+	}
+
+	.table-section {
+		border: 0;
+		border-radius: 0;
+	}
+}
+// #endregion
