@@ -10,7 +10,6 @@ export * from './voice-button';
 export * from './page-header';
 export * from './empty-state';
 export * from './period-toggle';
-export * from './responsive-table';
 export * from './stats-skeleton';
 export * from './kpi-stats';
 export * from './picker-grid';

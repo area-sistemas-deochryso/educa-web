@@ -11,7 +11,7 @@ import {
 import { SlicePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EstudianteAsistencia, EstadisticasAsistenciaDia } from '@data/models';
-import { ResponsiveTableComponent, TableSkeletonComponent } from '@intranet-shared/components';
+import { TableSkeletonComponent } from '@intranet-shared/components';
 import type { SkeletonColumnDef } from '@intranet-shared/components';
 import { FormatTimePipe, InitialsPipe } from '@intranet-shared/pipes';
 import { getStatusClass } from '@features/intranet/pages/cross-role/attendance-component/config/attendance.constants';
@@ -46,7 +46,6 @@ export interface JustificacionEvent {
 		FormsModule,
 		EduTable,
 		TableSkeletonComponent,
-		ResponsiveTableComponent,
 		EduButton,
 		EduMenu,
 		EduTooltip,

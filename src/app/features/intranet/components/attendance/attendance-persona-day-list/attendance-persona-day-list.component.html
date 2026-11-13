@@ -91,16 +91,63 @@
 } @else if (personasDelDia().length === 0 || !hasDayData()) {
 	<app-empty-state message="No hay registros de asistencia para esta fecha." />
 } @else {
-	<app-responsive-table
-		[value]="filteredPersonas()"
-		[paginator]="false"
-		emptyMessage="No hay registros de asistencia"
-		emptyIcon="pi pi-users"
-		ariaLabel="Lista de asistencia del día"
-	>
-		<!-- #region Desktop: tabla estándar -->
-		<ng-template #desktopView>
-			<edu-table [value]="filteredPersonas()" class="p-datatable-sm asistencia-table">
+	@if (isMobile()) {
+		<app-mobile-card-list [items]="filteredPersonas()" [pageSize]="8">
+			<ng-template let-persona>
+<div
+				class="mobile-card-inner"
+				[class.row-clickable]="allowJustify() && persona.puedeJustificar"
+				(click)="onPersonaClick(persona)"
+			>
+				<div class="mobile-card-title">
+					<div class="estudiante-info">
+						<span class="nombre">{{ persona.nombreCompleto }}</span>
+						<span class="dni">DNI: {{ persona.dni }}</span>
+					</div>
+					<span class="estado-box" [class]="getStatusClass(persona.estadoCodigo)">
+						{{ persona.estadoCodigo }}
+					</span>
+				</div>
+
+				<app-card-row label="Entrada">
+					<span class="hora" [class.hora-empty]="!persona.horaEntrada">{{ persona.horaEntrada | formatTime }}</span>
+				</app-card-row>
+				<app-card-row label="Salida">
+					<span class="hora" [class.hora-empty]="!persona.horaSalida">{{ persona.horaSalida | formatTime }}</span>
+				</app-card-row>
+
+				@if (persona.observacion) {
+					<div class="mobile-card-observacion">
+						<span class="observacion">
+							<i class="pi pi-info-circle"></i>
+							{{ persona.observacion }}
+						</span>
+					</div>
+				}
+
+				@if (showEditAdminAction()) {
+					<app-card-actions>
+						<edu-button
+							type="button"
+							icon="pi pi-pencil"
+							label="Editar"
+							[outlined]="true"
+							size="small"
+							severity="info"
+							(click)="onEditAdminClick($event, persona)"
+							[pt]="{
+								root: {
+									'aria-label': 'Editar asistencia del profesor en admin',
+								},
+							}"
+						/>
+					</app-card-actions>
+				}
+			</div>
+			</ng-template>
+		</app-mobile-card-list>
+	} @else {
+		<edu-table [value]="filteredPersonas()" class="p-datatable-sm asistencia-table">
 				<ng-template #header>
 					<tr>
 						<th style="width: 50px">#</th>
@@ -188,70 +235,7 @@
 					</tr>
 				</ng-template>
 			</edu-table>
-		</ng-template>
-		<!-- #endregion -->
-
-		<!-- #region Mobile: card por persona -->
-		<ng-template #mobileCard let-persona>
-			<div
-				class="mobile-card-inner"
-				[class.row-clickable]="allowJustify() && persona.puedeJustificar"
-				(click)="onPersonaClick(persona)"
-			>
-				<div class="rt-card__title mobile-card-title">
-					<div class="estudiante-info">
-						<span class="nombre">{{ persona.nombreCompleto }}</span>
-						<span class="dni">DNI: {{ persona.dni }}</span>
-					</div>
-					<span class="estado-box" [class]="getStatusClass(persona.estadoCodigo)">
-						{{ persona.estadoCodigo }}
-					</span>
-				</div>
-
-				<div class="rt-card__field">
-					<span class="rt-card__label"><i class="pi pi-sign-in"></i> Entrada</span>
-					<span class="hora" [class.hora-empty]="!persona.horaEntrada">
-						{{ persona.horaEntrada | formatTime }}
-					</span>
-				</div>
-				<div class="rt-card__field">
-					<span class="rt-card__label"><i class="pi pi-sign-out"></i> Salida</span>
-					<span class="hora" [class.hora-empty]="!persona.horaSalida">
-						{{ persona.horaSalida | formatTime }}
-					</span>
-				</div>
-
-				@if (persona.observacion) {
-					<div class="rt-card__field mobile-card-observacion">
-						<span class="observacion">
-							<i class="pi pi-info-circle"></i>
-							{{ persona.observacion }}
-						</span>
-					</div>
-				}
-
-				@if (showEditAdminAction()) {
-					<div class="rt-card__field mobile-card-actions">
-						<edu-button
-							type="button"
-							icon="pi pi-pencil"
-							label="Editar en admin"
-							[outlined]="true"
-							size="small"
-							severity="info"
-							(click)="onEditAdminClick($event, persona)"
-							[pt]="{
-								root: {
-									'aria-label': 'Editar asistencia del profesor en admin',
-								},
-							}"
-						/>
-					</div>
-				}
-			</div>
-		</ng-template>
-		<!-- #endregion -->
-	</app-responsive-table>
+	}
 }
 <!-- #endregion -->
 

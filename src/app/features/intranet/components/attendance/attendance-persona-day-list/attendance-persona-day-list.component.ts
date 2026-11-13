@@ -16,7 +16,8 @@ import {
 	PersonaAsistencia,
 	TipoPersona,
 } from '@data/models';
-import { ResponsiveTableComponent, TableSkeletonComponent } from '@intranet-shared/components';
+import { TableSkeletonComponent } from '@intranet-shared/components';
+import { CardActionsComponent, CardRowComponent, MobileCardListComponent, injectIsMobile } from '@shared/components';
 import type { SkeletonColumnDef } from '@intranet-shared/components';
 import { FormatTimePipe, InitialsPipe } from '@intranet-shared/pipes';
 import { getStatusClass } from '@features/intranet/pages/cross-role/attendance-component/config/attendance.constants';
@@ -52,7 +53,9 @@ export interface JustificacionPersonaEvent {
 		FormsModule,
 		EduTable,
 		TableSkeletonComponent,
-		ResponsiveTableComponent,
+		MobileCardListComponent,
+		CardRowComponent,
+		CardActionsComponent,
 		EduButton,
 		EduMenu,
 		EduTooltip,
@@ -114,6 +117,7 @@ export class AttendancePersonaDayListComponent {
 	// * Local state for the datepicker model (signal for OnPush reactivity)
 	readonly fechaValue = signal<Date>(new Date());
 	readonly searchTerm = signal('');
+	readonly isMobile = injectIsMobile();
 
 	// #region Estado del diálogo de justificación
 	readonly dialogVisible = signal(false);
