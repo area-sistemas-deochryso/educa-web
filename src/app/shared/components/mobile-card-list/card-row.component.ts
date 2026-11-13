@@ -31,6 +31,8 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
 		.card-row__value {
 			min-width: 0;
+			font-size: 0.9375rem;
+			line-height: 1.4;
 			overflow-wrap: anywhere;
 			white-space: pre-wrap;
 			color: var(--text-color);

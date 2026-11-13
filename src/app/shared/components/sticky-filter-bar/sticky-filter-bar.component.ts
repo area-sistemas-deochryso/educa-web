@@ -56,28 +56,41 @@ export class StickyFilterBarComponent {
 
 	private readonly observe = effect((onCleanup) => {
 		const el = this.watch();
-		if (!el || typeof IntersectionObserver === 'undefined') return;
+		if (!el) return;
 
-		let observer: IntersectionObserver | null = null;
-		const start = (): void => {
-			const top = this.appHeaderBottom();
-			this.host.nativeElement.style.setProperty('--sfb-top', `${top}px`);
-			observer?.disconnect();
-			observer = new IntersectionObserver(
-				([entry]) => {
-					const gone = !entry.isIntersecting && entry.boundingClientRect.bottom < top;
-					this.gone.set(gone);
-					if (!gone) this.open.set(false);
-				},
-				{ rootMargin: `-${top}px 0px 0px 0px` },
-			);
-			observer.observe(el);
+		let top = this.appHeaderBottom();
+		let frame = 0;
+		const check = (): void => {
+			frame = 0;
+			// Solo cuenta como «fuera» si el bloque ya pasó por arriba del encabezado (no si aún no llegó).
+			const gone = el.getBoundingClientRect().bottom < top;
+			if (gone === this.gone()) return;
+			this.gone.set(gone);
+			if (!gone) this.open.set(false);
 		};
-		start();
-		window.addEventListener('resize', start);
+		const schedule = (): void => {
+			if (!frame) frame = requestAnimationFrame(check);
+		};
+		const measure = (): void => {
+			top = this.appHeaderBottom();
+			this.host.nativeElement.style.setProperty('--sfb-top', `${top}px`);
+			schedule();
+		};
+
+		measure();
+		// El scroll puede ocurrir en el documento o en un contenedor interno: se escucha en captura.
+		window.addEventListener('scroll', schedule, { capture: true, passive: true });
+		window.addEventListener('resize', measure);
+		// El encabezado puede crecer después de montar (breadcrumb, banners): se vuelve a medir.
+		const header = document.querySelector('header.intranet-header');
+		const headerResize =
+			header && typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measure) : null;
+		if (header) headerResize?.observe(header);
 		onCleanup(() => {
-			window.removeEventListener('resize', start);
-			observer?.disconnect();
+			if (frame) cancelAnimationFrame(frame);
+			window.removeEventListener('scroll', schedule, { capture: true });
+			window.removeEventListener('resize', measure);
+			headerResize?.disconnect();
 		});
 	});
 
