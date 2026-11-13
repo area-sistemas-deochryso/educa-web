@@ -1,4 +1,34 @@
 <!-- #region Tabla de salones -->
+@if (isMobile()) {
+	@if (!loading() && salones().length === 0) {
+		<p class="cards-state">No hay salones para este nivel y año.</p>
+	} @else {
+		<app-mobile-card-list [items]="salones()" [pageSize]="5">
+			<ng-template let-salon>
+				<div>
+					<app-card-row label="Salón">{{ salon.grado }} {{ salon.seccion }}</app-card-row>
+					<app-card-row label="Modo"><app-modo-asignacion-badge [modo]="getModoAsignacion(salon)" /></app-card-row>
+					<app-card-row label="Sede">{{ salon.sede }}</app-card-row>
+					<app-card-row label="Tutor">{{ salon.tutorNombre || '—' }}</app-card-row>
+					<app-card-row label="Alumnos">{{ salon.totalEstudiantes }}</app-card-row>
+					<app-card-row label="Notas">
+						<edu-tag [value]="'' + salon.aprobados + ' aprob.'" severity="success" />
+						<edu-tag [value]="'' + salon.desaprobados + ' desap.'" severity="danger" />
+						<edu-tag [value]="'' + salon.pendientes + ' pend.'" severity="warn" />
+					</app-card-row>
+					<app-card-row label="Periodo">
+						<edu-tag [value]="getEstadoPeriodoLabel(salon.estadoPeriodo)" [severity]="getEstadoPeriodoSeverity(salon.estadoPeriodo)" />
+					</app-card-row>
+					<app-card-actions>
+						<edu-button icon="pi pi-eye" [text]="true" [rounded]="true" aria-label="Ver salón" (click)="selectSalon.emit(salon.id)" />
+						<edu-button icon="pi pi-calendar" [text]="true" [rounded]="true" aria-label="Ver horarios de este salón" (click)="goToHorarios.emit(salon.id)" />
+						<edu-button icon="pi pi-users" [text]="true" [rounded]="true" aria-label="Ver usuarios de este salón" (click)="goToUsuarios.emit(salon.id)" />
+					</app-card-actions>
+				</div>
+			</ng-template>
+		</app-mobile-card-list>
+	}
+} @else {
 <edu-table
 	[value]="salones()"
 	[dataKey]="'id'"
@@ -133,4 +163,5 @@
 		</tr>
 	</ng-template>
 </edu-table>
+}
 <!-- #endregion -->

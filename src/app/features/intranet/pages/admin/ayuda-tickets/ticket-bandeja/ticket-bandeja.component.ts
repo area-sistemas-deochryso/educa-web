@@ -7,6 +7,7 @@ import { UserPermissionsService } from '@core/services';
 
 import { TicketAdminDto, TicketEstado } from '../models/ticket-admin.models';
 import { TicketBandejaFacade } from '../services/ticket-bandeja.facade';
+import { CardRowComponent, MobileCardListComponent, injectIsMobile } from '@shared/components';
 import { EduSelect, EduSortableColumn, EduSpinner, EduTable, EduTag } from '@edu-ui';
 // #endregion
 
@@ -48,7 +49,7 @@ const ESTADO_LABEL: Record<TicketEstado, string> = {
 @Component({
 	selector: 'app-ticket-bandeja',
 	standalone: true,
-	imports: [DatePipe, EduTable, FormsModule, EduSpinner, EduSelect, EduSortableColumn, EduTag],
+	imports: [MobileCardListComponent, CardRowComponent, DatePipe, EduTable, FormsModule, EduSpinner, EduSelect, EduSortableColumn, EduTag],
 	providers: [TicketBandejaFacade],
 	templateUrl: './ticket-bandeja.component.html',
 	styleUrl: './ticket-bandeja.component.scss',
@@ -57,6 +58,7 @@ const ESTADO_LABEL: Record<TicketEstado, string> = {
 export class TicketBandejaComponent implements OnInit {
 	// #region Dependencies
 	private readonly facade = inject(TicketBandejaFacade);
+	readonly isMobile = injectIsMobile();
 	private readonly userPermisos = inject(UserPermissionsService);
 	// #endregion
 

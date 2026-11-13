@@ -37,30 +37,19 @@
 				<p>No hay tickets{{ filtroEstado() ? ' con este estado' : '' }}.</p>
 			</div>
 		} @else {
-			<section class="table-section">
-				<edu-table [value]="tickets()" dataKey="id" [scrollable]="true" styleClass="p-datatable-sm">
-					<ng-template #header>
-						<tr>
-							<th eduSortableColumn="tipoNombre" data-info-anchor="tabla-orden-columna">TIPO </th>
-							<th>DESCRIPCIÓN</th>
-							<th>PROPUESTA</th>
-							<th eduSortableColumn="usuarioNombre" data-info-anchor="tabla-orden-columna">USUARIO </th>
-							<th eduSortableColumn="fechaReg" data-info-anchor="tabla-orden-columna">FECHA </th>
-							<th eduSortableColumn="estado" data-info-anchor="tabla-orden-columna">ESTADO </th>
-							<th>CAMBIAR ESTADO</th>
-						</tr>
-					</ng-template>
-					<ng-template #body let-ticket>
-						<tr>
-							<td>{{ ticket.tipoNombre }}</td>
-							<td class="descripcion-cell">{{ ticket.descripcion }}</td>
-							<td class="descripcion-cell">{{ ticket.propuesta || '—' }}</td>
-							<td>{{ ticket.usuarioNombre }}</td>
-							<td>{{ ticket.fechaReg | date: 'dd/MM/yyyy HH:mm' }}</td>
-							<td>
-								<edu-tag [value]="labelFor(ticket.estado)" [severity]="severityFor(ticket.estado)" />
-							</td>
-							<td>
+			@if (isMobile()) {
+				<app-mobile-card-list [items]="tickets()" [pageSize]="5">
+					<ng-template let-ticket>
+						<div>
+							<app-card-row label="Tipo">{{ ticket.tipoNombre }}</app-card-row>
+							<app-card-row label="Detalle">{{ ticket.descripcion }}</app-card-row>
+							@if (ticket.propuesta) {
+								<app-card-row label="Propuesta">{{ ticket.propuesta }}</app-card-row>
+							}
+							<app-card-row label="Usuario">{{ ticket.usuarioNombre }}</app-card-row>
+							<app-card-row label="Fecha">{{ ticket.fechaReg | date: 'dd/MM/yyyy HH:mm' }}</app-card-row>
+							<app-card-row label="Estado"><edu-tag [value]="labelFor(ticket.estado)" [severity]="severityFor(ticket.estado)" /></app-card-row>
+							<app-card-row label="Cambiar">
 								<edu-select
 									[options]="estadoCambioOptions"
 									[ngModel]="ticket.estado"
@@ -70,13 +59,53 @@
 									appendTo="body"
 									[disabled]="updatingId() === ticket.id"
 									styleClass="estado-dropdown"
-									data-info-anchor="admin-tickets-fila-cambiar-estado-select"
 								/>
-							</td>
-						</tr>
+							</app-card-row>
+						</div>
 					</ng-template>
-				</edu-table>
-			</section>
+				</app-mobile-card-list>
+			} @else {
+			<section class="table-section">
+					<edu-table [value]="tickets()" dataKey="id" [scrollable]="true" styleClass="p-datatable-sm">
+						<ng-template #header>
+							<tr>
+								<th eduSortableColumn="tipoNombre" data-info-anchor="tabla-orden-columna">TIPO </th>
+								<th>DESCRIPCIÓN</th>
+								<th>PROPUESTA</th>
+								<th eduSortableColumn="usuarioNombre" data-info-anchor="tabla-orden-columna">USUARIO </th>
+								<th eduSortableColumn="fechaReg" data-info-anchor="tabla-orden-columna">FECHA </th>
+								<th eduSortableColumn="estado" data-info-anchor="tabla-orden-columna">ESTADO </th>
+								<th>CAMBIAR ESTADO</th>
+							</tr>
+						</ng-template>
+						<ng-template #body let-ticket>
+							<tr>
+								<td>{{ ticket.tipoNombre }}</td>
+								<td class="descripcion-cell">{{ ticket.descripcion }}</td>
+								<td class="descripcion-cell">{{ ticket.propuesta || '—' }}</td>
+								<td>{{ ticket.usuarioNombre }}</td>
+								<td>{{ ticket.fechaReg | date: 'dd/MM/yyyy HH:mm' }}</td>
+								<td>
+									<edu-tag [value]="labelFor(ticket.estado)" [severity]="severityFor(ticket.estado)" />
+								</td>
+								<td>
+									<edu-select
+										[options]="estadoCambioOptions"
+										[ngModel]="ticket.estado"
+										(ngModelChange)="onEstadoChange(ticket, $event)"
+										optionLabel="label"
+										optionValue="value"
+										appendTo="body"
+										[disabled]="updatingId() === ticket.id"
+										styleClass="estado-dropdown"
+										data-info-anchor="admin-tickets-fila-cambiar-estado-select"
+									/>
+								</td>
+							</tr>
+						</ng-template>
+					</edu-table>
+				</section>
+			}
 		}
 	}
 </div>

@@ -34,77 +34,111 @@
 				<p>No hay solicitudes.</p>
 			</div>
 		} @else {
-			<section class="table-section">
-				<edu-table [value]="solicitudesFiltradas()" dataKey="id" [scrollable]="true" styleClass="p-datatable-sm">
-					<ng-template #header>
-						<tr>
-							<th>ESTUDIANTE</th>
-							<th>CURSO</th>
-							<th>FECHA</th>
-							<th>COMENTARIO</th>
-							<th>ADJUNTO</th>
-							<th>ESTADO</th>
-							<th>ACCIONES</th>
-						</tr>
-					</ng-template>
-					<ng-template #body let-solicitud>
-						<tr>
-							<td>{{ solicitud.estudianteNombre }}</td>
-							<td>{{ solicitud.cursoNombre }} — {{ solicitud.salonDescripcion }}</td>
-							<td>{{ solicitud.fecha | date: 'dd/MM/yyyy' }}</td>
-							<td class="comentario-cell">{{ solicitud.comentario || '—' }}</td>
-							<td>
-								@if (solicitud.documentoUrl) {
-									<a
-										[href]="solicitud.documentoUrl"
-										target="_blank"
-										rel="noopener"
-										class="adjunto-link"
-										[attr.aria-label]="'Ver documento: ' + (solicitud.documentoNombre || 'adjunto')"
-									>
-										<i class="pi pi-paperclip"></i>
-										{{ solicitud.documentoNombre || 'Ver documento' }}
+			@if (isMobile()) {
+				<app-mobile-card-list [items]="solicitudesFiltradas()" [pageSize]="5">
+					<ng-template let-solicitud>
+						<div>
+							<app-card-row label="Estudiante">{{ solicitud.estudianteNombre }}</app-card-row>
+							<app-card-row label="Curso">{{ solicitud.cursoNombre }} — {{ solicitud.salonDescripcion }}</app-card-row>
+							<app-card-row label="Fecha">{{ solicitud.fecha | date: 'dd/MM/yyyy' }}</app-card-row>
+							@if (solicitud.comentario) {
+								<app-card-row label="Comentario">{{ solicitud.comentario }}</app-card-row>
+							}
+							@if (solicitud.documentoUrl) {
+								<app-card-row label="Adjunto">
+									<a [href]="solicitud.documentoUrl" target="_blank" rel="noopener" class="adjunto-link" [attr.aria-label]="'Ver documento: ' + (solicitud.documentoNombre || 'adjunto')">
+										<i class="pi pi-paperclip"></i> {{ solicitud.documentoNombre || 'Ver documento' }}
 									</a>
-								} @else {
-									—
-								}
-							</td>
-							<td>
+								</app-card-row>
+							}
+							<app-card-row label="Estado">
 								<edu-tag [value]="labelFor(solicitud.estado)" [severity]="severityFor(solicitud.estado)" />
 								@if (solicitud.estado === 'RECHAZADA' && solicitud.motivoRechazo) {
 									<p class="motivo-rechazo">{{ solicitud.motivoRechazo }}</p>
 								}
-							</td>
-							<td>
-								@if (solicitud.estado === 'PENDIENTE') {
-									<edu-button
-										label="Aprobar"
-										icon="pi pi-check"
-										size="small"
-										severity="success"
-										[disabled]="resolvingId() === solicitud.id"
-										[loading]="resolvingId() === solicitud.id"
-										(click)="onAprobar(solicitud)"
-										data-info-anchor="justificacion-bandeja-aprobar-btn"
-									/>
-									<edu-button
-										label="Rechazar"
-										icon="pi pi-times"
-										[outlined]="true"
-										size="small"
-										severity="danger"
-										[disabled]="resolvingId() === solicitud.id"
-										(click)="onAbrirRechazo(solicitud)"
-										data-info-anchor="justificacion-bandeja-rechazar-btn"
-									/>
-								} @else {
-									—
-								}
-							</td>
-						</tr>
+							</app-card-row>
+							@if (solicitud.estado === 'PENDIENTE') {
+								<app-card-actions>
+									<edu-button label="Aprobar" icon="pi pi-check" size="small" severity="success" [disabled]="resolvingId() === solicitud.id" [loading]="resolvingId() === solicitud.id" (click)="onAprobar(solicitud)" />
+									<edu-button label="Rechazar" icon="pi pi-times" [outlined]="true" size="small" severity="danger" [disabled]="resolvingId() === solicitud.id" (click)="onAbrirRechazo(solicitud)" />
+								</app-card-actions>
+							}
+						</div>
 					</ng-template>
-				</edu-table>
-			</section>
+				</app-mobile-card-list>
+			} @else {
+			<section class="table-section">
+					<edu-table [value]="solicitudesFiltradas()" dataKey="id" [scrollable]="true" styleClass="p-datatable-sm">
+						<ng-template #header>
+							<tr>
+								<th>ESTUDIANTE</th>
+								<th>CURSO</th>
+								<th>FECHA</th>
+								<th>COMENTARIO</th>
+								<th>ADJUNTO</th>
+								<th>ESTADO</th>
+								<th>ACCIONES</th>
+							</tr>
+						</ng-template>
+						<ng-template #body let-solicitud>
+							<tr>
+								<td>{{ solicitud.estudianteNombre }}</td>
+								<td>{{ solicitud.cursoNombre }} — {{ solicitud.salonDescripcion }}</td>
+								<td>{{ solicitud.fecha | date: 'dd/MM/yyyy' }}</td>
+								<td class="comentario-cell">{{ solicitud.comentario || '—' }}</td>
+								<td>
+									@if (solicitud.documentoUrl) {
+										<a
+											[href]="solicitud.documentoUrl"
+											target="_blank"
+											rel="noopener"
+											class="adjunto-link"
+											[attr.aria-label]="'Ver documento: ' + (solicitud.documentoNombre || 'adjunto')"
+										>
+											<i class="pi pi-paperclip"></i>
+											{{ solicitud.documentoNombre || 'Ver documento' }}
+										</a>
+									} @else {
+										—
+									}
+								</td>
+								<td>
+									<edu-tag [value]="labelFor(solicitud.estado)" [severity]="severityFor(solicitud.estado)" />
+									@if (solicitud.estado === 'RECHAZADA' && solicitud.motivoRechazo) {
+										<p class="motivo-rechazo">{{ solicitud.motivoRechazo }}</p>
+									}
+								</td>
+								<td>
+									@if (solicitud.estado === 'PENDIENTE') {
+										<edu-button
+											label="Aprobar"
+											icon="pi pi-check"
+											size="small"
+											severity="success"
+											[disabled]="resolvingId() === solicitud.id"
+											[loading]="resolvingId() === solicitud.id"
+											(click)="onAprobar(solicitud)"
+											data-info-anchor="justificacion-bandeja-aprobar-btn"
+										/>
+										<edu-button
+											label="Rechazar"
+											icon="pi pi-times"
+											[outlined]="true"
+											size="small"
+											severity="danger"
+											[disabled]="resolvingId() === solicitud.id"
+											(click)="onAbrirRechazo(solicitud)"
+											data-info-anchor="justificacion-bandeja-rechazar-btn"
+										/>
+									} @else {
+										—
+									}
+								</td>
+							</tr>
+						</ng-template>
+					</edu-table>
+				</section>
+			}
 		}
 	}
 </div>

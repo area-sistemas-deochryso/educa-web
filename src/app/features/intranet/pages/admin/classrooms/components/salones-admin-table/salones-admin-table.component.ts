@@ -1,14 +1,14 @@
 import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
 
 import { type ModoAsignacion, resolveModoAsignacion } from '@data/adapters';
-import { ModoAsignacionBadgeComponent } from '@shared/components';
+import { CardActionsComponent, CardRowComponent, MobileCardListComponent, ModoAsignacionBadgeComponent, injectIsMobile } from '@shared/components';
 import { SalonAdminListDto, PeriodoCierreEstado } from '../../models';
 import { EduButton, EduSortableColumn, EduTable, EduTag, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-classrooms-admin-table',
 	standalone: true,
-	imports: [EduTable, EduButton, EduTag, ModoAsignacionBadgeComponent, EduTooltip, EduSortableColumn],
+	imports: [MobileCardListComponent, CardRowComponent, CardActionsComponent, EduTable, EduButton, EduTag, ModoAsignacionBadgeComponent, EduTooltip, EduSortableColumn],
 	templateUrl: './salones-admin-table.component.html',
 	styleUrl: './salones-admin-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -17,6 +17,7 @@ export class ClassroomsAdminTableComponent {
 	// #region Inputs / Outputs
 	readonly salones = input.required<SalonAdminListDto[]>();
 	readonly loading = input(false);
+	readonly isMobile = injectIsMobile();
 
 	readonly selectSalon = output<number>();
 	readonly goToHorarios = output<number>();

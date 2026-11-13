@@ -4,7 +4,7 @@ import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { UserPermissionsService } from '@core/services';
-import { ErrorStateComponent } from '@shared/components';
+import { CardActionsComponent, CardRowComponent, ErrorStateComponent, MobileCardListComponent, injectIsMobile } from '@shared/components';
 import { SolicitudJustificacionAsistenciaDto, EstadoSolicitudJustificacion } from '@features/intranet/pages/estudiante/models';
 
 import { JustificacionAsistenciaBandejaFacade } from './justificacion-asistencia-bandeja.facade';
@@ -47,7 +47,7 @@ const ESTADO_LABEL: Record<EstadoSolicitudJustificacion, string> = {
 @Component({
 	selector: 'app-justificacion-asistencia-bandeja',
 	standalone: true,
-	imports: [DatePipe, FormsModule, EduButton, EduConfirmDialog, EduDialog, EduSpinner, EduSelect, EduTable, EduTag, EduTextarea, ErrorStateComponent],
+	imports: [DatePipe, FormsModule, EduButton, EduConfirmDialog, EduDialog, EduSpinner, EduSelect, EduTable, EduTag, EduTextarea, ErrorStateComponent, MobileCardListComponent, CardRowComponent, CardActionsComponent],
 	providers: [JustificacionAsistenciaBandejaFacade, EduConfirmationService],
 	templateUrl: './justificacion-asistencia-bandeja.component.html',
 	styleUrl: './justificacion-asistencia-bandeja.component.scss',
@@ -56,6 +56,7 @@ const ESTADO_LABEL: Record<EstadoSolicitudJustificacion, string> = {
 export class JustificacionAsistenciaBandejaComponent implements OnInit {
 	// #region Dependencies
 	private readonly facade = inject(JustificacionAsistenciaBandejaFacade);
+	readonly isMobile = injectIsMobile();
 	private readonly userPermisos = inject(UserPermissionsService);
 	private readonly confirmationService = inject(EduConfirmationService);
 	// #endregion
