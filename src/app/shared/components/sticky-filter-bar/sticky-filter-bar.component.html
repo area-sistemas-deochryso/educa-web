@@ -11,34 +11,36 @@
 		/>
 	</label>
 
-	<div class="sfb__filters">
-		<button
-			type="button"
-			class="sfb__btn"
-			[class.sfb__btn--active]="activeFilters() > 0"
-			aria-haspopup="true"
-			[attr.aria-expanded]="open()"
-			(click)="toggle()"
-		>
-			<i class="pi pi-filter" aria-hidden="true"></i>
-			<span class="sfb__label">Filtros</span>
-			@if (activeFilters() > 0) {
-				<em class="sfb__count">{{ activeFilters() }}</em>
-			}
-			<i class="pi pi-chevron-down sfb__chev" aria-hidden="true"></i>
-		</button>
-
-		@if (open()) {
-			<div class="sfb__panel" role="group" aria-label="Filtros">
-				<div class="sfb__panel-body"><ng-content /></div>
+	@if (showFilters()) {
+		<div class="sfb__filters">
+			<button
+				type="button"
+				class="sfb__btn"
+				[class.sfb__btn--active]="activeFilters() > 0"
+				aria-haspopup="true"
+				[attr.aria-expanded]="open()"
+				(click)="toggle()"
+			>
+				<i class="pi pi-filter" aria-hidden="true"></i>
+				<span class="sfb__label">Filtros</span>
 				@if (activeFilters() > 0) {
-					<button type="button" class="sfb__clear" (click)="clearFilters.emit()">
-						<i class="pi pi-filter-slash" aria-hidden="true"></i> Limpiar filtros
-					</button>
+					<em class="sfb__count">{{ activeFilters() }}</em>
 				}
-			</div>
-		}
-	</div>
+				<i class="pi pi-chevron-down sfb__chev" aria-hidden="true"></i>
+			</button>
+
+			@if (open()) {
+				<div class="sfb__panel" role="group" aria-label="Filtros">
+					<div class="sfb__panel-body"><ng-content /></div>
+					@if (activeFilters() > 0) {
+						<button type="button" class="sfb__clear" (click)="clearFilters.emit()">
+							<i class="pi pi-filter-slash" aria-hidden="true"></i> Limpiar filtros
+						</button>
+					}
+				</div>
+			}
+		</div>
+	}
 
 	<div class="sfb__actions"><ng-content select="[sfbActions]" /></div>
 </div>

@@ -76,6 +76,7 @@
 
 <app-sticky-filter-bar
 	[watch]="filtersEl"
+	[showFilters]="false"
 	[searchTerm]="searchTerm()"
 	placeholder="Buscar por nombre o DNI..."
 	(searchChange)="searchTerm.set($event)"

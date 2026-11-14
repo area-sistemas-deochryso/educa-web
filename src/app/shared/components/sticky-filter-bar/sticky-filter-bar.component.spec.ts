@@ -66,3 +66,14 @@ describe('StickyFilterBarComponent', () => {
 		expect(root().querySelector('.sfb__clear')).toBeNull();
 	});
 });
+
+describe('StickyFilterBarComponent sin filtros', () => {
+	it('oculta el botón «Filtros» cuando showFilters es falso', () => {
+		const fixture = TestBed.createComponent(StickyFilterBarComponent);
+		fixture.componentRef.setInput('watch', null);
+		fixture.componentRef.setInput('searchTerm', '');
+		fixture.componentRef.setInput('showFilters', false);
+		fixture.detectChanges();
+		expect((fixture.nativeElement as HTMLElement).querySelector('.sfb__btn')).toBeNull();
+	});
+});

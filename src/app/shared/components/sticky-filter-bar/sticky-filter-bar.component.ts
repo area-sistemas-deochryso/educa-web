@@ -45,6 +45,8 @@ export class StickyFilterBarComponent {
 	readonly placeholder = input('Buscar…');
 	/** Cantidad de filtros activos (sin contar el buscador); se muestra en el botón. */
 	readonly activeFilters = input(0);
+	/** Falso cuando la página solo tiene buscador: se oculta el botón «Filtros». */
+	readonly showFilters = input(true);
 
 	readonly searchChange = output<string>();
 	readonly clearFilters = output<void>();
