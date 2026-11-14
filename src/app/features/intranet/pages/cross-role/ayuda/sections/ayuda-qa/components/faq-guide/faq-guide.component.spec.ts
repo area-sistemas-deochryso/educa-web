@@ -163,4 +163,12 @@ describe('FaqGuideComponent', () => {
 
 		expect(titles).toEqual(['Entrar a Asistencias', 'Marca a cada estudiante', 'Guarda los cambios']);
 	});
+
+	it('describe la captura de un paso con su número y su título, no con un alt vacío', () => {
+		create();
+
+		const img = fixture.debugElement.query(By.css('.faq-guide__image')).nativeElement as HTMLImageElement;
+
+		expect(img.alt).toBe('Captura del paso 2: Marca a cada estudiante');
+	});
 });

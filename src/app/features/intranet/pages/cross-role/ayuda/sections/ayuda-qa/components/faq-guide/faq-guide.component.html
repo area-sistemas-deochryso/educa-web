@@ -51,7 +51,7 @@
 				<div class="faq-guide__body">
 					<p class="faq-guide__text">{{ step.texto }}</p>
 					@if (step.imagenUrl) {
-						<img [src]="step.imagenUrl" alt="" class="faq-guide__image" loading="lazy" />
+						<img [src]="step.imagenUrl" [alt]="'Captura del paso ' + (step.index + 1) + ': ' + step.title" class="faq-guide__image" loading="lazy" />
 					}
 				</div>
 			</li>
