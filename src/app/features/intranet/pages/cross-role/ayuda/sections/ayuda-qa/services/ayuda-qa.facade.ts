@@ -105,6 +105,9 @@ export class AyudaQaFacade {
 		() => this._searchTerm().trim() !== '' || this._categoria() !== null,
 	);
 
+	/** Hay algo distinto del estado inicial: búsqueda, categoría o modo «Para ti». */
+	readonly hasActiveFilters = computed(() => this.isFiltering() || this._modoVista() !== 'todas');
+
 	/**
 	 * «Más consultadas»: las primeras del rol según el orden del servidor. Si ese orden no llegó
 	 * (falló o aún carga), se usan las primeras del rol en el orden de siempre.
@@ -189,6 +192,7 @@ export class AyudaQaFacade {
 	clearFilters(): void {
 		this._searchTerm.set('');
 		this._categoria.set(null);
+		this._modoVista.set('todas');
 	}
 
 	/** Selecciona una pregunta (o `null` para volver a la lista). Si los filtros la ocultan, los limpia. */
@@ -268,7 +272,6 @@ export class AyudaQaFacade {
 		if (this.faqs().some((f) => f.id === id)) return;
 
 		this.clearFilters();
-		this._modoVista.set('todas');
 	}
 
 	private countWith(override: Partial<FaqFilter>): number {

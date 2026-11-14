@@ -11,11 +11,13 @@
 			[todasCount]="todasCount()"
 			[resultCount]="faqs().length"
 			[populares]="populares()"
+			[hasFilters]="hasActiveFilters()"
 			(searchChange)="onSearchChange($event)"
 			(modoChange)="onModoVistaChange($event)"
 			(categoriaChange)="onCategoriaChange($event)"
 			(faqSelected)="onFaqSelected($event)"
 			(ticketRequested)="onTicketRequested()"
+			(filtersCleared)="onClearFilters()"
 		/>
 	</div>
 	<!-- #endregion -->
@@ -30,6 +32,8 @@
 				[chips]="chips()"
 				[paraTiCount]="paraTiCount()"
 				[todasCount]="todasCount()"
+				[hasFilters]="hasActiveFilters()"
+				(filtersCleared)="onClearFilters()"
 				(searchChange)="onSearchChange($event)"
 				(modoChange)="onModoVistaChange($event)"
 				(categoriaChange)="onCategoriaChange($event)"

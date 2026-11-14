@@ -28,18 +28,30 @@ export class FaqHeaderComponent {
 	readonly todasCount = input.required<number>();
 	readonly resultCount = input.required<number>();
 	readonly populares = input<FaqDto[]>([]);
+	readonly hasFilters = input(false);
 
 	readonly searchChange = output<string>();
 	readonly modoChange = output<ModoVista>();
 	readonly categoriaChange = output<string | null>();
 	readonly faqSelected = output<number>();
 	readonly ticketRequested = output<void>();
+	readonly filtersCleared = output<void>();
 	// #endregion
 
 	private readonly searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
 
 	focusSearch(): void {
 		this.searchInput()?.nativeElement.focus();
+	}
+
+	/** Pulsar la categoría activa la quita (equivale a «Todas»). */
+	onCategoria(value: string | null): void {
+		this.categoriaChange.emit(value !== null && value === this.categoria() ? null : value);
+	}
+
+	onClear(): void {
+		this.filtersCleared.emit();
+		this.focusSearch();
 	}
 
 	onSearchInput(event: Event): void {

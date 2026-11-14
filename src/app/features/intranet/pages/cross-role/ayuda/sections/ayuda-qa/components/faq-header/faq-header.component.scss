@@ -92,6 +92,22 @@
 	}
 }
 
+.faq-clear {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.625rem 0.875rem;
+	border: 1px solid var(--surface-300);
+	border-radius: 0.75rem;
+	background: transparent;
+	color: var(--faq-accent-strong);
+	font: inherit;
+	font-size: 0.875rem;
+	font-weight: 600;
+	white-space: nowrap;
+	cursor: pointer;
+}
+
 .faq-seg {
 	display: inline-flex;
 	gap: 0.125rem;

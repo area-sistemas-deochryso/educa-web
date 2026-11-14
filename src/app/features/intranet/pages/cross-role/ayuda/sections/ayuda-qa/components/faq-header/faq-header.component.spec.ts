@@ -48,6 +48,36 @@ describe('FaqHeaderComponent', () => {
 		expect(fixture.debugElement.query(By.css('.faq-header__meta')).nativeElement.textContent).toContain('1 resultado');
 	});
 
+	it('pulsar la categoría activa la quita; una inactiva se selecciona', () => {
+		const emitted: (string | null)[] = [];
+		fixture.componentInstance.categoriaChange.subscribe((v) => emitted.push(v));
+		fixture.componentRef.setInput('categoria', 'Profesor');
+		fixture.detectChanges();
+
+		const chips = fixture.debugElement.queryAll(By.css('.faq-chip'));
+		chips[1].nativeElement.click();
+		chips[0].nativeElement.click();
+		fixture.componentRef.setInput('categoria', null);
+		fixture.detectChanges();
+		fixture.debugElement.queryAll(By.css('.faq-chip'))[1].nativeElement.click();
+
+		expect(emitted).toEqual([null, null, 'Profesor']);
+	});
+
+	it('«Limpiar filtros» solo aparece con filtros; al pulsarlo emite y enfoca el buscador', () => {
+		let cleared = 0;
+		fixture.componentInstance.filtersCleared.subscribe(() => cleared++);
+		fixture.detectChanges();
+		expect(fixture.debugElement.query(By.css('.faq-clear'))).toBeNull();
+
+		fixture.componentRef.setInput('hasFilters', true);
+		fixture.detectChanges();
+		fixture.debugElement.query(By.css('.faq-clear')).nativeElement.click();
+
+		expect(cleared).toBe(1);
+		expect(document.activeElement).toBe(fixture.debugElement.query(By.css('.faq-search__input')).nativeElement);
+	});
+
 	it('emite búsqueda, modo, categoría y pregunta elegida', () => {
 		const emitted: unknown[] = [];
 		fixture.componentInstance.searchChange.subscribe((v) => emitted.push(['q', v]));

@@ -75,6 +75,7 @@ export class AyudaQaComponent implements OnInit, AfterViewInit {
 	readonly selectedVote = this.facade.selectedVote;
 	readonly selectedId = this.facade.selectedId;
 	readonly headerCompact = this.facade.isFiltering;
+	readonly hasActiveFilters = this.facade.hasActiveFilters;
 
 	readonly detailOpen = computed(() => this.selectedFaq() !== null);
 	// #endregion

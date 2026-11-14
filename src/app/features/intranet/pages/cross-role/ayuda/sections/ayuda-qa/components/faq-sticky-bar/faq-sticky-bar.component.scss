@@ -104,6 +104,16 @@
 		}
 	}
 
+	&__clear {
+		flex: none;
+		padding: 0.5rem 0.625rem;
+		border: 1px solid var(--surface-300);
+		border-radius: 0.625rem;
+		background: transparent;
+		color: var(--faq-accent-strong);
+		cursor: pointer;
+	}
+
 	&__catlabel {
 		overflow: hidden;
 		text-overflow: ellipsis;

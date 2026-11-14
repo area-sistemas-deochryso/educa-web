@@ -33,6 +33,12 @@
 		</button>
 	</div>
 
+	@if (hasFilters()) {
+		<button type="button" class="sbar__clear" aria-label="Limpiar filtros" title="Limpiar filtros" (click)="onClear()">
+			<i class="pi pi-filter-slash" aria-hidden="true"></i>
+		</button>
+	}
+
 	<div class="sbar__cats">
 		<button
 			type="button"

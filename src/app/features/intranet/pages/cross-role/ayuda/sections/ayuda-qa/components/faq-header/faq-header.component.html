@@ -47,6 +47,13 @@
 				Todas <em class="faq-seg__count">{{ todasCount() }}</em>
 			</button>
 		</div>
+
+		@if (hasFilters()) {
+			<button type="button" class="faq-clear" (click)="onClear()">
+				<i class="pi pi-filter-slash" aria-hidden="true"></i>
+				Limpiar filtros
+			</button>
+		}
 	</div>
 
 	<div class="faq-chips" role="group" aria-label="Categorías">
@@ -56,7 +63,7 @@
 				class="faq-chip"
 				[class.faq-chip--on]="categoria() === chip.value"
 				[attr.aria-pressed]="categoria() === chip.value"
-				(click)="categoriaChange.emit(chip.value)"
+				(click)="onCategoria(chip.value)"
 			>
 				{{ chip.value ?? 'Todas' }}<em class="faq-chip__count">{{ chip.count }}</em>
 			</button>

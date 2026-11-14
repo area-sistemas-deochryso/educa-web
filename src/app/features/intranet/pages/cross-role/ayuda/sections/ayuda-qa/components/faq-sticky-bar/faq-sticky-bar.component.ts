@@ -32,10 +32,12 @@ export class FaqStickyBarComponent {
 	readonly chips = input.required<CategoriaChip[]>();
 	readonly paraTiCount = input.required<number>();
 	readonly todasCount = input.required<number>();
+	readonly hasFilters = input(false);
 
 	readonly searchChange = output<string>();
 	readonly modoChange = output<ModoVista>();
 	readonly categoriaChange = output<string | null>();
+	readonly filtersCleared = output<void>();
 	// #endregion
 
 	private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
@@ -64,8 +66,13 @@ export class FaqStickyBarComponent {
 	}
 
 	onCategoria(value: string | null): void {
-		this.categoriaChange.emit(value);
+		this.categoriaChange.emit(value !== null && value === this.categoria() ? null : value);
 		this.menuOpen.set(false);
+	}
+
+	onClear(): void {
+		this.filtersCleared.emit();
+		this.focusSearch();
 	}
 
 	@HostListener('document:click', ['$event'])

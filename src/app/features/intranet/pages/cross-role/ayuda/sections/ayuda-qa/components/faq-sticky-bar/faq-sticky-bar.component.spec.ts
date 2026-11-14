@@ -52,6 +52,32 @@ describe('FaqStickyBarComponent', () => {
 		expect(root().querySelector('.sbar__menu')).toBeNull();
 	});
 
+	it('pulsar la categoría activa la quita', () => {
+		const emitted: (string | null)[] = [];
+		component.categoriaChange.subscribe((v) => emitted.push(v));
+		fixture.componentRef.setInput('categoria', 'Profesor');
+		fixture.detectChanges();
+		root().querySelector<HTMLButtonElement>('.sbar__catbtn')!.click();
+		fixture.detectChanges();
+		root().querySelectorAll<HTMLButtonElement>('.sbar__item')[1].click();
+		expect(emitted).toEqual([null]);
+	});
+
+	it('el botón de limpiar solo aparece con filtros, tiene nombre accesible y enfoca el buscador', () => {
+		let cleared = 0;
+		component.filtersCleared.subscribe(() => cleared++);
+		expect(root().querySelector('.sbar__clear')).toBeNull();
+
+		fixture.componentRef.setInput('hasFilters', true);
+		fixture.detectChanges();
+		const btn = root().querySelector('.sbar__clear') as HTMLButtonElement;
+		expect(btn.getAttribute('aria-label')).toBe('Limpiar filtros');
+		btn.click();
+
+		expect(cleared).toBe(1);
+		expect(document.activeElement).toBe(root().querySelector('.sbar__input'));
+	});
+
 	it('emite el texto que se escribe en el buscador', () => {
 		const emitted: string[] = [];
 		component.searchChange.subscribe((v) => emitted.push(v));

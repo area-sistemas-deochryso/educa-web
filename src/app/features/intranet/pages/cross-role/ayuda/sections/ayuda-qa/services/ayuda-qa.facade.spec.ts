@@ -131,6 +131,24 @@ describe('AyudaQaFacade', () => {
 		expect(facade.isFiltering()).toBe(false);
 	});
 
+	it('clearFilters devuelve búsqueda, categoría y modo al estado inicial; hasActiveFilters lo refleja', () => {
+		load();
+		expect(facade.hasActiveFilters()).toBe(false);
+
+		facade.setModoVista('para-ti');
+		expect(facade.hasActiveFilters()).toBe(true);
+
+		facade.setSearchTerm('notas');
+		facade.setCategoria('Profesor');
+		facade.clearFilters();
+
+		expect(facade.hasActiveFilters()).toBe(false);
+		expect(facade.searchTerm()).toBe('');
+		expect(facade.categoria()).toBeNull();
+		expect(facade.modoVista()).toBe('todas');
+		expect(facade.todasCount()).toBe(facade.faqs().length);
+	});
+
 	it('«más consultadas» usa las primeras preguntas del rol', () => {
 		load();
 
