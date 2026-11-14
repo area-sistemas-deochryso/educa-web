@@ -19,6 +19,8 @@ export interface FaqDto {
 	pregunta: string;
 	respuesta: string;
 	categoria: string | null;
+	/** Palabras clave separadas por `, ` (ya normalizadas por el servidor); `null` si no tiene. */
+	palabrasClave?: string | null;
 	/** null cuando la FAQ no tiene wizard asociado (o el wizard está deshabilitado en el BE). */
 	wizard: FaqWizardDto | null;
 }

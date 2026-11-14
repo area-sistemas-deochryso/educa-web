@@ -7,6 +7,7 @@ import { AuthService } from '@core/services';
 import { logger } from '@core/helpers';
 
 import { FaqDto, FaqMotivo, FaqVoto } from '@features/intranet/pages/cross-role/ayuda/models/faq.models';
+import { faqMatchesWords, splitSearchWords } from '../helpers/faq-search';
 import { FaqService } from '@features/intranet/pages/cross-role/ayuda/services/faq.service';
 // #endregion
 
@@ -34,7 +35,7 @@ const RELACIONADAS_MAX = 3;
  * Una sola carga de `GET /api/faq` (el BE ya filtra por capability): búsqueda,
  * categoría y modo «Para ti / Todas» se aplican aquí con un único criterio
  * (`matches`), así los conteos de la cabecera coinciden con lo que se ve en la lista.
- * El BE busca con LIKE sobre pregunta y respuesta, igual que `matchesTerm`.
+ * La búsqueda es del FE: coincide si todas las palabras aparecen en pregunta, respuesta, palabras clave o pasos.
  */
 @Injectable()
 export class AyudaQaFacade {
@@ -289,7 +290,7 @@ export class AyudaQaFacade {
 	}
 
 	private matchesTerm(faq: FaqDto, term: string): boolean {
-		return faq.pregunta.toLowerCase().includes(term) || faq.respuesta.toLowerCase().includes(term);
+		return faqMatchesWords(faq, splitSearchWords(term));
 	}
 	// #endregion
 }

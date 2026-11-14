@@ -23,6 +23,8 @@ export interface FaqAdminDto {
 	pregunta: string;
 	respuesta: string;
 	categoria: string | null;
+	/** Palabras clave separadas por `, ` (máx. 500 caracteres); el servidor las normaliza. */
+	palabrasClave?: string | null;
 	capabilityId: number | null;
 	capabilityCodigo: string | null;
 	estado: boolean;
@@ -34,6 +36,8 @@ export interface CrearFaqRequest {
 	pregunta: string;
 	respuesta: string;
 	categoria: string | null;
+	/** Omitirla en el PUT la borra: siempre se reenvía. */
+	palabrasClave: string | null;
 	capabilityId: number | null;
 	wizard: WizardInput | null;
 }
@@ -42,6 +46,8 @@ export interface ActualizarFaqRequest {
 	pregunta: string;
 	respuesta: string;
 	categoria: string | null;
+	/** Omitirla en el PUT la borra: siempre se reenvía. */
+	palabrasClave: string | null;
 	capabilityId: number | null;
 	wizard: WizardInput | null;
 	rowVersion: string;
@@ -52,6 +58,8 @@ export interface FaqAdminFormData {
 	pregunta: string;
 	respuesta: string;
 	categoria: string | null;
+	/** Omitirla en el PUT la borra: siempre se reenvía. */
+	palabrasClave: string | null;
 	capabilityId: number | null;
 	wizard: WizardInput | null;
 }

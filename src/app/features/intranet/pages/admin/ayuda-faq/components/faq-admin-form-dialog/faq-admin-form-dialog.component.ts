@@ -17,6 +17,9 @@ import { deriveStepTitle } from '@features/intranet/pages/cross-role/ayuda/secti
 /** Máximo de caracteres del título de un paso (contrato `wizard.pasos[].titulo`). */
 export const PASO_TITULO_MAX_LENGTH = 120;
 
+/** Máximo de caracteres de las palabras clave (contrato `palabrasClave`). */
+export const PALABRAS_CLAVE_MAX_LENGTH = 500;
+
 interface CapabilityOption {
 	label: string;
 	value: number | null;
@@ -52,11 +55,13 @@ export class FaqAdminFormDialogComponent {
 	readonly pregunta = signal('');
 	readonly respuesta = signal('');
 	readonly categoria = signal('');
+	readonly palabrasClave = signal('');
 	readonly capabilityId = signal<number | null>(null);
 	readonly wizardTitulo = signal('');
 	readonly pasos = signal<WizardPasoInput[]>([]);
 
 	readonly pasoTituloMaxLength = PASO_TITULO_MAX_LENGTH;
+	readonly palabrasClaveMaxLength = PALABRAS_CLAVE_MAX_LENGTH;
 
 	readonly isEditing = computed(() => this.faq() !== null);
 	readonly headerLabel = computed(() => (this.isEditing() ? 'Editar FAQ' : 'Nueva FAQ'));
@@ -75,6 +80,7 @@ export class FaqAdminFormDialogComponent {
 				this.pregunta.set(faq.pregunta);
 				this.respuesta.set(faq.respuesta);
 				this.categoria.set(faq.categoria ?? '');
+				this.palabrasClave.set(faq.palabrasClave ?? '');
 				this.capabilityId.set(faq.capabilityId);
 				this.wizardTitulo.set(faq.wizard?.titulo ?? '');
 				this.pasos.set(faq.wizard?.pasos.map((p) => ({ ...p })) ?? []);
@@ -146,6 +152,7 @@ export class FaqAdminFormDialogComponent {
 			pregunta: this.pregunta().trim(),
 			respuesta: this.respuesta().trim(),
 			categoria: this.categoria().trim() || null,
+			palabrasClave: this.palabrasClave().trim() || null,
 			capabilityId: this.capabilityId(),
 			wizard,
 		};
@@ -176,6 +183,7 @@ export class FaqAdminFormDialogComponent {
 		this.pregunta.set('');
 		this.respuesta.set('');
 		this.categoria.set('');
+		this.palabrasClave.set('');
 		this.capabilityId.set(null);
 		this.wizardTitulo.set('');
 		this.pasos.set([]);

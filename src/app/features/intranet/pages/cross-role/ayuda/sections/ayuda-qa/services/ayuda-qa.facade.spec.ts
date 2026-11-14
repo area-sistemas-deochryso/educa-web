@@ -72,6 +72,59 @@ describe('AyudaQaFacade', () => {
 		expect(facade.faqs().map((f) => f.id)).toEqual([1]);
 	});
 
+	describe('búsqueda por todas las palabras', () => {
+		const LOGIN: FaqDto = {
+			id: 10,
+			pregunta: '¿Cómo entro a la intranet por primera vez?',
+			respuesta: 'Usa tu DNI.',
+			categoria: 'Común',
+			palabrasClave: 'login, inicio de sesion',
+			wizard: { titulo: null, pasos: [{ orden: 1, titulo: 'Abrir el navegador', texto: 'Escribe la dirección', imagenUrl: null }] },
+		};
+		const ids = () => facade.faqs().map((f) => f.id);
+
+		it('encuentra por palabra clave', () => {
+			load([...FAQS, LOGIN]);
+			facade.setSearchTerm('login');
+			expect(ids()).toEqual([10]);
+		});
+
+		it('palabras fuera de orden y sin tilde', () => {
+			load([...FAQS, LOGIN]);
+			facade.setSearchTerm('sesión inicio');
+			expect(ids()).toEqual([10]);
+		});
+
+		it('exige todas las palabras, aunque estén en campos distintos', () => {
+			load([...FAQS, LOGIN]);
+			facade.setSearchTerm('login intranet');
+			expect(ids()).toEqual([10]);
+			facade.setSearchTerm('login notas');
+			expect(ids()).toEqual([]);
+		});
+
+		it('encuentra por título o texto de un paso', () => {
+			load([...FAQS, LOGIN]);
+			facade.setSearchTerm('navegador');
+			expect(ids()).toEqual([10]);
+			facade.setSearchTerm('dirección');
+			expect(ids()).toEqual([10]);
+		});
+
+		it('una pregunta sin palabras clave sigue encontrándose por pregunta y respuesta', () => {
+			load();
+			facade.setSearchTerm('perfil');
+			expect(ids()).toEqual([1]);
+		});
+
+		it('una palabra inexistente deja la lista vacía y los conteos en cero', () => {
+			load([...FAQS, LOGIN]);
+			facade.setSearchTerm('zzz');
+			expect(ids()).toEqual([]);
+			expect([facade.paraTiCount(), facade.todasCount()]).toEqual([0, 0]);
+		});
+	});
+
 	it('«Para ti» solo deja la categoría del rol y «Común»', () => {
 		load();
 

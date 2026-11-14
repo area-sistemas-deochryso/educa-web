@@ -67,6 +67,22 @@
 			</div>
 		</div>
 
+		<div class="field">
+			<label for="faq-palabras-clave">Palabras clave (opcional)</label>
+			<input
+				id="faq-palabras-clave"
+				type="text"
+				eduInputText
+				class="w-full"
+				[ngModel]="palabrasClave()"
+				(ngModelChange)="palabrasClave.set($event)"
+				[attr.maxlength]="palabrasClaveMaxLength"
+				placeholder="login, inicio de sesión, ingresar"
+				data-info-anchor="admin-faq-form-palabras-clave-input"
+			/>
+			<small>Separadas por coma. Ayudan a encontrar la pregunta con otras palabras; no se muestran.</small>
+		</div>
+
 		<div class="wizard-editor">
 			<div class="wizard-editor-header">
 				<h4>Wizard (opcional)</h4>

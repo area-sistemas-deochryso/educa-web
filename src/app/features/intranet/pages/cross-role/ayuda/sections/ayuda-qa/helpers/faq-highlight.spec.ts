@@ -24,3 +24,33 @@ describe('highlightSegments', () => {
 		]);
 	});
 });
+
+describe('highlightSegments multi-palabra', () => {
+	it('resalta cada palabra sin importar tildes ni orden', () => {
+		expect(highlightSegments('Recuperar contraseña de sesión', 'sesion contrasena')).toEqual([
+			{ text: 'Recuperar ', match: false },
+			{ text: 'contraseña', match: true },
+			{ text: ' de ', match: false },
+			{ text: 'sesión', match: true },
+		]);
+	});
+
+	it('une rangos solapados o contiguos', () => {
+		expect(highlightSegments('inicio de sesión', 'inicio inic')).toEqual([
+			{ text: 'inicio', match: true },
+			{ text: ' de sesión', match: false },
+		]);
+	});
+
+	it('el índice sobre el original es correcto con tildes decompuestas (NFD)', () => {
+		const text = 'Co\u0301mo entro';
+		expect(highlightSegments(text, 'entro')).toEqual([
+			{ text: 'Co\u0301mo ', match: false },
+			{ text: 'entro', match: true },
+		]);
+	});
+
+	it('si la palabra no está en el texto visible no resalta nada', () => {
+		expect(highlightSegments('Alta de usuario', 'login')).toEqual([{ text: 'Alta de usuario', match: false }]);
+	});
+});

@@ -91,7 +91,7 @@ describe('FaqAdminFormDialogComponent', () => {
 
 		expect(emitted).toEqual({
 			id: null,
-			request: { pregunta: 'Pregunta', respuesta: 'Respuesta', categoria: null, capabilityId: null, wizard: null },
+			request: { pregunta: 'Pregunta', respuesta: 'Respuesta', categoria: null, palabrasClave: null, capabilityId: null, wizard: null },
 		});
 	});
 
@@ -105,6 +105,42 @@ describe('FaqAdminFormDialogComponent', () => {
 
 		expect(emitted?.id).toBe(1);
 		expect(emitted?.request.rowVersion).toBe('AAAA');
+	});
+
+	it('guardar sin tocar las palabras clave las conserva', () => {
+		fixture.componentRef.setInput('faq', { ...FAQ_WITH_WIZARD, palabrasClave: 'login, inicio de sesion' });
+		fixture.detectChanges();
+
+		let emitted: { request: { palabrasClave: string | null } } | null = null;
+		component.saveFaq.subscribe((e) => (emitted = e as unknown as typeof emitted));
+		component.onSave();
+
+		expect(emitted?.request.palabrasClave).toBe('login, inicio de sesion');
+	});
+
+	it('reordenar y quitar pasos conserva las palabras clave', () => {
+		fixture.componentRef.setInput('faq', { ...FAQ_WITH_WIZARD, palabrasClave: 'login' });
+		fixture.detectChanges();
+		component.movePaso(0, 1);
+		component.removePaso(0);
+
+		let emitted: { request: { palabrasClave: string | null } } | null = null;
+		component.saveFaq.subscribe((e) => (emitted = e as unknown as typeof emitted));
+		component.onSave();
+
+		expect(emitted?.request.palabrasClave).toBe('login');
+	});
+
+	it('palabras clave vacías viajan como null', () => {
+		component.pregunta.set('P');
+		component.respuesta.set('R');
+		component.palabrasClave.set('   ');
+
+		let emitted: { request: { palabrasClave: string | null } } | null = null;
+		component.saveFaq.subscribe((e) => (emitted = e as unknown as typeof emitted));
+		component.onSave();
+
+		expect(emitted?.request.palabrasClave).toBeNull();
 	});
 
 	it('onSave no emite si la pregunta o respuesta están vacías', () => {
