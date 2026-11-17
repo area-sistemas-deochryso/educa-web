@@ -2,21 +2,24 @@ import {
 	ChangeDetectionStrategy,
 	Component,
 	ElementRef,
+	Injector,
+	afterNextRender,
 	computed,
 	effect,
 	inject,
 	input,
+	output,
 	signal,
 	untracked,
 } from '@angular/core';
 
-import { FaqWizardDto } from '@features/intranet/pages/cross-role/ayuda/models/faq.models';
-import { StorageService } from '@core/services';
-import { deriveStepTitle, estimateMinutes, sanitizeGuideProgress } from '../../helpers/faq-guide';
+import { FaqWizardDto, GuideProgress } from '@features/intranet/pages/cross-role/ayuda/models/faq.models';
+import { clipGuideProgress, deriveStepTitle, estimateMinutes } from '../../helpers/faq-guide';
 
 /**
  * Guía paso a paso como checklist dentro del detalle (sin modal): un indicador de progreso,
- * título por paso derivado del texto, captura opcional y avance recordado en el navegador.
+ * título por paso, captura opcional y avance por persona. El avance inicial llega por `progress` y cada
+ * cambio sale por `progressChange`: quien lo guarda en el servidor es el facade, no la guía.
  * Cada paso se identifica por su posición: `orden` puede repetirse en los datos.
  * ↑↓ mueven entre pasos; Enter o espacio marcan el paso enfocado (es un `<button>`).
  * Al marcar un paso el siguiente pasa a ser el actual y se le hace scroll; el progreso va pegado arriba
@@ -31,11 +34,14 @@ import { deriveStepTitle, estimateMinutes, sanitizeGuideProgress } from '../../h
 	host: { '(keydown)': 'onKeydown($event)' },
 })
 export class FaqGuideComponent {
-	private readonly storage = inject(StorageService);
 	private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+	private readonly injector = inject(Injector);
 
 	readonly faqId = input.required<number>();
 	readonly wizard = input.required<FaqWizardDto>();
+	/** Avance guardado de la persona; solo se lee al abrir la guía (después manda el estado interno). */
+	readonly progress = input<GuideProgress | null>(null);
+	readonly progressChange = output<GuideProgress>();
 
 	private readonly done = signal<ReadonlySet<number>>(new Set());
 	private readonly currentIndex = signal<number | null>(null);
@@ -75,15 +81,23 @@ export class FaqGuideComponent {
 		return current !== null && current < this.total() - 1;
 	});
 
-	/** Al cambiar de pregunta se carga su avance guardado. */
+	/**
+	 * Al cambiar de pregunta se aplica su avance (recortado a los pasos actuales). Una guía en curso se abre
+	 * con su paso actual a la vista; una terminada o sin avance, desde arriba.
+	 */
 	private readonly loadProgress = effect(() => {
-		const faqId = this.faqId();
+		this.faqId();
 		untracked(() => {
-			const saved = sanitizeGuideProgress(this.storage.getAyudaGuideProgress(faqId));
+			const saved = clipGuideProgress(this.progress()?.done ?? [], this.progress()?.current, this.total());
 			this.done.set(new Set(saved.done));
 			this.currentIndex.set(saved.current);
 			this.justDone.set(null);
 			this.celebrate.set(false);
+
+			const target = this.current();
+			if (this.doneCount() > 0 && !this.finished() && target !== null) {
+				afterNextRender(() => this.scrollToStep(target), { injector: this.injector });
+			}
 		});
 	});
 
@@ -104,6 +118,15 @@ export class FaqGuideComponent {
 			this.currentIndex.set(next);
 			this.scrollToStep(next);
 		}
+		this.persist();
+	}
+
+	/** Vuelve la guía a cero: el estado vacío borra el avance guardado. */
+	reset(): void {
+		this.done.set(new Set());
+		this.currentIndex.set(null);
+		this.justDone.set(null);
+		this.celebrate.set(false);
 		this.persist();
 	}
 
@@ -151,6 +174,6 @@ export class FaqGuideComponent {
 	}
 
 	private persist(): void {
-		this.storage.setAyudaGuideProgress(this.faqId(), { done: [...this.done()], current: this.currentIndex() });
+		this.progressChange.emit({ done: [...this.done()].sort((a, b) => a - b), current: this.currentIndex() });
 	}
 }

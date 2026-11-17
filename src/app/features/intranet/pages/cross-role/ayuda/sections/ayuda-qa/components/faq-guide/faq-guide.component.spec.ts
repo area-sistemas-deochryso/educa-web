@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { FaqWizardDto } from '@features/intranet/pages/cross-role/ayuda/models/faq.models';
+import { FaqWizardDto, GuideProgress } from '@features/intranet/pages/cross-role/ayuda/models/faq.models';
 import { FaqGuideComponent } from './faq-guide.component';
 
 const WIZARD: FaqWizardDto = {
@@ -16,11 +16,15 @@ const WIZARD: FaqWizardDto = {
 
 describe('FaqGuideComponent', () => {
 	let fixture: ComponentFixture<FaqGuideComponent>;
+	let emitted: GuideProgress[];
 
-	function create(faqId = 7): void {
+	function create(faqId = 7, progress: GuideProgress | null = null): void {
 		fixture = TestBed.createComponent(FaqGuideComponent);
 		fixture.componentRef.setInput('faqId', faqId);
 		fixture.componentRef.setInput('wizard', WIZARD);
+		fixture.componentRef.setInput('progress', progress);
+		emitted = [];
+		fixture.componentInstance.progressChange.subscribe((p) => emitted.push(p));
 		fixture.detectChanges();
 	}
 
@@ -33,7 +37,6 @@ describe('FaqGuideComponent', () => {
 	}
 
 	beforeEach(() => {
-		localStorage.clear();
 		TestBed.configureTestingModule({ imports: [FaqGuideComponent] });
 	});
 
@@ -55,39 +58,71 @@ describe('FaqGuideComponent', () => {
 		expect(images[0].nativeElement.getAttribute('src')).toBe('https://cdn.test/paso2.png');
 	});
 
-	it('marcar un paso actualiza el progreso y lo conserva al reabrir la guía', () => {
+	it('marcar un paso actualiza el progreso y lo emite para que se guarde', () => {
 		create();
 		checks()[0].click();
 		fixture.detectChanges();
 
 		expect(text('.faq-guide__count')).toBe('1 de 3 pasos');
 		expect(checks()[0].getAttribute('aria-pressed')).toBe('true');
-
-		fixture.destroy();
-		create();
-
-		expect(text('.faq-guide__count')).toBe('1 de 3 pasos');
-		expect(checks()[0].getAttribute('aria-pressed')).toBe('true');
+		expect(emitted.at(-1)).toEqual({ done: [0], current: 1 });
 	});
 
-	it('el avance es por pregunta', () => {
-		create(7);
-		checks()[0].click();
-		fixture.destroy();
+	it('abre con el avance recibido y recuerda el último paso trabajado', () => {
+		create(7, { done: [0, 2], current: 2 });
 
-		create(8);
+		expect(text('.faq-guide__count')).toBe('2 de 3 pasos');
+		expect(checks()[0].getAttribute('aria-pressed')).toBe('true');
+		expect(checks()[1].getAttribute('aria-pressed')).toBe('false');
+		expect(checks()[2].getAttribute('aria-current')).toBe('step');
+	});
+
+	it('sin avance recibido arranca vacía y sin emitir nada', () => {
+		create();
 
 		expect(text('.faq-guide__count')).toBe('0 de 3 pasos');
+		expect(emitted).toEqual([]);
 	});
 
-	it('recuerda el último paso trabajado', () => {
+	it('recorta el avance guardado a los pasos que tiene hoy la guía', () => {
+		create(7, { done: [1, 5, -1, 1], current: 9 });
+
+		expect(text('.faq-guide__count')).toBe('1 de 3 pasos');
+		expect(checks()[1].getAttribute('aria-pressed')).toBe('true');
+		expect(checks()[0].getAttribute('aria-current')).toBe('step'); // `current` fuera de rango → primer pendiente
+	});
+
+	it('«Reiniciar guía» solo aparece con avance, vuelve a cero y emite el estado vacío', () => {
 		create();
-		checks()[2].click(); // último paso: no hay siguiente al que avanzar
+		expect(fixture.debugElement.query(By.css('.faq-guide__reset'))).toBeNull();
+
 		fixture.destroy();
+		create(7, { done: [0, 1], current: 1 });
+		(fixture.debugElement.query(By.css('.faq-guide__reset')).nativeElement as HTMLButtonElement).click();
+		fixture.detectChanges();
 
-		create();
+		expect(text('.faq-guide__count')).toBe('0 de 3 pasos');
+		expect(checks().every((b) => b.getAttribute('aria-pressed') === 'false')).toBe(true);
+		expect(fixture.debugElement.query(By.css('.faq-guide__reset'))).toBeNull();
+		expect(emitted.at(-1)).toEqual({ done: [], current: null });
+	});
 
-		expect(checks()[2].getAttribute('aria-current')).toBe('step');
+	it('una guía en curso se abre con su paso actual a la vista; una sin avance o terminada, no', async () => {
+		const scrollIntoView = vi.fn();
+		Element.prototype.scrollIntoView = scrollIntoView;
+
+		create(7, { done: [0], current: 1 });
+		await fixture.whenStable();
+		expect(scrollIntoView).toHaveBeenCalledTimes(1);
+
+		scrollIntoView.mockClear();
+		fixture.destroy();
+		create(7, null);
+		await fixture.whenStable();
+		fixture.destroy();
+		create(7, { done: [0, 1, 2], current: 2 });
+		await fixture.whenStable();
+		expect(scrollIntoView).not.toHaveBeenCalled();
 	});
 
 	it('al marcar un paso el siguiente pendiente pasa a ser el actual', () => {
@@ -134,9 +169,10 @@ describe('FaqGuideComponent', () => {
 		checks().forEach((b) => b.click());
 		fixture.detectChanges();
 		expect(fixture.debugElement.query(By.css('.faq-guide--celebrate'))).not.toBeNull();
+		expect(emitted.at(-1)?.done).toEqual([0, 1, 2]);
 		fixture.destroy();
 
-		create();
+		create(7, { done: [0, 1, 2], current: 2 });
 
 		expect(text('.faq-guide__count')).toBe('¡Guía completa!');
 		expect(fixture.debugElement.query(By.css('.faq-guide--celebrate'))).toBeNull();
@@ -160,22 +196,6 @@ describe('FaqGuideComponent', () => {
 
 		buttons[1].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
 		expect(document.activeElement).toBe(buttons[0]);
-	});
-
-	it('funciona aunque el almacenamiento local falle', () => {
-		const original = Storage.prototype.setItem;
-		Storage.prototype.setItem = () => {
-			throw new Error('bloqueado');
-		};
-		try {
-			create();
-			checks()[0].click();
-			fixture.detectChanges();
-
-			expect(text('.faq-guide__count')).toBe('1 de 3 pasos');
-		} finally {
-			Storage.prototype.setItem = original;
-		}
 	});
 
 	it('marca un solo paso aunque el `orden` de los datos se repita', () => {

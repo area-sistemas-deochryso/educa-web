@@ -19,10 +19,11 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { map } from 'rxjs/operators';
 
-import { FaqDto, FaqMotivo } from '../../models/faq.models';
+import { FaqDto, FaqMotivo, GuideProgress } from '../../models/faq.models';
 import { FaqDetailComponent } from './components/faq-detail/faq-detail.component';
 import { FaqHeaderComponent } from './components/faq-header/faq-header.component';
 import { FaqListComponent } from './components/faq-list/faq-list.component';
+import { FaqRetomarComponent } from './components/faq-retomar/faq-retomar.component';
 import { FaqStickyBarComponent } from './components/faq-sticky-bar/faq-sticky-bar.component';
 import { AyudaQaFacade, ModoVista } from './services/ayuda-qa.facade';
 import { EduButton, EduSpinner } from '@edu-ui';
@@ -45,6 +46,7 @@ const FAQ_QUERY_PARAM = 'faq';
 		FaqHeaderComponent,
 		FaqStickyBarComponent,
 		FaqListComponent,
+		FaqRetomarComponent,
 		FaqDetailComponent,
 	],
 	providers: [AyudaQaFacade],
@@ -75,6 +77,10 @@ export class AyudaQaComponent implements OnInit, AfterViewInit {
 	readonly selectedFaq = this.facade.selectedFaq;
 	readonly relacionadas = this.facade.relacionadas;
 	readonly selectedVote = this.facade.selectedVote;
+	readonly progressSummary = this.facade.progressSummary;
+	readonly retomar = this.facade.retomar;
+	readonly selectedProgress = this.facade.selectedProgress;
+	readonly progressReady = this.facade.progressReady;
 	readonly selectedId = this.facade.selectedId;
 	readonly headerCompact = this.facade.isFiltering;
 	readonly hasActiveFilters = this.facade.hasActiveFilters;
@@ -255,6 +261,10 @@ export class AyudaQaComponent implements OnInit, AfterViewInit {
 
 	onVoted(faqId: number, vote: { util: boolean; motivo: FaqMotivo | null }): void {
 		this.facade.vote(faqId, vote.util, vote.motivo);
+	}
+
+	onProgressChanged(faqId: number, progress: GuideProgress): void {
+		this.facade.saveProgress(faqId, progress);
 	}
 
 	/** «No útil» → ticket con la pregunta citada (el formulario la precarga desde `?descripcion=`). */

@@ -1,0 +1,26 @@
+@if (items().length > 0) {
+	<section class="faq-retomar" aria-labelledby="faq-retomar-titulo">
+		<h4 class="faq-retomar__titulo" id="faq-retomar-titulo">
+			<i class="pi pi-history" aria-hidden="true"></i> Retomar
+		</h4>
+		<ul class="faq-retomar__items">
+			@for (item of items(); track item.faq.id) {
+				<li>
+					<button type="button" class="faq-retomar__item" [attr.data-retomar-id]="item.faq.id" (click)="faqSelected.emit(item.faq.id)">
+						<span class="faq-retomar__pregunta">{{ item.faq.pregunta }}</span>
+						<span class="faq-retomar__avance">
+							<span class="faq-retomar__barra" aria-hidden="true">
+								<span class="faq-retomar__barra-fill" [style.width.%]="(item.summary.done / item.summary.total) * 100"></span>
+							</span>
+							{{ item.summary.done }}/{{ item.summary.total }} pasos
+						</span>
+						<span class="faq-retomar__accion">
+							Continuar en el paso {{ item.summary.step }}
+							<i class="pi pi-arrow-right" aria-hidden="true"></i>
+						</span>
+					</button>
+				</li>
+			}
+		</ul>
+	</section>
+}

@@ -41,3 +41,45 @@ export interface FaqVoto {
 	motivo: FaqMotivo | null;
 }
 // #endregion
+
+// #region Progreso de guías (GET /api/faq/progreso/mios, PUT /api/faq/{id}/progreso)
+// Ver `educa-coord/contracts/api-catalog.md` § FAQ. Los pasos se identifican por posición (base 0).
+
+/** Avance de la persona en una guía, tal como lo devuelve el servidor. */
+export interface FaqProgresoDto {
+	faqId: number;
+	hechos: number[];
+	actual?: number | null;
+	totalPasos: number;
+	fecha?: string | null;
+}
+
+/** Cuerpo del `PUT`: `hechos` vacío borra el registro («Reiniciar guía»). */
+export interface FaqProgresoBody {
+	hechos: number[];
+	actual?: number;
+	totalPasos: number;
+}
+
+/** Avance de una guía como lo maneja la UI. */
+export interface GuideProgress {
+	/** Posición (desde 0) de los pasos marcados como hechos, ascendente. */
+	done: number[];
+	/** Posición (desde 0) del último paso trabajado, o `null` si todavía no hay ninguno. */
+	current: number | null;
+}
+
+/** «Nunca vista» no tiene resumen: la lista no la marca. */
+export type GuideStatus = 'en-curso' | 'terminada';
+
+/** Lo que la lista y «Retomar» necesitan de una guía con avance, recortado a los pasos actuales. */
+export interface GuideSummary {
+	status: GuideStatus;
+	done: number;
+	total: number;
+	/** Paso (desde 1) donde seguir: el último trabajado o el primero pendiente. */
+	step: number;
+	/** ISO de la última actualización; ordena «Retomar». */
+	fecha: string;
+}
+// #endregion

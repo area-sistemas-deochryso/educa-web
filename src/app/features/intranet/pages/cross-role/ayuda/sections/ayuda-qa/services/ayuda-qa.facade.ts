@@ -6,8 +6,17 @@ import { EMPTY, catchError, of } from 'rxjs';
 import { AuthService } from '@core/services';
 import { logger } from '@core/helpers';
 
-import { FaqDto, FaqMotivo, FaqVoto } from '@features/intranet/pages/cross-role/ayuda/models/faq.models';
+import {
+	FaqDto,
+	FaqMotivo,
+	FaqProgresoDto,
+	FaqVoto,
+	GuideProgress,
+	GuideSummary,
+} from '@features/intranet/pages/cross-role/ayuda/models/faq.models';
+import { progressFromDto, summarizeGuideProgress } from '../helpers/faq-guide';
 import { faqMatchesWords, splitSearchWords } from '../helpers/faq-search';
+import { GuideProgressSync } from './guide-progress-sync';
 import { FaqService } from '@features/intranet/pages/cross-role/ayuda/services/faq.service';
 // #endregion
 
@@ -27,6 +36,18 @@ interface FaqFilter {
 
 const POPULARES_MAX = 3;
 const RELACIONADAS_MAX = 3;
+const RETOMAR_MAX = 3;
+
+/** Avance guardado de una guía más la fecha de su última actualización. */
+interface ProgressEntry extends GuideProgress {
+	fecha: string;
+}
+
+/** Guía en curso para la sección «Retomar». */
+export interface RetomarItem {
+	faq: FaqDto;
+	summary: GuideSummary;
+}
 
 /**
  * Estado + carga de la sección QA. Scoped al componente (no `providedIn: 'root'`)
@@ -59,6 +80,18 @@ export class AyudaQaFacade {
 	private readonly _consultadasIds = signal<number[] | null>(null);
 	/** Preguntas cuya apertura ya se contó en esta visita a la sección. */
 	private readonly openedIds = new Set<number>();
+	/** Avance por pregunta (`faqId`): lo que llegó del servidor más lo que la persona fue marcando. */
+	private readonly _progress = signal<Record<number, ProgressEntry>>({});
+	/** `true` cuando terminó la carga del avance (con o sin éxito): la guía espera a esto para no arrancar vacía. */
+	private readonly _progressReady = signal(false);
+	/** Guarda el avance en el servidor con debounce por guía; ver `GuideProgressSync`. */
+	private readonly progressSync = new GuideProgressSync(
+		(faqId, body) => this.faqService.guardarProgreso(faqId, body),
+		(faqId) => ({
+			progress: this._progress()[faqId],
+			total: this._faqs().find((f) => f.id === faqId)?.wizard?.pasos.length ?? 0,
+		}),
+	);
 
 	readonly rolUsuario = computed(() => this.authService.currentUser?.rol);
 
@@ -145,6 +178,38 @@ export class AyudaQaFacade {
 		return id === null ? null : (this._votes()[id] ?? null);
 	});
 
+	/** Guías con avance, recortadas a los pasos actuales de cada una. Las nunca vistas no aparecen. */
+	readonly progressSummary = computed<Record<number, GuideSummary>>(() => {
+		const progress = this._progress();
+		const result: Record<number, GuideSummary> = {};
+		for (const faq of this._faqs()) {
+			const entry = progress[faq.id];
+			const total = faq.wizard?.pasos.length ?? 0;
+			if (!entry || total === 0) continue;
+			const summary = summarizeGuideProgress(entry, total, entry.fecha);
+			if (summary) result[faq.id] = summary;
+		}
+		return result;
+	});
+
+	/** «Retomar»: guías en curso, la de avance más reciente primero (máx. `RETOMAR_MAX`). */
+	readonly retomar = computed<RetomarItem[]>(() => {
+		const summary = this.progressSummary();
+		return this._faqs()
+			.filter((faq) => summary[faq.id]?.status === 'en-curso')
+			.map((faq) => ({ faq, summary: summary[faq.id] }))
+			.sort((a, b) => Date.parse(b.summary.fecha) - Date.parse(a.summary.fecha))
+			.slice(0, RETOMAR_MAX);
+	});
+
+	/** Avance de la pregunta abierta, o `null` si no tiene. */
+	readonly selectedProgress = computed<GuideProgress | null>(() => {
+		const id = this._selectedId();
+		const entry = id === null ? undefined : this._progress()[id];
+		return entry ? { done: entry.done, current: entry.current } : null;
+	});
+
+	readonly progressReady = this._progressReady.asReadonly();
 	readonly categoria = this._categoria.asReadonly();
 	readonly searchTerm = this._searchTerm.asReadonly();
 	readonly modoVista = this._modoVista.asReadonly();
@@ -152,6 +217,11 @@ export class AyudaQaFacade {
 	readonly loading = this._loading.asReadonly();
 	readonly error = this._error.asReadonly();
 	// #endregion
+
+	constructor() {
+		// Al salir de la sección no se pierde lo marcado en los últimos 800 ms.
+		this.destroyRef.onDestroy(() => this.progressSync.flushAll());
+	}
 
 	// #region Commands
 	init(): void {
@@ -198,6 +268,7 @@ export class AyudaQaFacade {
 
 	/** Selecciona una pregunta (o `null` para volver a la lista). Si los filtros la ocultan, los limpia. */
 	select(id: number | null): void {
+		this.progressSync.flushAll();
 		this._selectedId.set(id);
 		this.revealSelected();
 		this.trackOpening();
@@ -221,6 +292,21 @@ export class AyudaQaFacade {
 				takeUntilDestroyed(this.destroyRef),
 			)
 			.subscribe();
+	}
+
+	/**
+	 * Avance de una guía: la UI lo refleja al instante y el guardado se agrupa (debounce). Un estado sin
+	 * pasos hechos es «Reiniciar guía»: borra el registro, y el paso actual solo no se guarda.
+	 */
+	saveProgress(faqId: number, progress: GuideProgress): void {
+		this._progress.update((current) => {
+			const next = { ...current };
+			if (progress.done.length === 0) delete next[faqId];
+			else next[faqId] = { done: progress.done, current: progress.current, fecha: new Date().toISOString() };
+			return next;
+		});
+
+		this.progressSync.schedule(faqId);
 	}
 	// #endregion
 
@@ -247,6 +333,30 @@ export class AyudaQaFacade {
 				takeUntilDestroyed(this.destroyRef),
 			)
 			.subscribe((faqs) => this._consultadasIds.set(faqs ? faqs.map((f) => f.id) : null));
+
+		this.faqService
+			.getMisProgresos()
+			.pipe(
+				catchError((err) => {
+					logger.warn('[AyudaQaFacade] Error cargando el avance de guías', err?.status);
+					return of([] as FaqProgresoDto[]);
+				}),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe((items) => {
+				const loaded: Record<number, ProgressEntry> = {};
+				for (const item of items) {
+					loaded[item.faqId] = { ...progressFromDto(item), fecha: item.fecha ?? new Date(0).toISOString() };
+					this.progressSync.remember(item.faqId, {
+						hechos: item.hechos,
+						actual: item.actual ?? undefined,
+						totalPasos: item.totalPasos,
+					});
+				}
+				// Lo marcado mientras cargaba prevalece sobre lo guardado en el servidor.
+				this._progress.update((actual) => ({ ...loaded, ...actual }));
+				this._progressReady.set(true);
+			});
 	}
 
 	/** Cuenta la apertura de la pregunta elegida, una vez por pregunta y por visita a la sección. */

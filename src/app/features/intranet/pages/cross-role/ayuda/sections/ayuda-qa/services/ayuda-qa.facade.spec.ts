@@ -1,16 +1,21 @@
 // #region Imports
+import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { environment } from '@config/environment';
 import { AuthService } from '@core/services';
-import { FaqDto } from '@features/intranet/pages/cross-role/ayuda/models/faq.models';
+import { FaqDto, FaqProgresoDto } from '@features/intranet/pages/cross-role/ayuda/models/faq.models';
 import { AyudaQaFacade } from './ayuda-qa.facade';
 // #endregion
 
 const FAQ_API = `${environment.apiUrl}/api/faq`;
+
+/** Provee el facade como la sección real (a nivel de componente) para probar lo que ocurre al destruirse. */
+@Component({ standalone: true, template: '', providers: [AyudaQaFacade] })
+class FacadeHostComponent {}
 
 const FAQS: FaqDto[] = [
 	{ id: 1, pregunta: '¿Cómo cambio mi contraseña?', respuesta: 'Ve a tu perfil.', categoria: 'Común', wizard: null },
@@ -371,4 +376,242 @@ describe('AyudaQaFacade', () => {
 		expect(facade.selectedFaq()?.id).toBe(1);
 	});
 	// #endregion
+
+	describe('progreso de guías', () => {
+		const guia = (id: number, pasos: number): FaqDto => ({
+			id,
+			pregunta: `Guía ${id}`,
+			respuesta: 'Sigue los pasos.',
+			categoria: 'Profesor',
+			wizard: { titulo: null, pasos: Array.from({ length: pasos }, (_, i) => ({ orden: i + 1, texto: `Paso ${i + 1}`, imagenUrl: null })) },
+		});
+		const G20 = guia(20, 3);
+		const G21 = guia(21, 2);
+		const PROGRESS_API = `${FAQ_API}/progreso/mios`;
+		const putUrl = (id: number) => `${FAQ_API}/${id}/progreso`;
+
+		function loadWith(progresos: FaqProgresoDto[] | 'error', faqs: FaqDto[] = [...FAQS, G20, G21]): void {
+			load(faqs);
+			const req = httpMock.expectOne(PROGRESS_API);
+			if (progresos === 'error') req.flush('', { status: 500, statusText: 'Server Error' });
+			else req.flush(progresos);
+		}
+
+		const saved = (faqId: number, hechos: number[], actual: number | undefined, totalPasos: number, fecha = '2026-11-17T10:00:00Z'): FaqProgresoDto => ({
+			faqId,
+			hechos,
+			actual,
+			totalPasos,
+			fecha,
+		});
+
+		beforeEach(() => vi.useFakeTimers());
+		afterEach(() => vi.useRealTimers());
+
+		it('la guía espera a que termine la carga del avance, con éxito o con error', () => {
+			load();
+			expect(facade.progressReady()).toBe(false);
+			httpMock.expectOne(PROGRESS_API).flush('', { status: 500, statusText: 'Server Error' });
+
+			expect(facade.progressReady()).toBe(true);
+			expect(facade.progressSummary()).toEqual({});
+		});
+
+		it('resume el avance de cada guía: en curso, terminada y nunca vista sin marca', () => {
+			loadWith([saved(20, [0, 1], 1, 3), saved(21, [0, 1], 1, 2)]);
+
+			expect(facade.progressSummary()).toEqual({
+				20: { status: 'en-curso', done: 2, total: 3, step: 2, fecha: '2026-11-17T10:00:00Z' },
+				21: { status: 'terminada', done: 2, total: 2, step: 2, fecha: '2026-11-17T10:00:00Z' },
+			});
+			expect(facade.progressSummary()[2]).toBeUndefined();
+		});
+
+		it('recorta el avance guardado a los pasos que tiene hoy la guía', () => {
+			loadWith([saved(20, [0, 4], 4, 5)]);
+
+			expect(facade.progressSummary()[20]).toMatchObject({ status: 'en-curso', done: 1, total: 3, step: 2 });
+		});
+
+		it('«Retomar» lista solo las guías en curso, la más reciente primero y con tope', () => {
+			const [g1, g2, g3, g4] = [30, 31, 32, 33].map((id) => guia(id, 4));
+			loadWith(
+				[
+					saved(30, [0], 0, 4, '2026-11-17T08:00:00Z'),
+					saved(31, [0], 0, 4, '2026-11-17T12:00:00Z'),
+					saved(32, [0], 0, 4, '2026-11-17T10:00:00Z'),
+					saved(33, [0], 0, 4, '2026-11-17T09:00:00Z'),
+					saved(21, [0, 1], 1, 2, '2026-11-17T13:00:00Z'), // terminada: no entra
+				],
+				[g1, g2, g3, g4, G21],
+			);
+
+			expect(facade.retomar().map((i) => i.faq.id)).toEqual([31, 32, 33]);
+		});
+
+		it('sin guías en curso «Retomar» queda vacío', () => {
+			loadWith([saved(21, [0, 1], 1, 2)]);
+
+			expect(facade.retomar()).toEqual([]);
+		});
+
+		it('la pregunta abierta recibe su avance guardado', () => {
+			loadWith([saved(20, [0], 0, 3)]);
+
+			facade.select(20);
+
+			expect(facade.selectedProgress()).toEqual({ done: [0], current: 0 });
+			facade.select(1);
+			expect(facade.selectedProgress()).toBeNull();
+		});
+
+		it('marcar se refleja al instante y el guardado se agrupa en un solo PUT', () => {
+			loadWith([]);
+
+			facade.saveProgress(20, { done: [0], current: 1 });
+			facade.saveProgress(20, { done: [0, 1], current: 2 });
+			facade.saveProgress(20, { done: [0, 1, 2], current: 2 });
+
+			expect(facade.progressSummary()[20].status).toBe('terminada');
+			vi.advanceTimersByTime(799);
+			httpMock.expectNone(putUrl(20));
+
+			vi.advanceTimersByTime(1);
+			const put = httpMock.expectOne(putUrl(20));
+			expect(put.request.method).toBe('PUT');
+			expect(put.request.body).toEqual({ hechos: [0, 1, 2], actual: 2, totalPasos: 3 });
+			expect(put.request.headers.get('X-Skip-Error-Toast')).toBe('true');
+		});
+
+		it('el PUT omite `actual` cuando no hay paso actual', () => {
+			loadWith([]);
+
+			facade.saveProgress(20, { done: [1], current: null });
+			vi.advanceTimersByTime(800);
+
+			expect(httpMock.expectOne(putUrl(20)).request.body).toEqual({ hechos: [1], totalPasos: 3 });
+		});
+
+		it('no reenvía un estado igual al que el servidor ya tiene', () => {
+			loadWith([saved(20, [0], 0, 3)]);
+
+			facade.saveProgress(20, { done: [0], current: 0 });
+			vi.advanceTimersByTime(800);
+
+			httpMock.expectNone(putUrl(20));
+		});
+
+		it('«Reiniciar» borra el avance enviando `hechos` vacío, y sin nada guardado no envía nada', () => {
+			loadWith([saved(20, [0], 0, 3)]);
+
+			facade.saveProgress(20, { done: [], current: null });
+			expect(facade.progressSummary()[20]).toBeUndefined();
+			vi.advanceTimersByTime(800);
+			expect(httpMock.expectOne(putUrl(20)).request.body).toEqual({ hechos: [], totalPasos: 3 });
+
+			facade.saveProgress(21, { done: [], current: null });
+			vi.advanceTimersByTime(800);
+			httpMock.expectNone(putUrl(21));
+		});
+
+		it('un guardado pendiente se envía al cambiar de pregunta, sin esperar el debounce', () => {
+			loadWith([]);
+			facade.select(20);
+
+			facade.saveProgress(20, { done: [0], current: 1 });
+			facade.select(null);
+
+			expect(httpMock.expectOne(putUrl(20)).request.body.hechos).toEqual([0]);
+		});
+
+		it('si el servidor falla (500) conserva el avance en memoria y la siguiente acción reenvía todo', () => {
+			loadWith([]);
+			facade.saveProgress(20, { done: [0], current: 1 });
+			vi.advanceTimersByTime(800);
+			httpMock.expectOne(putUrl(20)).flush('', { status: 500, statusText: 'Server Error' });
+
+			expect(facade.progressSummary()[20]).toMatchObject({ status: 'en-curso', done: 1 });
+			vi.advanceTimersByTime(60_000);
+			httpMock.expectNone(putUrl(20)); // no reintenta por su cuenta
+
+			facade.saveProgress(20, { done: [0, 1], current: 2 });
+			vi.advanceTimersByTime(800);
+			expect(httpMock.expectOne(putUrl(20)).request.body).toEqual({ hechos: [0, 1], actual: 2, totalPasos: 3 });
+		});
+
+		it.each([400, 404, 429])('%i no se reintenta y el avance sigue en memoria', (status) => {
+			loadWith([]);
+			facade.saveProgress(20, { done: [0], current: 1 });
+			vi.advanceTimersByTime(800);
+			httpMock.expectOne(putUrl(20)).flush('', { status, statusText: 'Error' });
+
+			vi.advanceTimersByTime(60_000);
+
+			httpMock.expectNone(putUrl(20));
+			expect(facade.progressSummary()[20]).toBeDefined();
+		});
+
+		it('503 reintenta una sola vez tras `Retry-After`', () => {
+			loadWith([]);
+			facade.saveProgress(20, { done: [0], current: 1 });
+			vi.advanceTimersByTime(800);
+			httpMock.expectOne(putUrl(20)).flush('', { status: 503, statusText: 'Unavailable', headers: { 'Retry-After': '2' } });
+
+			vi.advanceTimersByTime(1999);
+			httpMock.expectNone(putUrl(20));
+			vi.advanceTimersByTime(1);
+			httpMock.expectOne(putUrl(20)).flush('', { status: 503, statusText: 'Unavailable', headers: { 'Retry-After': '2' } });
+
+			vi.advanceTimersByTime(60_000);
+			httpMock.expectNone(putUrl(20));
+		});
+
+		it('la espera de un 503 tiene tope aunque `Retry-After` pida más', () => {
+			loadWith([]);
+			facade.saveProgress(20, { done: [0], current: 1 });
+			vi.advanceTimersByTime(800);
+			httpMock.expectOne(putUrl(20)).flush('', { status: 503, statusText: 'Unavailable', headers: { 'Retry-After': '120' } });
+
+			vi.advanceTimersByTime(10_000);
+
+			expect(httpMock.expectOne(putUrl(20))).toBeTruthy();
+		});
+
+		it('un cambio durante un PUT en vuelo espera a que termine para que no se pisen', () => {
+			loadWith([]);
+			facade.saveProgress(20, { done: [0], current: 1 });
+			vi.advanceTimersByTime(800);
+			const primero = httpMock.expectOne(putUrl(20));
+
+			facade.saveProgress(20, { done: [0, 1], current: 2 });
+			vi.advanceTimersByTime(800);
+			httpMock.expectNone(putUrl(20));
+
+			primero.flush({ faqId: 20, hechos: [0], totalPasos: 3 });
+			expect(httpMock.expectOne(putUrl(20)).request.body).toEqual({ hechos: [0, 1], actual: 2, totalPasos: 3 });
+		});
+
+		it('al salir de la sección se envía lo que estaba por guardarse', () => {
+			// El facade vive en el componente (no en la raíz): se destruye con él, con HttpClient aún operativo.
+			const host = TestBed.createComponent(FacadeHostComponent);
+			const scoped = host.debugElement.injector.get(AyudaQaFacade);
+			scoped.init();
+			httpMock.expectOne(FAQ_API).flush([...FAQS, G20]);
+			httpMock.expectOne(PROGRESS_API).flush([]);
+			scoped.saveProgress(20, { done: [0], current: 1 });
+
+			host.destroy();
+
+			expect(httpMock.expectOne(putUrl(20)).request.body).toEqual({ hechos: [0], actual: 1, totalPasos: 3 });
+		});
+
+		it('una guía sin pasos no se envía', () => {
+			loadWith([]);
+
+			facade.saveProgress(1, { done: [0], current: 0 }); // FAQ 1 no tiene guía
+			vi.advanceTimersByTime(800);
+
+			httpMock.expectNone(putUrl(1));
+		});
+	});
 });

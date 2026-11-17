@@ -81,10 +81,14 @@
 	} @else {
 		<div class="qa__layout">
 			<div class="qa__list">
+				@if (!headerCompact()) {
+					<app-faq-retomar [items]="retomar()" (faqSelected)="onFaqSelected($event)" />
+				}
 				<app-faq-list
 					[faqs]="faqs()"
 					[selectedId]="selectedId() ?? lastOpenedId()"
 					[term]="searchTerm()"
+					[progress]="progressSummary()"
 					(faqSelected)="onFaqSelected($event)"
 				/>
 			</div>
@@ -94,6 +98,9 @@
 						[faq]="faq"
 						[relacionadas]="relacionadas()"
 						[vote]="selectedVote()"
+						[progress]="selectedProgress()"
+						[progressReady]="progressReady()"
+						(progressChange)="onProgressChanged(faq.id, $event)"
 						(voted)="onVoted(faq.id, $event)"
 						(relatedSelected)="onFaqSelected($event)"
 						(ticketRequested)="onFaqTicketRequested($event)"

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 
-import { FaqDto, FaqMotivo, FaqVoto } from '@features/intranet/pages/cross-role/ayuda/models/faq.models';
+import { FaqDto, FaqMotivo, FaqVoto, GuideProgress } from '@features/intranet/pages/cross-role/ayuda/models/faq.models';
 import { EduButton } from '@edu-ui';
 import { FaqGuideComponent } from '../faq-guide/faq-guide.component';
 
@@ -33,6 +33,10 @@ export class FaqDetailComponent {
 	readonly faq = input.required<FaqDto>();
 	readonly relacionadas = input<FaqDto[]>([]);
 	readonly vote = input<FaqVoto | null>(null);
+	/** Avance guardado de la guía y si ya terminó de cargar: hasta entonces la guía no se muestra (arrancaría vacía). */
+	readonly progress = input<GuideProgress | null>(null);
+	readonly progressReady = input(true);
+	readonly progressChange = output<GuideProgress>();
 	readonly voted = output<FaqVoteEvent>();
 	readonly relatedSelected = output<number>();
 	readonly ticketRequested = output<FaqDto>();

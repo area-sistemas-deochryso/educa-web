@@ -26,10 +26,28 @@
 							}
 						</span>
 						@if (faq.wizard) {
-							<span class="faq-item__guia" title="Incluye guía paso a paso">
-								<i class="pi pi-list" aria-hidden="true"></i>
-								{{ faq.wizard.pasos.length }} pasos
-							</span>
+							@let avance = progress()[faq.id];
+							@if (avance?.status === 'en-curso') {
+								<span
+									class="faq-item__guia faq-item__guia--en-curso"
+									[attr.title]="'Guía en curso: ' + avance.done + ' de ' + avance.total + ' pasos hechos'"
+								>
+									<span class="faq-item__avance" aria-hidden="true">
+										<span class="faq-item__avance-fill" [style.width.%]="(avance.done / avance.total) * 100"></span>
+									</span>
+									<span class="sr-only">Guía en curso, </span>{{ avance.done }}/{{ avance.total }}
+								</span>
+							} @else if (avance?.status === 'terminada') {
+								<span class="faq-item__guia faq-item__guia--terminada" title="Guía terminada">
+									<i class="pi pi-check" aria-hidden="true"></i>
+									<span class="sr-only">Guía terminada, </span>{{ faq.wizard.pasos.length }} pasos
+								</span>
+							} @else {
+								<span class="faq-item__guia" title="Incluye guía paso a paso">
+									<i class="pi pi-list" aria-hidden="true"></i>
+									{{ faq.wizard.pasos.length }} pasos
+								</span>
+							}
 						}
 					</button>
 				</li>

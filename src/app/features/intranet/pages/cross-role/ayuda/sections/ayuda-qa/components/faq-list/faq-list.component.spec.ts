@@ -69,4 +69,49 @@ describe('FaqListComponent', () => {
 		expect(marks).toHaveLength(1);
 		expect(marks[0].nativeElement.textContent).toBe('contraseña');
 	});
+
+	describe('marcas de avance', () => {
+		const SUMMARY_EN_CURSO = { status: 'en-curso', done: 1, total: 3, step: 2, fecha: '2026-11-17T10:00:00Z' } as const;
+		const SUMMARY_TERMINADA = { status: 'terminada', done: 3, total: 3, step: 3, fecha: '2026-11-17T10:00:00Z' } as const;
+
+		function chip(): HTMLElement {
+			return fixture.debugElement.query(By.css('.faq-item__guia')).nativeElement;
+		}
+
+		it('una guía en curso muestra su avance con mini-barra en lugar del chip «N pasos»', () => {
+			fixture.componentRef.setInput('progress', { 2: SUMMARY_EN_CURSO });
+			fixture.detectChanges();
+
+			expect(chip().classList).toContain('faq-item__guia--en-curso');
+			expect(chip().textContent).toContain('1/3');
+			expect(chip().textContent).not.toContain('pasos');
+			expect(chip().querySelector<HTMLElement>('.faq-item__avance-fill')?.style.width).toMatch(/^33\.3/);
+			expect(chip().textContent).not.toMatch(/trab/i);
+		});
+
+		it('una guía terminada lleva una marca discreta y lo dice a lectores de pantalla', () => {
+			fixture.componentRef.setInput('progress', { 2: SUMMARY_TERMINADA });
+			fixture.detectChanges();
+
+			expect(chip().classList).toContain('faq-item__guia--terminada');
+			expect(chip().textContent).toContain('Guía terminada');
+		});
+
+		it('una guía nunca vista no lleva marca: queda el chip de siempre', () => {
+			fixture.componentRef.setInput('progress', {});
+			fixture.detectChanges();
+
+			expect(chip().classList).not.toContain('faq-item__guia--en-curso');
+			expect(chip().classList).not.toContain('faq-item__guia--terminada');
+			expect(chip().textContent).toContain('1 pasos');
+		});
+
+		it('una pregunta sin guía nunca se marca, aunque llegue un avance con su id', () => {
+			fixture.componentRef.setInput('progress', { 1: SUMMARY_EN_CURSO });
+			fixture.detectChanges();
+
+			expect(fixture.debugElement.queryAll(By.css('.faq-item__guia--en-curso'))).toHaveLength(0);
+			expect(fixture.debugElement.queryAll(By.css('.faq-item__guia'))).toHaveLength(1);
+		});
+	});
 });

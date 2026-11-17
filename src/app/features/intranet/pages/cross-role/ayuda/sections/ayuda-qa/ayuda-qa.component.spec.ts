@@ -149,4 +149,78 @@ describe('AyudaQaComponent', () => {
 		const conMotivo = httpMock.expectOne(`${FAQ_API}/1/feedback`);
 		expect(conMotivo.request.body).toEqual({ util: false, motivo: 'INCOMPLETA' });
 	});
+
+	describe('avance de guías', () => {
+		const GUIA: FaqDto = {
+			id: 7,
+			pregunta: '¿Cómo registro la matrícula?',
+			respuesta: 'Sigue la guía.',
+			categoria: 'Profesor',
+			wizard: { titulo: null, pasos: [1, 2, 3].map((n) => ({ orden: n, texto: `Paso ${n}`, imagenUrl: null })) },
+		};
+
+		async function openWithProgress(url = '/ayuda/qa'): Promise<void> {
+			await harness.navigateByUrl(url, AyudaQaComponent);
+			httpMock.expectOne(FAQ_API).flush([...FAQS, GUIA]);
+			httpMock.expectOne(`${FAQ_API}/progreso/mios`).flush([{ faqId: 7, hechos: [0], actual: 1, totalPasos: 3, fecha: '2026-11-17T10:00:00Z' }]);
+			harness.detectChanges();
+		}
+
+		it('«Retomar» aparece arriba con las guías en curso, y la lista las marca', async () => {
+			await openWithProgress();
+
+			const retomar = root().query(By.css('app-faq-retomar'));
+			expect(retomar.nativeElement.textContent).toContain('Continuar en el paso 2');
+			expect(root().query(By.css('.faq-item__guia--en-curso')).nativeElement.textContent).toContain('1/3');
+		});
+
+		it('«Retomar» se oculta mientras hay búsqueda o categoría activas', async () => {
+			await openWithProgress();
+
+			const input = root().query(By.css('input'));
+			input.nativeElement.value = 'matrícula';
+			input.nativeElement.dispatchEvent(new Event('input'));
+			harness.detectChanges();
+
+			expect(root().query(By.css('.faq-retomar'))).toBeNull();
+			expect(root().query(By.css('.faq-item__guia--en-curso'))).not.toBeNull();
+		});
+
+		it('elegir una guía de «Retomar» la abre con su avance y deja el paso actual marcado', async () => {
+			await openWithProgress();
+
+			(root().query(By.css('[data-retomar-id="7"]')).nativeElement as HTMLButtonElement).click();
+			await harness.fixture.whenStable();
+			harness.detectChanges();
+
+			expect(router.url).toContain('faq=7');
+			expect(root().query(By.css('.faq-guide__count')).nativeElement.textContent).toContain('1 de 3 pasos');
+			expect(root().query(By.css('.faq-guide__step--current .faq-guide__step-title')).nativeElement.textContent).toContain('Paso 2');
+		});
+
+		it('un enlace directo espera a que cargue el avance antes de mostrar la guía', async () => {
+			await harness.navigateByUrl('/ayuda/qa?faq=7', AyudaQaComponent);
+			httpMock.expectOne(FAQ_API).flush([...FAQS, GUIA]);
+			harness.detectChanges();
+
+			expect(root().query(By.css('app-faq-guide'))).toBeNull();
+			expect(root().query(By.css('.faq-detail__progress-loading'))).not.toBeNull();
+
+			httpMock.expectOne(`${FAQ_API}/progreso/mios`).flush([{ faqId: 7, hechos: [0, 1], actual: 2, totalPasos: 3, fecha: '2026-11-17T10:00:00Z' }]);
+			harness.detectChanges();
+
+			expect(root().query(By.css('.faq-detail__progress-loading'))).toBeNull();
+			expect(root().query(By.css('.faq-guide__count')).nativeElement.textContent).toContain('2 de 3 pasos');
+		});
+
+		it('si falla la carga del avance la guía abre vacía, sin error visible', async () => {
+			await harness.navigateByUrl('/ayuda/qa?faq=7', AyudaQaComponent);
+			httpMock.expectOne(FAQ_API).flush([...FAQS, GUIA]);
+			httpMock.expectOne(`${FAQ_API}/progreso/mios`).flush('', { status: 500, statusText: 'Server Error' });
+			harness.detectChanges();
+
+			expect(root().query(By.css('.faq-guide__count')).nativeElement.textContent).toContain('0 de 3 pasos');
+			expect(root().query(By.css('.qa-error'))).toBeNull();
+		});
+	});
 });

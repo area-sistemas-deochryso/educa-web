@@ -4,9 +4,9 @@ import { Observable } from 'rxjs';
 
 import { environment } from '@config/environment';
 
-import { FaqDto, FaqMotivo, FaqVotoDto } from '../models/faq.models';
+import { FaqDto, FaqMotivo, FaqProgresoBody, FaqProgresoDto, FaqVotoDto } from '../models/faq.models';
 
-/** Las llamadas secundarias (voto, apertura, ranking) no deben mostrar toast si fallan. */
+/** Las llamadas secundarias (voto, apertura, ranking, progreso) no deben mostrar toast si fallan. */
 const SILENT = { headers: new HttpHeaders({ 'X-Skip-Error-Toast': 'true' }) };
 
 /**
@@ -45,5 +45,15 @@ export class FaqService {
 	/** Cuenta una apertura (contador agregado, sin usuario). Responde 204. */
 	registrarApertura(faqId: number): Observable<void> {
 		return this.http.post<void>(`${this.apiUrl}/${faqId}/apertura`, null, SILENT);
+	}
+
+	/** Avance de la persona en todas sus guías (una consulta, para pintar la lista). */
+	getMisProgresos(): Observable<FaqProgresoDto[]> {
+		return this.http.get<FaqProgresoDto[]>(`${this.apiUrl}/progreso/mios`, SILENT);
+	}
+
+	/** Reemplaza el avance de una guía (idempotente); `hechos` vacío borra el registro. */
+	guardarProgreso(faqId: number, body: FaqProgresoBody): Observable<FaqProgresoDto> {
+		return this.http.put<FaqProgresoDto>(`${this.apiUrl}/${faqId}/progreso`, body, SILENT);
 	}
 }

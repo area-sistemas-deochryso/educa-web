@@ -9,7 +9,16 @@
 
 	@if (faq().wizard; as wizard) {
 		@if (wizard.pasos.length > 0) {
-			<app-faq-guide [faqId]="faq().id" [wizard]="wizard" />
+			@if (progressReady()) {
+				<app-faq-guide
+					[faqId]="faq().id"
+					[wizard]="wizard"
+					[progress]="progress()"
+					(progressChange)="progressChange.emit($event)"
+				/>
+			} @else {
+				<p class="faq-detail__progress-loading" role="status">Cargando tu avance…</p>
+			}
 		}
 	}
 

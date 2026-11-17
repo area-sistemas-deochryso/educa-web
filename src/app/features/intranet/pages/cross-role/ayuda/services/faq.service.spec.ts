@@ -66,4 +66,23 @@ describe('FaqService', () => {
 
 		expect(req.request.headers.get('X-Skip-Error-Toast')).toBe('true');
 	});
+
+	it('getMisProgresos lee el avance propio de todas las guías sin toast de error', () => {
+		service.getMisProgresos().subscribe();
+
+		const req = httpMock.expectOne(`${FAQ_API}/progreso/mios`);
+
+		expect(req.request.method).toBe('GET');
+		expect(req.request.headers.get('X-Skip-Error-Toast')).toBe('true');
+	});
+
+	it('guardarProgreso reemplaza el avance de una guía con PUT y sin toast de error', () => {
+		service.guardarProgreso(7, { hechos: [0, 1], actual: 1, totalPasos: 3 }).subscribe();
+
+		const req = httpMock.expectOne(`${FAQ_API}/7/progreso`);
+
+		expect(req.request.method).toBe('PUT');
+		expect(req.request.body).toEqual({ hechos: [0, 1], actual: 1, totalPasos: 3 });
+		expect(req.request.headers.get('X-Skip-Error-Toast')).toBe('true');
+	});
 });

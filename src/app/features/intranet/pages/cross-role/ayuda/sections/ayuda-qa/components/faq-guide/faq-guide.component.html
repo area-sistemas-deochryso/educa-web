@@ -1,7 +1,14 @@
 <section class="faq-guide" [class.faq-guide--celebrate]="celebrate()" aria-label="Guía paso a paso">
 	<header class="faq-guide__header">
 		<strong class="faq-guide__title">Guía paso a paso</strong>
-		<span class="faq-guide__meta">{{ total() }} {{ total() === 1 ? 'paso' : 'pasos' }} · unos {{ minutes() }} min</span>
+		<span class="faq-guide__header-end">
+			<span class="faq-guide__meta">{{ total() }} {{ total() === 1 ? 'paso' : 'pasos' }} · unos {{ minutes() }} min</span>
+			@if (doneCount() > 0) {
+				<button type="button" class="faq-guide__reset" (click)="reset()">
+					<i class="pi pi-refresh" aria-hidden="true"></i> Reiniciar guía
+				</button>
+			}
+		</span>
 	</header>
 
 	<div class="faq-guide__layout">

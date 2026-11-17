@@ -20,9 +20,41 @@ $progress-offset: 6.5rem;
 		font-size: 0.9375rem;
 	}
 
+	&__header-end {
+		display: inline-flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 0.25rem 0.875rem;
+	}
+
 	&__meta {
 		font-size: 0.8125rem;
 		color: var(--faq-text-muted);
+	}
+
+	/* Acción discreta: no compite con la guía, pero se alcanza con teclado y se lee como botón. */
+	&__reset {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.3rem;
+		padding: 0.125rem 0.25rem;
+		border: 0;
+		border-radius: 0.25rem;
+		background: transparent;
+		color: var(--faq-accent-strong);
+		font: inherit;
+		font-size: 0.8125rem;
+		font-weight: 600;
+		cursor: pointer;
+
+		&:hover {
+			text-decoration: underline;
+		}
+
+		&:focus-visible {
+			outline: 2px solid var(--faq-accent-strong);
+			outline-offset: 2px;
+		}
 	}
 
 	// #region Layout: índice lateral (solo escritorio) + columna principal

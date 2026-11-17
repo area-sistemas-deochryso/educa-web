@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 
-import { FaqDto } from '@features/intranet/pages/cross-role/ayuda/models/faq.models';
+import { FaqDto, GuideSummary } from '@features/intranet/pages/cross-role/ayuda/models/faq.models';
 import { highlightSegments } from '../../helpers/faq-highlight';
 
 interface CategoriaGrupo {
@@ -25,6 +25,8 @@ export class FaqListComponent {
 	readonly selectedId = input<number | null>(null);
 	/** Término de búsqueda activo, para resaltar coincidencias en la pregunta. */
 	readonly term = input('');
+	/** Avance por pregunta (`faqId`): solo trae las guías en curso o terminadas; las nunca vistas no llevan marca. */
+	readonly progress = input<Record<number, GuideSummary>>({});
 	readonly faqSelected = output<number>();
 
 	readonly categoriaIconMap: Record<string, string> = {
