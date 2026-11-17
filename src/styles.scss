@@ -771,3 +771,22 @@ strong {
 	}
 }
 // #endregion
+
+/* Ayuda > FAQ: transición lista ↔ detalle (View Transitions). La clase la pone `AyudaQaComponent` solo mientras dura. */
+.faq-vt::view-transition-group(faq-q) {
+	animation-duration: 0.32s;
+	animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+
+.faq-vt::view-transition-old(root),
+.faq-vt::view-transition-new(root) {
+	animation-duration: 0.22s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.faq-vt::view-transition-group(*),
+	.faq-vt::view-transition-old(*),
+	.faq-vt::view-transition-new(*) {
+		animation: none;
+	}
+}

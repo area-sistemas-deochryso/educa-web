@@ -83,7 +83,7 @@
 			<div class="qa__list">
 				<app-faq-list
 					[faqs]="faqs()"
-					[selectedId]="selectedId()"
+					[selectedId]="selectedId() ?? lastOpenedId()"
 					[term]="searchTerm()"
 					(faqSelected)="onFaqSelected($event)"
 				/>
@@ -99,8 +99,6 @@
 						(ticketRequested)="onFaqTicketRequested($event)"
 						(back)="onFaqSelected(null)"
 					/>
-				} @else {
-					<p class="qa__detail-hint">Elige una pregunta de la lista para ver su respuesta.</p>
 				}
 			</div>
 		</div>

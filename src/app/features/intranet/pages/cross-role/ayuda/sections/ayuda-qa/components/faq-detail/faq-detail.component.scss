@@ -8,7 +8,7 @@
 	border-radius: 0.875rem;
 
 	&__back {
-		display: none;
+		display: inline-flex;
 		justify-self: start;
 		align-items: center;
 		gap: 0.5rem;
@@ -32,6 +32,8 @@
 	}
 
 	&__pregunta {
+		// Elemento compartido con la pregunta de la lista (ver `AyudaQaComponent.transition`).
+		view-transition-name: faq-q;
 		margin: 0;
 		font-size: 1.3125rem;
 		line-height: 1.25;
@@ -132,11 +134,5 @@
 		&:hover {
 			text-decoration: underline;
 		}
-	}
-}
-
-@media (max-width: 767px) {
-	.faq-detail__back {
-		display: inline-flex;
 	}
 }

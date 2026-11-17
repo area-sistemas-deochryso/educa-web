@@ -11,6 +11,7 @@
 					<button
 						type="button"
 						class="faq-item"
+						[attr.data-faq-id]="faq.id"
 						[class.faq-item--on]="faq.id === selectedId()"
 						[attr.aria-current]="faq.id === selectedId() ? 'true' : null"
 						(click)="faqSelected.emit(faq.id)"

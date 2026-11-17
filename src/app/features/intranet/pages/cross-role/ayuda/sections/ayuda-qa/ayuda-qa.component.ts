@@ -1,6 +1,7 @@
 // #region Imports
 import {
 	AfterViewInit,
+	ApplicationRef,
 	ChangeDetectionStrategy,
 	Component,
 	DestroyRef,
@@ -31,8 +32,8 @@ import { EduButton, EduSpinner } from '@edu-ui';
 const FAQ_QUERY_PARAM = 'faq';
 
 /**
- * Sección QA: cabecera de dos estados + maestro-detalle (lista a la izquierda, respuesta a la derecha;
- * en móvil son dos pantallas). El BE ya filtra por capability — este componente no reimplementa el
+ * Sección QA: cabecera de dos estados + lista/detalle que se alternan a ancho completo (pantallas separadas
+ * en todos los anchos; la cabecera y la lista se ocultan mientras se lee la respuesta). El BE ya filtra por capability — este componente no reimplementa el
  * chequeo. La pregunta abierta vive en la URL (`?faq=<id>`) para poder compartirla.
  */
 @Component({
@@ -57,6 +58,7 @@ export class AyudaQaComponent implements OnInit, AfterViewInit {
 	private readonly route = inject(ActivatedRoute);
 	private readonly router = inject(Router);
 	private readonly destroyRef = inject(DestroyRef);
+	private readonly appRef = inject(ApplicationRef);
 	// #endregion
 
 	// #region State del facade
@@ -78,6 +80,9 @@ export class AyudaQaComponent implements OnInit, AfterViewInit {
 	readonly hasActiveFilters = this.facade.hasActiveFilters;
 
 	readonly detailOpen = computed(() => this.selectedFaq() !== null);
+
+	/** Última pregunta abierta: al volver a la lista sigue marcada y recibe el foco, aunque la selección ya sea `null`. */
+	readonly lastOpenedId = signal<number | null>(null);
 	// #endregion
 
 	// #region Enlace directo (?faq=<id>)
@@ -97,6 +102,23 @@ export class AyudaQaComponent implements OnInit, AfterViewInit {
 		untracked(() => this.facade.select(id));
 	});
 	// #endregion
+
+	/**
+	 * Lista y detalle se alternan a ancho completo: al abrir una pregunta se sube al inicio de la sección, y al
+	 * volver la lista reaparece en el mismo punto (sin esto el scroll queda donde estaba el detalle).
+	 */
+	private readonly restoreScrollAndFocus = effect(() => {
+		const id = this.selectedId();
+		untracked(() => {
+			if (id !== null) {
+				this.lastOpenedId.set(id);
+				this.host.nativeElement.scrollIntoView?.({ block: 'start' });
+				return;
+			}
+			if (this.lastOpenedId() === null) return;
+			requestAnimationFrame(() => this.revealLastOpened());
+		});
+	});
 
 	private readonly header = viewChild(FaqHeaderComponent);
 	private readonly stickyBar = viewChild(FaqStickyBarComponent);
@@ -173,11 +195,46 @@ export class AyudaQaComponent implements OnInit, AfterViewInit {
 	}
 
 	onFaqSelected(id: number | null): void {
-		void this.router.navigate([], {
-			relativeTo: this.route,
-			queryParams: { [FAQ_QUERY_PARAM]: id },
-			queryParamsHandling: 'merge',
+		const navigate = (): Promise<boolean> =>
+			this.router.navigate([], {
+				relativeTo: this.route,
+				queryParams: { [FAQ_QUERY_PARAM]: id },
+				queryParamsHandling: 'merge',
+			});
+
+		const root = document.documentElement;
+		const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+		if (typeof document.startViewTransition !== 'function' || reduceMotion) {
+			void navigate();
+			return;
+		}
+
+		// Elemento compartido: la pregunta de la lista (si se abre desde ella) viaja hasta el título del detalle.
+		const source =
+			id === null ? null : this.host.nativeElement.querySelector<HTMLElement>(`[data-faq-id="${id}"] .faq-item__pregunta`);
+		if (source) source.style.viewTransitionName = 'faq-q';
+
+		root.classList.add('faq-vt');
+		const transition = document.startViewTransition(async () => {
+			await navigate();
+			this.appRef.tick(); // vuelca URL → selección → DOM antes de que el navegador capture el estado nuevo
+			if (id === null) this.revealLastOpened(); // al volver, la fila ya está en su sitio y el título aterriza en ella
+			const target = this.host.nativeElement.querySelector<HTMLElement>('.faq-item--on .faq-item__pregunta');
+			if (id === null && target) target.style.viewTransitionName = 'faq-q';
 		});
+		void transition.finished.finally(() => {
+			root.classList.remove('faq-vt');
+			this.host.nativeElement
+				.querySelectorAll<HTMLElement>('.faq-item__pregunta')
+				.forEach((el) => el.style.removeProperty('view-transition-name'));
+		});
+	}
+
+	/** Deja a la vista la última pregunta abierta y le devuelve el foco (al volver del detalle). */
+	private revealLastOpened(): void {
+		const item = this.host.nativeElement.querySelector<HTMLElement>('.faq-item--on');
+		item?.scrollIntoView?.({ block: 'center' });
+		item?.focus({ preventScroll: true });
 	}
 
 	onClearFilters(): void {

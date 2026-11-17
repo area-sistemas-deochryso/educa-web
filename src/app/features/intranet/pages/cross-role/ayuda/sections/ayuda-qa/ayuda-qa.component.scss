@@ -1,17 +1,24 @@
 .qa {
+	// Lista y detalle se alternan (pantallas separadas en todos los anchos): lo que se mira usa el ancho útil.
 	&__layout {
-		display: grid;
-		grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
-		gap: 2rem;
-		align-items: start;
+		display: block;
 	}
 
+	// Detalle a ancho completo, con un tope para que las líneas no se estiren (el texto de la respuesta lleva el suyo).
 	&__detail {
-		position: sticky;
-		top: 8rem;
-		/* Una guía larga es más alta que la ventana: el panel scrollea por dentro. */
-		max-height: calc(100vh - 9rem);
-		overflow-y: auto;
+		display: none;
+		max-width: 72rem;
+		margin-inline: auto;
+	}
+
+	&--detail-open &__detail {
+		display: block;
+	}
+
+	&--detail-open &__header,
+	&--detail-open &__list,
+	&--detail-open &__stickybar {
+		display: none;
 	}
 
 	// Barra compacta: contenedor pegajoso de alto 0 (no ocupa espacio) con la barra absoluta dentro.
@@ -43,22 +50,6 @@
 		transition-delay: 0s;
 	}
 
-	// Con la barra visible, el detalle pegajoso baja para no quedar tapado por ella.
-	&--bar &__detail {
-		top: 9.75rem;
-		max-height: calc(100vh - 10.75rem);
-	}
-
-	&__detail-hint {
-		display: grid;
-		place-items: center;
-		min-height: 16rem;
-		padding: 2rem 1rem;
-		text-align: center;
-		color: var(--faq-text-muted);
-		border: 1px dashed var(--surface-300);
-		border-radius: 0.875rem;
-	}
 }
 
 .qa-loading {
@@ -98,39 +89,6 @@
 		flex-wrap: wrap;
 		justify-content: center;
 		gap: 0.5rem;
-	}
-}
-
-/* Móvil: lista y detalle son pantallas separadas. */
-@media (max-width: 767px) {
-	.qa__layout {
-		grid-template-columns: 1fr;
-	}
-
-	.qa__detail {
-		position: static;
-		max-height: none;
-		overflow-y: visible;
-		display: none;
-	}
-
-	.qa__detail-hint {
-		display: none;
-	}
-
-	.qa--detail-open .qa__stickybar {
-		display: none;
-	}
-
-	.qa--detail-open {
-		.qa__header,
-		.qa__list {
-			display: none;
-		}
-
-		.qa__detail {
-			display: block;
-		}
 	}
 }
 
