@@ -82,12 +82,64 @@ describe('FaqGuideComponent', () => {
 
 	it('recuerda el último paso trabajado', () => {
 		create();
-		checks()[1].click();
+		checks()[2].click(); // último paso: no hay siguiente al que avanzar
 		fixture.destroy();
 
 		create();
 
+		expect(checks()[2].getAttribute('aria-current')).toBe('step');
+	});
+
+	it('al marcar un paso el siguiente pendiente pasa a ser el actual', () => {
+		create();
+
+		checks()[0].click();
+		fixture.detectChanges();
+
 		expect(checks()[1].getAttribute('aria-current')).toBe('step');
+		expect(text('.faq-guide__now')).toContain('Paso 2: Marca a cada estudiante');
+	});
+
+	it('no avanza al desmarcar ni si el siguiente ya estaba hecho', () => {
+		create();
+		checks()[1].click(); // paso 2 hecho → actual: paso 3
+		checks()[0].click(); // paso 1: el siguiente (2) ya está hecho → se queda en 1
+		fixture.detectChanges();
+		expect(checks()[0].getAttribute('aria-current')).toBe('step');
+
+		checks()[0].click(); // desmarcar
+		fixture.detectChanges();
+		expect(checks()[0].getAttribute('aria-current')).toBe('step');
+	});
+
+	it('el índice y anterior/siguiente llevan a un paso sin marcarlo', () => {
+		create();
+		const indexItems = fixture.debugElement.queryAll(By.css('.faq-guide__index-item')).map((d) => d.nativeElement as HTMLButtonElement);
+		expect(indexItems.length).toBe(3);
+
+		indexItems[2].click();
+		fixture.detectChanges();
+		expect(checks()[2].getAttribute('aria-current')).toBe('step');
+		expect(text('.faq-guide__count')).toBe('0 de 3 pasos');
+
+		const [prev, next] = fixture.debugElement.queryAll(By.css('.faq-guide__nav-btn')).map((d) => d.nativeElement as HTMLButtonElement);
+		expect(next.disabled).toBe(true);
+		prev.click();
+		fixture.detectChanges();
+		expect(checks()[1].getAttribute('aria-current')).toBe('step');
+	});
+
+	it('celebra solo cuando la persona completa la guía, no al reabrir una ya completa', () => {
+		create();
+		checks().forEach((b) => b.click());
+		fixture.detectChanges();
+		expect(fixture.debugElement.query(By.css('.faq-guide--celebrate'))).not.toBeNull();
+		fixture.destroy();
+
+		create();
+
+		expect(text('.faq-guide__count')).toBe('¡Guía completa!');
+		expect(fixture.debugElement.query(By.css('.faq-guide--celebrate'))).toBeNull();
 	});
 
 	it('al completar todos los pasos lo indica', () => {

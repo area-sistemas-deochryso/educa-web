@@ -1,60 +1,125 @@
-<section class="faq-guide" aria-label="Guía paso a paso">
+<section class="faq-guide" [class.faq-guide--celebrate]="celebrate()" aria-label="Guía paso a paso">
 	<header class="faq-guide__header">
 		<strong class="faq-guide__title">Guía paso a paso</strong>
 		<span class="faq-guide__meta">{{ total() }} {{ total() === 1 ? 'paso' : 'pasos' }} · unos {{ minutes() }} min</span>
 	</header>
 
-	<div class="faq-guide__progress">
-		<div
-			class="faq-guide__bar"
-			role="progressbar"
-			aria-label="Progreso de la guía"
-			aria-valuemin="0"
-			[attr.aria-valuemax]="total()"
-			[attr.aria-valuenow]="doneCount()"
-		>
-			<div class="faq-guide__bar-fill" [style.width.%]="percent()"></div>
-		</div>
-		<span class="faq-guide__count">
-			@if (finished()) {
-				¡Guía completa!
-			} @else {
-				{{ doneCount() }} de {{ total() }} pasos
-			}
-		</span>
-	</div>
+	<div class="faq-guide__layout">
+		<!-- #region Índice de pasos (escritorio) -->
+		<nav class="faq-guide__index" aria-label="Índice de pasos">
+			<ol class="faq-guide__index-list">
+				@for (step of steps(); track step.index) {
+					<li>
+						<button
+							type="button"
+							class="faq-guide__index-item"
+							[class.faq-guide__index-item--done]="step.done"
+							[class.faq-guide__index-item--current]="current() === step.index"
+							[attr.aria-current]="current() === step.index ? 'step' : null"
+							(click)="goTo(step.index)"
+						>
+							<span class="faq-guide__index-box" aria-hidden="true">
+								@if (step.done) {
+									<i class="pi pi-check"></i>
+								} @else {
+									{{ step.index + 1 }}
+								}
+							</span>
+							<span class="faq-guide__index-title">{{ step.title }}</span>
+						</button>
+					</li>
+				}
+			</ol>
+		</nav>
+		<!-- #endregion -->
 
-	<ol class="faq-guide__steps">
-		@for (step of steps(); track step.index) {
-			<li
-				class="faq-guide__step"
-				[class.faq-guide__step--done]="step.done"
-				[class.faq-guide__step--current]="current() === step.index"
-			>
-				<button
-					type="button"
-					class="faq-guide__check"
-					[attr.aria-pressed]="step.done"
-					[attr.aria-current]="current() === step.index ? 'step' : null"
-					(click)="toggle(step.index)"
-					(focus)="onStepFocus(step.index)"
-				>
-					<span class="faq-guide__box" aria-hidden="true">
-						@if (step.done) {
-							<i class="pi pi-check"></i>
+		<div class="faq-guide__main">
+			<!-- Progreso pegado al hacer scroll: siempre a la vista, con el paso actual y navegación -->
+			<div class="faq-guide__progress">
+				<div class="faq-guide__progress-top">
+					<div
+						class="faq-guide__bar"
+						role="progressbar"
+						aria-label="Progreso de la guía"
+						aria-valuemin="0"
+						[attr.aria-valuemax]="total()"
+						[attr.aria-valuenow]="doneCount()"
+					>
+						<div class="faq-guide__bar-fill" [style.width.%]="percent()"></div>
+					</div>
+					<span class="faq-guide__count">
+						@if (finished()) {
+							¡Guía completa!
 						} @else {
-							{{ step.index + 1 }}
+							{{ doneCount() }} de {{ total() }} pasos
 						}
 					</span>
-					<span class="faq-guide__step-title">{{ step.title }}</span>
-				</button>
-				<div class="faq-guide__body">
-					<p class="faq-guide__text">{{ step.texto }}</p>
-					@if (step.imagenUrl) {
-						<img [src]="step.imagenUrl" [alt]="'Captura del paso ' + (step.index + 1) + ': ' + step.title" class="faq-guide__image" loading="lazy" />
-					}
 				</div>
-			</li>
-		}
-	</ol>
+				<div class="faq-guide__progress-bottom">
+					<span class="faq-guide__now">
+						@if (finished()) {
+							Todos los pasos completados
+						} @else if (currentStep(); as now) {
+							Paso {{ now.index + 1 }}: {{ now.title }}
+						}
+					</span>
+					<span class="faq-guide__nav">
+						<button
+							type="button"
+							class="faq-guide__nav-btn"
+							aria-label="Paso anterior"
+							[disabled]="!hasPrev()"
+							(click)="goPrev()"
+						>
+							<i class="pi pi-chevron-up" aria-hidden="true"></i>
+						</button>
+						<button
+							type="button"
+							class="faq-guide__nav-btn"
+							aria-label="Paso siguiente"
+							[disabled]="!hasNext()"
+							(click)="goNext()"
+						>
+							<i class="pi pi-chevron-down" aria-hidden="true"></i>
+						</button>
+					</span>
+				</div>
+			</div>
+
+			<ol class="faq-guide__steps">
+				@for (step of steps(); track step.index) {
+					<li
+						class="faq-guide__step"
+						[class.faq-guide__step--done]="step.done"
+						[class.faq-guide__step--current]="current() === step.index"
+						[class.faq-guide__step--pop]="justDone() === step.index && step.done"
+					>
+						<button
+							type="button"
+							class="faq-guide__check"
+							[attr.aria-pressed]="step.done"
+							[attr.aria-current]="current() === step.index ? 'step' : null"
+							(click)="toggle(step.index)"
+							(focus)="onStepFocus(step.index)"
+						>
+							<span class="faq-guide__box" aria-hidden="true">
+								@if (step.done) {
+									<i class="pi pi-check"></i>
+								} @else {
+									{{ step.index + 1 }}
+								}
+							</span>
+							<span class="faq-guide__step-title">{{ step.title }}</span>
+						</button>
+						<div class="faq-guide__body">
+							<p class="faq-guide__text">{{ step.texto }}</p>
+							@if (step.imagenUrl) {
+								<img [src]="step.imagenUrl" [alt]="'Captura del paso ' + (step.index + 1) + ': ' + step.title" class="faq-guide__image" loading="lazy" />
+							}
+						</div>
+					</li>
+				}
+			</ol>
+		</div>
+	</div>
 </section>
