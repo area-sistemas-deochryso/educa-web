@@ -22,4 +22,5 @@ export * from './estado.utils';
 export * from './jwt.utils';
 export * from './api-schema-versions';
 export * from './file-type.utils';
+export * from './view-transition-guard';
 // #endregion

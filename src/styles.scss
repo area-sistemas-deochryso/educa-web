@@ -50,10 +50,12 @@
 }
 
 /*
- * Entrada de página (plan F10 F2): fade del componente que monta el router-outlet de primer nivel del layout.
- * Solo opacity — un transform crearía un containing block y movería los `position: fixed` (modales, FAB) durante la animación.
- * Solo el outlet directo de `.intranet-content`: los outlets anidados de los shells no se re-animan al cambiar de pestaña,
- * y un cambio de query param (ej. FAQ de Ayuda) no recrea el componente, así que tampoco anima.
+ * Entrada de página (plan F10 F2/F5). Un cambio de query param (ej. FAQ de Ayuda) no recrea el componente, así que no anima.
+ * - Contenedor (cualquier outlet bajo `.intranet-content`, incluidos los de los shells): solo opacity — un transform
+ *   crearía un containing block y movería los `position: fixed` (modales, FAB). Es el respaldo para navegadores sin
+ *   View Transitions: con ellas (`html.has-vt`, ver `view-transition-guard.ts`) el fade lo da el crossfade del navegador.
+ * - Hijos directos del componente de página: `motion-rise` escalonado (--i por posición, tope 6). Se excluyen el outlet
+ *   anidado y su componente para no apilar el movimiento dos veces en los shells.
  */
 @keyframes page-enter {
 	from {
@@ -61,8 +63,44 @@
 	}
 }
 
-.intranet-content > router-outlet + * {
+html:not(.has-vt) .intranet-content router-outlet + * {
 	animation: page-enter var(--motion-base) var(--ease-out);
+}
+
+.intranet-content router-outlet + * > :not(router-outlet):not(router-outlet + *) {
+	animation: motion-rise var(--motion-base) var(--ease-out) backwards;
+	animation-delay: calc(var(--i, 0) * var(--motion-stagger));
+
+	&:nth-child(2) {
+		--i: 1;
+	}
+	&:nth-child(3) {
+		--i: 2;
+	}
+	&:nth-child(4) {
+		--i: 3;
+	}
+	&:nth-child(5) {
+		--i: 4;
+	}
+	&:nth-child(n + 6) {
+		--i: 5;
+	}
+}
+
+/* Salida/entrada con View Transitions: crossfade de la página con la duración de los tokens. */
+::view-transition-old(root),
+::view-transition-new(root) {
+	animation-duration: var(--motion-base);
+	animation-timing-function: var(--ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	::view-transition-group(*),
+	::view-transition-old(*),
+	::view-transition-new(*) {
+		animation: none;
+	}
 }
 
 /*

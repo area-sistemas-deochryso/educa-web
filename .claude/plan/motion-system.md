@@ -43,6 +43,11 @@ Utilidades `.motion-press`/`.motion-fade-in`/`.motion-stagger-item`/`.motion-sav
 
 Utilidades compartidas: hover/press en botones y cards, fade skeleton→contenido, stagger en listas cortas, feedback "guardado". Primero login, asistencia y calificaciones. Medir en ms reales (Performance API), no por percepción.
 
+### F5 — Transiciones entre páginas más visibles
+`depends_on: [F2, F4]` · brief 940 · ✅ awaiting-prod
+
+Tras probar F1-F4 el usuario no notó suficiente movimiento entre páginas. `withViewTransitions()` (crossfade de salida/entrada) con un wrapper que omite la transición en navegaciones de solo query params (protege la manual de `ayuda-qa`), `motion-rise` escalonado en los hijos directos de cada página y fade de respaldo sin View Transitions. Supera la decisión de F2 de no usar View Transitions. Deuda: el wrapper monkey-patchea `document.startViewTransition`.
+
 ## Después
 
 Evaluar **F** (librería de motion) solo si F1-F4 dejan casos que CSS/`animate.*` no resuelven. Opcional: regla stylelint que prohíba `transition: all`.
