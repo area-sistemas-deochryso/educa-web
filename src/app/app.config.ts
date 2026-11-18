@@ -2,6 +2,7 @@
 import {
 	ApplicationConfig,
 	ErrorHandler,
+	inject,
 	LOCALE_ID,
 	provideBrowserGlobalErrorListeners,
 	provideZonelessChangeDetection,
@@ -44,7 +45,7 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { provideRouter } from '@angular/router';
 import { registerLocaleData } from '@angular/common';
 import { AdaptivePreloadingStrategy } from '@core/services/preloading/adaptive-preloading.strategy';
-import { provideViewTransitionGuard } from '@core/helpers';
+import { provideViewTransitionGuard, SharedElementService } from '@core/helpers';
 import { routes } from './app.routes';
 
 // #endregion
@@ -59,7 +60,10 @@ export const appConfig: ApplicationConfig = {
 			routes,
 			withPreloading(AdaptivePreloadingStrategy),
 			withEnabledBlockingInitialNavigation(),
-			withViewTransitions({ skipInitialTransition: true }),
+			withViewTransitions({
+				skipInitialTransition: true,
+				onViewTransitionCreated: ({ transition }) => inject(SharedElementService).track(transition),
+			}),
 		),
 		provideViewTransitionGuard(),
 		provideHttpClient(

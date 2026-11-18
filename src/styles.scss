@@ -95,6 +95,18 @@ html:not(.has-vt) .intranet-content router-outlet + * {
 	animation-timing-function: var(--ease-out);
 }
 
+/* Elemento compartido (SharedElementService): la tarjeta viaja hasta su destino con la duración «slow». */
+::view-transition-group(*.shared-element) {
+	animation-duration: var(--motion-slow);
+	animation-timing-function: var(--ease-out);
+}
+
+::view-transition-old(*.shared-element),
+::view-transition-new(*.shared-element) {
+	height: 100%;
+	object-fit: cover;
+}
+
 @media (prefers-reduced-motion: reduce) {
 	::view-transition-group(*),
 	::view-transition-old(*),

@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, effect, input, output, untracked, viewChild } from '@angular/core';
 import { FormsModule, NgModel } from '@angular/forms';
 import { EduSelectButton } from '@edu-ui';
+import { SharedElementDirective } from '@intranet-shared/directives';
 import type { HorarioProfesorDto } from '@features/intranet/pages/profesor/models';
 
 interface SlotOption {
@@ -16,7 +17,7 @@ interface SlotOption {
 @Component({
 	selector: 'app-curso-hub-header',
 	standalone: true,
-	imports: [FormsModule, EduSelectButton],
+	imports: [FormsModule, EduSelectButton, SharedElementDirective],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	styles: `
 		.hub-header {
@@ -71,7 +72,7 @@ interface SlotOption {
 		}
 	`,
 	template: `
-		<header class="hub-header">
+		<header class="hub-header" [appSharedElement]="sharedId()">
 			<div class="hub-header__title">
 				<i class="pi pi-book" aria-hidden="true"></i>
 				<div class="hub-header__heading">
@@ -103,6 +104,8 @@ export class CursoHubHeaderComponent {
 	readonly salonDescripcion = input.required<string>();
 	readonly slots = input.required<readonly HorarioProfesorDto[]>();
 	readonly selectedSlotId = input<number | null>(null);
+	/** Id del par compartido con la tarjeta de la lista (transición de elemento compartido). */
+	readonly sharedId = input<string | null>(null);
 	/** El padre lo incrementa cuando bloquea un cambio de franja: el selector vuelve a mostrar `selectedSlotId`. */
 	readonly resetKey = input(0);
 	private readonly slotModel = viewChild(NgModel);

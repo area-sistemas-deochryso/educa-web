@@ -22,6 +22,8 @@ export interface EduOverlayOpenOptions {
 	closeOnEscape?: boolean;
 	/** Defaults to true. Pass false when the trigger is a typable input that must keep the caret. */
 	trapFocus?: boolean;
+	/** The panel grows from (and shrinks back to) the element that was focused when it opened. */
+	originFromTrigger?: boolean;
 }
 
 export interface EduOverlayCloseOptions {
@@ -35,6 +37,7 @@ export class EduOverlayHandle {
 	private previouslyFocused: HTMLElement | null = null;
 	private subscriptions = new Subscription();
 	private closing = false;
+	private originFromTrigger = false;
 
 	constructor(
 		private readonly overlay: Overlay,
@@ -59,6 +62,7 @@ export class EduOverlayHandle {
 		}
 
 		this.previouslyFocused = document.activeElement as HTMLElement | null;
+		this.originFromTrigger = options.originFromTrigger ?? false;
 
 		this.overlayRef = this.overlay.create({
 			positionStrategy: options.positionStrategy,
@@ -77,7 +81,10 @@ export class EduOverlayHandle {
 			// rAF: let the browser paint the initial state (no data-open) before
 			// toggling, so the CSS engine actually animates the transition
 			// instead of starting straight at the final state.
-			requestAnimationFrame(() => panelEl.setAttribute('data-open', ''));
+			requestAnimationFrame(() => {
+				this.syncOrigin(panelEl);
+				panelEl.setAttribute('data-open', '');
+			});
 		}
 
 		if (options.trapFocus ?? true) {
@@ -120,6 +127,7 @@ export class EduOverlayHandle {
 		this.focusTrap = null;
 
 		const panelEl = this.overlayRef.overlayElement.firstElementChild as HTMLElement | null;
+		if (panelEl) this.syncOrigin(panelEl);
 		panelEl?.removeAttribute('data-open');
 
 		if (options?.immediate || !panelEl) {
@@ -128,6 +136,38 @@ export class EduOverlayHandle {
 		}
 
 		waitForTransition(panelEl).then(() => this.disposeNow());
+	}
+
+	/**
+	 * Points the panel's transform-origin at the trigger's centre so the enter/leave
+	 * scale reads as growing out of the button. Without a usable trigger (gone,
+	 * off-screen, or huge) the vars are cleared and the CSS falls back to a centred scale.
+	 */
+	private syncOrigin(panelEl: HTMLElement): void {
+		const trigger = this.previouslyFocused;
+		const panel = panelEl.getBoundingClientRect();
+		const rect = this.originFromTrigger && trigger?.isConnected ? trigger.getBoundingClientRect() : null;
+		const usable =
+			rect &&
+			rect.width > 0 &&
+			rect.height > 0 &&
+			rect.width < window.innerWidth / 2 &&
+			rect.bottom > 0 &&
+			rect.top < window.innerHeight &&
+			rect.right > 0 &&
+			rect.left < window.innerWidth;
+
+		if (!usable) {
+			panelEl.style.removeProperty('--edu-origin');
+			panelEl.style.removeProperty('--edu-origin-scale');
+			return;
+		}
+
+		// The rect is scaled around the panel's centre, so rebuild the unscaled top-left from that centre.
+		const x = rect.left + rect.width / 2 - (panel.left + panel.width / 2) + panelEl.offsetWidth / 2;
+		const y = rect.top + rect.height / 2 - (panel.top + panel.height / 2) + panelEl.offsetHeight / 2;
+		panelEl.style.setProperty('--edu-origin', `${x}px ${y}px`);
+		panelEl.style.setProperty('--edu-origin-scale', '0.3');
 	}
 
 	private disposeNow(): void {

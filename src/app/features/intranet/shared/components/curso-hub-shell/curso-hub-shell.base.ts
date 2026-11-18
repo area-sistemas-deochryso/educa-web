@@ -48,6 +48,7 @@ export const CURSO_HUB_SHELL_TEMPLATE = `
 					[salonDescripcion]="current.salonDescripcion"
 					[slots]="pairSlots()"
 					[selectedSlotId]="current.id"
+					[sharedId]="'curso-' + pairKey()"
 					[resetKey]="selectionResetKey()"
 					(slotChange)="onSlotChange($event)"
 				>
@@ -127,7 +128,7 @@ export abstract class CursoHubShellBase implements OnInit, HasPendingChanges {
 
 	private readonly cursoId = computed(() => parseId(this.params().get('cursoId')));
 	private readonly salonId = computed(() => parseId(this.params().get('salonId')));
-	private readonly pairKey = computed(() => `${this.cursoId()}-${this.salonId()}`);
+	protected readonly pairKey = computed(() => `${this.cursoId()}-${this.salonId()}`);
 	/** `null` si no vino `horarioId`; `NaN` si vino pero no es numérico. */
 	private readonly requestedId = computed(() => {
 		const raw = this.query().get('horarioId');

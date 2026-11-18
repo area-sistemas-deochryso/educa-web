@@ -238,6 +238,7 @@ export class EduDialog implements OnDestroy {
 				backdropClass: 'cdk-overlay-dark-backdrop',
 				closeOnBackdropClick: this.dismissableMask(),
 				closeOnEscape: this.closeOnEscape(),
+				originFromTrigger: true,
 			},
 			() => this.requestClose(),
 		);

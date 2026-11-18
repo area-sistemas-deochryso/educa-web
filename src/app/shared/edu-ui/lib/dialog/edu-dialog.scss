@@ -10,13 +10,18 @@
 	border-radius: var(--eduui-content-border-radius);
 	box-shadow: var(--eduui-overlay-modal-shadow);
 	overflow: hidden;
+	// `scale` (not `transform`) so the drag's inline translate3d doesn't cancel the enter/leave animation.
+	// --edu-origin/--edu-origin-scale are set by the overlay handle when the dialog grows out of its trigger.
 	opacity: 0;
-	transform: scale(0.96);
-	transition: opacity 180ms ease-out, transform 180ms ease-out;
+	scale: var(--edu-origin-scale, 0.96);
+	transform-origin: var(--edu-origin, 50% 50%);
+	transition:
+		opacity var(--motion-base, 200ms) var(--ease-out, ease-out),
+		scale var(--motion-base, 200ms) var(--ease-out, ease-out);
 
 	&[data-open] {
 		opacity: 1;
-		transform: scale(1);
+		scale: 1;
 	}
 }
 

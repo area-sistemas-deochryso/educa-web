@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { EduTag } from '@edu-ui';
+import { SharedElementDirective } from '@intranet-shared/directives';
 
 import { buildCursoHubLink, type CursoHubRol } from '../../helpers/curso-hub-link.helpers';
 import type { ContenidoResumenDto } from '@features/intranet/pages/profesor/models';
@@ -39,7 +40,7 @@ function buildProgress(resumen: ContenidoResumenDto | undefined): SlotProgress |
 @Component({
 	selector: 'app-curso-pair-card',
 	standalone: true,
-	imports: [RouterLink, EduTag],
+	imports: [RouterLink, EduTag, SharedElementDirective],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	styles: `
 		:host {
@@ -171,6 +172,7 @@ function buildProgress(resumen: ContenidoResumenDto | undefined): SlotProgress |
 	template: `
 		<article
 			class="pair-card"
+			[appSharedElement]="sharedId()"
 			[attr.data-info-anchor]="anchorPrefix() + '-card'"
 			[style.--card-accent]="accent()"
 		>
@@ -182,6 +184,7 @@ function buildProgress(resumen: ContenidoResumenDto | undefined): SlotProgress |
 				</h3>
 				<a
 					class="pair-card__salon"
+					data-shared-skip
 					[routerLink]="salonLink()"
 					[attr.data-info-anchor]="anchorPrefix() + '-card-salon-tag'"
 					[attr.aria-label]="'Ver salón ' + group().salonDescripcion"
@@ -254,6 +257,9 @@ export class CursoPairCardComponent {
 	readonly salonLink = input.required<string>();
 	/** Prefijo de los `data-info-anchor` (ej. `profesor-cursos`). */
 	readonly anchorPrefix = input.required<string>();
+
+	/** Par origen↔destino de la transición: la tarjeta se convierte en el encabezado del hub. */
+	protected readonly sharedId = computed(() => `curso-${this.group().cursoId}-${this.group().salonId}`);
 
 	/** Destino del cuerpo: el par sin franja (el hub la resuelve por preselección). */
 	protected readonly body = computed(() =>
