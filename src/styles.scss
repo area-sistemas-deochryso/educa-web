@@ -118,6 +118,34 @@ button.motion-press:not(:disabled) {
 	animation: motion-saved var(--motion-base) var(--ease-out) backwards;
 }
 
+/*
+ * Entrada de toasts (plan F10 F3b). `edu-ui` es una librería vendored desde `educa-libs` (Angular 19: sin `animate.enter/leave`),
+ * así que se anima desde aquí sin tocar la librería. Solo la entrada: la salida sigue siendo inmediata porque el `@for` de
+ * `edu-toast` quita el nodo al expirar. El transform va en el item, no en `.edu-toast` (que usa transform para centrarse).
+ * Dialog y popover ya tienen entrada y salida propias en `edu-ui` (`data-open` + transition).
+ */
+@keyframes toast-enter-top {
+	from {
+		opacity: 0;
+		transform: translateY(-8px);
+	}
+}
+
+@keyframes toast-enter-bottom {
+	from {
+		opacity: 0;
+		transform: translateY(8px);
+	}
+}
+
+.edu-toast__item {
+	animation: toast-enter-top var(--motion-base) var(--ease-out) backwards;
+}
+
+.edu-toast[data-position^='bottom'] .edu-toast__item {
+	animation-name: toast-enter-bottom;
+}
+
 /* Self-hosted fonts for better performance (eliminates external dependency) */
 @font-face {
 	font-family: 'Inter';

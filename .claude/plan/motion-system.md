@@ -32,9 +32,9 @@ Tokens `--motion-fast` (120 ms), `--motion-base` (200 ms), `--motion-slow` (320 
 `@keyframes page-enter` aplicado al componente que monta el router-outlet de primer nivel de `.intranet-content` (0.2 s, `--ease-out`, solo opacity). Reemplaza el plan original de `withViewTransitions()`: el router lanza una View Transition en toda navegación, incluso de query params, y abortaría la manual de `ayuda-qa`. Verificado en vivo, sin regresión en `ayuda-qa`.
 
 ### F3 — Entrada/salida de overlays con `animate.enter`/`animate.leave`
-`depends_on: [F1]` · brief 937 · ✅ awaiting-prod (parcial) · resto: brief 939
+`depends_on: [F1]` · briefs 937 y 939 · ✅ awaiting-prod
 
-mobile-menu, module-selector y notification-card ✅ (enter+leave con tokens). Toasts, popover (user-profile-menu) y modales viven en `edu-ui` (vendored desde `educa-libs`, hoy sin animación) y pasan al brief 939. Riesgo: `animate.leave` retrasa el borrado del nodo; ajustar specs que esperan remoción inmediata, citando el motivo.
+mobile-menu, module-selector y notification-card ✅ (enter+leave con tokens). Toasts, popover (user-profile-menu) y modales viven en `edu-ui` (vendored desde `educa-libs`, hoy sin animación) pasaron al brief 939: ahí se vio que dialog y popover ya animan entrada y salida por sí mismos (`data-open` + transition) y que `educa-libs` usa Angular 19 (sin `animate.*`), así que solo se agregó la entrada del toast desde `styles.scss`. La salida del toast queda como deuda (ver brief 939). Riesgo: `animate.leave` retrasa el borrado del nodo; ajustar specs que esperan remoción inmediata, citando el motivo.
 
 ### F4 — Micro-interacciones
 `depends_on: [F1, F3]` · brief 938 · ✅ awaiting-prod
