@@ -25,6 +25,28 @@
 		url('primeicons/fonts/primeicons.ttf') format('truetype');
 }
 
+/* Motion tokens (plan F10): duraciones y easings compartidos. Animar solo transform/opacity y propiedades de color. */
+:root {
+	--motion-fast: 120ms;
+	--motion-base: 200ms;
+	--motion-slow: 320ms;
+	--ease-out: cubic-bezier(0.2, 0, 0, 1);
+	--ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Reduced motion global: se respeta la preferencia del SO. Las View Transitions ya se controlan aparte (`.faq-vt` abajo). */
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+		transition-delay: 0s !important;
+		scroll-behavior: auto !important;
+	}
+}
+
 /* Self-hosted fonts for better performance (eliminates external dependency) */
 @font-face {
 	font-family: 'Inter';
@@ -340,7 +362,13 @@ ul li {
 a,
 button {
 	touch-action: manipulation;
-	transition: all 0.3s;
+	transition:
+		color var(--motion-slow) var(--ease-in-out),
+		background-color var(--motion-slow) var(--ease-in-out),
+		border-color var(--motion-slow) var(--ease-in-out),
+		box-shadow var(--motion-slow) var(--ease-in-out),
+		opacity var(--motion-slow) var(--ease-in-out),
+		transform var(--motion-slow) var(--ease-in-out);
 }
 
 body.informative-mode-active {
@@ -414,7 +442,10 @@ strong {
 	font-weight: var(--font-weight-normal);
 	line-height: normal;
 	padding: 15px 20px;
-	transition: all 0.3s;
+	transition:
+		color var(--motion-slow) var(--ease-in-out),
+		background-color var(--motion-slow) var(--ease-in-out),
+		border-color var(--motion-slow) var(--ease-in-out);
 }
 
 .custom-btn:hover {
@@ -454,7 +485,7 @@ strong {
 	z-index: 1;
 	display: inline-block;
 	vertical-align: middle;
-	transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+	transition: color var(--motion-slow) cubic-bezier(0.645, 0.045, 0.355, 1);
 	padding-bottom: 2px;
 }
 
@@ -520,7 +551,10 @@ strong {
 	color: var(--white-color);
 	font-size: var(--p-font-size);
 	font-weight: var(--font-weight-normal);
-	transition: all 0.3s;
+	transition:
+		color var(--motion-slow) var(--ease-in-out),
+		background-color var(--motion-slow) var(--ease-in-out),
+		border-color var(--motion-slow) var(--ease-in-out);
 	margin-bottom: 24px;
 }
 
@@ -571,7 +605,9 @@ strong {
 	top: 0;
 	bottom: 0;
 	right: 0;
-	transition: all 0.5s;
+	transition:
+		color var(--motion-slow) var(--ease-in-out),
+		background-color var(--motion-slow) var(--ease-in-out);
 	display: flex;
 	justify-content: center;
 	align-items: center;

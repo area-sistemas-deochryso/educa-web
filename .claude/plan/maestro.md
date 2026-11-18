@@ -12,6 +12,7 @@
 | F5 | Consolidación Frontend | ⏳ 0% | Tras Plan 4 BE |
 | F8 | Design Patterns Backend | Incremental | Al tocar módulos |
 | F9 | Design Patterns Frontend | Incremental | Al tocar módulos |
+| F10 | [Motion system](motion-system.md) | 🟡 En progreso — F1 (935) ✅ en `awaiting-prod/`; 936-938 en `open/` | F1 tokens → F2 View Transitions · F3 `animate.*` → F4 micro-interacciones |
 | xP41 | → Correlation Hub (coord) | ver P41 en coord (F4/F6 diseñadas, briefs 848-851; F5 materializado) | puede tocar FE — ver maestro coord |
 | xP50 | FE cohesion & coupling refactor (coord) | ✅ CERRADO (2026-09-25) — F1-F3a-F3b ✅ · F4 ❌ descartado | Service move + email consolidation |
 <!-- INDEX:END -->
@@ -28,6 +29,7 @@
 | F5 | Consolidación Frontend | Bloqueado por Plan 4 BE |
 | F8 | Design Patterns Backend | Incremental |
 | F9 | Design Patterns Frontend | Incremental |
+| F10 | Motion system (animaciones y transiciones) | 🟡 25% — F1 ✅ (935, awaiting-prod); F2-F4 (936-938) en `open/` |
 | xP41 | Correlation Hub (coord) | → ver maestro coord |
 | xP50 | FE cohesion & coupling refactor (coord) | ✅ CERRADO (2026-09-25) |
 
