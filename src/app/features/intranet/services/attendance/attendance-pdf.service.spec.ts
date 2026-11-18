@@ -1,9 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 import { AttendancePdfService } from './attendance-pdf.service';
+import { SelectorContext } from './attendance-view.models';
 import { AttendanceService } from '@intranet-shared/services';
 import { DestroyRef } from '@angular/core';
-import { of, Subject, throwError } from 'rxjs';
+import { of, Subject } from 'rxjs';
 
 // Mock de AttendanceService
 const mockAttendanceService = {
@@ -42,8 +43,6 @@ vi.mock(import('@core/helpers'), async (importOriginal) => {
 
 describe('AttendancePdfService', () => {
 	let service: AttendancePdfService;
-	let attendanceService: AttendanceService;
-	let destroyRef: DestroyRef;
 
 	beforeEach(() => {
 		vi.clearAllMocks();
@@ -58,8 +57,6 @@ describe('AttendancePdfService', () => {
 		});
 
 		service = TestBed.runInInjectionContext(() => new AttendancePdfService());
-		attendanceService = TestBed.inject(AttendanceService);
-		destroyRef = TestBed.inject(DestroyRef);
 	});
 
 	it('debe crear el servicio', () => {
@@ -72,7 +69,7 @@ describe('AttendancePdfService', () => {
 
 	describe('init', () => {
 		it('debe establecer el getSelectorContext', () => {
-			const mockContext = { grado: '1ro', seccion: 'A' } as any;
+			const mockContext = { grado: '1ro', seccion: 'A' } as unknown as SelectorContext;
 			const fn = vi.fn(() => mockContext);
 			service.init(fn);
 			expect(service['getSelectorContext']()).toEqual(mockContext);
@@ -81,7 +78,7 @@ describe('AttendancePdfService', () => {
 
 	describe('verPdfAsistenciaDia', () => {
 		it('debe llamar al servicio y viewBlobInNewTab cuando hay contexto', () => {
-			const ctx = { grado: '1ro', seccion: 'A' } as any;
+			const ctx = { grado: '1ro', seccion: 'A' } as unknown as SelectorContext;
 			const fecha = new Date(2026, 2, 15);
 			const blob = new Blob(['pdf'], { type: 'application/pdf' });
 			vi.mocked(mockAttendanceService.descargarPdfAsistenciaDia).mockReturnValue(of(blob));
@@ -102,7 +99,7 @@ describe('AttendancePdfService', () => {
 
 	describe('descargarPdfAsistenciaDia', () => {
 		it('debe descargar con nombre de archivo correcto', () => {
-			const ctx = { grado: '1ro', seccion: 'A' } as any;
+			const ctx = { grado: '1ro', seccion: 'A' } as unknown as SelectorContext;
 			const fecha = new Date(2026, 2, 15);
 			const blob = new Blob(['pdf'], { type: 'application/pdf' });
 			vi.mocked(mockAttendanceService.descargarPdfAsistenciaDia).mockReturnValue(of(blob));
@@ -179,7 +176,7 @@ describe('AttendancePdfService', () => {
 
 	describe('verPdfSalonMes', () => {
 		it('debe llamar al servicio con contexto del selector', () => {
-			const ctx = { grado: '2do', seccion: 'B' } as any;
+			const ctx = { grado: '2do', seccion: 'B' } as unknown as SelectorContext;
 			const fecha = new Date(2026, 3, 10);
 			const blob = new Blob(['pdf'], { type: 'application/pdf' });
 			vi.mocked(mockAttendanceService.descargarPdfAsistenciaMes).mockReturnValue(of(blob));
@@ -202,7 +199,7 @@ describe('AttendancePdfService', () => {
 
 	describe('descargarPdfSalonMes', () => {
 		it('debe descargar con nombre de archivo correcto', () => {
-			const ctx = { grado: '2do', seccion: 'B' } as any;
+			const ctx = { grado: '2do', seccion: 'B' } as unknown as SelectorContext;
 			const fecha = new Date(2026, 3, 10);
 			const blob = new Blob(['pdf'], { type: 'application/pdf' });
 			vi.mocked(mockAttendanceService.descargarPdfAsistenciaMes).mockReturnValue(of(blob));
@@ -219,7 +216,7 @@ describe('AttendancePdfService', () => {
 
 	describe('verPdfSalonAnio', () => {
 		it('debe llamar al servicio con rango de año del salón', () => {
-			const ctx = { grado: '3ro', seccion: 'C' } as any;
+			const ctx = { grado: '3ro', seccion: 'C' } as unknown as SelectorContext;
 			const fecha = new Date(2026, 5, 15); // Junio 2026, mismo año que hoy (2026)
 			const blob = new Blob(['pdf'], { type: 'application/pdf' });
 			vi.mocked(mockAttendanceService.descargarPdfAsistenciaPeriodo).mockReturnValue(of(blob));
@@ -245,7 +242,7 @@ describe('AttendancePdfService', () => {
 
 	describe('descargarPdfSalonAnio', () => {
 		it('debe descargar con nombre de archivo correcto', () => {
-			const ctx = { grado: '3ro', seccion: 'C' } as any;
+			const ctx = { grado: '3ro', seccion: 'C' } as unknown as SelectorContext;
 			const fecha = new Date(2026, 5, 15);
 			const blob = new Blob(['pdf'], { type: 'application/pdf' });
 			vi.mocked(mockAttendanceService.descargarPdfAsistenciaPeriodo).mockReturnValue(of(blob));
@@ -262,7 +259,7 @@ describe('AttendancePdfService', () => {
 
 	describe('verMesFromContext / descargarMesFromContext', () => {
 		it('verMesFromContext debe llamar al servicio con contexto', () => {
-			const ctx = { grado: '4to', seccion: 'D' } as any;
+			const ctx = { grado: '4to', seccion: 'D' } as unknown as SelectorContext;
 			const blob = new Blob(['pdf'], { type: 'application/pdf' });
 			vi.mocked(mockAttendanceService.descargarPdfAsistenciaMes).mockReturnValue(of(blob));
 			service['getSelectorContext'] = () => ctx;
@@ -274,7 +271,7 @@ describe('AttendancePdfService', () => {
 		});
 
 		it('descargarMesFromContext debe llamar al servicio con contexto', () => {
-			const ctx = { grado: '4to', seccion: 'D' } as any;
+			const ctx = { grado: '4to', seccion: 'D' } as unknown as SelectorContext;
 			const blob = new Blob(['pdf'], { type: 'application/pdf' });
 			vi.mocked(mockAttendanceService.descargarPdfAsistenciaMes).mockReturnValue(of(blob));
 			service['getSelectorContext'] = () => ctx;
@@ -290,7 +287,7 @@ describe('AttendancePdfService', () => {
 
 	describe('verPeriodoFromContext / descargarPeriodoFromContext', () => {
 		it('verPeriodoFromContext debe llamar al servicio con contexto', () => {
-			const ctx = { grado: '5to', seccion: 'E' } as any;
+			const ctx = { grado: '5to', seccion: 'E' } as unknown as SelectorContext;
 			const blob = new Blob(['pdf'], { type: 'application/pdf' });
 			vi.mocked(mockAttendanceService.descargarPdfAsistenciaPeriodo).mockReturnValue(of(blob));
 			service['getSelectorContext'] = () => ctx;
@@ -304,7 +301,7 @@ describe('AttendancePdfService', () => {
 		});
 
 		it('descargarPeriodoFromContext debe llamar al servicio con contexto', () => {
-			const ctx = { grado: '5to', seccion: 'E' } as any;
+			const ctx = { grado: '5to', seccion: 'E' } as unknown as SelectorContext;
 			const blob = new Blob(['pdf'], { type: 'application/pdf' });
 			vi.mocked(mockAttendanceService.descargarPdfAsistenciaPeriodo).mockReturnValue(of(blob));
 			service['getSelectorContext'] = () => ctx;
@@ -320,7 +317,7 @@ describe('AttendancePdfService', () => {
 
 	describe('descargarExcelAsistenciaDia', () => {
 		it('debe descargar Excel con nombre de archivo correcto', () => {
-			const ctx = { grado: '6to', seccion: 'F' } as any;
+			const ctx = { grado: '6to', seccion: 'F' } as unknown as SelectorContext;
 			const fecha = new Date(2026, 0, 20);
 			const blob = new Blob(['xlsx'], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 			vi.mocked(mockAttendanceService.descargarExcelAsistenciaDia).mockReturnValue(of(blob));
@@ -365,7 +362,7 @@ describe('AttendancePdfService', () => {
 
 	describe('descargarExcelSalonMes', () => {
 		it('debe descargar Excel de salón mes con contexto', () => {
-			const ctx = { grado: '7mo', seccion: 'G' } as any;
+			const ctx = { grado: '7mo', seccion: 'G' } as unknown as SelectorContext;
 			const fecha = new Date(2026, 6, 5);
 			const blob = new Blob(['xlsx'], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 			vi.mocked(mockAttendanceService.descargarExcelAsistenciaMes).mockReturnValue(of(blob));
@@ -382,7 +379,7 @@ describe('AttendancePdfService', () => {
 
 	describe('descargarExcelSalonAnio', () => {
 		it('debe descargar Excel de salón año con contexto', () => {
-			const ctx = { grado: '8vo', seccion: 'H' } as any;
+			const ctx = { grado: '8vo', seccion: 'H' } as unknown as SelectorContext;
 			const fecha = new Date(2026, 8, 10);
 			const blob = new Blob(['xlsx'], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 			vi.mocked(mockAttendanceService.descargarExcelAsistenciaPeriodo).mockReturnValue(of(blob));
@@ -399,7 +396,7 @@ describe('AttendancePdfService', () => {
 
 	describe('descargarExcelMesFromContext / descargarExcelPeriodoFromContext', () => {
 		it('descargarExcelMesFromContext debe llamar al servicio con contexto', () => {
-			const ctx = { grado: '9no', seccion: 'I' } as any;
+			const ctx = { grado: '9no', seccion: 'I' } as unknown as SelectorContext;
 			const blob = new Blob(['xlsx'], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 			vi.mocked(mockAttendanceService.descargarExcelAsistenciaMes).mockReturnValue(of(blob));
 			service['getSelectorContext'] = () => ctx;
@@ -413,7 +410,7 @@ describe('AttendancePdfService', () => {
 		});
 
 		it('descargarExcelPeriodoFromContext debe llamar al servicio con contexto', () => {
-			const ctx = { grado: '1ro', seccion: 'A' } as any;
+			const ctx = { grado: '1ro', seccion: 'A' } as unknown as SelectorContext;
 			const blob = new Blob(['xlsx'], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 			vi.mocked(mockAttendanceService.descargarExcelAsistenciaPeriodo).mockReturnValue(of(blob));
 			service['getSelectorContext'] = () => ctx;
@@ -429,7 +426,7 @@ describe('AttendancePdfService', () => {
 
 	describe('run (helper privado)', () => {
 		it('debe establecer downloadingPdf en true durante la ejecución', async () => {
-			const ctx = { grado: '1ro', seccion: 'A' } as any;
+			const ctx = { grado: '1ro', seccion: 'A' } as unknown as SelectorContext;
 			const blob = new Blob(['pdf'], { type: 'application/pdf' });
 			const subject = new Subject<Blob>();
 			vi.mocked(mockAttendanceService.descargarPdfAsistenciaDia).mockReturnValue(subject);

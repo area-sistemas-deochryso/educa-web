@@ -448,7 +448,7 @@ describe('CalificacionesFacade', () => {
 
 			facade.openCalificarDialog(calGrupal);
 
-			expect(api.getGrupos).toHaveBeenCalledWith(contenido!.id);
+			expect(api.getGrupos).toHaveBeenCalledWith(contenido?.id);
 			expect(store.calificarDialogVisible()).toBe(true);
 			expect(store.selectedCalificacion()).toEqual(calGrupal);
 		});

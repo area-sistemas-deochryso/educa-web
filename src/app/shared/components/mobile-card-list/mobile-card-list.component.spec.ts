@@ -40,6 +40,14 @@ class PagingHostComponent {
 	readonly paging = createClientPaging(this.source, 10);
 }
 
+function getButton(container: HTMLElement, label: string): HTMLButtonElement {
+	const button = container.querySelector<HTMLButtonElement>(`button[aria-label="${label}"]`);
+	if (!button) {
+		throw new Error(`Button with aria-label "${label}" not found`);
+	}
+	return button;
+}
+
 describe('MobileCardListComponent con paginación compartida', () => {
 	it('toma el tamaño de página, comparte el estado con la tabla y lo restaura al destruirse', () => {
 		const fixture = TestBed.createComponent(PagingHostComponent);
@@ -52,7 +60,7 @@ describe('MobileCardListComponent con paginación compartida', () => {
 		expect(host.paging.rows()).toBe(2);
 		expect(values()).toEqual(['uno', 'dos']);
 
-		root.querySelector<HTMLButtonElement>('button[aria-label="Página siguiente"]')!.click();
+		getButton(root, 'Página siguiente').click();
 		fixture.detectChanges();
 		expect(host.paging.first()).toBe(2);
 		expect(values()).toEqual(['tres', 'cuatro']);
@@ -72,7 +80,7 @@ describe('MobileCardListComponent', () => {
 		[...root().querySelectorAll('.mcl__card .card-row__value')].map((c) => (c.textContent ?? '').trim());
 	const status = (): string => (root().querySelector('.mcl__status')?.textContent ?? '').trim();
 	const click = (label: string): void => {
-		root().querySelector<HTMLButtonElement>(`button[aria-label="${label}"]`)!.click();
+		getButton(root(), label).click();
 		fixture.detectChanges();
 	};
 
@@ -87,7 +95,7 @@ describe('MobileCardListComponent', () => {
 	});
 
 	it('«Anterior» está deshabilitado en la primera página', () => {
-		const prev = root().querySelector<HTMLButtonElement>('button[aria-label="Página anterior"]')!;
+		const prev = getButton(root(), 'Página anterior');
 		expect(prev.disabled).toBe(true);
 	});
 
@@ -103,7 +111,7 @@ describe('MobileCardListComponent', () => {
 		click('Página siguiente');
 		click('Página siguiente');
 		expect(cards()).toEqual(['cinco']);
-		const next = root().querySelector<HTMLButtonElement>('button[aria-label="Página siguiente"]')!;
+		const next = getButton(root(), 'Página siguiente');
 		expect(next.disabled).toBe(true);
 	});
 
@@ -148,7 +156,7 @@ describe('MobileCardListComponent con paginación de servidor', () => {
 		expect(el.querySelectorAll('.mcl__card').length).toBe(3);
 		expect(el.querySelector('.mcl__status')?.textContent?.trim()).toBe('1 de 3');
 
-		el.querySelector<HTMLButtonElement>('button[aria-label="Página siguiente"]')!.click();
+		getButton(el, 'Página siguiente').click();
 		expect(fixture.componentInstance.requested).toEqual([{ page: 1, rows: 3 }]);
 	});
 });

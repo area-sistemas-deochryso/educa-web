@@ -1,7 +1,7 @@
 // * Behavior tests para SchedulesApiService — verifica cada endpoint HTTP y su payload/URL.
 // #region Imports
 import { TestBed } from '@angular/core/testing';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import {
 	HttpTestingController,
@@ -19,11 +19,10 @@ import type {
 	HorariosEstadisticas,
 } from '../models/horario.interface';
 import type { ProfesorListDto } from '../models/profesor.interface';
-import type { DiaSemana } from '../models/horario.interface';
 // #endregion
 
 // #region Fixtures
-const mockHorario: any = {
+const mockHorario: Record<string, unknown> = {
 	id: 1,
 	diaSemana: 1,
 	horaInicio: '08:00',
@@ -35,7 +34,7 @@ const mockHorario: any = {
 	cantidadEstudiantes: 20,
 };
 
-const mockHorarios: any[] = [mockHorario];
+const mockHorarios: Record<string, unknown>[] = [mockHorario];
 
 const mockProfesor: ProfesorListDto = {
 	id: 200,
@@ -55,7 +54,7 @@ const mockEstadisticas: HorariosEstadisticas = {
 	horariosConConflicto: 0,
 };
 
-const mockImportResult: any = {
+const mockImportResult: Record<string, unknown> = {
 	procesados: 3,
 	creados: 2,
 	actualizados: 1,
@@ -230,7 +229,7 @@ describe('SchedulesApiService', () => {
 
 	describe('getEstudiantesDisponibles', () => {
 		it('should GET estudiantes disponibles', () => {
-			const mockEstudiantes: any[] = [{ id: 300, nombre: 'Est 1' }];
+			const mockEstudiantes: Record<string, unknown>[] = [{ id: 300, nombre: 'Est 1' }];
 			service.getEstudiantesDisponibles(10).subscribe((estudiantes) => {
 				expect(estudiantes).toEqual(mockEstudiantes);
 			});

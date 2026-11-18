@@ -26,6 +26,12 @@ describe('FaqStickyBarComponent', () => {
 
 	const root = (): HTMLElement => fixture.nativeElement as HTMLElement;
 
+	const catButton = (): HTMLButtonElement => {
+		const btn = root().querySelector<HTMLButtonElement>('.sbar__catbtn');
+		expect(btn).toBeTruthy();
+		return btn as HTMLButtonElement;
+	};
+
 	it('muestra los conteos de «Para ti» y «Todas»', () => {
 		const text = root().textContent ?? '';
 		expect(text).toContain('Para ti');
@@ -35,7 +41,7 @@ describe('FaqStickyBarComponent', () => {
 
 	it('el menú de categorías está cerrado hasta que se pulsa el botón', () => {
 		expect(root().querySelector('.sbar__menu')).toBeNull();
-		root().querySelector<HTMLButtonElement>('.sbar__catbtn')!.click();
+		catButton().click();
 		fixture.detectChanges();
 		expect(root().querySelector('.sbar__menu')).not.toBeNull();
 	});
@@ -43,7 +49,7 @@ describe('FaqStickyBarComponent', () => {
 	it('elegir una categoría la emite y cierra el menú', () => {
 		const emitted: (string | null)[] = [];
 		component.categoriaChange.subscribe((v) => emitted.push(v));
-		root().querySelector<HTMLButtonElement>('.sbar__catbtn')!.click();
+		catButton().click();
 		fixture.detectChanges();
 		const items = root().querySelectorAll<HTMLButtonElement>('.sbar__item');
 		items[1].click();
@@ -57,7 +63,7 @@ describe('FaqStickyBarComponent', () => {
 		component.categoriaChange.subscribe((v) => emitted.push(v));
 		fixture.componentRef.setInput('categoria', 'Profesor');
 		fixture.detectChanges();
-		root().querySelector<HTMLButtonElement>('.sbar__catbtn')!.click();
+		catButton().click();
 		fixture.detectChanges();
 		root().querySelectorAll<HTMLButtonElement>('.sbar__item')[1].click();
 		expect(emitted).toEqual([null]);
@@ -81,7 +87,8 @@ describe('FaqStickyBarComponent', () => {
 	it('emite el texto que se escribe en el buscador', () => {
 		const emitted: string[] = [];
 		component.searchChange.subscribe((v) => emitted.push(v));
-		const input = root().querySelector<HTMLInputElement>('.sbar__input')!;
+		const input = root().querySelector('.sbar__input') as HTMLInputElement;
+		expect(input).toBeTruthy();
 		input.value = 'asistencia';
 		input.dispatchEvent(new Event('input'));
 		expect(emitted).toEqual(['asistencia']);

@@ -2,10 +2,21 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { StudentAttendanceComponent } from './student-attendance.component';
 import { EstudianteFacade } from '../services/estudiante.facade';
-import { DestroyRef } from '@angular/core';
+import { DestroyRef, WritableSignal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { of, throwError } from 'rxjs';
-import { SecurityContext } from '@angular/core';
+import type { SolicitudJustificacionAsistenciaDto } from '@data/models';
+
+interface ComponentInternals {
+	asistencia: unknown;
+	_horarios: unknown;
+	_justificarDialogVisible: WritableSignal<boolean>;
+	_justificarContext: WritableSignal<unknown>;
+	getJustificacionState: (item: unknown) => unknown;
+}
+
+type AttendanceItem = Parameters<StudentAttendanceComponent['getJustificacionState']>[0];
+type JustificationPayload = Parameters<StudentAttendanceComponent['onGuardarJustificacion']>[0];
 
 const mockEstudianteFacade = {
 	getMiAsistenciaActiva: vi.fn(() => of({ horarios: [] })),
@@ -114,7 +125,7 @@ describe('StudentAttendanceComponent', () => {
 			fecha: '2026-03-15',
 			estado: 'P',
 			justificacion: 'Justificado por enfermedad',
-		} as any;
+		} as unknown as AttendanceItem;
 		expect(component.getJustificacionState(item)).toEqual({
 			kind: 'text',
 			text: 'Justificado por enfermedad',
@@ -127,12 +138,12 @@ describe('StudentAttendanceComponent', () => {
 			fecha: '2026-03-15',
 			estado: 'P',
 			justificacion: null,
-		} as any;
+		} as unknown as AttendanceItem;
 		expect(component.getJustificacionState(item)).toEqual({ kind: 'dash' });
 	});
 
 	it('debe abrir dialog de justificar', () => {
-		const item = { asistenciaCursoId: 1, fecha: '2026-03-15', estado: 'F', justificacion: null } as any;
+		const item = { asistenciaCursoId: 1, fecha: '2026-03-15', estado: 'F', justificacion: null } as unknown as AttendanceItem;
 		component.onAbrirJustificar(item);
 		expect(component.justificarDialogVisible()).toBe(true);
 		expect(component.justificarContext()?.asistenciaCursoId).toBe(1);
@@ -140,16 +151,17 @@ describe('StudentAttendanceComponent', () => {
 	});
 
 	it('debe cerrar dialog de justificar', () => {
-		component._justificarDialogVisible.set(true);
-		component._justificarContext.set({ asistenciaCursoId: 1, fecha: '2026-03-15', motivoRechazoAnterior: null } as any);
+		const internals = component as unknown as ComponentInternals;
+		internals._justificarDialogVisible.set(true);
+		internals._justificarContext.set({ asistenciaCursoId: 1, fecha: '2026-03-15', motivoRechazoAnterior: null });
 		component.onJustificarDialogVisibleChange(false);
 		expect(component.justificarDialogVisible()).toBe(false);
 		expect(component.justificarContext()).toBeNull();
 	});
 
 	it('debe guardar justificación', () => {
-		const payload = { asistenciaCursoId: 1, formData: new FormData() } as any;
-		const solicitudCreada = { asistenciaCursoId: 1, estado: 'PENDIENTE' } as any;
+		const payload = { asistenciaCursoId: 1, formData: new FormData() } as unknown as JustificationPayload;
+		const solicitudCreada = { asistenciaCursoId: 1, estado: 'PENDIENTE' } as unknown as SolicitudJustificacionAsistenciaDto;
 		vi.mocked(api.crearSolicitudJustificacion).mockReturnValue(of(solicitudCreada));
 
 		component.onGuardarJustificacion(payload);
@@ -163,14 +175,14 @@ describe('StudentAttendanceComponent', () => {
 	});
 
 	it('debe manejar error al guardar justificación', () => {
-		const payload = { asistenciaCursoId: 1, formData: new FormData() } as any;
+		const payload = { asistenciaCursoId: 1, formData: new FormData() } as unknown as JustificationPayload;
 		vi.mocked(api.crearSolicitudJustificacion).mockReturnValue(throwError(() => new Error('Error')));
 		component.onGuardarJustificacion(payload);
 		expect(component.solicitudSaving()).toBe(false);
 	});
 
 	it('debe calcular porcentaje de asistencia', () => {
-		vi.mocked(component as any).asistencia = vi.fn(() => ({
+		(component as unknown as ComponentInternals).asistencia = vi.fn(() => ({
 			totalPresente: 10,
 			totalTarde: 3,
 			totalClases: 13,
@@ -180,7 +192,7 @@ describe('StudentAttendanceComponent', () => {
 	});
 
 	it('debe retornar null de porcentaje cuando no hay clases', () => {
-		vi.mocked(component as any).asistencia = vi.fn(() => ({
+		(component as unknown as ComponentInternals).asistencia = vi.fn(() => ({
 			totalPresente: 0,
 			totalTarde: 0,
 			totalClases: 0,
@@ -190,8 +202,8 @@ describe('StudentAttendanceComponent', () => {
 	});
 
 	it('debe calcular cursoOptions deduplicando por cursoId+salonId', () => {
-		vi.mocked(component as any)._horarios = vi.fn(() => [
-			{ id: 1, cursoId: 1, cursoNombre: 'Matemáticas', salonId: 1, salonDescripcion: '1ro A' },
+		(component as unknown as ComponentInternals)._horarios = vi.fn(() => [
+			{ id: 1, cursoId: 1, cursoNombre: 'Matemáticas',salonId: 1, salonDescripcion: '1ro A' },
 			{ id: 2, cursoId: 1, cursoNombre: 'Matemáticas', salonId: 1, salonDescripcion: '1ro A' },
 			{ id: 3, cursoId: 2, cursoNombre: 'Ciencias', salonId: 2, salonDescripcion: '2do B' },
 		]);
@@ -202,7 +214,7 @@ describe('StudentAttendanceComponent', () => {
 	});
 
 	it('debe calcular selectedNivel basado en horario seleccionado', () => {
-		vi.mocked(component as any)._horarios = vi.fn(() => [
+		(component as unknown as ComponentInternals)._horarios = vi.fn(() => [
 			{ id: 1, cursoId: 1, cursoNombre: 'Matemáticas Primaria', salonId: 1, salonDescripcion: '1ro Primaria A' },
 		]);
 		component.selectedHorarioId.set(1);
@@ -210,24 +222,24 @@ describe('StudentAttendanceComponent', () => {
 	});
 
 	it('debe calcular hayJustificaciones cuando hay justificaciones', () => {
-		vi.mocked(component as any).asistencia = vi.fn(() => ({
+		(component as unknown as ComponentInternals).asistencia = vi.fn(() => ({
 			detalle: [
 				{ asistenciaCursoId: 1, fecha: '2026-03-15', estado: 'F', justificacion: 'Enfermedad' },
 				{ asistenciaCursoId: 2, fecha: '2026-03-16', estado: 'P', justificacion: null },
 			],
 		}));
-		vi.spyOn(component as any, 'getJustificacionState').mockReturnValue({ kind: 'text', text: 'Enfermedad' } as any);
+		vi.spyOn(component as unknown as ComponentInternals, 'getJustificacionState').mockReturnValue({ kind: 'text', text: 'Enfermedad' });
 		expect(component.hayJustificaciones()).toBe(true);
 	});
 
 	it('debe calcular hayJustificaciones como false cuando no hay justificaciones', () => {
-		vi.mocked(component as any).asistencia = vi.fn(() => ({
+		(component as unknown as ComponentInternals).asistencia = vi.fn(() => ({
 			detalle: [
 				{ asistenciaCursoId: 1, fecha: '2026-03-15', estado: 'P', justificacion: null },
 				{ asistenciaCursoId: 2, fecha: '2026-03-16', estado: 'T', justificacion: null },
 			],
 		}));
-		vi.spyOn(component as any, 'getJustificacionState').mockReturnValue({ kind: 'dash' } as any);
+		vi.spyOn(component as unknown as ComponentInternals, 'getJustificacionState').mockReturnValue({ kind: 'dash' });
 		expect(component.hayJustificaciones()).toBe(false);
 	});
 
