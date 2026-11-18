@@ -24,8 +24,8 @@
 
 <!-- #region Side panel -->
 @if (isOpen()) {
-	<div class="panel-backdrop" (click)="close()"></div>
-	<aside class="panel" (keydown)="onKeydown($event)">
+	<div class="panel-backdrop" animate.enter="panel-backdrop-enter" animate.leave="panel-backdrop-leave" (click)="close()"></div>
+	<aside class="panel" animate.enter="panel-enter" animate.leave="panel-leave" (keydown)="onKeydown($event)">
 		<!-- #region Search -->
 		<div class="panel-search">
 			<i class="pi pi-search panel-search-icon"></i>

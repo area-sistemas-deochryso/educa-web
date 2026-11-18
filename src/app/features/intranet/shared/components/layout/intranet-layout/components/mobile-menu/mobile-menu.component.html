@@ -6,8 +6,8 @@
 </button>
 
 @if (isOpen()) {
-	<div class="menu-overlay" (click)="close()"></div>
-	<nav class="mobile-nav">
+	<div class="menu-overlay" animate.enter="menu-overlay-enter" animate.leave="menu-overlay-leave" (click)="close()"></div>
+	<nav class="mobile-nav" animate.enter="mobile-nav-enter" animate.leave="mobile-nav-leave">
 		<!-- #region Header -->
 		<div class="nav-header">
 			<a routerLink="/" class="logo-link" (click)="close()">

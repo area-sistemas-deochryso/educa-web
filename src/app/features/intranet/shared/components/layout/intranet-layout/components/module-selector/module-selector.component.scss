@@ -63,7 +63,6 @@
 	inset: 0;
 	background: rgba(0, 0, 0, 0.15);
 	z-index: 1000;
-	animation: fadeIn 0.15s ease;
 }
 
 @keyframes fadeIn {
@@ -88,7 +87,6 @@
 	z-index: 1001;
 	display: flex;
 	flex-direction: column;
-	animation: slideIn 0.2s ease;
 }
 
 @keyframes slideIn {
@@ -98,6 +96,23 @@
 	to {
 		transform: translateX(0);
 	}
+}
+
+// * animate.enter / animate.leave: Angular keeps the node until these animations end.
+.panel-backdrop-enter {
+	animation: fadeIn var(--motion-base) var(--ease-out);
+}
+
+.panel-backdrop-leave {
+	animation: fadeIn var(--motion-base) var(--ease-in-out) reverse forwards;
+}
+
+.panel-enter {
+	animation: slideIn var(--motion-base) var(--ease-out);
+}
+
+.panel-leave {
+	animation: slideIn var(--motion-base) var(--ease-in-out) reverse forwards;
 }
 // #endregion
 

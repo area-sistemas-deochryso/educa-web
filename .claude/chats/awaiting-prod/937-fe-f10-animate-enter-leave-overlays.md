@@ -12,13 +12,20 @@ hot-paths: []
 
 > **Repos afectados**: `educa-web` (solo FE).
 > **Plan**: [`plan/motion-system.md`](../../plan/motion-system.md) (F10) · fase F3.
-> **Created**: 2026-11-18 · **Estado**: ⏳ pendiente arrancar.
+> **Created**: 2026-11-18 · **Estado**: ✅ F3 cerrada localmente (commit en `chat/937-fe-f10-animate-enter-leave-overlays`); alcance reducido, resto en brief 939.
+> **Validación prod**: ⏳ pendiente desde 2026-11-18
 > **MODO SUGERIDO**: `/design` corto → `/execute` → `/validate`.
 > **modules**: `ui` (motion).
 
 ## OBJETIVO
 
 Aplicar `animate.enter`/`animate.leave` a toasts, modales, mobile-menu, module-selector, user-profile-menu y notification-card con los tokens de F1. Depende de F1 (brief 935).
+
+> **Alcance real (2026-11-18)**: toast, popover (`user-profile-menu`) y dialogs son componentes de `edu-ui` (vendored desde `educa-libs`) y su nodo no lo crean los archivos de `touches`. Por decisión del usuario, F3 cubrió solo `mobile-menu`, `module-selector` y `notification-card`; el resto pasa al brief 939.
+>
+> **Hecho**: `animate.enter`/`animate.leave` con tokens en `mobile-menu` (overlay + drawer, slide 300→200 ms) y `module-selector` (backdrop + panel); `animate.leave` en `notification-card` (la entrada escalonada `slideInRight` se dejó). Sin specs que ajustar (los 3 componentes no tienen).
+>
+> **Verificación en vivo** (admin, `UseTestEnv=true`): clases `*-enter`/`*-leave` aplicadas, panel 200 ms, nodos removidos al terminar. No verificado: `notification-card`, reduced-motion real y ms exactos de salida (en el Chrome automatizado los frames se frenan hasta ~1 s y `animationend` llega tarde; revisar en Chrome normal).
 
 ## PRE-WORK OBLIGATORIO
 

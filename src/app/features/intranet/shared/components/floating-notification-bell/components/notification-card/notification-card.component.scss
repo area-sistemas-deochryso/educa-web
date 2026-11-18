@@ -12,6 +12,18 @@ $priority-urgent: var(--red-600);
 	}
 }
 
+// * animate.leave: the inline stagger delay must not postpone the exit.
+.notification-card-leave {
+	animation: notification-leave var(--motion-fast) var(--ease-in-out) 0ms forwards !important;
+}
+
+@keyframes notification-leave {
+	to {
+		opacity: 0;
+		transform: translateX(30px);
+	}
+}
+
 @keyframes pulse {
 	0%,
 	100% {

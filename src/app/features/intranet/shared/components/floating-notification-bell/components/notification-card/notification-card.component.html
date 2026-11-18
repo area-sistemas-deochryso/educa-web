@@ -2,6 +2,7 @@
 <!-- * Notification card with read/unread actions and optional CTA. -->
 <div
 	class="notification-card"
+	animate.leave="notification-card-leave"
 	[ngClass]="priorityClass"
 	[class.is-read]="isRead"
 	[class.is-unread]="!isRead"

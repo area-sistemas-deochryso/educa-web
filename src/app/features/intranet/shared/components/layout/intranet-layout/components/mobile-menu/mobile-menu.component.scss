@@ -66,7 +66,6 @@ app-mobile-menu .menu-overlay {
 	bottom: 0;
 	background-color: rgba(0, 0, 0, 0.5);
 	z-index: 200;
-	animation: mobileMenuFadeIn 0.2s ease;
 	touch-action: none;
 }
 
@@ -83,7 +82,6 @@ app-mobile-menu .mobile-nav {
 	z-index: 201;
 	display: flex;
 	flex-direction: column;
-	animation: mobileMenuSlideIn 0.3s ease;
 	overscroll-behavior: contain;
 
 	@supports (height: 100dvh) {
@@ -481,5 +479,22 @@ app-mobile-menu .user-profile-section {
 	to {
 		transform: translateX(0);
 	}
+}
+
+// * animate.enter / animate.leave: Angular keeps the node until these animations end.
+app-mobile-menu .menu-overlay-enter {
+	animation: mobileMenuFadeIn var(--motion-base) var(--ease-out);
+}
+
+app-mobile-menu .menu-overlay-leave {
+	animation: mobileMenuFadeIn var(--motion-base) var(--ease-in-out) reverse forwards;
+}
+
+app-mobile-menu .mobile-nav-enter {
+	animation: mobileMenuSlideIn var(--motion-base) var(--ease-out);
+}
+
+app-mobile-menu .mobile-nav-leave {
+	animation: mobileMenuSlideIn var(--motion-base) var(--ease-in-out) reverse forwards;
 }
 // #endregion

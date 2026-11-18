@@ -32,9 +32,9 @@ Tokens `--motion-fast` (120 ms), `--motion-base` (200 ms), `--motion-slow` (320 
 `@keyframes page-enter` aplicado al componente que monta el router-outlet de primer nivel de `.intranet-content` (0.2 s, `--ease-out`, solo opacity). Reemplaza el plan original de `withViewTransitions()`: el router lanza una View Transition en toda navegación, incluso de query params, y abortaría la manual de `ayuda-qa`. Verificado en vivo, sin regresión en `ayuda-qa`.
 
 ### F3 — Entrada/salida de overlays con `animate.enter`/`animate.leave`
-`depends_on: [F1]` · brief 937
+`depends_on: [F1]` · brief 937 · ✅ awaiting-prod (parcial) · resto: brief 939
 
-Toasts, modales, mobile-menu, module-selector, user-profile-menu, notification-card. Riesgo: `animate.leave` retrasa el borrado del nodo; ajustar specs que esperan remoción inmediata, citando el motivo.
+mobile-menu, module-selector y notification-card ✅ (enter+leave con tokens). Toasts, popover (user-profile-menu) y modales viven en `edu-ui` (vendored desde `educa-libs`, hoy sin animación) y pasan al brief 939. Riesgo: `animate.leave` retrasa el borrado del nodo; ajustar specs que esperan remoción inmediata, citando el motivo.
 
 ### F4 — Micro-interacciones
 `depends_on: [F1, F3]` · brief 938
