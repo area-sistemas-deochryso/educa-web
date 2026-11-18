@@ -14,7 +14,7 @@ Hoy la intranet casi no tiene motion sistémico: ~75 `@keyframes`/`transition:` 
 | Estilo | Sutil: ≤200 ms, fades y desplazamientos ~8 px | Intranet de uso diario; móvil/PWA |
 | Propiedades animables | Solo `transform` y `opacity` | Rendimiento en móvil; nunca `all`, `width`, `height` |
 | Entrada/salida de nodos | `animate.enter` / `animate.leave` (API nativa) | Sin depender de `@angular/animations` (deprecado) |
-| Navegación | `withViewTransitions()` con skip en reduced-motion | 1 línea + CSS; degrada sin soporte |
+| Navegación | Fade de entrada en CSS puro (`.intranet-content > router-outlet + *`), solo opacity | `withViewTransitions()` descartado: el router llama a `startViewTransition` en toda navegación y abortaría la transición manual de `ayuda-qa` (ver brief 936) |
 | Alcance F4 | 2-3 módulos primero (login, asistencia, calificaciones) y luego escalar | Evita un barrido masivo sin evidencia |
 | Reduced-motion | Obligatorio y global desde F1 | A11y; ver `reference/a11y.md` |
 | `@angular/animations` | No se toca | Fuera de alcance (opción E no elegida) |
@@ -26,10 +26,10 @@ Hoy la intranet casi no tiene motion sistémico: ~75 `@keyframes`/`transition:` 
 
 Tokens `--motion-fast` (120 ms), `--motion-base` (200 ms), `--motion-slow` (320 ms), `--ease-out`, `--ease-in-out` en `edu-ui`. Regla global `prefers-reduced-motion`. Reemplazo de los `transition: all` de `styles.scss` por propiedades explícitas. Cierre: `grep "transition: all"` = 0 en `styles.scss`; con reduced-motion ninguna animación corre.
 
-### F2 — View Transitions del router
-`depends_on: [F1]` · brief 936
+### F2 — Fade de entrada entre páginas
+`depends_on: [F1]` · brief 936 · ✅ awaiting-prod
 
-`withViewTransitions()` en `app.config.ts` con skip inicial y skip en reduced-motion; fade de 150-200 ms entre páginas. Riesgos: choque con `.faq-vt` de `ayuda-qa` (`styles.scss` ~776-781) y comportamiento en iOS PWA (Safari ≥18; scroll restoration). Verificar en iPhone real antes de mergear.
+`@keyframes page-enter` aplicado al componente que monta el router-outlet de primer nivel de `.intranet-content` (0.2 s, `--ease-out`, solo opacity). Reemplaza el plan original de `withViewTransitions()`: el router lanza una View Transition en toda navegación, incluso de query params, y abortaría la manual de `ayuda-qa`. Verificado en vivo, sin regresión en `ayuda-qa`.
 
 ### F3 — Entrada/salida de overlays con `animate.enter`/`animate.leave`
 `depends_on: [F1]` · brief 937

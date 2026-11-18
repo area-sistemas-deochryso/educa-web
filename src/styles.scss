@@ -47,6 +47,22 @@
 	}
 }
 
+/*
+ * Entrada de página (plan F10 F2): fade del componente que monta el router-outlet de primer nivel del layout.
+ * Solo opacity — un transform crearía un containing block y movería los `position: fixed` (modales, FAB) durante la animación.
+ * Solo el outlet directo de `.intranet-content`: los outlets anidados de los shells no se re-animan al cambiar de pestaña,
+ * y un cambio de query param (ej. FAQ de Ayuda) no recrea el componente, así que tampoco anima.
+ */
+@keyframes page-enter {
+	from {
+		opacity: 0;
+	}
+}
+
+.intranet-content > router-outlet + * {
+	animation: page-enter var(--motion-base) var(--ease-out);
+}
+
 /* Self-hosted fonts for better performance (eliminates external dependency) */
 @font-face {
 	font-family: 'Inter';
