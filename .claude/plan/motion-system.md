@@ -37,7 +37,9 @@ Tokens `--motion-fast` (120 ms), `--motion-base` (200 ms), `--motion-slow` (320 
 mobile-menu, module-selector y notification-card ✅ (enter+leave con tokens). Toasts, popover (user-profile-menu) y modales viven en `edu-ui` (vendored desde `educa-libs`, hoy sin animación) y pasan al brief 939. Riesgo: `animate.leave` retrasa el borrado del nodo; ajustar specs que esperan remoción inmediata, citando el motivo.
 
 ### F4 — Micro-interacciones
-`depends_on: [F1, F3]` · brief 938
+`depends_on: [F1, F3]` · brief 938 · ✅ awaiting-prod
+
+Utilidades `.motion-press`/`.motion-fade-in`/`.motion-stagger-item`/`.motion-saved` en `styles.scss`, aplicadas en login, asistencia y calificaciones (módulos pendientes listados en el brief). Diseño original:
 
 Utilidades compartidas: hover/press en botones y cards, fade skeleton→contenido, stagger en listas cortas, feedback "guardado". Primero login, asistencia y calificaciones. Medir en ms reales (Performance API), no por percepción.
 

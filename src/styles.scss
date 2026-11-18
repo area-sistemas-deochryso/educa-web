@@ -30,6 +30,7 @@
 	--motion-fast: 120ms;
 	--motion-base: 200ms;
 	--motion-slow: 320ms;
+	--motion-stagger: 30ms;
 	--ease-out: cubic-bezier(0.2, 0, 0, 1);
 	--ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -40,6 +41,7 @@
 	*::before,
 	*::after {
 		animation-duration: 0.01ms !important;
+		animation-delay: 0s !important;
 		animation-iteration-count: 1 !important;
 		transition-duration: 0.01ms !important;
 		transition-delay: 0s !important;
@@ -61,6 +63,59 @@
 
 .intranet-content > router-outlet + * {
 	animation: page-enter var(--motion-base) var(--ease-out);
+}
+
+/*
+ * Micro-interacciones (plan F10 F4). Utilidades compartidas, solo opacity/transform.
+ * Fill-mode `backwards` (nunca `both`): con `forwards` el transform final quedaría aplicado y crearía un containing block.
+ * El reduced-motion global ya anula duración y delay.
+ */
+@keyframes motion-rise {
+	from {
+		opacity: 0;
+		transform: translateY(8px);
+	}
+}
+
+@keyframes motion-saved {
+	from {
+		opacity: 0;
+		transform: translateY(-4px);
+	}
+}
+
+/*
+ * Press: escala breve al presionar. Se aplica al <button> o al host que lo contiene (edu-button).
+ * `:not(:disabled)` sube la especificidad por encima de `.edu-button[_ngcontent]` (que tiene su propio `transition`),
+ * por eso se repiten sus propiedades de color para no perder la transición de hover.
+ */
+.motion-press button:not(:disabled),
+button.motion-press:not(:disabled) {
+	transition:
+		transform var(--motion-fast) var(--ease-out),
+		background var(--eduui-form-field-transition-duration, var(--motion-base)),
+		border-color var(--eduui-form-field-transition-duration, var(--motion-base)),
+		color var(--eduui-form-field-transition-duration, var(--motion-base));
+
+	&:active {
+		transform: scale(0.97);
+	}
+}
+
+/* Fade del contenido que reemplaza a un skeleton (el @if lo inserta de golpe). */
+.motion-fade-in {
+	animation: page-enter var(--motion-base) var(--ease-out);
+}
+
+/* Stagger en listas cortas: cada item define `--i` (índice); se topa en 8 para no alargar la espera. */
+.motion-stagger-item {
+	animation: motion-rise var(--motion-base) var(--ease-out) backwards;
+	animation-delay: calc(min(var(--i, 0), 8) * var(--motion-stagger));
+}
+
+/* Feedback de guardado: el indicador entra con un pequeño descenso. */
+.motion-saved {
+	animation: motion-saved var(--motion-base) var(--ease-out) backwards;
 }
 
 /* Self-hosted fonts for better performance (eliminates external dependency) */

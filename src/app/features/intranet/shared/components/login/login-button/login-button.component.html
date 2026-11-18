@@ -1,7 +1,7 @@
 <!-- #region Template -->
 <!-- * Primary submit CTA with a loading visual state. -->
 <div class="button-row">
-	<button [type]="type" class="login-btn" [disabled]="disabled">
+	<button [type]="type" class="login-btn motion-press" [disabled]="disabled">
 		@if (isLoading) {
 			<span class="btn-label">{{ loadingLabel }}</span>
 			<span class="btn-icon">

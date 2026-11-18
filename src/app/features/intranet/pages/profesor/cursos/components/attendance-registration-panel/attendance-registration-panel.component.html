@@ -32,7 +32,7 @@
 			@if (esListaSinGuardar()) {
 				<edu-tag value="Sin guardar" severity="warn" icon="pi pi-info-circle" />
 			} @else if (guardadoALabel(); as hora) {
-				<edu-tag [value]="'Guardado a las ' + hora" severity="success" icon="pi pi-check-circle" />
+				<edu-tag class="motion-saved" [value]="'Guardado a las ' + hora" severity="success" icon="pi pi-check-circle" />
 			}
 		</div>
 	}
@@ -117,9 +117,9 @@
 
 <!-- #region Student list -->
 @if (!loading() && hasEstudiantes()) {
-	<div class="estudiantes-list">
+	<div class="estudiantes-list motion-fade-in">
 		@for (est of estudiantes(); track est.estudianteId; let i = $index) {
-			<div class="estudiante-row">
+			<div class="estudiante-row motion-stagger-item" [style.--i]="i">
 				<div class="estudiante-info">
 					<span class="estudiante-index">{{ i + 1 }}</span>
 					<div class="estudiante-data">
@@ -139,7 +139,7 @@
 					<div class="estado-buttons">
 						@for (estado of estados; track estado) {
 							<edu-button
-								class="estado-btn"
+								class="estado-btn motion-press"
 									[severity]="getEstadoSeverity(estado)"
 								[outlined]="est.estado !== estado"
 								data-info-anchor="profesor-asistencia-estado-btn"

@@ -40,6 +40,7 @@
 		} @else if (contenido()) {
 			<!-- #region Panel — requiere contenido() no-null -->
 			<app-calificaciones-panel
+				class="motion-fade-in"
 				[calificacionesPorSemana]="calVm().calificacionesPorSemana"
 				[periodos]="calVm().periodos"
 				[loading]="calVm().loading"
