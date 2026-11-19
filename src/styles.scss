@@ -10,6 +10,9 @@
 /* Capa de tokens semánticos de theming (brief 521) */
 @use 'tokens';
 
+/* Motion expresivo (plan F11): tokens y utilidades nuevas, aparte del bloque de F10 de este archivo */
+@use 'motion-expressive';
+
 /* PWA safe areas - removido de body, aplicado en intranet-layout.component.scss */
 
 /* PrimeIcons */
