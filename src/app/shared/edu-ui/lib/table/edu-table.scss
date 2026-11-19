@@ -104,3 +104,59 @@
 		opacity: 1;
 	}
 }
+
+/*
+ * Salida de fila (plan F11 F4): deslizamiento y luego pliegue del hueco. El estado base ya es el final;
+ * los keyframes parten del estado natural con fill-mode `backwards` (sin `forwards`), así que con
+ * reduced-motion (duración ~0) la fila queda oculta y se retira de inmediato. El pliegue anima
+ * altura/padding: es la excepción a transform/opacity, porque el hueco debe cerrarse sin que el resto salte.
+ */
+.edu-table__tbody ::ng-deep tr.edu-row--leaving {
+	opacity: 0;
+	transform: translateX(var(--motion-exit-distance, 1.5rem));
+	pointer-events: none;
+	animation: edu-row-slide-out var(--motion-base) var(--ease-out) backwards;
+}
+
+.edu-table__tbody ::ng-deep tr.edu-row--folding {
+	animation: edu-row-fold var(--motion-base) var(--ease-in-out) backwards;
+
+	> :is(td, th) {
+		padding-block: 0;
+		border-bottom-width: 0;
+		animation: edu-row-fold-cell var(--motion-base) var(--ease-in-out) backwards;
+
+		> * {
+			max-height: 0;
+			margin-block: 0;
+			padding-block: 0;
+			overflow: hidden;
+			animation: edu-row-fold-content var(--motion-base) var(--ease-in-out) backwards;
+		}
+	}
+}
+
+@keyframes edu-row-slide-out {
+	from {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+@keyframes edu-row-fold {
+	from {
+		opacity: 0;
+	}
+}
+
+@keyframes edu-row-fold-cell {
+	from {
+		padding-block: var(--row-pad, 0.75rem);
+	}
+}
+
+@keyframes edu-row-fold-content {
+	from {
+		max-height: var(--row-h, 3rem);
+	}
+}

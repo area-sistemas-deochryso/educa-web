@@ -2,20 +2,34 @@ import { NgTemplateOutlet } from '@angular/common';
 import {
 	ChangeDetectionStrategy,
 	Component,
+	ElementRef,
 	TemplateRef,
+	afterRenderEffect,
 	computed,
 	contentChild,
 	contentChildren,
 	effect,
+	linkedSignal,
 	inject,
 	input,
 	output,
+	signal,
+	viewChild,
 } from '@angular/core';
 import { EduPaginator, EduPaginatorPageEvent } from '../paginator/edu-paginator';
 import { EduTemplate } from './edu-template';
 import { EduTableService } from './edu-table.service';
 import { EduPassThrough, EduPtRoot } from '../passthrough/edu-pt-root';
 import { EduSpinner } from '../spinner/edu-spinner';
+import {
+	DisplayRow,
+	LeavingRow,
+	MAX_ANIMATED_REMOVALS,
+	cellTexts,
+	flashChangedRow,
+	hasChanged,
+	playRowExit,
+} from './edu-table-row-motion';
 
 export type EduTableSortOrder = 'asc' | 'desc' | null;
 
@@ -75,12 +89,12 @@ function normalizeSortOrder(value: EduTableSortOrderInput): EduTableSortOrder {
 						<ng-container [ngTemplateOutlet]="header"></ng-container>
 					</thead>
 				}
-				<tbody class="edu-table__tbody">
+				<tbody class="edu-table__tbody" #tbody>
 					@if (bodyTemplate(); as body) {
-						@for (row of value(); track trackByFn(row, $index); let index = $index) {
+						@for (item of displayRows(); track item.key; let index = $index) {
 							<ng-container
 								[ngTemplateOutlet]="body"
-								[ngTemplateOutletContext]="{ $implicit: row, rowIndex: index }"
+								[ngTemplateOutletContext]="{ $implicit: item.row, rowIndex: index }"
 							></ng-container>
 						}
 					}
@@ -168,6 +182,27 @@ export class EduTable<T = unknown> {
 		() => this.captionRef() ?? this.legacyTemplate('caption'),
 	);
 
+	private readonly tbody = viewChild<ElementRef<HTMLTableSectionElement>>('tbody');
+
+	/** Filas quitadas que siguen en el DOM mientras corre su salida. */
+	private readonly leaving = linkedSignal<readonly T[], LeavingRow<T>[]>({
+		source: this.value,
+		computation: (rows, previous) => this.detectRemovals(rows, previous?.source ?? [], previous?.value ?? []),
+	});
+	private readonly cellSnapshots = new Map<unknown, string[]>();
+	private readonly exiting = new Set<unknown>();
+
+	/** Con identidad de fila real (`trackBy`/`dataKey`) se animan cambios y bajas; sin ella, la tabla se ve igual que siempre. */
+	private readonly motionEnabled = computed(() => !!this.trackBy() || !!this.dataKey());
+
+	protected readonly displayRows = computed<DisplayRow<T>[]>(() => {
+		const rows = this.value().map((row, i) => ({ row, key: this.trackByFn(row, i), leaving: false }));
+		for (const gone of this.leaving()) {
+			rows.splice(Math.min(gone.index, rows.length), 0, { row: gone.row, key: gone.key, leaving: true });
+		}
+		return rows;
+	});
+
 	private readonly normalizedSortOrder = computed(() => normalizeSortOrder(this.sortOrder()));
 
 	constructor() {
@@ -175,6 +210,7 @@ export class EduTable<T = unknown> {
 			this.service.sortField.set(this.sortField());
 			this.service.sortOrder.set(this.normalizedSortOrder());
 		});
+		afterRenderEffect(() => this.runRowMotion(this.displayRows()));
 		this.service.sortChange.subscribe((event) => {
 			this.sortChange.emit(event);
 			this.onLazyLoad.emit({
@@ -193,6 +229,56 @@ export class EduTable<T = unknown> {
 			rows: event.rows,
 			sortField: this.sortField(),
 			sortOrder: this.normalizedSortOrder(),
+		});
+	}
+
+	/** Baja puntual = el conjunto nuevo es subconjunto del anterior y faltan pocas filas; paginar o filtrar no entra. */
+	private detectRemovals(
+		rows: readonly T[],
+		previous: readonly T[],
+		current: readonly LeavingRow<T>[],
+	): LeavingRow<T>[] {
+		if (!this.motionEnabled() || this.loading()) return [];
+		const nextKeys = new Set(rows.map((row, i) => this.trackByFn(row, i)));
+		const gone = previous
+			.map((row, index) => ({ row, index, key: this.trackByFn(row, index) }))
+			.filter((entry) => !nextKeys.has(entry.key));
+		const isSubset = previous.length - gone.length === rows.length;
+		const still = current.filter((entry) => !nextKeys.has(entry.key));
+		if (!isSubset || gone.length === 0 || gone.length > MAX_ANIMATED_REMOVALS) return still;
+		return [...still, ...gone.filter((g) => !still.some((s) => s.key === g.key))];
+	}
+
+	private runRowMotion(rows: readonly DisplayRow<T>[]): void {
+		const body = this.tbody()?.nativeElement;
+		if (!body || !this.motionEnabled()) return;
+		const trs = body.children;
+		if (trs.length !== rows.length) return;
+
+		const seen = new Set<unknown>();
+		const changed: { tr: Element; previous: string[]; current: string[] }[] = [];
+		rows.forEach((item, i) => {
+			const tr = trs[i];
+			seen.add(item.key);
+			if (item.leaving) return this.startExit(tr as HTMLElement, item.key);
+			const current = cellTexts(tr);
+			const previous = this.cellSnapshots.get(item.key);
+			if (hasChanged(previous, current)) changed.push({ tr, previous: previous!, current });
+			this.cellSnapshots.set(item.key, current);
+		});
+		for (const key of this.cellSnapshots.keys()) if (!seen.has(key)) this.cellSnapshots.delete(key);
+
+		// Cambio masivo (orden con columna de índice, recarga con datos nuevos): no se destella.
+		if (changed.length * 2 > rows.length) return;
+		for (const { tr, previous, current } of changed) flashChangedRow(tr, previous, current);
+	}
+
+	private startExit(tr: HTMLElement, key: unknown): void {
+		if (this.exiting.has(key)) return;
+		this.exiting.add(key);
+		playRowExit(tr, () => {
+			this.exiting.delete(key);
+			this.leaving.update((list) => list.filter((entry) => entry.key !== key));
 		});
 	}
 

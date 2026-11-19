@@ -13,7 +13,7 @@
 | F8 | Design Patterns Backend | Incremental | Al tocar módulos |
 | F9 | Design Patterns Frontend | Incremental | Al tocar módulos |
 | F10 | [Motion system](motion-system.md) | 🟡 En progreso — F1-F4 (935-938), F3b (939) F5 (940) y F6 (941, elemento compartido) ✅ en `awaiting-prod/` | F1 tokens → F2 fade de entrada (CSS) · F3 `animate.*` → F4 micro-interacciones |
-| F11 | [Motion expresivo](motion-expresivo.md) | 🟡 En progreso — F1 (943), F2 (944) y F3 (945) ✅ en `awaiting-prod/`; F4-F7 y F9 desbloqueadas | F1 fundaciones → F2 botón · F3 campos · F4 filas · F5 toast · F6 acordeón · F7 modal → F8 · F9 slide |
+| F11 | [Motion expresivo](motion-expresivo.md) | 🟡 En progreso — F1 (943), F2 (944), F3 (945) y F4 (946) ✅ en `awaiting-prod/`; F5-F7 y F9 desbloqueadas | F1 fundaciones → F2 botón · F3 campos · F4 filas · F5 toast · F6 acordeón · F7 modal → F8 · F9 slide |
 | xP41 | → Correlation Hub (coord) | ver P41 en coord (F4/F6 diseñadas, briefs 848-851; F5 materializado) | puede tocar FE — ver maestro coord |
 | xP50 | FE cohesion & coupling refactor (coord) | ✅ CERRADO (2026-09-25) — F1-F3a-F3b ✅ · F4 ❌ descartado | Service move + email consolidation |
 <!-- INDEX:END -->
@@ -31,7 +31,7 @@
 | F8 | Design Patterns Backend | Incremental |
 | F9 | Design Patterns Frontend | Incremental |
 | F10 | Motion system (animaciones y transiciones) | 🟡 ~95% — F1-F4, F3b, F5 y F6 ✅ en awaiting-prod; falta validación manual y evaluar F (librería) |
-| F11 | Motion expresivo | 🟡 F1-F3 ✅ en awaiting-prod; F4-F7 y F9 desbloqueadas |
+| F11 | Motion expresivo | 🟡 F1-F4 ✅ en awaiting-prod; F5-F7 y F9 desbloqueadas |
 | xP41 | Correlation Hub (coord) | → ver maestro coord |
 | xP50 | FE cohesion & coupling refactor (coord) | ✅ CERRADO (2026-09-25) |
 
