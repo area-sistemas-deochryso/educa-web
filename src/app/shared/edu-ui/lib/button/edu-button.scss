@@ -47,6 +47,27 @@
 	&__icon {
 		font-size: 1rem;
 	}
+
+	/* Éxito: el botón se encoge y vuelve (resorte de F1); el check entra con `.motion-value-bounce`. */
+	&--success {
+		animation: edu-button-success var(--motion-emphasis) var(--ease-spring) backwards;
+	}
+}
+
+@keyframes edu-button-success {
+	from {
+		transform: scale(0.94);
+	}
+}
+
+/* Anuncio para lectores de pantalla (región `role="status"`), sin ocupar espacio. */
+.edu-button__status {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
 }
 
 /* Solid (default) variant — bg/border/color from severity, hover/active shades darken */

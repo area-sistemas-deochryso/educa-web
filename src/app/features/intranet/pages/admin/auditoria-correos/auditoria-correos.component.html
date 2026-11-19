@@ -12,6 +12,9 @@
 		size="small"
 		(click)="refresh()"
 		[loading]="vm().loading"
+		[success]="refreshed()"
+		successLabel="Datos actualizados"
+		[ripple]="true"
 		data-info-anchor="admin-auditoria-correos-refrescar-btn"
 	/>
 </app-page-header>

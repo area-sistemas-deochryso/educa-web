@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 
 import { EduButton } from '@edu-ui';
 
@@ -22,15 +22,27 @@ import { EmailDeferFailBannerComponent } from '@features/intranet/pages/admin/em
 })
 export class AuditoriaCorreosComponent implements OnInit {
 	private readonly facade = inject(AuditoriaCorreosFacade);
+	private readonly destroyRef = inject(DestroyRef);
+	private successTimer: ReturnType<typeof setTimeout> | undefined;
 
 	readonly vm = this.facade.vm;
+	/** Piloto F11 F2: muestra el check del botón tras un refresco exitoso (el consumidor lo apaga). */
+	readonly refreshed = signal(false);
+
+	constructor() {
+		this.destroyRef.onDestroy(() => clearTimeout(this.successTimer));
+	}
 
 	ngOnInit(): void {
 		this.facade.loadAuditoria();
 	}
 
 	refresh(): void {
-		this.facade.refresh();
+		this.facade.refresh(() => {
+			this.refreshed.set(true);
+			clearTimeout(this.successTimer);
+			this.successTimer = setTimeout(() => this.refreshed.set(false), 1600);
+		});
 	}
 
 	onSearchChange(term: string): void {

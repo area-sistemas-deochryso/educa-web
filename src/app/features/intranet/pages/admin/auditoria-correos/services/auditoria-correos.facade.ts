@@ -24,7 +24,7 @@ export class AuditoriaCorreosFacade {
 	// #endregion
 
 	// #region Carga de datos
-	loadAuditoria(): void {
+	loadAuditoria(onSuccess?: () => void): void {
 		if (this.store.loading()) return;
 		this.store.setLoading(true);
 
@@ -36,6 +36,7 @@ export class AuditoriaCorreosFacade {
 					this.store.setItems(items);
 					this.store.setTableReady(true);
 					this.store.setLoading(false);
+					onSuccess?.();
 				},
 				error: (err) => {
 					logger.error('[AuditoriaCorreosFacade] Error al cargar auditoría:', err);
@@ -49,8 +50,8 @@ export class AuditoriaCorreosFacade {
 			});
 	}
 
-	refresh(): void {
-		this.loadAuditoria();
+	refresh(onSuccess?: () => void): void {
+		this.loadAuditoria(onSuccess);
 	}
 	// #endregion
 
