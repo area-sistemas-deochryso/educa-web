@@ -3,7 +3,7 @@
 		<i class="pi pi-arrow-left" aria-hidden="true"></i> Volver a la lista
 	</button>
 
-	<span class="faq-detail__categoria">{{ faq().categoria ?? 'Común' }}</span>
+	<span class="faq-detail__categoria" [class]="'faq-detail__categoria--' + rolModifier()">{{ rol() }}</span>
 	<h3 class="faq-detail__pregunta">{{ faq().pregunta }}</h3>
 	<p class="faq-detail__respuesta">{{ faq().respuesta }}</p>
 

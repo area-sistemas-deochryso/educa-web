@@ -27,6 +27,15 @@ describe('FaqDetailComponent', () => {
 		fixture = TestBed.createComponent(FaqDetailComponent);
 	});
 
+	it('el badge de rol lleva el modificador de color de su categoría', () => {
+		fixture.componentRef.setInput('faq', FAQ_CON_WIZARD);
+		fixture.detectChanges();
+
+		const badge = fixture.debugElement.query(By.css('.faq-detail__categoria')).nativeElement as HTMLElement;
+		expect(badge.textContent?.trim()).toBe('Profesor');
+		expect(badge.classList).toContain('faq-detail__categoria--profesor');
+	});
+
 	it('una FAQ sin wizard no muestra el bloque de guía', () => {
 		fixture.componentRef.setInput('faq', FAQ_SIN_WIZARD);
 		fixture.detectChanges();

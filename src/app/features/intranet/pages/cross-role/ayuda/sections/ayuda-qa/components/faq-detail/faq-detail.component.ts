@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 
 import { FaqDto, FaqMotivo, FaqVoto, GuideProgress } from '@features/intranet/pages/cross-role/ayuda/models/faq.models';
 import { EduButton } from '@edu-ui';
@@ -8,6 +8,13 @@ export interface FaqVoteEvent {
 	util: boolean;
 	motivo: FaqMotivo | null;
 }
+
+const ROL_MODIFIER: Record<string, string> = {
+	Común: 'comun',
+	Profesor: 'profesor',
+	Estudiante: 'estudiante',
+	'Asistente Administrativo': 'asistente',
+};
 
 const MOTIVOS: readonly { value: FaqMotivo; label: string }[] = [
 	{ value: 'INCOMPLETA', label: 'Está incompleta' },
@@ -43,6 +50,9 @@ export class FaqDetailComponent {
 	readonly back = output<void>();
 
 	readonly motivos = MOTIVOS;
+
+	readonly rol = computed(() => this.faq().categoria ?? 'Común');
+	readonly rolModifier = computed(() => ROL_MODIFIER[this.rol()] ?? 'comun');
 
 	votar(util: boolean, motivo: FaqMotivo | null = null): void {
 		this.voted.emit({ util, motivo });

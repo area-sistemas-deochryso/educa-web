@@ -29,6 +29,26 @@
 		color: var(--faq-text-muted);
 		font-size: 0.75rem;
 		font-weight: 600;
+
+		&--comun {
+			background: color-mix(in srgb, #3b82f6 16%, transparent);
+			color: #1d4ed8;
+		}
+
+		&--profesor {
+			background: color-mix(in srgb, #22c55e 16%, transparent);
+			color: #15803d;
+		}
+
+		&--estudiante {
+			background: color-mix(in srgb, #f97316 16%, transparent);
+			color: #c2410c;
+		}
+
+		&--asistente {
+			background: color-mix(in srgb, #a855f7 16%, transparent);
+			color: #7e22ce;
+		}
 	}
 
 	&__pregunta {
