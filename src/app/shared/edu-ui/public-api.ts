@@ -1,6 +1,6 @@
-// Vendored from educa-libs (packages/edu-ui/src) — commit 1c9d3f8, F6g, 2026-08-25.
-// Not published to a registry (P79 F6); source-of-truth stays in educa-libs,
-// re-sync manually on changes.
+// Originally vendored from educa-libs (packages/edu-ui/src) — commit 1c9d3f8, F6g, 2026-08-25.
+// Not published to a registry. This copy is the single source of truth since brief 942;
+// educa-libs is frozen, do not re-sync from it.
 //
 // F1 — Foundation + trivial components (CSS-only wrappers).
 // Design tokens: import 'dist/edu-ui/tokens.css' in the consuming app (F6).

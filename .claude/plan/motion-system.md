@@ -60,4 +60,6 @@ Decisiones: la copia vendored de `edu-ui` está adelantada a `educa-libs` (el di
 
 ## Después
 
+**F10 — reconciliación `educa-libs` (brief 942, 2026-11-19)**: la copia vendored se declara única fuente de verdad y `educa-libs` queda congelada; la divergencia registrada arriba deja de ser deuda.
+
 Evaluar **F** (librería de motion) solo si F1-F4 dejan casos que CSS/`animate.*` no resuelven. Opcional: regla stylelint que prohíba `transition: all`.

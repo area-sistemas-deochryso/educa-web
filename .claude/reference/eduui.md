@@ -1,6 +1,6 @@
 # edu-ui
 
-Librería de componentes propia (CDK-based) que reemplazó a PrimeNG en el swap de P79 F6 (brief 588, 277 archivos migrados). Vendorizada en `src/app/shared/edu-ui/` (fuente de verdad vive en `educa-libs`, re-sync manual ante cambios — ver `public-api.ts`). Tema Aura preservado vía tokens propios. Dark mode con clase `.dark-mode`.
+Librería de componentes propia (CDK-based) que reemplazó a PrimeNG en el swap de P79 F6 (brief 588, 277 archivos migrados). Vive en `src/app/shared/edu-ui/`, que es la **única fuente de verdad** (decisión del brief 942, 2026-11-19). `educa-libs` quedó congelada y desfasada: no se resincroniza desde ahí ni se porta nada hacia ahí. Tema Aura preservado vía tokens propios. Dark mode con clase `.dark-mode`.
 
 > **Para estructura recomendada por componente** (stat card, tabla, filter bar, dialogs, drawers, alert banners): ver `reference/design-system.md` sección 7 (pautas B1-B11). Esta regla cubre cómo importar y usar edu-ui; el design-system cubre cómo ensamblar los componentes en páginas consistentes.
 
@@ -100,7 +100,7 @@ import type { EduPaginatorPageEvent } from '@edu-ui';
 
 `dismiss` existe para quien convierte el aviso en una `Promise` (un guard no puede quedar colgado si el usuario cierra con la X). Ver `reference/unsaved-changes.md`.
 
-> ⚠️ **`shared/edu-ui` es vendorizada** (fuente de verdad en `educa-libs`). Esta extensión se hizo localmente en el brief 769: hay que portarla a `educa-libs` o el próximo re-sync la pisa y rompe `UnsavedChangesPromptService`.
+> Esta extensión (brief 769) vive solo en `shared/edu-ui`, que es la fuente de verdad: no hay re-sync que la pise.
 
 ## Por qué es necesario (overlays)
 
