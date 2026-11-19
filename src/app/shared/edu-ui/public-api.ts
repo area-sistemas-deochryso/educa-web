@@ -19,6 +19,7 @@ export type { EduTagSeverity } from './lib/tag/edu-tag';
 
 export { EduInputText } from './lib/input-text/edu-input-text';
 export { EduTextarea } from './lib/textarea/edu-textarea';
+export { EduShakeOnInvalid } from './lib/shake-on-invalid/edu-shake-on-invalid';
 
 export { EduSpinner } from './lib/spinner/edu-spinner';
 

@@ -18,6 +18,7 @@ import {
 	viewChild,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { EduShakeOnInvalid } from '../shake-on-invalid/edu-shake-on-invalid';
 import { EduOverlayHandle } from '../overlay/edu-overlay-handle';
 import { EduPassThrough, EduPtRoot } from '../passthrough/edu-pt-root';
 import {
@@ -47,7 +48,7 @@ let nextInstanceId = 0;
 @Component({
 	selector: 'edu-select',
 	standalone: true,
-	imports: [EduPtRoot, NgTemplateOutlet],
+	imports: [EduPtRoot, NgTemplateOutlet, EduShakeOnInvalid],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	providers: [
 		{
@@ -66,6 +67,8 @@ let nextInstanceId = 0;
 			aria-haspopup="listbox"
 			[attr.aria-expanded]="isOpen()"
 			[attr.aria-busy]="loading()"
+			[attr.aria-invalid]="invalid() ? 'true' : null"
+			[eduShakeOnInvalid]="invalid()"
 			[attr.aria-controls]="listboxId"
 			[attr.aria-activedescendant]="activeOptionId()"
 			[attr.tabindex]="isFormDisabled() ? -1 : 0"
@@ -198,6 +201,8 @@ export class EduSelect implements ControlValueAccessor, OnDestroy {
 	readonly optionGroupLabel = input<string>();
 	readonly optionGroupChildren = input<string>();
 	readonly loading = input(false);
+	/** Estado inválido gestionado por el consumidor; expone `aria-invalid` y sacude el campo al activarse. */
+	readonly invalid = input(false);
 	readonly pt = input<EduPassThrough>();
 
 	protected readonly selectedItemTemplate = contentChild<TemplateRef<unknown>>('selectedItem');

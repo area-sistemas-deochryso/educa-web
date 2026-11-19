@@ -18,6 +18,7 @@ import {
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { EduOverlayHandle } from '../overlay/edu-overlay-handle';
 import { EduPassThrough, EduPtRoot } from '../passthrough/edu-pt-root';
+import { EduShakeOnInvalid } from '../shake-on-invalid/edu-shake-on-invalid';
 import {
 	MonthCell,
 	formatDate,
@@ -47,7 +48,7 @@ let nextErrorId = 0;
 @Component({
 	selector: 'edu-datepicker',
 	standalone: true,
-	imports: [NgTemplateOutlet, EduPtRoot],
+	imports: [NgTemplateOutlet, EduPtRoot, EduShakeOnInvalid],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	providers: [
 		{
@@ -62,6 +63,7 @@ let nextErrorId = 0;
 				class="edu-datepicker"
 				[class.edu-datepicker--disabled]="isFormDisabled()"
 					[class.edu-datepicker--invalid]="inputError() !== null"
+				[eduShakeOnInvalid]="inputError() !== null"
 				role="combobox"
 				aria-haspopup="dialog"
 				[attr.aria-expanded]="isOpen()"

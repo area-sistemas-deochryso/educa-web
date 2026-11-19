@@ -1,9 +1,11 @@
 import { Directive, ElementRef, HostListener, effect, inject, input } from '@angular/core';
+import { EduShakeOnInvalid } from '../shake-on-invalid/edu-shake-on-invalid';
 
 @Directive({
 	selector: 'textarea[eduTextarea]',
 	standalone: true,
 	host: { class: 'edu-textarea' },
+	hostDirectives: [EduShakeOnInvalid],
 })
 export class EduTextarea {
 	readonly autoResize = input(false);
