@@ -9,6 +9,7 @@ hot-paths: []
 
 > **Repo destino**: `educa-web` (frontend, branch `main`). Abrir el chat nuevo en este repo.
 > **Plan**: [`plan/motion-expresivo.md`](../../plan/motion-expresivo.md) (F11) · **Chat**: 2 · **Fase**: F2 · **Creado**: 2026-11-19 · **Estado**: ✅ cerrado local; verificación manual + lint/build pendientes (Node 20 < 22.22.3).
+> **Validación prod**: ✅ verificada 2026-11-20 — local con BBDD de prueba: medición en vivo + visto por el usuario
 > **Created**: 2026-11-19
 > **MODO SUGERIDO**: `/design` → `/execute` → `/validate` (toca la API pública de un componente compartido).
 > **modules**: `ui` (motion, edu-button).
