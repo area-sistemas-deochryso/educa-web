@@ -23,6 +23,51 @@
 		opacity: 1;
 		scale: 1;
 	}
+
+	// Entrada escalonada: header → cuerpo → footer. Solo corre mientras el panel tiene `data-open`
+	// (al quitarlo en la salida la animación desaparece y el contenido queda en su estado natural).
+	// Estado base = final; los keyframes solo llevan `from` y el fill-mode es `backwards`.
+	&[data-open] .edu-dialog-header,
+	&[data-open] .edu-dialog-body,
+	&[data-open] .edu-dialog-footer {
+		animation: edu-dialog-content-in var(--motion-base, 200ms) var(--ease-out, ease-out) backwards;
+	}
+
+	&[data-open] .edu-dialog-body {
+		animation-delay: calc(var(--motion-fast, 120ms) / 2);
+	}
+
+	&[data-open] .edu-dialog-footer {
+		animation-delay: var(--motion-fast, 120ms);
+	}
+
+	// Hoja inferior (viewport angosto): sube desde abajo ocupando el ancho. `translate` independiente de
+	// `scale`/`transform`; sin resorte, un rebote dejaría un hueco bajo la hoja. El `!important` del ancho
+	// pisa el `[style]` inline de cada uso (p. ej. `width: 600px`).
+	&--sheet {
+		width: 100% !important;
+		min-width: 0;
+		max-width: 100%;
+		max-height: 90dvh;
+		border-radius: var(--eduui-content-border-radius) var(--eduui-content-border-radius) 0 0;
+		padding-bottom: env(safe-area-inset-bottom);
+		scale: 1;
+		translate: 0 100%;
+		transition:
+			opacity var(--motion-base, 200ms) var(--ease-out, ease-out),
+			translate var(--motion-slow, 320ms) var(--ease-out, ease-out);
+
+		&[data-open] {
+			translate: 0 0;
+		}
+	}
+}
+
+@keyframes edu-dialog-content-in {
+	from {
+		opacity: 0;
+		transform: translateY(0.5rem);
+	}
 }
 
 .edu-dialog-header {

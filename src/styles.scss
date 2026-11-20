@@ -459,6 +459,20 @@ body {
 	font-family: var(--intranet-font-family);
 }
 
+/* Fondo desenfocado del diálogo (plan F11 F7). El backdrop lo crea CDK fuera del componente, por eso vive acá.
+   Excepción a "solo transform/opacity": `backdrop-filter` con radio FIJO en un único nodo; lo que se anima es la
+   `opacity` del backdrop (CDK), nunca el radio. El costo se mide en móvil antes de F8; para atenuarlo basta
+   bajar `--edu-dialog-blur` (0 lo apaga). Sin soporte de `backdrop-filter` queda solo el oscurecido de CDK. */
+.edu-dialog-backdrop {
+	backdrop-filter: blur(var(--edu-dialog-blur, 4px));
+}
+
+@media (prefers-reduced-transparency: reduce) {
+	.edu-dialog-backdrop {
+		backdrop-filter: none;
+	}
+}
+
 /*---------------------------------------
   TYPOGRAPHY
 -----------------------------------------*/

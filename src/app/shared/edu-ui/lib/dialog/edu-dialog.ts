@@ -21,6 +21,9 @@ import { EduButton } from '../button/edu-button';
 import { EduOverlayHandle } from '../overlay/edu-overlay-handle';
 import { EduPassThrough, EduPtRoot } from '../passthrough/edu-pt-root';
 
+/** En viewports angostos el diálogo sube desde abajo como hoja (se decide al abrir, no es reactivo). */
+const SHEET_QUERY = '(max-width: 600px)';
+
 @Component({
 	selector: 'edu-dialog',
 	standalone: true,
@@ -31,6 +34,7 @@ import { EduPassThrough, EduPtRoot } from '../passthrough/edu-pt-root';
 			<div
 				class="edu-dialog-panel"
 				[class]="styleClass()"
+					[class.edu-dialog-panel--sheet]="sheet()"
 				[style]="style()"
 				[attr.role]="modal() ? 'dialog' : null"
 				[attr.aria-modal]="modal() ? 'true' : null"
@@ -40,7 +44,7 @@ import { EduPassThrough, EduPtRoot } from '../passthrough/edu-pt-root';
 				@if (showHeader()) {
 					<div
 						class="edu-dialog-header"
-						[class.edu-dialog-header--draggable]="draggable()"
+						[class.edu-dialog-header--draggable]="draggable() && !sheet()"
 						(mousedown)="onHeaderMouseDown($event)"
 					>
 						@if (headerTemplate(); as tpl) {
@@ -80,7 +84,7 @@ import { EduPassThrough, EduPtRoot } from '../passthrough/edu-pt-root';
 						</div>
 					</div>
 				}
-				@if (resizable()) {
+				@if (resizable() && !sheet()) {
 					<div
 						class="edu-dialog-resize-handle"
 						(mousedown)="onResizeMouseDown($event)"
@@ -123,6 +127,7 @@ export class EduDialog implements OnDestroy {
 	private readonly handle = new EduOverlayHandle(this.overlay, this.focusTrapFactory);
 
 	protected readonly confirmingClose = signal(false);
+	protected readonly sheet = signal(false);
 
 	private panelEl: HTMLElement | null = null;
 	private dragOffset = { x: 0, y: 0 };
@@ -165,7 +170,7 @@ export class EduDialog implements OnDestroy {
 	}
 
 	protected onHeaderMouseDown(event: MouseEvent): void {
-		if (!this.draggable() || !this.panelEl) {
+		if (!this.draggable() || this.sheet() || !this.panelEl) {
 			return;
 		}
 		if ((event.target as HTMLElement).closest('.edu-dialog-header__close')) {
@@ -195,7 +200,7 @@ export class EduDialog implements OnDestroy {
 	}
 
 	protected onResizeMouseDown(event: MouseEvent): void {
-		if (!this.resizable() || !this.panelEl) {
+		if (!this.resizable() || this.sheet() || !this.panelEl) {
 			return;
 		}
 		event.preventDefault();
@@ -222,12 +227,13 @@ export class EduDialog implements OnDestroy {
 	private open(): void {
 		this.dragOffset = { x: 0, y: 0 };
 
+		this.sheet.set(window.matchMedia(SHEET_QUERY).matches);
+
 		const portal = new TemplatePortal(this.overlayTemplateRef(), this.viewContainerRef);
-		const positionStrategy = this.overlay
-			.position()
-			.global()
-			.centerHorizontally()
-			.centerVertically();
+		const global = this.overlay.position().global();
+		const positionStrategy = this.sheet()
+			? global.bottom('0').width('100%')
+			: global.centerHorizontally().centerVertically();
 
 		this.handle.open(
 			portal,
@@ -235,7 +241,8 @@ export class EduDialog implements OnDestroy {
 				positionStrategy,
 				panelClass: 'edu-dialog-pane',
 				hasBackdrop: this.modal(),
-				backdropClass: 'cdk-overlay-dark-backdrop',
+				// `edu-dialog-backdrop` lleva el desenfoque; el drawer comparte la clase oscura de CDK y no lo recibe.
+				backdropClass: ['cdk-overlay-dark-backdrop', 'edu-dialog-backdrop'],
 				closeOnBackdropClick: this.dismissableMask(),
 				closeOnEscape: this.closeOnEscape(),
 				originFromTrigger: true,

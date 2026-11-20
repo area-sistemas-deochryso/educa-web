@@ -17,7 +17,7 @@ export interface EduOverlayOpenOptions {
 	positionStrategy: PositionStrategy;
 	panelClass: string | string[];
 	hasBackdrop: boolean;
-	backdropClass?: string;
+	backdropClass?: string | string[];
 	closeOnBackdropClick: boolean;
 	closeOnEscape?: boolean;
 	/** Defaults to true. Pass false when the trigger is a typable input that must keep the caret. */
@@ -45,9 +45,8 @@ export class EduOverlayHandle {
 	) {}
 
 	// overlayRef stays non-null through the whole leave transition, so isOpen
-	// stays true and open() (`if (this.overlayRef) return`) blocks reopening
-	// while a previous close is still animating out — avoids overlapping
-	// overlays from the same handle without a separate flag.
+	// stays true. open() during that leave disposes the leaving overlay first,
+	// so a handle never holds two overlays at once.
 	get isOpen(): boolean {
 		return this.overlayRef !== null;
 	}
@@ -58,7 +57,11 @@ export class EduOverlayHandle {
 
 	open(portal: TemplatePortal, options: EduOverlayOpenOptions, onCloseRequest: () => void): void {
 		if (this.overlayRef) {
-			return;
+			if (!this.closing) {
+				return;
+			}
+			// Reabrir durante la salida: se descarta el overlay que se estaba retirando y se crea uno nuevo.
+			this.disposeNow();
 		}
 
 		this.previouslyFocused = document.activeElement as HTMLElement | null;
@@ -135,7 +138,11 @@ export class EduOverlayHandle {
 			return;
 		}
 
-		waitForTransition(panelEl).then(() => this.disposeNow());
+		const leavingRef = this.overlayRef;
+		// Si se reabrió mientras salía, `overlayRef` ya es otro y no hay que retirarlo.
+		waitForTransition(panelEl).then(() => {
+			if (this.overlayRef === leavingRef) this.disposeNow();
+		});
 	}
 
 	/**
