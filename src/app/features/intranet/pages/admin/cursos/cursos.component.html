@@ -402,77 +402,62 @@
 				}
 			</div>
 
-			<!-- Grados seleccionados — data-driven por nivel -->
+			<!-- Grados — matriz nivel × grado (click para asignar/quitar) -->
 			<div class="field">
-				<div class="grados-form-content">
-					@for (nivel of vm().niveles; track nivel.key) {
-						@if (nivel.allGrados.length > 0) {
-							<div class="grados-form-section">
-								<h4 class="form-section-title">
-									<i [class]="nivel.icon"></i>
-									{{ nivel.title }}
-								</h4>
-								<div class="selected-grados">
-									@if (nivel.selectedGrados.length > 0) {
-										@for (grado of nivel.selectedGrados; track grado.id) {
-											<span [class]="'custom-tag ' + nivel.tagClass">
-												<span class="tag-text">{{ grado.nombre }}</span>
-												<button
-													type="button"
-													class="tag-remove"
-													data-info-anchor="admin-cursos-grado-remove-btn"
-													(click)="removeGrado(grado.id)"
-													[attr.aria-label]="'Remover ' + grado.nombre"
-												>
-													<i class="pi pi-times"></i>
-												</button>
-											</span>
-										}
-									} @else {
-										<span class="no-selection">Sin grados seleccionados</span>
-									}
+				<label>Grados</label>
+				<div class="grados-form-matrix">
+					<div class="grados-row grados-head" aria-hidden="true">
+						<span></span>
+						<div class="grados-cells">
+							@for (n of [1, 2, 3, 4, 5, 6]; track n) {
+								<span class="head-cell">{{ n }}°</span>
+							}
+						</div>
+					</div>
+					@for (nivel of vm().gradosMatrizForm; track nivel.key) {
+						<div class="grados-row">
+							<div class="row-label">
+								<i [class]="nivel.icon"></i>
+								<div class="row-text">
+									<span class="row-title">{{ nivel.title }}</span>
+									<span class="row-hint">{{ nivel.total }}/{{ nivel.max }}</span>
 								</div>
 							</div>
-						}
-					}
-				</div>
-			</div>
-
-			<!-- Grados disponibles — data-driven por nivel -->
-			<div class="field">
-				<label>Grados disponibles</label>
-				<div class="available-grados-grid">
-					@for (nivel of vm().niveles; track nivel.key) {
-						@if (nivel.allGrados.length > 0) {
-							<div class="available-column">
-								<h5 class="column-title">
-									<i [class]="nivel.icon"></i>
-									{{ nivel.title }}
-								</h5>
-								<div class="available-items">
-									@if (nivel.availableGrados.length > 0) {
-										@for (grado of nivel.availableGrados; track grado.id) {
-											<button
-												class="available-item"
-												data-info-anchor="admin-cursos-grado-add-btn"
-												(click)="addGrado(grado.id)"
-												[attr.aria-label]="'Agregar ' + grado.nombre"
-											>
-												<i class="pi pi-plus"></i>
-												<span>{{ grado.nombre }}</span>
-											</button>
-										}
+							<div class="grados-cells">
+								@for (celda of nivel.celdas; track celda.key) {
+									@if (celda.gradoId === null) {
+										<span class="grado-cell" data-state="na">–</span>
 									} @else {
-										<span class="no-available">Todos seleccionados</span>
+										<button
+											type="button"
+											class="grado-cell is-clickable"
+											[attr.data-state]="celda.state"
+											[attr.data-info-anchor]="
+												celda.state === 'active'
+													? 'admin-cursos-grado-remove-btn'
+													: 'admin-cursos-grado-add-btn'
+											"
+											[attr.aria-pressed]="celda.state === 'active'"
+											[attr.aria-label]="
+												(celda.state === 'active' ? 'Remover ' : 'Agregar ') + celda.nombre
+											"
+											(click)="
+												celda.state === 'active'
+													? removeGrado(celda.gradoId)
+													: addGrado(celda.gradoId)
+											"
+										>
+											@if (celda.state === 'active') {
+												<i class="pi pi-check"></i>
+											}
+										</button>
 									}
-								</div>
+								}
 							</div>
-						}
+						</div>
 					}
 				</div>
-				<small class="field-hint"
-					>Haz clic en un grado para agregarlo o usa la X para removerlo</small
-				>
+				<small class="field-hint">Haz clic en un círculo para asignar o quitar el grado</small>
 			</div>
 
 			<!-- Estado (solo en edición) -->
@@ -528,21 +513,38 @@
 	class="grados-dialog"
 >
 	<div class="grados-content">
-		@for (nivel of vm().cursoGradosNiveles; track nivel.title) {
-			<div class="grados-section">
-				<h3 class="section-title">
-					<i [class]="nivel.icon"></i>
-					{{ nivel.title }}
-				</h3>
-				<div class="grados-grid">
-					@for (grado of nivel.grados; track grado.id) {
-						<edu-tag [value]="grado.nombre" styleClass="tag-neutral" />
+		@if (vm().cursoGradosNiveles.length > 0) {
+			<div class="grados-row grados-head" aria-hidden="true">
+				<span></span>
+				<div class="grados-cells">
+					@for (n of [1, 2, 3, 4, 5, 6]; track n) {
+						<span class="head-cell">{{ n }}°</span>
 					}
 				</div>
 			</div>
-		}
-
-		@if (vm().cursoGradosNiveles.length === 0) {
+			@for (nivel of vm().cursoGradosMatriz; track nivel.title) {
+				<div class="grados-row">
+					<div class="row-label">
+						<i [class]="nivel.icon"></i>
+						<div class="row-text">
+							<span class="row-title">{{ nivel.title }}</span>
+							<span class="row-hint">{{ nivel.total }}/{{ nivel.max }}</span>
+						</div>
+					</div>
+					<div class="grados-cells">
+						@for (celda of nivel.celdas; track celda.key) {
+							<span class="grado-cell" [attr.data-state]="celda.state">
+								@if (celda.state === 'active') {
+									<i class="pi pi-check"></i>
+								} @else if (celda.state === 'na') {
+									–
+								}
+							</span>
+						}
+					</div>
+				</div>
+			}
+		} @else {
 			<div class="empty-grados">
 				<i class="pi pi-inbox"></i>
 				<p>Este curso no tiene grados asignados</p>

@@ -166,6 +166,31 @@ export class CursosStore extends BaseCrudStore<Curso, CursoFormData, CursosEstad
 			availableGrados: gradosByNivel[nivel].available,
 		}));
 	});
+
+	/** Matriz nivel × grado (1°–6°) del dialog de edición: cada celda es un toggle asignar/quitar */
+	readonly gradosMatrizForm = computed(() =>
+		this.niveles().map((nivel) => {
+			const seleccionados = new Set(nivel.selectedGrados.map((g) => g.id));
+			const porNumero = new Map(nivel.allGrados.map((g) => [Number(/\d/.exec(g.nombre)?.[0]), g]));
+			const celdas = Array.from({ length: 6 }, (_, i) => {
+				const grado = porNumero.get(i + 1);
+				return {
+					key: i,
+					gradoId: grado?.id ?? null,
+					nombre: grado?.nombre ?? '',
+					state: !grado ? ('na' as const) : seleccionados.has(grado.id) ? ('active' as const) : ('missing' as const),
+				};
+			});
+			return {
+				key: nivel.key,
+				title: nivel.title,
+				icon: nivel.icon,
+				celdas,
+				total: nivel.selectedGrados.length,
+				max: nivel.allGrados.length,
+			};
+		}),
+	);
 	// #endregion
 
 	// #region Computed — grados del curso seleccionado (dialog "ver grados")
@@ -198,6 +223,35 @@ export class CursosStore extends BaseCrudStore<Curso, CursoFormData, CursosEstad
 		return (['Inicial', 'Primaria', 'Secundaria'] as const)
 			.map((nivel) => ({ ...NIVEL_VISUAL_CONFIGS[nivel], grados: gradosByNivel[nivel] }))
 			.filter((n) => n.grados.length > 0);
+	});
+
+	/** Matriz de cobertura nivel × grado para el dialog "ver grados" (muestra también los grados NO asignados) */
+	readonly cursoGradosMatriz = computed(() => {
+		const SLOTS = { Inicial: [3, 4, 5], Primaria: [1, 2, 3, 4, 5, 6], Secundaria: [1, 2, 3, 4, 5] } as const;
+		const gradosByNivel = {
+			Inicial: this.cursoGradosInicial(),
+			Primaria: this.cursoGradosPrimaria(),
+			Secundaria: this.cursoGradosSecundaria(),
+		} as const;
+
+		return (['Inicial', 'Primaria', 'Secundaria'] as const).map((nivel) => {
+			const asignados = new Set(
+				gradosByNivel[nivel].map((g) => Number(/\d/.exec(g.nombre)?.[0])),
+			);
+			// 6 columnas fijas (1°–6°): 'active' = asignado, 'missing' = existe y no está asignado, 'na' = el nivel no tiene ese grado
+			const celdas = Array.from({ length: 6 }, (_, i): { key: number; state: 'active' | 'missing' | 'na' } => {
+				const n = i + 1;
+				const existe = (SLOTS[nivel] as readonly number[]).includes(n);
+				return { key: i, state: !existe ? 'na' : asignados.has(n) ? 'active' : 'missing' };
+			});
+			const existentes = celdas.filter((c) => c.state !== 'na');
+			return {
+				...NIVEL_VISUAL_CONFIGS[nivel],
+				celdas,
+				total: existentes.filter((c) => c.state === 'active').length,
+				max: existentes.length,
+			};
+		});
 	});
 	// #endregion
 
@@ -310,6 +364,8 @@ export class CursosStore extends BaseCrudStore<Curso, CursoFormData, CursosEstad
 		saving: this.saving(),
 		niveles: this.niveles(),
 		cursoGradosNiveles: this.cursoGradosNiveles(),
+		cursoGradosMatriz: this.cursoGradosMatriz(),
+		gradosMatrizForm: this.gradosMatrizForm(),
 	}));
 	// #endregion
 
