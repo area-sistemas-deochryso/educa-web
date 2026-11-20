@@ -45,9 +45,9 @@ const PAGE_WINDOW = 5;
 			</button>
 
 			@if (rowsPerPageOptions()?.length) {
-				<select class="edu-paginator__rows" [value]="rows()" (change)="onRowsChange($event)">
+				<select class="edu-paginator__rows" (change)="onRowsChange($event)">
 					@for (opt of rowsPerPageOptions(); track opt) {
-						<option [value]="opt">{{ opt }}</option>
+						<option [value]="opt" [selected]="opt === rows()">{{ opt }}</option>
 					}
 				</select>
 			}
