@@ -1,28 +1,17 @@
-<!-- #region Header -->
-<app-page-header icon="pi pi-building" title="Gestión de Salones" subtitle="Administra los salones y su capacidad para el periodo académico">
-	<app-period-toggle
-		[value]="vm().esVerano"
-		(valueChange)="onPeriodoChange($event)"
-		data-info-anchor="period-toggle"
-	/>
-	<edu-input-number
-		[ngModel]="vm().filtroAnio"
-		(ngModelChange)="onAnioChange($event)"
-		[useGrouping]="false"
-		[min]="2020"
-		[max]="2030"
-		[style]="{ width: '100px' }"
-		data-info-anchor="admin-salones-anio-filter-input"
-	/>
+<!-- #region Header: título + acción principal (el contexto vive en la barra de abajo) -->
+<app-page-header icon="pi pi-building" title="Gestión de Salones" [subtitle]="subtitle()">
 	<edu-button
 		icon="pi pi-refresh"
-		[outlined]="true"
+		[text]="true"
+		severity="secondary"
 		(click)="onRefresh()"
 		[pt]="{
 			root: {
 				'aria-label': 'Refrescar',
 			},
 		}"
+		eduTooltip="Refrescar"
+		eduTooltipPosition="bottom"
 		data-info-anchor="admin-salones-refresh-btn"
 	/>
 	<edu-button
@@ -42,85 +31,90 @@
 	</div>
 }
 
-<!-- #region Stats -->
-@if (vm().statsReady) {
-	<app-kpi-stats [items]="statsItems()" />
-}
+<!-- #region Barra de contexto: periodo → año → nivel → estado (de lo más general a lo más específico) -->
+<div class="context-bar">
+	<div class="context-period">
+		<app-period-toggle
+			[value]="vm().esVerano"
+			(valueChange)="onPeriodoChange($event)"
+			data-info-anchor="period-toggle"
+		/>
+
+		<div class="year-stepper" role="group" aria-label="Año">
+			<button
+				type="button"
+				class="step-btn"
+				aria-label="Año anterior"
+				[disabled]="vm().filtroAnio <= anioMin"
+				(click)="onAnioStep(-1)"
+				data-info-anchor="admin-salones-anio-prev-btn"
+			>
+				<i class="pi pi-chevron-left"></i>
+			</button>
+			<output class="year-value" aria-live="polite" data-info-anchor="admin-salones-anio-filter-input">{{ vm().filtroAnio }}</output>
+			<button
+				type="button"
+				class="step-btn"
+				aria-label="Año siguiente"
+				[disabled]="vm().filtroAnio >= anioMax"
+				(click)="onAnioStep(1)"
+				data-info-anchor="admin-salones-anio-next-btn"
+			>
+				<i class="pi pi-chevron-right"></i>
+			</button>
+		</div>
+	</div>
+
+	<div class="nivel-tabs" role="tablist" aria-label="Nivel educativo">
+		@for (nivel of niveles; track nivel) {
+			<button
+				type="button"
+				role="tab"
+				class="nivel-tab"
+				[class.active]="vm().selectedNivel === nivel"
+				[attr.aria-selected]="vm().selectedNivel === nivel"
+				(click)="onNivelChange(nivel)"
+				data-info-anchor="admin-salones-nivel-tab"
+			>
+				{{ nivel }}
+			</button>
+		}
+	</div>
+
+	<!-- Estado del periodo y sus acciones (config, cierre) agrupados en un solo menú -->
+	<div class="period-menu">
+		<edu-button
+			[label]="periodLabel()"
+			icon="pi pi-sliders-h"
+			[outlined]="true"
+			severity="secondary"
+			size="small"
+			(click)="onTogglePeriodMenu($event)"
+			[pt]="{
+				root: {
+					'aria-label': 'Acciones del periodo: ' + periodLabel(),
+					'aria-haspopup': 'menu',
+				},
+			}"
+			data-info-anchor="admin-salones-periodo-menu-btn"
+		/>
+		<edu-menu #periodMenu [model]="periodMenuItems()" [popup]="true" appendTo="body" />
+	</div>
+</div>
 <!-- #endregion -->
 
-<!-- #region Tabs por nivel -->
-<edu-tabs [value]="nivelTabIndex[vm().selectedNivel]" (valueChange)="onTabChange($any($event))">
-	
-		@for (nivel of niveles; track nivel; let i = $index) {
-			<edu-tab [value]="i" data-info-anchor="admin-salones-nivel-tab">{{ nivel }}</edu-tab>
-		}
-	
-	
-		@for (nivel of niveles; track nivel; let i = $index) {
-			<edu-tabpanel [value]="i">
-				<!-- Toolbar del nivel -->
-				<div class="nivel-toolbar">
-					<div class="toolbar-tags">
-						@if (vm().periodoActual; as periodo) {
-							<edu-tag
-								[value]="periodo.estadoCierre === 'CERRADO' ? 'Periodo Cerrado' : 'Periodo Abierto'"
-								[severity]="periodo.estadoCierre === 'CERRADO' ? 'success' : 'info'"
-							/>
-						} @else {
-							<edu-tag value="Sin periodo" severity="warn" />
-						}
-
-						@if (vm().configActual; as config) {
-							<edu-tag
-								[value]="config.tipoCalificacion === 'NUMERICO' ? 'Numérico' : 'Literal'"
-								styleClass="tag-neutral"
-							/>
-						}
-					</div>
-					<div class="toolbar-actions">
-						<edu-button
-							label="Config Calificaciones"
-							icon="pi pi-cog"
-							[outlined]="true"
-							size="small"
-							(click)="onOpenConfigDialog()"
-							data-info-anchor="admin-salones-config-calificaciones-btn"
-						/>
-						@if (vm().periodoActual && !vm().periodoCerrado) {
-							<edu-button
-								label="Cerrar Periodo"
-								icon="pi pi-lock"
-								size="small"
-								severity="danger"
-								(click)="onOpenCerrarPeriodo()"
-								data-info-anchor="admin-salones-cerrar-periodo-btn"
-							/>
-						}
-						@if (testTools && vm().periodoActual && vm().periodoCerrado) {
-							<edu-button
-								label="Reabrir periodo (dev)"
-								icon="pi pi-lock-open"
-								size="small"
-								severity="warn"
-								[outlined]="true"
-								(click)="onReabrirPeriodoDev(vm().periodoActual!.id)"
-							/>
-						}
-					</div>
-				</div>
-
-				<!-- Tabla de salones -->
-				<app-classrooms-admin-table
-					[salones]="vm().salones"
-					[loading]="vm().loading"
-					(selectSalon)="onSelectSalon($event)"
-					(goToHorarios)="onGoToHorarios($event)"
-					(goToUsuarios)="onGoToUsuarios($event)"
-				/>
-			</edu-tabpanel>
-		}
-	
-</edu-tabs>
+<!-- #region Tabla de salones -->
+<!-- El @for de un solo elemento recrea la tabla al cambiar de nivel, así los filtros y la vista no arrastran valores del nivel anterior. -->
+@for (nivel of [vm().selectedNivel]; track nivel) {
+	<app-classrooms-admin-table
+		[salones]="vm().salones"
+		[loading]="vm().loading"
+		[estadisticas]="vm().statsReady ? vm().estadisticas : null"
+		(selectSalon)="onSelectSalon($event)"
+		(goToHorarios)="onGoToHorarios($event)"
+		(goToUsuarios)="onGoToUsuarios($event)"
+	/>
+}
 <!-- #endregion -->
 
 <!-- #region Dialogs — siempre en el DOM -->

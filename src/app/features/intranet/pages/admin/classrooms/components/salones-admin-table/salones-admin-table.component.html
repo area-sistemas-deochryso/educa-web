@@ -1,26 +1,196 @@
+<!-- #region Herramientas: vista + buscador + filtros (una sola fila) -->
+<div class="tools-row" #filtersEl>
+	<!-- Izquierda: qué se muestra (vista) y, en Notas, los totales del nivel -->
+	<div class="tools-view">
+		<edu-select-button
+			[options]="vistaOptions"
+			[ngModel]="vista()"
+			(ngModelChange)="onVistaChange($event)"
+			optionLabel="label"
+			optionValue="value"
+			[allowEmpty]="false"
+			data-info-anchor="admin-salones-vista-toggle"
+		/>
+
+		@if (vista() === 'notas' && estadisticas(); as stats) {
+			<div class="notas-stats" aria-label="Totales de notas del nivel">
+				<edu-tag [value]="'Aprobados · ' + stats.totalAprobados" severity="success" />
+				<edu-tag [value]="'Desaprobados · ' + stats.totalDesaprobados" severity="danger" />
+				<edu-tag [value]="'Pendientes · ' + stats.totalPendientes" severity="warn" />
+			</div>
+		}
+	</div>
+
+	<!-- Derecha: encontrar (buscador + filtros) -->
+	<div class="tools-find">
+		<div class="search-box">
+			<i class="pi pi-search"></i>
+			<input
+				type="text"
+				eduInputText
+				placeholder="Buscar por salón, sede o tutor..."
+				data-info-anchor="admin-salones-search-input"
+				[ngModel]="searchTerm()"
+				(ngModelChange)="onSearchTermChange($event)"
+			/>
+		</div>
+
+		<edu-button
+			[label]="activeFilterCount() ? 'Filtros (' + activeFilterCount() + ')' : 'Filtros'"
+			icon="pi pi-filter"
+			[outlined]="true"
+			severity="secondary"
+			(click)="toggleFilters()"
+			[pt]="{ root: { 'aria-expanded': filtersOpen() ? 'true' : 'false', 'aria-controls': 'salones-filters-panel' } }"
+			data-info-anchor="admin-salones-filtros-btn"
+		/>
+	</div>
+</div>
+
+@if (filtersOpen()) {
+<section class="filters-section" id="salones-filters-panel">
+	<edu-select
+		[options]="sedeOptions()"
+		[optionLabel]="'label'"
+		[optionValue]="'value'"
+		[ngModel]="filterSede()"
+		(ngModelChange)="onFilterSedeChange($event)"
+		placeholder="Sede"
+		[style]="{ minWidth: '160px' }"
+		appendTo="body"
+		data-info-anchor="admin-salones-sede-select"
+	/>
+	<edu-select
+		[options]="modoOptions"
+		[optionLabel]="'label'"
+		[optionValue]="'value'"
+		[ngModel]="filterModo()"
+		(ngModelChange)="onFilterModoChange($event)"
+		placeholder="Modo"
+		[style]="{ minWidth: '150px' }"
+		appendTo="body"
+		data-info-anchor="admin-salones-modo-select"
+	/>
+	<edu-select
+		[options]="tutorOptions"
+		[optionLabel]="'label'"
+		[optionValue]="'value'"
+		[ngModel]="filterTutor()"
+		(ngModelChange)="onFilterTutorChange($event)"
+		placeholder="Tutor"
+		[style]="{ minWidth: '130px' }"
+		appendTo="body"
+		data-info-anchor="admin-salones-tutor-select"
+	/>
+	<edu-select
+		[options]="periodoOptions"
+		[optionLabel]="'label'"
+		[optionValue]="'value'"
+		[ngModel]="filterPeriodo()"
+		(ngModelChange)="onFilterPeriodoChange($event)"
+		placeholder="Periodo"
+		[style]="{ minWidth: '150px' }"
+		appendTo="body"
+		data-info-anchor="admin-salones-periodo-select"
+	/>
+
+	<edu-button
+		label="Limpiar"
+		icon="pi pi-filter-slash"
+		[text]="true"
+		data-info-anchor="admin-salones-limpiar-filtros-btn"
+		(click)="clearFilters()"
+		[pt]="{ root: { 'aria-label': 'Limpiar filtros' } }"
+	/>
+</section>
+}
+
+<!-- Barra compacta: buscador y filtros siguen a mano cuando el bloque de arriba sale de la pantalla -->
+<app-sticky-filter-bar
+	[watch]="filtersEl"
+	[searchTerm]="searchTerm()"
+	placeholder="Buscar por salón, sede o tutor..."
+	[activeFilters]="activeFilterCount()"
+	(searchChange)="onSearchTermChange($event)"
+	(clearFilters)="clearFilters()"
+>
+	<edu-select
+		[options]="sedeOptions()"
+		[optionLabel]="'label'"
+		[optionValue]="'value'"
+		[ngModel]="filterSede()"
+		(ngModelChange)="onFilterSedeChange($event)"
+		placeholder="Sede"
+		appendTo="body"
+	/>
+	<edu-select
+		[options]="modoOptions"
+		[optionLabel]="'label'"
+		[optionValue]="'value'"
+		[ngModel]="filterModo()"
+		(ngModelChange)="onFilterModoChange($event)"
+		placeholder="Modo"
+		appendTo="body"
+	/>
+	<edu-select
+		[options]="tutorOptions"
+		[optionLabel]="'label'"
+		[optionValue]="'value'"
+		[ngModel]="filterTutor()"
+		(ngModelChange)="onFilterTutorChange($event)"
+		placeholder="Tutor"
+		appendTo="body"
+	/>
+	<edu-select
+		[options]="periodoOptions"
+		[optionLabel]="'label'"
+		[optionValue]="'value'"
+		[ngModel]="filterPeriodo()"
+		(ngModelChange)="onFilterPeriodoChange($event)"
+		placeholder="Periodo"
+		appendTo="body"
+	/>
+</app-sticky-filter-bar>
+<!-- #endregion -->
+
 <!-- #region Tabla de salones -->
+<section class="table-section">
 @if (isMobile()) {
-	@if (!loading() && salones().length === 0) {
-		<p class="cards-state">No hay salones para este nivel y año.</p>
+	@if (loading()) {
+		<p class="cards-state" aria-live="polite">Cargando salones…</p>
+	} @else if (paging.totalRecords() === 0) {
+		<p class="cards-state">No se encontraron salones. Ajusta los filtros de búsqueda.</p>
 	} @else {
-		<app-mobile-card-list [items]="salones()" [pageSize]="5">
+		<app-mobile-card-list [paging]="paging" [pageSize]="5">
 			<ng-template let-salon>
 				<div>
-					<app-card-row label="Salón">{{ salon.grado }} {{ salon.seccion }}</app-card-row>
-					<app-card-row label="Modo"><app-modo-asignacion-badge [modo]="getModoAsignacion(salon)" /></app-card-row>
+					<app-card-row label="Salón">
+						<span class="salon-name">{{ salon.grado }}</span>
+						<span class="salon-seccion">{{ salon.seccion }}</span>
+					</app-card-row>
 					<app-card-row label="Sede">{{ salon.sede }}</app-card-row>
-					<app-card-row label="Tutor">{{ salon.tutorNombre || '—' }}</app-card-row>
-					<app-card-row label="Alumnos">{{ salon.totalEstudiantes }}</app-card-row>
-					<app-card-row label="Notas">
-						<edu-tag [value]="'' + salon.aprobados + ' aprob.'" severity="success" />
-						<edu-tag [value]="'' + salon.desaprobados + ' desap.'" severity="danger" />
-						<edu-tag [value]="'' + salon.pendientes + ' pend.'" severity="warn" />
-					</app-card-row>
-					<app-card-row label="Periodo">
-						<edu-tag [value]="getEstadoPeriodoLabel(salon.estadoPeriodo)" [severity]="getEstadoPeriodoSeverity(salon.estadoPeriodo)" />
-					</app-card-row>
+					@if (vista() === 'docentes') {
+						<app-card-row label="Modo"><app-modo-asignacion-badge [modo]="getModoAsignacion(salon)" /></app-card-row>
+						<app-card-row label="Tutor">
+							@if (salon.tutorNombre) {
+								{{ salon.tutorNombre }}
+							} @else {
+								<span class="muted">Sin tutor</span>
+							}
+						</app-card-row>
+					} @else {
+						<app-card-row label="Alumnos">{{ salon.totalEstudiantes }}</app-card-row>
+						<app-card-row label="Notas">
+							<edu-tag [value]="'' + salon.aprobados + ' aprob.'" severity="success" />
+							<edu-tag [value]="'' + salon.desaprobados + ' desap.'" severity="danger" />
+							<edu-tag [value]="'' + salon.pendientes + ' pend.'" severity="warn" />
+						</app-card-row>
+						<app-card-row label="Periodo">
+							<edu-tag [value]="getEstadoPeriodoLabel(salon.estadoPeriodo)" [severity]="getEstadoPeriodoSeverity(salon.estadoPeriodo)" />
+						</app-card-row>
+					}
 					<app-card-actions>
-						<edu-button icon="pi pi-eye" [text]="true" [rounded]="true" aria-label="Ver salón" (click)="selectSalon.emit(salon.id)" />
+						<edu-button label="Ver detalle" icon="pi pi-eye" size="small" (click)="selectSalon.emit(salon.id)" />
 						<edu-button icon="pi pi-calendar" [text]="true" [rounded]="true" aria-label="Ver horarios de este salón" (click)="goToHorarios.emit(salon.id)" />
 						<edu-button icon="pi pi-users" [text]="true" [rounded]="true" aria-label="Ver usuarios de este salón" (click)="goToUsuarios.emit(salon.id)" />
 					</app-card-actions>
@@ -30,138 +200,128 @@
 	}
 } @else {
 <edu-table
-	[value]="salones()"
+	[value]="paging.value()"
 	[dataKey]="'id'"
 	[loading]="loading()"
-	[paginator]="salones().length > 10"
+	[paginator]="true"
 	[rows]="10"
+	[first]="paging.first()"
+	[totalRecords]="paging.totalRecords()"
 	[rowsPerPageOptions]="[10, 25, 50]"
-	stateStorage="session"
-	stateKey="admin-salones-table"
-	[scrollable]="true"
-	scrollHeight="flex"
-	styleClass="p-datatable-sm"
+	[showCurrentPageReport]="true"
+	currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} salones"
+	styleClass="p-datatable-sm salones-table"
+	(onPageChange)="paging.onPageChange($event)"
 >
 	<ng-template #header>
 		<tr>
-			<th style="width: 50px">#</th>
-			<th eduSortableColumn="grado" style="min-width: 120px" data-info-anchor="tabla-orden-columna">
-				GRADO 
-			</th>
-			<th eduSortableColumn="seccion" style="width: 80px" data-info-anchor="tabla-orden-columna">
-				SECCIÓN 
-			</th>
-			<th style="width: 110px" class="text-center">MODO</th>
-			<th eduSortableColumn="sede" style="min-width: 100px" data-info-anchor="tabla-orden-columna">
-				SEDE 
-			</th>
-			<th style="min-width: 180px">TUTOR</th>
-			<th eduSortableColumn="totalEstudiantes" style="width: 80px" class="text-center" data-info-anchor="tabla-orden-columna">
-				ESTUDIANTES 
-			</th>
-			<th style="width: 100px" class="text-center">APROBADOS</th>
-			<th style="width: 110px" class="text-center">DESAPROBADOS</th>
-			<th style="width: 100px" class="text-center">PENDIENTES</th>
-			<th style="width: 100px" class="text-center">PERIODO</th>
-			<th style="width: 80px" class="text-center">ACCIONES</th>
+			<th eduSortableColumn="grado" style="min-width: 220px" data-info-anchor="tabla-orden-columna">SALÓN</th>
+			@if (vista() === 'docentes') {
+				<th style="width: 130px" class="text-center">MODO</th>
+				<th style="min-width: 260px">TUTOR</th>
+			} @else {
+				<th eduSortableColumn="totalEstudiantes" style="width: 130px" class="text-center" data-info-anchor="tabla-orden-columna">ESTUDIANTES</th>
+				<th style="width: 120px" class="text-center">APROBADOS</th>
+				<th style="width: 140px" class="text-center">DESAPROBADOS</th>
+				<th style="width: 120px" class="text-center">PENDIENTES</th>
+				<th style="width: 120px" class="text-center">PERIODO</th>
+			}
+			<th style="width: 200px" class="text-center">ACCIONES</th>
 		</tr>
 	</ng-template>
-	<ng-template #body let-salon let-rowIndex="rowIndex">
-		<tr>
-			<td>{{ rowIndex + 1 }}</td>
-			<td>{{ salon.grado }}</td>
-			<td>{{ salon.seccion }}</td>
-			<td class="text-center">
-				<app-modo-asignacion-badge [modo]="getModoAsignacion(salon)" />
+	<ng-template #body let-salon>
+		<tr class="salon-row" (click)="selectSalon.emit(salon.id)">
+			<td>
+				<div class="salon-cell">
+					<span class="salon-seccion">{{ salon.seccion }}</span>
+					<div class="salon-text">
+						<span class="salon-name">{{ salon.grado }}</span>
+						<span class="salon-sede">{{ salon.sede }}</span>
+					</div>
+				</div>
 			</td>
-			<td>{{ salon.sede }}</td>
-			<td>{{ salon.tutorNombre || '—' }}</td>
+			@if (vista() === 'docentes') {
+				<td class="text-center">
+					<app-modo-asignacion-badge [modo]="getModoAsignacion(salon)" />
+				</td>
+				<td>
+					@if (salon.tutorNombre) {
+						<span class="tutor-name" [attr.title]="salon.tutorNombre">{{ salon.tutorNombre }}</span>
+					} @else {
+						<span class="muted">Sin tutor</span>
+					}
+				</td>
+			} @else {
+				<td class="text-center">
+					<span class="font-semibold">{{ salon.totalEstudiantes }}</span>
+				</td>
+				<td class="text-center">
+					@if (salon.aprobados > 0) {
+						<edu-tag [value]="'' + salon.aprobados" severity="success" />
+					} @else {
+						<span class="muted">0</span>
+					}
+				</td>
+				<td class="text-center">
+					@if (salon.desaprobados > 0) {
+						<edu-tag [value]="'' + salon.desaprobados" severity="danger" />
+					} @else {
+						<span class="muted">0</span>
+					}
+				</td>
+				<td class="text-center">
+					@if (salon.pendientes > 0) {
+						<edu-tag [value]="'' + salon.pendientes" severity="warn" />
+					} @else {
+						<span class="muted">0</span>
+					}
+				</td>
+				<td class="text-center">
+					<edu-tag
+						[value]="getEstadoPeriodoLabel(salon.estadoPeriodo)"
+						[severity]="getEstadoPeriodoSeverity(salon.estadoPeriodo)"
+					/>
+				</td>
+			}
 			<td class="text-center">
-				<span class="font-semibold">{{ salon.totalEstudiantes }}</span>
-			</td>
-			<td class="text-center">
-				@if (salon.aprobados > 0) {
-					<edu-tag [value]="'' + salon.aprobados" severity="success" />
-				} @else {
-					<span class="text-color-secondary">0</span>
-				}
-			</td>
-			<td class="text-center">
-				@if (salon.desaprobados > 0) {
-					<edu-tag [value]="'' + salon.desaprobados" severity="danger" />
-				} @else {
-					<span class="text-color-secondary">0</span>
-				}
-			</td>
-			<td class="text-center">
-				@if (salon.pendientes > 0) {
-					<edu-tag [value]="'' + salon.pendientes" severity="warn" />
-				} @else {
-					<span class="text-color-secondary">0</span>
-				}
-			</td>
-			<td class="text-center">
-				<edu-tag
-					[value]="getEstadoPeriodoLabel(salon.estadoPeriodo)"
-					[severity]="getEstadoPeriodoSeverity(salon.estadoPeriodo)"
-				/>
-			</td>
-			<td class="text-center">
-				<edu-button
-					icon="pi pi-eye"
-					[text]="true"
-					[rounded]="true"
-					size="small"
-					eduTooltip="Ver salón"
-					eduTooltipPosition="top"
-					(click)="selectSalon.emit(salon.id)"
-					[pt]="{
-						root: {
-							'aria-label': 'Ver salón',
-						},
-					}"
-					data-info-anchor="admin-salones-table-ver-btn"
-				/>
-				<edu-button
-					icon="pi pi-calendar"
-					[text]="true"
-					[rounded]="true"
-					size="small"
-					eduTooltip="Ver horarios de este salón"
-					eduTooltipPosition="top"
-					(click)="goToHorarios.emit(salon.id)"
-					[pt]="{
-						root: {
-							'aria-label': 'Ver horarios de este salón',
-						},
-					}"
-					data-info-anchor="admin-salones-table-horarios-btn"
-				/>
-				<edu-button
-					icon="pi pi-users"
-					[text]="true"
-					[rounded]="true"
-					size="small"
-					eduTooltip="Ver usuarios de este salón"
-					eduTooltipPosition="top"
-					(click)="goToUsuarios.emit(salon.id)"
-					[pt]="{
-						root: {
-							'aria-label': 'Ver usuarios de este salón',
-						},
-					}"
-					data-info-anchor="admin-salones-table-usuarios-btn"
-				/>
+				<div class="actions">
+					<edu-button
+						label="Ver detalle"
+						icon="pi pi-eye"
+						size="small"
+						[outlined]="true"
+						(click)="$event.stopPropagation(); selectSalon.emit(salon.id)"
+						data-info-anchor="admin-salones-table-ver-btn"
+					/>
+					<edu-button
+						icon="pi pi-ellipsis-v"
+						[text]="true"
+						[rounded]="true"
+						size="small"
+						eduTooltip="Horarios y usuarios"
+						eduTooltipPosition="top"
+						(click)="$event.stopPropagation(); openRowMenu($event, salon.id)"
+						[pt]="{
+							root: {
+								'aria-label': 'Más acciones del salón',
+								'aria-haspopup': 'menu',
+							},
+						}"
+						data-info-anchor="admin-salones-table-mas-btn"
+					/>
+				</div>
 			</td>
 		</tr>
 	</ng-template>
 	<ng-template #emptymessage>
 		<tr>
-			<td colspan="12" class="text-center p-4">
-				No hay salones para este nivel y año.
+			<td [attr.colspan]="vista() === 'docentes' ? 4 : 7" class="text-center p-4">
+				No se encontraron salones. Ajusta los filtros de búsqueda.
 			</td>
 		</tr>
 	</ng-template>
 </edu-table>
+<edu-menu #rowMenu [model]="rowMenuItems()" [popup]="true" appendTo="body" />
 }
+</section>
 <!-- #endregion -->

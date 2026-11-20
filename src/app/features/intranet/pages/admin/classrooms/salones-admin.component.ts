@@ -1,8 +1,7 @@
-import { Component, ChangeDetectionStrategy, inject, OnInit, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, OnInit, computed, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
 
-import { PageHeaderComponent, PeriodToggleComponent, KpiStatsComponent, type KpiStatItem } from '@intranet-shared/components';
+import { PageHeaderComponent, PeriodToggleComponent } from '@intranet-shared/components';
 import { ClassroomsAdminFacade } from './services';
 import { ClassroomsAdminTableComponent } from './components/salones-admin-table/salones-admin-table.component';
 import { ConfigGradeDialogComponent } from './components/config-calificacion-dialog/config-calificacion-dialog.component';
@@ -19,21 +18,18 @@ import {
 } from './models';
 import { NuevoSalonDialogComponent } from './components/nuevo-salon-dialog/nuevo-salon-dialog.component';
 import { environment } from '@config/environment';
-import { EduButton, EduConfirmDialog, EduConfirmationService, EduInputNumber, EduMessageService, EduTab, EduTabPanel, EduTabs, EduTag, EduToast } from '@edu-ui';
+import { EduButton, EduConfirmDialog, EduConfirmationService, EduMenu, type EduMenuItem, EduMessageService, EduToast, EduTooltip } from '@edu-ui';
 @Component({
 	selector: 'app-classrooms-admin',
 	standalone: true,
 	imports: [
-		FormsModule,
-		EduTabs, EduTab, EduTabPanel,
 		EduButton,
-		EduTag,
-		EduInputNumber,
+		EduMenu,
+		EduTooltip,
 		EduToast,
 		EduConfirmDialog,
 		PageHeaderComponent,
 		PeriodToggleComponent,
-		KpiStatsComponent,
 		ClassroomsAdminTableComponent,
 		ConfigGradeDialogComponent,
 		ClosePeriodDialogComponent,
@@ -65,27 +61,54 @@ export class ClassroomsAdminComponent implements OnInit {
 	});
 	// #endregion
 
-	// #region Stats KPI
-	readonly statsItems = computed<KpiStatItem[]>(() => {
-		const stats = this.vm().estadisticas;
-		return [
-			{ icon: 'pi pi-building', label: 'Salones', value: stats.totalSalones },
-			{ icon: 'pi pi-users', label: 'Estudiantes', value: stats.totalEstudiantes },
-			{ icon: 'pi pi-check-circle', label: 'Aprobados', value: stats.totalAprobados, variant: 'success' },
-			{ icon: 'pi pi-times-circle', label: 'Desaprobados', value: stats.totalDesaprobados, variant: 'critical' },
-			{ icon: 'pi pi-clock', label: 'Pendientes', value: stats.totalPendientes, variant: 'warning' }];
+	// #region Subtítulo con totales (Aprobados/Desaprobados/Pendientes viven en la vista Notas de la tabla)
+	readonly subtitle = computed(() => {
+		const { statsReady, estadisticas } = this.vm();
+		if (!statsReady) return 'Administra los salones y su capacidad para el periodo académico';
+		return `${estadisticas.totalSalones} salones · ${estadisticas.totalEstudiantes} estudiantes`;
 	});
+	// #endregion
+
+	// #region Menú de periodo (estado + config + cierre)
+	private readonly periodMenu = viewChild<EduMenu>('periodMenu');
+
+	/** Estado y tipo de calificación del nivel activo, p. ej. «Periodo abierto · Numérico». */
+	readonly periodLabel = computed(() => {
+		const { periodoActual, periodoCerrado, configActual } = this.vm();
+		const estado = !periodoActual ? 'Sin periodo' : periodoCerrado ? 'Periodo cerrado' : 'Periodo abierto';
+		if (!configActual) return estado;
+		return `${estado} · ${configActual.tipoCalificacion === 'NUMERICO' ? 'Numérico' : 'Literal'}`;
+	});
+
+	readonly periodMenuItems = computed<EduMenuItem[]>(() => {
+		const { periodoActual, periodoCerrado } = this.vm();
+		const items: EduMenuItem[] = [
+			{ label: 'Configurar calificaciones', icon: 'pi pi-cog', command: () => this.onOpenConfigDialog() },
+		];
+		if (periodoActual && !periodoCerrado) {
+			items.push({ label: 'Cerrar periodo…', icon: 'pi pi-lock', command: () => this.onOpenCerrarPeriodo() });
+		}
+		if (this.testTools && periodoActual && periodoCerrado) {
+			items.push({
+				label: 'Reabrir periodo (dev)',
+				icon: 'pi pi-lock-open',
+				command: () => this.onReabrirPeriodoDev(periodoActual.id),
+			});
+		}
+		return items;
+	});
+
+	onTogglePeriodMenu(event: Event): void {
+		this.periodMenu()?.toggle(event);
+	}
 	// #endregion
 
 	// #region Estado local
 	/** Herramientas de QA: solo true en environment.development. */
 	readonly testTools = environment.debug.testTools;
 	readonly niveles = NIVELES;
-	readonly nivelTabIndex: Record<NivelEducativo, number> = {
-		Inicial: 0,
-		Primaria: 1,
-		Secundaria: 2,
-	};
+	readonly anioMin = 2020;
+	readonly anioMax = 2030;
 	// #endregion
 
 	// #region Lifecycle
@@ -94,16 +117,16 @@ export class ClassroomsAdminComponent implements OnInit {
 	}
 	// #endregion
 
-	// #region Event handlers — EduTabs
-	onTabChange(index: number): void {
-		const nivel = this.niveles[index];
-		if (nivel) {
+	// #region Event handlers — barra de contexto
+	onNivelChange(nivel: NivelEducativo): void {
+		if (nivel !== this.vm().selectedNivel) {
 			this.facade.setNivel(nivel);
 		}
 	}
 
-	onAnioChange(anio: number): void {
-		if (anio && anio >= 2020 && anio <= 2030) {
+	onAnioStep(delta: -1 | 1): void {
+		const anio = this.vm().filtroAnio + delta;
+		if (anio >= this.anioMin && anio <= this.anioMax) {
 			this.facade.setAnio(anio);
 		}
 	}

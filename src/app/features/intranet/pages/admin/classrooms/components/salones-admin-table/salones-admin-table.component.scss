@@ -8,3 +8,158 @@
 	text-align: center;
 	color: var(--faq-text-muted, var(--text-color-secondary));
 }
+
+.muted {
+	color: var(--text-color-secondary);
+}
+
+// #region Herramientas: tabs de vista + buscador + botón «Filtros», todo en una fila
+.tools-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.75rem 1rem;
+	flex-wrap: wrap;
+	margin: 1rem 0 0.75rem;
+
+	// Qué se ve: control segmentado + totales de notas
+	.tools-view {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		flex-wrap: wrap;
+		min-width: 0;
+	}
+
+	// Cómo encontrarlo: buscador y filtros pegados a la derecha
+	.tools-find {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin-left: auto;
+	}
+
+	.search-box {
+		position: relative;
+		flex: 0 1 320px;
+		min-width: 200px;
+
+		i {
+			position: absolute;
+			left: 0.75rem;
+			top: 50%;
+			transform: translateY(-50%);
+			color: var(--text-color);
+			opacity: 0.6;
+		}
+
+		input {
+			width: 100%;
+			padding-left: 2.25rem;
+		}
+	}
+}
+
+// Panel plegable con los selects (se abre con «Filtros»)
+.filters-section {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	margin-bottom: 0.75rem;
+	padding: 0.75rem 1rem;
+	border-radius: 12px;
+	border: 1px solid var(--surface-300);
+	flex-wrap: wrap;
+}
+
+.notas-stats {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+.table-section {
+	border-radius: 12px;
+	border: 1px solid var(--surface-300);
+	overflow: hidden;
+}
+// #endregion
+
+// #region Celda Salón
+.salon-cell {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+}
+
+.salon-seccion {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 2rem;
+	height: 2rem;
+	padding: 0 0.5rem;
+	border-radius: 0.5rem;
+	font-weight: 700;
+	background: var(--surface-0, #fff);
+	color: var(--text-color);
+}
+
+// En las cards móviles el chip va después del nombre (en la tabla va antes, dentro de `.salon-cell`).
+.salon-name + .salon-seccion {
+	margin-left: 0.5rem;
+}
+
+.salon-text {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+	line-height: 1.25;
+}
+
+.salon-name {
+	font-weight: 600;
+	white-space: nowrap;
+}
+
+.salon-sede {
+	font-size: 0.8rem;
+	color: var(--text-color-secondary);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.tutor-name {
+	display: block;
+	max-width: 320px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+// #endregion
+
+// #region Filas y acciones
+// `edu-table` fuerza `text-align: left` en th/td con la misma especificidad; anclar a `.table-section` gana sin !important.
+.table-section {
+	th.text-center,
+	td.text-center {
+		text-align: center;
+	}
+}
+
+.salon-row {
+	cursor: pointer;
+
+	&:hover > td {
+		background: #e4e4e4;
+	}
+}
+
+.actions {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.25rem;
+	white-space: nowrap;
+}
+// #endregion
