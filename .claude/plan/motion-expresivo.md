@@ -1,5 +1,7 @@
 # F11 — Motion expresivo (animaciones y transiciones de otro tipo)
 
+> **Estado**: ✅ cerrado 2026-11-20 (F1-F9, briefs 943-951, verificadas en local con BBDD de prueba; brief 952). Ver "Pendiente conocido" al final.
+
 > **Creado**: 2026-11-19 · **Scope**: solo FE (`educa-web`). Sin cambios de BE ni contratos.
 > **Relación con F10**: F10 ([motion-system.md](motion-system.md)) dejó el vocabulario base (fade, subida de 8 px, escala 0.96, todo ≤ 200 ms). F11 **no repite** ninguna de esas animaciones: agrega movimientos de otro tipo y solo donde F10 no animaba, o donde el efecto nuevo es distinto al existente. Origen: tras probar F10 el usuario no notó suficiente movimiento.
 > **Decisiones del usuario**: selección hecha sobre un muestrario interactivo (M2, M3, P1, F1-F5, S2, S3, S4); intensidad **intermedia**; M1, P2, P3 y S1 quedan fuera.
@@ -115,15 +117,42 @@ F10 (tokens, reduced-motion, View Transitions, elementos compartidos) ya cerrada
 - **Isolation**: worktree (toca FE de producto).
 - **Exclusive**: false. F2-F7 y F9 son hermanas; F2 y F6 comparten estilos globales y F7/F8 comparten el dialog, así que conviene mergear en secuencia.
 - **Touches**: componentes compartidos de `edu-ui` (botón, tabla, toast, acordeón, dialog), estilos globales, configuración del router.
-- **Parallel risk**: no se revisó `chats/running/` al diseñar.
+- **Parallel risk**: no se revisó `chats/running/` al diseñar (histórico; el plan ya cerró).
 
 ## Contract checklist
 
 - [ ] Los tokens de duración enfática y de easing tipo resorte existen y toda animación de F11 los usa, sin valores hardcoded.
 - [ ] Toda animación de F11 tiene regla bajo reduced-motion.
-- [ ] `edu-button` expone un estado de éxito además de `loading`.
-- [ ] `edu-toast` anima la salida de los mensajes.
-- [ ] `edu-accordion` anima la altura del panel sin quitarlo del DOM de golpe.
-- [ ] `edu-table` anima la salida de una fila quitada.
-- [ ] `edu-dialog` soporta fondo borroso con contenido escalonado y variante de hoja inferior en móvil.
-- [ ] La transición de página distingue avance y retroceso.
+- [x] `edu-button` expone un estado de éxito además de `loading`.
+- [x] `edu-toast` anima la salida de los mensajes.
+- [x] `edu-accordion` anima la altura del panel sin quitarlo del DOM de golpe.
+- [x] `edu-table` anima la salida de una fila quitada.
+- [~] `edu-dialog` soporta fondo borroso con contenido escalonado (✅ desktop) y variante de hoja inferior en móvil (sin verificar: no hay dispositivo).
+- [x] La transición de página distingue avance y retroceso.
+
+## Pendiente conocido (al cierre, 2026-11-20)
+
+Lo que el plan promete y no se verificó con la herramienta disponible, más lo que se midió después del cierre.
+
+| Ítem | Estado |
+|---|---|
+| Reduced-motion con la preferencia del SO emulada | Pendiente. Verificado solo por lectura: regla global `*` con `!important` (`styles.scss`), el contador y el slide lo respetan por JS (`matchMedia`) |
+| Hoja inferior en móvil (F7/M2) y costo del blur en móvil modesto | Sin verificar: no hay dispositivo |
+| Diálogo de justificación en `/intranet/asistencia` | Sin verificar: no hay faltas registradas |
+| F4: pliegue del hueco al quitar fila | ✅ medido tras corregir un defecto (ver abajo). Residual de ~35 px corregido (ver abajo); queda una subida transitoria de ~9 px al arrancar el pliegue |
+| F6: contador subiendo desde cero | ✅ medido (0 → 51 en ~0,5 s, valor final accesible desde el inicio) |
+| Barrido de valores hardcoded en animaciones F11 | ✅ hecho: todo usa tokens. Única excepción: giro del chevron (`edu-accordion-header.scss`, `0.15s ease`) |
+
+### Defecto hallado en F4 después del cierre
+
+`playRowExit` comparaba `animationName` con `'edu-row-slide-out'`, pero con encapsulación emulada Angular prefija los keyframes (`_ngcontent-ng-cNNN_edu-row-slide-out`). El pliegue nunca arrancaba: la fila quedaba invisible ocupando su espacio 1,5 s (respaldo) y desaparecía de golpe. El test unitario usaba el nombre sin prefijo y pasaba. Corregido por sufijo (`endsWith`) con test que usa el nombre prefijado. Lección: un test de animación con nombres sintéticos no prueba el nombre real en el navegador.
+
+Además, la salida solo anima bajas puntuales (≤ 3 filas, sin reposición): en tablas paginadas por servidor, filtrar repone la página y no anima. Es por diseño.
+
+### Residual del pliegue de fila (diagnóstico y arreglo)
+
+Al final del pliegue la fila medía 35 px en vez de 0: el relleno de las celdas llegaba a ~0,2 px, pero los hijos directos (`span.nombre-text`, `edu-button`, `edu-tag`) son elementos `inline` y `max-height` no aplica a cajas en línea, y la celda conservaba la altura de su línea (`line-height: 24px`). Al retirar la fila se perdían esos 35 px de golpe.
+
+Arreglo aplicado en `edu-row--folding`: celdas con `line-height` animado hasta 0 (`--row-lh` se fija en `playRowExit`) e hijos como `inline-block` con `vertical-align: top`. Medido en `/admin/cursos` (quitar 1 fila): altura de la tabla 167 → 143 → 121 → 118 → 116 → 108 sin salto final; deslizamiento 0-208 ms, pliegue 215-410 ms.
+
+Queda abierto: al arrancar el pliegue la tabla sube ~9 px un instante (167 → 176 → 174 → 156) antes de bajar; probablemente por pasar los hijos `div` (`.actions`, `.completitud-badges`) a `inline-block`. Visible solo si hay filas debajo. `vertical-align: top` no lo resolvió.
