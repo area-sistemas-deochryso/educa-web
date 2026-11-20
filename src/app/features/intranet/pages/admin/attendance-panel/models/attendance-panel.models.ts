@@ -36,6 +36,12 @@ export interface AttendancePanelKpis {
 	comparacionDisponible: boolean;
 }
 
+/** Parte "periodo anterior" de los KPIs: se carga después de la parte actual. */
+export type AttendancePanelKpisPrevio = Pick<
+	AttendancePanelKpis,
+	'porcentajeAsistenciaPrevio' | 'ausenciasPrevio' | 'tardanzasPrevio' | 'comparacionDisponible'
+>;
+
 export function emptyPanelKpis(): AttendancePanelKpis {
 	return {
 		porcentajeAsistencia: 0,

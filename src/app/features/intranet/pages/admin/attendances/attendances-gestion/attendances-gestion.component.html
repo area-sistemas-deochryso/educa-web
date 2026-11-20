@@ -151,16 +151,7 @@
 
 <!-- #region Filtros -->
 <div class="filters-bar" #filtersEl>
-	<edu-datepicker
-		[(ngModel)]="fechaCalendar"
-		(ngModelChange)="onFechaChange($event)"
-		dateFormat="yy-mm-dd"
-		[showIcon]="true"
-		appendTo="body"
-		placeholder="Fecha"
-		data-info-anchor="admin-asistencia-fecha-picker"
-	/>
-	<edu-icon-field>
+	<edu-icon-field class="filters-search">
 		<edu-input-icon styleClass="pi pi-search" />
 		<input
 			type="text"
@@ -173,6 +164,15 @@
 			data-info-anchor="admin-asistencia-buscar-input"
 		/>
 	</edu-icon-field>
+	<edu-datepicker
+		[(ngModel)]="fechaCalendar"
+		(ngModelChange)="onFechaChange($event)"
+		dateFormat="yy-mm-dd"
+		[showIcon]="true"
+		appendTo="body"
+		placeholder="Fecha"
+		data-info-anchor="admin-asistencia-fecha-picker"
+	/>
 </div>
 <!-- #endregion -->
 
@@ -433,23 +433,26 @@
 
 		@if (vm().formData.tipoOperacion !== 'salida' || vm().isEditing) {
 			<!-- Hora entrada -->
-			<div class="form-field">
+			<div class="form-field" [class.form-field--half]="vm().isEditing">
 				<label>Hora de entrada</label>
 				@if (vm().isEditing) {
 					<div class="field-with-action">
 						@if (vm().formData.horaEntrada) {
-							<edu-datepicker
-								[ngModel]="vm().formData.horaEntrada"
-								(ngModelChange)="store.updateFormData({ horaEntrada: $event })"
-								[timeOnly]="true"
-								[inline]="true"
-								[showTime]="true"
-								[showSeconds]="false"
-								[hourFormat]="'24'"
-								placeholder="HH:mm"
-								data-info-anchor="admin-asistencia-form-hora-entrada-picker"
-							/>
+							<div class="time-card">
+								<edu-datepicker
+									[ngModel]="vm().formData.horaEntrada"
+									(ngModelChange)="store.updateFormData({ horaEntrada: $event })"
+									[timeOnly]="true"
+									[inline]="true"
+									[showTime]="true"
+									[showSeconds]="false"
+									[hourFormat]="'24'"
+									placeholder="HH:mm"
+									data-info-anchor="admin-asistencia-form-hora-entrada-picker"
+								/>
+							</div>
 							<edu-button
+								class="time-card-btn"
 								icon="pi pi-times"
 								[text]="true"
 								size="small"
@@ -490,23 +493,26 @@
 
 		@if (vm().formData.tipoOperacion === 'completa' || vm().formData.tipoOperacion === 'salida' || vm().isEditing) {
 			<!-- Hora salida -->
-			<div class="form-field">
+			<div class="form-field" [class.form-field--half]="vm().isEditing">
 				<label>Hora de salida</label>
 				<div class="field-with-action">
 					@if (vm().isEditing) {
 						@if (vm().formData.horaSalida) {
-							<edu-datepicker
-								[ngModel]="vm().formData.horaSalida"
-								(ngModelChange)="store.updateFormData({ horaSalida: $event })"
-								[timeOnly]="true"
-								[inline]="true"
-								[showTime]="true"
-								[showSeconds]="false"
-								[hourFormat]="'24'"
-								placeholder="HH:mm"
-								data-info-anchor="admin-asistencia-form-hora-salida-picker"
-							/>
+							<div class="time-card">
+								<edu-datepicker
+									[ngModel]="vm().formData.horaSalida"
+									(ngModelChange)="store.updateFormData({ horaSalida: $event })"
+									[timeOnly]="true"
+									[inline]="true"
+									[showTime]="true"
+									[showSeconds]="false"
+									[hourFormat]="'24'"
+									placeholder="HH:mm"
+									data-info-anchor="admin-asistencia-form-hora-salida-picker"
+								/>
+							</div>
 							<edu-button
+								class="time-card-btn"
 								icon="pi pi-times"
 								[text]="true"
 								size="small"

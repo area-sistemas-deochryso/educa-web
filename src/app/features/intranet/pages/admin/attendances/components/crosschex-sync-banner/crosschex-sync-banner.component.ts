@@ -12,6 +12,11 @@ import { CrossChexSyncStatusService } from '@core/services/signalr';
 import { EduButton, EduProgressBar } from '@edu-ui';
 
 const DEFAULT_DELAY_S = 16;
+/** QUEUED sin arrancar tras este tiempo => nadie está procesando el job (p. ej. Hangfire apagado en local). */
+const QUEUED_STALL_MS = 45_000;
+/** RUNNING sin ningún evento nuevo tras este tiempo => el job dejó de avanzar. */
+const RUNNING_STALL_MS = 90_000;
+const STALL_CHECK_MS = 5_000;
 
 /**
  * Plan 24 Chat 3 — Banner full-width que muestra el progreso del sync
@@ -44,13 +49,36 @@ export class CrossChexSyncBannerComponent {
 	readonly dismiss = output<void>();
 	// #endregion
 
+	// #region Detección de bloqueo
+	private readonly _now = signal(Date.now());
+	private readonly _lastEventAt = signal(Date.now());
+
+	/**
+	 * `true` si hay un job activo (QUEUED/RUNNING) que no está avanzando. El BE no
+	 * publica un estado "bloqueado": en local (`Development`) no corre el servidor de
+	 * Hangfire y el job queda encolado para siempre, así que se infiere por inactividad.
+	 */
+	readonly isStalled = computed(() => {
+		const s = this.status();
+		if (!s || (s.estado !== 'QUEUED' && s.estado !== 'RUNNING')) return false;
+		const now = this._now();
+		if (s.estado === 'QUEUED') {
+			// `iniciadoEn` viene en hora Perú sin offset (UTC-5).
+			const started = Date.parse(/[zZ]|[+-]\d\d:\d\d$/.test(s.iniciadoEn) ? s.iniciadoEn : `${s.iniciadoEn}-05:00`);
+			const since = Number.isNaN(started) ? this._lastEventAt() : started;
+			return now - since > QUEUED_STALL_MS;
+		}
+		return now - this._lastEventAt() > RUNNING_STALL_MS;
+	});
+	// #endregion
+
 	// #region Countdown
 	private readonly _countdownSeconds = signal(0);
 	private countdownInterval: ReturnType<typeof setInterval> | null = null;
 
 	readonly countdownDisplay = computed(() => {
 		const s = this._countdownSeconds();
-		if (s <= 0) return '';
+		if (s <= 0 || this.isStalled()) return '';
 		const min = Math.floor(s / 60);
 		const sec = s % 60;
 		return min > 0
@@ -69,7 +97,18 @@ export class CrossChexSyncBannerComponent {
 			if (remaining > 0) this.startCountdown(remaining);
 		});
 
-		this.destroyRef.onDestroy(() => this.stopCountdown());
+		// Cada emisión del servicio (aunque llegue idéntica) cuenta como señal de vida.
+		effect(() => {
+			this.status();
+			this._lastEventAt.set(Date.now());
+		});
+
+		const stallTimer = setInterval(() => this._now.set(Date.now()), STALL_CHECK_MS);
+
+		this.destroyRef.onDestroy(() => {
+			this.stopCountdown();
+			clearInterval(stallTimer);
+		});
 	}
 
 	private estimateRemainingSeconds(s: {
@@ -170,6 +209,10 @@ export class CrossChexSyncBannerComponent {
 		const s = this.status();
 		if (!s) return '';
 
+		if (this.isStalled()) {
+			return 'No hay avance: el proceso de sincronización no está respondiendo, no se está descargando nada. Cierra este aviso y vuelve a intentarlo más tarde.';
+		}
+
 		switch (s.estado) {
 			case 'QUEUED':
 				return 'Encolando sincronización…';
@@ -192,7 +235,7 @@ export class CrossChexSyncBannerComponent {
 	});
 
 	/** Subtexto con la fase (Descargando / Procesando / …). Vacío si no hay fase. */
-	readonly fase = computed(() => this.status()?.fase ?? '');
+	readonly fase = computed(() => (this.isStalled() ? '' : (this.status()?.fase ?? '')));
 	// #endregion
 
 	// #region Event handlers

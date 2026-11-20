@@ -2,6 +2,7 @@
 	<div
 		class="sync-banner"
 		[class.sync-banner--failed]="isFailed()"
+		[class.sync-banner--stalled]="isStalled()"
 		role="status"
 		aria-live="polite"
 	>
@@ -11,6 +12,9 @@
 					@if (isFailed()) {
 						<i class="pi pi-exclamation-circle"></i>
 						<span>Sincronización fallida</span>
+					} @else if (isStalled()) {
+						<i class="pi pi-pause-circle"></i>
+						<span>Sincronización detenida</span>
 					} @else {
 						<i class="pi pi-sync pi-spin"></i>
 						<span>Sincronizando CrossChex</span>
@@ -29,7 +33,7 @@
 				}
 			</p>
 
-			@if (!isFailed()) {
+			@if (!isFailed() && !isStalled()) {
 				@if (isRangeSync() && dayProgress()) {
 					<edu-progress-bar [value]="percent()" [style]="{ height: '6px' }" />
 					@if (pageProgress()) {
@@ -43,7 +47,7 @@
 			}
 		</div>
 
-		@if (isFailed()) {
+		@if (isFailed() || isStalled()) {
 			<div class="sync-banner__actions">
 				<edu-button
 					type="button"

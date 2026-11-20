@@ -1,6 +1,6 @@
 import { DestroyRef, inject, Injectable } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Subject, catchError, forkJoin, of, switchMap, type Observable } from 'rxjs';
+import { Subject, catchError, concat, forkJoin, map, of, switchMap, type Observable } from 'rxjs';
 
 import { logger } from '@core/helpers';
 import { UserProfileService } from '@core/services';
@@ -10,6 +10,7 @@ import {
 	emptyPanelDto,
 	type AttendancePanelFilters,
 	type AttendancePanelHoraBucket,
+	type AttendancePanelKpisPrevio,
 	type AttendancePanelSerie,
 } from '../models';
 import { AttendancePanelService } from './attendance-panel.service';
@@ -59,14 +60,27 @@ export class AttendancePanelFacade {
 				switchMap(() => {
 					const filters = this.store.filters();
 					const esDia = filters.rango === 'dia';
-					return forkJoin({
+					const principal$ = forkJoin({
 						kpis: this.api.getKpis(filters),
 						breakdown: this.api.getBreakdown(filters),
 						horaBuckets: esDia
 							? this.api.getHoraBuckets(filters)
 							: forkJoinEmpty<AttendancePanelHoraBucket>(),
 						series: esDia ? forkJoinEmpty<AttendancePanelSerie>() : this.api.getSeries(filters),
-					}).pipe(
+					});
+
+					// Primero lo que el usuario ve (periodo actual); la comparación con el periodo
+					// anterior llega después y solo completa las flechas de los KPIs. El `switchMap`
+					// externo cancela ambas fases si cambian los filtros.
+					return principal$.pipe(
+						switchMap((result) =>
+							concat(
+								of({ fase: 'principal' as const, result }),
+								this.api.getKpisPrevio(filters).pipe(
+									map((previo) => ({ fase: 'previo' as const, previo })),
+								),
+							),
+						),
 						catchError((err) => {
 							logger.error('[AttendancePanel] Error al cargar el panel', err);
 							return of(null);
@@ -75,17 +89,21 @@ export class AttendancePanelFacade {
 				}),
 				takeUntilDestroyed(this.destroyRef),
 			)
-			.subscribe((result) => {
-				if (!result) {
+			.subscribe((emision) => {
+				if (!emision) {
 					this.store.setError('No se pudo cargar el panel de asistencias.');
 					this.store.setLoading(false);
 					return;
 				}
+				if (emision.fase === 'previo') {
+					this.store.patchKpis(emision.previo satisfies AttendancePanelKpisPrevio);
+					return;
+				}
 				const dto = emptyPanelDto();
-				dto.kpis = result.kpis;
-				dto.breakdown = result.breakdown;
-				dto.horaBuckets = result.horaBuckets;
-				dto.series = result.series;
+				dto.kpis = emision.result.kpis;
+				dto.breakdown = emision.result.breakdown;
+				dto.horaBuckets = emision.result.horaBuckets;
+				dto.series = emision.result.series;
 				this.store.setDto(dto);
 				this.store.setLoading(false);
 			});

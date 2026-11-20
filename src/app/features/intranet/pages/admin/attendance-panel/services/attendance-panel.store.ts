@@ -50,6 +50,10 @@ export class AttendancePanelStore {
 		this._dto.set(dto);
 	}
 
+	patchKpis(partial: Partial<AttendancePanelDto['kpis']>): void {
+		this._dto.update((dto) => ({ ...dto, kpis: { ...dto.kpis, ...partial } }));
+	}
+
 	setLoading(loading: boolean): void {
 		this._loading.set(loading);
 	}

@@ -97,6 +97,12 @@
 
 // #region Filtros — B6 canonical (border + border-radius, sin background)
 .filters-bar {
+	.filters-search {
+		flex: 1;
+		min-width: 0;
+	}
+
+
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;
@@ -166,11 +172,13 @@
 
 // #region Dialog form
 .form-grid {
-	display: flex;
-	flex-direction: column;
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
 	gap: 1rem;
 
 	.form-field {
+		grid-column: 1 / -1;
+		min-width: 0;
 		display: flex;
 		flex-direction: column;
 		gap: 0.5rem;
@@ -189,6 +197,56 @@
 			p-datepicker {
 				flex: 1;
 			}
+		}
+	}
+
+	.form-field--half {
+		grid-column: auto;
+	}
+
+	// Tarjeta de hora: selector HH:mm centrado dentro de un contenedor suave
+	.time-card {
+		flex: 1;
+		display: flex;
+		justify-content: center;
+		min-width: 0;
+
+		// El panel inline ya trae su propio borde: sin tarjeta doble
+		::ng-deep .edu-datepicker-panel--inline {
+			width: auto;
+			padding: 0;
+			border: 0;
+			background: transparent;
+
+			.edu-datepicker-panel__time {
+				border-top: 0;
+				padding: 0;
+				margin: 0;
+			}
+		}
+	}
+
+	// Selector de tipo de persona: ocupa el ancho y hace wrap en vez de scroll horizontal
+	::ng-deep edu-select-button {
+		display: block;
+		width: 100%;
+
+		.edu-select-button {
+			display: flex;
+			flex-wrap: wrap;
+			width: 100%;
+			gap: 0.25rem;
+			padding: 0.25rem;
+			border-radius: 0.5rem;
+			background: var(--eduui-surface-100);
+		}
+
+		.edu-select-button__option {
+			flex: 1 1 auto;
+			border: 0;
+			background: transparent;
+			border-radius: 0.375rem;
+			font-size: 0.875rem;
 		}
 	}
 }

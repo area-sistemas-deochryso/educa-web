@@ -9,6 +9,11 @@
 	border: 1px solid var(--surface-300);
 	border-radius: 10px;
 
+	&--stalled {
+		background: color-mix(in srgb, var(--orange-500) 12%, transparent);
+		border-color: var(--orange-500);
+	}
+
 	&--failed {
 		background: color-mix(in srgb, var(--red-500) 12%, transparent);
 		border-color: var(--red-500);
@@ -89,4 +94,8 @@
 	.sync-banner__actions {
 		align-self: flex-end;
 	}
+}
+
+.sync-banner--stalled .sync-banner__title i {
+	color: var(--orange-600);
 }

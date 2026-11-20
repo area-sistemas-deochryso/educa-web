@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { forkJoin, map, shareReplay, type Observable } from 'rxjs';
+import { catchError, forkJoin, map, of, shareReplay, type Observable } from 'rxjs';
 
 import { formatDateLocalIso } from '@core/helpers';
 import type { AsistenciaAdminEstadisticas } from '@data/models';
@@ -17,6 +17,7 @@ import {
 	type AttendancePanelFilters,
 	type AttendancePanelHoraBucket,
 	type AttendancePanelKpis,
+	type AttendancePanelKpisPrevio,
 	type AttendancePanelSerie,
 } from '../models';
 
@@ -40,36 +41,71 @@ export class AttendancePanelService {
 	// Gap real: `tendencia` solo trae porcentajes por punto/tipo, no conteos crudos ni el
 	// denominador — no hay forma correcta de derivar `ausencias`/`tardanzas` (ver
 	// `conteosDisponibles` en el modelo). Esos 2 KPIs se marcan no disponibles en este rango.
+	// Solo el periodo actual: el anterior (comparación) se pide aparte con `getKpisPrevio`
+	// para no hacer esperar los KPIs/gráficos por una segunda consulta pesada.
 	getKpis(filters: AttendancePanelFilters): Observable<AttendancePanelKpis> {
 		if (filters.rango === 'dia') {
-			return forkJoin({
-				actual: this.getEstadisticasDia(filters, filters.fecha, 'todos'),
-				previo: this.getEstadisticasDia(filters, this.fechaPeriodoAnterior(filters), 'todos'),
-			}).pipe(
-				map(({ actual, previo }) => ({
+			return this.getEstadisticasDia(filters, filters.fecha, 'todos').pipe(
+				map((actual) => ({
 					porcentajeAsistencia: actual.porcentajeAsistencia,
 					ausencias: actual.falta,
 					tardanzas: actual.tardanza,
-					porcentajeAsistenciaPrevio: previo.porcentajeAsistencia,
-					ausenciasPrevio: previo.falta,
-					tardanzasPrevio: previo.tardanza,
+					porcentajeAsistenciaPrevio: 0,
+					ausenciasPrevio: 0,
+					tardanzasPrevio: 0,
 					conteosDisponibles: true,
-					comparacionDisponible: true,
+					comparacionDisponible: false,
 				})),
 			);
 		}
 
-		return this.getTendenciaActualYPrevio(filters).pipe(
-			map(({ actual, previo }) => ({
+		return this.getTendenciaActual(filters).pipe(
+			map((actual) => ({
 				porcentajeAsistencia: this.porcentajeAsistenciaTendencia(actual),
 				ausencias: 0,
 				tardanzas: 0,
-				porcentajeAsistenciaPrevio: previo ? this.porcentajeAsistenciaTendencia(previo) : 0,
+				porcentajeAsistenciaPrevio: 0,
 				ausenciasPrevio: 0,
 				tardanzasPrevio: 0,
 				conteosDisponibles: false,
-				comparacionDisponible: previo !== null,
+				comparacionDisponible: false,
 			})),
+		);
+	}
+
+	/**
+	 * Periodo anterior equivalente. Si falla (p. ej. 500 de `tendencia` para ciertos rangos)
+	 * devuelve `comparacionDisponible: false` en vez de romper el panel ya cargado.
+	 */
+	getKpisPrevio(filters: AttendancePanelFilters): Observable<AttendancePanelKpisPrevio> {
+		const sinComparacion: AttendancePanelKpisPrevio = {
+			porcentajeAsistenciaPrevio: 0,
+			ausenciasPrevio: 0,
+			tardanzasPrevio: 0,
+			comparacionDisponible: false,
+		};
+
+		if (filters.rango === 'dia') {
+			return this.getEstadisticasDia(filters, this.fechaPeriodoAnterior(filters), 'todos').pipe(
+				map((previo) => ({
+					porcentajeAsistenciaPrevio: previo.porcentajeAsistencia,
+					ausenciasPrevio: previo.falta,
+					tardanzasPrevio: previo.tardanza,
+					comparacionDisponible: true,
+				})),
+				catchError(() => of(sinComparacion)),
+			);
+		}
+
+		const rango: TendenciaRangoTipo = filters.rango === 'semana' ? 'semana' : 'mes';
+		return this.getTendenciaCacheada(rango, this.fechaPeriodoAnterior(filters), filters.sedeId).pipe(
+			map((previo) => ({
+				porcentajeAsistenciaPrevio: this.porcentajeAsistenciaTendencia(previo),
+				ausenciasPrevio: 0,
+				tardanzasPrevio: 0,
+				comparacionDisponible: true,
+			})),
+			catchError(() => of(sinComparacion)),
 		);
 	}
 	// #endregion
@@ -172,16 +208,6 @@ export class AttendancePanelService {
 	private getTendenciaActual(filters: AttendancePanelFilters): Observable<TendenciaAsistencia> {
 		const rango: TendenciaRangoTipo = filters.rango === 'semana' ? 'semana' : 'mes';
 		return this.getTendenciaCacheada(rango, filters.fecha, filters.sedeId);
-	}
-
-	private getTendenciaActualYPrevio(
-		filters: AttendancePanelFilters,
-	): Observable<{ actual: TendenciaAsistencia; previo: TendenciaAsistencia | null }> {
-		const rango: TendenciaRangoTipo = filters.rango === 'semana' ? 'semana' : 'mes';
-		return forkJoin({
-			actual: this.getTendenciaCacheada(rango, filters.fecha, filters.sedeId),
-			previo: this.getTendenciaCacheada(rango, this.fechaPeriodoAnterior(filters), filters.sedeId),
-		});
 	}
 
 	private getTendenciaCacheada(
