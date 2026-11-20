@@ -26,6 +26,8 @@ export interface EduOverlayOpenOptions {
 	originFromTrigger?: boolean;
 	/** Floor for the pane width in px (e.g. the anchor's width, so a dropdown is never narrower than its input). */
 	minWidth?: number;
+	/** Fixed pane width in px (e.g. the anchor's width, so long options don't widen the dropdown past its input). */
+	width?: number;
 }
 
 export interface EduOverlayCloseOptions {
@@ -76,6 +78,7 @@ export class EduOverlayHandle {
 			backdropClass: options.backdropClass,
 			panelClass: options.panelClass,
 			minWidth: options.minWidth,
+			width: options.width,
 		});
 
 		this.overlayRef.attach(portal);

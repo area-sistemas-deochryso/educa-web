@@ -36,6 +36,15 @@
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;
+
+	// El panel mide lo mismo que su input: el input debe caber sus opciones ("Inactivos", "INICIAL 3 AÑOS A")
+	edu-select {
+		min-width: 10rem;
+
+		&[data-info-anchor='admin-users-salon-filter'] {
+			min-width: 13rem;
+		}
+	}
 }
 
 .contact-filter {

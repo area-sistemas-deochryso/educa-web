@@ -418,6 +418,8 @@ export class EduSelect implements ControlValueAccessor, OnDestroy {
 				hasBackdrop: true,
 				backdropClass: 'cdk-overlay-transparent-backdrop',
 				closeOnBackdropClick: true,
+				// El panel mide lo mismo que su input
+				width: trigger.getBoundingClientRect().width,
 			},
 			() => this.close(),
 		);
