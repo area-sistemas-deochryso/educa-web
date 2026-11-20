@@ -124,9 +124,14 @@
 	> :is(td, th) {
 		padding-block: 0;
 		border-bottom-width: 0;
+		/* Sin esto la celda conserva la altura de su línea y la fila no baja de ~35px. */
+		line-height: 0;
 		animation: edu-row-fold-cell var(--motion-base) var(--ease-in-out) backwards;
 
 		> * {
+			/* `max-height` no aplica a cajas en línea (span, edu-button, edu-tag). */
+			display: inline-block;
+			vertical-align: top;
 			max-height: 0;
 			margin-block: 0;
 			padding-block: 0;
@@ -152,6 +157,7 @@
 @keyframes edu-row-fold-cell {
 	from {
 		padding-block: var(--row-pad, 0.75rem);
+		line-height: var(--row-lh, 1.5);
 	}
 }
 

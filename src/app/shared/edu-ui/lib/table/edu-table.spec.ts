@@ -83,4 +83,17 @@ describe('EduTable row motion', () => {
 		await fixture.whenStable();
 		expect(trs()).toHaveLength(3);
 	});
+
+	it('follows the exit through keyframe names prefixed by emulated encapsulation', async () => {
+		const { fixture, trs } = await setup();
+		fixture.componentInstance.rows.update((rows) => rows.filter((r) => r.id !== 2));
+		await fixture.whenStable();
+		const leaving = trs()[1];
+
+		leaving.dispatchEvent(animationEnd('_ngcontent-ng-c123_edu-row-slide-out'));
+		expect(leaving.classList.contains('edu-row--folding')).toBe(true);
+		leaving.dispatchEvent(animationEnd('_ngcontent-ng-c123_edu-row-fold'));
+		await fixture.whenStable();
+		expect(trs()).toHaveLength(3);
+	});
 });

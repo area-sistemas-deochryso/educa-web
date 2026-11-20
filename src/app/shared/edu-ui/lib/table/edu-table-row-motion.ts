@@ -60,6 +60,7 @@ export function playRowExit(row: HTMLElement, done: () => void): void {
 		'--row-pad',
 		firstCell ? getComputedStyle(firstCell).paddingTop : '0px',
 	);
+	row.style.setProperty('--row-lh', firstCell ? getComputedStyle(firstCell).lineHeight : '1.5');
 
 	let finished = false;
 	const finish = (): void => {
@@ -71,8 +72,9 @@ export function playRowExit(row: HTMLElement, done: () => void): void {
 	};
 	const onEnd = (event: AnimationEvent): void => {
 		if (event.target !== row) return;
-		if (event.animationName === 'edu-row-slide-out') row.classList.add('edu-row--folding');
-		else if (event.animationName === 'edu-row-fold') finish();
+		// Emulated encapsulation prefixes keyframe names (`_ngcontent-ng-cNNN_edu-row-fold`), so match by suffix.
+		if (event.animationName.endsWith('edu-row-slide-out')) row.classList.add('edu-row--folding');
+		else if (event.animationName.endsWith('edu-row-fold')) finish();
 	};
 	const timer = setTimeout(finish, EXIT_FALLBACK_MS);
 	row.addEventListener('animationend', onEnd);
