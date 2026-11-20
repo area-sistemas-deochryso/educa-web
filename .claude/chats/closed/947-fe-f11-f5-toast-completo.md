@@ -9,7 +9,7 @@ hot-paths: []
 
 > **Repo destino**: `educa-web` (frontend, branch `main`). Abrir el chat nuevo en este repo.
 > **Plan**: [`plan/motion-expresivo.md`](../../plan/motion-expresivo.md) (F11) · **Chat**: 5 · **Fase**: F5 · **Creado**: 2026-11-19 · **Estado**: ✅ implementado 2026-11-20.
-> **Validación prod**: ⏳ pendiente desde 2026-11-20 — tests (5) y `tsc` OK; falta verificación visual (barra, pausa con cursor, salida deslizante, reduced-motion); el navegador automatizado se congelaba al capturar.
+> **Validación prod**: ✅ verificada 2026-11-20 — en local (BBDD de prueba): entrada `toast-enter-top` 200 ms, barra 5000 ms que pasa a `paused` con el cursor, salida `edu-toast-exit` 200 ms; reduced-motion cubierto por la regla global.
 > **MODO SUGERIDO**: `/investigate` → `/design` → `/execute` → `/validate`.
 > **modules**: `ui` (motion, `edu-toast`).
 
