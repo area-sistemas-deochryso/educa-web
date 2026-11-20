@@ -1,0 +1,314 @@
+:host {
+	display: block;
+}
+
+// El shell de Monitoreo pinta las pestañas justo encima: separa el encabezado de ellas.
+app-page-header {
+	display: block;
+	margin-top: 1rem;
+}
+
+.header-actions {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+// #region Barra de filtros (patrón B1/B6: border sin background)
+.filters-bar {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	margin-bottom: 1rem;
+	padding: 0.75rem 1rem;
+	background: transparent;
+	border: 1px solid var(--surface-300);
+	border-radius: 10px;
+
+	// «Limpiar» queda a la derecha y atenuado: no compite con los filtros.
+	> edu-button {
+		margin-left: auto;
+		opacity: 0.5;
+
+		&:hover {
+			opacity: 1;
+		}
+	}
+}
+
+.search-box {
+	position: relative;
+	flex: 1;
+	min-width: 180px;
+	max-width: 320px;
+
+	i {
+		position: absolute;
+		left: 0.75rem;
+		top: 50%;
+		transform: translateY(-50%);
+		color: var(--text-color-secondary);
+		font-size: 0.85rem;
+	}
+
+	input {
+		width: 100%;
+		padding-left: 2.25rem;
+		font-size: 0.875rem;
+	}
+}
+
+.filter-dropdowns {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+@media (max-width: 768px) {
+	.filters-bar {
+		flex-wrap: wrap;
+	}
+
+	.search-box {
+		flex: 1 1 100%;
+		max-width: none;
+	}
+
+	.filter-dropdowns {
+		flex-wrap: wrap;
+		flex: 1;
+	}
+}
+// #endregion
+
+// #region Tabla (patrón B4)
+.table-section {
+	background: transparent;
+	border: 1px solid var(--surface-300);
+	border-radius: 12px;
+	overflow: hidden;
+
+	.nowrap {
+		white-space: nowrap;
+	}
+
+	.subject {
+		display: block;
+		max-width: 520px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.user-link {
+		color: var(--blue-800);
+		font-weight: 500;
+		text-decoration: none;
+
+		&:hover {
+			text-decoration: underline;
+		}
+	}
+
+	.detail {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.35rem;
+	}
+
+	.detail-none {
+		color: var(--text-color-secondary);
+	}
+}
+
+// #region Chip clicable de «Detalle» (tabla y leyenda)
+.detail-chip {
+	display: inline-flex;
+	padding: 0;
+	border: 0;
+	background: transparent;
+	cursor: pointer;
+	border-radius: 999px;
+
+	&:hover {
+		filter: brightness(0.95);
+	}
+
+	&:focus-visible {
+		outline: 2px solid var(--primary-color);
+		outline-offset: 2px;
+	}
+}
+// #endregion
+
+// #region Leyenda
+.legend-section {
+	margin-top: 1rem;
+	padding: 1rem 1.25rem;
+	background: transparent;
+	border: 1px solid var(--surface-300);
+	border-radius: 12px;
+}
+
+.legend-title {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	margin: 0;
+	font-size: 0.95rem;
+	font-weight: 600;
+}
+
+.legend-hint {
+	margin: 0.25rem 0 1rem;
+	font-size: 0.85rem;
+	color: var(--text-color-secondary);
+}
+
+.legend-groups {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	gap: 1.25rem;
+}
+
+.legend-group {
+	h4 {
+		margin: 0 0 0.5rem;
+		font-size: 0.8rem;
+		font-weight: 600;
+		letter-spacing: 0.5px;
+		text-transform: uppercase;
+		color: var(--text-color-secondary);
+	}
+
+	.legend-sub {
+		text-transform: none;
+		letter-spacing: 0;
+		font-weight: 400;
+	}
+
+	ul {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	li {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.6rem;
+	}
+
+	.detail-chip,
+	.legend-term {
+		flex: 0 0 11.5rem;
+	}
+
+	.legend-term {
+		font-size: 0.85rem;
+		font-weight: 600;
+	}
+
+	.legend-text {
+		font-size: 0.85rem;
+		color: var(--text-color-secondary);
+	}
+}
+// #endregion
+
+// #region Modal de significado
+.detail-dialog-title {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	font-weight: 600;
+}
+
+.detail-dialog {
+	h4 {
+		margin: 1rem 0 0.25rem;
+		font-size: 0.8rem;
+		font-weight: 600;
+		letter-spacing: 0.5px;
+		text-transform: uppercase;
+		color: var(--text-color-secondary);
+	}
+
+	p {
+		margin: 0;
+		font-size: 0.9rem;
+		line-height: 1.55;
+	}
+
+	.detail-dialog-code {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-size: 0.85rem;
+		color: var(--text-color-secondary);
+
+		code {
+			padding: 0.1rem 0.5rem;
+			border-radius: 6px;
+			background: var(--surface-200);
+			color: var(--text-color);
+			font-family: monospace;
+		}
+	}
+}
+// #endregion
+
+.empty-state {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 2rem 1rem;
+	color: var(--text-color-secondary);
+
+	i {
+		font-size: 2rem;
+	}
+
+	p {
+		margin: 0;
+		font-weight: 500;
+		color: var(--text-color);
+	}
+
+	span {
+		font-size: 0.85rem;
+	}
+}
+
+// #endregion
+
+// #region Estado de error
+.state-box {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 3rem 1rem;
+	border: 1px dashed var(--surface-300);
+	border-radius: 12px;
+	color: var(--text-color-secondary);
+
+	i {
+		font-size: 2rem;
+	}
+
+	p {
+		margin: 0;
+		color: var(--text-color);
+	}
+
+	&.state-error i,
+	&.state-error p {
+		color: var(--red-500);
+	}
+}
+// #endregion

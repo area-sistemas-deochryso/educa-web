@@ -34,6 +34,10 @@ export function readAutoOpenQueryParams(
 		return autoOpen ? { kind: 'dni', dni } : null;
 	}
 
+	// Filtro por texto libre (p. ej. nombre desde Monitoreo → Emails MailerSend): solo filtra, no abre.
+	const search = params.get('search');
+	if (search) setSearchTerm(search);
+
 	if (!autoOpen) return null;
 
 	const newRol = params.get('rol');

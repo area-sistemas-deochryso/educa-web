@@ -43,6 +43,9 @@ const NO_CACHE_PATTERNS = [
 	'/api/Auth/verificar',
 	'/api/Auth/sessions',
 	'/api/auth/capabilities',
+	// Vista admin de MailerSend: datos en vivo de un servicio externo (10 req/min). Servir
+	// una respuesta cacheada ocultaría emails nuevos y errores de config/scope.
+	'/api/sistema/mailersend',
 ];
 
 // #region SCHEMA FINGERPRINT (Plan WAL Resilience M4)

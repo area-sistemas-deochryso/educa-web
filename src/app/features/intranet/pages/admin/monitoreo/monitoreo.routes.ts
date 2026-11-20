@@ -5,6 +5,7 @@ import { authGuard, permissionsGuard } from '@core/guards';
 import { environment } from '@config/environment';
 
 import { DomainId } from './models/monitoreo-hub-badges.models';
+import { defaultTabGuard, tileSlug } from './monitoreo-access';
 import { DOMAINS } from './monitoreo-hub.catalog';
 // #endregion
 
@@ -55,6 +56,11 @@ const CORREOS_TAB_ROUTES: Record<string, TabRouteConfig> = {
 			),
 		title: 'Intranet - Dominios pausados',
 	},
+	mailersend: {
+		loadComponent: () =>
+			import('../mailersend-activity').then((m) => m.MailerSendActivityComponent),
+		title: 'Intranet - Emails de MailerSend',
+	},
 	'defer-events': {
 		loadComponent: () =>
 			import('../email-outbox/components/defer-events-tab/defer-events-tab.component').then(
@@ -84,13 +90,23 @@ function buildDomainChildren(
 	const domain = DOMAINS.find((d) => d.id === domainId);
 	if (!domain) return [];
 
-	const firstSlug = domain.tiles[0]?.route.split('/').pop() ?? '';
-	const children: Routes = [{ path: '', redirectTo: firstSlug, pathMatch: 'full' }];
+	// Entrada del dominio: va a la primera pestaña que el usuario SÍ puede abrir (no a la primera del
+	// catálogo). `permissionPath: 'intranet'` + `standalonePermission` evitan que el candado del panel
+	// la bloquee antes de decidir; la decisión real la toma `defaultTabGuard`.
+	const children: Routes = [
+		{
+			path: '',
+			pathMatch: 'full',
+			children: [],
+			canActivate: [authGuard, defaultTabGuard(domainId)],
+			data: { permissionPath: 'intranet', standalonePermission: true },
+		},
+	];
 
 	for (const tile of domain.tiles) {
 		if (tile.featureFlag && !environment.features[tile.featureFlag]) continue;
 
-		const slug = tile.route.split('/').pop() ?? '';
+		const slug = tileSlug(tile);
 		const config = tabRoutes[slug];
 		if (!config) continue;
 
@@ -98,7 +114,10 @@ function buildDomainChildren(
 			path: slug,
 			loadComponent: config.loadComponent,
 			canActivate: [authGuard, permissionsGuard],
-			data: { permissionPath: `intranet/admin/monitoreo/${domainId}/${slug}` },
+			data: {
+				permissionPath: `intranet/admin/monitoreo/${domainId}/${slug}`,
+				...(tile.standalonePermission ? { standalonePermission: true } : {}),
+			},
 			title: config.title,
 		});
 	}

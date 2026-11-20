@@ -83,6 +83,81 @@ describe('permissionsGuard — Security Contracts', () => {
 	});
 	// #endregion
 
+	// #region INV: A standalone leaf skips ancestors' gate, nothing else does
+	describe('INV: data.standalonePermission moves the check to the leaf, never removes it', () => {
+		interface Node {
+			path: string[];
+			data?: Record<string, unknown>;
+		}
+
+		/** Builds parent → child → … snapshots (with `firstChild`) and returns each level. */
+		function buildChain(...nodes: Node[]): ActivatedRouteSnapshot[] {
+			const routes = nodes.map((n) => ({
+				url: n.path.map((p) => ({ path: p }) as UrlSegment),
+				routeConfig: { data: n.data },
+				data: n.data ?? {},
+				parent: null,
+				firstChild: null,
+			})) as unknown as ActivatedRouteSnapshot[];
+			routes.forEach((r, i) => {
+				(r as { parent: unknown }).parent = routes[i - 1] ?? null;
+				(r as { firstChild: unknown }).firstChild = routes[i + 1] ?? null;
+			});
+			return routes;
+		}
+
+		const run = (route: ActivatedRouteSnapshot) =>
+			TestBed.runInInjectionContext(() => permissionsGuard(route, {} as RouterStateSnapshot));
+
+		it('should skip the shell when the leaf is standalone', async () => {
+			const [shell] = buildChain(
+				{ path: ['intranet', 'admin', 'monitoreo', 'correos'], data: { permissionPath: 'intranet/admin/monitoreo' } },
+				{ path: ['mailersend'], data: { permissionPath: 'intranet/admin/monitoreo/correos/mailersend', standalonePermission: true } },
+			);
+
+			expect(await run(shell)).toBe(true);
+			expect(userPermisosMock.tienePermiso).not.toHaveBeenCalled();
+		});
+
+		it('should still evaluate the standalone leaf itself with its own permissionPath', async () => {
+			const [, leaf] = buildChain(
+				{ path: ['intranet', 'admin', 'monitoreo', 'correos'], data: { permissionPath: 'intranet/admin/monitoreo' } },
+				{ path: ['mailersend'], data: { permissionPath: 'intranet/admin/monitoreo/correos/mailersend', standalonePermission: true } },
+			);
+
+			const result = await run(leaf);
+
+			expect(userPermisosMock.tienePermiso).toHaveBeenCalledWith('intranet/admin/monitoreo/correos/mailersend');
+			expect(result).toBeInstanceOf(UrlTree);
+		});
+
+		it('should keep gating the shell when the leaf is NOT standalone', async () => {
+			const [shell] = buildChain(
+				{ path: ['intranet', 'admin', 'monitoreo', 'correos'], data: { permissionPath: 'intranet/admin/monitoreo' } },
+				{ path: ['bandeja'], data: { permissionPath: 'intranet/admin/monitoreo/correos/bandeja' } },
+			);
+
+			const result = await run(shell);
+
+			expect(userPermisosMock.tienePermiso).toHaveBeenCalledWith('intranet/admin/monitoreo');
+			expect(result).toBeInstanceOf(UrlTree);
+		});
+
+		it('should not let a standalone leaf open its sibling routes', async () => {
+			const [shell] = buildChain(
+				{ path: ['intranet', 'admin', 'monitoreo', 'correos'], data: { permissionPath: 'intranet/admin/monitoreo' } },
+				{ path: ['blacklist'], data: { permissionPath: 'intranet/admin/monitoreo/correos/blacklist' } },
+			);
+			// A user holding only the MailerSend capability.
+			(userPermisosMock.tienePermiso as ReturnType<typeof vi.fn>).mockImplementation(
+				(ruta: string) => ruta === 'intranet/admin/monitoreo/correos/mailersend',
+			);
+
+			expect(await run(shell)).toBeInstanceOf(UrlTree);
+		});
+	});
+	// #endregion
+
 	// #region INV: Permissions load failure forces logout
 	describe('INV: Permission load failure forces full logout (not just redirect)', () => {
 		it('should call authService.logout() when ensurePermisosLoaded fails', async () => {

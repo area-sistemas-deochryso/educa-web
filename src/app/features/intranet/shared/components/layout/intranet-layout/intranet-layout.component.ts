@@ -287,7 +287,7 @@ export class IntranetLayoutComponent implements OnInit, AfterViewInit, OnDestroy
 			}
 			const badgesByRoute = this.buildBadgesByRoute();
 			if (loaded) {
-				const modulos = buildModuloMenus(caps, this.effectiveRol(), badgesByRoute);
+				const modulos = buildModuloMenus(caps, this.effectiveRol(), badgesByRoute, this.userPermissionsService);
 				this._modulos.set(modulos);
 				const id = detectModuloFromUrl(this.router.url, modulos);
 				this.applySelection(id, modulos, this.router.url);
@@ -342,6 +342,7 @@ export class IntranetLayoutComponent implements OnInit, AfterViewInit, OnDestroy
 				this.userPermissionsService.userCapabilities(),
 				this.effectiveRol(),
 				this.buildBadgesByRoute(),
+				this.userPermissionsService,
 			);
 			this._modulos.set(modulos);
 			const id = detectModuloFromUrl(this.router.url, modulos);

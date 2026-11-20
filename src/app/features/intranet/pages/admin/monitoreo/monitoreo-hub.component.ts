@@ -4,7 +4,6 @@ import { RouterLink } from '@angular/router';
 
 import { PageHeaderComponent } from '@intranet-shared/components/page-header/page-header.component';
 import { UserPermissionsService } from '@core/services';
-import { environment } from '@config/environment';
 import { EmailMonitoreoFacade } from '../email-outbox-dashboard-dia/services';
 import { EmailDeferFailBannerComponent } from '../email-outbox-shared';
 import { MonitoreoHubBadgesFacade } from './services/monitoreo-hub-badges.facade';
@@ -15,6 +14,7 @@ import {
 	HubDeltas,
 	LinkBadge,
 } from './models/monitoreo-hub-badges.models';
+import { canOpenTile } from './monitoreo-access';
 import { DOMAINS, DomainTile } from './monitoreo-hub.catalog';
 import {
 	DomainHeadline,
@@ -113,7 +113,7 @@ export class MonitoreoHubComponent {
 
 		return DOMAINS.map((domain) => {
 			const tiles = domain.tiles
-				.filter((t) => this.tileVisible(t))
+				.filter((t) => canOpenTile(this.userPermisos, domain.id, t))
 				.map<RenderedTile>((t) => {
 					const badge = t.badgeKey ? badges[t.badgeKey] : null;
 					const hubParams: HubQueryParams = { from: 'hub' };
@@ -186,11 +186,6 @@ export class MonitoreoHubComponent {
 	// #endregion
 
 	// #region Helpers
-	private tileVisible(tile: DomainTile): boolean {
-		if (tile.featureFlag && !environment.features[tile.featureFlag]) return false;
-		return this.userPermisos.hasCapability(tile.capability);
-	}
-
 	private lookupDelta(key: HubBadgeKey | undefined, deltas: HubDeltas | null): number | null {
 		if (!key || !deltas) return null;
 		if (key === 'bandeja') return deltas.bandeja;

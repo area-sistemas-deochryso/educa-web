@@ -56,3 +56,17 @@ este caso coincide con su path real pero necesita estar explícito.
    evitar pedir un seed.
 3. Documentá en un comentario, en la declaración de la ruta, CUÁL capability se está
    reusando y por qué (ver ejemplos existentes en `intranet.routes.ts`).
+
+## Hoja con permiso propio bajo un shell/contenedor gateado (`data.standalonePermission`)
+
+`canActivateChild` evalúa **cada ancestro** de la hoja (en Monitoreo: el tramo `admin/monitoreo` y el
+shell `correos`/`incidencias`, ambos contra `intranet/admin/monitoreo`). Un rol con la capability de
+una hoja pero sin la del panel queda bloqueado en el ancestro.
+
+Cuando una hoja se comparte con roles que **no** deben ver el resto del área (ej. `correos/mailersend`,
+capability `EMAIL_MAILERSEND_PAGE_API_VIEW`), marcala con `data: { standalonePermission: true }`:
+el guard salta los **ancestros** de esa hoja y la autoriza solo con su propio `permissionPath`.
+
+- Es opt-in por hoja: las demás hojas del mismo shell siguen exigiendo el candado del ancestro.
+- La hoja marcada siempre se evalúa; el flag mueve el chequeo a la hoja, no lo elimina.
+- Contrato: `permisos-security.contract.spec.ts` (bloque `standalonePermission`).

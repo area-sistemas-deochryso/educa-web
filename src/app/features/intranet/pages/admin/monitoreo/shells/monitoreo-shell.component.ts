@@ -9,8 +9,9 @@ import {
 } from '@angular/router';
 import { filter, map } from 'rxjs/operators';
 
-import { environment } from '@config/environment';
+import { UserPermissionsService } from '@core/services/permissions';
 
+import { canOpenTile, tileSlug } from '../monitoreo-access';
 import { DomainId } from '../models/monitoreo-hub-badges.models';
 import { DOMAINS } from '../monitoreo-hub.catalog';
 import { EduTab, EduTabs } from '@edu-ui';
@@ -36,6 +37,7 @@ export class MonitoreoShellComponent {
 	// #region Dependencies
 	private readonly route = inject(ActivatedRoute);
 	private readonly router = inject(Router);
+	private readonly userPermisos = inject(UserPermissionsService);
 	// #endregion
 
 	// #region Domain ID from route data
@@ -47,10 +49,11 @@ export class MonitoreoShellComponent {
 		const domain = DOMAINS.find((d) => d.id === this.domainId);
 		if (!domain) return [];
 
+		// Solo pestañas que este usuario puede abrir: ofrecer una que rebota es ruido y fuga de superficie.
 		return domain.tiles
-			.filter((t) => !t.featureFlag || environment.features[t.featureFlag])
+			.filter((t) => canOpenTile(this.userPermisos, this.domainId, t))
 			.map((t) => ({
-				value: this.extractTabSlug(t.route),
+				value: tileSlug(t),
 				label: t.label,
 				icon: t.icon,
 			}));
@@ -77,10 +80,6 @@ export class MonitoreoShellComponent {
 		const segment = this.route.firstChild?.snapshot?.url?.[0]?.path;
 		const firstTab = this.tabs()[0]?.value ?? '';
 		return segment ?? firstTab;
-	}
-
-	private extractTabSlug(route: string): string {
-		return route.split('/').pop() ?? '';
 	}
 	// #endregion
 }

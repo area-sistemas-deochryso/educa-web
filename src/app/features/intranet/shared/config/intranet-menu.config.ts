@@ -4,6 +4,7 @@ import { environment } from '@config/environment';
 import { ModuloId, MODULOS } from '@shared/constants';
 import { CapabilityCode } from '@shared/types';
 import { UserRole } from '@core/services/auth';
+import { isMonitoreoItemReachable, type MenuRouteAccess } from './intranet-menu-access';
 
 // #endregion
 
@@ -39,6 +40,8 @@ export interface MenuItemDef {
 	capability: CapabilityCode;
 	modulo: ModuloId;
 	exact?: boolean;
+	/** Hoja de Monitoreo con `CAP_Ruta` propia: no exige la del panel (ver `monitoreo-access.ts`). */
+	standalonePermission?: boolean;
 	featureFlag?: FeatureFlag;
 	queryParams?: Record<string, string>;
 	group?: { label: string; icon: string };
@@ -156,6 +159,7 @@ export const MENU_ITEMS: MenuItemDef[] = [
 	{ route: '/intranet/admin/monitoreo/correos/quarantine', label: 'Cuarentena', icon: 'pi pi-clock', capability: 'EMAIL_QUARANTINE_API_MANAGE', modulo: 'administrador', soloParaRol: ADMIN_ROLES, featureFlag: 'emailQuarantineTab', group: { label: 'Monitoreo', icon: 'pi pi-chart-bar' }, subgroup: [{ label: 'Correos', icon: 'pi pi-envelope' }], preview: 'admin-table', description: 'Pausas temporales con auto-release. Promueve a blacklist al 3.er hit.' },
 	{ route: '/intranet/admin/monitoreo/correos/domain-pauses', label: 'Dominios pausados', icon: 'pi pi-pause', capability: 'EMAIL_DOMINIO_PAGE_VIEW', modulo: 'administrador', soloParaRol: ADMIN_ROLES, featureFlag: 'emailDomainPausesTab', group: { label: 'Monitoreo', icon: 'pi pi-chart-bar' }, subgroup: [{ label: 'Correos', icon: 'pi pi-envelope' }], preview: 'admin-table', description: 'Dominios receptores pausados con timeout y auto-resume.' },
 	{ route: '/intranet/admin/monitoreo/correos/defer-events', label: 'Eventos defer', icon: 'pi pi-replay', capability: 'EMAIL_DEFER_EVENTS_API_VIEW', modulo: 'administrador', soloParaRol: ADMIN_ROLES, featureFlag: 'emailDeferEventsTab', group: { label: 'Monitoreo', icon: 'pi pi-chart-bar' }, subgroup: [{ label: 'Correos', icon: 'pi pi-envelope' }], preview: 'admin-table', description: 'Historial de defers/fails sincrónicos del MTA por destinatario.' },
+	{ route: '/intranet/admin/monitoreo/correos/mailersend', label: 'Emails MailerSend', icon: 'pi pi-send', capability: 'EMAIL_MAILERSEND_PAGE_API_VIEW', standalonePermission: true, modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Monitoreo', icon: 'pi pi-chart-bar' }, subgroup: [{ label: 'Correos', icon: 'pi pi-envelope' }], preview: 'admin-table', description: 'Actividad de MailerSend: en cola, rechazados, enviados y entregados.' },
 	{ route: '/intranet/admin/monitoreo/incidencias/errores', label: 'Errores', icon: 'pi pi-exclamation-circle', capability: 'ERROR_LOGS_API_VIEW', modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Monitoreo', icon: 'pi pi-chart-bar' }, subgroup: [{ label: 'Incidencias', icon: 'pi pi-megaphone' }], preview: 'kanban', description: 'Bugs agrupados por fingerprint con kanban de estados (NUEVO → RESUELTO).' },
 	{ route: '/intranet/admin/monitoreo/incidencias/reportes', label: 'Reportes de Usuarios', icon: 'pi pi-comment', capability: 'REPORTES_USUARIO_API_VIEW', modulo: 'administrador', soloParaRol: ADMIN_ROLES, group: { label: 'Monitoreo', icon: 'pi pi-chart-bar' }, subgroup: [{ label: 'Incidencias', icon: 'pi pi-megaphone' }], preview: 'admin-table', description: 'Feedback manual: tipo, descripción y propuesta enviada por usuarios.' },
 	{ route: '/intranet/admin/monitoreo/seguridad/rate-limit', label: 'Rate Limit', icon: 'pi pi-bolt', capability: 'RATE_LIMIT_EVENTS_API_VIEW', modulo: 'administrador', soloParaRol: ADMIN_ROLES, featureFlag: 'rateLimitMonitoring', group: { label: 'Monitoreo', icon: 'pi pi-chart-bar' }, subgroup: [{ label: 'Seguridad', icon: 'pi pi-shield' }], preview: 'admin-table', description: 'Eventos 429 con policy, partition, top endpoints y top roles afectados.' },
@@ -227,6 +231,7 @@ export function buildModuloMenus(
 	userCapabilities: Set<string>,
 	rol?: UserRole,
 	badgesByRoute?: Record<string, number>,
+	routeAccess?: MenuRouteAccess,
 ): ModuloMenu[] {
 	const hasPermisos = userCapabilities.size > 0;
 
@@ -238,7 +243,9 @@ export function buildModuloMenus(
 		hasPermisos
 			? enabledItems.filter(
 					(item) =>
-						userCapabilities.has(item.capability) && (!item.soloParaRol || (rol && item.soloParaRol.includes(rol))),
+						userCapabilities.has(item.capability) &&
+						(!item.soloParaRol || (rol && item.soloParaRol.includes(rol))) &&
+						isMonitoreoItemReachable(item, routeAccess),
 				)
 			: enabledItems
 	).map((item) => ({ ...item, label: resolveMenuItemLabel(item, rol) }));

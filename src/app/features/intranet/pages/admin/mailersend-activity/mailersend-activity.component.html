@@ -1,0 +1,250 @@
+<app-page-header
+	icon="pi pi-send"
+	title="Emails de MailerSend"
+	subtitle="Actividad de envío registrada en MailerSend"
+>
+	<div class="header-actions">
+		<edu-button
+			icon="pi pi-refresh"
+			label="Refrescar"
+			[outlined]="true"
+			size="small"
+			[disabled]="loading()"
+			(click)="load()"
+			[pt]="{ root: { 'aria-label': 'Refrescar' } }"
+		/>
+	</div>
+</app-page-header>
+
+<div class="filters-bar">
+	<div class="search-box">
+		<i class="pi pi-search"></i>
+		<input
+			type="email"
+			eduInputText
+			placeholder="Buscar por correo del destinatario..."
+			aria-label="Buscar por correo del destinatario"
+			[ngModel]="destinatario()"
+			(ngModelChange)="destinatario.set($event)"
+			(blur)="onDestinatarioApply()"
+			(keyup.enter)="onDestinatarioApply()"
+		/>
+	</div>
+
+	<div class="filter-dropdowns">
+		<edu-datepicker
+			[ngModel]="desde()"
+			(ngModelChange)="onDesdeChange($event)"
+			placeholder="Desde"
+			[showIcon]="true"
+			appendTo="body"
+		/>
+		<edu-datepicker
+			[ngModel]="hasta()"
+			(ngModelChange)="onHastaChange($event)"
+			placeholder="Hasta"
+			[showIcon]="true"
+			appendTo="body"
+		/>
+		<edu-multi-select
+			[options]="estadoOptions"
+			optionLabel="label"
+			optionValue="value"
+			[ngModel]="estados()"
+			(ngModelChange)="onEstadosChange($event)"
+			placeholder="Todos los estados"
+			[maxSelectedLabels]="2"
+			appendTo="body"
+		/>
+	</div>
+
+	<edu-button
+		label="Limpiar"
+		icon="pi pi-filter-slash"
+		[text]="true"
+		size="small"
+		(click)="clearFilters()"
+		[pt]="{ root: { 'aria-label': 'Limpiar filtros' } }"
+	/>
+</div>
+
+@if (error()) {
+	<div class="state-box state-error" role="alert">
+		<i class="pi pi-exclamation-triangle"></i>
+		<p>{{ error() }}</p>
+	</div>
+} @else {
+	<section class="table-section">
+		<edu-table
+			[value]="items()"
+			[dataKey]="'id'"
+			[loading]="loading()"
+			styleClass="p-datatable-sm mailersend-table"
+		>
+			<ng-template #header>
+				<tr>
+					<th style="width: 190px">FECHA</th>
+					<th style="width: 140px">ESTADO</th>
+					<th style="min-width: 320px">ASUNTO</th>
+					<th style="width: 220px">DETALLE</th>
+				</tr>
+			</ng-template>
+
+			<ng-template #body let-mail>
+				<tr>
+					<td class="nowrap">{{ mail.createdAt | date: 'dd/MM/yyyy HH:mm:ss' }}</td>
+					<td>
+						<edu-tag [value]="labelOf(mail.status)" [severity]="severityOf(mail.status)" />
+					</td>
+					<td>
+						@if (userNameOf(mail.subject); as name) {
+							<span class="subject" [title]="'Ver a ' + name + ' en Usuarios'"
+								>{{ mail.subject.slice(0, mail.subject.indexOf(' - ') + 3)
+								}}<a class="user-link" routerLink="/intranet/admin/usuarios" [queryParams]="{ search: searchTermOf(name) }">{{
+									name
+								}}</a></span
+							>
+						} @else {
+							<span class="subject" [title]="mail.subject ?? ''">{{ mail.subject }}</span>
+						}
+					</td>
+					<td class="detail">
+						@for (detail of detailsOf(mail); track detail.kind + detail.code) {
+							<button
+								type="button"
+								class="detail-chip"
+								[title]="detail.code"
+								[attr.aria-label]="'Ver el significado de ' + detail.label"
+								(click)="openDetail(detail.kind, detail.code)"
+							>
+								<edu-tag [value]="detail.label" [severity]="detail.severity" />
+							</button>
+						} @empty {
+							<span class="detail-none">—</span>
+						}
+					</td>
+				</tr>
+			</ng-template>
+
+			<ng-template #emptymessage>
+				<tr>
+					<td colspan="4" class="empty-message">
+						<div class="empty-state">
+							<i class="pi pi-inbox"></i>
+							<p>No se encontraron emails</p>
+							<span>Intenta ajustar el rango de fechas o los estados</span>
+						</div>
+					</td>
+				</tr>
+			</ng-template>
+		</edu-table>
+
+		<!-- MailerSend no devuelve el total: el paginador usa el mínimo conocido (ver totalRecords) -->
+		<edu-paginator
+			[rows]="limit()"
+			[first]="first()"
+			[totalRecords]="totalRecords()"
+			[rowsPerPageOptions]="pageSizeOptions"
+			[showCurrentPageReport]="true"
+			currentPageReportTemplate="Mostrando {first} a {last} emails"
+			(onPageChange)="onPageChange($event)"
+		/>
+	</section>
+}
+
+<!-- #region Leyenda de «Detalle» -->
+<section class="legend-section" aria-label="Leyenda de detalles">
+	<h3 class="legend-title"><i class="pi pi-info-circle"></i> Leyenda de detalles</h3>
+	<p class="legend-hint">
+		Haz clic en cualquier detalle, aquí o en la tabla, para ver qué significa y qué hacer.
+	</p>
+
+	<div class="legend-groups">
+		<div class="legend-group">
+			<h4>Estado</h4>
+			<ul>
+				@for (estado of estadoLegend; track estado.code) {
+					<li>
+						<span class="legend-term">{{ estado.label }}</span>
+						<span class="legend-text">{{ estado.summary }}</span>
+					</li>
+				}
+			</ul>
+		</div>
+
+		<div class="legend-group">
+			<h4>Motivo del rechazo <span class="legend-sub">(emails «Rechazado»)</span></h4>
+			<ul>
+				@for (detail of suppressionDetails; track detail.code) {
+					<li>
+						<button
+							type="button"
+							class="detail-chip"
+							[attr.aria-label]="'Ver el significado de ' + detail.label"
+							(click)="openDetail(detail.kind, detail.code)"
+						>
+							<edu-tag [value]="detail.label" [severity]="detail.severity" />
+						</button>
+						<span class="legend-text">{{ detail.summary }}</span>
+					</li>
+				}
+			</ul>
+		</div>
+
+		<div class="legend-group">
+			<h4>Interacción <span class="legend-sub">(emails entregados)</span></h4>
+			<ul>
+				@for (detail of interactionDetails; track detail.code) {
+					<li>
+						<button
+							type="button"
+							class="detail-chip"
+							[attr.aria-label]="'Ver el significado de ' + detail.label"
+							(click)="openDetail(detail.kind, detail.code)"
+						>
+							<edu-tag [value]="detail.label" [severity]="detail.severity" />
+						</button>
+						<span class="legend-text">{{ detail.summary }}</span>
+					</li>
+				}
+			</ul>
+		</div>
+	</div>
+</section>
+<!-- #endregion -->
+
+<!-- #region Modal: significado de un detalle (siempre en el DOM, ver dialogs-sync.md) -->
+<edu-dialog
+	[visible]="detailVisible()"
+	(visibleChange)="onDetailVisibleChange($event)"
+	[modal]="true"
+	[draggable]="false"
+	[style]="{ width: '560px', maxWidth: '95vw' }"
+>
+	<ng-template #header>
+		<span class="detail-dialog-title">
+			<i class="pi pi-info-circle"></i>
+			{{ selectedDetail()?.label }}
+		</span>
+	</ng-template>
+
+	@if (selectedDetail(); as detail) {
+		<div class="detail-dialog">
+			<p class="detail-dialog-code">
+				<span>{{ detail.kind === 'suppression' ? 'Motivo del rechazo' : 'Interacción' }}</span>
+				<code>{{ detail.code }}</code>
+			</p>
+
+			<h4>Qué significa</h4>
+			<p>{{ detail.meaning }}</p>
+
+			<h4>Qué hacer</h4>
+			<p>{{ detail.action }}</p>
+		</div>
+	}
+
+	<ng-template #footer>
+		<edu-button label="Cerrar" [text]="true" (click)="onDetailVisibleChange(false)" />
+	</ng-template>
+</edu-dialog>
+<!-- #endregion -->

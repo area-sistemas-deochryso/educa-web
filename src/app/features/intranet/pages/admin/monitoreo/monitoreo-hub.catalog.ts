@@ -20,6 +20,8 @@ export interface DomainTile {
 	featureFlag?: FeatureFlagKey;
 	badgeKey?: HubBadgeKey;
 	description: string;
+	/** La hoja tiene `CAP_Ruta` propia: no exige la del panel de Monitoreo (ver `monitoreo-access.ts`). */
+	standalonePermission?: boolean;
 }
 
 export interface DomainDef {
@@ -107,6 +109,14 @@ export const DOMAINS: DomainDef[] = [
 				capability: 'EMAIL_DEFER_EVENTS_API_VIEW',
 				featureFlag: 'emailDeferEventsTab',
 				description: 'Historial de defers/fails sincrónicos del MTA por destinatario.',
+			},
+			{
+				label: 'Emails MailerSend',
+				route: '/intranet/admin/monitoreo/correos/mailersend',
+				icon: 'pi pi-send',
+				capability: 'EMAIL_MAILERSEND_PAGE_API_VIEW',
+				standalonePermission: true,
+				description: 'Actividad de MailerSend: en cola, rechazados, enviados y entregados.',
 			},
 		],
 	},
