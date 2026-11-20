@@ -129,9 +129,8 @@
 		animation: edu-row-fold-cell var(--motion-base) var(--ease-in-out) backwards;
 
 		> * {
-			/* `max-height` no aplica a cajas en línea (span, edu-button, edu-tag). */
-			display: inline-block;
-			vertical-align: top;
+			/* `max-height` no aplica a cajas en línea (span, edu-button, edu-tag). La fila ya está invisible, así que el cambio de display no se ve. */
+			display: block;
 			max-height: 0;
 			margin-block: 0;
 			padding-block: 0;
