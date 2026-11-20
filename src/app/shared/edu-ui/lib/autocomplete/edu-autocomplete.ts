@@ -5,6 +5,7 @@ import { TemplatePortal } from '@angular/cdk/portal';
 import {
 	ChangeDetectionStrategy,
 	Component,
+	ElementRef,
 	OnDestroy,
 	TemplateRef,
 	ViewContainerRef,
@@ -55,6 +56,7 @@ const PANEL_POSITIONS: ConnectedPosition[] = [
 	],
 	template: `
 		<span
+			#anchor
 			class="edu-autocomplete"
 			[style]="style()"
 			[eduPtRoot]="$safeNavigationMigration(pt()?.root)"
@@ -179,6 +181,7 @@ export class EduAutoComplete<T = unknown> implements ControlValueAccessor, OnDes
 	);
 
 	private readonly overlayTemplateRef = viewChild<TemplateRef<unknown>>('overlayTemplate');
+	private readonly anchorRef = viewChild<ElementRef<HTMLElement>>('anchor');
 	private readonly viewContainerRef = inject(ViewContainerRef);
 	private readonly overlay = inject(Overlay);
 	private readonly focusTrapFactory = inject(FocusTrapFactory);
@@ -346,6 +349,10 @@ export class EduAutoComplete<T = unknown> implements ControlValueAccessor, OnDes
 		this.nav.reset();
 	}
 
+	/**
+	 * The panel anchors to the whole field (input + chevron), not to whichever inner
+	 * element fired the event: anchoring to the chevron pushed it to the right edge.
+	 */
 	private open(trigger: HTMLElement): void {
 		const overlayTemplate = this.overlayTemplateRef();
 		if (!overlayTemplate || this.handle.isOpen) {
@@ -353,9 +360,10 @@ export class EduAutoComplete<T = unknown> implements ControlValueAccessor, OnDes
 		}
 
 		const portal = new TemplatePortal(overlayTemplate, this.viewContainerRef);
+		const anchor = this.anchorRef()?.nativeElement ?? trigger;
 		const positionStrategy = this.overlay
 			.position()
-			.flexibleConnectedTo(trigger)
+			.flexibleConnectedTo(anchor)
 			.withPositions(PANEL_POSITIONS)
 			.withFlexibleDimensions(false)
 			.withPush(true);
@@ -364,6 +372,7 @@ export class EduAutoComplete<T = unknown> implements ControlValueAccessor, OnDes
 			portal,
 			{
 				positionStrategy,
+				minWidth: anchor.getBoundingClientRect().width,
 				panelClass: 'edu-autocomplete-pane',
 				hasBackdrop: false,
 				closeOnBackdropClick: false,

@@ -24,6 +24,8 @@ export interface EduOverlayOpenOptions {
 	trapFocus?: boolean;
 	/** The panel grows from (and shrinks back to) the element that was focused when it opened. */
 	originFromTrigger?: boolean;
+	/** Floor for the pane width in px (e.g. the anchor's width, so a dropdown is never narrower than its input). */
+	minWidth?: number;
 }
 
 export interface EduOverlayCloseOptions {
@@ -73,6 +75,7 @@ export class EduOverlayHandle {
 			hasBackdrop: options.hasBackdrop,
 			backdropClass: options.backdropClass,
 			panelClass: options.panelClass,
+			minWidth: options.minWidth,
 		});
 
 		this.overlayRef.attach(portal);
