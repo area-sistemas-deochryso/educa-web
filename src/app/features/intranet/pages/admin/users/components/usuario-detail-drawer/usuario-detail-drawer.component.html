@@ -13,76 +13,124 @@
 		</div>
 	</ng-template>
 
-	@if (usuario()) {
-		<!-- * User snapshot -->
-		<div class="detail-content">
-			<div class="detail-avatar">
-				<i class="pi pi-user"></i>
+	@if (usuario(); as u) {
+		<!-- * Identity: avatar, name, DNI and status tags -->
+		<div class="detail-hero">
+			<edu-avatar [label]="initials()" [rol]="u.rol" size="xlarge" shape="circle" variant="brand" />
+			<div class="detail-name">{{ u.apellidos | fullName: u.nombres }}</div>
+			<span class="detail-dni">DNI {{ u.dni }}</span>
+			<div class="detail-tags">
+				<edu-tag [value]="u.rol" [severity]="uiMapping.getRolSeverity(u.rol)" styleClass="tag-neutral" />
+				<edu-tag [value]="u.estado | estadoLabel" [severity]="u.estado | estadoSeverity" styleClass="tag-neutral" />
 			</div>
+		</div>
 
-			<div class="detail-name">{{ usuario()!.apellidos | fullName: usuario()!.nombres }}</div>
+		<div class="detail-sections">
+			@if (u.correo || u.telefono) {
+				<section class="detail-section">
+					<h3 class="section-title"><i class="pi pi-envelope"></i>Contacto</h3>
+					<dl class="info-list">
+						@if (u.correo) {
+							<div class="info-item info-item--stack">
+								<dt>Correo</dt>
+								<dd>{{ u.correo }}</dd>
+							</div>
+						}
+						@if (u.telefono) {
+							<div class="info-item">
+								<dt>Teléfono</dt>
+								<dd>{{ u.telefono }}</dd>
+							</div>
+						}
+					</dl>
+				</section>
+			}
 
-			<edu-tag
-				[value]="usuario()!.rol"
-				[severity]="uiMapping.getRolSeverity(usuario()!.rol)"
-				styleClass="tag-neutral"
-			/>
+			@if (u.sedeNombre || u.salonNombre || u.salonesNombres?.length || u.grado || u.seccion) {
+				<section class="detail-section">
+					<h3 class="section-title"><i class="pi pi-building"></i>Académico</h3>
+					<dl class="info-list">
+						@if (u.sedeNombre) {
+							<div class="info-item">
+								<dt>Sede</dt>
+								<dd>{{ u.sedeNombre }}</dd>
+							</div>
+						}
+						@if (u.salonNombre) {
+							<div class="info-item">
+								<dt>Salón</dt>
+								<dd>{{ u.salonNombre }}</dd>
+							</div>
+						}
+						@if (u.salonesNombres?.length) {
+							<div class="info-item">
+								<dt>Salones</dt>
+								<dd>{{ u.salonesNombres!.join(', ') }}</dd>
+							</div>
+						}
+						@if (u.grado && !u.salonNombre) {
+							<div class="info-item">
+								<dt>Grado</dt>
+								<dd>{{ u.grado }}</dd>
+							</div>
+						}
+						@if (u.seccion && !u.salonNombre) {
+							<div class="info-item">
+								<dt>Sección</dt>
+								<dd>{{ u.seccion }}</dd>
+							</div>
+						}
+					</dl>
+				</section>
+			}
 
-			<!-- * Basic info list -->
-			<div class="detail-info">
-				<div class="info-item">
-					<span class="info-label">DNI</span>
-					<span class="info-value">{{ usuario()!.dni }}</span>
-				</div>
-				<div class="info-item">
-					<span class="info-label">Estado</span>
-					<edu-tag
-						[value]="usuario()!.estado | estadoLabel"
-						[severity]="usuario()!.estado | estadoSeverity"
-						styleClass="tag-neutral"
-					/>
-				</div>
-				@if (usuario()!.correo) {
+			@if (u.nombreApoderado || u.correoApoderado || u.telefonoApoderado) {
+				<section class="detail-section">
+					<h3 class="section-title"><i class="pi pi-users"></i>Apoderado</h3>
+					<dl class="info-list">
+						@if (u.nombreApoderado) {
+							<div class="info-item">
+								<dt>Nombre</dt>
+								<dd>{{ u.nombreApoderado }}</dd>
+							</div>
+						}
+						@if (u.correoApoderado) {
+							<div class="info-item info-item--stack">
+								<dt>Correo</dt>
+								<dd>{{ u.correoApoderado }}</dd>
+							</div>
+						}
+						@if (u.telefonoApoderado) {
+							<div class="info-item">
+								<dt>Teléfono</dt>
+								<dd>{{ u.telefonoApoderado }}</dd>
+							</div>
+						}
+					</dl>
+				</section>
+			}
+
+			<section class="detail-section">
+				<h3 class="section-title"><i class="pi pi-calendar"></i>Registro</h3>
+				<dl class="info-list">
+					@if (u.fechaNacimiento) {
+						<div class="info-item">
+							<dt>Nacimiento</dt>
+							<dd>{{ u.fechaNacimiento | date: 'dd/MM/yyyy' }}</dd>
+						</div>
+					}
 					<div class="info-item">
-						<span class="info-label">Correo</span>
-						<span class="info-value">{{ usuario()!.correo }}</span>
+						<dt>Registrado</dt>
+						<dd>{{ u.fechaRegistro | date: 'dd/MM/yyyy' }}</dd>
 					</div>
-				}
-				@if (usuario()!.telefono) {
-					<div class="info-item">
-						<span class="info-label">Telefono</span>
-						<span class="info-value">{{ usuario()!.telefono }}</span>
-					</div>
-				}
-				@if (usuario()!.sedeNombre) {
-					<div class="info-item">
-						<span class="info-label">Sede</span>
-						<span class="info-value">{{ usuario()!.sedeNombre }}</span>
-					</div>
-				}
-				@if (usuario()!.grado) {
-					<div class="info-item">
-						<span class="info-label">Grado</span>
-						<span class="info-value">{{ usuario()!.grado }}</span>
-					</div>
-				}
-				@if (usuario()!.seccion) {
-					<div class="info-item">
-						<span class="info-label">Seccion</span>
-						<span class="info-value">{{ usuario()!.seccion }}</span>
-					</div>
-				}
-				@if (usuario()!.correoApoderado) {
-					<div class="info-item">
-						<span class="info-label">Correo del Apoderado</span>
-						<span class="info-value">{{ usuario()!.correoApoderado }}</span>
-					</div>
-				}
-				<div class="info-item">
-					<span class="info-label">Fecha de Registro</span>
-					<span class="info-value">{{ usuario()!.fechaRegistro | date: 'dd/MM/yyyy' }}</span>
-				</div>
-			</div>
+					@if (u.fechaModificacion) {
+						<div class="info-item">
+							<dt>Modificado</dt>
+							<dd>{{ u.fechaModificacion | date: 'dd/MM/yyyy' }}</dd>
+						</div>
+					}
+				</dl>
+			</section>
 		</div>
 
 		<!-- * Footer actions -->
