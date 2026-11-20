@@ -54,7 +54,53 @@
 	background: var(--eduui-content-background);
 	box-shadow: var(--eduui-overlay-popover-shadow);
 	pointer-events: auto;
+	position: relative;
+	overflow: hidden;
 }
+
+/* Salida (plan F11 F5): el estado final es la clase; el keyframe solo define el origen (fill-mode `backwards`). */
+@keyframes edu-toast-exit {
+	from {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+.edu-toast .edu-toast__item.edu-toast__item--leaving {
+	opacity: 0;
+	transform: translate(var(--toast-exit-x, 0), var(--toast-exit-y, 0));
+	pointer-events: none;
+	animation: edu-toast-exit var(--motion-base) var(--ease-out) backwards;
+}
+.edu-toast[data-position$='right'] { --toast-exit-x: var(--motion-exit-distance); }
+.edu-toast[data-position$='left'] { --toast-exit-x: calc(var(--motion-exit-distance) * -1); }
+.edu-toast[data-position='top-center'] { --toast-exit-y: calc(var(--motion-exit-distance) * -1); }
+.edu-toast[data-position='bottom-center'] { --toast-exit-y: var(--motion-exit-distance); }
+.edu-toast[data-position='center'] { --toast-exit-y: calc(var(--motion-exit-distance) * -1); }
+
+/* Cuenta regresiva: `scaleX` 1→0 en lineal; se congela junto con el temporizador (`data-paused`). */
+@keyframes edu-toast-countdown {
+	from {
+		transform: scaleX(1);
+	}
+}
+
+.edu-toast__bar {
+	position: absolute;
+	inset: auto 0 0 0;
+	height: 3px;
+	background: currentColor;
+	opacity: 0.35;
+	transform: scaleX(0);
+	transform-origin: left;
+	animation: edu-toast-countdown var(--toast-life) linear backwards;
+}
+.edu-toast__item[data-paused] .edu-toast__bar { animation-play-state: paused; }
+.edu-toast__item--leaving .edu-toast__bar { visibility: hidden; }
+.edu-toast__item[data-severity='success'] .edu-toast__bar { color: var(--eduui-green-600); }
+.edu-toast__item[data-severity='info'] .edu-toast__bar { color: var(--eduui-sky-600); }
+.edu-toast__item[data-severity='warn'] .edu-toast__bar { color: var(--eduui-yellow-600); }
+.edu-toast__item[data-severity='danger'] .edu-toast__bar { color: var(--eduui-red-600); }
 
 .edu-toast__item[data-severity='success'] { border-color: var(--eduui-green-200); }
 .edu-toast__item[data-severity='info'] { border-color: var(--eduui-sky-200); }
