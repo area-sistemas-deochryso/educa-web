@@ -10,7 +10,7 @@ hot-paths: []
 
 > **Repo destino**: `educa-web` (frontend, branch `main`). Abrir el chat nuevo en este repo.
 > **Plan**: [`plan/motion-expresivo.md`](../../plan/motion-expresivo.md) (F11) · **Chat**: 8 · **Fase**: F9 · **Creado**: 2026-11-20 · **Estado**: ✅ implementado (commit `1684734d` en `chat/950-fe-f11-f9-slide-direccional`).
-> **Validación prod**: ⏳ pendiente desde 2026-11-20 — verificación manual del usuario (desktop/móvil/reduced-motion en `/intranet/admin/cursos` y `/intranet/asistencia`) y `/wt-merge` previo.
+> **Validación prod**: ✅ verificada 2026-11-20 — slide probado en local por el usuario (desktop, ajustado a 360 px / 400 ms en `dfc80ab6`); blur de F7 aprobado.
 > **MODO SUGERIDO**: `/investigate` → `/design` → `/execute` → `/validate`.
 > **modules**: `ui` (motion, router).
 
