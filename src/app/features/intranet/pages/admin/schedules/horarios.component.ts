@@ -32,12 +32,12 @@ import {
 	buildDeleteHorarioMessage,
 	buildToggleHorarioMessage,
 } from '@app/shared/constants';
-import { EduButton, EduCheckbox, EduConfirmDialog, EduConfirmationService, EduDialog, EduSelect, EduTag, EduTooltip } from '@edu-ui';
+import { EduButton, EduCheckbox, EduConfirmDialog, EduConfirmationService, EduDialog, EduInputText, EduSelect, EduTag, EduTooltip } from '@edu-ui';
 
 @Component({
 	selector: 'app-schedules',
 	standalone: true,
-	imports: [FormsModule, EduButton, EduCheckbox, EduConfirmDialog, EduDialog, EduSelect, EduTag, EduTooltip, ScheduleDetailDrawerComponent, SchedulesCoursePickerComponent, SchedulesFormDialogComponent, SchedulesImportDialogComponent, SchedulesStatsSkeletonComponent, ScheduleGridLayoutComponent, ScheduleGlobalViewComponent, PageHeaderComponent, PeriodToggleComponent, KpiStatsComponent, DependencyGuidanceComponent],
+	imports: [FormsModule, EduButton, EduCheckbox, EduConfirmDialog, EduDialog, EduInputText, EduSelect, EduTag, EduTooltip, ScheduleDetailDrawerComponent, SchedulesCoursePickerComponent, SchedulesFormDialogComponent, SchedulesImportDialogComponent, SchedulesStatsSkeletonComponent, ScheduleGridLayoutComponent, ScheduleGlobalViewComponent, PageHeaderComponent, PeriodToggleComponent, KpiStatsComponent, DependencyGuidanceComponent],
 	templateUrl: './horarios.component.html',
 	styleUrl: './horarios.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -53,6 +53,21 @@ export class SchedulesComponent implements OnInit {
 	readonly vm = this.dataFacade.vm;
 
 	readonly selectedEstudianteIds = signal<number[]>([]);
+	readonly studentSearch = signal('');
+
+	/** Disponibles filtrados por nombre o DNI (sin distinguir tildes ni mayúsculas). */
+	readonly filteredEstudiantes = computed(() => {
+		const norm = (s: string) => s.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
+		const term = norm(this.studentSearch().trim());
+		const all = this.vm().estudiantesDisponibles;
+		return term ? all.filter((e: EstudianteHorarioDto) => norm(`${e.nombreCompleto} ${e.dni}`).includes(term)) : all;
+	});
+
+	readonly allFilteredSelected = computed(() => {
+		const shown = this.filteredEstudiantes();
+		const selected = this.selectedEstudianteIds();
+		return shown.length > 0 && shown.every((e: EstudianteHorarioDto) => selected.includes(e.id));
+	});
 
 	// #region Auto-filtro por salonId (brief 436)
 	private pendingSalonId: number | null = null;
@@ -72,10 +87,11 @@ export class SchedulesComponent implements OnInit {
 			this.pendingSalonId = null;
 		});
 
-		// * Camino optimizado: al cargar la lista de disponibles, arrancar con todos seleccionados.
+		// * Al cargar la lista de disponibles, arrancar sin selección: el admin elige a quién asignar.
 		effect(() => {
-			const disponibles = this.vm().estudiantesDisponibles;
-			this.selectedEstudianteIds.set(disponibles.map((e: EstudianteHorarioDto) => e.id));
+			void this.vm().estudiantesDisponibles;
+			this.selectedEstudianteIds.set([]);
+			this.studentSearch.set('');
 		});
 	}
 	// #endregion
@@ -316,8 +332,9 @@ export class SchedulesComponent implements OnInit {
 	}
 
 	onToggleAllStudents(checked: boolean): void {
-		this.selectedEstudianteIds.set(
-			checked ? this.vm().estudiantesDisponibles.map((e: EstudianteHorarioDto) => e.id) : [],
+		const shownIds = this.filteredEstudiantes().map((e: EstudianteHorarioDto) => e.id);
+		this.selectedEstudianteIds.update((ids) =>
+			checked ? [...new Set([...ids, ...shownIds])] : ids.filter((id) => !shownIds.includes(id)),
 		);
 	}
 

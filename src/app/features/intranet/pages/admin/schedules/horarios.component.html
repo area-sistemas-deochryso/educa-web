@@ -262,32 +262,52 @@
 	[draggable]="false"
 	[resizable]="false"
 	[closable]="true"
-	header="Seleccionar Estudiantes"
+	header="Agregar estudiantes"
 	styleClass="student-selection-dialog"
 	[style]="{ width: '450px' }"
 >
 	@if (vm().estudiantesDisponibles.length > 0) {
+		<p class="student-selection-hint">Marca los estudiantes del salón que llevarán este curso.</p>
+
+		@if (vm().estudiantesDisponibles.length > 6) {
+			<div class="student-search">
+				<i class="pi pi-search"></i>
+				<input
+					type="text"
+					eduInputText
+					placeholder="Buscar por nombre o DNI..."
+					[ngModel]="studentSearch()"
+					(ngModelChange)="studentSearch.set($event)"
+				/>
+			</div>
+		}
+
 		<div class="student-selection-content">
 			<div class="student-selection-item select-all">
 				<edu-checkbox
 					[binary]="true"
-					[ngModel]="selectedEstudianteIds().length === vm().estudiantesDisponibles.length"
+					[ngModel]="allFilteredSelected()"
 					(ngModelChange)="onToggleAllStudents($event)"
 					data-info-anchor="admin-schedules-seleccionar-todos-checkbox"
 				/>
-				<span>Seleccionar todos</span>
+				<span>Seleccionar todos{{ studentSearch().trim() ? ' los resultados' : '' }}</span>
 			</div>
 
-			@for (estudiante of vm().estudiantesDisponibles; track estudiante.id) {
-				<div class="student-selection-item">
+			@for (estudiante of filteredEstudiantes(); track estudiante.id) {
+				<label class="student-selection-item selectable">
 					<edu-checkbox
 						[binary]="true"
 						[ngModel]="selectedEstudianteIds().includes(estudiante.id)"
 						(ngModelChange)="onToggleStudent(estudiante.id, $event)"
 						data-info-anchor="admin-schedules-seleccionar-estudiante-checkbox"
 					/>
-					<span>{{ estudiante.nombreCompleto }}</span>
-				</div>
+					<span class="student-text">
+						<span class="student-name">{{ estudiante.nombreCompleto }}</span>
+						<small>DNI: {{ estudiante.dni }}</small>
+					</span>
+				</label>
+			} @empty {
+				<p class="student-selection-empty">Ningún estudiante coincide con la búsqueda.</p>
 			}
 		</div>
 	} @else {
@@ -302,7 +322,7 @@
 			(click)="onCloseStudentSelection()"
 		/>
 		<edu-button
-			label="Asignar Seleccionados"
+			[label]="selectedEstudianteIds().length > 0 ? 'Asignar (' + selectedEstudianteIds().length + ')' : 'Asignar'"
 			icon="pi pi-check"
 			[disabled]="selectedEstudianteIds().length === 0"
 			(click)="onConfirmStudentSelection()"

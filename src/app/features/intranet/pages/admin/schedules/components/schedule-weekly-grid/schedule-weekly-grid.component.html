@@ -104,27 +104,25 @@
 
               <!-- Hover actions -->
               <div class="block-actions">
-                <edu-button
-                  icon="pi pi-eye"
-                  [text]="true"
-                  [rounded]="true"
-                  size="small"
+                <button
+                  type="button"
                   class="action-btn"
+                  aria-label="Ver detalles"
                   data-info-anchor="admin-schedules-block-ver-detalle-btn"
                   (click)="onViewDetailClick($event, block)"
-                  [pt]="{ root: { 'aria-label': 'Ver detalles' } }"
-                />
+                >
+                  <i class="pi pi-eye"></i>
+                </button>
                 @if (isAdmin()) {
-                  <edu-button
-                    icon="pi pi-pencil"
-                    [text]="true"
-                    [rounded]="true"
-                    size="small"
+                  <button
+                    type="button"
                     class="action-btn"
+                    aria-label="Editar"
                     data-info-anchor="admin-schedules-block-editar-btn"
                     (click)="onEditClick($event, block)"
-                    [pt]="{ root: { 'aria-label': 'Editar' } }"
-                  />
+                  >
+                    <i class="pi pi-pencil"></i>
+                  </button>
                 }
               </div>
             </div>

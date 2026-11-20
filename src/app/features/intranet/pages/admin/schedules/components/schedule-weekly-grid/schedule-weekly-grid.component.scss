@@ -273,20 +273,41 @@
   top: 2px;
   right: 2px;
   display: flex;
-  gap: 0.125rem;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.15s;
 
+  // Botones nativos (no edu-button): el tamaño no depende de estilos internos de la librería.
   .action-btn {
-    width: 24px;
-    height: 24px;
-    background: rgba(255, 255, 255, 0.95);
-    color: var(--primary-text-color);
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.15s;
+
+    i {
+      font-size: 0.7rem;
+    }
 
     &:hover {
-      background: var(--intranet-white-color);
-      transform: scale(1.1);
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    &:focus-visible {
+      outline: 2px solid #fff;
+      outline-offset: -2px;
     }
   }
 }

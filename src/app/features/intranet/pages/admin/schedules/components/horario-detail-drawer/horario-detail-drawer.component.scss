@@ -30,9 +30,16 @@
     }
 
     .header-subtitle {
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
       margin: 0.25rem 0 0 0;
       font-size: 0.85rem;
       color: var(--text-color-secondary);
+
+      i {
+        font-size: 0.8rem;
+      }
     }
   }
 }
@@ -143,45 +150,50 @@
   border-radius: 8px;
   border: 1px solid var(--surface-border);
 
-  .info-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
+  // Lista clave–valor: etiqueta a la izquierda, valor a la derecha, filas separadas por una línea.
+  .info-list {
+    margin: 0;
 
-    .info-item {
+    .info-row {
+      display: grid;
+      grid-template-columns: 7.5rem 1fr;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.625rem 0;
+      border-bottom: 1px solid var(--surface-border);
+
+      &:first-child {
+        padding-top: 0;
+      }
+
+      &:last-child {
+        padding-bottom: 0;
+        border-bottom: 0;
+      }
+    }
+
+    dt {
       display: flex;
-      flex-direction: column;
+      align-items: center;
       gap: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--text-color-secondary);
 
-      &.full-width {
-        grid-column: 1 / -1;
-      }
+      i {
+        color: var(--intranet-accent-color-blue);
+        font-size: 0.9rem;
 
-      label {
-        font-size: 0.8rem;
-        font-weight: 500;
-        color: var(--text-color-secondary);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
-
-      .info-value {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 0.95rem;
-        font-weight: 500;
-        color: var(--text-color);
-
-        i {
-          color: var(--intranet-accent-color-blue);
-          font-size: 1rem;
-        }
-
-        &.tutor-value i {
+        &.tutor-icon {
           color: var(--accent-amber);
         }
       }
+    }
+
+    dd {
+      margin: 0;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text-color);
     }
   }
 }
@@ -433,10 +445,9 @@
 // #endregion
 // #region Responsive
 @media (max-width: 768px) {
-  .info-section {
-    .info-grid {
-      grid-template-columns: 1fr;
-    }
+  .info-section .info-list .info-row {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
   }
 }
 

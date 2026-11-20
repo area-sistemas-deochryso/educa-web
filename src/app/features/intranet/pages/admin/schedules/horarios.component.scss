@@ -173,6 +173,53 @@
       margin-bottom: 0.25rem;
       font-weight: 600;
     }
+
+    &.selectable {
+      cursor: pointer;
+
+      &:hover {
+        background: var(--surface-100);
+      }
+    }
+
+    .student-text {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      line-height: 1.25;
+
+      small {
+        color: var(--text-color-secondary);
+      }
+    }
+
+    .student-name {
+      font-weight: 500;
+    }
+  }
+}
+
+.student-selection-hint {
+  margin: 0 0 0.75rem;
+  font-size: 0.9rem;
+  color: var(--text-color-secondary);
+}
+
+.student-search {
+  position: relative;
+  margin-bottom: 0.75rem;
+
+  i {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.6;
+  }
+
+  input {
+    width: 100%;
+    padding-left: 2.25rem;
   }
 }
 
