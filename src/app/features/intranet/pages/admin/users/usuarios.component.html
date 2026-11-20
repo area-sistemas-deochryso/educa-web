@@ -17,14 +17,10 @@
 	<!-- * One-time migration (dev only) -->
 	@if (canMigrarContrasenas() && migrationPhase() !== 'hidden' && !migracionCompletada()) {
 		@if (migrationPhase() === 'toast') {
-			<div class="migration-overlay" (click)="dismissMigration()" data-info-anchor="admin-users-migration-dismiss-overlay"></div>
 			<div class="migration-toast">
 				<i class="pi pi-info-circle"></i>
 				<span>Hay contraseñas en texto plano que pueden migrarse al campo encriptado.</span>
 			</div>
-		}
-		@if (migrationPhase() === 'spotlight') {
-			<div class="migration-overlay migration-overlay--dim" (click)="dismissMigration()"></div>
 		}
 	} @else if (canMigrarContrasenas() && migracionCompletada()) {
 		<div class="migration-success-toast">

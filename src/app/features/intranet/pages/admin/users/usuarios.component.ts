@@ -376,10 +376,6 @@ export class UsersComponent implements AfterViewInit {
 	}
 	// #endregion
 
-	dismissMigration(): void {
-		this.migrationPhase.set('hidden');
-	}
-
 	// #region Private helpers
 	private initMigrationTimer(): void {
 		if (!this.canMigrarContrasenas()) return;

@@ -5,19 +5,6 @@
 }
 
 // #region Migration float
-.migration-overlay {
-	position: fixed;
-	inset: 0;
-	background: rgba(0, 0, 0, 0.3);
-	z-index: 1000;
-	animation: overlayFadeIn 0.3s ease;
-	cursor: pointer;
-
-	&--dim {
-		background: rgba(0, 0, 0, 0.45);
-	}
-}
-
 .migration-toast {
 	position: fixed;
 	// * Anclado cerca del top del viewport (no centrado) para no superponerse
@@ -94,10 +81,6 @@
 	}
 }
 
-@keyframes overlayFadeIn {
-	from { opacity: 0; }
-	to { opacity: 1; }
-}
 // #endregion
 
 // #endregion (validation action removed — moved to overflow menu)
