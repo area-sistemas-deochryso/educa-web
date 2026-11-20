@@ -74,8 +74,6 @@ export class UsersTableComponent {
 	readonly missingGuardianEmailLabel = MISSING_GUARDIAN_EMAIL_LABEL;
 	readonly hasMissingGuardianEmail = hasMissingGuardianEmail;
 
-	private initialLoadDone = false;
-
 	isSavePending(usuario: UsuarioLista): boolean {
 		return this.pendingSaveKeys().has(buildUsuarioKey(usuario.rol, usuario.id));
 	}
@@ -115,10 +113,6 @@ export class UsersTableComponent {
 	}
 
 	onLazyLoad(event: EduTableLazyLoadEvent): void {
-		if (!this.initialLoadDone) {
-			this.initialLoadDone = true;
-			return;
-		}
 		const first = event.first ?? 0;
 		const rows = event.rows ?? this.rows();
 		const page = Math.floor(first / rows) + 1;
