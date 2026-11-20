@@ -139,7 +139,7 @@ Lo que el plan promete y no se verificó con la herramienta disponible, más lo 
 | Reduced-motion con la preferencia del SO emulada | Pendiente. Verificado solo por lectura: regla global `*` con `!important` (`styles.scss`), el contador y el slide lo respetan por JS (`matchMedia`) |
 | Hoja inferior en móvil (F7/M2) y costo del blur en móvil modesto | Sin verificar: no hay dispositivo |
 | Diálogo de justificación en `/intranet/asistencia` | Sin verificar: no hay faltas registradas |
-| F4: pliegue del hueco al quitar fila | ✅ medido tras corregir un defecto (ver abajo). Residual de ~35 px corregido (ver abajo); queda una subida transitoria de ~9 px al arrancar el pliegue |
+| F4: pliegue del hueco al quitar fila | ✅ medido tras corregir un defecto (ver abajo). Residual de ~35 px corregido (ver abajo); subida transitoria de ~3 px (un fotograma) al arrancar, aceptada |
 | F6: contador subiendo desde cero | ✅ medido (0 → 51 en ~0,5 s, valor final accesible desde el inicio) |
 | Barrido de valores hardcoded en animaciones F11 | ✅ hecho: todo usa tokens. Única excepción: giro del chevron (`edu-accordion-header.scss`, `0.15s ease`) |
 
@@ -153,6 +153,6 @@ Además, la salida solo anima bajas puntuales (≤ 3 filas, sin reposición): en
 
 Al final del pliegue la fila medía 35 px en vez de 0: el relleno de las celdas llegaba a ~0,2 px, pero los hijos directos (`span.nombre-text`, `edu-button`, `edu-tag`) son elementos `inline` y `max-height` no aplica a cajas en línea, y la celda conservaba la altura de su línea (`line-height: 24px`). Al retirar la fila se perdían esos 35 px de golpe.
 
-Arreglo aplicado en `edu-row--folding`: celdas con `line-height` animado hasta 0 (`--row-lh` se fija en `playRowExit`) e hijos como `inline-block` con `vertical-align: top`. Medido en `/admin/cursos` (quitar 1 fila): altura de la tabla 167 → 143 → 121 → 118 → 116 → 108 sin salto final; deslizamiento 0-208 ms, pliegue 215-410 ms.
+Arreglo aplicado en `edu-row--folding`: celdas con `line-height` animado hasta 0 (`--row-lh` se fija en `playRowExit`) e hijos como `display: block` (la fila ya está en opacidad 0, así que el cambio no se ve). Medido en `/admin/cursos` (quitar 1 fila): altura de la tabla 167 → 170 → 167 → 143 → 122 → 117 → 116 → 108, sin salto final; deslizamiento 0-208 ms, pliegue 215-410 ms.
 
-Queda abierto: al arrancar el pliegue la tabla sube ~9 px un instante (167 → 176 → 174 → 156) antes de bajar; probablemente por pasar los hijos `div` (`.actions`, `.completitud-badges`) a `inline-block`. Visible solo si hay filas debajo. `vertical-align: top` no lo resolvió.
+Una primera versión con `inline-block` + `vertical-align: top` dejaba una subida de ~9 px al arrancar (por la línea base de los hijos); con `block` queda en ~3 px durante un fotograma, que se acepta.
