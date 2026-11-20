@@ -12,6 +12,7 @@
 	--motion-ripple: 620ms;
 	--motion-shake-distance: 8px;
 	--motion-exit-distance: 24px;
+	--motion-slide-distance: clamp(16px, 5vw, 40px);
 	/* Respaldo del resorte para navegadores sin `linear()`. */
 	--ease-spring: cubic-bezier(0.34, 1.3, 0.64, 1);
 }
@@ -96,5 +97,55 @@
 
 	&.is-rippling::after {
 		animation: motion-ripple var(--motion-ripple) var(--ease-out) backwards;
+	}
+}
+
+/*
+ * Slide direccional entre páginas (plan F11 F9). El guard de View Transitions pone `data-vt-direction` (forward | back)
+ * en <html> y `view-transition-name: page-content` en `.intranet-content` solo mientras dura la transición; sin esas marcas
+ * (query-only, navegación entre hermanos, reduced-motion, sin soporte) nada de esto aplica y queda el crossfade de `root`.
+ * La página nueva entra desde el lado de la dirección; la saliente se desplaza menos y se oscurece con `filter: brightness`
+ * (acotado a este pseudoelemento, que es una captura raster; no se usa backdrop-filter). Fill-mode `backwards`.
+ */
+html[data-vt-direction='forward'] {
+	--vt-sign: 1;
+}
+
+html[data-vt-direction='back'] {
+	--vt-sign: -1;
+}
+
+@keyframes page-slide-in {
+	from {
+		opacity: 0;
+		transform: translateX(calc(var(--motion-slide-distance) * var(--vt-sign)));
+	}
+}
+
+@keyframes page-slide-out {
+	to {
+		opacity: 0;
+		transform: translateX(calc(var(--motion-slide-distance) * var(--vt-sign) * -0.4));
+		filter: brightness(0.9);
+	}
+}
+
+html[data-vt-direction]::view-transition-old(page-content),
+html[data-vt-direction]::view-transition-new(page-content) {
+	mix-blend-mode: normal;
+}
+
+html[data-vt-direction]::view-transition-old(page-content) {
+	animation: page-slide-out var(--motion-base) var(--ease-out) backwards;
+}
+
+html[data-vt-direction]::view-transition-new(page-content) {
+	animation: page-slide-in var(--motion-base) var(--ease-out) backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	html[data-vt-direction]::view-transition-old(page-content),
+	html[data-vt-direction]::view-transition-new(page-content) {
+		animation: none;
 	}
 }
