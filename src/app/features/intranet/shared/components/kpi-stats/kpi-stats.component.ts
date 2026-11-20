@@ -1,7 +1,7 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
-import { CountUpComponent } from '@shared/components/count-up';
+import { CountUpComponent } from '@shared/components';
 // #endregion
 
 // #region Types
