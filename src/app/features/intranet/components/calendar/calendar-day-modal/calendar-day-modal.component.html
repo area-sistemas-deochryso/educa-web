@@ -1,88 +1,79 @@
 <!-- #region Template -->
-@if (visible()) {
-	<!-- * Overlay click closes the modal -->
-	<div class="modal-overlay" (click)="onOverlayClick($event)">
-		<div
-			class="modal-content"
-			[class.holiday-modal]="data()?.type === 'holiday'"
-			[class.event-modal]="data()?.type === 'event'"
-		>
-			<!-- * Close action -->
-			<button class="modal-close" (click)="onClose()">
-				<i class="pi pi-times"></i>
-			</button>
-
-			@if (data(); as modalData) {
-				<!-- * Header with icon + badge -->
-				<div class="modal-header">
-					<div
-						class="modal-icon"
-						[class.holiday-icon]="modalData.type === 'holiday'"
-						[class.event-icon]="modalData.type === 'event'"
-					>
-						<i
-							class="pi"
-							[ngClass]="
-								modalData.type === 'holiday'
-									? $safeNavigationMigration(modalData.holiday?.icon)
-									: $safeNavigationMigration(modalData.event?.icon)
-							"
-						></i>
-					</div>
-					<div class="modal-title-section">
-						<span
-							class="modal-badge"
-							[class.holiday-badge]="modalData.type === 'holiday'"
-							[class.event-badge]="modalData.type === 'event'"
-						>
-							{{
-								modalData.type === 'holiday'
-									? getHolidayTypeLabel(modalData.holiday!.type)
-									: getEventTypeLabel(modalData.event!.type)
-							}}
-						</span>
-						<h2 class="modal-title">
-							{{
-								modalData.type === 'holiday'
-									? modalData.holiday?.name
-									: modalData.event?.title
-							}}
-						</h2>
-					</div>
+<!-- * edu-dialog aporta backdrop desenfocado, entrada escalonada, hoja móvil, Esc y foco (F11 F8). -->
+<edu-dialog
+	[visible]="visible()"
+	(visibleChange)="onVisibleChange($event)"
+	[modal]="true"
+	[dismissableMask]="true"
+	[style]="dialogStyle()"
+	[header]="data() ? modalTitle() : ''"
+>
+	<ng-template #header>
+		@if (data(); as modalData) {
+			<div class="modal-header">
+				<div
+					class="modal-icon"
+					[class.holiday-icon]="modalData.type === 'holiday'"
+					[class.event-icon]="modalData.type === 'event'"
+				>
+					<i
+						class="pi"
+						[ngClass]="
+							modalData.type === 'holiday'
+								? $safeNavigationMigration(modalData.holiday?.icon)
+								: $safeNavigationMigration(modalData.event?.icon)
+						"
+					></i>
 				</div>
-
-				<div class="modal-body">
-					<!-- * Date + optional time/location -->
-					<div class="modal-date">
-						<i class="pi pi-calendar"></i>
-						<span>{{ formatDate(modalData.date) }}</span>
-					</div>
-
-					@if (modalData.type === 'event' && modalData.event) {
-						@if (modalData.event.time) {
-							<div class="modal-info">
-								<i class="pi pi-clock"></i>
-								<span>{{ modalData.event.time }}</span>
-							</div>
-						}
-						@if (modalData.event.location) {
-							<div class="modal-info">
-								<i class="pi pi-map-marker"></i>
-								<span>{{ modalData.event.location }}</span>
-							</div>
-						}
-					}
-
-					<p class="modal-description">
+				<div class="modal-title-section">
+					<span
+						class="modal-badge"
+						[class.holiday-badge]="modalData.type === 'holiday'"
+						[class.event-badge]="modalData.type === 'event'"
+					>
 						{{
 							modalData.type === 'holiday'
-								? modalData.holiday?.description
-								: modalData.event?.description
+								? getHolidayTypeLabel(modalData.holiday!.type)
+								: getEventTypeLabel(modalData.event!.type)
 						}}
-					</p>
+					</span>
+					<h2 class="modal-title">{{ modalTitle() }}</h2>
 				</div>
+			</div>
+		}
+	</ng-template>
+
+	@if (data(); as modalData) {
+		<div class="modal-body">
+			<!-- * Date + optional time/location -->
+			<div class="modal-date">
+				<i class="pi pi-calendar"></i>
+				<span>{{ formatDate(modalData.date) }}</span>
+			</div>
+
+			@if (modalData.type === 'event' && modalData.event) {
+				@if (modalData.event.time) {
+					<div class="modal-info">
+						<i class="pi pi-clock"></i>
+						<span>{{ modalData.event.time }}</span>
+					</div>
+				}
+				@if (modalData.event.location) {
+					<div class="modal-info">
+						<i class="pi pi-map-marker"></i>
+						<span>{{ modalData.event.location }}</span>
+					</div>
+				}
 			}
+
+			<p class="modal-description">
+				{{
+					modalData.type === 'holiday'
+						? modalData.holiday?.description
+						: modalData.event?.description
+				}}
+			</p>
 		</div>
-	</div>
-}
+	}
+</edu-dialog>
 <!-- #endregion -->

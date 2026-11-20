@@ -1,92 +1,10 @@
 // #region Styles
-.modal-overlay {
-	position: fixed;
-	inset: 0;
-	background: rgba(0, 0, 0, 0.5);
-	backdrop-filter: blur(4px);
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	z-index: 1000;
-	padding: 1rem;
-	animation: fadeIn 0.2s ease;
-}
-
-@keyframes fadeIn {
-	from {
-		opacity: 0;
-	}
-	to {
-		opacity: 1;
-	}
-}
-
-.modal-content {
-	background: white;
-	border-radius: 24px;
-	max-width: 480px;
-	width: 100%;
-	max-height: 90vh;
-	overflow-y: auto;
-	position: relative;
-	box-shadow: var(--shadow-3);
-	animation: slideUp 0.3s ease;
-
-	&.holiday-modal {
-		border-top: 4px solid var(--red-600);
-	}
-
-	&.event-modal {
-		border-top: 4px solid var(--green-600);
-	}
-}
-
-@keyframes slideUp {
-	from {
-		opacity: 0;
-		transform: translateY(20px);
-	}
-	to {
-		opacity: 1;
-		transform: translateY(0);
-	}
-}
-
-.modal-close {
-	position: absolute;
-	top: 1rem;
-	right: 1rem;
-	width: 36px;
-	height: 36px;
-	border-radius: 50%;
-	border: none;
-	background: var(--surface-50);
-	cursor: pointer;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	transition: all 0.2s ease;
-	z-index: 1;
-
-	i {
-		font-size: 1rem;
-		color: var(--intranet-soft-text-color);
-	}
-
-	&:hover {
-		background: var(--surface-100);
-
-		i {
-			color: var(--intranet-alternative-text-color);
-		}
-	}
-}
-
+// * Backdrop, panel, entrada y cierre los aporta edu-dialog; acá solo el contenido.
 .modal-header {
 	display: flex;
 	align-items: flex-start;
 	gap: 1rem;
-	padding: 1.5rem 1.5rem 1rem;
+	flex: 1;
 }
 
 .modal-icon {
@@ -154,10 +72,6 @@
 	line-height: 1.3;
 }
 
-.modal-body {
-	padding: 0 1.5rem 1.5rem;
-}
-
 .modal-date,
 .modal-info {
 	display: flex;
@@ -191,16 +105,10 @@
 }
 
 @media (max-width: 768px) {
-	.modal-content {
-		margin: 0.5rem;
-		border-radius: 20px;
-	}
-
 	.modal-header {
 		flex-direction: column;
 		align-items: center;
 		text-align: center;
-		padding-top: 2.5rem;
 	}
 
 	.modal-title-section {

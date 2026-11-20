@@ -1,13 +1,14 @@
 // #region Imports
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { EduDialog } from '@edu-ui';
 import { ModalData } from '@features/intranet/pages/cross-role/calendary-component/calendar.types';
 
 // #endregion
 // #region Implementation
 @Component({
 	selector: 'app-calendar-day-modal',
-	imports: [CommonModule],
+	imports: [CommonModule, EduDialog],
 	templateUrl: './calendar-day-modal.component.html',
 	styleUrl: './calendar-day-modal.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -20,14 +21,22 @@ export class CalendarDayModalComponent {
 	// * Close output for parent control.
 	closeModal = output<void>();
 
-	onClose(): void {
-		this.closeModal.emit();
-	}
+	// * Accent color by type, applied to the dialog panel.
+	readonly dialogStyle = computed<Record<string, string>>(() => {
+		const accent = this.data()?.type === 'holiday' ? 'var(--red-600)' : 'var(--green-600)';
+		return { width: '480px', 'border-top': `4px solid ${accent}` };
+	});
 
-	onOverlayClick(event: MouseEvent): void {
-		// * Only close when clicking the overlay, not the content.
-		if ((event.target as HTMLElement).classList.contains('modal-overlay')) {
-			this.onClose();
+	readonly modalTitle = computed(() => {
+		const modalData = this.data();
+		if (!modalData) return '';
+		return (modalData.type === 'holiday' ? modalData.holiday?.name : modalData.event?.title) ?? '';
+	});
+
+	onVisibleChange(visible: boolean): void {
+		// * Esc, backdrop click and the X all arrive here; the parent owns the state.
+		if (!visible) {
+			this.closeModal.emit();
 		}
 	}
 
