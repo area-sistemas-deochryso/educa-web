@@ -124,59 +124,279 @@
 		}
 	}
 
-	// Sección de salones del profesor
+	// Sección de salones del profesor: matriz grado × sección
 	.salon-profesor-section {
-		.salones-list {
-			display: flex;
-			flex-direction: column;
-			gap: 0.375rem;
-			margin-bottom: 1rem;
+		.salon-matrix {
+			--label-col: 9rem;
+			margin-bottom: 0.75rem;
 
-			.salon-row {
+			.matrix-row {
+				display: grid;
+				grid-template-columns: var(--label-col) 1fr;
+				align-items: center;
+				gap: 0.75rem;
+				padding: 0.4rem 0;
+				border-bottom: 1px solid var(--surface-200);
+
+				&.matrix-head {
+					padding: 0 0 0.4rem;
+				}
+			}
+
+			.matrix-cells {
+				display: grid;
+				grid-template-columns: repeat(var(--cols, 1), 1fr);
+				gap: 0.4rem;
+				justify-items: center;
+			}
+
+			.head-cell {
+				font-size: 0.8rem;
+				font-weight: 600;
+				color: var(--text-color-secondary);
+			}
+
+			.matrix-nivel {
 				display: flex;
 				align-items: center;
-				justify-content: space-between;
-				padding: 0.5rem 0.75rem;
-				background: var(--surface-100);
-				border-radius: 8px;
-				border: 1px solid var(--surface-300);
-				min-height: 2.5rem;
+				gap: 0.4rem;
+				width: 100%;
+				padding: 0.6rem 0.25rem;
+				border: 0;
+				border-bottom: 1px solid var(--surface-200);
+				background: transparent;
+				font: inherit;
+				font-size: 0.75rem;
+				font-weight: 600;
+				letter-spacing: 0.06em;
+				text-align: left;
+				text-transform: uppercase;
+				color: var(--text-color-secondary);
+				cursor: pointer;
 
-				.salon-nombre {
-					font-weight: 500;
-					font-size: 0.9rem;
+				&:hover {
 					color: var(--text-color);
-					flex: 1;
-					min-width: 0;
+				}
+
+				&:focus-visible {
+					outline: 2px solid var(--primary-color);
+					outline-offset: 1px;
+				}
+
+				.nivel-chevron {
+					width: 0.9rem;
+					font-size: 0.7rem;
+				}
+
+				.nivel-count {
+					padding: 0.05rem 0.4rem;
+					border-radius: 999px;
+					background: var(--surface-100);
+					letter-spacing: 0;
+				}
+
+				// Resumen visible solo con el nivel plegado
+				.nivel-resumen {
+					margin-left: auto;
 					overflow: hidden;
 					text-overflow: ellipsis;
 					white-space: nowrap;
+					font-weight: 500;
+					letter-spacing: 0.02em;
+					text-transform: none;
+				}
+			}
+
+			.row-title {
+				font-size: 0.875rem;
+				font-weight: 500;
+				color: var(--text-color);
+			}
+
+			.salon-cell {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 1.75rem;
+				height: 1.75rem;
+				padding: 0;
+				border-radius: 50%;
+				font-size: 0.85rem;
+				color: var(--text-color);
+
+				&[data-state='active'] {
+					background: var(--primary-color);
+					color: var(--primary-color-text, #fff);
+					border: 0;
+
+					i {
+						font-size: 0.75rem;
+					}
+				}
+
+				&[data-state='missing'] {
+					background: transparent;
+					border: 1.5px solid var(--surface-border);
+				}
+
+				&[data-state='na'] {
+					opacity: 0.35;
+				}
+
+				// Solo las celdas con salón real son botones
+				&:is(button) {
+					cursor: pointer;
+					transition: transform 0.1s ease, border-color 0.1s ease;
+
+					&:hover {
+						transform: scale(1.1);
+					}
+
+					&[data-state='missing']:hover {
+						border-color: var(--primary-color);
+					}
+
+					&:focus-visible {
+						outline: 2px solid var(--primary-color);
+						outline-offset: 2px;
+					}
+				}
+			}
+		}
+
+		.tutor-list {
+			display: flex;
+			flex-direction: column;
+			gap: 0.4rem;
+			padding: 0.75rem;
+			margin-bottom: 0.5rem;
+			background: var(--surface-50);
+			border-radius: 10px;
+
+			.tutor-row {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+
+				.salon-nombre {
+					font-size: 0.9rem;
+					font-weight: 500;
 				}
 
 				.salon-actions {
 					display: flex;
 					align-items: center;
 					gap: 0.375rem;
-					flex-shrink: 0;
-					margin-left: 0.75rem;
+				}
 
-					.tutor-label {
-						margin: 0;
-						font-size: 0.8rem;
-						cursor: pointer;
-						user-select: none;
-						color: var(--text-color-secondary);
-					}
+				.tutor-label {
+					margin: 0;
+					font-size: 0.8rem;
+					cursor: pointer;
+					user-select: none;
+					color: var(--text-color-secondary);
 				}
 			}
 		}
+	}
 
-		.agregar-salon-row {
-			display: grid;
-			grid-template-columns: 1fr 1fr auto;
-			align-items: start;
+	// Stepper Salones → Cursos
+	.asignaciones-stepper {
+		display: block;
+		grid-column: 1 / -1;
+
+		.edu-step-panels,
+		edu-step-panels {
+			display: block;
+			margin-top: 1rem;
+		}
+
+		.step-count {
+			margin-left: 0.4rem;
+			padding: 0.05rem 0.45rem;
+			border-radius: 999px;
+			background: var(--surface-100);
+			font-size: 0.75rem;
+			font-weight: 600;
+			color: var(--text-color-secondary);
+		}
+
+		.step-nav {
+			display: flex;
+			justify-content: flex-end;
+			margin-top: 0.75rem;
+		}
+	}
+
+	// Elementos compartidos por Salones asignados / Cursos que dicta
+	.salon-profesor-section,
+	.cursos-profesor-section {
+		padding: 1rem;
+		border: 1px solid var(--surface-200);
+		border-radius: 12px;
+
+		.assign-head {
+			display: flex;
+			align-items: center;
 			gap: 0.5rem;
-			margin-bottom: 0.25rem;
+			margin-bottom: 0.75rem;
+
+			i {
+				font-size: 0.95rem;
+				color: var(--text-color-secondary);
+			}
+
+			.assign-title {
+				font-weight: 600;
+				color: var(--text-color);
+			}
+
+			.assign-count {
+				min-width: 1.4rem;
+				padding: 0.05rem 0.45rem;
+				border-radius: 999px;
+				background: var(--surface-100);
+				font-size: 0.75rem;
+				font-weight: 600;
+				text-align: center;
+				color: var(--text-color-secondary);
+			}
+		}
+
+		.curso-row {
+			background: transparent;
+			border-color: var(--surface-200);
+		}
+
+		.add-label {
+			font-size: 0.75rem;
+			font-weight: 600;
+			letter-spacing: 0.05em;
+			text-transform: uppercase;
+			color: var(--text-color-secondary);
+		}
+
+		.assign-empty {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 0.5rem;
+			padding: 0.9rem;
+			margin-bottom: 1rem;
+			border: 1px dashed var(--surface-300);
+			border-radius: 8px;
+			font-size: 0.875rem;
+			color: var(--text-color-secondary);
+		}
+
+		.add-panel {
+			display: flex;
+			flex-direction: column;
+			gap: 0.5rem;
+			padding: 0.75rem;
+			margin-bottom: 0.5rem;
+			background: var(--surface-50);
+			border-radius: 10px;
 		}
 	}
 }

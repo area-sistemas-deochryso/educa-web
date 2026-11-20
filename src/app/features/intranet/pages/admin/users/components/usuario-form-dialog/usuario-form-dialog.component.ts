@@ -3,7 +3,6 @@ import { SalonListDto } from '@features/intranet/pages/admin/schedules/models/sa
 import { CursoListaDto } from '@features/intranet/pages/admin/schedules/models/curso.interface';
 import { type ProfesorCursoListaDto } from '@data/models';
 import { resolveModoAsignacion } from '@data/adapters';
-import { ModoAsignacionBadgeComponent, getModoAsignacionTooltip } from '@shared/components';
 import {
 	ActualizarUsuarioRequest,
 	CrearUsuarioRequest,
@@ -12,11 +11,11 @@ import {
 } from '../../services';
 import {
 	computeGradosOptions,
-	computeModoPreview,
 	computeSalonesAsignados,
+	computeSalonesMatriz,
 	computeSeccionesOptions,
 	findSalonSeleccionado,
-	isSalonYaAsignado,
+	type SalonNivelView,
 } from './usuario-form-dialog.helpers';
 import {
 	ChangeDetectionStrategy,
@@ -28,7 +27,7 @@ import {
 	output,
 	signal,
 } from '@angular/core';
-import { generatePassword } from '@core/helpers';
+import { detectarNivel, generatePassword } from '@core/helpers';
 import { rolRequiereSalon, rolPermiteEsTutor, canEditPassword } from '@shared/models';
 import { RolService } from '@core/services/roles';
 
@@ -36,7 +35,7 @@ import { FormFieldErrorComponent } from '@intranet-shared/components';
 import { FormsModule } from '@angular/forms';
 import { UppercaseInputDirective } from '@intranet-shared/directives';
 import { EstadoLabelPipe } from '@intranet-shared/pipes';
-import { EduButton, EduCheckbox, EduDialog, EduInputText, EduMultiSelect, EduPassword, EduSelect, EduTab, EduTabPanel, EduTabs, EduToggle, EduTooltip } from '@edu-ui';
+import { EduButton, EduCheckbox, EduDialog, EduInputText, EduMultiSelect, EduPassword, EduSelect, EduStep, EduStepList, EduStepPanel, EduStepPanels, EduStepper, EduTab, EduTabPanel, EduTabs, EduToggle } from '@edu-ui';
 
 export type UsuarioFormData = Partial<CrearUsuarioRequest & ActualizarUsuarioRequest>;
 
@@ -63,8 +62,7 @@ export interface FormValidationErrors {
 		EduMultiSelect,
 		EduSelect,
 		EduTabs, EduTab, EduTabPanel,
-		ModoAsignacionBadgeComponent,
-		EduTooltip,
+		EduStepper, EduStepList, EduStep, EduStepPanels, EduStepPanel,
 		EduToggle,
 		EduPassword,
 		FormFieldErrorComponent,
@@ -111,6 +109,7 @@ export class UserFormDialogComponent {
 			.map((r) => ({ label: r.nombre, value: r.nombre }));
 	});
 	readonly activeFormTab = signal<string>('datos');
+	readonly asignacionStep = signal<'salones' | 'cursos'>('salones');
 
 	readonly _gradoSeleccionado = signal<string | null>(null);
 	readonly _seccionSeleccionada = signal<string | null>(null);
@@ -182,13 +181,25 @@ export class UserFormDialogComponent {
 		computeSalonesAsignados(this.formData().salones ?? [], this.salones()),
 	);
 
-	// Verificar si el salón seleccionado ya está asignado
-	readonly salonYaAsignado = computed(() =>
-		isSalonYaAsignado(this.salonSeleccionado(), this.formData().salones ?? []),
+	// Matriz grado × sección (profesor): cada celda es un salón asignable con un clic
+	readonly salonesMatriz = computed(() =>
+		computeSalonesMatriz(this.salones(), this.formData().salones ?? []),
 	);
 
-	// Modo de asignación del salón seleccionado en el selector grado/sección (antes de agregarlo)
-	readonly salonSeleccionadoModoPreview = computed(() => computeModoPreview(this.salonSeleccionado()));
+	// Niveles plegables: por defecto abiertos solo los que ya tienen salones; un clic del usuario manda
+	private readonly nivelesOverride = signal<Record<string, boolean>>({});
+
+	isNivelAbierto(nivel: SalonNivelView): boolean {
+		return this.nivelesOverride()[nivel.key] ?? nivel.total > 0;
+	}
+
+	toggleNivel(nivel: SalonNivelView): void {
+		const abierto = this.isNivelAbierto(nivel);
+		this.nivelesOverride.update((o) => ({ ...o, [nivel.key]: !abierto }));
+	}
+
+	// Solo los salones Flexibles (verano) permiten elegir si el profesor es tutor
+	readonly salonesFlexibles = computed(() => this.salonesAsignados().filter((s) => s.modo === 'Flexible'));
 	// #endregion
 
 	// #region Computed — opciones de sede
@@ -242,6 +253,9 @@ export class UserFormDialogComponent {
 			.map((c) => ({ label: c.nombre, value: c.id }));
 	});
 
+	// Si el profesor deja de tener salones Por curso, el paso "cursos" desaparece: volver a salones
+	readonly stepActual = computed(() => (this.showCursosSection() ? this.asignacionStep() : 'salones'));
+
 	// Cursos seleccionados en el multi-select para agregar
 	readonly _cursosSeleccionados = signal<number[]>([]);
 	// #endregion
@@ -252,7 +266,11 @@ export class UserFormDialogComponent {
 	}
 
 	onVisibleChange(visible: boolean): void {
-		if (!visible) this.activeFormTab.set('datos');
+		if (!visible) {
+			this.activeFormTab.set('datos');
+			this.asignacionStep.set('salones');
+			this.nivelesOverride.set({});
+		}
 		this.visibleChange.emit(visible);
 	}
 
@@ -290,21 +308,24 @@ export class UserFormDialogComponent {
 		// Para Profesor, no hacer nada aquí — se agrega via "Agregar"
 	}
 
-	// Agregar salón seleccionado a la lista del profesor
-	onAgregarSalon(): void {
-		const salon = this.salonSeleccionado();
-		if (!salon || this.salonYaAsignado()) return;
+	// Marca o desmarca un salón en la matriz del profesor
+	onToggleSalon(salonId: number): void {
+		const current = this.formData().salones ?? [];
+		if (current.some((s) => s.salonId === salonId)) {
+			this.onRemoverSalon(salonId);
+			return;
+		}
+
+		const salon = this.salones().find((s) => s.salonId === salonId);
+		if (!salon) return;
 
 		// En modo tutor pleno, la asignación siempre queda marcada como Tutor (INV-AS06)
-		const esTutor = this.salonSeleccionadoModoPreview()?.modo === 'TutorPleno';
-
-		const current = this.formData().salones ?? [];
-		const newSalones: SalonAsignacion[] = [...current, { salonId: salon.salonId, esTutor }];
+		const esTutor = resolveModoAsignacion(salon.gradoOrden, salon.seccion) === 'TutorPleno';
+		// Fija el nivel abierto para que no se pliegue solo al cambiar su conteo
+		const nivel = detectarNivel(salon.grado);
+		if (nivel) this.nivelesOverride.update((o) => ({ ...o, [nivel.toLowerCase()]: true }));
+		const newSalones: SalonAsignacion[] = [...current, { salonId, esTutor }];
 		this.fieldChange.emit({ field: 'salones', value: newSalones });
-
-		// Limpiar selector para permitir agregar otro
-		this._gradoSeleccionado.set(null);
-		this._seccionSeleccionada.set(null);
 	}
 
 	// Remover salón de la lista del profesor
@@ -313,8 +334,6 @@ export class UserFormDialogComponent {
 		const newSalones = current.filter((s) => s.salonId !== salonId);
 		this.fieldChange.emit({ field: 'salones', value: newSalones.length > 0 ? newSalones : undefined });
 	}
-
-	readonly modoTooltipFor = getModoAsignacionTooltip;
 
 	// Toggle tutor de un salón en la lista del profesor (solo aplica en modo Flexible — TutorPleno y PorCurso no muestran el control)
 	onToggleTutor(salonId: number, esTutor: boolean): void {
