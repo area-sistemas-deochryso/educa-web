@@ -1,5 +1,7 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+
+import { CountUpComponent } from '@shared/components/count-up';
 // #endregion
 
 // #region Types
@@ -18,6 +20,7 @@ export interface KpiStatItem {
 @Component({
 	selector: 'app-kpi-stats',
 	standalone: true,
+	imports: [CountUpComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './kpi-stats.component.html',
 	styleUrls: ['./kpi-stats.component.scss'],

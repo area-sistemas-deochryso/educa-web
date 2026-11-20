@@ -6,7 +6,47 @@
 	overflow: hidden;
 }
 
+/*
+ * Pliegue de altura con `grid-template-rows: 0fr ↔ 1fr`. Excepción deliberada a "solo transform/opacity":
+ * la altura del contenido es desconocida (no sirve `max-height` fijo ni `scaleY`, que deforma el texto) y es una
+ * sola propiedad en un nodo; precedente: el pliegue de fila en `edu-table`. Clase base = estado final, los keyframes
+ * solo llevan `from` y el fill-mode es `backwards`.
+ */
 .edu-accordion-panel__content {
+	display: grid;
+	grid-template-rows: 1fr;
+
+	&--entering {
+		animation: edu-accordion-open var(--motion-slow) var(--ease-out) backwards;
+	}
+
+	&--leaving {
+		grid-template-rows: 0fr;
+		opacity: 0;
+		animation: edu-accordion-close var(--motion-slow) var(--ease-out) backwards;
+	}
+}
+
+.edu-accordion-panel__clip {
+	min-height: 0;
+	overflow: hidden;
+}
+
+.edu-accordion-panel__body {
 	padding: 0.75rem 1rem 1rem;
 	border-top: 1px solid var(--eduui-content-border-color);
+}
+
+@keyframes edu-accordion-open {
+	from {
+		grid-template-rows: 0fr;
+		opacity: 0;
+	}
+}
+
+@keyframes edu-accordion-close {
+	from {
+		grid-template-rows: 1fr;
+		opacity: 1;
+	}
 }

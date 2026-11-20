@@ -12,7 +12,7 @@
 		>
 			<div class="stat-content">
 				<span class="stat-label">{{ item.label }}</span>
-				<span class="stat-value">{{ item.value }}</span>
+				<span class="stat-value"><app-count-up [value]="item.value" /></span>
 				@if (item.sublabel) {
 					<span class="stat-sublabel">{{ item.sublabel }}</span>
 				}

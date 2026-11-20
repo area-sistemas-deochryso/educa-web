@@ -11,3 +11,4 @@ export * from './file-row';
 export * from './file-viewer';
 export * from './mobile-card-list';
 export * from './sticky-filter-bar';
+export * from './count-up';
