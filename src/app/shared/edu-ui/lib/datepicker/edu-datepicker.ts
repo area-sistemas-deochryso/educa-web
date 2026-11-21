@@ -21,6 +21,7 @@ import { EduPassThrough, EduPtRoot } from '../passthrough/edu-pt-root';
 import { EduShakeOnInvalid } from '../shake-on-invalid/edu-shake-on-invalid';
 import {
 	MonthCell,
+	coerceDateValue,
 	formatDate,
 	formatHint,
 	formatTime,
@@ -343,9 +344,20 @@ export class EduDatePicker implements ControlValueAccessor, OnDestroy {
 		this.handle.close({ immediate: true });
 	}
 
-	writeValue(value: Date | Date[] | null): void {
-		this.value.set(value ?? null);
-		const first = Array.isArray(value) ? value[0] : value;
+	/**
+	 * Tolera strings (ISO o en el `dateFormat` del campo) además de `Date`: todo se normaliza a `Date`
+	 * y lo no interpretable queda en null. Sin esto, un '' del formulario dejaba `viewDate` como string
+	 * y abrir el calendario fallaba con `getMonth is not a function`. El valor que el control emite
+	 * hacia el modelo sigue siendo `Date`.
+	 */
+	writeValue(value: Date | Date[] | string | string[] | null | undefined): void {
+		const format = this.dateFormat();
+		const normalized = Array.isArray(value)
+			? value.map((item) => coerceDateValue(item, format)).filter((date): date is Date => date !== null)
+			: coerceDateValue(value, format);
+
+		this.value.set(normalized);
+		const first = Array.isArray(normalized) ? normalized[0] : normalized;
 		this.viewDate.set(first ?? new Date());
 	}
 

@@ -1,6 +1,43 @@
 import { describe, expect, it } from 'vitest';
 
-import { formatHint, parseDate } from './date-picker-utils';
+import { coerceDateValue, formatHint, parseDate } from './date-picker-utils';
+
+describe('coerceDateValue', () => {
+	it('deja pasar un Date válido', () => {
+		const date = new Date(2026, 0, 2);
+		expect(coerceDateValue(date, 'dd/mm/yyyy')).toBe(date);
+	});
+
+	it('rechaza un Date inválido', () => {
+		expect(coerceDateValue(new Date('x'), 'dd/mm/yyyy')).toBeNull();
+	});
+
+	it.each([[''], ['   '], [null], [undefined], [42], [{}]])('devuelve null con %j', (value) => {
+		expect(coerceDateValue(value, 'dd/mm/yyyy')).toBeNull();
+	});
+
+	it('lee YYYY-MM-DD como ese día local', () => {
+		const date = coerceDateValue('2026-01-02', 'dd/mm/yyyy');
+		expect([date?.getFullYear(), date?.getMonth(), date?.getDate(), date?.getHours()]).toEqual([2026, 0, 2, 0]);
+	});
+
+	it('rechaza una fecha ISO imposible', () => {
+		expect(coerceDateValue('2026-02-31', 'dd/mm/yyyy')).toBeNull();
+	});
+
+	it('conserva la hora de un ISO con hora', () => {
+		const date = coerceDateValue('2026-01-02T08:30:00', 'dd/mm/yyyy');
+		expect([date?.getDate(), date?.getHours(), date?.getMinutes()]).toEqual([2, 8, 30]);
+	});
+
+	it('lee texto en el formato del campo', () => {
+		expect(coerceDateValue('15/10/2026', 'dd/mm/yyyy')?.getMonth()).toBe(9);
+	});
+
+	it('devuelve null con texto que no es fecha', () => {
+		expect(coerceDateValue('no-es-fecha', 'dd/mm/yyyy')).toBeNull();
+	});
+});
 
 describe('parseDate', () => {
 	it.each([

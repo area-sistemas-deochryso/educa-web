@@ -108,6 +108,42 @@ export function formatHint(dateFormat: string): string {
 	return dateFormat.replace(/yyyy|yy/g, (token) => (token === 'yyyy' ? 'aaaa' : 'aa'));
 }
 
+const ISO_DATE = /^(\d{4})-(\d{2})-(\d{2})(?:[T ].*)?$/;
+
+/**
+ * Normaliza lo que un formulario le escribe al control (`writeValue`) a un `Date` válido, o null.
+ * Acepta `Date`, ISO ('2026-01-02' o '2026-01-02T08:00:00') y texto en el `dateFormat` del campo.
+ * Vacío, nulo, fecha inválida o tipo desconocido → null, para que el calendario nunca reciba
+ * un valor que no sea `Date` (un '' o un string rompía `getMonth()` al abrirlo).
+ */
+export function coerceDateValue(value: unknown, dateFormat: string): Date | null {
+	if (value instanceof Date) {
+		return Number.isNaN(value.getTime()) ? null : value;
+	}
+	if (typeof value !== 'string') {
+		return null;
+	}
+
+	const text = value.trim();
+	if (!text) {
+		return null;
+	}
+
+	const iso = ISO_DATE.exec(text);
+	if (iso) {
+		const hasTime = text.length > 10;
+		const date = hasTime
+			? new Date(text)
+			: new Date(Number(iso[1]), Number(iso[2]) - 1, Number(iso[3]));
+		const isRealDate =
+			!Number.isNaN(date.getTime()) &&
+			(hasTime || (date.getMonth() === Number(iso[2]) - 1 && date.getDate() === Number(iso[3])));
+		return isRealDate ? date : null;
+	}
+
+	return parseDate(text, dateFormat);
+}
+
 /**
  * Parses typed text against `dateFormat`. Either year token accepts 2 or 4 digits
  * (a 2-digit year means 20xx). Returns null when the text doesn't match or isn't a

@@ -15,7 +15,7 @@ describe('EduDatePicker', () => {
 		document.querySelectorAll('.cdk-overlay-container').forEach((el) => (el.innerHTML = ''));
 	});
 
-	async function render(inputs: Record<string, unknown> = {}, initial: Date | null = null) {
+	async function render(inputs: Record<string, unknown> = {}, initial: Date | string | null = null) {
 		const fixture = TestBed.createComponent(EduDatePicker);
 		for (const [name, value] of Object.entries(inputs)) {
 			fixture.componentRef.setInput(name, value);
@@ -174,6 +174,58 @@ describe('EduDatePicker', () => {
 			await fixture.whenStable();
 
 			expect(document.querySelector('.edu-datepicker-panel')).not.toBeNull();
+		});
+	});
+
+	describe('writeValue with non-Date values', () => {
+		const panelText = () => document.querySelector('.edu-datepicker-panel')?.textContent ?? '';
+
+		async function open(fixture: Awaited<ReturnType<typeof render>>) {
+			input(fixture).click();
+			fixture.detectChanges();
+			await fixture.whenStable();
+		}
+
+		it('opens the calendar when a form writes an empty string', async () => {
+			const fixture = await render({ dateFormat: 'dd/mm/yyyy' }, '');
+
+			await open(fixture);
+
+			expect(panelText()).toContain(String(new Date().getFullYear()));
+			expect(input(fixture).value).toBe('');
+		});
+
+		it('reads an ISO date string as that day, with no timezone shift', async () => {
+			const fixture = await render({ dateFormat: 'dd/mm/yyyy' }, '2026-01-02');
+
+			expect(input(fixture).value).toBe('02/01/2026');
+			await open(fixture);
+			expect(panelText()).toContain('2026');
+		});
+
+		it('reads a string written in the field format', async () => {
+			const fixture = await render({ dateFormat: 'dd/mm/yyyy' }, '15/10/2026');
+
+			expect(input(fixture).value).toBe('15/10/2026');
+		});
+
+		it('treats an unreadable string as empty instead of breaking', async () => {
+			const fixture = await render({ dateFormat: 'dd/mm/yyyy' }, 'no-es-fecha');
+
+			await open(fixture);
+
+			expect(input(fixture).value).toBe('');
+			expect(panelText()).not.toBe('');
+		});
+
+		it('keeps emitting Date objects after being written a string', async () => {
+			const fixture = await render({ dateFormat: 'dd/mm/yyyy' }, '2026-01-02');
+
+			await type(fixture, '20/03/2026');
+
+			const last = changes[changes.length - 1];
+			expect(last).toBeInstanceOf(Date);
+			expect((last as Date).getMonth()).toBe(2);
 		});
 	});
 
