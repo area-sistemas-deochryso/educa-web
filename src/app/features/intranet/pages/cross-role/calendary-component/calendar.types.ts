@@ -2,6 +2,7 @@
 import { Holiday } from './holidays.config';
 import { CalendarEvent } from './events.config';
 import { TipoEntradaCalendario } from '@data/models';
+import type { EventMarkerKind } from '@shared/components';
 
 // #endregion
 // #region Implementation
@@ -26,6 +27,24 @@ export interface CalendarMonth {
 	month: number;
 	days: CalendarDay[];
 	id: string;
+}
+
+/** Entrada unificada del calendario: un feriado o un evento, con su rango en 'YYYY-MM-DD'. */
+export interface CalendarEntry {
+	id: string;
+	kind: EventMarkerKind;
+	title: string;
+	start: string;
+	end: string | null;
+	time?: string;
+	location?: string;
+	holiday?: Holiday;
+	event?: CalendarEvent;
+}
+
+export interface EntrySelection {
+	entry: CalendarEntry;
+	date: Date;
 }
 
 export interface ModalData {

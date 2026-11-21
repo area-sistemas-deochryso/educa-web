@@ -1,35 +1,45 @@
 <!-- #region Template -->
 <header class="calendar-header">
-	<!-- * Header title -->
 	<div class="header-content">
-		<div class="header-icon">
-			<i class="pi pi-calendar"></i>
-		</div>
+		<i class="pi pi-calendar" aria-hidden="true"></i>
 		<div class="header-text">
-			<h2>Calendario Académico</h2>
+			<h1>Calendario Académico</h1>
 			<p>Año escolar {{ currentYear() }}</p>
 		</div>
 	</div>
-	<!-- * Actions: today + year search -->
+
 	<div class="header-actions">
-		<button class="today-btn" (click)="onGoToToday()" title="Ir a hoy">
-			<i class="pi pi-calendar"></i>
-			<span>Hoy</span>
-		</button>
-		<div class="year-search">
-			<input
-				type="number"
-				[(ngModel)]="searchYear"
-				(keydown)="onSearchKeydown($event)"
-				placeholder="Buscar año"
-				min="1900"
-				max="2100"
-				class="year-input"
-			/>
-			<button class="search-btn" (click)="onGoToYear()" title="Buscar año">
-				<i class="pi pi-search"></i>
+		<div class="year-nav" role="group" aria-label="Año">
+			<button type="button" class="nav-btn" aria-label="Año anterior" (click)="goToYear.emit(currentYear() - 1)">
+				<i class="pi pi-chevron-left" aria-hidden="true"></i>
+			</button>
+			<strong class="year-label" aria-live="polite">{{ currentYear() }}</strong>
+			<button type="button" class="nav-btn" aria-label="Año siguiente" (click)="goToYear.emit(currentYear() + 1)">
+				<i class="pi pi-chevron-right" aria-hidden="true"></i>
 			</button>
 		</div>
+		<button type="button" class="today-btn" (click)="goToToday.emit()">
+			<i class="pi pi-calendar" aria-hidden="true"></i>
+			<span>Hoy</span>
+		</button>
 	</div>
 </header>
+
+<nav class="month-pills" aria-label="Meses del año">
+	@for (month of months; track month.short; let i = $index) {
+		<button
+			type="button"
+			class="pill"
+			[class.pill--on]="i === currentMonth()"
+			[attr.aria-current]="i === currentMonth() ? 'true' : null"
+			[attr.aria-label]="countLabel(i)"
+			(click)="goToMonth.emit(i)"
+		>
+			{{ month.short }}
+			@if ((monthCounts()[i] ?? 0) > 0) {
+				<span class="count">{{ monthCounts()[i] }}</span>
+			}
+		</button>
+	}
+</nav>
 <!-- #endregion -->

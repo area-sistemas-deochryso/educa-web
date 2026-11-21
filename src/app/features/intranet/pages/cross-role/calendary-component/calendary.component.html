@@ -1,20 +1,49 @@
 <!-- #region Template -->
 <div class="calendar-container">
-	<!-- * Year header with navigation -->
+	<!-- * Title, year arrows, today and month pills -->
 	<app-calendar-header
 		[currentYear]="currentYear()"
+		[currentMonth]="currentMonth()"
+		[monthCounts]="monthCounts()"
 		(goToToday)="onGoToToday()"
 		(goToYear)="onGoToYear($event)"
+		(goToMonth)="onGoToMonth($event)"
 	/>
 
-	<!-- * Legend for events/holidays -->
 	<app-calendar-legend />
 
-	<!-- * Month cards grid -->
-	<div class="months-grid">
-		@for (month of calendar(); track trackByMonth($index, month)) {
-			<app-calendar-month-card [month]="month" (dayClick)="onDayClick($event)" />
-		}
+	<div class="layout">
+		<!-- * Big month with event titles inside each day -->
+		<section class="month-panel" aria-labelledby="month-title">
+			<div class="month-bar">
+				<button type="button" class="step-btn" aria-label="Mes anterior" (click)="onStepMonth(-1)">
+					<i class="pi pi-chevron-left" aria-hidden="true"></i>
+				</button>
+				<h2 id="month-title">{{ monthTitle() }}</h2>
+				<button type="button" class="step-btn" aria-label="Mes siguiente" (click)="onStepMonth(1)">
+					<i class="pi pi-chevron-right" aria-hidden="true"></i>
+				</button>
+			</div>
+
+			@if (monthData(); as month) {
+				<app-calendar-month-view
+					[month]="month"
+					[entries]="entries()"
+					[selectedKey]="selectedKey()"
+					(entrySelect)="onEntrySelect($event)"
+					(daySelect)="onDaySelect($event)"
+				/>
+			}
+		</section>
+
+		<!-- * Month (or selected day) agenda -->
+		<app-calendar-agenda
+			[heading]="agendaHeading()"
+			[entries]="agendaEntries()"
+			[canClear]="selectedKey() !== null"
+			(entrySelect)="onEntrySelect($event)"
+			(clearSelection)="onClearSelection()"
+		/>
 	</div>
 </div>
 

@@ -1,0 +1,199 @@
+@use '../../../../../shared/components/event-type-marker/event-kind-colors' as kinds;
+
+// #region Grid
+:host {
+	display: block;
+}
+
+.weekdays,
+.grid {
+	display: grid;
+	grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.weekdays {
+	span {
+		padding: 0.5rem 0;
+		text-align: center;
+		font-size: 0.75rem;
+		font-weight: 600;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: var(--text-color-secondary);
+	}
+}
+
+.grid {
+	border: 1px solid var(--surface-200);
+	border-radius: 0.75rem;
+	overflow: hidden;
+}
+
+.cell {
+	display: flex;
+	flex-direction: column;
+	gap: 0.15rem;
+	min-width: 0;
+	min-height: 5.5rem;
+	padding: 0.3rem;
+	border-top: 1px solid var(--surface-200);
+	border-left: 1px solid var(--surface-200);
+
+	&:nth-child(7n + 1) {
+		border-left: 0;
+	}
+
+	&:nth-child(-n + 7) {
+		border-top: 0;
+	}
+
+	&--other {
+		background: var(--surface-50);
+	}
+
+	&--selected {
+		background: var(--blue-100);
+	}
+}
+// #endregion
+
+// #region Day number
+.num {
+	align-self: flex-start;
+	min-width: 1.6rem;
+	height: 1.6rem;
+	padding: 0 0.3rem;
+	border: 0;
+	border-radius: 999px;
+	background: transparent;
+	color: var(--text-color);
+	font: inherit;
+	font-size: 0.8rem;
+	font-weight: 600;
+	cursor: pointer;
+
+	&:hover {
+		background: var(--surface-100);
+	}
+
+	&:focus-visible {
+		outline: 2px solid var(--accent-interactive);
+		outline-offset: 1px;
+	}
+
+	&--other {
+		display: inline-flex;
+		align-items: center;
+		color: var(--text-color-secondary);
+		opacity: 0.5;
+		cursor: default;
+	}
+}
+
+.cell--today .num {
+	background: var(--orange-500);
+	color: var(--white-color);
+
+	&:hover {
+		background: var(--orange-600);
+	}
+}
+// #endregion
+
+// #region Chips
+.chip {
+	@include kinds.event-kind-colors;
+
+	display: flex;
+	align-items: center;
+	gap: 0.3rem;
+	width: 100%;
+	min-width: 0;
+	height: 1.35rem;
+	padding: 0 0.35rem;
+	border: 0;
+	border-radius: 0.3rem;
+	background: var(--kind-bg);
+	color: var(--kind-fg);
+	font: inherit;
+	font-size: 0.7rem;
+	font-weight: 600;
+	text-align: left;
+	cursor: pointer;
+
+	&:hover {
+		filter: brightness(0.96);
+	}
+
+	&:focus-visible {
+		outline: 2px solid var(--accent-interactive);
+		outline-offset: 1px;
+	}
+
+	// Continuación de un rango: franja sin texto para no repetir el título cada día.
+	&--cont {
+		height: 0.9rem;
+	}
+
+	app-event-type-marker {
+		display: inline-flex;
+	}
+}
+
+.chip-label {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.more {
+	align-self: flex-start;
+	padding: 0 0.25rem;
+	border: 0;
+	background: transparent;
+	color: var(--text-color-secondary);
+	font: inherit;
+	font-size: 0.7rem;
+	font-weight: 600;
+	cursor: pointer;
+
+	&:hover {
+		color: var(--text-color);
+	}
+}
+// #endregion
+
+// #region Móvil — celdas compactas: el título vive en la agenda
+@media (max-width: 768px) {
+	.cell {
+		min-height: 3.4rem;
+		align-items: center;
+		flex-direction: column;
+		padding: 0.2rem;
+	}
+
+	.num {
+		align-self: center;
+	}
+
+	.chip {
+		width: auto;
+		height: auto;
+		padding: 0;
+		background: transparent;
+		display: inline-flex;
+	}
+
+	.chip--cont {
+		width: 0.5rem;
+		height: 0.5rem;
+		border-radius: 50%;
+		background: var(--kind-fg);
+	}
+
+	.chip-label,
+	.more {
+		display: none;
+	}
+}
+// #endregion

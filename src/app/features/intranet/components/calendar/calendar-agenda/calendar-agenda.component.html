@@ -1,0 +1,31 @@
+<!-- #region Template -->
+<section class="agenda" aria-labelledby="agenda-heading">
+	<header class="agenda-head">
+		<h3 id="agenda-heading">{{ heading() }}</h3>
+		@if (canClear()) {
+			<button type="button" class="link" (click)="clearSelection.emit()">Ver todo el mes</button>
+		}
+	</header>
+
+	@if (entries().length) {
+		<ul class="list">
+			@for (entry of entries(); track entry.id) {
+				<li>
+					<button type="button" class="item" (click)="select(entry)">
+						<app-date-badge [date]="entry.start" [kind]="entry.kind" />
+						<span class="body">
+							<strong>{{ entry.title }}</strong>
+							<small>{{ meta(entry) }}</small>
+						</span>
+					</button>
+				</li>
+			}
+		</ul>
+	} @else {
+		<div class="empty">
+			<strong>Sin eventos</strong>
+			<p>No hay feriados ni eventos en este período.</p>
+		</div>
+	}
+</section>
+<!-- #endregion -->

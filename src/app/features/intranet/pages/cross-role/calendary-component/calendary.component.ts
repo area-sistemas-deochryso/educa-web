@@ -1,15 +1,23 @@
 // #region Imports
-import { ChangeDetectionStrategy, Component, OnInit, AfterViewInit, DestroyRef, signal, inject, PLATFORM_ID } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { CalendarHeaderComponent } from '@features/intranet/components/calendar/calendar-header/calendar-header.component';
 import { CalendarLegendComponent } from '@features/intranet/components/calendar/calendar-legend/calendar-legend.component';
-import { CalendarMonthCardComponent } from '@features/intranet/components/calendar/calendar-month-card/calendar-month-card.component';
+import { CalendarMonthViewComponent } from '@features/intranet/components/calendar/calendar-month-view/calendar-month-view.component';
+import { CalendarAgendaComponent } from '@features/intranet/components/calendar/calendar-agenda/calendar-agenda.component';
 import { CalendarDayModalComponent } from '@features/intranet/components/calendar/calendar-day-modal/calendar-day-modal.component';
-import { CalendarDay, CalendarMonth, ModalData } from './calendar.types';
+import { CalendarDay, CalendarMonth, EntrySelection, ModalData } from './calendar.types';
 import { CalendarEvent, getEventFromList, isDateInEventRangeFromList, isDateEventEndFromList } from './events.config';
 import { isHoliday } from './holidays.config';
+import {
+	buildCalendarEntries,
+	countEntriesByMonth,
+	entriesInMonth,
+	entriesOnDay,
+	entryToModalData,
+	formatShortDate,
+} from './calendar-entries.utils';
 import { CalendarUtilsService } from '@features/intranet/services/calendar/calendar-utils.service';
 import { EventsCalendarService } from '@features/intranet/pages/admin/events-calendar/services';
 import { EventoCalendarioActivo } from '@data/models';
@@ -23,14 +31,14 @@ import { logger } from '@core/helpers';
 	imports: [
 		CalendarHeaderComponent,
 		CalendarLegendComponent,
-		CalendarMonthCardComponent,
+		CalendarMonthViewComponent,
+		CalendarAgendaComponent,
 		CalendarDayModalComponent,
 	],
 	templateUrl: './calendary.component.html',
 	styleUrl: './calendary.component.scss',
 })
-export class CalendaryComponent implements OnInit, AfterViewInit {
-	private platformId = inject(PLATFORM_ID);
+export class CalendaryComponent implements OnInit {
 	private eventosService = inject(EventsCalendarService);
 	private route = inject(ActivatedRoute);
 	private calendarUtils = inject(CalendarUtilsService);
@@ -39,28 +47,44 @@ export class CalendaryComponent implements OnInit, AfterViewInit {
 	// #region State
 	calendar = signal<CalendarMonth[]>([]);
 	currentYear = signal(new Date().getFullYear());
-	today = new Date();
+	currentMonth = signal(new Date().getMonth());
+	/** Día elegido ('YYYY-MM-DD'); filtra la agenda a ese día. */
+	selectedKey = signal<string | null>(null);
 	private events = signal<CalendarEvent[]>([]);
 
 	showModal = signal(false);
 	modalData = signal<ModalData | null>(null);
 	// #endregion
 
+	// #region Derived view state
+	readonly entries = computed(() => buildCalendarEntries(this.calendar(), this.events()));
+	readonly monthData = computed(() => this.calendar()[this.currentMonth()] ?? null);
+	readonly monthCounts = computed(() => countEntriesByMonth(this.entries(), this.currentYear()));
+	readonly monthTitle = computed(() => `${this.calendarUtils.monthNames[this.currentMonth()]} ${this.currentYear()}`);
+
+	readonly agendaEntries = computed(() => {
+		const key = this.selectedKey();
+		return key
+			? entriesOnDay(this.entries(), key)
+			: entriesInMonth(this.entries(), this.currentYear(), this.currentMonth());
+	});
+
+	readonly agendaHeading = computed(() => {
+		const key = this.selectedKey();
+		if (key) return formatShortDate(key);
+		return `Agenda de ${this.calendarUtils.monthNames[this.currentMonth()].toLowerCase()}`;
+	});
+	// #endregion
+
 	ngOnInit(): void {
+		this.applyFragment();
 		this.loadEventsFromApi();
 	}
 
-	ngAfterViewInit(): void {
-		if (isPlatformBrowser(this.platformId)) {
-			setTimeout(() => {
-				const fragment = this.route.snapshot.fragment;
-				if (fragment) {
-					this.scrollToElement(fragment);
-				} else {
-					this.scrollToToday();
-				}
-			}, 100);
-		}
+	/** `#month-N` abre ese mes. `#today` y sin fragmento abren el mes actual (valor inicial). */
+	private applyFragment(): void {
+		const match = /^month-(\d{1,2})$/.exec(this.route.snapshot.fragment ?? '');
+		if (match && Number(match[1]) < 12) this.currentMonth.set(Number(match[1]));
 	}
 
 	// #region Data loading
@@ -159,63 +183,58 @@ export class CalendaryComponent implements OnInit, AfterViewInit {
 
 	// #region Navigation
 
-	scrollToToday(): void {
-		const todayElement = document.getElementById('today');
-		if (todayElement) {
-			todayElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-		} else {
-			const currentMonth = this.today.getMonth();
-			this.scrollToElement(`month-${currentMonth}`);
-		}
-	}
-
-	scrollToElement(elementId: string): void {
-		const element = document.getElementById(elementId);
-		if (element) {
-			element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-		}
-	}
-
 	onGoToToday(): void {
-		const todayYear = new Date().getFullYear();
-		if (this.currentYear() !== todayYear) {
-			this.currentYear.set(todayYear);
+		const now = new Date();
+		this.selectedKey.set(null);
+		this.currentMonth.set(now.getMonth());
+		if (this.currentYear() !== now.getFullYear()) {
+			this.currentYear.set(now.getFullYear());
 			this.loadEventsFromApi();
 		}
-		setTimeout(() => this.scrollToToday(), 100);
 	}
 
 	onGoToYear(year: number): void {
+		this.selectedKey.set(null);
 		this.currentYear.set(year);
 		this.loadEventsFromApi();
+	}
+
+	onGoToMonth(month: number): void {
+		this.selectedKey.set(null);
+		this.currentMonth.set(month);
+	}
+
+	/** Mes anterior o siguiente; al cruzar enero/diciembre cambia de año y recarga. */
+	onStepMonth(delta: -1 | 1): void {
+		const next = this.currentMonth() + delta;
+		if (next < 0 || next > 11) {
+			this.onGoToYear(this.currentYear() + delta);
+			this.currentMonth.set(next < 0 ? 11 : 0);
+			return;
+		}
+		this.onGoToMonth(next);
+	}
+
+	onDaySelect(key: string): void {
+		this.selectedKey.update((current) => (current === key ? null : key));
+	}
+
+	onClearSelection(): void {
+		this.selectedKey.set(null);
 	}
 
 	// #endregion
 
 	// #region Modal handlers
 
-	onDayClick(day: CalendarDay): void {
-		if (!day.isCurrentMonth) return;
-
-		if (day.isHoliday && day.holiday) {
-			this.modalData.set({ type: 'holiday', date: day.fullDate, holiday: day.holiday });
-			this.showModal.set(true);
-		} else if (day.hasEvent && day.event) {
-			this.modalData.set({ type: 'event', date: day.fullDate, event: day.event });
-			this.showModal.set(true);
-		} else if ((day.isInEventRange || day.isEventEnd) && day.rangeEvent) {
-			this.modalData.set({ type: 'event', date: day.fullDate, event: day.rangeEvent });
-			this.showModal.set(true);
-		}
+	onEntrySelect(selection: EntrySelection): void {
+		this.modalData.set(entryToModalData(selection.entry, selection.date));
+		this.showModal.set(true);
 	}
 
 	onCloseModal(): void {
 		this.showModal.set(false);
 		this.modalData.set(null);
-	}
-
-	trackByMonth(_index: number, month: CalendarMonth): string {
-		return month.id;
 	}
 
 	// #endregion

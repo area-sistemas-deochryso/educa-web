@@ -1,190 +1,168 @@
 // #region Styles
+:host {
+	display: block;
+}
+
 .calendar-header {
 	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 1rem;
-	padding: 1.5rem 0;
 	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
 	gap: 1rem;
-
-	.header-content {
-		display: flex;
-		align-items: center;
-		gap: 1rem;
-	}
-
-	// * Ícono plano sin caja, mismo patrón que app-page-header (Design system
-	// * §B9) — antes era una caja 56px con gradiente azul, único header admin
-	// * que no seguía el resto del patrón visual.
-	.header-icon {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-
-		i {
-			font-size: 1.5rem;
-			color: var(--intranet-default-text-color, #171717);
-		}
-	}
-
-	.header-text {
-		h1 {
-			margin: 0 0 0.25rem;
-			font-size: 1.5rem;
-			font-weight: var(--intranet-font-weight-bold, bold);
-			color: var(--intranet-default-text-color, #171717);
-		}
-
-		p {
-			margin: 0;
-			font-size: 0.95rem;
-			color: var(--intranet-soft-text-color, #5e5e5e);
-		}
-	}
-
-	.header-actions {
-		display: flex;
-		align-items: center;
-		gap: 1rem;
-		flex-wrap: wrap;
-	}
+	padding: 1rem 0;
 }
 
-.year-search {
+.header-content {
 	display: flex;
 	align-items: center;
-	background: var(--intranet-background-color, white);
-	border-radius: 12px;
-	border: 2px solid var(--intranet-accent-color-green, #28a745);
-	overflow: hidden;
-	transition: all 0.3s ease;
+	gap: 0.75rem;
 
-	&:focus-within {
-		box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.15);
+	> i {
+		font-size: 1.5rem;
+		color: var(--text-color);
 	}
 }
 
-.year-input {
-	// ch en vez de px fijo: el placeholder "Buscar año" (10 caracteres) se
-	// cortaba porque el ancho fijo no dejaba espacio para el texto completo.
-	width: 12ch;
-	height: 44px;
-	padding: 0 1rem;
-	border: none;
-	background: transparent;
-	font-size: 0.95rem;
-	color: var(--intranet-default-text-color, #171717);
-	outline: none;
-
-	&::placeholder {
-		color: var(--intranet-soft-text-color, #999);
+.header-text {
+	h1 {
+		margin: 0 0 0.15rem;
+		font-size: 1.5rem;
+		font-weight: 700;
+		color: var(--text-color);
 	}
 
-	&::-webkit-outer-spin-button,
-	&::-webkit-inner-spin-button {
-		-webkit-appearance: none;
+	p {
 		margin: 0;
+		font-size: 0.95rem;
+		color: var(--text-color-secondary);
 	}
-	-moz-appearance: textfield;
 }
 
-.search-btn {
-	width: 44px;
-	height: 44px;
-	border: none;
-	background: var(--intranet-accent-color-green, #28a745);
-	cursor: pointer;
+.header-actions {
 	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+}
+
+.year-nav {
+	display: flex;
+	align-items: center;
+	gap: 0.25rem;
+}
+
+.year-label {
+	min-width: 3.5rem;
+	text-align: center;
+	font-size: 1rem;
+	font-variant-numeric: tabular-nums;
+	color: var(--text-color);
+}
+
+.nav-btn {
+	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	transition: all 0.2s ease;
-
-	i {
-		font-size: 1rem;
-		color: white;
-	}
+	width: 2.25rem;
+	height: 2.25rem;
+	border: 1px solid var(--surface-300);
+	border-radius: 0.6rem;
+	background: transparent;
+	color: var(--text-color);
+	cursor: pointer;
 
 	&:hover {
-		background: var(--green-700);
+		background: var(--surface-100);
+	}
+
+	&:focus-visible {
+		outline: 2px solid var(--accent-interactive);
+		outline-offset: 2px;
 	}
 }
 
 .today-btn {
-	display: flex;
+	display: inline-flex;
 	align-items: center;
 	gap: 0.5rem;
-	height: 48px;
-	padding: 0 1.5rem;
-	border-radius: 12px;
-	border: none;
-	// Token canónico (design-system.md §8) — antes hex literal (var(--orange-500)/#e09000).
-	background: linear-gradient(135deg, var(--orange-500), var(--orange-600));
-	color: white;
+	height: 2.25rem;
+	padding: 0 1rem;
+	border: 0;
+	border-radius: 0.6rem;
+	background: var(--orange-500);
+	color: var(--white-color);
+	font: inherit;
+	font-size: 0.875rem;
 	font-weight: 600;
-	font-size: 0.95rem;
 	cursor: pointer;
-	transition: all 0.2s ease;
-	box-shadow: 0 4px 12px color-mix(in srgb, var(--orange-500) 30%, transparent);
-
-	i {
-		font-size: 1.1rem;
-	}
 
 	&:hover {
-		transform: translateY(-2px);
-		box-shadow: 0 6px 16px color-mix(in srgb, var(--orange-500) 40%, transparent);
+		background: var(--orange-600);
 	}
+
+	&:focus-visible {
+		outline: 2px solid var(--accent-interactive);
+		outline-offset: 2px;
+	}
+}
+
+.month-pills {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4rem;
+	padding-bottom: 1rem;
+}
+
+.pill {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	padding: 0.35rem 0.75rem;
+	border: 0;
+	border-radius: 999px;
+	background: var(--surface-100);
+	color: var(--text-color-secondary);
+	font: inherit;
+	font-size: 0.8rem;
+	font-weight: 600;
+	cursor: pointer;
+
+	&:hover {
+		background: var(--surface-200);
+	}
+
+	&:focus-visible {
+		outline: 2px solid var(--accent-interactive);
+		outline-offset: 2px;
+	}
+
+	&--on {
+		background: var(--intranet-accent-color-blue, var(--blue-800));
+		color: var(--white-color);
+
+		&:hover {
+			background: var(--intranet-accent-color-blue, var(--blue-800));
+		}
+	}
+}
+
+.count {
+	padding: 0 0.35rem;
+	border-radius: 999px;
+	background: color-mix(in srgb, currentColor 18%, transparent);
+	font-size: 0.7rem;
+	font-variant-numeric: tabular-nums;
 }
 
 @media (max-width: 768px) {
 	.calendar-header {
 		flex-direction: column;
 		align-items: flex-start;
-
-		.header-actions {
-			width: 100%;
-			justify-content: flex-end;
-			gap: 0.75rem;
-		}
 	}
 }
 
 @media (max-width: 480px) {
-	.calendar-header {
-		.header-icon {
-			width: 48px;
-			height: 48px;
-
-			i {
-				font-size: 1.4rem;
-			}
-		}
-
-		.header-text h1 {
-			font-size: 1.25rem;
-		}
-	}
-
-	.year-input {
-		width: 10ch;
-		height: 40px;
-		padding: 0 0.75rem;
-		font-size: 0.875rem;
-	}
-
-	.search-btn {
-		width: 40px;
-		height: 40px;
-	}
-
-	.today-btn {
-		height: 44px;
-		padding: 0 1rem;
-
-		span {
-			display: none;
-		}
+	.today-btn span {
+		display: none;
 	}
 }
 // #endregion

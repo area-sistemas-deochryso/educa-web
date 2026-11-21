@@ -1,0 +1,55 @@
+<!-- #region Template -->
+<div class="weekdays" aria-hidden="true">
+	@for (name of weekdays; track name) {
+		<span>{{ name }}</span>
+	}
+</div>
+
+<div class="grid">
+	@for (cell of cells(); track cell.key) {
+		<div
+			class="cell"
+			[class.cell--other]="!cell.day.isCurrentMonth"
+			[class.cell--today]="cell.day.isToday"
+			[class.cell--selected]="cell.key === selectedKey()"
+		>
+			@if (cell.day.isCurrentMonth) {
+				<button
+					type="button"
+					class="num"
+					[attr.aria-label]="cell.ariaLabel"
+					[attr.aria-pressed]="cell.key === selectedKey()"
+					(click)="daySelect.emit(cell.key)"
+				>
+					{{ cell.day.date }}
+				</button>
+
+				@for (chip of cell.chips; track chip.entry.id) {
+					<button
+						type="button"
+						class="chip"
+						[class.chip--cont]="!chip.showLabel"
+						[attr.data-kind]="chip.entry.kind"
+						[attr.aria-label]="chip.entry.title"
+						[title]="chip.entry.title"
+						(click)="entrySelect.emit({ entry: chip.entry, date: cell.day.fullDate })"
+					>
+						@if (chip.showLabel) {
+							<app-event-type-marker [kind]="chip.entry.kind" />
+							<span class="chip-label">{{ chip.entry.title }}</span>
+						}
+					</button>
+				}
+
+				@if (cell.extra > 0) {
+					<button type="button" class="more" (click)="daySelect.emit(cell.key)">
+						+{{ cell.extra }} más
+					</button>
+				}
+			} @else {
+				<span class="num num--other">{{ cell.day.date }}</span>
+			}
+		</div>
+	}
+</div>
+<!-- #endregion -->

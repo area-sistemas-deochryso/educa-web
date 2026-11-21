@@ -34,10 +34,36 @@ describe('CalendaryComponent', () => {
 		expect(component).toBeTruthy();
 	});
 
-	it('should render one month card per month of the calendar', () => {
+	it('should render a single big month view plus the agenda', () => {
 		fixture.detectChanges();
-		const cards = fixture.nativeElement.querySelectorAll('app-calendar-month-card');
-		expect(cards.length).toBe(12);
+		expect(fixture.nativeElement.querySelectorAll('app-calendar-month-view').length).toBe(1);
+		expect(fixture.nativeElement.querySelectorAll('app-calendar-agenda').length).toBe(1);
+	});
+
+	it('should open the current month by default', () => {
+		expect(component.currentMonth()).toBe(new Date().getMonth());
+	});
+
+	it('should select a month and clear the selected day', () => {
+		component.onDaySelect('2026-03-10');
+		component.onGoToMonth(2);
+		expect(component.currentMonth()).toBe(2);
+		expect(component.selectedKey()).toBeNull();
+	});
+
+	it('should toggle the selected day', () => {
+		component.onDaySelect('2026-03-10');
+		expect(component.selectedKey()).toBe('2026-03-10');
+		component.onDaySelect('2026-03-10');
+		expect(component.selectedKey()).toBeNull();
+	});
+
+	it('should cross to the previous year when stepping back from January', () => {
+		component.onGoToMonth(0);
+		const year = component.currentYear();
+		component.onStepMonth(-1);
+		expect(component.currentYear()).toBe(year - 1);
+		expect(component.currentMonth()).toBe(11);
 	});
 
 	it('should initialize with current year', () => {
