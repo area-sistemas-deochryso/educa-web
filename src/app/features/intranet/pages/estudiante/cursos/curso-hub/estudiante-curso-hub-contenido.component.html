@@ -48,65 +48,23 @@
 								}
 							</div>
 
-							<!-- Accordion de semanas -->
+							<!-- Semanas (lista + detalle / tira + agenda) -->
 							@if (filteredSemanas().length === 0) {
 								<div class="empty-state">
 									<i class="pi pi-search"></i>
 									<p>No se encontraron semanas</p>
 								</div>
 							} @else {
-								<div class="weeks-accordion">
-									<edu-accordion [multiple]="true" [value]="openPanelsStr()" (valueChange)="onAccordionChangeStr($any($event))">
-										@for (semana of filteredSemanas(); track semana.id) {
-											<edu-accordion-panel [value]="semana.id.toString()">
-												<edu-accordion-header data-info-anchor="estudiante-curso-dialog-week-accordion">
-													<div class="week-header" [class.week-header--vigente]="semana.id === semanaVigenteId()" [attr.data-semana-vigente]="semana.id === semanaVigenteId() ? 'true' : null">
-														<span class="week-number">{{ semana.numeroSemana }}</span>
-														<div class="week-title-group">
-															<span class="week-label">Semana {{ semana.numeroSemana }}</span>
-															@if (semana.id === semanaVigenteId()) {
-																<span class="week-vigente-tag">Semana actual</span>
-															}
-															@if (semana.titulo) {
-																<span class="week-subtitle">{{ semana.titulo }}</span>
-															}
-															@if (semana.fechaInicio && semana.fechaFin) {
-																<span class="week-dates">
-																	<i class="pi pi-calendar"></i>
-																	{{ semana.fechaInicio | date: 'dd/MM' }} – {{ semana.fechaFin | date: 'dd/MM' }}
-																</span>
-															}
-														</div>
-														<div class="week-badges">
-															@if (semana.archivos.length > 0) {
-																<span class="mini-badge files">
-																	<i class="pi pi-paperclip"></i>
-																	{{ semana.archivos.length }}
-																</span>
-															}
-															@if (semana.tareas.length - contarExamenes(semana.tareas) > 0) {
-																<span class="mini-badge tasks" eduTooltip="Tareas y actividades" eduTooltipPosition="top">
-																	<i class="pi pi-file-edit"></i>
-																	{{ semana.tareas.length - contarExamenes(semana.tareas) }}
-																</span>
-															}
-															@if (contarExamenes(semana.tareas) > 0) {
-																<span class="mini-badge exam" eduTooltip="Exámenes" eduTooltipPosition="top">
-																	<i class="pi pi-verified"></i>
-																	{{ contarExamenes(semana.tareas) }}
-																</span>
-															}
-															@if (proximaFechaLimite(semana.tareas); as proxima) {
-																<span class="mini-badge due" [class.due--pronto]="fechaLimiteEstado(proxima) === 'pronto'" eduTooltip="Próxima fecha límite" eduTooltipPosition="top">
-																	<i class="pi pi-clock"></i>
-																	{{ proxima | date: 'dd/MM' }}
-																</span>
-															}
-														</div>
-													</div>
-												</edu-accordion-header>
-												
-													<div class="semana-body">
+								<app-semana-nav
+									anchorPrefix="estudiante-curso-dialog"
+									[items]="navItems()"
+									[activeId]="semanaActiva()?.id ?? null"
+									[layout]="layout()"
+									(selectWeek)="selectSemana($event)"
+									(layoutChange)="setLayout($event)"
+								>
+									@if (semanaActiva(); as semana) {
+										<div class="semana-body" [class.semana-body--agenda]="layout() === 'strip'">
 														<!-- Descripción y mensaje -->
 														@if (semana.descripcion || semana.mensajeDocente) {
 															<div class="semana-intro">
@@ -154,7 +112,7 @@
 														<!-- #endregion -->
 
 														<!-- #region Tareas -->
-														<div class="section-block">
+														<div class="section-block section-block--tareas">
 															<div class="section-header">
 																<div class="section-label">
 																	<i class="pi pi-file-edit"></i>
@@ -403,11 +361,8 @@ Sin fecha límite
 														}
 														<!-- #endregion -->
 													</div>
-												
-											</edu-accordion-panel>
-										}
-									</edu-accordion>
-								</div>
+									}
+								</app-semana-nav>
 							}
 						</div>
 </div>

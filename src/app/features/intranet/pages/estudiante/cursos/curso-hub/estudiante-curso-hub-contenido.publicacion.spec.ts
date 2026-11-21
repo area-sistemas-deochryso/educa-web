@@ -58,7 +58,6 @@ describe('EstudianteCursoHubContenidoComponent — borrador y publicación (P113
 		});
 		const fixture = TestBed.createComponent(EstudianteCursoHubContenidoComponent);
 		fixture.detectChanges();
-		((fixture.nativeElement as HTMLElement).querySelector('button.edu-accordion-header') as HTMLButtonElement).click();
 		fixture.detectChanges();
 		return fixture.nativeElement as HTMLElement;
 	}

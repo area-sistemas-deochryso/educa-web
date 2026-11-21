@@ -23,6 +23,8 @@ const DAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Vierne
 	],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	styles: `
+		.card-meta { display: flex; align-items: center; gap: 0.5rem; }
+		.card-meta i { font-size: 0.875rem; }
 		.course-grid {
 			// Flexbox, no CSS Grid: con pocos cursos, un grid (auto-fill o
 			// auto-fit) deja las columnas sobrantes en blanco en vez de
@@ -79,8 +81,8 @@ const DAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Vierne
 							[accent]="colorMap().get(group.cursoId)"
 						>
 							@if (group.profesores.length > 0) {
-								<div class="flex align-items-center gap-2">
-									<i class="pi pi-user text-xs"></i>
+								<div class="card-meta">
+									<i class="pi pi-user"></i>
 									<span>{{ group.profesores.join(', ') }}</span>
 								</div>
 							}

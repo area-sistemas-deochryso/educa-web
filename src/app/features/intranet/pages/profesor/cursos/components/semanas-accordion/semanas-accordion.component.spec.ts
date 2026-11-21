@@ -136,40 +136,47 @@ describe('SemanasAccordionComponent — semana vigente (P110-F14)', () => {
 		return { fixture, component: fixture.componentInstance, el: fixture.nativeElement as HTMLElement };
 	}
 
-	const scrollIntoView = vi.fn();
 	beforeEach(() => {
-		scrollIntoView.mockClear();
 		// jsdom no implementa scrollIntoView.
-		Element.prototype.scrollIntoView = scrollIntoView;
+		Element.prototype.scrollIntoView = vi.fn();
 	});
 
-	it('expande y destaca la semana vigente y lleva la vista hasta ella; las demás quedan colapsadas', async () => {
+	it('abre y marca la semana vigente; el resto no se muestra', () => {
 		const { fixture, component, el } = create({ semanaVigente: 2 });
 		fixture.detectChanges();
-		await new Promise((resolve) => setTimeout(resolve));
-
-		expect(scrollIntoView).toHaveBeenCalledOnce();
 
 		expect(component.openPanels()).toEqual([2]);
-		expect(el.querySelectorAll('.week-vigente-tag').length).toBe(1);
-		expect(el.querySelector('[data-semana-vigente="true"]')?.textContent).toContain('Semana 2');
+		expect(el.querySelector('.rail__item[aria-current="true"]')?.textContent).toContain('2');
+		expect(el.querySelectorAll('.dot--actual').length).toBe(1);
+		expect(el.querySelectorAll('.semana-body').length).toBe(1);
 	});
 
-	it('sin semanaVigente no expande ni destaca nada', async () => {
-		const { component, el } = create({});
-		await new Promise((resolve) => setTimeout(resolve));
+	it('sin semanaVigente abre la primera semana y no marca ninguna como en curso', () => {
+		const { fixture, component, el } = create({});
+		fixture.detectChanges();
 
-		expect(scrollIntoView).not.toHaveBeenCalled();
-
-		expect(component.openPanels()).toEqual([]);
-		expect(el.querySelector('.week-vigente-tag')).toBeNull();
+		expect(component.openPanels()).toEqual([1]);
+		expect(el.querySelector('.dot--actual')).toBeNull();
 	});
 
-	it('con una semanaVigente fuera de rango no rompe ni destaca nada', () => {
-		const { component, el } = create({ semanaVigente: 52 });
+	it('con una semanaVigente fuera de rango abre la primera y no marca ninguna como en curso', () => {
+		const { fixture, component, el } = create({ semanaVigente: 52 });
+		fixture.detectChanges();
 
-		expect(component.openPanels()).toEqual([]);
-		expect(el.querySelector('[data-semana-vigente]')).toBeNull();
+		expect(component.openPanels()).toEqual([1]);
+		expect(el.querySelector('.dot--actual')).toBeNull();
+	});
+
+	it('recuerda la vista elegida y cambia entre lista y agenda', () => {
+		const { fixture, component, el } = create({ semanaVigente: 1 });
+		expect(el.querySelector('.rail')).not.toBeNull();
+
+		component.setLayout('strip');
+		fixture.detectChanges();
+
+		expect(el.querySelector('.strip')).not.toBeNull();
+		expect(el.querySelector('.rail')).toBeNull();
+		expect(el.querySelector('.semana-body--agenda')).not.toBeNull();
 	});
 });
 

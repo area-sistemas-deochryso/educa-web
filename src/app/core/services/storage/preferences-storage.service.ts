@@ -63,6 +63,8 @@ const PREFERENCES_KEYS = {
 	// Brief 485 — draggable "Ayuda" FAB position
 	AYUDA_FAB_POSITION: 'educa_pref_ayuda_fab_position',
 
+	// Pestaña Contenido (profesor/estudiante) — vista de semanas: lista o tira
+	CONTENIDO_SEMANAS_LAYOUT: 'educa_pref_contenido_semanas_layout',
 	// Fusión FAB Ayuda+Reportar — ocultar/mostrar manual
 	FAB_MENU_HIDDEN: 'educa_pref_fab_menu_hidden',
 } as const;
@@ -70,6 +72,8 @@ const PREFERENCES_KEYS = {
 export type ErrorGroupsViewMode = 'kanban' | 'table' | 'events' | 'heatmap' | 'pareto';
 
 const ERROR_GROUPS_VIEW_MODES: readonly ErrorGroupsViewMode[] = ['kanban', 'table', 'events', 'heatmap', 'pareto'];
+
+export type ContenidoSemanasLayout = 'list' | 'strip';
 
 export type CorrelationViewMode = 'timeline' | 'section';
 
@@ -636,6 +640,18 @@ export class PreferencesStorageService {
 	hasErrorGroupsViewModePreference(): boolean {
 		const stored = this.getItem(PREFERENCES_KEYS.ERROR_GROUPS_VIEW_MODE) as ErrorGroupsViewMode | null;
 		return !!stored && ERROR_GROUPS_VIEW_MODES.includes(stored);
+	}
+
+	// #endregion
+	// #region CONTENIDO SEMANAS LAYOUT
+
+	/** Vista elegida para las semanas de la pestaña Contenido. Default: lista + detalle. */
+	getContenidoSemanasLayout(): ContenidoSemanasLayout {
+		return this.getItem(PREFERENCES_KEYS.CONTENIDO_SEMANAS_LAYOUT) === 'strip' ? 'strip' : 'list';
+	}
+
+	setContenidoSemanasLayout(layout: ContenidoSemanasLayout): void {
+		this.setItem(PREFERENCES_KEYS.CONTENIDO_SEMANAS_LAYOUT, layout);
 	}
 
 	// #endregion

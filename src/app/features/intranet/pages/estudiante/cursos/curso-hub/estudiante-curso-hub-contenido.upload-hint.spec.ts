@@ -45,7 +45,6 @@ describe('EstudianteCursoHubContenidoComponent — aviso de formatos de subida',
 	it('muestra el aviso junto a «Subir a la semana» y a «Subir entrega», asociado a cada control', () => {
 		const fixture = TestBed.createComponent(EstudianteCursoHubContenidoComponent);
 		fixture.detectChanges();
-		((fixture.nativeElement as HTMLElement).querySelector('button.edu-accordion-header') as HTMLButtonElement).click();
 		fixture.detectChanges();
 
 		const uploads = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('edu-file-upload'));

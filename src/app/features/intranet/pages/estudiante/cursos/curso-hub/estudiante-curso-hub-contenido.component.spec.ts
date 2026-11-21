@@ -210,18 +210,20 @@ describe('EstudianteCursoHubContenidoComponent', () => {
 			expect(facade.loadMisArchivos).toHaveBeenCalledWith(11);
 		});
 
-		it('no expande nada si el BE no devuelve semanaVigente', () => {
+		it('abre la primera semana si el BE no devuelve semanaVigente', () => {
 			loaded(undefined);
-			const { component } = create();
+			const { fixture, component } = create();
+			fixture.detectChanges();
 
-			expect((component as unknown as { openPanels(): number[] }).openPanels()).toEqual([]);
+			expect((component as unknown as { openPanels(): number[] }).openPanels()).toEqual([10]);
 		});
 
-		it('no expande nada si semanaVigente no corresponde a ninguna semana', () => {
+		it('abre la primera semana si semanaVigente no corresponde a ninguna semana', () => {
 			loaded(52);
-			const { component } = create();
+			const { fixture, component } = create();
+			fixture.detectChanges();
 
-			expect((component as unknown as { openPanels(): number[] }).openPanels()).toEqual([]);
+			expect((component as unknown as { openPanels(): number[] }).openPanels()).toEqual([10]);
 		});
 	});
 

@@ -1,29 +1,37 @@
 import { Component, ChangeDetectionStrategy, inject, OnInit, computed } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { PageHeaderComponent, EmptyStateComponent, CursoPairCardComponent } from '@intranet-shared/components';
 import { PluralizePipe } from '@intranet-shared/pipes';
 import { buildCursoColorMap } from '@intranet-shared/config/curso-colors';
 import { groupHorariosByPair, setupCursoHubLegacyRedirect } from '@intranet-shared/helpers';
 import { ThemeService } from '@core/services/theme';
 import { ProfesorFacade } from '../services/profesor.facade';
-import { EduSpinner } from '@edu-ui';
+import { EduButton, EduSpinner } from '@edu-ui';
 
 @Component({
 	selector: 'app-profesor-cursos',
 	standalone: true,
 	imports: [
+		EduButton,
 		EduSpinner,
-		RouterLink,
 		PageHeaderComponent,
 		EmptyStateComponent,
 		CursoPairCardComponent,
 		PluralizePipe],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	styles: `
+		.card-meta { display: flex; align-items: center; gap: 0.5rem; }
+		.card-meta i { font-size: 0.875rem; }
 		.course-grid {
-			display: grid;
-			grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+			// Flexbox, no CSS Grid: con pocos cursos las tarjetas se estiran
+			// en vez de dejar columnas vacías (igual que estudiante-cursos).
+			display: flex;
+			flex-wrap: wrap;
 			gap: 1rem;
+		}
+		app-curso-pair-card {
+			flex: 1 1 320px;
+			max-width: 100%;
 		}
 	`,
 	template: `
@@ -35,9 +43,7 @@ import { EduSpinner } from '@edu-ui';
 			<app-empty-state icon="pi pi-book" title="Mis Cursos" message="No tienes cursos asignados" />
 		} @else {
 			<app-page-header icon="pi pi-book" title="Mis Cursos">
-				<a routerLink="/intranet/profesor/horarios" data-info-anchor="profesor-cursos-ver-horario" class="text-sm no-underline text-primary flex align-items-center gap-1">
-					<i class="pi pi-calendar"></i> Ver horario
-				</a>
+				<edu-button label="Ver horario" icon="pi pi-calendar" size="small" [outlined]="true" data-info-anchor="profesor-cursos-ver-horario" (click)="onVerHorario()" />
 			</app-page-header>
 
 			<div class="p-4 pt-0">
@@ -50,8 +56,8 @@ import { EduSpinner } from '@edu-ui';
 							[group]="group"
 							[accent]="colorMap().get(group.cursoId)"
 						>
-							<div class="flex align-items-center gap-2">
-								<i class="pi pi-users text-xs"></i>
+							<div class="card-meta">
+								<i class="pi pi-users"></i>
 								<span>{{ group.cantidadEstudiantes | pluralize: 'estudiante' }}</span>
 							</div>
 						</app-curso-pair-card>
@@ -64,6 +70,7 @@ import { EduSpinner } from '@edu-ui';
 export class ProfesorCursosComponent implements OnInit {
 	private readonly facade = inject(ProfesorFacade);
 	private readonly theme = inject(ThemeService);
+	private readonly router = inject(Router);
 
 	readonly vm = this.facade.vm;
 
@@ -80,5 +87,9 @@ export class ProfesorCursosComponent implements OnInit {
 
 	ngOnInit(): void {
 		this.facade.loadData();
+	}
+
+	onVerHorario(): void {
+		this.router.navigate(['/intranet/profesor/horarios']);
 	}
 }

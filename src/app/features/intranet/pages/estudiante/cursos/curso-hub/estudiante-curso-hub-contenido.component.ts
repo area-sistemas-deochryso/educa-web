@@ -3,23 +3,19 @@ import {
 	Component,
 	computed,
 	effect,
-	ElementRef,
 	inject,
 	signal,
 	untracked,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ErrorHandlerService } from '@core/services';
+import { ErrorHandlerService, StorageService, type ContenidoSemanasLayout } from '@core/services';
 import { FileRowComponent, UPLOAD_ACCEPT, UPLOAD_LIMITS, describeUploadLimits, validateUploadFile, FileViewerService, ViewableArchivo } from '@shared/components';
-import { CursoHubContextService, EmptyStateComponent } from '@intranet-shared/components';
+import { CursoHubContextService, EmptyStateComponent, SemanaNavComponent, resolverSemanaActiva, type SemanaNavItem } from '@intranet-shared/components';
 import { TareasPendientesService } from '@intranet-shared/services';
 import { EstudianteCursosFacade } from '@features/intranet/pages/estudiante/services/estudiante-cursos.facade';
 import type { EstudianteArchivoDto, EstudianteTareaArchivoDto } from '@features/intranet/pages/estudiante/models';
 import {
-	EduAccordion,
-	EduAccordionHeader,
-	EduAccordionPanel,
 	EduButton,
 	EduConfirmDialog,
 	EduConfirmationService,
@@ -67,9 +63,6 @@ function todayIso(): string {
 	imports: [
 		DatePipe,
 		FormsModule,
-		EduAccordion,
-		EduAccordionHeader,
-		EduAccordionPanel,
 		EduButton,
 		EduConfirmDialog,
 		EduFileUpload,
@@ -77,6 +70,7 @@ function todayIso(): string {
 		EduTooltip,
 		EmptyStateComponent,
 		FileRowComponent,
+		SemanaNavComponent,
 	],
 	providers: [EduConfirmationService],
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -91,7 +85,7 @@ export class EstudianteCursoHubContenidoComponent {
 	private readonly confirmationService = inject(EduConfirmationService);
 	private readonly errorHandler = inject(ErrorHandlerService);
 	private readonly tareasPendientes = inject(TareasPendientesService);
-	private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+	private readonly storage = inject(StorageService);
 	protected readonly uploadAccept = UPLOAD_ACCEPT;
 	protected readonly uploadMaxBytes = UPLOAD_LIMITS.maxFileSizeBytes;
 	protected readonly uploadHint = describeUploadLimits();
@@ -106,8 +100,8 @@ export class EstudianteCursoHubContenidoComponent {
 	protected readonly vm = this.facade.vm;
 	protected readonly searchQuery = signal('');
 	protected readonly openPanels = signal<number[]>([]);
-	// edu-accordion's [value] is string-based — semana ids are numeric, so this bridges the two.
-	protected readonly openPanelsStr = computed(() => this.openPanels().map((v) => v.toString()));
+	/** Vista de semanas elegida por el usuario (se recuerda entre visitas). */
+	protected readonly layout = signal<ContenidoSemanasLayout>(this.storage.getContenidoSemanasLayout());
 
 	private readonly slotId = computed(() => this.hubContext.slot()?.id ?? null);
 
@@ -150,14 +144,13 @@ export class EstudianteCursoHubContenidoComponent {
 			});
 		});
 
-		// Semana vigente: se expande sola y la vista se lleva hasta ella; el resto queda colapsado.
+		// Sin selección previa, se abre la semana vigente (o la primera si el BE no la pudo derivar).
 		effect(() => {
-			const semanaId = this.semanaVigenteId();
+			const semanaId = this.semanaVigenteId() ?? this.vm().semanas[0]?.id ?? null;
 			if (semanaId === null) return;
 			untracked(() => {
-				if (this.openPanels().includes(semanaId)) return;
-				this.onAccordionChangeStr([...this.openPanels(), semanaId].map(String));
-				this.scrollToSemanaVigente();
+				if (this.openPanels().length > 0) return;
+				this.onAccordionChangeStr([String(semanaId)]);
 			});
 		});
 
@@ -181,6 +174,40 @@ export class EstudianteCursoHubContenidoComponent {
 			});
 		});
 	}
+
+	// #region Navegación de semanas
+	/** Semana mostrada: la seleccionada si sigue visible; si no, la primera de la lista. */
+	protected readonly semanaActiva = computed(() => resolverSemanaActiva(this.filteredSemanas(), this.openPanels()));
+
+	protected readonly navItems = computed<SemanaNavItem[]>(() => {
+		const vigente = this.vm().contenido?.semanaVigente ?? null;
+		return this.filteredSemanas().map((s) => {
+			const examenes = contarExamenes(s.tareas);
+			return {
+				id: s.id,
+				numero: s.numeroSemana,
+				titulo: s.titulo ?? null,
+				fechaInicio: s.fechaInicio ?? null,
+				fechaFin: s.fechaFin ?? null,
+				estado: vigente === null ? 'proxima' : s.numeroSemana === vigente ? 'actual' : s.numeroSemana < vigente ? 'pasada' : 'proxima',
+				archivos: s.archivos.length,
+				tareas: s.tareas.length - examenes,
+				examenes,
+				proximaFecha: proximaFechaLimite(s.tareas),
+				borrador: false,
+			};
+		});
+	});
+
+	protected selectSemana(semanaId: number): void {
+		this.onAccordionChangeStr([String(semanaId)]);
+	}
+
+	protected setLayout(layout: ContenidoSemanasLayout): void {
+		this.layout.set(layout);
+		this.storage.setContenidoSemanasLayout(layout);
+	}
+	// #endregion
 
 	// #region Contenido
 	protected onRefreshContenido(): void {
@@ -242,15 +269,6 @@ export class EstudianteCursoHubContenidoComponent {
 	// #region Helpers
 	protected esTareaNueva(tareaId: number): boolean {
 		return this.tareasPendientes.nuevasIds().has(tareaId) || this.vistasEstaVisita().has(tareaId);
-	}
-
-	/** Desplaza la vista hasta la semana vigente una vez que el acordeón la pintó expandida. */
-	private scrollToSemanaVigente(): void {
-		setTimeout(() => {
-			this.host.nativeElement
-				.querySelector('[data-semana-vigente="true"]')
-				?.scrollIntoView({ block: 'start', behavior: 'smooth' });
-		});
 	}
 
 	protected getMisArchivosSemana(semanaId: number): EstudianteArchivoDto[] {

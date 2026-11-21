@@ -1,0 +1,141 @@
+<div class="nav" [class.nav--strip]="layout() === 'strip'">
+	<div class="nav__bar">
+		<span class="nav__count">{{ items().length }} {{ items().length === 1 ? 'semana' : 'semanas' }}</span>
+		<div class="nav__switch" role="group" aria-label="Vista de semanas">
+			<button
+				type="button"
+				[attr.aria-pressed]="layout() === 'list'"
+				[attr.data-info-anchor]="anchorPrefix() + '-vista-lista'"
+				(click)="layoutChange.emit('list')"
+			>
+				<i class="pi pi-list" aria-hidden="true"></i> Lista
+			</button>
+			<button
+				type="button"
+				[attr.aria-pressed]="layout() === 'strip'"
+				[attr.data-info-anchor]="anchorPrefix() + '-vista-tira'"
+				(click)="layoutChange.emit('strip')"
+			>
+				<i class="pi pi-calendar" aria-hidden="true"></i> Agenda
+			</button>
+		</div>
+	</div>
+
+	<div class="nav__body">
+		@if (layout() === 'list') {
+			<nav class="rail" aria-label="Semanas" [attr.data-info-anchor]="anchorPrefix() + '-riel'">
+				@for (item of items(); track item.id) {
+					<button
+						type="button"
+						class="rail__item"
+						[class.rail__item--pasada]="item.estado === 'pasada'"
+						[attr.aria-current]="item.id === activeId() ? 'true' : null"
+						(click)="selectWeek.emit(item.id)"
+					>
+						<span class="rail__num">{{ item.numero }}</span>
+						<span class="rail__text">
+							<b>{{ item.titulo || 'Semana ' + item.numero }}</b>
+							@if (item.fechaInicio && item.fechaFin) {
+								<small>{{ item.fechaInicio | date: 'dd/MM' }} – {{ item.fechaFin | date: 'dd/MM' }}</small>
+							}
+						</span>
+						@if (item.estado === 'actual') {
+							<span class="dot dot--actual" title="Semana en curso"></span>
+						} @else if (item.estado === 'pasada') {
+							<i class="pi pi-check rail__done" aria-label="Terminada"></i>
+						}
+						@if (item.borrador) {
+							<span class="dot dot--borrador" title="Borrador"></span>
+						}
+					</button>
+				}
+			</nav>
+		} @else {
+			<nav class="strip" aria-label="Semanas" [attr.data-info-anchor]="anchorPrefix() + '-tira'">
+				@for (item of items(); track item.id) {
+					<button
+						type="button"
+						class="strip__item"
+						[class.strip__item--actual]="item.estado === 'actual'"
+						[class.strip__item--pasada]="item.estado === 'pasada'"
+						[attr.aria-current]="item.id === activeId() ? 'true' : null"
+						(click)="selectWeek.emit(item.id)"
+					>
+						<b>S{{ item.numero }}</b>
+						@if (item.fechaInicio) {
+							<small>{{ item.fechaInicio | date: 'dd/MM' }}</small>
+						}
+						<span class="strip__dots" aria-hidden="true">
+							@if (item.archivos > 0) {
+								<i class="d d--archivo"></i>
+							}
+							@if (item.tareas > 0) {
+								<i class="d d--tarea"></i>
+							}
+							@if (item.examenes > 0) {
+								<i class="d d--examen"></i>
+							}
+						</span>
+					</button>
+				}
+			</nav>
+		}
+
+		<section class="detail" aria-live="polite">
+			@if (active(); as semana) {
+				<header class="detail__head">
+					<div class="detail__eyebrow">
+						Semana {{ semana.numero }} de {{ items().length }}
+						@if (semana.fechaInicio && semana.fechaFin) {
+							· {{ semana.fechaInicio | date: 'dd/MM' }} – {{ semana.fechaFin | date: 'dd/MM' }}
+						}
+						<span class="pill" [class.pill--actual]="semana.estado === 'actual'">{{ estadoLabel(semana.estado) }}</span>
+						@if (semana.borrador) {
+							<span class="pill pill--borrador">Borrador</span>
+						}
+					</div>
+					<h3 class="detail__title">{{ semana.titulo || 'Semana ' + semana.numero }}</h3>
+					<div class="detail__counts">
+						@if (semana.archivos > 0) {
+							<span class="count count--archivo"><i class="pi pi-paperclip"></i> {{ semana.archivos }}</span>
+						}
+						@if (semana.tareas > 0) {
+							<span class="count count--tarea"><i class="pi pi-file-edit"></i> {{ semana.tareas }}</span>
+						}
+						@if (semana.examenes > 0) {
+							<span class="count count--examen"><i class="pi pi-verified"></i> {{ semana.examenes }}</span>
+						}
+						@if (semana.proximaFecha; as proxima) {
+							<span class="count" [class.count--urgente]="urgente(proxima)">
+								<i class="pi pi-clock"></i> {{ proxima | date: 'dd/MM' }}
+							</span>
+						}
+					</div>
+				</header>
+				<div class="detail__step">
+					<button
+						type="button"
+						[disabled]="!prev()"
+						aria-label="Semana anterior"
+						[attr.data-info-anchor]="anchorPrefix() + '-semana-anterior'"
+						(click)="goPrev()"
+					>
+						<i class="pi pi-chevron-left"></i>
+					</button>
+					<button
+						type="button"
+						[disabled]="!next()"
+						aria-label="Semana siguiente"
+						[attr.data-info-anchor]="anchorPrefix() + '-semana-siguiente'"
+						(click)="goNext()"
+					>
+						<i class="pi pi-chevron-right"></i>
+					</button>
+				</div>
+				<div class="detail__content">
+					<ng-content />
+				</div>
+			}
+		</section>
+	</div>
+</div>

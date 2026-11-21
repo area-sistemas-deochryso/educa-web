@@ -12,6 +12,7 @@ import {
 } from './storage.models';
 import { SessionStorageService } from './session-storage.service';
 import {
+	ContenidoSemanasLayout,
 	CorrelationViewMode,
 	ErrorGroupsViewMode,
 	PreferencesStorageService,
@@ -19,7 +20,7 @@ import {
 } from './preferences-storage.service';
 import { NotificationStorageService } from './notification-storage.service';
 
-export type { CorrelationViewMode, ErrorGroupsViewMode, ThemePreference } from './preferences-storage.service';
+export type { ContenidoSemanasLayout, CorrelationViewMode, ErrorGroupsViewMode, ThemePreference } from './preferences-storage.service';
 
 /**
  * Storage facade for auth, permissions, notifications, and preferences.
@@ -403,6 +404,16 @@ export class StorageService {
 
 	hasErrorGroupsViewModePreference(): boolean {
 		return this.preferences.hasErrorGroupsViewModePreference();
+	}
+	// #endregion
+
+	// #region CONTENIDO SEMANAS LAYOUT
+	getContenidoSemanasLayout(): ContenidoSemanasLayout {
+		return this.preferences.getContenidoSemanasLayout();
+	}
+
+	setContenidoSemanasLayout(layout: ContenidoSemanasLayout): void {
+		this.preferences.setContenidoSemanasLayout(layout);
 	}
 	// #endregion
 

@@ -43,101 +43,67 @@ function buildProgress(resumen: ContenidoResumenDto | undefined): SlotProgress |
 	imports: [RouterLink, EduTag, SharedElementDirective],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	styles: `
-		:host {
-			display: block;
-			min-width: 0;
-		}
+		:host { display: block; min-width: 0; }
 		.pair-card {
 			position: relative;
+			display: flex;
+			flex-direction: column;
+			gap: 0.75rem;
 			height: 100%;
-			border-radius: 8px;
+			border-radius: 12px;
 			border: 1px solid var(--surface-200);
 			border-left: 4px solid var(--card-accent, var(--primary-accent));
 			background: var(--surface-card, #fcfdfe);
-			padding: 1rem 1.25rem;
-			transition:
-				box-shadow 0.15s,
-				border-color 0.15s;
+			padding: 1.125rem 1.25rem 1rem;
+			transition: box-shadow 0.15s, border-color 0.15s, transform 0.15s;
 		}
 		.pair-card:hover {
-			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+			box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
 			border-color: var(--surface-300);
 			border-left-color: var(--card-accent, var(--primary-accent));
+			transform: translateY(-1px);
 		}
-		.pair-card__title {
-			margin: 0;
-			font-size: 1.125rem;
-			line-height: 1.4;
-		}
-		.pair-card__link {
-			color: inherit;
-			text-decoration: none;
-		}
-		.pair-card__link::after {
-			content: '';
-			position: absolute;
-			inset: 0;
-			border-radius: 8px;
-		}
-		.pair-card__link:focus-visible {
-			outline: none;
-		}
-		.pair-card__link:focus-visible::after {
-			outline: 2px solid var(--accent-interactive, var(--primary-accent));
-			outline-offset: 2px;
-		}
-		.pair-card__salon,
+		.pair-card__head { display: flex; flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+		.pair-card__title { margin: 0; font-size: 1.125rem; font-weight: 700; line-height: 1.3; }
+		.pair-card__link { color: inherit; text-decoration: none; }
+		.pair-card__link::after { content: ''; position: absolute; inset: 0; border-radius: 12px; }
+		.pair-card__link:focus-visible { outline: none; }
+		.pair-card__link:focus-visible::after { outline: 2px solid var(--accent-interactive, var(--primary-accent)); outline-offset: 2px; }
+		.pair-card__salon, .pair-card__slot { position: relative; z-index: 1; }
+		.pair-card__salon { text-decoration: none; }
+		.pair-card__meta { font-size: 0.875rem; color: var(--text-color-secondary); }
+		.pair-card__slots { display: flex; flex-direction: column; gap: 0.5rem; margin: 0; padding: 0; list-style: none; }
 		.pair-card__slot {
-			position: relative;
-			z-index: 1;
-		}
-		.pair-card__salon {
-			text-decoration: none;
-		}
-		.pair-card__slots {
 			display: flex;
-			flex-wrap: wrap;
-			gap: 0.5rem;
-			margin: 0.75rem 0 0;
-			padding: 0;
-			list-style: none;
-		}
-		.pair-card__slot {
-			display: inline-flex;
-			align-items: center;
+			flex-direction: column;
 			gap: 0.4rem;
-			padding: 0.25rem 0.6rem;
-			border: 1px solid var(--surface-300);
-			border-radius: 999px;
+			padding: 0.55rem 0.75rem;
+			border: 1px solid var(--surface-200);
+			border-radius: 8px;
 			background: var(--surface-50);
 			color: var(--text-color);
-			font-size: 0.8125rem;
 			text-decoration: none;
-			transition:
-				border-color 0.15s,
-				background-color 0.15s;
+			transition: border-color 0.15s, background-color 0.15s;
 		}
-		.pair-card__slot:hover,
-		.pair-card__slot:focus-visible {
-			border-color: var(--accent-interactive, var(--primary-accent));
+		.pair-card__slot:hover, .pair-card__slot:focus-visible {
+			border-color: var(--card-accent, var(--primary-accent));
 			background: var(--surface-100);
 		}
-		.pair-card__slot i {
-			font-size: 0.7rem;
-		}
+		.pair-card__when { display: flex; align-items: center; gap: 0.45rem; font-size: 0.8125rem; font-weight: 600; }
+		.pair-card__when i { font-size: 0.8rem; color: var(--card-accent, var(--primary-accent)); }
 		.pair-card__progress {
-			display: inline-flex;
+			display: flex;
 			align-items: center;
-			gap: 0.35rem;
-			padding-left: 0.4rem;
-			border-left: 1px solid var(--surface-300);
+			gap: 0.5rem;
 			font-size: 0.75rem;
+			color: var(--text-color-secondary);
 			font-variant-numeric: tabular-nums;
 		}
 		.pair-card__progress-bar {
 			position: relative;
-			width: 2.5rem;
-			height: 0.35rem;
+			flex: 1 1 auto;
+			min-width: 2rem;
+			height: 0.375rem;
 			border-radius: 999px;
 			background: var(--surface-200);
 			overflow: hidden;
@@ -148,26 +114,20 @@ function buildProgress(resumen: ContenidoResumenDto | undefined): SlotProgress |
 			border-radius: 999px;
 			background: var(--card-accent, var(--primary-accent));
 		}
-		.pair-card__progress--empty {
-			color: var(--text-color-secondary);
-		}
+		.pair-card__progress-text { flex: 0 0 auto; white-space: nowrap; }
 		.pair-card__affordance {
 			display: flex;
 			align-items: center;
 			justify-content: flex-end;
 			gap: 0.35rem;
-			margin-top: 0.75rem;
-			font-size: 0.75rem;
+			margin-top: auto;
+			padding-top: 0.25rem;
+			font-size: 0.8125rem;
 			font-weight: 600;
 			color: var(--primary-accent);
 		}
-		.pair-card__affordance i {
-			font-size: 0.7rem;
-			transition: transform 0.15s;
-		}
-		.pair-card:hover .pair-card__affordance i {
-			transform: translateX(3px);
-		}
+		.pair-card__affordance i { font-size: 0.75rem; transition: transform 0.15s; }
+		.pair-card:hover .pair-card__affordance i { transform: translateX(3px); }
 	`,
 	template: `
 		<article
@@ -176,8 +136,8 @@ function buildProgress(resumen: ContenidoResumenDto | undefined): SlotProgress |
 			[attr.data-info-anchor]="anchorPrefix() + '-card'"
 			[style.--card-accent]="accent()"
 		>
-			<div class="flex align-items-start justify-content-between gap-2 mb-2">
-				<h3 class="pair-card__title font-bold">
+			<div class="pair-card__head">
+				<h3 class="pair-card__title">
 					<a class="pair-card__link" [routerLink]="body().commands">{{
 						group().cursoNombre
 					}}</a>
@@ -192,7 +152,7 @@ function buildProgress(resumen: ContenidoResumenDto | undefined): SlotProgress |
 					<edu-tag [value]="group().salonDescripcion" severity="info" />
 				</a>
 			</div>
-			<div class="text-sm text-color-secondary">
+			<div class="pair-card__meta">
 				<ng-content />
 			</div>
 			<ul class="pair-card__slots" aria-label="Clases del curso">
@@ -204,8 +164,8 @@ function buildProgress(resumen: ContenidoResumenDto | undefined): SlotProgress |
 							[queryParams]="item.target.queryParams"
 							[attr.data-info-anchor]="anchorPrefix() + '-card-franja'"
 						>
-							<i class="pi pi-calendar" aria-hidden="true"></i>
 							<span class="pair-card__when">
+								<i class="pi pi-calendar" aria-hidden="true"></i>
 								{{ item.slot.diaSemanaDescripcion }} · {{ item.slot.horaInicio }} -
 								{{ item.slot.horaFin }}
 							</span>
@@ -233,9 +193,7 @@ function buildProgress(resumen: ContenidoResumenDto | undefined): SlotProgress |
 										>
 								</span>
 							} @else {
-								<span class="pair-card__progress pair-card__progress--empty"
-									>Sin contenido</span
-								>
+								<span class="pair-card__progress">Sin contenido</span>
 							}
 						</a>
 					</li>

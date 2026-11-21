@@ -6,31 +6,19 @@ import { CursoContenidoCrudFacade } from '../../services/curso-contenido-crud.fa
 import { CursoContenidoPublicacionFacade } from '../../services/curso-contenido-publicacion.facade';
 import { CursoContenidoUiFacade } from '../../services/curso-contenido-ui.facade';
 import { ContenidoArchivoTipo, CursoContenidoArchivoDto, CursoContenidoSemanaDto, CursoContenidoTareaDto, TareaArchivoDto } from '@features/intranet/pages/profesor/models';
-import { ErrorHandlerService } from '@core/services';
+import { ErrorHandlerService, StorageService, type ContenidoSemanasLayout } from '@core/services';
+import { buildResumenes, type FechaLimiteEstado, type SemanaFiltro } from './semanas-accordion.helpers';
+import { SemanaNavComponent, resolverSemanaActiva, type SemanaNavItem } from '@intranet-shared/components';
 import { FileRowComponent, UPLOAD_ACCEPT, UPLOAD_LIMITS, describeUploadLimits, validateUploadFile, FileViewerService, ViewableArchivo } from '@shared/components';
-import { EduAccordion, EduAccordionHeader, EduAccordionPanel, EduButton, EduConfirmationService, EduFileUpload, type EduFileUploadSelectEvent, EduMenu, type EduMenuItem, EduMessageService, EduToast, EduTooltip } from '@edu-ui';
+import { EduButton, EduConfirmationService, EduFileUpload, type EduFileUploadSelectEvent, EduMenu, type EduMenuItem, EduMessageService, EduToast, EduTooltip } from '@edu-ui';
 
-// #region Tipos de la vista
-export type SemanaFiltro = 'all' | 'study' | 'deliver';
-export type SemanaEstado = 'actual' | 'pasada' | 'proxima';
-export type FechaLimiteEstado = 'vencida' | 'pronto' | 'normal';
-
-interface SemanaResumen {
-	individuales: number;
-	grupales: number;
-	examenes: number;
-	/** Próxima fecha límite aún no vencida (ISO) o `null`. */
-	proximaFecha: string | null;
-	estado: SemanaEstado;
-}
-
+export type { SemanaFiltro, SemanaEstado, FechaLimiteEstado } from './semanas-accordion.helpers';
 const DIAS_URGENTE = 2;
 const MS_POR_DIA = 86_400_000;
-// #endregion
 @Component({
 	selector: 'app-semanas-accordion',
 	standalone: true,
-	imports: [DatePipe, FormsModule, EduButton, EduAccordion, EduAccordionHeader, EduAccordionPanel, EduTooltip, EduToast, EduFileUpload, EduMenu, FileRowComponent],
+	imports: [DatePipe, FormsModule, EduButton, SemanaNavComponent, EduTooltip, EduToast, EduFileUpload, EduMenu, FileRowComponent],
 	providers: [EduMessageService],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './semanas-accordion.component.html',
@@ -46,6 +34,7 @@ export class SemanasAccordionComponent {
 	private readonly confirmationService = inject(EduConfirmationService);
 	private readonly errorHandler = inject(ErrorHandlerService);
 	private readonly messageService = inject(EduMessageService);
+	private readonly storage = inject(StorageService);
 	private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 	readonly uploadAccept = UPLOAD_ACCEPT;
 	readonly uploadMaxBytes = UPLOAD_LIMITS.maxFileSizeBytes;
@@ -62,6 +51,8 @@ export class SemanasAccordionComponent {
 	/** Vista previa de lo que ve el estudiante: oculta todos los controles de edición. */
 	readonly studentView = signal(false);
 	readonly filtro = signal<SemanaFiltro>('all');
+	/** Vista de semanas elegida por el usuario (se recuerda entre visitas). */
+	readonly layout = signal<ContenidoSemanasLayout>(this.storage.getContenidoSemanasLayout());
 	private readonly addMenuRef = viewChild<EduMenu>('addMenu');
 	private readonly fileInputRef = viewChild<ElementRef<HTMLInputElement>>('materialInput');
 	private menuSemanaId: number | null = null;
@@ -130,23 +121,7 @@ export class SemanasAccordionComponent {
 	});
 
 	/** Contadores, próxima fecha y estado de cada semana, calculados una vez por cambio de datos. */
-	readonly resumenes = computed(() => {
-		const vigente = this.numeroVigente();
-		const ahora = Date.now();
-		const map = new Map<number, SemanaResumen>();
-		for (const s of this.semanasVista()) {
-			const examenes = s.tareas.filter((t) => t.tipo === 'EXAMEN').length;
-			const trabajos = s.tareas.filter((t) => t.tipo !== 'EXAMEN');
-			const grupales = trabajos.filter((t) => t.esGrupal).length;
-			const proxima = s.tareas
-				.map((t) => t.fechaLimite)
-				.filter((f): f is string => !!f && new Date(f).getTime() >= ahora)
-				.sort((a, b) => new Date(a).getTime() - new Date(b).getTime())[0] ?? null;
-			const estado: SemanaEstado = vigente === null ? 'proxima' : s.numeroSemana === vigente ? 'actual' : s.numeroSemana < vigente ? 'pasada' : 'proxima';
-			map.set(s.id, { individuales: trabajos.length - grupales, grupales, examenes, proximaFecha: proxima, estado });
-		}
-		return map;
-	});
+	readonly resumenes = computed(() => buildResumenes(this.semanasVista(), this.numeroVigente()));
 
 	fechaLimiteEstado(fecha: string | null): FechaLimiteEstado {
 		if (!fecha) return 'normal';
@@ -165,30 +140,49 @@ export class SemanasAccordionComponent {
 	});
 
 	constructor() {
-		// La semana vigente se expande sola y la vista se lleva hasta ella; el resto queda colapsado.
+		// Sin selección previa, se abre la semana vigente (o la primera si el BE no la pudo derivar).
 		effect(() => {
-			const semanaId = this.semanaVigenteId();
+			const semanaId = this.semanaVigenteId() ?? this.vm().semanas[0]?.id ?? null;
 			if (semanaId === null) return;
 			untracked(() => {
-				if (this.openPanels().includes(semanaId)) return;
-				this.openPanels.update((prev) => [...prev, semanaId]);
-				setTimeout(() => {
-					this.host.nativeElement
-						.querySelector('[data-semana-vigente="true"]')
-						?.scrollIntoView({ block: 'start', behavior: 'smooth' });
-				});
+				if (this.openPanels().length > 0) return;
+				this.openPanels.set([semanaId]);
 			});
 		});
 	}
 	// #endregion
 
-	// #region Accordion value bridge
-	// edu-accordion's [value] is string-based (no numeric convention) — semana ids are
-	// numeric, so this bridges the two at the template boundary only.
-	readonly openPanelsStr = computed(() => this.openPanels().map((v) => v.toString()));
+	// #region Navegación de semanas
+	/** Semana mostrada: la seleccionada si sigue visible; si no, la primera de la lista. */
+	readonly semanaActiva = computed(() => resolverSemanaActiva(this.semanasVista(), this.openPanels()));
 
-	onOpenPanelsChangeStr(values: string[]): void {
-		this.openPanels.set(values.map((v) => Number(v)));
+	readonly navItems = computed<SemanaNavItem[]>(() => {
+		const resumenes = this.resumenes();
+		return this.semanasVista().map((s) => {
+			const r = resumenes.get(s.id);
+			return {
+				id: s.id,
+				numero: s.numeroSemana,
+				titulo: s.titulo ?? null,
+				fechaInicio: s.fechaInicio ?? null,
+				fechaFin: s.fechaFin ?? null,
+				estado: r?.estado ?? 'proxima',
+				archivos: s.archivos.length,
+				tareas: (r?.individuales ?? 0) + (r?.grupales ?? 0),
+				examenes: r?.examenes ?? 0,
+				proximaFecha: r?.proximaFecha ?? null,
+				borrador: s.publicado === false,
+			};
+		});
+	});
+
+	selectSemana(semanaId: number): void {
+		this.openPanels.set([semanaId]);
+	}
+
+	setLayout(layout: ContenidoSemanasLayout): void {
+		this.layout.set(layout);
+		this.storage.setContenidoSemanasLayout(layout);
 	}
 	// #endregion
 
