@@ -1,0 +1,43 @@
+:host {
+	display: block;
+}
+
+.icon-picker {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(2.5rem, 1fr));
+	gap: 0.4rem;
+}
+
+.icon-picker__item {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	height: 2.5rem;
+	border: 1px solid var(--surface-300);
+	border-radius: 0.6rem;
+	background: transparent;
+	color: var(--text-color-secondary);
+	font-size: 1.05rem;
+	cursor: pointer;
+
+	&:hover {
+		background: var(--surface-100);
+		color: var(--text-color);
+	}
+
+	&:focus-visible {
+		outline: 2px solid var(--accent-interactive);
+		outline-offset: 2px;
+	}
+
+	&--on {
+		border-color: var(--blue-800);
+		background: var(--blue-100);
+		color: var(--blue-800);
+
+		&:hover {
+			background: var(--blue-100);
+			color: var(--blue-800);
+		}
+	}
+}

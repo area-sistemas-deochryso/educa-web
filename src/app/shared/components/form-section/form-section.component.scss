@@ -1,0 +1,44 @@
+:host {
+	display: block;
+}
+
+.form-section {
+	padding-top: 1.25rem;
+	border-top: 1px solid var(--surface-200);
+}
+
+:host(:first-child) .form-section {
+	padding-top: 0;
+	border-top: 0;
+}
+
+.form-section__head {
+	margin-bottom: 0.875rem;
+}
+
+.form-section__title {
+	margin: 0;
+	font-size: 0.72rem;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--text-color-secondary);
+}
+
+.form-section__hint {
+	margin: 0.2rem 0 0;
+	font-size: 0.8rem;
+	color: var(--text-color-secondary);
+}
+
+.form-section__body {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 1rem;
+}
+
+@media (max-width: 480px) {
+	.form-section__body {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}

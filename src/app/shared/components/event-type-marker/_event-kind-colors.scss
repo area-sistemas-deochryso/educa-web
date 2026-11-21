@@ -1,0 +1,32 @@
+// Paleta única por tipo de evento; la consumen el marcador y la insignia de fecha.
+@mixin event-kind-colors {
+	&[data-kind='academic'] {
+		--kind-fg: var(--blue-800);
+		--kind-bg: var(--blue-100);
+	}
+
+	&[data-kind='cultural'] {
+		--kind-fg: var(--violet-600);
+		--kind-bg: var(--violet-50);
+	}
+
+	&[data-kind='sports'] {
+		--kind-fg: var(--green-600);
+		--kind-bg: var(--green-100);
+	}
+
+	&[data-kind='meeting'] {
+		--kind-fg: var(--orange-600);
+		--kind-bg: var(--orange-100);
+	}
+
+	&[data-kind='holiday'] {
+		--kind-fg: var(--red-600);
+		--kind-bg: var(--red-100);
+	}
+
+	&[data-kind='other'] {
+		--kind-fg: var(--gray-600);
+		--kind-bg: var(--surface-100);
+	}
+}

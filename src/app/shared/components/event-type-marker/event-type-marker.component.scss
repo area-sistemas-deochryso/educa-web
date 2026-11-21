@@ -1,0 +1,39 @@
+@use './event-kind-colors' as kinds;
+
+// Forma + color: el tipo se distingue sin depender solo del color (WCAG 1.4.1).
+.marker {
+	@include kinds.event-kind-colors;
+
+	display: inline-block;
+	flex: none;
+	width: 0.75rem;
+	height: 0.75rem;
+	background: var(--kind-fg, var(--gray-600));
+
+	&[data-kind='academic'] {
+		clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+	}
+
+	&[data-kind='cultural'] {
+		clip-path: polygon(50% 0, 100% 100%, 0 100%);
+	}
+
+	&[data-kind='sports'] {
+		border-radius: 0.15rem;
+	}
+
+	&[data-kind='meeting'] {
+		border-radius: 50%;
+	}
+
+	&[data-kind='holiday'] {
+		border-radius: 50%;
+		box-shadow: 0 0 0 2px var(--kind-bg);
+	}
+
+	&[data-kind='other'] {
+		background: transparent;
+		border-radius: 50%;
+		box-shadow: inset 0 0 0 2px var(--kind-fg);
+	}
+}

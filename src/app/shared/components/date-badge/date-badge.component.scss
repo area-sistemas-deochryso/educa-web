@@ -1,0 +1,31 @@
+@use '../event-type-marker/event-kind-colors' as kinds;
+
+.date-badge {
+	@include kinds.event-kind-colors;
+
+	display: flex;
+	flex: none;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	width: 2.75rem;
+	height: 3rem;
+	border-radius: 0.6rem;
+	background: var(--kind-bg, var(--surface-100));
+	color: var(--kind-fg, var(--text-color));
+	font-variant-numeric: tabular-nums;
+}
+
+.day {
+	font-size: 1.1rem;
+	font-weight: 700;
+	line-height: 1;
+}
+
+.sub {
+	margin-top: 0.15rem;
+	font-size: 0.6rem;
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}

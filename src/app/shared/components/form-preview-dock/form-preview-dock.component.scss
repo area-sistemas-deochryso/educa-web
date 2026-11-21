@@ -1,0 +1,106 @@
+// Sin encapsulación: el panel se pinta en el contenedor de overlays, fuera de la vista del componente.
+.fpd-pane {
+	pointer-events: none;
+}
+
+// Todo el texto va dentro de la tarjeta: el fondo oscuro del panel es leve y un texto suelto se pierde sobre la página.
+.fpd {
+	// En el panel (flex) este margen centra la tarjeta en vertical y en horizontal.
+	margin: auto;
+	width: min(26rem, calc(100% - 3rem));
+	max-height: calc(100% - 3rem);
+	overflow-y: auto;
+	// Con tanto contenido puede necesitar scroll; el resto del panel sigue sin capturar el puntero.
+	pointer-events: auto;
+	padding: 1rem;
+	border-radius: 0.9rem;
+	// Mismo fondo que el panel lateral (edu-drawer), para que se lean como una sola familia.
+	background: var(--eduui-content-background, #fff);
+	box-shadow: var(--shadow-3, 0 12px 32px rgba(0, 0, 0, 0.25));
+	animation: fpd-in 280ms ease-out both;
+}
+
+.fpd__label {
+	margin: 0 0 0.75rem;
+	font-size: 0.72rem;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--text-color-secondary);
+}
+
+.fpd__hint {
+	margin: 0.75rem 0 0;
+	font-size: 0.8rem;
+	color: var(--text-color-secondary);
+}
+
+// Kit común del contenido de una vista previa (lo usan las plantillas de las páginas que proyectan aquí
+// y la variante dentro del formulario en pantallas angostas).
+.pv {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.pv-block {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.pv-cap {
+	margin: 0;
+	font-size: 0.7rem;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--text-color-secondary);
+}
+
+.pv-empty {
+	font-style: italic;
+	color: var(--text-color-secondary);
+}
+
+.pv-warn {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.5rem;
+	margin: 0;
+	padding: 0.6rem 0.75rem;
+	border-radius: 0.6rem;
+	background: var(--amber-100);
+	color: var(--amber-800);
+	font-size: 0.8rem;
+}
+
+.pv-note {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.5rem;
+	margin: 0;
+	font-size: 0.78rem;
+	color: var(--text-color-secondary);
+
+	i {
+		margin-top: 0.15rem;
+	}
+}
+
+@keyframes fpd-in {
+	from {
+		opacity: 0;
+		transform: translateX(-0.75rem);
+	}
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.fpd {
+		animation: none;
+	}
+}
