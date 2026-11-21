@@ -88,8 +88,8 @@
 						formControlName="dni"
 						autocomplete="username"
 						[attr.disabled]="isDisabled ? '' : null"
-						maxlength="8"
-						pattern="[0-9]*"
+						[appDigitsOnlyInput]="8"
+						[attr.aria-invalid]="loginForm.controls.dni.invalid && loginForm.controls.dni.touched"
 					/>
 				</app-login-input>
 				<app-form-error [control]="loginForm.controls.dni" />

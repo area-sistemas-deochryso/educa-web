@@ -1,5 +1,6 @@
 // #region Implementation
 export * from './uppercase-input/uppercase-input.directive';
+export * from './digits-only-input/digits-only-input.directive';
 export * from './table-loading/table-loading.directive';
 export * from './drag-drop';
 export * from './shared-element/shared-element.directive';

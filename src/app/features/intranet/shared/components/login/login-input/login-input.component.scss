@@ -17,5 +17,39 @@
 	&:focus-within {
 		border-bottom-color: var(--intranet-accent-color-blue);
 	}
+
+	// * Feedback de validez: solo tras interactuar (ng-touched) o con valor escrito (ng-dirty).
+	&:has(input.ng-invalid.ng-touched) {
+		border-bottom-color: var(--red-500);
+	}
+
+	&:has(input.ng-valid.ng-dirty:not(:placeholder-shown)) {
+		border-bottom-color: var(--green-600);
+	}
+
+	// * Carácter rechazado (no numérico / excede el máximo): sacudida corta.
+	&.is-rejected {
+		animation: field-rejected 0.3s ease;
+		border-bottom-color: var(--red-500);
+	}
+}
+
+@keyframes field-rejected {
+	0%,
+	100% {
+		transform: translateX(0);
+	}
+	25% {
+		transform: translateX(-4px);
+	}
+	75% {
+		transform: translateX(4px);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.login-field.is-rejected {
+		animation: none;
+	}
 }
 // #endregion

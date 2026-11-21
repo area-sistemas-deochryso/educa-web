@@ -22,7 +22,7 @@ import { FormErrorComponent } from '@intranet-shared/components/form-error';
 
 import { Router } from '@angular/router';
 
-import { UppercaseInputDirective } from '@intranet-shared/directives';
+import { DigitsOnlyInputDirective, UppercaseInputDirective } from '@intranet-shared/directives';
 import { InitialsPipe } from '@intranet-shared/pipes';
 import { TrackClickDirective, TrackSubmitDirective } from '@shared/directives';
 import { logger } from '@core/helpers';
@@ -48,6 +48,7 @@ import { EduAvatar, EduInputText, EduSelect, EduToggle, EduTooltip } from '@edu-
 		LoginOptionsComponent,
 		LoginButtonComponent,
 		UppercaseInputDirective,
+		DigitsOnlyInputDirective,
 		InitialsPipe,
 		TrackClickDirective,
 		TrackSubmitDirective,

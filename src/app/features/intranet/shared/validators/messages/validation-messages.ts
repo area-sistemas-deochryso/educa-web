@@ -19,7 +19,7 @@ export const VALIDATION_MESSAGES: ValidationMessageConfig = {
 	pattern: 'El formato no es valido',
 
 	// Validadores custom
-	dni: 'El DNI debe tener exactamente 8 digitos',
+	dni: 'El DNI debe tener exactamente 8 dígitos',
 	email: 'Ingrese un correo electronico valido',
 	phoneNumber: 'Ingrese un numero de telefono valido (9 digitos)',
 	onlyLetters: 'Solo se permiten letras',

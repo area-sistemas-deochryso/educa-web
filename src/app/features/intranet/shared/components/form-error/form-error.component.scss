@@ -4,6 +4,20 @@
 	flex-direction: column;
 	gap: 0.25rem;
 	margin-top: 0.25rem;
+	animation: form-error-in 0.2s ease-out;
+}
+
+@keyframes form-error-in {
+	from {
+		opacity: 0;
+		transform: translateY(-4px);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.form-error {
+		animation: none;
+	}
 }
 .p-error {
 	font-size: 0.75rem;
