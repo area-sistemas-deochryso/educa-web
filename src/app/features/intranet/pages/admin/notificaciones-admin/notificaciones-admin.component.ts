@@ -1,6 +1,6 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
-import { DatePipe } from '@angular/common';
+import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PageHeaderComponent, KpiStatsComponent, type KpiStatItem } from '@intranet-shared/components';
 import { EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleLabelPipe } from '@intranet-shared/pipes';
@@ -8,9 +8,9 @@ import { UiMappingService } from '@intranet-shared/services';
 import { NotificacionesAdminFacade, NotificacionesAdminStore } from './services';
 import type { NotificacionFormData } from './services';
 import { NotificacionLista } from '@data/models';
-import { createClientPaging } from '@shared/utils';
-import { CardActionsComponent, CardRowComponent, MobileCardListComponent, StickyFilterBarComponent, injectIsMobile } from '@shared/components';
-import { EduButton, EduConfirmDialog, EduConfirmationService, EduDatePicker, EduDialog, EduIconField, EduInputIcon, EduInputText, EduSelect, EduTable, EduTag, EduTextarea, EduToggle, EduTooltip } from '@edu-ui';
+import { buildYearOptions, dateToYmd, ymdToDate, type TimeStatus } from '@shared/utils';
+import { FormPreviewDockComponent, FormSectionComponent, IconPickerComponent, injectIsMobile, StickyFilterBarComponent, TimeStatusChipComponent } from '@shared/components';
+import { EduButton, EduConfirmDialog, EduConfirmationService, EduDatePicker, EduDrawer, EduIconField, EduInputIcon, EduInputText, EduSelect, EduSelectButton, EduTag, EduTextarea, EduToggle, EduTooltip } from '@edu-ui';
 
 // #endregion
 // #region Implementation
@@ -18,11 +18,11 @@ import { EduButton, EduConfirmDialog, EduConfirmationService, EduDatePicker, Edu
 	selector: 'app-notificaciones-admin',
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [DatePipe, 
+	imports: [DatePipe, NgTemplateOutlet, 
 		FormsModule,
-		EduTable,
 		EduButton,
-		EduDialog,
+		EduDrawer,
+		EduSelectButton,
 		EduInputText,
 		EduTextarea,
 		EduSelect,
@@ -39,20 +39,23 @@ import { EduButton, EduConfirmDialog, EduConfirmationService, EduDatePicker, Edu
 		EstadoSeverityPipe,
 		EstadoToggleLabelPipe,
 		StickyFilterBarComponent,
-		MobileCardListComponent,
-		CardRowComponent,
-		CardActionsComponent],
+		TimeStatusChipComponent,
+		FormSectionComponent,
+		FormPreviewDockComponent,
+		IconPickerComponent],
 	providers: [EduConfirmationService],
 	templateUrl: './notificaciones-admin.component.html',
 	styleUrl: './notificaciones-admin.component.scss',
 })
 export class NotificacionesAdminComponent implements OnInit {
-	readonly isMobile = injectIsMobile();
 	/** Filtros activos sin contar el buscador (los muestra el botón «Filtros» de la barra compacta). */
 	readonly activeFilterCount = computed(() => {
 		const { filterTipo, filterEstado } = this.vm();
 		return [filterTipo, filterEstado].filter((v) => v !== null && v !== undefined && v !== '').length;
 	});
+
+	/** Con ancho suficiente la vista previa flota a la izquierda del panel; si no, queda dentro del formulario. */
+	readonly isWideScreen = injectIsMobile('(min-width: 1100px)');
 
 	// #region Dependencias
 	private facade = inject(NotificacionesAdminFacade);
@@ -64,7 +67,40 @@ export class NotificacionesAdminComponent implements OnInit {
 	// #region Estado del facade
 	readonly vm = this.facade.vm;
 	showValidation = signal(false);
-	readonly itemsPaging = createClientPaging(computed(() => this.vm().items));
+	// edu-datepicker trabaja con Date; el formulario guarda 'YYYY-MM-DD'. Las señales calculadas mantienen
+	// la misma instancia de Date mientras el texto no cambie, así el calendario no se reinicia en cada ciclo.
+	readonly fechaInicioDate = computed(() => ymdToDate(this.vm().formData.fechaInicio));
+	readonly fechaFinDate = computed(() => ymdToDate(this.vm().formData.fechaFin));
+	/** Días que dura la vigencia, contando inicio y fin (0 si falta una fecha o el rango está al revés). */
+	readonly vigenciaDias = computed(() => {
+		const start = this.fechaInicioDate();
+		const end = this.fechaFinDate();
+		if (!start || !end || end < start) return 0;
+		return Math.round((end.getTime() - start.getTime()) / 86_400_000) + 1;
+	});
+	readonly anioOptions = computed(() => buildYearOptions(this.vm().filterAnio));
+	/** Tarjetas, la más reciente primero. Sin paginación: son decenas por año. */
+	readonly sortedItems = computed(() =>
+		[...this.vm().items].sort(
+			(a, b) => b.fechaInicio.localeCompare(a.fechaInicio) || a.titulo.localeCompare(b.titulo),
+		),
+	);
+	/** Para una vigencia "En curso" suena mejor "Vigente". */
+	readonly vigenciaLabels: Partial<Record<TimeStatus, string>> = { ongoing: 'Vigente' };
+
+	// Destinatario: "Todos" deja los 3 campos en null; "Segmentar" muestra los 3 selects (mismos campos de siempre).
+	readonly destinatarioModeOptions = [
+		{ label: 'Todos', value: 'all' },
+		{ label: 'Segmentar', value: 'segment' }];
+	private readonly forceSegment = signal(false);
+	readonly destinatarioMode = computed<'all' | 'segment'>(() => {
+		const { destinatarioRol, destinatarioGrado, destinatarioSeccion } = this.vm().formData;
+		return this.forceSegment() || destinatarioRol || destinatarioGrado || destinatarioSeccion ? 'segment' : 'all';
+	});
+	readonly destinatarioSummary = computed(() => {
+		const { destinatarioRol, destinatarioGrado, destinatarioSeccion } = this.vm().formData;
+		return this.formatDestinatario(destinatarioRol, destinatarioGrado, destinatarioSeccion);
+	});
 	// #endregion
 
 	// #region Stats KPI
@@ -105,6 +141,7 @@ export class NotificacionesAdminComponent implements OnInit {
 		{ label: 'Media', value: 'medium' },
 		{ label: 'Alta', value: 'high' },
 		{ label: 'Urgente', value: 'urgent' }];
+
 
 	readonly estadoOptions = [
 		{ label: 'Todos', value: null },
@@ -190,11 +227,22 @@ export class NotificacionesAdminComponent implements OnInit {
 	}
 
 	onNew(): void {
+		this.forceSegment.set(false);
 		this.facade.openNewDialog();
 	}
 
 	onEdit(item: NotificacionLista): void {
+		this.forceSegment.set(false);
 		this.facade.openEditDialog(item);
+	}
+
+	onDestinatarioMode(mode: 'all' | 'segment'): void {
+		if (mode === 'all') {
+			this.store.updateFormField('destinatarioRol', null);
+			this.store.updateFormField('destinatarioGrado', null);
+			this.store.updateFormField('destinatarioSeccion', null);
+		}
+		this.forceSegment.set(mode === 'segment');
 	}
 
 	onToggleEstado(item: NotificacionLista): void {
@@ -233,11 +281,17 @@ export class NotificacionesAdminComponent implements OnInit {
 	updateField<K extends keyof NotificacionFormData>(field: K, value: NotificacionFormData[K]): void {
 		this.store.updateFormField(field, value);
 	}
+	onDateChange(field: 'fechaInicio' | 'fechaFin', value: Date | Date[] | null): void {
+		this.updateField(field, dateToYmd(Array.isArray(value) ? value[0] : value));
+	}
 	// #endregion
 
 	// #region Dialog handlers
 	onDialogVisibleChange(visible: boolean): void {
-		if (!visible) this.facade.closeDialog();
+		if (!visible) {
+			this.forceSegment.set(false);
+			this.facade.closeDialog();
+		}
 	}
 
 	onConfirmDialogHide(): void {
@@ -247,10 +301,14 @@ export class NotificacionesAdminComponent implements OnInit {
 
 	// #region UI helpers
 	getDestinatarioLabel(item: NotificacionLista): string {
+		return this.formatDestinatario(item.destinatarioRol, item.destinatarioGrado, item.destinatarioSeccion);
+	}
+
+	private formatDestinatario(rol: string | null, grado: string | null, seccion: string | null): string {
 		const parts: string[] = [];
-		if (item.destinatarioRol) parts.push(item.destinatarioRol);
-		if (item.destinatarioGrado) parts.push(item.destinatarioGrado);
-		if (item.destinatarioSeccion) parts.push(`Sección ${item.destinatarioSeccion}`);
+		if (rol) parts.push(rol);
+		if (grado) parts.push(grado);
+		if (seccion) parts.push(`Sección ${seccion}`);
 		return parts.length > 0 ? parts.join(' - ') : 'Todos';
 	}
 	// #endregion

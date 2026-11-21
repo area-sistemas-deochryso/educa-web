@@ -1,7 +1,7 @@
 <!-- #region Header -->
 <app-page-header icon="pi pi-bell" title="Gestión de Notificaciones" subtitle="Administra las notificaciones que ven los usuarios del sistema">
 	<edu-select
-		[options]="[{ label: '2025', value: 2025 }, { label: '2026', value: 2026 }, { label: '2027', value: 2027 }]"
+		[options]="anioOptions()"
 		[optionLabel]="'label'"
 		[optionValue]="'value'"
 		[ngModel]="vm().filterAnio"
@@ -103,88 +103,42 @@
 	/>
 </app-sticky-filter-bar>
 
-<!-- #region Tabla -->
-@if (isMobile()) {
-	@if (vm().loading) {
-		<p class="cards-state" aria-live="polite">Cargando…</p>
-	} @else if (itemsPaging.totalRecords() === 0) {
-		<p class="cards-state">No se encontraron notificaciones.</p>
-	} @else {
-		<app-mobile-card-list [paging]="itemsPaging" [pageSize]="5">
-			<ng-template let-item>
-				<div>
-					<app-card-row label="Título">{{ item.titulo }}</app-card-row>
-					<app-card-row label="Tipo"><edu-tag [value]="uiMapping.getNotificacionTipoLabel(item.tipo)" styleClass="tag-neutral" /></app-card-row>
-					<app-card-row label="Prioridad"><edu-tag [value]="uiMapping.getNotificacionPrioridadLabel(item.prioridad)" [severity]="uiMapping.getNotificacionPrioridadSeverity(item.prioridad)" /></app-card-row>
-					<app-card-row label="Vigencia">{{ item.fechaInicio | date: 'dd/MM/yyyy' }} – {{ item.fechaFin | date: 'dd/MM/yyyy' }}</app-card-row>
-					<app-card-row label="Para"><edu-tag [value]="getDestinatarioLabel(item)" styleClass="tag-neutral" /></app-card-row>
-					<app-card-row label="Estado"><edu-tag [value]="item.estado | estadoLabel" [severity]="item.estado | estadoSeverity" /></app-card-row>
-					<app-card-actions>
-						<edu-button icon="pi pi-pencil" [text]="true" [rounded]="true" aria-label="Editar" (click)="onEdit(item)" />
-						<edu-button [icon]="item.estado ? 'pi pi-eye-slash' : 'pi pi-eye'" [text]="true" [rounded]="true" [severity]="item.estado ? 'warn' : 'success'" [attr.aria-label]="item.estado | estadoToggleLabel" (click)="onToggleEstado(item)" />
-						<edu-button icon="pi pi-trash" [text]="true" [rounded]="true" severity="danger" aria-label="Eliminar" (click)="onDelete(item)" />
-					</app-card-actions>
-				</div>
-			</ng-template>
-		</app-mobile-card-list>
-	}
+<!-- #region Lista de tarjetas -->
+@if (vm().loading && vm().items.length === 0) {
+	<p class="list-state" aria-live="polite">Cargando…</p>
+} @else if (sortedItems().length === 0) {
+	<div class="list-state">
+		<strong>No se encontraron notificaciones</strong>
+		<p>Ajusta los filtros o crea una notificación nueva.</p>
+	</div>
 } @else {
-<edu-table
-	[value]="itemsPaging.value()"
-	[dataKey]="'id'"
-	[loading]="vm().loading"
-	[paginator]="true"
-	[rows]="10"
-	[first]="itemsPaging.first()"
-	[totalRecords]="itemsPaging.totalRecords()"
-	[rowsPerPageOptions]="[5, 10, 25]"
-	(onPageChange)="itemsPaging.onPageChange($event)"
-	stateStorage="session"
-	stateKey="notificaciones-admin-table"
-	[showCurrentPageReport]="true"
-	currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}"
-	styleClass="p-datatable-sm"
->
-	<ng-template #header>
-		<tr>
-			<th eduSortableColumn="titulo" data-info-anchor="tabla-orden-columna">Título</th>
-			<th eduSortableColumn="tipo" style="width: 110px" data-info-anchor="tabla-orden-columna">Tipo</th>
-			<th eduSortableColumn="prioridad" style="width: 100px" data-info-anchor="tabla-orden-columna">Prioridad</th>
-			<th style="width: 110px">Fecha Inicio</th>
-			<th style="width: 110px">Fecha Fin</th>
-			<th style="width: 130px">Destinatario</th>
-			<th eduSortableColumn="estado" style="width: 90px" data-info-anchor="tabla-orden-columna">Estado</th>
-			<th style="width: 140px">Acciones</th>
-		</tr>
-	</ng-template>
+	<ul class="notif-list">
+		@for (item of sortedItems(); track item.id) {
+			<li class="notif-card" [class.notif-card--off]="!item.estado" [attr.data-priority]="item.prioridad">
+				<span class="notif-icon" aria-hidden="true"><i class="pi {{ item.icono }}"></i></span>
 
-	<ng-template #body let-item>
-		<tr>
-			<td>
-				<div class="titulo-cell">
-					<i class="pi {{ item.icono }}"></i>
-					<span>{{ item.titulo }}</span>
+				<div class="notif-main">
+					<strong class="notif-title">{{ item.titulo }}</strong>
+					<p class="notif-message">{{ item.mensaje }}</p>
+					<div class="notif-tags">
+						<edu-tag [value]="uiMapping.getNotificacionPrioridadLabel(item.prioridad)" [severity]="uiMapping.getNotificacionPrioridadSeverity(item.prioridad)" />
+						<edu-tag [value]="uiMapping.getNotificacionTipoLabel(item.tipo)" styleClass="tag-neutral" />
+						<edu-tag [value]="getDestinatarioLabel(item)" styleClass="tag-neutral" />
+						<span class="notif-dates">{{ item.fechaInicio | date: 'dd/MM/yyyy' }} – {{ item.fechaFin | date: 'dd/MM/yyyy' }}</span>
+						<app-time-status-chip [start]="item.fechaInicio" [end]="item.fechaFin" [labels]="vigenciaLabels" />
+						@if (!item.estado) {
+							<edu-tag [value]="item.estado | estadoLabel" [severity]="item.estado | estadoSeverity" />
+						}
+					</div>
 				</div>
-			</td>
-			<td>
-				<edu-tag [value]="uiMapping.getNotificacionTipoLabel(item.tipo)" styleClass="tag-neutral" />
-			</td>
-			<td>
-				<edu-tag [value]="uiMapping.getNotificacionPrioridadLabel(item.prioridad)" [severity]="uiMapping.getNotificacionPrioridadSeverity(item.prioridad)" />
-			</td>
-			<td>{{ item.fechaInicio | date: 'dd/MM/yyyy' }}</td>
-			<td>{{ item.fechaFin | date: 'dd/MM/yyyy' }}</td>
-			<td>
-				<edu-tag [value]="getDestinatarioLabel(item)" styleClass="tag-neutral" />
-			</td>
-			<td>
-				<edu-tag
-					[value]="item.estado | estadoLabel"
-					[severity]="item.estado | estadoSeverity"
-				/>
-			</td>
-			<td>
+
 				<div class="actions-cell">
+					<edu-toggle
+						[ngModel]="item.estado"
+						(ngModelChange)="onToggleEstado(item)"
+						[ariaLabel]="item.estado | estadoToggleLabel"
+						data-info-anchor="admin-notificaciones-toggle-estado-btn"
+					/>
 					<edu-button
 						icon="pi pi-pencil"
 						[text]="true"
@@ -194,17 +148,6 @@
 						eduTooltipPosition="top"
 						[pt]="{ root: { 'aria-label': 'Editar' } }"
 						data-info-anchor="admin-notificaciones-editar-btn"
-					/>
-					<edu-button
-						[icon]="item.estado ? 'pi pi-eye-slash' : 'pi pi-eye'"
-						[text]="true"
-						[rounded]="true"
-						[severity]="item.estado ? 'warn' : 'success'"
-						(click)="onToggleEstado(item)"
-						[eduTooltip]="item.estado | estadoToggleLabel"
-						eduTooltipPosition="top"
-						[pt]="{ root: { 'aria-label': item.estado | estadoToggleLabel } }"
-						data-info-anchor="admin-notificaciones-toggle-estado-btn"
 					/>
 					<edu-button
 						icon="pi pi-trash"
@@ -218,243 +161,323 @@
 						data-info-anchor="admin-notificaciones-eliminar-btn"
 					/>
 				</div>
-			</td>
-		</tr>
-	</ng-template>
-
-	<ng-template #emptymessage>
-		<tr>
-			<td colspan="8" class="text-center p-4">
-				<i class="pi pi-inbox" style="font-size: 2rem; color: var(--text-color-secondary)"></i>
-				<p>No se encontraron notificaciones</p>
-			</td>
-		</tr>
-	</ng-template>
-</edu-table>
+			</li>
+		}
+	</ul>
 }
 <!-- #endregion -->
 
-<!-- #region Dialog Crear/Editar -->
-<edu-dialog
+<!-- #region Vista previa (plantilla): flotante a la izquierda en pantallas anchas, dentro del formulario en las angostas -->
+<ng-template #previewTpl>
+	<div class="pv" aria-live="polite">
+		<!-- Tal como se ve en el panel de notificaciones -->
+		<section class="pv-block">
+			<p class="pv-cap">En el panel de notificaciones</p>
+			<div class="notif-preview" [attr.data-priority]="vm().formData.prioridad">
+				<span class="notif-icon" aria-hidden="true"><i class="pi {{ vm().formData.icono }}"></i></span>
+				<div class="notif-main">
+					<div class="pv-meta">
+						<span class="pv-badge">{{ uiMapping.getNotificacionTipoLabel(vm().formData.tipo) }}</span>
+						<span class="pv-prio">{{ uiMapping.getNotificacionPrioridadLabel(vm().formData.prioridad) }}</span>
+					</div>
+					<strong class="notif-title">{{ vm().formData.titulo || 'Título de la notificación' }}</strong>
+					<p class="notif-message" [class.pv-empty]="!vm().formData.mensaje">
+						{{ vm().formData.mensaje || 'El mensaje aparecerá aquí.' }}
+					</p>
+					@if (vm().formData.actionUrl) {
+						<span class="notif-action">{{ vm().formData.actionText || 'Ver más' }} <i class="pi pi-arrow-right" aria-hidden="true"></i></span>
+					}
+				</div>
+				<div class="pv-actions" aria-hidden="true">
+					<i class="pi pi-eye"></i>
+					@if (vm().formData.dismissible) {
+						<i class="pi pi-times"></i>
+					}
+				</div>
+			</div>
+			@if (!vm().formData.dismissible) {
+				<p class="pv-note"><i class="pi pi-lock" aria-hidden="true"></i> No se puede descartar: queda hasta que termine la vigencia.</p>
+			}
+			@if (vm().formData.prioridad === 'high' || vm().formData.prioridad === 'urgent') {
+				<p class="pv-note"><i class="pi pi-bell" aria-hidden="true"></i> Además aparece como aviso emergente arriba a la derecha.</p>
+			}
+		</section>
+
+		<section class="pv-block">
+			<p class="pv-cap">Quién la recibe</p>
+			@if (destinatarioMode() === 'all') {
+				<div class="pv-chips"><span class="pv-chip-dest pv-chip-dest--all"><i class="pi pi-users" aria-hidden="true"></i> Todos los usuarios</span></div>
+			} @else {
+				<div class="pv-chips">
+					<span class="pv-chip-dest" [class.pv-chip-dest--any]="!vm().formData.destinatarioRol">Rol: {{ vm().formData.destinatarioRol || 'cualquiera' }}</span>
+					<span class="pv-chip-dest" [class.pv-chip-dest--any]="!vm().formData.destinatarioGrado">Grado: {{ vm().formData.destinatarioGrado || 'cualquiera' }}</span>
+					<span class="pv-chip-dest" [class.pv-chip-dest--any]="!vm().formData.destinatarioSeccion">Sección: {{ vm().formData.destinatarioSeccion || 'cualquiera' }}</span>
+				</div>
+			}
+		</section>
+
+		<section class="pv-block">
+			<p class="pv-cap">Cuándo se muestra</p>
+			@if (vm().formData.fechaInicio && vm().formData.fechaFin) {
+				<p class="pv-when">
+					{{ vm().formData.fechaInicio | date: 'dd/MM/yyyy' }} <i class="pi pi-arrow-right" aria-hidden="true"></i> {{ vm().formData.fechaFin | date: 'dd/MM/yyyy' }}
+					@if (vigenciaDias(); as dias) {
+						<span class="pv-days">{{ dias }} {{ dias === 1 ? 'día' : 'días' }}</span>
+					}
+					<app-time-status-chip [start]="vm().formData.fechaInicio" [end]="vm().formData.fechaFin" [labels]="vigenciaLabels" />
+				</p>
+			} @else {
+				<p class="pv-empty">Elige desde y hasta cuándo se muestra.</p>
+			}
+		</section>
+
+		@if (!vm().formData.estado) {
+			<p class="pv-warn" role="status">
+				<i class="pi pi-eye-slash" aria-hidden="true"></i>
+				Está desactivada: no se muestra a nadie aunque esté vigente.
+			</p>
+		}
+	</div>
+</ng-template>
+<!-- #endregion -->
+
+<!-- #region Drawer Crear/Editar (nunca dentro de @if: ver reference/dialogs-sync.md) -->
+<edu-drawer
 	[header]="vm().isEditing ? 'Editar Notificación' : 'Nueva Notificación'"
 	[visible]="vm().dialogVisible"
 	(visibleChange)="onDialogVisibleChange($event)"
+	position="right"
 	[modal]="true"
-	[style]="{ width: '650px' }"
-	[closable]="true"
+	[style]="{ width: 'min(560px, 100vw)' }"
 >
-	<div class="form-grid">
-		<div class="form-field full">
-			<label for="titulo">Título *</label>
-			<input
-				eduInputText
-				id="titulo"
-				[ngModel]="vm().formData.titulo"
-				(ngModelChange)="updateField('titulo', $event)"
-				placeholder="Título de la notificación"
-				data-info-anchor="admin-notificaciones-form-titulo-input"
-			/>
-			@if (showValidation() && !vm().formData.titulo.trim()) {
-				<small class="error-msg">El título es obligatorio</small>
-			}
-		</div>
-
-		<div class="form-field full">
-			<label for="mensaje">Mensaje *</label>
-			<textarea
-				eduTextarea
-				id="mensaje"
-				[ngModel]="vm().formData.mensaje"
-				(ngModelChange)="updateField('mensaje', $event)"
-				placeholder="Mensaje de la notificación"
-				[rows]="3"
-				[autoResize]="true"
-				data-info-anchor="admin-notificaciones-form-mensaje-textarea"
-			></textarea>
-			@if (showValidation() && !vm().formData.mensaje.trim()) {
-				<small class="error-msg">El mensaje es obligatorio</small>
-			}
-		</div>
-
-		<div class="form-field">
-			<label for="tipo">Tipo</label>
-			<edu-select
-				id="tipo"
-				[options]="tipoOptions.slice(1)"
-				[optionLabel]="'label'"
-				[optionValue]="'value'"
-				[ngModel]="vm().formData.tipo"
-				(ngModelChange)="updateField('tipo', $event)"
-				appendTo="body"
-				data-info-anchor="admin-notificaciones-form-tipo-select"
-			/>
-		</div>
-
-		<div class="form-field">
-			<label for="prioridad">Prioridad</label>
-			<edu-select
-				id="prioridad"
-				[options]="prioridadOptions"
-				[optionLabel]="'label'"
-				[optionValue]="'value'"
-				[ngModel]="vm().formData.prioridad"
-				(ngModelChange)="updateField('prioridad', $event)"
-				appendTo="body"
-				data-info-anchor="admin-notificaciones-form-prioridad-select"
-			/>
-		</div>
-
-		<div class="form-field">
-			<label for="destinatarioRol">Destinatario Rol</label>
-			<edu-select
-				id="destinatarioRol"
-				[options]="destinatarioRolOptions"
-				[optionLabel]="'label'"
-				[optionValue]="'value'"
-				[ngModel]="vm().formData.destinatarioRol"
-				(ngModelChange)="updateField('destinatarioRol', $event)"
-				appendTo="body"
-				placeholder="Todos los roles"
-				data-info-anchor="admin-notificaciones-form-destinatario-rol-select"
-			/>
-		</div>
-
-		<div class="form-field">
-			<label for="destinatarioGrado">Destinatario Grado</label>
-			<edu-select
-				id="destinatarioGrado"
-				[options]="destinatarioGradoOptions"
-				[optionLabel]="'label'"
-				[optionValue]="'value'"
-				[ngModel]="vm().formData.destinatarioGrado"
-				(ngModelChange)="updateField('destinatarioGrado', $event)"
-				appendTo="body"
-				placeholder="Todos los grados"
-				data-info-anchor="admin-notificaciones-form-destinatario-grado-select"
-			/>
-		</div>
-
-		<div class="form-field">
-			<label for="destinatarioSeccion">Destinatario Sección</label>
-			<edu-select
-				id="destinatarioSeccion"
-				[options]="destinatarioSeccionOptions"
-				[optionLabel]="'label'"
-				[optionValue]="'value'"
-				[ngModel]="vm().formData.destinatarioSeccion"
-				(ngModelChange)="updateField('destinatarioSeccion', $event)"
-				appendTo="body"
-				placeholder="Todas las secciones"
-				data-info-anchor="admin-notificaciones-form-destinatario-seccion-select"
-			/>
-		</div>
-
-		<div class="form-field">
-			<label for="icono">Ícono</label>
-			<edu-select
-				id="icono"
-				[options]="iconoOptions"
-				[optionLabel]="'label'"
-				[optionValue]="'value'"
-				[ngModel]="vm().formData.icono"
-				(ngModelChange)="updateField('icono', $event)"
-				appendTo="body"
-				data-info-anchor="admin-notificaciones-form-icono-select"
-			>
-				<ng-template let-item #selectedItem>
-					<div class="icon-option">
-						<i class="pi {{ item.value }}"></i>
-						<span>{{ item.label }}</span>
-					</div>
-				</ng-template>
-				<ng-template let-item #item>
-					<div class="icon-option">
-						<i class="pi {{ item.value }}"></i>
-						<span>{{ item.label }}</span>
-					</div>
-				</ng-template>
-			</edu-select>
-		</div>
-
-		<div class="form-field">
-			<label>Vista previa</label>
-			<div class="icon-preview">
-				<i class="pi {{ vm().formData.icono }}" style="font-size: 1.5rem"></i>
+	<div class="drawer-form">
+		@if (!isWideScreen()) {
+		<app-form-section heading="Vista previa" hint="Así la verá el usuario.">
+			<div class="form-field full">
+				<ng-container [ngTemplateOutlet]="previewTpl" />
 			</div>
-		</div>
+		</app-form-section>
+		}
 
-		<div class="form-field">
-			<label for="fechaInicio">Fecha Inicio *</label>
-			<edu-datepicker
-				id="fechaInicio"
-				[ngModel]="vm().formData.fechaInicio"
-				(ngModelChange)="updateField('fechaInicio', $event)"
-				dateFormat="yy-mm-dd"
-				appendTo="body"
-				data-info-anchor="admin-notificaciones-form-fecha-inicio-picker"
-			/>
-			@if (showValidation() && !vm().formData.fechaInicio) {
-				<small class="error-msg">La fecha de inicio es obligatoria</small>
-			}
-		</div>
+		<app-form-section heading="Contenido">
+			<div class="form-field full">
+				<label for="titulo">Título *</label>
+				<input
+					eduInputText
+					id="titulo"
+					[ngModel]="vm().formData.titulo"
+					(ngModelChange)="updateField('titulo', $event)"
+					placeholder="Ej. Entrega de libretas"
+					data-info-anchor="admin-notificaciones-form-titulo-input"
+				/>
+				@if (showValidation() && !vm().formData.titulo.trim()) {
+					<small class="error-msg">El título es obligatorio</small>
+				}
+			</div>
 
-		<div class="form-field">
-			<label for="fechaFin">Fecha Fin *</label>
-			<edu-datepicker
-				id="fechaFin"
-				[ngModel]="vm().formData.fechaFin"
-				(ngModelChange)="updateField('fechaFin', $event)"
-				dateFormat="yy-mm-dd"
-				appendTo="body"
-				data-info-anchor="admin-notificaciones-form-fecha-fin-picker"
-			/>
-			@if (showValidation() && !vm().formData.fechaFin) {
-				<small class="error-msg">La fecha de fin es obligatoria</small>
-			}
-		</div>
+			<div class="form-field full">
+				<label for="mensaje">Mensaje *</label>
+				<textarea
+					eduTextarea
+					id="mensaje"
+					[ngModel]="vm().formData.mensaje"
+					(ngModelChange)="updateField('mensaje', $event)"
+					placeholder="Qué necesita saber la persona que la recibe"
+					[rows]="3"
+					data-info-anchor="admin-notificaciones-form-mensaje-textarea"
+				></textarea>
+				@if (showValidation() && !vm().formData.mensaje.trim()) {
+					<small class="error-msg">El mensaje es obligatorio</small>
+				}
+			</div>
+		</app-form-section>
 
-		<div class="form-field">
-			<label for="actionUrl">URL de acción</label>
-			<input
-				eduInputText
-				id="actionUrl"
-				[ngModel]="vm().formData.actionUrl"
-				(ngModelChange)="updateField('actionUrl', $event)"
-				placeholder="/intranet/..."
-				data-info-anchor="admin-notificaciones-form-action-url-input"
-			/>
-		</div>
+		<app-form-section heading="Prioridad, tipo e ícono">
+			<div class="form-field full">
+				<label>Prioridad</label>
+				<edu-select-button
+					[options]="prioridadOptions"
+					optionLabel="label"
+					optionValue="value"
+					[allowEmpty]="false"
+					[ngModel]="vm().formData.prioridad"
+					(ngModelChange)="updateField('prioridad', $event)"
+					data-info-anchor="admin-notificaciones-form-prioridad-select"
+				/>
+			</div>
 
-		<div class="form-field">
-			<label for="actionText">Texto del botón</label>
-			<input
-				eduInputText
-				id="actionText"
-				[ngModel]="vm().formData.actionText"
-				(ngModelChange)="updateField('actionText', $event)"
-				placeholder="Ver detalles"
-				data-info-anchor="admin-notificaciones-form-action-text-input"
-			/>
-		</div>
+			<div class="form-field full">
+				<label for="tipo">Tipo</label>
+				<edu-select
+					id="tipo"
+					[options]="tipoOptions.slice(1)"
+					[optionLabel]="'label'"
+					[optionValue]="'value'"
+					[ngModel]="vm().formData.tipo"
+					(ngModelChange)="updateField('tipo', $event)"
+					appendTo="body"
+					data-info-anchor="admin-notificaciones-form-tipo-select"
+				/>
+			</div>
 
-		<div class="form-field toggles">
-			<div class="toggle-item">
-				<label>Descartable</label>
+			<div class="form-field full">
+				<label>Ícono</label>
+				<app-icon-picker
+					[options]="iconoOptions"
+					[value]="vm().formData.icono"
+					(valueChange)="updateField('icono', $event)"
+					data-info-anchor="admin-notificaciones-form-icono-select"
+				/>
+			</div>
+		</app-form-section>
+
+		<app-form-section heading="Destinatarios">
+			<div class="form-field full">
+				<label>¿Quién la recibe?</label>
+				<edu-select-button
+					[options]="destinatarioModeOptions"
+					optionLabel="label"
+					optionValue="value"
+					[allowEmpty]="false"
+					[ngModel]="destinatarioMode()"
+					(ngModelChange)="onDestinatarioMode($event)"
+					data-info-anchor="admin-notificaciones-form-destinatario-modo"
+				/>
+				@if (destinatarioMode() === 'segment') {
+					<div class="segment-grid">
+						<div class="form-field">
+							<label for="destinatarioRol">Rol</label>
+							<edu-select
+								id="destinatarioRol"
+								[options]="destinatarioRolOptions"
+								[optionLabel]="'label'"
+								[optionValue]="'value'"
+								[ngModel]="vm().formData.destinatarioRol"
+								(ngModelChange)="updateField('destinatarioRol', $event)"
+								appendTo="body"
+								placeholder="Todos los roles"
+								data-info-anchor="admin-notificaciones-form-destinatario-rol-select"
+							/>
+						</div>
+						<div class="form-field">
+							<label for="destinatarioGrado">Grado</label>
+							<edu-select
+								id="destinatarioGrado"
+								[options]="destinatarioGradoOptions"
+								[optionLabel]="'label'"
+								[optionValue]="'value'"
+								[ngModel]="vm().formData.destinatarioGrado"
+								(ngModelChange)="updateField('destinatarioGrado', $event)"
+								appendTo="body"
+								placeholder="Todos los grados"
+								data-info-anchor="admin-notificaciones-form-destinatario-grado-select"
+							/>
+						</div>
+						<div class="form-field">
+							<label for="destinatarioSeccion">Sección</label>
+							<edu-select
+								id="destinatarioSeccion"
+								[options]="destinatarioSeccionOptions"
+								[optionLabel]="'label'"
+								[optionValue]="'value'"
+								[ngModel]="vm().formData.destinatarioSeccion"
+								(ngModelChange)="updateField('destinatarioSeccion', $event)"
+								appendTo="body"
+								placeholder="Todas las secciones"
+								data-info-anchor="admin-notificaciones-form-destinatario-seccion-select"
+							/>
+						</div>
+					</div>
+				}
+				<small class="hint">Se enviará a: {{ destinatarioSummary() }}</small>
+			</div>
+		</app-form-section>
+
+		<app-form-section heading="Vigencia" hint="Se muestra desde el inicio hasta el fin, ambos días incluidos.">
+			<div class="form-field">
+				<label for="fechaInicio">Desde *</label>
+				<edu-datepicker
+					id="fechaInicio"
+					[ngModel]="fechaInicioDate()"
+					(ngModelChange)="onDateChange('fechaInicio', $event)"
+					dateFormat="dd/mm/yyyy"
+					appendTo="body"
+					data-info-anchor="admin-notificaciones-form-fecha-inicio-picker"
+				/>
+				@if (showValidation() && !vm().formData.fechaInicio) {
+					<small class="error-msg">La fecha de inicio es obligatoria</small>
+				}
+			</div>
+
+			<div class="form-field">
+				<label for="fechaFin">Hasta *</label>
+				<edu-datepicker
+					id="fechaFin"
+					[ngModel]="fechaFinDate()"
+					(ngModelChange)="onDateChange('fechaFin', $event)"
+					dateFormat="dd/mm/yyyy"
+					appendTo="body"
+					data-info-anchor="admin-notificaciones-form-fecha-fin-picker"
+				/>
+				@if (showValidation() && !vm().formData.fechaFin) {
+					<small class="error-msg">La fecha de fin es obligatoria</small>
+				}
+			</div>
+		</app-form-section>
+
+		<app-form-section heading="Botón de acción" hint="Opcional. Lleva a quien la lee a otra página de la intranet.">
+			<div class="form-field">
+				<label for="actionText">Texto del botón</label>
+				<input
+					eduInputText
+					id="actionText"
+					[ngModel]="vm().formData.actionText"
+					(ngModelChange)="updateField('actionText', $event)"
+					placeholder="Ver detalles"
+					data-info-anchor="admin-notificaciones-form-action-text-input"
+				/>
+			</div>
+
+			<div class="form-field">
+				<label for="actionUrl">Enlace</label>
+				<input
+					eduInputText
+					id="actionUrl"
+					[ngModel]="vm().formData.actionUrl"
+					(ngModelChange)="updateField('actionUrl', $event)"
+					placeholder="/intranet/..."
+					data-info-anchor="admin-notificaciones-form-action-url-input"
+				/>
+			</div>
+		</app-form-section>
+
+		<app-form-section heading="Opciones">
+			<div class="form-field full toggle-row">
+				<div class="toggle-row__text">
+					<strong>Descartable</strong>
+					<small>La persona puede cerrarla y no volver a verla.</small>
+				</div>
 				<edu-toggle
 					[ngModel]="vm().formData.dismissible"
 					(ngModelChange)="updateField('dismissible', $event)"
+					ariaLabel="Descartable"
 					data-info-anchor="admin-notificaciones-form-descartable-toggle"
 				/>
 			</div>
-			<div class="toggle-item">
-				<label>Activa</label>
+
+			<div class="form-field full toggle-row">
+				<div class="toggle-row__text">
+					<strong>Activa</strong>
+					<small>Si la apagas, no se muestra a nadie aunque esté vigente.</small>
+				</div>
 				<edu-toggle
 					[ngModel]="vm().formData.estado"
 					(ngModelChange)="updateField('estado', $event)"
+					ariaLabel="Activa"
 					data-info-anchor="admin-notificaciones-form-activa-toggle"
 				/>
 			</div>
-		</div>
+		</app-form-section>
 	</div>
 
 	<ng-template #footer>
@@ -468,7 +491,15 @@
 			data-info-anchor="admin-notificaciones-form-guardar-btn"
 		/>
 	</ng-template>
-</edu-dialog>
+</edu-drawer>
+
+<app-form-preview-dock
+	[visible]="vm().dialogVisible && isWideScreen()"
+	heading="Vista previa"
+	[rightOffset]="560"
+>
+	<ng-container [ngTemplateOutlet]="previewTpl" />
+</app-form-preview-dock>
 <!-- #endregion -->
 
 <!-- #region Confirm Dialog -->

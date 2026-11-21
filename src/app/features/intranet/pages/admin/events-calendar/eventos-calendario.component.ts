@@ -1,6 +1,6 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
-import { DatePipe } from '@angular/common';
+import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PageHeaderComponent, KpiStatsComponent, type KpiStatItem } from '@intranet-shared/components';
 import { EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleLabelPipe } from '@intranet-shared/pipes';
@@ -8,9 +8,9 @@ import { UiMappingService } from '@intranet-shared/services';
 import { EventsCalendarFacade, EventsCalendarStore } from './services';
 import type { EventoFormData } from './services';
 import { EventoCalendarioLista } from '@data/models';
-import { createClientPaging } from '@shared/utils';
-import { CardActionsComponent, CardRowComponent, MobileCardListComponent, StickyFilterBarComponent, injectIsMobile } from '@shared/components';
-import { EduButton, EduConfirmDialog, EduConfirmationService, EduDatePicker, EduDialog, EduIconField, EduInputIcon, EduInputText, EduSelect, EduTable, EduTag, EduTextarea, EduToggle, EduTooltip } from '@edu-ui';
+import { buildYearOptions, dateToYmd, ymdToDate, groupByMonth } from '@shared/utils';
+import { DateBadgeComponent, EventTypeMarkerComponent, FormPreviewDockComponent, FormSectionComponent, IconPickerComponent, injectIsMobile, StickyFilterBarComponent, TimeStatusChipComponent } from '@shared/components';
+import { EduButton, EduConfirmDialog, EduConfirmationService, EduDatePicker, EduDrawer, EduIconField, EduInputIcon, EduInputText, EduSelect, EduSelectButton, EduTag, EduTextarea, EduToggle, EduTooltip } from '@edu-ui';
 
 // #endregion
 // #region Implementation
@@ -18,11 +18,10 @@ import { EduButton, EduConfirmDialog, EduConfirmationService, EduDatePicker, Edu
 	selector: 'app-events-calendar',
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [DatePipe, 
+	imports: [DatePipe, NgTemplateOutlet, 
 		FormsModule,
-		EduTable,
 		EduButton,
-		EduDialog,
+		EduDrawer,
 		EduInputText,
 		EduTextarea,
 		EduSelect,
@@ -39,20 +38,26 @@ import { EduButton, EduConfirmDialog, EduConfirmationService, EduDatePicker, Edu
 		EstadoSeverityPipe,
 		EstadoToggleLabelPipe,
 		StickyFilterBarComponent,
-		MobileCardListComponent,
-		CardRowComponent,
-		CardActionsComponent],
+		DateBadgeComponent,
+		EventTypeMarkerComponent,
+		TimeStatusChipComponent,
+		FormSectionComponent,
+		FormPreviewDockComponent,
+		IconPickerComponent,
+		EduSelectButton],
 	providers: [EduConfirmationService],
 	templateUrl: './eventos-calendario.component.html',
 	styleUrl: './eventos-calendario.component.scss',
 })
 export class EventsCalendarComponent implements OnInit {
-	readonly isMobile = injectIsMobile();
 	/** Filtros activos sin contar el buscador (los muestra el botón «Filtros» de la barra compacta). */
 	readonly activeFilterCount = computed(() => {
 		const { filterTipo, filterEstado } = this.vm();
 		return [filterTipo, filterEstado].filter((v) => v !== null && v !== undefined && v !== '').length;
 	});
+
+	/** Con ancho suficiente la vista previa flota a la izquierda del panel; si no, queda dentro del formulario. */
+	readonly isWideScreen = injectIsMobile('(min-width: 1100px)');
 
 	// #region Dependencias
 	private facade = inject(EventsCalendarFacade);
@@ -64,7 +69,21 @@ export class EventsCalendarComponent implements OnInit {
 	// #region Estado del facade
 	readonly vm = this.facade.vm;
 	showValidation = signal(false);
-	readonly itemsPaging = createClientPaging(computed(() => this.vm().items));
+	// edu-datepicker trabaja con Date; el formulario guarda 'YYYY-MM-DD'. Las señales calculadas mantienen
+	// la misma instancia de Date mientras el texto no cambie, así el calendario no se reinicia en cada ciclo.
+	readonly fechaInicioDate = computed(() => ymdToDate(this.vm().formData.fechaInicio));
+	readonly fechaFinDate = computed(() => ymdToDate(this.vm().formData.fechaFin));
+	/** Fecha larga para la vista previa del detalle («sábado, 23 de noviembre de 2026»). */
+	readonly fechaInicioLarga = computed(() => this.fechaLarga(this.fechaInicioDate()));
+	readonly fechaFinLarga = computed(() => this.fechaLarga(this.fechaFinDate()));
+	readonly anioOptions = computed(() => buildYearOptions(this.vm().filterAnio));
+	/** Eventos del año agrupados por mes de inicio, cronológicos. Sin paginación: son decenas por año. */
+	readonly groups = computed(() => {
+		const sorted = [...this.vm().items].sort(
+			(a, b) => a.fechaInicio.localeCompare(b.fechaInicio) || a.titulo.localeCompare(b.titulo),
+		);
+		return groupByMonth(sorted, (item) => item.fechaInicio);
+	});
 	// #endregion
 
 	// #region Stats KPI
@@ -184,9 +203,16 @@ export class EventsCalendarComponent implements OnInit {
 
 	// #endregion
 
+	private fechaLarga(date: Date | null): string {
+		return date ? date.toLocaleDateString('es-PE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) : '';
+	}
+
 	// #region Form field updates
 	updateField<K extends keyof EventoFormData>(field: K, value: EventoFormData[K]): void {
 		this.store.updateFormField(field, value);
+	}
+	onDateChange(field: 'fechaInicio' | 'fechaFin', value: Date | Date[] | null): void {
+		this.updateField(field, dateToYmd(Array.isArray(value) ? value[0] : value));
 	}
 	// #endregion
 

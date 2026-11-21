@@ -1,7 +1,7 @@
 <!-- #region Header -->
 <app-page-header icon="pi pi-calendar" title="Gestión de Eventos del Calendario" subtitle="Administra los eventos que aparecen en el calendario escolar">
 	<edu-select
-		[options]="[{ label: '2025', value: 2025 }, { label: '2026', value: 2026 }, { label: '2027', value: 2027 }]"
+		[options]="anioOptions()"
 		[optionLabel]="'label'"
 		[optionValue]="'value'"
 		[ngModel]="vm().filterAnio"
@@ -103,282 +103,328 @@
 	/>
 </app-sticky-filter-bar>
 
-<!-- #region Tabla -->
-@if (isMobile()) {
-	@if (vm().loading) {
-		<p class="cards-state" aria-live="polite">Cargando…</p>
-	} @else if (itemsPaging.totalRecords() === 0) {
-		<p class="cards-state">No se encontraron eventos.</p>
-	} @else {
-		<app-mobile-card-list [paging]="itemsPaging" [pageSize]="5">
-			<ng-template let-item>
-				<div>
-					<app-card-row label="Título">{{ item.titulo }}</app-card-row>
-					@if (item.ubicacion) {
-						<app-card-row label="Lugar">{{ item.ubicacion }}</app-card-row>
-					}
-					<app-card-row label="Tipo"><edu-tag [value]="uiMapping.getEventoTipoLabel(item.tipo)" styleClass="tag-neutral" /></app-card-row>
-					<app-card-row label="Fecha">{{ item.fechaInicio | date: 'dd/MM/yyyy' }}{{ item.fechaFin ? ' – ' + (item.fechaFin | date: 'dd/MM/yyyy') : '' }}</app-card-row>
-					<app-card-row label="Hora">{{ item.hora || '—' }}</app-card-row>
-					<app-card-row label="Estado"><edu-tag [value]="item.estado | estadoLabel" [severity]="item.estado | estadoSeverity" /></app-card-row>
-					<app-card-actions>
-						<edu-button icon="pi pi-pencil" [text]="true" [rounded]="true" aria-label="Editar" (click)="onEdit(item)" />
-						<edu-button [icon]="item.estado ? 'pi pi-eye-slash' : 'pi pi-eye'" [text]="true" [rounded]="true" [severity]="item.estado ? 'warn' : 'success'" [attr.aria-label]="item.estado | estadoToggleLabel" (click)="onToggleEstado(item)" />
-						<edu-button icon="pi pi-trash" [text]="true" [rounded]="true" severity="danger" aria-label="Eliminar" (click)="onDelete(item)" />
-					</app-card-actions>
-				</div>
-			</ng-template>
-		</app-mobile-card-list>
-	}
+<!-- #region Lista por mes -->
+@if (vm().loading && vm().items.length === 0) {
+	<p class="list-state" aria-live="polite">Cargando…</p>
+} @else if (groups().length === 0) {
+	<div class="list-state">
+		<strong>No se encontraron eventos</strong>
+		<p>Ajusta los filtros o crea un evento nuevo.</p>
+	</div>
 } @else {
-<edu-table
-	[value]="itemsPaging.value()"
-	[dataKey]="'id'"
-	[loading]="vm().loading"
-	[paginator]="true"
-	[rows]="10"
-	[first]="itemsPaging.first()"
-	[totalRecords]="itemsPaging.totalRecords()"
-	[rowsPerPageOptions]="[5, 10, 25]"
-	stateStorage="session"
-	(onPageChange)="itemsPaging.onPageChange($event)"
-	stateKey="eventos-calendario-table"
-	[showCurrentPageReport]="true"
-	currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}"
-	styleClass="p-datatable-sm"
->
-	<ng-template #header>
-		<tr>
-			<th eduSortableColumn="titulo" data-info-anchor="tabla-orden-columna">Título</th>
-			<th eduSortableColumn="tipo" style="width: 110px" data-info-anchor="tabla-orden-columna">Tipo</th>
-			<th style="width: 110px">Fecha Inicio</th>
-			<th style="width: 110px">Fecha Fin</th>
-			<th style="width: 100px">Hora</th>
-			<th eduSortableColumn="estado" style="width: 90px" data-info-anchor="tabla-orden-columna">Estado</th>
-			<th style="width: 140px">Acciones</th>
-		</tr>
-	</ng-template>
+	@for (group of groups(); track group.key) {
+		<section class="month-group" [attr.aria-label]="group.label">
+			<h3 class="month-title">
+				{{ group.label }}
+				<small>{{ group.items.length }} {{ group.items.length === 1 ? 'evento' : 'eventos' }}</small>
+			</h3>
+			<ul class="event-list">
+				@for (item of group.items; track item.id) {
+					<li class="event-row" [class.event-row--off]="!item.estado">
+						<app-date-badge [date]="item.fechaInicio" [kind]="item.tipo" sub="weekday" />
 
-	<ng-template #body let-item>
-		<tr>
-			<td>
-				<div class="titulo-cell">
-					<i class="pi {{ item.icono }}"></i>
-					<div>
-						<span class="titulo-text">{{ item.titulo }}</span>
-						@if (item.ubicacion) {
-							<span class="ubicacion-text"><i class="pi pi-map-marker"></i> {{ item.ubicacion }}</span>
-						}
-					</div>
-				</div>
-			</td>
-			<td>
-				<edu-tag [value]="uiMapping.getEventoTipoLabel(item.tipo)" styleClass="tag-neutral" />
-			</td>
-			<td>{{ item.fechaInicio | date: 'dd/MM/yyyy' }}</td>
-			<td>{{ item.fechaFin ? (item.fechaFin | date: 'dd/MM/yyyy') : '—' }}</td>
-			<td>{{ item.hora || '—' }}</td>
-			<td>
-				<edu-tag
-					[value]="item.estado | estadoLabel"
-					[severity]="item.estado | estadoSeverity"
-				/>
-			</td>
-			<td>
-				<div class="actions-cell">
-					<edu-button
-						icon="pi pi-pencil"
-						[text]="true"
-						[rounded]="true"
-						(click)="onEdit(item)"
-						eduTooltip="Editar"
-						eduTooltipPosition="top"
-						[pt]="{ root: { 'aria-label': 'Editar' } }"
-						data-info-anchor="admin-eventos-editar-btn"
-					/>
-					<edu-button
-						[icon]="item.estado ? 'pi pi-eye-slash' : 'pi pi-eye'"
-						[text]="true"
-						[rounded]="true"
-						[severity]="item.estado ? 'warn' : 'success'"
-						(click)="onToggleEstado(item)"
-						[eduTooltip]="item.estado | estadoToggleLabel"
-						eduTooltipPosition="top"
-						[pt]="{ root: { 'aria-label': item.estado | estadoToggleLabel } }"
-						data-info-anchor="admin-eventos-toggle-estado-btn"
-					/>
-					<edu-button
-						icon="pi pi-trash"
-						[text]="true"
-						[rounded]="true"
-						severity="danger"
-						(click)="onDelete(item)"
-						eduTooltip="Eliminar"
-						eduTooltipPosition="top"
-						[pt]="{ root: { 'aria-label': 'Eliminar' } }"
-						data-info-anchor="admin-eventos-eliminar-btn"
-					/>
-				</div>
-			</td>
-		</tr>
-	</ng-template>
+						<div class="event-main">
+							<strong class="event-title">{{ item.titulo }}</strong>
+							<span class="event-meta">
+								<span class="meta-type">
+									<app-event-type-marker [kind]="item.tipo" />
+									{{ uiMapping.getEventoTipoLabel(item.tipo) }}
+								</span>
+								<span>
+									{{ item.fechaInicio | date: 'dd/MM/yyyy' }}@if (item.fechaFin) { – {{ item.fechaFin | date: 'dd/MM/yyyy' }} }
+								</span>
+								@if (item.hora) {
+									<span>{{ item.hora }}</span>
+								}
+								@if (item.ubicacion) {
+									<span><i class="pi pi-map-marker" aria-hidden="true"></i> {{ item.ubicacion }}</span>
+								}
+							</span>
+						</div>
 
-	<ng-template #emptymessage>
-		<tr>
-			<td colspan="7" class="text-center p-4">
-				<i class="pi pi-inbox" style="font-size: 2rem; color: var(--text-color-secondary)"></i>
-				<p>No se encontraron eventos</p>
-			</td>
-		</tr>
-	</ng-template>
-</edu-table>
+						<div class="event-status">
+							<app-time-status-chip [start]="item.fechaInicio" [end]="item.fechaFin" />
+							@if (!item.estado) {
+								<edu-tag [value]="item.estado | estadoLabel" [severity]="item.estado | estadoSeverity" />
+							}
+						</div>
+
+						<div class="actions-cell">
+							<edu-toggle
+								[ngModel]="item.estado"
+								(ngModelChange)="onToggleEstado(item)"
+								[ariaLabel]="item.estado | estadoToggleLabel"
+								data-info-anchor="admin-eventos-toggle-estado-btn"
+							/>
+							<edu-button
+								icon="pi pi-pencil"
+								[text]="true"
+								[rounded]="true"
+								(click)="onEdit(item)"
+								eduTooltip="Editar"
+								eduTooltipPosition="top"
+								[pt]="{ root: { 'aria-label': 'Editar' } }"
+								data-info-anchor="admin-eventos-editar-btn"
+							/>
+							<edu-button
+								icon="pi pi-trash"
+								[text]="true"
+								[rounded]="true"
+								severity="danger"
+								(click)="onDelete(item)"
+								eduTooltip="Eliminar"
+								eduTooltipPosition="top"
+								[pt]="{ root: { 'aria-label': 'Eliminar' } }"
+								data-info-anchor="admin-eventos-eliminar-btn"
+							/>
+						</div>
+					</li>
+				}
+			</ul>
+		</section>
+	}
 }
 <!-- #endregion -->
 
-<!-- #region Dialog Crear/Editar -->
-<edu-dialog
+<!-- #region Vista previa (plantilla): flotante a la izquierda en pantallas anchas, dentro del formulario en las angostas -->
+<ng-template #previewTpl>
+	<div class="pv" aria-live="polite">
+		<!-- En el calendario: el chip que se ve dentro del día -->
+		<section class="pv-block">
+			<p class="pv-cap">En el calendario</p>
+			<div class="pv-cell" [class.pv-cell--off]="!vm().formData.estado">
+				<span class="pv-cell__day">{{ fechaInicioDate()?.getDate() ?? '–' }}</span>
+				<span class="pv-chip" [attr.data-kind]="vm().formData.tipo">
+					<app-event-type-marker [kind]="vm().formData.tipo" />
+					<span class="pv-chip__text">{{ vm().formData.titulo || 'Título del evento' }}</span>
+				</span>
+				@if (fechaFinDate()) {
+					<span class="pv-cell__range">hasta el {{ fechaFinDate() | date: 'dd/MM' }}</span>
+				}
+			</div>
+		</section>
+
+		<!-- Al abrir el evento: el detalle que ve el usuario -->
+		<section class="pv-block">
+			<p class="pv-cap">Al abrir el evento</p>
+			<div class="pv-detail" [attr.data-kind]="vm().formData.tipo">
+				<div class="pv-detail__head">
+					<span class="pv-detail__icon" aria-hidden="true"><i class="pi {{ vm().formData.icono }}"></i></span>
+					<div class="pv-detail__title">
+						<span class="pv-detail__badge">Evento · {{ uiMapping.getEventoTipoLabel(vm().formData.tipo) }}</span>
+						<strong>{{ vm().formData.titulo || 'Título del evento' }}</strong>
+					</div>
+				</div>
+				<ul class="pv-detail__facts">
+					<li>
+						<i class="pi pi-calendar" aria-hidden="true"></i>
+						@if (fechaInicioLarga()) {
+							<span>{{ fechaInicioLarga() }}@if (fechaFinLarga()) { <em> al </em>{{ fechaFinLarga() }} }</span>
+						} @else {
+							<span class="pv-empty">Elige la fecha de inicio</span>
+						}
+					</li>
+					@if (vm().formData.hora) {
+						<li><i class="pi pi-clock" aria-hidden="true"></i><span>{{ vm().formData.hora }}</span></li>
+					}
+					@if (vm().formData.ubicacion) {
+						<li><i class="pi pi-map-marker" aria-hidden="true"></i><span>{{ vm().formData.ubicacion }}</span></li>
+					}
+				</ul>
+				<p class="pv-detail__desc" [class.pv-empty]="!vm().formData.descripcion">
+					{{ vm().formData.descripcion || 'La descripción aparecerá aquí.' }}
+				</p>
+			</div>
+		</section>
+
+		<!-- En la lista de gestión -->
+		<section class="pv-block">
+			<p class="pv-cap">En esta lista</p>
+			<div class="pv-row" [class.pv-row--off]="!vm().formData.estado">
+				@if (vm().formData.fechaInicio) {
+					<app-date-badge [date]="vm().formData.fechaInicio" [kind]="vm().formData.tipo" sub="weekday" />
+				} @else {
+					<span class="ev-preview__empty" aria-hidden="true"><i class="pi pi-calendar"></i></span>
+				}
+				<div class="ev-preview__main">
+					<strong>{{ vm().formData.titulo || 'Título del evento' }}</strong>
+					<span class="ev-preview__meta">
+						<span class="meta-type">
+							<app-event-type-marker [kind]="vm().formData.tipo" />
+							{{ uiMapping.getEventoTipoLabel(vm().formData.tipo) }}
+						</span>
+						@if (vm().formData.fechaInicio) {
+							<span>
+								{{ vm().formData.fechaInicio | date: 'dd/MM/yyyy' }}@if (vm().formData.fechaFin) { – {{ vm().formData.fechaFin | date: 'dd/MM/yyyy' }} }
+							</span>
+						}
+						@if (vm().formData.hora) {
+							<span>{{ vm().formData.hora }}</span>
+						}
+						@if (vm().formData.ubicacion) {
+							<span><i class="pi pi-map-marker" aria-hidden="true"></i> {{ vm().formData.ubicacion }}</span>
+						}
+					</span>
+				</div>
+				@if (vm().formData.fechaInicio) {
+					<app-time-status-chip [start]="vm().formData.fechaInicio" [end]="vm().formData.fechaFin || null" />
+				}
+			</div>
+		</section>
+
+		@if (!vm().formData.estado) {
+			<p class="pv-warn" role="status">
+				<i class="pi pi-eye-slash" aria-hidden="true"></i>
+				Está desactivado: no aparece en el calendario, solo en esta lista.
+			</p>
+		}
+	</div>
+</ng-template>
+<!-- #endregion -->
+
+<!-- #region Drawer Crear/Editar (nunca dentro de @if: ver reference/dialogs-sync.md) -->
+<edu-drawer
 	[header]="vm().isEditing ? 'Editar Evento' : 'Nuevo Evento'"
 	[visible]="vm().dialogVisible"
 	(visibleChange)="onDialogVisibleChange($event)"
+	position="right"
 	[modal]="true"
-	[style]="{ width: '650px' }"
-	[closable]="true"
+	[style]="{ width: 'min(520px, 100vw)' }"
 >
-	<div class="form-grid">
-		<div class="form-field full">
-			<label for="titulo">Título *</label>
-			<input
-				eduInputText
-				id="titulo"
-				[ngModel]="vm().formData.titulo"
-				(ngModelChange)="updateField('titulo', $event)"
-				placeholder="Título del evento"
-				data-info-anchor="admin-eventos-form-titulo-input"
-			/>
-			@if (showValidation() && !vm().formData.titulo.trim()) {
-				<small class="error-msg">El título es obligatorio</small>
-			}
-		</div>
+	<div class="drawer-form">
+		@if (!isWideScreen()) {
+		<app-form-section heading="Vista previa" hint="Así se verá en la lista y en el calendario.">
+			<div class="form-field full">
+				<ng-container [ngTemplateOutlet]="previewTpl" />
+			</div>
+		</app-form-section>
+		}
 
-		<div class="form-field full">
-			<label for="descripcion">Descripción *</label>
-			<textarea
-				eduTextarea
-				id="descripcion"
-				[ngModel]="vm().formData.descripcion"
-				(ngModelChange)="updateField('descripcion', $event)"
-				placeholder="Descripción del evento"
-				[rows]="3"
-				[autoResize]="true"
-				data-info-anchor="admin-eventos-form-descripcion-textarea"
-			></textarea>
-			@if (showValidation() && !vm().formData.descripcion.trim()) {
-				<small class="error-msg">La descripción es obligatoria</small>
-			}
-		</div>
+		<app-form-section heading="Información">
+			<div class="form-field full">
+				<label for="titulo">Título *</label>
+				<input
+					eduInputText
+					id="titulo"
+					[ngModel]="vm().formData.titulo"
+					(ngModelChange)="updateField('titulo', $event)"
+					placeholder="Ej. Entrega de libretas"
+					data-info-anchor="admin-eventos-form-titulo-input"
+				/>
+				@if (showValidation() && !vm().formData.titulo.trim()) {
+					<small class="error-msg">El título es obligatorio</small>
+				}
+			</div>
 
-		<div class="form-field">
-			<label for="tipo">Tipo</label>
-			<edu-select
-				id="tipo"
-				[options]="tipoOptions.slice(1)"
-				[optionLabel]="'label'"
-				[optionValue]="'value'"
-				[ngModel]="vm().formData.tipo"
-				(ngModelChange)="updateField('tipo', $event)"
-				appendTo="body"
-				data-info-anchor="admin-eventos-form-tipo-select"
-			/>
-		</div>
+			<div class="form-field full">
+				<label for="descripcion">Descripción *</label>
+				<textarea
+					eduTextarea
+					id="descripcion"
+					[ngModel]="vm().formData.descripcion"
+					(ngModelChange)="updateField('descripcion', $event)"
+					placeholder="Qué pasa y a quién le importa"
+					[rows]="3"
+					data-info-anchor="admin-eventos-form-descripcion-textarea"
+				></textarea>
+				@if (showValidation() && !vm().formData.descripcion.trim()) {
+					<small class="error-msg">La descripción es obligatoria</small>
+				}
+			</div>
+		</app-form-section>
 
-		<div class="form-field">
-			<label for="icono">Ícono</label>
-			<edu-select
-				id="icono"
-				[options]="iconoOptions"
-				[optionLabel]="'label'"
-				[optionValue]="'value'"
-				[ngModel]="vm().formData.icono"
-				(ngModelChange)="updateField('icono', $event)"
-				appendTo="body"
-				data-info-anchor="admin-eventos-form-icono-select"
-			>
-				<ng-template let-item #selectedItem>
-					<div class="icon-option">
-						<i class="pi {{ item.value }}"></i>
-						<span>{{ item.label }}</span>
-					</div>
-				</ng-template>
-				<ng-template let-item #item>
-					<div class="icon-option">
-						<i class="pi {{ item.value }}"></i>
-						<span>{{ item.label }}</span>
-					</div>
-				</ng-template>
-			</edu-select>
-		</div>
+		<app-form-section heading="Tipo e ícono">
+			<div class="form-field full">
+				<label>Tipo</label>
+				<edu-select-button
+					[options]="tipoOptions.slice(1)"
+					optionLabel="label"
+					optionValue="value"
+					[allowEmpty]="false"
+					[ngModel]="vm().formData.tipo"
+					(ngModelChange)="updateField('tipo', $event)"
+					data-info-anchor="admin-eventos-form-tipo-select"
+				/>
+			</div>
 
-		<div class="form-field">
-			<label for="fechaInicio">Fecha Inicio *</label>
-			<edu-datepicker
-				id="fechaInicio"
-				[ngModel]="vm().formData.fechaInicio"
-				(ngModelChange)="updateField('fechaInicio', $event)"
-				dateFormat="yy-mm-dd"
-				appendTo="body"
-				data-info-anchor="admin-eventos-form-fecha-inicio-picker"
-			/>
-			@if (showValidation() && !vm().formData.fechaInicio) {
-				<small class="error-msg">La fecha de inicio es obligatoria</small>
-			}
-		</div>
+			<div class="form-field full">
+				<label>Ícono</label>
+				<app-icon-picker
+					[options]="iconoOptions"
+					[value]="vm().formData.icono"
+					(valueChange)="updateField('icono', $event)"
+					data-info-anchor="admin-eventos-form-icono-select"
+				/>
+			</div>
+		</app-form-section>
 
-		<div class="form-field">
-			<label for="fechaFin">Fecha Fin (opcional)</label>
-			<edu-datepicker
-				id="fechaFin"
-				[ngModel]="vm().formData.fechaFin"
-				(ngModelChange)="updateField('fechaFin', $event)"
-				dateFormat="yy-mm-dd"
-				appendTo="body"
-				data-info-anchor="admin-eventos-form-fecha-fin-picker"
-			/>
-		</div>
+		<app-form-section heading="Cuándo y dónde">
+			<div class="form-field">
+				<label for="fechaInicio">Fecha de inicio *</label>
+				<edu-datepicker
+					id="fechaInicio"
+					[ngModel]="fechaInicioDate()"
+					(ngModelChange)="onDateChange('fechaInicio', $event)"
+					dateFormat="dd/mm/yyyy"
+					appendTo="body"
+					data-info-anchor="admin-eventos-form-fecha-inicio-picker"
+				/>
+				@if (showValidation() && !vm().formData.fechaInicio) {
+					<small class="error-msg">La fecha de inicio es obligatoria</small>
+				}
+			</div>
 
-		<div class="form-field">
-			<label for="hora">Hora</label>
-			<input
-				eduInputText
-				id="hora"
-				[ngModel]="vm().formData.hora"
-				(ngModelChange)="updateField('hora', $event)"
-				placeholder="8:00 AM"
-				data-info-anchor="admin-eventos-form-hora-input"
-			/>
-		</div>
+			<div class="form-field">
+				<label for="fechaFin">Fecha de fin <span class="optional">(opcional)</span></label>
+				<edu-datepicker
+					id="fechaFin"
+					[ngModel]="fechaFinDate()"
+					(ngModelChange)="onDateChange('fechaFin', $event)"
+					dateFormat="dd/mm/yyyy"
+					appendTo="body"
+					data-info-anchor="admin-eventos-form-fecha-fin-picker"
+				/>
+			</div>
 
-		<div class="form-field">
-			<label for="ubicacion">Ubicación</label>
-			<input
-				eduInputText
-				id="ubicacion"
-				[ngModel]="vm().formData.ubicacion"
-				(ngModelChange)="updateField('ubicacion', $event)"
-				placeholder="Auditorio principal"
-				data-info-anchor="admin-eventos-form-ubicacion-input"
-			/>
-		</div>
+			<div class="form-field">
+				<label for="hora">Hora <span class="optional">(opcional)</span></label>
+				<input
+					eduInputText
+					id="hora"
+					[ngModel]="vm().formData.hora"
+					(ngModelChange)="updateField('hora', $event)"
+					placeholder="8:00 AM"
+					data-info-anchor="admin-eventos-form-hora-input"
+				/>
+			</div>
 
-		<div class="form-field toggles">
-			<div class="toggle-item">
-				<label>Activo</label>
+			<div class="form-field">
+				<label for="ubicacion">Lugar <span class="optional">(opcional)</span></label>
+				<input
+					eduInputText
+					id="ubicacion"
+					[ngModel]="vm().formData.ubicacion"
+					(ngModelChange)="updateField('ubicacion', $event)"
+					placeholder="Auditorio principal"
+					data-info-anchor="admin-eventos-form-ubicacion-input"
+				/>
+			</div>
+		</app-form-section>
+
+		<app-form-section heading="Visibilidad">
+			<div class="form-field full toggle-row">
+				<div class="toggle-row__text">
+					<strong>Activo</strong>
+					<small>Si lo apagas, el evento no se muestra en el calendario.</small>
+				</div>
 				<edu-toggle
 					[ngModel]="vm().formData.estado"
 					(ngModelChange)="updateField('estado', $event)"
+					ariaLabel="Activo"
 					data-info-anchor="admin-eventos-form-activo-toggle"
 				/>
 			</div>
-		</div>
+		</app-form-section>
 	</div>
 
 	<ng-template #footer>
@@ -392,7 +438,15 @@
 			data-info-anchor="admin-eventos-form-guardar-btn"
 		/>
 	</ng-template>
-</edu-dialog>
+</edu-drawer>
+
+<app-form-preview-dock
+	[visible]="vm().dialogVisible && isWideScreen()"
+	heading="Vista previa"
+	[rightOffset]="520"
+>
+	<ng-container [ngTemplateOutlet]="previewTpl" />
+</app-form-preview-dock>
 <!-- #endregion -->
 
 <!-- #region Confirm Dialog -->
