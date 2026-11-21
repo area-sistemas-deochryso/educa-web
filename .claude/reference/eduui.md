@@ -33,6 +33,12 @@ import type { EduPaginatorPageEvent } from '@edu-ui';
 | ConfirmDialog | `edu-confirm-dialog` + `EduConfirmationService` | Confirmaciones |
 | Popover | `edu-popover` | Ver regla de contenido abajo |
 
+## `edu-datepicker` — qué valor entra y qué sale
+
+El control **emite `Date`** hacia el modelo. `writeValue` acepta además strings (ISO `'2026-01-02'`, ISO con hora, o texto en el `dateFormat` del campo) y los normaliza a `Date`; vacío, nulo o ilegible queda en `null` (`coerceDateValue`, `date-picker-utils.ts`). Antes un `''` dejaba `viewDate` como string y abrir el calendario fallaba con `getMonth is not a function`, **sin mensaje en consola** (el error solo llegaba a `/api/sistema/errors`).
+
+Aun así, si el modelo guarda texto (`'YYYY-MM-DD'`), convierte en el borde: `[ngModel]="fechaDate()"` con un `computed(() => ymdToDate(...))` (misma instancia mientras el texto no cambie) y `(ngModelChange)` → `dateToYmd`. `dateFormat` es solo de pantalla: `yy` = 2 dígitos, `yyyy` = 4; usa `dd/mm/yyyy`.
+
 ## Regla CRÍTICA: appendTo="body" en overlays anclados
 
 **SIEMPRE** usar `appendTo="body"` en `edu-select`, `edu-multi-select`, `edu-autocomplete`, `edu-datepicker` y `edu-popover` — igual que en la era PrimeNG. Internamente usan CDK Overlay (`EduOverlayHandle` con `flexibleConnectedTo`), pero el input se mantiene por compatibilidad de API y para evitar regresiones de z-index/overflow dentro de diálogos o contenedores con `overflow: hidden`.

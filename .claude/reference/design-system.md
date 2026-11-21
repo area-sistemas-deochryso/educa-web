@@ -916,6 +916,18 @@ Antes de brief 747 la fila ícono + nombre + tamaño estaba copiada en 5 sitios 
 - `(open)` es el gancho del visor in-app (F4 del P105): hoy los consumidores hacen `window.open`.
 - Subida: `edu-file-upload` con `[accept]="UPLOAD_ACCEPT"` y `[maxFileSize]="UPLOAD_LIMITS.maxFileSizeBytes"`, y `validateUploadFile(file)` para extensión y largo de nombre (límites alineados con `FileUploadConfig.cs` del BE). Para avisar un rechazo usa `ErrorHandlerService.showWarning`, no `EduMessageService` inyectado: `ToastContainerComponent` provee su propia instancia y un toast enviado a la raíz nunca se ve.
 
+### B15 · Listas por mes, formularios en panel lateral y piezas del calendario
+
+Rediseño del módulo de calendario (`.claude/plan/calendario-redesign-b.md`): las páginas admin de **Eventos** y **Notificaciones** dejaron la tabla paginada por una lista y editan en un `edu-drawer` lateral. Reglas para repetirlo:
+
+- **Tipo = forma + color, nunca solo color** (WCAG 1.4.1). `<app-event-type-marker [kind]>` dibuja rombo, triángulo, cuadrado, círculo, aro o círculo con halo (feriado). La paleta vive en un solo parcial (`event-type-marker/_event-kind-colors.scss`, mixin `event-kind-colors`) que consumen el marcador, `<app-date-badge>` y los chips del calendario. Un tipo que el sistema no conoce se muestra como `other` (`resolveEventMarkerKind`).
+- **Estado temporal con texto**: `<app-time-status-chip [start] [end]>` (Próximo / En curso / Finalizado); `[labels]` cambia el texto de un estado (ej. «Vigente» para una vigencia). La lógica es `getTimeStatus` (`@shared/utils`), que compara días locales.
+- **Lista agrupada por mes** con `groupByMonth` (`@shared/utils`). Sin paginación ni orden por columna cuando el volumen anual es de decenas; si crece, vuelve a `edu-table`.
+- **Formulario largo en panel lateral**: `edu-drawer` (nunca dentro de `@if`, ver `dialogs-sync.md`) con bloques `<app-form-section heading hint>`, ícono con `<app-icon-picker>` (cuadrícula, no un select de nombres), opciones como **fila** (texto + descripción a la izquierda, `edu-toggle` con `ariaLabel` a la derecha) y una **vista previa viva** al inicio del formulario. Los campos de selección corta (tipo, prioridad, «Todos/Segmentar») son `edu-select-button`.
+- **Textarea en el panel**: dale `min-height` propia; el `rows` y el autoajuste no alcanzan dentro de un overlay oculto y quedaba de una línea.
+- **Años de un selector**: `buildYearOptions` (`@shared/utils`), nunca una lista fija.
+- **Fechas**: el formulario guarda `'YYYY-MM-DD'`; al `edu-datepicker` se le pasa un `Date` estable (`computed` con `ymdToDate`) y se convierte al volver con `dateToYmd`. Formato de pantalla `dd/mm/yyyy`. Un `Date` nuevo en cada ciclo reinicia el mes visible del calendario.
+
 ---
 
 ---
