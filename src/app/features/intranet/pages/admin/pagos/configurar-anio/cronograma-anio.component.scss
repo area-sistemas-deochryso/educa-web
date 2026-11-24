@@ -1,0 +1,78 @@
+@use '../styles/pagos' as pagos;
+
+// #region Cuotas del editor
+// En el celular cada cuota es una tarjeta con los campos uno debajo del otro; en escritorio, una fila.
+.cuotas {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.cuota {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 0.5rem;
+	padding: 0.75rem;
+	border: 1px solid var(--surface-200);
+	border-radius: 8px;
+}
+
+.cuota__numero {
+	font-weight: 600;
+}
+
+.cuota__campo {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	min-width: 0;
+	font-size: 0.8125rem;
+	font-weight: 600;
+
+	small {
+		@include pagos.hint;
+		font-weight: 400;
+	}
+
+	// Más específicas que `small` de arriba, que las dejaría en gris.
+	small.campo__error {
+		color: var(--tint-danger-text);
+	}
+
+	// El mismo tono que `.aviso` de configurar-anio.component.scss (contraste AA sobre el fondo de la intranet).
+	small.aviso {
+		color: var(--yellow-800);
+	}
+}
+
+// El ícono nativo del calendario es negro salvo que el navegador sepa que el tema es oscuro.
+:host-context(.dark-mode) input[type='date'] {
+	color-scheme: dark;
+}
+
+@media (min-width: 768px) {
+	.cuota {
+		grid-template-columns: 6rem minmax(10rem, 1fr) minmax(12rem, 1fr);
+		gap: 1rem;
+		align-items: start;
+		padding: 0.5rem 0;
+		border: 0;
+		border-bottom: 1px solid var(--surface-200);
+		border-radius: 0;
+	}
+
+	.cuota__numero {
+		padding-top: 1.75rem;
+	}
+}
+// #endregion
+
+// #region Resumen
+// La etiqueta anterior va debajo de la nueva, dentro de la misma celda.
+.tabla small.ayuda {
+	display: block;
+}
+// #endregion

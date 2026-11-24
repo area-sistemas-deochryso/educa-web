@@ -44,5 +44,6 @@
 - **Mezcla `ngModel` + Signal Forms en el mismo componente**: la doc no la describe; no se probó.
 - **Lector de pantalla real**: la accesibilidad se evaluó por atributos, no con tecnología asistiva.
 - **Un formulario más grande** (selects dependientes, listas dinámicas, formularios en `edu-dialog`): el piloto es de 3 campos de texto.
+- **Listas dinámicas con borrador en facade y validación entre filas**: no adoptado (P123 F3, brief 956 — `pagos/configurar-anio`).
 
 Si alguno de los dos primeros falla al primer uso real, la decisión pasa a **no adoptar todavía** para ese tipo de formulario.

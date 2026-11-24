@@ -184,12 +184,25 @@ export function resumenConfirmacion(cargos: number, alumnos: number): string {
 // #endregion
 
 // #region Errores
+/** Lo que llega al `error` de un `subscribe`: un `HttpErrorResponse`, o el `TimeoutError` del interceptor de 30 s, sin `status`. */
 export interface ErrorHttpLike {
 	status?: number;
 	error?: { errorCode?: string } | null;
+	name?: string;
 }
 
-export type AccionCargaInicial = 'cargar-parametros' | 'guardar-parametros' | 'vista-previa' | 'generar' | 'confirmar' | 'importar-vista-previa' | 'importar-confirmar';
+export type AccionCargaInicial =
+	| 'cargar-parametros'
+	| 'guardar-parametros'
+	| 'vista-previa'
+	| 'generar'
+	| 'confirmar'
+	| 'importar-vista-previa'
+	| 'importar-confirmar'
+	| 'cargar-montos'
+	| 'guardar-montos'
+	| 'cargar-cronograma'
+	| 'guardar-cronograma';
 
 const MENSAJES_POR_CODIGO: Readonly<Record<string, string>> = {
 	PAGO_PARAMETRO_VALOR_INVALIDO: 'Los valores no pueden ser negativos y admiten como máximo dos decimales.',
@@ -205,8 +218,26 @@ const MENSAJES_POR_CODIGO: Readonly<Record<string, string>> = {
 	IMPORTACION_EXCEDE_LIMITE: 'El archivo supera las 3000 filas permitidas por carga. Divídelo en varios archivos.',
 	IMPORTACION_VISTA_PREVIA_DESACTUALIZADA: 'Los datos cambiaron desde la vista previa. Se recalculó: revisa los números y confirma de nuevo.',
 	CARGO_CONFIRMACION_VISTA_PREVIA_DESACTUALIZADA: 'Los datos cambiaron desde la vista previa. Se recalculó: revisa los números y confirma de nuevo.',
+	PAGO_CONFIG_ANIO_INVALIDO: 'El año debe estar entre 2020 y 2100.',
+	PAGO_CONFIG_MONTO_INVALIDO: 'Cada monto debe ser mayor que S/ 0.00, tener como máximo dos decimales y no pasar de S/ 99,999,999.99.',
+	PAGO_MONTO_NIVEL_INVALIDO: 'El nivel de un monto debe ser Inicial, Primaria, Secundaria o «Todos los niveles».',
+	PAGO_MONTO_CONCEPTO_INVALIDO:
+		'Uno de los conceptos ya no existe o fue desactivado, así que no admite montos. Se recargó la lista de conceptos: revisa los montos y vuelve a guardar.',
+	PAGO_MONTO_DUPLICADO: 'Se envió dos veces el monto de un mismo concepto y nivel: cada concepto admite un solo monto por nivel.',
+	PAGO_MONTO_CONFLICTO:
+		'Otra persona cambió los montos de este año mientras editabas. Se cargaron sus valores y tus cambios siguen en pantalla: revísalos y vuelve a guardar.',
+	PAGO_CRONOGRAMA_INCOMPLETO: 'El cronograma lleva exactamente 10 cuotas, numeradas del 1 al 10, cada una con su fecha.',
+	PAGO_CRONOGRAMA_FECHA_FUERA_DE_ANIO: 'Todas las fechas de vencimiento deben caer dentro del año que estás configurando.',
+	PAGO_CRONOGRAMA_FUERA_DE_ORDEN: 'Cada cuota debe vencer después de la anterior: las fechas van en orden y no pueden repetirse.',
+	PAGO_CRONOGRAMA_ETIQUETA_INVALIDA: 'Cada cuota necesita una etiqueta de 1 a 30 caracteres (por ejemplo, «Marzo»).',
+	PAGO_CRONOGRAMA_CONFLICTO:
+		'Otra persona cambió el cronograma de este año mientras editabas. Se cargaron sus fechas y tus cambios siguen en pantalla: revísalos y vuelve a guardar.',
 };
 
+/**
+ * Sin respuesta del servidor (status 0 o timeout). Los de `guardar-montos` y `guardar-cronograma` afirman que no se
+ * guardó: su facade los muestra solo después de releer y encontrar todavía diferencias (el PUT es todo o nada).
+ */
 const MENSAJE_RED: Readonly<Record<AccionCargaInicial, string>> = {
 	'cargar-parametros': 'No hubo respuesta del servidor. Intenta de nuevo.',
 	'guardar-parametros': 'No hubo respuesta del servidor. Recarga los parámetros y revisa si quedaron guardados antes de repetir.',
@@ -215,6 +246,10 @@ const MENSAJE_RED: Readonly<Record<AccionCargaInicial, string>> = {
 	confirmar: 'No hubo respuesta del servidor. Vuelve a calcular la vista previa: si ya se confirmaron, el conteo bajará.',
 	'importar-vista-previa': 'No hubo respuesta del servidor. Intenta de nuevo.',
 	'importar-confirmar': 'No hubo respuesta del servidor. Vuelve a calcular la vista previa: lo que ya se aplicó aparecerá como «ya existe».',
+	'cargar-montos': 'No hubo respuesta del servidor. Intenta de nuevo con «Volver a cargar».',
+	'guardar-montos': 'No hubo respuesta del servidor y los montos no quedaron guardados: tus cambios siguen en pantalla. Revísalos y vuelve a guardar.',
+	'cargar-cronograma': 'No hubo respuesta del servidor. Intenta de nuevo con «Volver a cargar».',
+	'guardar-cronograma': 'No hubo respuesta del servidor y el cronograma no quedó guardado: tus cambios siguen en pantalla. Revísalo y vuelve a guardar.',
 };
 
 const MENSAJE_GENERICO: Readonly<Record<AccionCargaInicial, string>> = {
@@ -225,16 +260,48 @@ const MENSAJE_GENERICO: Readonly<Record<AccionCargaInicial, string>> = {
 	confirmar: 'No se pudieron confirmar los cargos. Intenta de nuevo.',
 	'importar-vista-previa': 'No se pudo calcular la vista previa de la importación.',
 	'importar-confirmar': 'No se pudo confirmar la importación. Vuelve a calcular la vista previa e intenta de nuevo.',
+	'cargar-montos': 'No se pudieron cargar los montos del año.',
+	'guardar-montos': 'No se pudieron guardar los montos. Tus cambios siguen en pantalla: revísalos e intenta de nuevo.',
+	'cargar-cronograma': 'No se pudo cargar el cronograma del año.',
+	'guardar-cronograma': 'No se pudo guardar el cronograma. Tus cambios siguen en pantalla: revísalos e intenta de nuevo.',
 };
 
-/** Mensaje en español por `errorCode`. Nunca se muestra el texto crudo del servidor. */
+/**
+ * Lo que dicen los parámetros del año después de releer tras un guardado incierto (sin respuesta, timeout o `5xx`). Con
+ * el mismo `rowVersion` el PUT no se aplicó (es todo o nada), así que se puede afirmar que no quedaron guardados. Con
+ * otro `rowVersion` y otros valores, alguien más los cambió: se muestran los suyos, como tras `PAGO_PARAMETRO_CONFLICTO`.
+ */
+export const TEXTOS_RELECTURA_PARAMETROS = {
+	noGuardados:
+		'No hubo respuesta del servidor y los parámetros no quedaron guardados: tus cambios siguen en pantalla. Revísalos y vuelve a guardar.',
+	conflicto: MENSAJES_POR_CODIGO['PAGO_PARAMETRO_CONFLICTO'],
+} as const;
+
+/**
+ * Mensaje en español por `errorCode`. Nunca se muestra el texto crudo del servidor.
+ * El código manda; sin código, «sin respuesta» es tanto el status 0 como un error sin `status` (el `TimeoutError` del
+ * interceptor de 30 s, que no es un `HttpErrorResponse`). Desde P123 F3 un timeout da el mensaje de red de la acción,
+ * y ya no el genérico, en todas las pantallas que usan esta función: parámetros del año, generar cargos, confirmar
+ * «sin dato» e importación, además de montos y cronograma.
+ */
 export function mensajeDeError(err: ErrorHttpLike | null | undefined, accion: AccionCargaInicial): string {
 	if (!err) return MENSAJE_GENERICO[accion];
-	if (err.status === 0) return MENSAJE_RED[accion];
 	const codigo = err.error?.errorCode;
 	if (codigo && MENSAJES_POR_CODIGO[codigo]) return MENSAJES_POR_CODIGO[codigo];
+	if (err.status === 0 || err.status === undefined) return MENSAJE_RED[accion];
 	if (err.status === 409) return 'Otra persona modificó los datos al mismo tiempo. Revisa y vuelve a intentarlo.';
 	return MENSAJE_GENERICO[accion];
+}
+
+/**
+ * El resultado del guardado es incierto o la base ya no es de fiar: hay que releer antes de volver a guardar, nunca
+ * reintentar (INV-S05). Sin respuesta, timeout o `5xx`: el PUT pudo aplicarse o no. `409`: otra persona cambió la base.
+ * `PAGO_MONTO_CONCEPTO_INVALIDO`: un concepto se desactivó y hay que leer la lista de nuevo. Un `400` de regla no relee:
+ * la base sigue siendo la misma y lo escrito se conserva.
+ */
+export function requiereRelectura(err: ErrorHttpLike | null | undefined): boolean {
+	if (!err || err.status === undefined || err.status === 0 || err.status === 409 || err.status >= 500) return true;
+	return err.error?.errorCode === 'PAGO_MONTO_CONCEPTO_INVALIDO';
 }
 
 /** Tras este `409` el conteo mostrado ya no es el real: la pantalla debe recalcular la vista previa. */

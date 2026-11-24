@@ -1,0 +1,51 @@
+<div class="configurar-anio">
+	<div class="cabecera-anio">
+		<label class="campo campo--anio">
+			<span>Año</span>
+			<edu-select
+				[options]="anios"
+				[ngModel]="anioSelector()"
+				(ngModelChange)="cambiarAnio($event)"
+				[disabled]="ocupado()"
+				appendTo="body"
+				[pt]="ptAnio"
+			/>
+		</label>
+		@if (ocupado()) {
+			<small class="ayuda" data-testid="anio-ocupado">
+				Espera a que termine la operación en curso para cambiar de año.
+			</small>
+		}
+	</div>
+
+	<nav class="guia" [attr.aria-label]="etiquetaGuia()">
+		@if (sinConfigurar()) {
+			<p class="ayuda" data-testid="guia-sin-configurar">{{ textoSinConfigurar() }}</p>
+		}
+		<ol class="pasos">
+			@for (paso of pasos(); track paso.numero) {
+				<li>
+					<button
+						type="button"
+						class="paso"
+						[class.paso--actual]="paso.actual"
+						[attr.aria-current]="paso.actual ? 'step' : null"
+						[attr.data-testid]="'paso-' + paso.numero"
+						(click)="irA(paso.destino)"
+					>
+						<span class="paso__titulo">{{ paso.numero }}. {{ paso.titulo }}</span>
+						<edu-tag [value]="paso.etiqueta" [severity]="paso.severidad" />
+						<span class="paso__detalle">{{ paso.detalle }}</span>
+					</button>
+				</li>
+			}
+		</ol>
+	</nav>
+
+	<app-parametros-anio [anio]="anio()" />
+	<app-montos-anio [anio]="anio()" />
+	<app-cronograma-anio [anio]="anio()" />
+	<app-generar-cargos [anio]="anio()" [bloqueo]="textoBloqueo()" [avisos]="avisos()" />
+	<!-- En la raíz, nunca dentro de un @if: lo usan «Descartar» de las secciones y el aviso de cambios sin guardar. -->
+	<edu-confirm-dialog />
+</div>
