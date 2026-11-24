@@ -8,6 +8,7 @@ import { getPersonInitials } from '@core/helpers';
 import type { CuentaAjuste, CuentaCargo, CuentaPago, EstudianteBusqueda, RegistrarAjustePayload } from '@data/models';
 import { EduAutoComplete, EduAvatar, EduButton, EduMessage, EduTag, EduTemplate } from '@edu-ui';
 import { ErrorStateComponent } from '@shared/components';
+import { esConcepto } from '../registrar-pago/registrar-pago.logic';
 import { formatSoles } from '../utils/pagos-format.util';
 import { AccionesCuentaFacade, type ResultadoAccion } from './acciones-cuenta.facade';
 import { admiteAjuste, avisoAnularPago, topeAjuste } from './acciones-cuenta.logic';
@@ -223,6 +224,18 @@ export class EstadoCuentaComponent {
 	/** Lleva al formulario de «Registrar pago» con este alumno ya elegido (mismos query params que «Quiénes deben»). */
 	protected registrarPago(estudianteId: number, nombre: string): void {
 		void this.router.navigate(['/intranet/admin/pagos/registrar'], { queryParams: { estudianteId, nombre } });
+	}
+
+	/** «Cobrar matrícula» solo aparece si la cuenta tiene un cargo de matrícula sin pagar (incluido «sin dato»). */
+	protected readonly matriculaPendiente = computed(() =>
+		(this.facade.cuenta()?.cargos ?? []).some((c) => c.estado !== 'Pagado' && esConcepto(c.concepto, 'MATRICULA')),
+	);
+
+	/** Abre «Registrar pago» con la matrícula de este alumno precargada (monto, concepto y medio). */
+	protected cobrarMatricula(estudianteId: number, nombre: string): void {
+		void this.router.navigate(['/intranet/admin/pagos/registrar'], {
+			queryParams: { estudianteId, nombre, concepto: 'MATRICULA' },
+		});
 	}
 
 	protected readonly iniciales = getPersonInitials;

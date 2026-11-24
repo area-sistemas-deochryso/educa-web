@@ -7,13 +7,20 @@ import { logger } from '@core/helpers';
 import type { EstudianteBusqueda, MiembroFamilia, PagoMedio, RepartoAplicacion } from '@data/models';
 import { PagosApiService } from '../services/pagos-api.service';
 import {
+	type CargoCobrable,
+	type ConceptoCobroRapido,
 	type IntentoPago,
+	type PrecargaCobro,
 	armarPayload,
 	claveParaEnvio,
 	diferenciaCentavos,
 	huellaDe,
 	esIdempotenciaEnCurso,
+	mensajeCargoNoAplicable,
 	mensajeDeError,
+	mensajeSinConfirmar,
+	precargarCobro,
+	repartoCoincideConPrecarga,
 	repartoCuadra,
 	resultadoDesconocido,
 } from './registrar-pago.logic';
@@ -57,6 +64,13 @@ export class RegistrarPagoFacade {
 	/** El último envío quedó `IDEMPOTENCIA_EN_CURSO`: la pantalla ofrece verificar el estado de cuenta. */
 	readonly pagoEnCurso = signal(false);
 
+	/** Cobro rápido: cargos del concepto elegido, leídos del estado de cuenta. `null` fuera de ese flujo. */
+	readonly precarga = signal<PrecargaCobro | null>(null);
+	readonly loadingPrecarga = signal(false);
+	readonly errorPrecarga = signal<string | null>(null);
+	/** Cargos del alumno según su estado de cuenta; sirve para ofrecer «Cobrar inscripción» tras el pago. */
+	private readonly cargosCuenta = signal<CargoCobrable[]>([]);
+
 	readonly sugerencias = signal<EstudianteBusqueda[]>([]);
 	readonly errorBusqueda = signal<string | null>(null);
 
@@ -66,6 +80,16 @@ export class RegistrarPagoFacade {
 	private reusarClave = false;
 
 	readonly idsSeleccionados = computed(() => [...this.seleccionados()]);
+
+	/** La inscripción se puede sumar al pago de matrícula (o cobrarse después) si aún tiene saldo cobrable. */
+	readonly inscripcionCobrable = computed(
+		() => precargarCobro(this.cargosCuenta(), ['INSCRIPCION']).cobrables.length > 0,
+	);
+	/** «Cobrar inscripción» tras el pago: solo si quedó pendiente y este pago no la cubrió ni era ya por ella. */
+	readonly ofrecerInscripcion = computed(
+		() => this.inscripcionCobrable() && !(this.precarga()?.conceptos.includes('INSCRIPCION') ?? true),
+	);
+	readonly incluyeInscripcion = computed(() => this.precarga()?.conceptos.includes('INSCRIPCION') ?? false);
 
 	constructor() {
 		// switchMap descarta la respuesta de la búsqueda anterior si ya hay una más nueva.
@@ -97,9 +121,12 @@ export class RegistrarPagoFacade {
 	}
 
 	/** Fija el alumno que paga y carga su grupo familiar. Todos los del grupo arrancan seleccionados. */
-	iniciar(estudiante: { id: number; nombre: string }): void {
+	iniciar(estudiante: { id: number; nombre: string }, soloAlumno = false): void {
 		// Cambiar de alumno invalida el reparto, el resultado y el intento en curso.
 		this.pagoRegistrado.set(null);
+		this.precarga.set(null);
+		this.errorPrecarga.set(null);
+		this.cargosCuenta.set([]);
 		this.limpiarReparto();
 		this.intento = null;
 		this.reusarClave = false;
@@ -111,7 +138,7 @@ export class RegistrarPagoFacade {
 					? miembros
 					: [{ estudianteId: estudiante.id, nombreCompleto: estudiante.nombre }, ...miembros];
 				this.familia.set(lista);
-				this.seleccionados.set(new Set(lista.map((m) => m.estudianteId)));
+				this.seleccionados.set(new Set(soloAlumno ? [estudiante.id] : lista.map((m) => m.estudianteId)));
 				this.loadingFamilia.set(false);
 			},
 			error: (err: unknown) => {
@@ -132,6 +159,85 @@ export class RegistrarPagoFacade {
 		this.limpiarReparto();
 	}
 
+	/**
+	 * Cobro rápido: fija al alumno (solo él, sin hermanos), lee su estado de cuenta, precarga el monto de los
+	 * conceptos pedidos y pide el reparto al servidor. Si algo no cuadra, deja el reparto editable y lo avisa.
+	 */
+	precargar(
+		estudiante: { id: number; nombre: string },
+		conceptos: readonly ConceptoCobroRapido[],
+		fechaPago: string,
+	): void {
+		this.iniciar(estudiante, true);
+		this.cargarPrecarga(estudiante.id, conceptos, fechaPago);
+	}
+
+	/** Suma o quita la inscripción del pago de matrícula y recalcula monto y reparto. */
+	alternarInscripcion(fechaPago: string): void {
+		const actual = this.precarga();
+		const est = this.estudiante();
+		if (!actual || !est) return;
+		const conceptos: ConceptoCobroRapido[] = actual.conceptos.includes('INSCRIPCION')
+			? actual.conceptos.filter((c) => c !== 'INSCRIPCION')
+			: [...actual.conceptos, 'INSCRIPCION'];
+		this.limpiarReparto();
+		this.cargarPrecarga(est.id, conceptos, fechaPago);
+	}
+
+	/** Tras un pago: abre de nuevo el cobro rápido del mismo alumno, ahora por la inscripción. */
+	cobrarInscripcion(fechaPago: string): void {
+		const est = this.estudiante();
+		if (!est) return;
+		this.pagoRegistrado.set(null);
+		this.limpiarReparto();
+		this.intento = null;
+		this.reusarClave = false;
+		this.cargarPrecarga(est.id, ['INSCRIPCION'], fechaPago);
+	}
+
+	/** Vuelve a la búsqueda para el siguiente alumno de la fila. */
+	siguienteAlumno(): void {
+		this.pagoRegistrado.set(null);
+		this.limpiarReparto();
+		this.estudiante.set(null);
+		this.familia.set([]);
+		this.seleccionados.set(new Set());
+		this.precarga.set(null);
+		this.errorPrecarga.set(null);
+		this.cargosCuenta.set([]);
+		this.sugerencias.set([]);
+		this.intento = null;
+		this.reusarClave = false;
+	}
+
+	private cargarPrecarga(estudianteId: number, conceptos: readonly ConceptoCobroRapido[], fechaPago: string): void {
+		this.loadingPrecarga.set(true);
+		this.errorPrecarga.set(null);
+		this.api.estadoCuenta(estudianteId).subscribe({
+			next: (cuenta) => {
+				this.loadingPrecarga.set(false);
+				this.cargosCuenta.set(cuenta.cargos);
+				const precarga = precargarCobro(cuenta.cargos, conceptos);
+				this.precarga.set(precarga);
+				if (precarga.cobrables.length > 0) {
+					this.proponer(precarga.monto, fechaPago);
+					return;
+				}
+				const nombre = conceptos.map((c) => (c === 'MATRICULA' ? 'matrícula' : 'inscripción')).join(' ni ');
+				this.errorPrecarga.set(
+					precarga.sinConfirmar.length > 0
+						? mensajeSinConfirmar(precarga.sinConfirmar)
+						: `Este alumno no tiene ${nombre} pendiente de cobro.`,
+				);
+			},
+			error: (err: unknown) => {
+				logger.error('[RegistrarPagoFacade] Error al leer el estado de cuenta', err);
+				this.loadingPrecarga.set(false);
+				this.errorPrecarga.set('No se pudo leer el estado de cuenta. Propón el reparto a mano o inténtalo de nuevo.');
+			},
+		});
+	}
+
 	/** Pide la propuesta de reparto al servidor. No persiste nada. */
 	proponer(monto: number, fechaPago: string): void {
 		const ids = this.idsSeleccionados();
@@ -143,6 +249,12 @@ export class RegistrarPagoFacade {
 			next: (propuesta) => {
 				this.reparto.set(propuesta.aplicaciones);
 				this.sobrante.set(propuesta.sobrante);
+				const precarga = this.precarga();
+				if (precarga && !repartoCoincideConPrecarga(propuesta.aplicaciones, precarga.cobrables, monto)) {
+					this.errorReparto.set(
+						'El reparto propuesto no coincide con lo que se iba a cobrar: revísalo o edítalo antes de registrar.',
+					);
+				}
 				this.loadingReparto.set(false);
 			},
 			error: (err: unknown) => {
@@ -198,7 +310,11 @@ export class RegistrarPagoFacade {
 				if (!this.reusarClave) this.intento = null;
 				this.pagoEnCurso.set(esIdempotenciaEnCurso(err));
 				logger.error('[RegistrarPagoFacade] Error al registrar el pago', err);
-				this.errorRegistro.set(mensajeDeError(err));
+				this.errorRegistro.set(
+					err.error?.errorCode === 'PAGO_CARGO_NO_APLICABLE'
+						? mensajeCargoNoAplicable(this.reparto())
+						: mensajeDeError(err),
+				);
 				this.guardando.set(false);
 			},
 		});

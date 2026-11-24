@@ -5,6 +5,12 @@ import {
 	armarPayload,
 	camposFaltantes,
 	claveParaEnvio,
+	comprobanteSugerido,
+	conceptoDeRuta,
+	mensajeCargoNoAplicable,
+	mensajeSinConfirmar,
+	precargarCobro,
+	repartoCoincideConPrecarga,
 	esIdempotenciaEnCurso,
 	resultadoDesconocido,
 	diferenciaCentavos,
@@ -220,5 +226,72 @@ describe('teclaPermitidaEnMonto', () => {
 	it('deja pasar teclas con nombre y atajos de teclado', () => {
 		for (const tecla of ['Backspace', 'Tab', 'ArrowLeft', 'Enter']) expect(teclaPermitidaEnMonto(tecla, false)).toBe(true);
 		expect(teclaPermitidaEnMonto('v', true)).toBe(true);
+	});
+});
+
+describe('cobro rápido de matrícula', () => {
+	const cargo = (over: Partial<{ cargoId: number; concepto: string; cuota: string | null; saldo: number; datoConfirmado: boolean; estado: string }>) => ({
+		cargoId: 1,
+		concepto: 'Matrícula',
+		cuota: null,
+		saldo: 350,
+		datoConfirmado: true,
+		estado: 'Pendiente',
+		...over,
+	});
+
+	it('conceptoDeRuta acepta matrícula/inscripción sin importar tildes o mayúsculas y descarta lo demás', () => {
+		expect(conceptoDeRuta('matrícula')).toBe('MATRICULA');
+		expect(conceptoDeRuta('INSCRIPCION')).toBe('INSCRIPCION');
+		expect(conceptoDeRuta('pension')).toBeNull();
+		expect(conceptoDeRuta(null)).toBeNull();
+	});
+
+	it('precargarCobro suma solo los cobrables del concepto pedido', () => {
+		const cargos = [
+			cargo({ cargoId: 1, saldo: 350 }),
+			cargo({ cargoId: 2, concepto: 'Inscripción', saldo: 100 }),
+			cargo({ cargoId: 3, concepto: 'Pensión', cuota: '3', saldo: 400 }),
+		];
+		const solo = precargarCobro(cargos, ['MATRICULA']);
+		expect(solo.cobrables.map((c) => c.cargoId)).toEqual([1]);
+		expect(solo.monto).toBe(350);
+		expect(precargarCobro(cargos, ['MATRICULA', 'INSCRIPCION']).monto).toBe(450);
+	});
+
+	it('un cargo pagado no se cobra y uno «sin dato» bloquea con su nombre', () => {
+		const pagado = precargarCobro([cargo({ estado: 'Pagado', saldo: 0 })], ['MATRICULA']);
+		expect(pagado.cobrables).toEqual([]);
+		expect(pagado.sinConfirmar).toEqual([]);
+
+		const sinDato = precargarCobro([cargo({ datoConfirmado: false, estado: 'SinDato', saldo: 0 })], ['MATRICULA']);
+		expect(sinDato.cobrables).toEqual([]);
+		expect(sinDato.sinConfirmar).toHaveLength(1);
+		expect(mensajeSinConfirmar(sinDato.sinConfirmar)).toContain('«Matrícula»');
+	});
+
+	it('mensajeCargoNoAplicable nombra el cargo si es uno solo y lista candidatos si son varios', () => {
+		expect(mensajeCargoNoAplicable([{ concepto: 'Matrícula', cuota: null }])).toContain('«Matrícula»');
+		const varios = mensajeCargoNoAplicable([
+			{ concepto: 'Matrícula', cuota: null },
+			{ concepto: 'Pensión', cuota: '3' },
+		]);
+		expect(varios).toContain('Uno de los cargos');
+		expect(varios).toContain('«Pensión · cuota 3»');
+	});
+
+	it('repartoCoincideConPrecarga exige los mismos cargos y que cuadre', () => {
+		const apps = [{ ...app(350), cargoId: 1 }];
+		expect(repartoCoincideConPrecarga(apps, [{ cargoId: 1 }], 350)).toBe(true);
+		expect(repartoCoincideConPrecarga(apps, [{ cargoId: 2 }], 350)).toBe(false);
+		expect(repartoCoincideConPrecarga([...apps, { ...app(50), cargoId: 9 }], [{ cargoId: 1 }], 400)).toBe(false);
+		expect(repartoCoincideConPrecarga(apps, [{ cargoId: 1 }], 300)).toBe(false);
+	});
+
+	it('comprobanteSugerido pone «S/N» en efectivo y lo retira solo si lo puso el sistema', () => {
+		expect(comprobanteSugerido('EFECTIVO', '')).toBe('S/N');
+		expect(comprobanteSugerido('EFECTIVO', 'B001-45')).toBe('B001-45');
+		expect(comprobanteSugerido('YAPE', 'S/N')).toBe('');
+		expect(comprobanteSugerido('YAPE', 'B001-45')).toBe('B001-45');
 	});
 });

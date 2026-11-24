@@ -117,3 +117,124 @@ describe('RegistrarPagoFacade — reintento tras un error de idempotencia', () =
 		expect(claveDe(registrarPago, 1)).not.toBe(claveDe(registrarPago, 0));
 	});
 });
+
+describe('RegistrarPagoFacade — cobro rápido de matrícula', () => {
+	const cargo = (over: Record<string, unknown>) => ({
+		cargoId: 1,
+		concepto: 'Matrícula',
+		cuota: null,
+		saldo: 350,
+		datoConfirmado: true,
+		estado: 'Pendiente',
+		...over,
+	});
+	const aplicacion = (cargoId: number, base: number) => ({
+		cargoId,
+		estudianteId: 280,
+		estudiante: 'Pérez, Ana',
+		concepto: cargoId === 1 ? 'Matrícula' : 'Inscripción',
+		cuota: null,
+		vencimiento: null,
+		montoBase: base,
+		montoRecargo: 0,
+	});
+
+	function crearConCuenta(cargos: unknown[], aplicaciones = [aplicacion(1, 350)]) {
+		const proponerReparto = vi.fn(() => of({ aplicaciones, sobrante: 0 }));
+		const registrarPago = vi.fn();
+		TestBed.configureTestingModule({
+			providers: [
+				RegistrarPagoFacade,
+				{
+					provide: PagosApiService,
+					useValue: {
+						familia: () => of([{ estudianteId: 280, nombreCompleto: 'Pérez, Ana' }, { estudianteId: 281, nombreCompleto: 'Pérez, Luis' }]),
+						estadoCuenta: () => of({ cargos }),
+						proponerReparto,
+						registrarPago,
+					},
+				},
+			],
+		});
+		return { facade: TestBed.inject(RegistrarPagoFacade), proponerReparto, registrarPago };
+	}
+
+	const ana280 = { id: 280, nombre: 'Pérez, Ana' };
+
+	it('precarga el monto de la matrícula y propone el reparto solo para el alumno, sin hermanos', () => {
+		const { facade, proponerReparto } = crearConCuenta([cargo({})]);
+
+		facade.precargar(ana280, ['MATRICULA'], '2026-11-24');
+
+		expect(facade.precarga()?.monto).toBe(350);
+		expect(proponerReparto).toHaveBeenCalledWith(350, '2026-11-24', [280]);
+		expect(facade.errorReparto()).toBeNull();
+	});
+
+	it('avisa si el reparto del servidor no coincide con los cargos precargados', () => {
+		const { facade } = crearConCuenta([cargo({})], [aplicacion(7, 350)]);
+
+		facade.precargar(ana280, ['MATRICULA'], '2026-11-24');
+
+		expect(facade.errorReparto()).toContain('no coincide');
+	});
+
+	it('con la matrícula «sin dato» no propone y nombra el cargo', () => {
+		const { facade, proponerReparto } = crearConCuenta([cargo({ datoConfirmado: false, estado: 'SinDato', saldo: 0 })]);
+
+		facade.precargar(ana280, ['MATRICULA'], '2026-11-24');
+
+		expect(proponerReparto).not.toHaveBeenCalled();
+		expect(facade.errorPrecarga()).toContain('«Matrícula»');
+	});
+
+	it('sin matrícula pendiente lo dice en vez de dejar el formulario mudo', () => {
+		const { facade } = crearConCuenta([cargo({ estado: 'Pagado', saldo: 0 })]);
+
+		facade.precargar(ana280, ['MATRICULA'], '2026-11-24');
+
+		expect(facade.errorPrecarga()).toContain('no tiene matrícula pendiente');
+	});
+
+	it('suma la inscripción al mismo pago y la ofrece después si no se incluyó', () => {
+		const { facade, proponerReparto } = crearConCuenta([cargo({}), cargo({ cargoId: 2, concepto: 'Inscripción', saldo: 100 })]);
+
+		facade.precargar(ana280, ['MATRICULA'], '2026-11-24');
+		expect(facade.ofrecerInscripcion()).toBe(true);
+
+		facade.alternarInscripcion('2026-11-24');
+		expect(facade.precarga()?.monto).toBe(450);
+		expect(proponerReparto).toHaveBeenLastCalledWith(450, '2026-11-24', [280]);
+		expect(facade.ofrecerInscripcion()).toBe(false);
+	});
+
+	it('PAGO_CARGO_NO_APLICABLE nombra el cargo del reparto', () => {
+		const { facade, registrarPago } = crearConCuenta([cargo({})]);
+		registrarPago.mockReturnValue(throwError(() => ({ status: 400, error: { errorCode: 'PAGO_CARGO_NO_APLICABLE' } })));
+		facade.precargar(ana280, ['MATRICULA'], '2026-11-24');
+
+		facade.registrar({
+			monto: 350,
+			fechaPago: '2026-11-24',
+			horaPago: null,
+			medio: 'EFECTIVO',
+			bancoOrigen: null,
+			numeroOperacion: null,
+			comprobante: 'S/N',
+			observaciones: null,
+		});
+
+		expect(facade.errorRegistro()).toContain('«Matrícula»');
+	});
+
+	it('siguienteAlumno vuelve a la búsqueda sin estado del alumno anterior', () => {
+		const { facade } = crearConCuenta([cargo({})]);
+		facade.precargar(ana280, ['MATRICULA'], '2026-11-24');
+
+		facade.siguienteAlumno();
+
+		expect(facade.estudiante()).toBeNull();
+		expect(facade.precarga()).toBeNull();
+		expect(facade.reparto()).toEqual([]);
+	});
+});

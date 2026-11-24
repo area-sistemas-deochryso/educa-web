@@ -36,9 +36,48 @@
 		} @else if (facade.pagoRegistrado(); as pagoId) {
 			<edu-message severity="success" [text]="'Pago registrado (N.º ' + pagoId + ').'" />
 			<div class="acciones">
-				<edu-button label="Registrar otro pago" icon="pi pi-plus" (click)="facade.nuevoPago()" />
+				@if (facade.ofrecerInscripcion()) {
+					<edu-button label="Cobrar inscripción" icon="pi pi-wallet" severity="success" (click)="cobrarInscripcion()" />
+				}
+				<edu-button label="Siguiente alumno" icon="pi pi-arrow-right" [outlined]="true" (click)="siguienteAlumno()" />
+				<edu-button label="Registrar otro pago" icon="pi pi-plus" [outlined]="true" (click)="facade.nuevoPago()" />
 			</div>
 		} @else {
+			@if (facade.loadingPrecarga()) {
+				<p class="ayuda" role="status">Leyendo el estado de cuenta…</p>
+			}
+			@if (facade.errorPrecarga(); as errorPrecarga) {
+				<edu-message severity="warn" [text]="errorPrecarga" data-testid="error-precarga" />
+				@if (facade.estudiante() && facade.precarga()?.sinConfirmar?.length) {
+					<p class="ayuda">
+						<a [routerLink]="['/intranet/admin/pagos/sin-dato']" data-testid="ir-sin-dato">Ir a «Sin dato» para confirmarlo</a>
+					</p>
+				}
+			}
+			@if (facade.precarga(); as precarga) {
+				@if (precarga.cobrables.length > 0) {
+					<p class="paga" data-testid="resumen-cobro">
+						Se cobrará:
+						@for (c of precarga.cobrables; track c.cargoId; let ultimo = $last) {
+							<strong>{{ c.concepto }}{{ c.cuota ? ' · cuota ' + c.cuota : '' }}</strong>{{ ultimo ? '' : ' + ' }}
+						}
+						· {{ soles(precarga.monto) }}
+					</p>
+					@if (precarga.conceptos.includes('MATRICULA') && (facade.incluyeInscripcion() || facade.inscripcionCobrable())) {
+						<label class="miembro" [class.miembro--on]="facade.incluyeInscripcion()">
+							<input
+								type="checkbox"
+								class="sr-only"
+								[checked]="facade.incluyeInscripcion()"
+								(change)="alternarInscripcion()"
+							/>
+							<i [class]="facade.incluyeInscripcion() ? 'pi pi-check-circle' : 'pi pi-circle'" aria-hidden="true"></i>
+							Incluir la inscripción en este mismo pago
+						</label>
+					}
+				}
+			}
+
 			<h3 class="card__title card__title--sub">2. Alumnos que cubre este pago</h3>
 			<p class="paga">
 				Alumno que paga: <strong>{{ facade.estudiante()?.nombre }}</strong>
@@ -147,7 +186,7 @@
 				</label>
 				<label class="campo">
 					<span>Medio</span>
-					<edu-select [options]="medios" [ngModel]="medio()" (ngModelChange)="medio.set($event)" optionLabel="label" optionValue="value" />
+					<edu-select [options]="medios" [ngModel]="medio()" (ngModelChange)="cambiarMedio($event)" optionLabel="label" optionValue="value" />
 				</label>
 				<label class="campo">
 					<span>Hora (opcional)</span>

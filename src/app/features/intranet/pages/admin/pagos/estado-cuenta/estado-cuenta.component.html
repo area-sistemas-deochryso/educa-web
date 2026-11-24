@@ -45,6 +45,16 @@
 					size="small"
 					(click)="registrarPago(cuenta.estudianteId, cuenta.estudiante)"
 				/>
+				@if (matriculaPendiente()) {
+					<edu-button
+						class="alumno__accion"
+						label="Cobrar matrícula"
+						icon="pi pi-wallet"
+						size="small"
+						data-testid="cobrar-matricula"
+						(click)="cobrarMatricula(cuenta.estudianteId, cuenta.estudiante)"
+					/>
+				}
 
 				<dl class="cuenta__totales" aria-label="Totales de la cuenta">
 					@if (categoria(); as cat) {

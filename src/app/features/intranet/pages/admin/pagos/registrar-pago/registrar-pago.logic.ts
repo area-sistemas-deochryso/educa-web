@@ -48,6 +48,107 @@ export function teclaPermitidaEnMonto(tecla: string, conAtajo: boolean): boolean
 }
 // #endregion
 
+// #region Cobro rápido de matrícula
+/** Concepto a precargar desde un atajo («Cobrar matrícula» / «Cobrar inscripción»). */
+export type ConceptoCobroRapido = 'MATRICULA' | 'INSCRIPCION';
+
+/** Sin tildes y en mayúsculas: `Matrícula` → `MATRICULA`. */
+const normalizarConcepto = (texto: string): string =>
+	texto
+		.normalize('NFD')
+		.replace(/[̀-ͯ]/g, '')
+		.toUpperCase()
+		.trim();
+
+export const esConcepto = (concepto: string, codigo: ConceptoCobroRapido): boolean =>
+	normalizarConcepto(concepto) === codigo;
+
+/** Lee el `?concepto=` de la ruta; cualquier otro valor se ignora. */
+export function conceptoDeRuta(valor: string | null): ConceptoCobroRapido | null {
+	const limpio = valor ? normalizarConcepto(valor) : '';
+	return limpio === 'MATRICULA' || limpio === 'INSCRIPCION' ? limpio : null;
+}
+
+export interface CargoCobrable {
+	cargoId: number;
+	concepto: string;
+	cuota: string | null;
+	saldo: number;
+	datoConfirmado: boolean;
+	estado: string;
+}
+
+/** Cargos de los conceptos pedidos que aún se pueden cobrar o que bloquean el cobro por estar «sin dato». */
+export interface PrecargaCobro {
+	conceptos: readonly ConceptoCobroRapido[];
+	cobrables: CargoCobrable[];
+	sinConfirmar: CargoCobrable[];
+	/** Suma de saldos de los cobrables, en soles. */
+	monto: number;
+}
+
+export function precargarCobro(
+	cargos: readonly CargoCobrable[],
+	conceptos: readonly ConceptoCobroRapido[],
+): PrecargaCobro {
+	const delConcepto = cargos.filter((c) => conceptos.some((k) => esConcepto(c.concepto, k)));
+	const sinConfirmar = delConcepto.filter((c) => !c.datoConfirmado);
+	const cobrables = delConcepto.filter((c) => c.datoConfirmado && c.estado !== 'Pagado' && toCentavos(c.saldo) > 0);
+	const monto = toSoles(cobrables.reduce((sum, c) => sum + toCentavos(c.saldo), 0));
+	return { conceptos, cobrables, sinConfirmar, monto };
+}
+
+const nombreDeCargo = (c: { concepto: string; cuota?: string | null }): string =>
+	c.cuota ? `${c.concepto} · cuota ${c.cuota}` : c.concepto;
+
+/** Mensaje de «cargo con datos sin confirmar» que nombra el cargo y dice dónde confirmarlo. */
+export function mensajeSinConfirmar(cargos: readonly { concepto: string; cuota?: string | null }[]): string {
+	if (cargos.length === 0) return MENSAJES_POR_CODIGO['PAGO_CARGO_NO_APLICABLE'];
+	const nombres = cargos.map((c) => `«${nombreDeCargo(c)}»`).join(', ');
+	return cargos.length === 1
+		? `El cargo ${nombres} tiene datos sin confirmar y no se puede cobrar todavía. Confírmalo en «Sin dato» y vuelve a intentarlo.`
+		: `Estos cargos tienen datos sin confirmar: ${nombres}. Confírmalos en «Sin dato» antes de cobrar.`;
+}
+
+/**
+ * `PAGO_CARGO_NO_APLICABLE` no dice qué cargo falló: con uno solo en el reparto se nombra; con varios se lista
+ * el reparto como candidatos para que la persona sepa dónde mirar.
+ */
+export function mensajeCargoNoAplicable(aplicaciones: readonly { concepto: string; cuota: string | null }[]): string {
+	if (aplicaciones.length === 0) return MENSAJES_POR_CODIGO['PAGO_CARGO_NO_APLICABLE'];
+	if (aplicaciones.length === 1) return mensajeSinConfirmar(aplicaciones);
+	const nombres = aplicaciones.map((c) => `«${nombreDeCargo(c)}»`).join(', ');
+	return `Uno de los cargos del reparto tiene datos sin confirmar (${nombres}). Confírmalo en «Sin dato» o quítalo del reparto.`;
+}
+
+/**
+ * El reparto propuesto sirve para el cobro rápido solo si cubre exactamente los cargos precargados
+ * (ni uno más, ni uno menos) y cuadra con el monto.
+ */
+export function repartoCoincideConPrecarga(
+	aplicaciones: readonly RepartoAplicacion[],
+	cobrables: readonly { cargoId: number }[],
+	monto: number,
+): boolean {
+	const esperados = new Set(cobrables.map((c) => c.cargoId));
+	const recibidos = new Set(aplicaciones.map((a) => a.cargoId));
+	return (
+		esperados.size === recibidos.size && [...esperados].every((id) => recibidos.has(id)) && repartoCuadra(monto, aplicaciones)
+	);
+}
+
+export const COMPROBANTE_EFECTIVO = 'S/N';
+
+/**
+ * Comprobante sugerido al cambiar de medio: en efectivo propone «S/N» si está vacío; al dejar el efectivo
+ * retira el «S/N» que el sistema puso, sin tocar un comprobante escrito a mano.
+ */
+export function comprobanteSugerido(medio: PagoMedio, actual: string): string {
+	if (medio === 'EFECTIVO') return actual.trim() === '' ? COMPROBANTE_EFECTIVO : actual;
+	return actual.trim().toUpperCase() === COMPROBANTE_EFECTIVO ? '' : actual;
+}
+// #endregion
+
 // #region Payload
 /** Arma el cuerpo de `POST /api/pagos` a partir del formulario. La hora se envía como `HH:mm:ss` (TimeSpan). */
 export function armarPayload(datos: {

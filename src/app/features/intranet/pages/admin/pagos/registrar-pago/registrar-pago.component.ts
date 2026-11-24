@@ -1,5 +1,5 @@
 // #region Imports
-import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -8,7 +8,13 @@ import type { EstudianteBusqueda, PagoMedio } from '@data/models';
 import { EduAutoComplete, EduButton, EduDatePicker, EduInputNumber, EduMessage, EduSelect, EduTemplate } from '@edu-ui';
 import { formatFechaConDia, formatSoles } from '../utils/pagos-format.util';
 import { RegistrarPagoFacade } from './registrar-pago.facade';
-import { camposFaltantes, diferenciaCentavos, teclaPermitidaEnMonto } from './registrar-pago.logic';
+import {
+	camposFaltantes,
+	comprobanteSugerido,
+	conceptoDeRuta,
+	diferenciaCentavos,
+	teclaPermitidaEnMonto,
+} from './registrar-pago.logic';
 // #endregion
 
 const MEDIOS: { label: string; value: PagoMedio }[] = [
@@ -63,14 +69,28 @@ export class RegistrarPagoComponent {
 	protected readonly comprobante = signal('');
 	protected readonly observaciones = signal('');
 
+	/** Si la persona ya eligió un medio, el cobro rápido no se lo pisa con efectivo. */
+	private medioElegido = false;
+
 	constructor() {
 		this.route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
 			const id = Number(params.get('estudianteId'));
 			const nombre = params.get('nombre') ?? '';
 			if (Number.isInteger(id) && id > 0) {
 				this.seleccionado.set({ estudianteId: id, nombreCompleto: nombre, salon: null });
-				this.facade.iniciar({ id, nombre });
+				const concepto = conceptoDeRuta(params.get('concepto'));
+				if (concepto) {
+					this.iniciarCobroRapido({ id, nombre }, concepto);
+				} else {
+					this.facade.iniciar({ id, nombre });
+				}
 			}
+		});
+
+		// El monto del formulario sigue a lo que el cobro rápido precargó (matrícula, con o sin inscripción).
+		effect(() => {
+			const precarga = this.facade.precarga();
+			if (precarga && precarga.cobrables.length > 0) this.monto.set(precarga.monto);
 		});
 	}
 
@@ -116,6 +136,48 @@ export class RegistrarPagoComponent {
 
 	protected buscarEstudiantes(evento: { query: string }): void {
 		this.facade.buscarEstudiantes(evento.query);
+	}
+
+	/** Cobro rápido: efectivo salvo que ya se haya elegido otro medio, con «S/N» sugerido en efectivo. */
+	private iniciarCobroRapido(estudiante: { id: number; nombre: string }, concepto: 'MATRICULA' | 'INSCRIPCION'): void {
+		if (!this.medioElegido) this.medio.set('EFECTIVO');
+		this.comprobante.update((actual) => comprobanteSugerido(this.medio(), actual));
+		this.facade.precargar(estudiante, [concepto], this.fechaIso());
+	}
+
+	private fechaIso(): string {
+		return isoLocal(this.fecha() ?? new Date());
+	}
+
+	protected cambiarMedio(medio: PagoMedio): void {
+		this.medioElegido = true;
+		this.medio.set(medio);
+		this.comprobante.update((actual) => comprobanteSugerido(medio, actual));
+	}
+
+	protected alternarInscripcion(): void {
+		this.facade.alternarInscripcion(this.fechaIso());
+	}
+
+	protected cobrarInscripcion(): void {
+		this.limpiarDatosDelPago();
+		this.facade.cobrarInscripcion(this.fechaIso());
+	}
+
+	protected siguienteAlumno(): void {
+		this.seleccionado.set(null);
+		this.limpiarDatosDelPago();
+		this.facade.siguienteAlumno();
+	}
+
+	/** Deja el formulario listo para otro cobro; el medio se conserva (la caja suele cobrar varios seguidos igual). */
+	private limpiarDatosDelPago(): void {
+		this.monto.set(null);
+		this.hora.set(null);
+		this.banco.set('');
+		this.operacion.set('');
+		this.observaciones.set('');
+		this.comprobante.set(comprobanteSugerido(this.medio(), ''));
 	}
 
 	protected elegirEstudiante(estudiante: EstudianteBusqueda): void {

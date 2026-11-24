@@ -65,6 +65,13 @@
 						>
 							Registrar pago
 						</a>
+						<a
+							[routerLink]="['/intranet/admin/pagos/registrar']"
+							[queryParams]="{ estudianteId: fila.estudianteId, nombre: fila.estudiante, concepto: 'MATRICULA' }"
+							[attr.aria-label]="'Cobrar la matrícula de ' + fila.estudiante"
+						>
+							Cobrar matrícula
+						</a>
 					</div></td>
 				</tr>
 				@if (open) {
