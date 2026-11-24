@@ -1,0 +1,198 @@
+<section class="seccion" aria-labelledby="montos-title">
+	<h3 id="montos-title" class="seccion__title" tabindex="-1">2. Montos del año {{ anio() }}</h3>
+	<p class="seccion__nota">
+		Monto base de cada concepto, en soles. «Todos los niveles» se cobra en los niveles que no
+		tienen monto propio; si un nivel tiene el suyo, se cobra ese. Cambiar un monto no reescribe
+		los cargos ya generados.
+	</p>
+
+	@switch (facade.estado()) {
+		@case ('cargando') {
+			<p class="seccion__nota" role="status">Cargando montos…</p>
+		}
+		@case ('error') {
+			@if (facade.mensaje(); as m) {
+				<edu-message [severity]="m.severidad" [text]="m.texto" />
+			}
+			<div class="acciones">
+				<edu-button
+					data-testid="recargar-montos"
+					label="Volver a cargar"
+					icon="pi pi-refresh"
+					severity="secondary"
+					[outlined]="true"
+					(click)="recargar()"
+				/>
+			</div>
+		}
+		@default {
+			<!-- Junto al título, que recibe el foco al guardar: el resultado queda a la vista -->
+			@if (facade.mensaje(); as m) {
+				<edu-message [severity]="m.severidad" [text]="m.texto" />
+			}
+			@if (facade.conceptos().length === 0) {
+				<edu-message
+					severity="warn"
+					text="No hay conceptos de cobro activos: se activan desde la base de datos."
+				/>
+			} @else {
+				@if (facade.revision(); as r) {
+					<!-- Modo revisión: reemplaza al editor; lo que se ve es exactamente lo que se envía -->
+					<div class="revision">
+						<h4 id="montos-revision-title" class="revision__titulo" tabindex="-1">
+							{{ r.tituloRevision }}
+						</h4>
+						<p class="seccion__nota">
+							{{ r.resumen.titulo }}. Nada se guarda hasta que confirmes.
+						</p>
+						<div class="tabla-scroll">
+							<table class="tabla">
+								<caption>
+									Cambios en los montos
+								</caption>
+								<thead>
+									<tr>
+										<th scope="col">Concepto</th>
+										<th scope="col">Nivel</th>
+										<th scope="col" class="num">Antes</th>
+										<th scope="col" class="num">Ahora</th>
+									</tr>
+								</thead>
+								<tbody>
+									@for (fila of r.resumen.filas; track fila.clave) {
+										<tr>
+											<td>{{ fila.concepto }}</td>
+											<td>{{ fila.nivel }}</td>
+											<td class="num">{{ fila.antes }}</td>
+											<td class="num">{{ fila.ahora }}</td>
+										</tr>
+									}
+								</tbody>
+							</table>
+						</div>
+						<ul class="avisos" aria-label="Antes de guardar">
+							@for (aviso of r.resumen.avisos; track aviso) {
+								<li>{{ aviso }}</li>
+							}
+						</ul>
+						<div class="acciones">
+							<edu-button
+								data-testid="guardar-montos"
+								[label]="r.etiquetaGuardar"
+								icon="pi pi-check"
+								severity="success"
+								[loading]="facade.guardando()"
+								(click)="facade.guardar()"
+							/>
+							<edu-button
+								data-testid="seguir-editando-montos"
+								label="Seguir editando"
+								severity="secondary"
+								[text]="true"
+								[disabled]="facade.guardando()"
+								(click)="facade.volverAEditar()"
+							/>
+						</div>
+					</div>
+				} @else {
+					<!-- Editor: una grilla por concepto con las 4 celdas de nivel -->
+					@if (facade.cobertura().vacia) {
+						<p class="banner" role="note">
+							Este año todavía no tiene montos. Escríbelos y revísalos antes de
+							guardar: un cargo sin monto no se genera.
+						</p>
+					}
+					@if (facade.releyendo()) {
+						<p class="seccion__nota" role="status">
+							Volviendo a leer los montos para confirmar qué quedó guardado…
+						</p>
+					}
+					<div class="conceptos-montos">
+						@for (fila of facade.filas(); track fila.conceptoId) {
+							<fieldset class="concepto">
+								<legend class="concepto__nombre">
+									{{ fila.nombre }}
+									@if (fila.soloAlumnosNuevos) {
+										<edu-tag
+											value="Solo alumnos nuevos"
+											styleClass="tag-neutral"
+										/>
+									}
+								</legend>
+								@if (fila.ayuda; as ayuda) {
+									<p class="ayuda">{{ ayuda }}</p>
+								}
+								<div class="concepto__celdas">
+									@for (celda of fila.celdas; track celda.clave) {
+										<div class="celda-monto">
+											<label [for]="celda.inputId">{{
+												celda.etiqueta
+											}}</label>
+											<input
+												eduInputText
+												type="text"
+												inputmode="decimal"
+												autocomplete="off"
+												placeholder="Sin monto"
+												[id]="celda.inputId"
+												[ngModel]="celda.texto"
+												(ngModelChange)="facade.editar(celda.clave, $event)"
+												[disabled]="facade.ocupado()"
+												[attr.aria-invalid]="celda.error ? 'true' : null"
+												[attr.aria-describedby]="
+													celda.mensaje ? celda.ayudaId : null
+												"
+											/>
+											@if (celda.mensaje; as m) {
+												<small
+													[id]="celda.ayudaId"
+													[class.campo__error]="celda.esError"
+													>{{ m }}</small
+												>
+											}
+										</div>
+									}
+								</div>
+								<p class="concepto__resultado">{{ fila.seCobra }}</p>
+							</fieldset>
+						}
+					</div>
+					<div class="acciones">
+						<edu-button
+							data-testid="revisar-montos"
+							label="Revisar cambios"
+							icon="pi pi-eye"
+							severity="secondary"
+							[disabled]="!facade.puedeRevisar()"
+							(click)="revisar()"
+						/>
+						@if (facade.hayCambios()) {
+							<edu-button
+								data-testid="descartar-montos"
+								label="Descartar cambios"
+								severity="danger"
+								[outlined]="true"
+								[disabled]="facade.ocupado()"
+								(click)="descartar()"
+							/>
+						}
+						@if (facade.baseIncierta()) {
+							<edu-button
+								data-testid="volver-a-leer-montos"
+								label="Volver a leer"
+								icon="pi pi-refresh"
+								severity="secondary"
+								[outlined]="true"
+								[loading]="facade.releyendo()"
+								(click)="volverALeer()"
+							/>
+						}
+					</div>
+					@if (facade.motivoNoRevisar(); as motivo) {
+						<p class="ayuda" data-testid="motivo-montos">{{ motivo }}</p>
+					}
+				}
+			}
+		}
+	}
+</section>

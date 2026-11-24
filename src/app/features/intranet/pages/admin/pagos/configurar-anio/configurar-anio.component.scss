@@ -4,6 +4,8 @@
 	display: flex;
 	flex-direction: column;
 	gap: 1.5rem;
+	// El body no remapea su color en modo oscuro: sin esto las etiquetas heredan negro sobre fondo oscuro.
+	color: var(--text-color);
 }
 
 .seccion {
@@ -51,6 +53,8 @@
 
 .acciones {
 	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
 	gap: 0.5rem;
 }
 
@@ -131,3 +135,133 @@
 .sr-only {
 	@include pagos.sr-only;
 }
+
+// #region Secciones de montos y cronograma (P123 F3)
+.ayuda {
+	@include pagos.hint;
+}
+
+// Variante compuesta: dentro de un `.campo`, la regla `.campo small` (más específica) dejaría el texto en gris.
+// `--yellow-800` y no `--orange-700`: las secciones no tienen fondo propio y el texto queda sobre
+// `--intranet-background-color`, donde `--orange-700` no llega a 4.5:1 (WCAG 1.4.3). `--yellow-800` sí (~5.9:1) y
+// tiene su variante para el modo oscuro.
+.aviso,
+.campo small.aviso {
+	@include pagos.hint;
+	color: var(--yellow-800);
+}
+
+.campo__error,
+.campo small.campo__error {
+	margin: 0;
+	font-size: 0.8125rem;
+	font-weight: 400;
+	color: var(--tint-danger-text);
+}
+
+.banner {
+	@include pagos.banner(var(--blue-500));
+	margin: 0;
+}
+
+.avisos {
+	margin: 0;
+	padding: 0.75rem 1rem 0.75rem 2rem;
+	border: 1px solid var(--orange-500);
+	border-radius: 8px;
+	background: color-mix(in srgb, var(--orange-500) 12%, transparent);
+	color: var(--text-color);
+	font-size: 0.875rem;
+
+	// Las reglas globales de `li` y `p` fijan su propio gris: sin esto el aviso queda ilegible en modo oscuro.
+	li {
+		color: inherit;
+		font-size: inherit;
+		font-weight: 400;
+	}
+
+	li + li {
+		margin-top: 0.25rem;
+	}
+}
+
+.tabla-scroll {
+	overflow-x: auto;
+}
+
+.revision {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.revision__titulo {
+	margin: 0;
+	font-size: 1rem;
+	font-weight: 600;
+}
+
+// `eduInputText` solo marca inválido con validadores de forms (`.ng-invalid.ng-touched`): acá se pinta por `aria-invalid`.
+.edu-input-text[aria-invalid='true'] {
+	border-color: var(--eduui-form-field-invalid-border-color, var(--red-500));
+}
+// #endregion
+
+// #region Guía de pasos (ConfigurarAnioComponent)
+.cabecera-anio {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-end;
+	gap: 0.5rem 1rem;
+}
+
+.guia {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.pasos {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+	gap: 0.5rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.paso {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 0.25rem;
+	width: 100%;
+	height: 100%;
+	min-height: 44px;
+	padding: 0.625rem 0.75rem;
+	border: 1px solid var(--surface-300);
+	border-radius: 8px;
+	background: transparent;
+	color: var(--text-color);
+	font: inherit;
+	text-align: left;
+	cursor: pointer;
+
+	&:hover {
+		background: var(--surface-100);
+	}
+}
+
+.paso--actual {
+	border-color: var(--blue-800);
+	box-shadow: inset 0 0 0 1px var(--blue-800);
+}
+
+.paso__titulo {
+	font-weight: 600;
+}
+
+.paso__detalle {
+	@include pagos.hint;
+}
+// #endregion

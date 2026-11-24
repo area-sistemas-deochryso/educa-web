@@ -1,0 +1,76 @@
+// Grilla de montos del paso 2. Las clases comunes (.seccion, .acciones, .ayuda, .banner, .avisos, .revision,
+// .tabla, .campo__error y el borde de `aria-invalid`) vienen de configurar-anio.component.scss.
+
+// #region Conceptos
+.conceptos-montos {
+	display: flex;
+	flex-direction: column;
+	gap: 1.25rem;
+}
+
+.concepto {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	min-width: 0;
+	margin: 0;
+	padding: 1rem 0 0;
+	border: 0;
+	border-top: 1px solid var(--surface-200);
+
+	&:first-child {
+		padding-top: 0;
+		border-top: 0;
+	}
+}
+
+.concepto__nombre {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0;
+	font-size: 0.9375rem;
+	font-weight: 600;
+}
+
+.concepto__resultado {
+	margin: 0;
+	font-size: 0.875rem;
+	font-weight: 400;
+	color: var(--text-color);
+}
+// #endregion
+
+// #region Celdas: 4 columnas en escritorio, 2×2 en el celular
+// A 360 px la tarjeta deja ~282 px de contenido: dos columnas de 8rem más el espacio entre ellas (272 px) entran; con
+// 8.5rem (288 px) la grilla caería a una sola columna.
+.concepto__celdas {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+	gap: 0.75rem 1rem;
+}
+
+.celda-monto {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	min-width: 0;
+	font-size: 0.8125rem;
+	font-weight: 600;
+
+	input {
+		text-align: right;
+		font-variant-numeric: tabular-nums;
+	}
+
+	small {
+		font-weight: 400;
+		color: var(--text-color-secondary);
+	}
+
+	// `.celda-monto small` es más específica que `.campo__error`: sin esto el error quedaría gris.
+	small.campo__error {
+		color: var(--tint-danger-text);
+	}
+}
+// #endregion

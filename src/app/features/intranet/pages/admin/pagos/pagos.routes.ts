@@ -1,5 +1,7 @@
 import { Routes } from '@angular/router';
 
+import { pendingChangesGuard } from '@core/guards';
+
 /**
  * Rutas hijas del shell de Pagos (`PagosShellComponent`). Heredan la autorización de
  * `PAGOS_API_MANAGE` vía `permissionPath` declarado en el padre (`intranet.routes.ts`) — ver
@@ -37,6 +39,8 @@ export default [
 		path: 'configurar-anio',
 		loadComponent: () =>
 			import('./configurar-anio/configurar-anio.component').then((m) => m.ConfigurarAnioComponent),
+		// Con cambios sin guardar en parámetros, montos o cronograma, salir de la pestaña o del módulo pregunta antes.
+		canDeactivate: [pendingChangesGuard],
 		title: 'Intranet - Pagos: Configurar año',
 	},
 	{
