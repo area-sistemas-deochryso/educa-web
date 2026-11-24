@@ -1,0 +1,172 @@
+<section class="consistencia" aria-label="Consistencia entre matrícula y cobro">
+	<div class="consistencia__banner" role="note">
+		<i class="pi pi-info-circle" aria-hidden="true"></i>
+		<p>
+			@if (facade.vista() === 'sin-cargo') {
+				Alumnos matriculados en {{ facade.anio() ?? 'el año' }} que no tienen ningún cargo vigente: no se les cobró nada,
+				por eso el panel no los cuenta como «al día». Solo informa: no bloquea la matrícula ni el cobro.
+			} @else {
+				Cargos vigentes de {{ facade.anio() ?? 'el año' }} de alumnos que no tienen matrícula activa en un salón de ese
+				año (sin matrícula, retirados o matriculados solo en otro año). Solo informa: no bloquea la matrícula ni el
+				cobro.
+			}
+		</p>
+	</div>
+
+	<edu-select-button
+		class="consistencia__vista"
+		[options]="vistas"
+		optionLabel="label"
+		optionValue="value"
+		[allowEmpty]="false"
+		[ngModel]="facade.vista()"
+		(ngModelChange)="onVista($event)"
+		aria-label="Tipo de inconsistencia"
+	/>
+
+	@if (facade.cargada()) {
+		<dl class="consistencia__totales" aria-label="Totales del conjunto filtrado completo">
+			@if (facade.vista() === 'sin-cargo') {
+				<div>
+					<dt>Alumnos sin cargo</dt>
+					<dd>{{ facade.total() }}</dd>
+				</div>
+			} @else {
+				<div>
+					<dt>Alumnos</dt>
+					<dd>{{ facade.sinMatricula()?.alumnos }}</dd>
+				</div>
+				<div>
+					<dt>Cargos</dt>
+					<dd>{{ facade.sinMatricula()?.cargos }}</dd>
+				</div>
+			}
+		</dl>
+	}
+
+	<app-quienes-deben-filters
+		[buscar]="facade.buscar()"
+		[salonId]="facade.salonId()"
+		[salones]="facade.salones()"
+		[mostrarSalon]="facade.vista() === 'sin-cargo'"
+		(searchChange)="facade.onSearchInput($event)"
+		(salonChange)="facade.setSalon($event)"
+	/>
+
+	@if (facade.error()) {
+		<app-error-state message="No se pudo cargar el reporte de consistencia." (retry)="facade.reload()" />
+	} @else if (facade.loading() && !facade.cargada()) {
+		<app-table-skeleton [columns]="skeletonColumns" [rows]="8" />
+	} @else if (facade.cargada()) {
+		@if (facade.total() === 0) {
+			<p class="consistencia__vacio">
+				@if (facade.hasFilters()) {
+					Sin resultados para el filtro aplicado.
+				} @else if (facade.vista() === 'sin-cargo') {
+					Todos los matriculados tienen al menos un cargo.
+				} @else {
+					No hay cargos de alumnos sin matrícula.
+				}
+			</p>
+		} @else {
+			<div class="consistencia__tabla" [class.consistencia__tabla--loading]="facade.loading()" [attr.aria-busy]="facade.loading()">
+				<div class="consistencia__wrap">
+					@if (facade.vista() === 'sin-cargo') {
+						<table class="tabla">
+							<caption>Matriculados sin ningún cargo del año</caption>
+							<thead>
+								<tr>
+									<th scope="col">Alumno</th>
+									<th scope="col">Salón</th>
+									<th scope="col"><span class="sr-only">Acciones</span></th>
+								</tr>
+							</thead>
+							<tbody>
+								@for (fila of facade.filasSinCargo(); track fila.estudianteId) {
+									<tr>
+										<td>
+											<span class="alumno">
+												<edu-avatar [label]="iniciales(fila.estudiante)" shape="circle" aria-hidden="true" />
+												{{ fila.estudiante }}
+											</span>
+										</td>
+										<td>{{ fila.salon }}</td>
+										<td class="acciones">
+											<a
+												class="ver"
+												[routerLink]="['/intranet/admin/pagos/estado-cuenta', fila.estudianteId]"
+												[attr.aria-label]="'Ver el estado de cuenta de ' + fila.estudiante"
+											>
+												<i class="pi pi-eye" aria-hidden="true"></i>
+												Estado de cuenta
+											</a>
+										</td>
+									</tr>
+								}
+							</tbody>
+						</table>
+					} @else {
+						<table class="tabla">
+							<caption>Alumnos con cargos pero sin matrícula activa</caption>
+							<thead>
+								<tr>
+									<th scope="col">Alumno</th>
+									<th scope="col" class="num">Cargos</th>
+									<th scope="col">Detalle</th>
+									<th scope="col"><span class="sr-only">Acciones</span></th>
+								</tr>
+							</thead>
+							<tbody>
+								@for (fila of facade.filasSinMatricula(); track fila.estudianteId) {
+									<tr>
+										<td>
+											<span class="alumno">
+												<edu-avatar [label]="iniciales(fila.estudiante)" shape="circle" aria-hidden="true" />
+												{{ fila.estudiante }}
+											</span>
+										</td>
+										<td class="num">{{ fila.cargos }}</td>
+										<td>
+											<ul class="detalle">
+												@for (cargo of fila.detalle; track cargo.cargoId) {
+													<li>
+														{{ cargo.concepto }}@if (cargo.cuota) {
+															· {{ cargo.cuota }}
+														}
+														· base {{ soles(cargo.montoBase) }}
+														@if (!cargo.datoConfirmado) {
+															· sin dato
+														}
+													</li>
+												}
+											</ul>
+										</td>
+										<td class="acciones">
+											<a
+												class="ver"
+												[routerLink]="['/intranet/admin/pagos/estado-cuenta', fila.estudianteId]"
+												[attr.aria-label]="'Ver el estado de cuenta de ' + fila.estudiante"
+											>
+												<i class="pi pi-eye" aria-hidden="true"></i>
+												Estado de cuenta
+											</a>
+										</td>
+									</tr>
+								}
+							</tbody>
+						</table>
+					}
+				</div>
+				<edu-paginator
+					[rows]="facade.pageSize()"
+					[first]="facade.first()"
+					[totalRecords]="facade.total()"
+					[rowsPerPageOptions]="[10, 20, 50, 100]"
+					[showCurrentPageReport]="true"
+					currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} alumnos"
+					(onPageChange)="onPage($event)"
+				/>
+			</div>
+		}
+	}
+</section>

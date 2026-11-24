@@ -5,7 +5,7 @@ import { pendingChangesGuard } from '@core/guards';
 /**
  * Rutas hijas del shell de Pagos (`PagosShellComponent`). Heredan la autorización de
  * `PAGOS_API_MANAGE` vía `permissionPath` declarado en el padre (`intranet.routes.ts`) — ver
- * `.claude/reference/route-permission-sharing.md`. F5b (registrar pago), F5c (estado de cuenta, sin dato) y F6b (configurar año) y F6c (importar) suman hijas acá; el estado de cuenta tiene dos rutas (landing con buscador y `:estudianteId`).
+ * `.claude/reference/route-permission-sharing.md`. F5b (registrar pago), P123 F5 (consistencia), F5c (estado de cuenta, sin dato) y F6b (configurar año) y F6c (importar) suman hijas acá; el estado de cuenta tiene dos rutas (landing con buscador y `:estudianteId`).
  */
 export default [
 	{ path: '', redirectTo: 'panel', pathMatch: 'full' },
@@ -34,6 +34,11 @@ export default [
 		path: 'sin-dato',
 		loadComponent: () => import('./sin-dato/sin-dato.component').then((m) => m.SinDatoComponent),
 		title: 'Intranet - Pagos: Sin dato',
+	},
+	{
+		path: 'consistencia',
+		loadComponent: () => import('./consistencia/consistencia.component').then((m) => m.ConsistenciaComponent),
+		title: 'Intranet - Pagos: Consistencia',
 	},
 	{
 		path: 'configurar-anio',

@@ -45,7 +45,10 @@ export function ordenarCortes(cortes: readonly PagoCorte[]): PagoCorte[] {
 	return [...cortes].sort((a, b) => a.mes - b.mes);
 }
 
-/** Suma de las categorías exclusivas. `conDatosSinConfirmar` y `sinCargos` son transversales: no entran (INV-PG14). */
+/**
+ * Suma de las categorías exclusivas = matriculados con cargos (`matriculados − sinCargos`, xrepo-123 F4).
+ * `sinCargos` es una cifra aparte y `conDatosSinConfirmar` es transversal (INV-PG14): ninguna entra.
+ */
 export function totalExclusivo(conteos: PagosConteos): number {
 	return conteos.alDia + conteos.pagoParcial + conteos.conDeuda;
 }

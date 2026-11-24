@@ -9,7 +9,7 @@ import { EduTab, EduTabs } from '@edu-ui';
 // #endregion
 
 interface ShellTab {
-	value: 'panel' | 'registrar' | 'estado-cuenta' | 'sin-dato' | 'configurar-anio' | 'importar';
+	value: 'panel' | 'registrar' | 'estado-cuenta' | 'sin-dato' | 'consistencia' | 'configurar-anio' | 'importar';
 	label: string;
 	icon: string;
 }
@@ -19,6 +19,7 @@ const TABS: ShellTab[] = [
 	{ value: 'registrar', label: 'Registrar pago', icon: 'pi pi-plus-circle' },
 	{ value: 'estado-cuenta', label: 'Estado de cuenta', icon: 'pi pi-file' },
 	{ value: 'sin-dato', label: 'Sin dato', icon: 'pi pi-question-circle' },
+	{ value: 'consistencia', label: 'Consistencia', icon: 'pi pi-exclamation-triangle' },
 	{ value: 'configurar-anio', label: 'Configurar año', icon: 'pi pi-cog' },
 	{ value: 'importar', label: 'Importar', icon: 'pi pi-upload' },
 ];
@@ -50,6 +51,11 @@ const HEADERS: Record<ShellTab['value'], ShellHeader> = {
 		icon: 'pi pi-question-circle',
 		title: 'Sin dato',
 		subtitle: 'Cargos que el sistema no sabe si se pagaron: no cuentan como deuda',
+	},
+	consistencia: {
+		icon: 'pi pi-exclamation-triangle',
+		title: 'Consistencia',
+		subtitle: 'Matriculados que no tienen cargos y cargos de alumnos que no están matriculados',
 	},
 	'configurar-anio': {
 		icon: 'pi pi-cog',

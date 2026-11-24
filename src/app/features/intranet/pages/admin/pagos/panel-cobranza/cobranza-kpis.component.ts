@@ -18,7 +18,11 @@ const COBRANZA_BAJA = 80;
 				<div class="kpi__body">
 					<h3 class="kpi__title">Matriculados</h3>
 					<p class="kpi__value">{{ panel().matriculados }}</p>
-					<p class="kpi__hint">Año {{ panel().anio }}</p>
+					<p class="kpi__hint">
+						Año {{ panel().anio }}@if (panel().conteos.sinCargos > 0) {
+							· {{ panel().conteos.sinCargos }} sin cargos
+						}
+					</p>
 				</div>
 			</article>
 			<article class="kpi">
@@ -48,7 +52,7 @@ const COBRANZA_BAJA = 80;
 							<div class="kpi__fill" [style.width.%]="ancho(panel().porcentajeAlDia)"></div>
 						</div>
 					}
-					<p class="kpi__hint">{{ panel().conteos.alDia }} de {{ panel().matriculados }} matriculados</p>
+					<p class="kpi__hint">{{ panel().conteos.alDia }} de {{ panel().matriculados - panel().conteos.sinCargos }} matriculados con cargos</p>
 				</div>
 			</article>
 			<article class="kpi">

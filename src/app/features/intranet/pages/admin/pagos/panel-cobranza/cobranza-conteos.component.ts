@@ -1,21 +1,26 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 import type { PagosConteos } from '@data/models';
 import { totalExclusivo } from './panel-cobranza.logic';
 
 /**
- * Conteos por categoría. Al día / parcial / con deuda son exclusivos y suman el total;
- * «con datos sin confirmar» y «sin cargos» son transversales y NO suman (INV-PG14).
+ * Conteos por categoría. Al día / parcial / con deuda son exclusivos y suman los matriculados **con cargos**
+ * (`matriculados − sinCargos`). «Sin cargos» es una cifra aparte: no se cobró nada, así que no es «al día» y queda
+ * fuera de ese total (xrepo-123 F4). «Con datos sin confirmar» es transversal (INV-PG14).
  */
 @Component({
 	selector: 'app-cobranza-conteos',
 	standalone: true,
+	imports: [RouterLink],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
 		<section aria-label="Alumnos por situación de pago">
 			<h3 class="title">Alumnos por situación de pago</h3>
 			<ul class="row" aria-label="Categorías exclusivas">
-				<li class="chip chip--total" data-testid="total"><strong>{{ total() }}</strong> Total</li>
+				<li class="chip chip--total" data-testid="total"><strong>{{ total() }}</strong> Con cargos
+					<small>Matriculados con al menos un cargo del año. No incluye a los «sin cargos».</small>
+				</li>
 				<li class="chip chip--ok"><strong>{{ conteos().alDia }}</strong> Al día</li>
 				<li class="chip chip--partial">
 					<strong>{{ conteos().pagoParcial }}</strong> Pago parcial
@@ -23,7 +28,7 @@ import { totalExclusivo } from './panel-cobranza.logic';
 				</li>
 				<li class="chip chip--debt"><strong>{{ conteos().conDeuda }}</strong> Con deuda</li>
 			</ul>
-			<p class="note">Aparte, sin sumar al total (un mismo alumno puede estar en ambos):</p>
+			<p class="note">Aparte, sin sumar a los «con cargos»:</p>
 			<ul class="row" aria-label="Conteos transversales">
 				<li class="chip chip--aside" data-testid="sin-confirmar">
 					<strong>{{ conteos().conDatosSinConfirmar }}</strong> Con datos sin confirmar
@@ -31,7 +36,13 @@ import { totalExclusivo } from './panel-cobranza.logic';
 				</li>
 				<li class="chip chip--aside" data-testid="sin-cargos">
 					<strong>{{ conteos().sinCargos }}</strong> Sin cargos
-					<small>Cuentan como «al día»: sin esta cifra casi todos parecen al día antes de la carga inicial.</small>
+					<small>
+						Matriculados a quienes aún no se les generó ningún cargo del año: no se les cobró nada, por eso no
+						cuentan como «al día» ni en el porcentaje.
+					</small>
+					@if (conteos().sinCargos > 0) {
+						<a class="chip__link" routerLink="/intranet/admin/pagos/consistencia">Ver quiénes son</a>
+					}
 				</li>
 			</ul>
 		</section>
@@ -90,6 +101,10 @@ import { totalExclusivo } from './panel-cobranza.logic';
 		}
 		.chip--aside {
 			border-style: dashed;
+		}
+		.chip__link {
+			flex-basis: 100%;
+			font-size: 0.8125rem;
 		}
 		.note {
 			margin: 0.5rem 0;

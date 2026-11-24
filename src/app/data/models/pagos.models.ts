@@ -8,15 +8,20 @@ export interface PagosConteos {
 	conDeuda: number;
 	/** Transversal: no suma al total. */
 	conDatosSinConfirmar: number;
-	/** Transversal: un alumno sin cargos del año cuenta como «al día»; este conteo evita leerlo como cobranza real. */
+	/**
+	 * Matriculados sin ningún cargo vigente del año. Ya NO cuentan en `alDia` ni en el denominador del porcentaje:
+	 * `alDia + pagoParcial + conDeuda = matriculados − sinCargos` (xrepo-123 F4).
+	 */
 	sinCargos: number;
 }
 
 export interface PagosPorNivel {
 	nivel: string;
+	/** Incluye a los `sinCargos`; el porcentaje se calcula sobre `matriculados − sinCargos`. */
 	matriculados: number;
 	alDia: number;
 	porcentaje: number | null;
+	sinCargos: number;
 }
 
 export interface PagosDinero {
@@ -297,6 +302,58 @@ export interface SinDato {
 }
 
 export interface SinDatoFiltros {
+	buscar?: string;
+	salonId?: number | null;
+	page?: number;
+	pageSize?: number;
+}
+// #endregion
+
+// #region Consistencia matrícula ↔ cobro (xrepo-123 F4/F5)
+/** Matriculado activo del año sin ningún cargo vigente (`GET /api/pagos/consistencia/matriculados-sin-cargo`). */
+export interface MatriculadoSinCargoFila {
+	estudianteId: number;
+	estudiante: string;
+	salonId: number;
+	salon: string;
+}
+
+export interface MatriculadosSinCargo {
+	anio: number;
+	/** Del conjunto filtrado completo, no de la página. Coincide con `conteos.sinCargos` del panel. */
+	total: number;
+	/** Opciones del filtro de salón (antes de buscar y filtrar). */
+	salones: PagosSalonOpcion[];
+	filas: { data: MatriculadoSinCargoFila[]; total: number; page: number; pageSize: number };
+}
+
+export interface CargoSinMatriculaDetalle {
+	cargoId: number;
+	concepto: string;
+	cuota: string | null;
+	montoBase: number;
+	/** `false` = cargo «sin dato» (INV-PG14); también se lista. */
+	datoConfirmado: boolean;
+}
+
+/** Alumno con cargos vigentes del año pero sin matrícula activa en un salón de ese año. */
+export interface CargoSinMatriculaFila {
+	estudianteId: number;
+	estudiante: string;
+	cargos: number;
+	detalle: CargoSinMatriculaDetalle[];
+}
+
+export interface CargosSinMatricula {
+	anio: number;
+	alumnos: number;
+	cargos: number;
+	filas: { data: CargoSinMatriculaFila[]; total: number; page: number; pageSize: number };
+}
+
+/** Sin `anio` el servidor usa el de hoy (hora de Perú). `salonId` solo aplica a «matriculados sin cargo». */
+export interface ConsistenciaFiltros {
+	anio?: number;
 	buscar?: string;
 	salonId?: number | null;
 	page?: number;

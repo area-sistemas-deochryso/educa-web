@@ -7,7 +7,9 @@ import { environment } from '@config/environment';
 import type {
 	ConfiguracionAnio,
 	ConfirmarImportacionPayload,
+	CargosSinMatricula,
 	ConfirmarSinDatoPayload,
+	ConsistenciaFiltros,
 	EstadoCuenta,
 	EstudianteBusqueda,
 	FiltroSinDato,
@@ -16,6 +18,7 @@ import type {
 	GuardarMontosAnioPayload,
 	GuardarParametroAnioPayload,
 	ImportacionPayload,
+	MatriculadosSinCargo,
 	MiembroFamilia,
 	PagoCorte,
 	ParametroAnio,
@@ -102,6 +105,33 @@ export class PagosApiService {
 			}),
 		});
 	}
+
+	// #region Consistencia matrícula ↔ cobro (P123 F5)
+	/** Matriculados activos del año sin ningún cargo vigente. Política `reports`: el llamador aplica debounce. */
+	matriculadosSinCargo(filtros: ConsistenciaFiltros): Observable<MatriculadosSinCargo> {
+		return this.http.get<MatriculadosSinCargo>(`${this.apiUrl}/consistencia/matriculados-sin-cargo`, {
+			params: this.params({
+				anio: filtros.anio,
+				buscar: filtros.buscar?.trim(),
+				salonId: filtros.salonId,
+				page: filtros.page,
+				pageSize: filtros.pageSize,
+			}),
+		});
+	}
+
+	/** Cargos vigentes del año de alumnos sin matrícula activa, por alumno. Sin filtro de salón. */
+	cargosSinMatricula(filtros: ConsistenciaFiltros): Observable<CargosSinMatricula> {
+		return this.http.get<CargosSinMatricula>(`${this.apiUrl}/consistencia/cargos-sin-matricula`, {
+			params: this.params({
+				anio: filtros.anio,
+				buscar: filtros.buscar?.trim(),
+				page: filtros.page,
+				pageSize: filtros.pageSize,
+			}),
+		});
+	}
+	// #endregion
 
 	// #region Registrar pago
 	/** Propone el reparto entre los alumnos indicados. No persiste nada. */

@@ -25,19 +25,21 @@ const ALL_SALONES = { salonId: null, nombre: 'Todos los salones' };
 					(input)="onInput($event)"
 				/>
 			</label>
-			<div class="filters__field">
-				<span class="filters__label">Salón</span>
-				<edu-select
-					[options]="options()"
-					[ngModel]="salonId()"
-					(ngModelChange)="salonChange.emit($event)"
-					optionLabel="nombre"
-					optionValue="salonId"
-					placeholder="Todos los salones"
-					appendTo="body"
-					class="filters__select"
-				/>
-			</div>
+			@if (mostrarSalon()) {
+				<div class="filters__field">
+					<span class="filters__label">Salón</span>
+					<edu-select
+						[options]="options()"
+						[ngModel]="salonId()"
+						(ngModelChange)="salonChange.emit($event)"
+						optionLabel="nombre"
+						optionValue="salonId"
+						placeholder="Todos los salones"
+						appendTo="body"
+						class="filters__select"
+					/>
+				</div>
+			}
 		</div>
 	`,
 	styleUrl: './quienes-deben-filters.component.scss',
@@ -47,6 +49,8 @@ export class QuienesDebenFiltersComponent {
 	readonly buscar = input('');
 	readonly salonId = input<number | null>(null);
 	readonly salones = input<PagosSalonOpcion[]>([]);
+	/** Una lista sin salón (p. ej. «cargos sin matrícula») oculta el selector. */
+	readonly mostrarSalon = input(true);
 
 	readonly searchChange = output<string>();
 	readonly salonChange = output<number | null>();

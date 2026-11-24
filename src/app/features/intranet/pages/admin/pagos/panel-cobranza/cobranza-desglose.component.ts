@@ -16,7 +16,7 @@ import { formatPorcentaje, formatSoles } from '../utils/pagos-format.util';
 					<div class="bar">
 						<div class="bar__head">
 							<span>{{ n.nivel }}</span>
-							<span>{{ pct(n.porcentaje) }} ({{ n.alDia }} de {{ n.matriculados }})</span>
+							<span>{{ pct(n.porcentaje) }} ({{ n.alDia }} de {{ n.matriculados - n.sinCargos }})</span>
 						</div>
 						<div
 							class="bar__track"
@@ -28,6 +28,9 @@ import { formatPorcentaje, formatSoles } from '../utils/pagos-format.util';
 						>
 							<div class="bar__fill" [style.width.%]="ancho(n.porcentaje)"></div>
 						</div>
+						@if (n.sinCargos > 0) {
+							<p class="muted">{{ n.sinCargos }} sin cargos, fuera de este porcentaje.</p>
+						}
 					</div>
 				} @empty {
 					<p class="muted">Sin niveles para mostrar.</p>
