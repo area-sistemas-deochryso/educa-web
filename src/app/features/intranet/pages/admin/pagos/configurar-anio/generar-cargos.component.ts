@@ -9,9 +9,11 @@ import { GenerarCargosFacade } from './generar-cargos.facade';
 // #endregion
 
 /**
- * Generar los cargos del año (D2-D6): elegir conceptos → vista previa → confirmar.
+ * Paso 4 de «Configurar año»: generar los cargos del año (D2-D6): elegir conceptos → vista previa → confirmar.
  * Es una acción explícita, nunca un job: el error más caro del arranque es el cobro doble, así que una persona
  * ve cuántos cargos nacen, cuántos ya existen y cuántos se omiten (y por qué) antes de escribir.
+ * La pantalla decide cuándo no se puede generar (`bloqueo`: cargando, sin parámetros o con cambios sin guardar, porque
+ * los cargos copian lo guardado) y qué se omitirá (`avisos`: montos o cronograma incompletos).
  */
 @Component({
 	selector: 'app-generar-cargos',
@@ -19,11 +21,22 @@ import { GenerarCargosFacade } from './generar-cargos.facade';
 	imports: [FormsModule, EduAutoComplete, EduButton, EduCheckbox, EduMessage, EduTemplate],
 	template: `
 		<section class="seccion" aria-labelledby="generar-title">
-			<h3 id="generar-title" class="seccion__title">2. Generar cargos del año {{ anio() }}</h3>
+			<h3 id="generar-title" class="seccion__title" tabindex="-1">4. Generar cargos del año {{ anio() }}</h3>
 			<p class="seccion__nota">
 				Crea los cargos de matrícula, inscripción y pensión de los alumnos matriculados. Es seguro repetirlo: lo que ya existe no se duplica. Los útiles todavía no se
 				generan.
 			</p>
+			@if (bloqueo(); as motivo) {
+				<p class="ayuda" data-testid="motivo-bloqueo">
+					<i class="pi pi-lock" aria-hidden="true"></i> {{ motivo }}
+				</p>
+			} @else if (avisos().length > 0) {
+				<ul class="avisos" data-testid="avisos-generacion" aria-label="Avisos antes de generar">
+					@for (aviso of avisos(); track aviso) {
+						<li>{{ aviso }}</li>
+					}
+				</ul>
+			}
 
 			<fieldset class="conceptos">
 				<legend>Conceptos a generar</legend>
@@ -74,7 +87,7 @@ import { GenerarCargosFacade } from './generar-cargos.facade';
 										icon="pi pi-times"
 										severity="secondary"
 										[text]="true"
-										[attr.aria-label]="'Quitar a ' + alumno.nombreCompleto"
+										[pt]="{ root: { 'aria-label': 'Quitar a ' + alumno.nombreCompleto } }"
 										[disabled]="facade.generando()"
 										(click)="quitarAlumno(alumno.estudianteId)"
 									/>
@@ -122,25 +135,27 @@ import { GenerarCargosFacade } from './generar-cargos.facade';
 					</dl>
 
 					@if (vp.porConcepto.length > 0) {
-						<table class="tabla">
-							<caption class="sr-only">Cargos por concepto</caption>
-							<thead>
-								<tr>
-									<th scope="col">Concepto</th>
-									<th scope="col" class="num">A crear</th>
-									<th scope="col" class="num">Ya existen</th>
-								</tr>
-							</thead>
-							<tbody>
-								@for (fila of vp.porConcepto; track fila.concepto) {
+						<div class="tabla-scroll">
+							<table class="tabla">
+								<caption class="sr-only">Cargos por concepto</caption>
+								<thead>
 									<tr>
-										<td>{{ etiqueta(fila.concepto) }}</td>
-										<td class="num">{{ fila.aCrear }}</td>
-										<td class="num">{{ fila.yaExisten }}</td>
+										<th scope="col">Concepto</th>
+										<th scope="col" class="num">A crear</th>
+										<th scope="col" class="num">Ya existen</th>
 									</tr>
-								}
-							</tbody>
-						</table>
+								</thead>
+								<tbody>
+									@for (fila of vp.porConcepto; track fila.concepto) {
+										<tr>
+											<td>{{ etiqueta(fila.concepto) }}</td>
+											<td class="num">{{ fila.aCrear }}</td>
+											<td class="num">{{ fila.yaExisten }}</td>
+										</tr>
+									}
+								</tbody>
+							</table>
+						</div>
 					}
 
 					@if (vp.omitidos.length > 0) {
@@ -162,7 +177,7 @@ import { GenerarCargosFacade } from './generar-cargos.facade';
 								[label]="'Generar ' + cantidad(vp.aCrear)"
 								icon="pi pi-check"
 								[loading]="facade.generando()"
-								[disabled]="facade.generando() || facade.calculando()"
+								[disabled]="facade.generando() || facade.calculando() || bloqueo() !== null"
 								(click)="facade.generar()"
 							/>
 						</div>
@@ -183,6 +198,10 @@ import { GenerarCargosFacade } from './generar-cargos.facade';
 })
 export class GenerarCargosComponent {
 	readonly anio = input.required<number>();
+	/** Por qué no se puede generar todavía (lo decide la pantalla); `null` = se puede. */
+	readonly bloqueo = input<string | null>(null);
+	/** Lo que se omitirá al generar, sin impedirlo. */
+	readonly avisos = input<readonly string[]>([]);
 	protected readonly facade = inject(GenerarCargosFacade);
 
 	protected readonly conceptos = CONCEPTOS;
@@ -195,13 +214,18 @@ export class GenerarCargosComponent {
 	protected readonly busqueda = signal<EstudianteBusqueda | string | null>(null);
 
 	protected readonly puedeCalcular = computed(
-		() => this.seleccion().length > 0 && !this.facade.calculando() && !this.facade.generando(),
+		() =>
+			this.bloqueo() === null &&
+			this.seleccion().length > 0 &&
+			!this.facade.calculando() &&
+			!this.facade.generando(),
 	);
 
 	constructor() {
-		// Cambiar de año deja sin efecto lo calculado: el conteo era de otro año.
+		// Cambiar de año o quedar bloqueado deja sin efecto lo calculado.
 		effect(() => {
 			this.anio();
+			this.bloqueo();
 			untracked(() => this.facade.invalidar());
 		});
 	}

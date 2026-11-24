@@ -1,16 +1,19 @@
 // #region Imports
-import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams, HttpResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 
 import { environment } from '@config/environment';
 import type {
+	ConfiguracionAnio,
 	ConfirmarImportacionPayload,
 	ConfirmarSinDatoPayload,
 	EstadoCuenta,
 	EstudianteBusqueda,
 	FiltroSinDato,
 	GenerarCargosPayload,
+	GuardarCronogramaAnioPayload,
+	GuardarMontosAnioPayload,
 	GuardarParametroAnioPayload,
 	ImportacionPayload,
 	MiembroFamilia,
@@ -39,8 +42,15 @@ export interface PagosArchivo {
 }
 
 /**
+ * Las pantallas de «Configurar año» muestran el error en línea por `errorCode`; el toast global repetiría el texto
+ * crudo del servidor. Los 5xx y los status 0 se siguen reportando.
+ */
+const SIN_TOAST = { headers: new HttpHeaders({ 'X-Skip-Error-Toast': 'true' }) };
+
+/**
  * Cliente de `/api/pagos` (reportes de cobranza). Las respuestas `ApiResponse<T>` las desenvuelve el interceptor.
  * Los reportes llevan la política de rate limiting `reports`: quien llama debe aplicar debounce y no reintentar 4xx/429.
+ * Pagos no se cachea en el SW (INV-WAL-RES11): cada GET va a la red, también la relectura después de un `409`.
  */
 @Injectable({ providedIn: 'root' })
 export class PagosApiService {
@@ -137,12 +147,12 @@ export class PagosApiService {
 	// #region Carga inicial (F6a)
 	/** Parámetros del año. `404 PAGO_PARAMETRO_ANIO_INEXISTENTE` si todavía no existen. */
 	parametrosAnio(anio: number): Observable<ParametroAnio> {
-		return this.http.get<ParametroAnio>(`${this.apiUrl}/parametros/${anio}`);
+		return this.http.get<ParametroAnio>(`${this.apiUrl}/parametros/${anio}`, SIN_TOAST);
 	}
 
 	/** Crea o edita los parámetros del año; `rowVersion` nulo solo al crear. */
 	guardarParametrosAnio(payload: GuardarParametroAnioPayload): Observable<ParametroAnio> {
-		return this.http.put<ParametroAnio>(`${this.apiUrl}/parametros`, payload);
+		return this.http.put<ParametroAnio>(`${this.apiUrl}/parametros`, payload, SIN_TOAST);
 	}
 
 	/** Cuántos cargos nacerían y cuántos se omiten. No escribe. */
@@ -162,6 +172,23 @@ export class PagosApiService {
 	/** Confirma en bloque lo «sin dato». `cargosEsperados` es el conteo de la vista previa; si ya no coincide, `409`. */
 	confirmarSinDato(payload: ConfirmarSinDatoPayload): Observable<ResultadoConfirmacion> {
 		return this.http.post<ResultadoConfirmacion>(`${this.apiUrl}/cargos/sin-dato/confirmar`, payload);
+	}
+	// #endregion
+
+	// #region Configuración del año (P123 F2)
+	/** Conceptos activos con sus montos y el cronograma del año. Un año sin datos responde vacío, no `404`. */
+	configuracionAnio(anio: number): Observable<ConfiguracionAnio> {
+		return this.http.get<ConfiguracionAnio>(`${this.apiUrl}/configuracion/${anio}`, SIN_TOAST);
+	}
+
+	/** Upsert de los montos enviados (no borra; todo o nada, INV-PG06). `rowVersion` nulo solo al crear (INV-S05). */
+	guardarMontosAnio(payload: GuardarMontosAnioPayload): Observable<ConfiguracionAnio> {
+		return this.http.put<ConfiguracionAnio>(`${this.apiUrl}/configuracion/montos`, payload, SIN_TOAST);
+	}
+
+	/** Reemplaza las 10 cuotas del año (todo o nada, INV-PG05). */
+	guardarCronogramaAnio(payload: GuardarCronogramaAnioPayload): Observable<ConfiguracionAnio> {
+		return this.http.put<ConfiguracionAnio>(`${this.apiUrl}/configuracion/cronograma`, payload, SIN_TOAST);
 	}
 	// #endregion
 

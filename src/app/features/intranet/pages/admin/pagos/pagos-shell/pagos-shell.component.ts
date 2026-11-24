@@ -1,5 +1,5 @@
 // #region Imports
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, linkedSignal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter, map } from 'rxjs/operators';
@@ -54,7 +54,7 @@ const HEADERS: Record<ShellTab['value'], ShellHeader> = {
 	'configurar-anio': {
 		icon: 'pi pi-cog',
 		title: 'Configurar año',
-		subtitle: 'Parámetros de cobranza del año y generación de sus cargos',
+		subtitle: 'Parámetros, montos y cronograma del año, y la generación de sus cargos',
 	},
 	importar: {
 		icon: 'pi pi-upload',
@@ -88,7 +88,8 @@ export class PagosShellComponent {
 
 	readonly tabs = TABS;
 
-	readonly activeTab = toSignal(
+	/** La pestaña de la ruta vigente: cambia solo cuando una navegación termina. */
+	private readonly routeTab = toSignal(
 		this.router.events.pipe(
 			filter((e) => e instanceof NavigationEnd),
 			map(() => this.resolveActiveTab()),
@@ -96,13 +97,24 @@ export class PagosShellComponent {
 		{ initialValue: this.resolveActiveTab() },
 	);
 
+	/**
+	 * La pestaña marcada. Sigue a la ruta, pero se adelanta al elegir otra (la tira ya la marcó): así, si la navegación
+	 * se cancela («Quedarme» ante cambios sin guardar en «Configurar año»), volver a la de la ruta es un cambio que la
+	 * tira ve.
+	 */
+	readonly activeTab = linkedSignal(() => this.routeTab());
+
 	readonly header = computed(
-		() => HEADERS[this.activeTab() as ShellTab['value']] ?? HEADER_POR_DEFECTO,
+		() => HEADERS[this.routeTab() as ShellTab['value']] ?? HEADER_POR_DEFECTO,
 	);
 
 	onTabChange(value: string | number | undefined): void {
 		if (value === undefined) return;
-		void this.router.navigate([String(value)], { relativeTo: this.route });
+		const revert = () => this.activeTab.set(this.routeTab());
+		this.activeTab.set(String(value));
+		void this.router.navigate([String(value)], { relativeTo: this.route }).then((navigated) => {
+			if (!navigated) revert();
+		}, revert);
 	}
 
 	private resolveActiveTab(): string {
