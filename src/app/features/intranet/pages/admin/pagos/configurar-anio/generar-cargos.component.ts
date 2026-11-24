@@ -5,6 +5,8 @@ import { FormsModule } from '@angular/forms';
 import type { ConceptoGenerable, EstudianteBusqueda } from '@data/models';
 import { EduAutoComplete, EduButton, EduCheckbox, EduMessage, EduTemplate } from '@edu-ui';
 import { CONCEPTOS, armarPayloadGeneracion, cantidadCargos, describirOmision, etiquetaConcepto } from '../utils/carga-inicial.logic';
+import { type AlumnosSalonCambio, AlumnosSalonComponent } from './alumnos-salon.component';
+import { idsInscripcion } from './alumnos-salon.logic';
 import { GenerarCargosFacade } from './generar-cargos.facade';
 // #endregion
 
@@ -18,7 +20,7 @@ import { GenerarCargosFacade } from './generar-cargos.facade';
 @Component({
 	selector: 'app-generar-cargos',
 	standalone: true,
-	imports: [FormsModule, EduAutoComplete, EduButton, EduCheckbox, EduMessage, EduTemplate],
+	imports: [FormsModule, AlumnosSalonComponent, EduAutoComplete, EduButton, EduCheckbox, EduMessage, EduTemplate],
 	template: `
 		<section class="seccion" aria-labelledby="generar-title">
 			<h3 id="generar-title" class="seccion__title" tabindex="-1">4. Generar cargos del año {{ anio() }}</h3>
@@ -50,9 +52,18 @@ import { GenerarCargosFacade } from './generar-cargos.facade';
 				}
 			</fieldset>
 
-			@if (elegido('INSCRIPCION')) {
+			<app-alumnos-salon [anio]="anio()" [inscripcion]="elegido('INSCRIPCION')" [disabled]="facade.generando()" (cambio)="cambiarSalon($event)" />
+
+			@if (elegido('INSCRIPCION') && salonId() !== null && inscritos().length > 0) {
+				<p class="ayuda" data-testid="aviso-buscador-ignorado">
+					<i class="pi pi-info-circle" aria-hidden="true"></i> Con un salón elegido solo se inscribe a los alumnos marcados en su lista. Los {{ inscritos().length }} elegidos por buscador no se
+					inscribirán; quita el salón para usarlos.
+				</p>
+			}
+
+			@if (elegido('INSCRIPCION') && salonId() === null) {
 				<div class="inscripcion">
-					<label class="campo">
+					<label class="campo campo--auto">
 						<span>Alumnos nuevos a inscribir</span>
 						<edu-autocomplete
 							[suggestions]="facade.sugerencias()"
@@ -212,6 +223,9 @@ export class GenerarCargosComponent {
 	protected readonly seleccion = signal<ConceptoGenerable[]>(['MATRICULA', 'PENSION']);
 	protected readonly inscritos = signal<EstudianteBusqueda[]>([]);
 	protected readonly busqueda = signal<EstudianteBusqueda | string | null>(null);
+	/** Filtro por salón y alumnos marcados como nuevos en su lista (P123 F8). */
+	protected readonly salonId = signal<number | null>(null);
+	protected readonly nuevosDelSalon = signal<number[]>([]);
 
 	protected readonly puedeCalcular = computed(
 		() =>
@@ -251,13 +265,24 @@ export class GenerarCargosComponent {
 		this.facade.invalidar();
 	}
 
+	protected cambiarSalon(cambio: AlumnosSalonCambio): void {
+		this.salonId.set(cambio.salonId);
+		this.nuevosDelSalon.set(cambio.nuevos);
+		this.facade.invalidar();
+	}
+
 	protected calcular(): void {
 		if (!this.puedeCalcular()) return;
 		this.facade.calcular(
 			armarPayloadGeneracion(
 				this.anio(),
 				this.seleccion(),
-				this.inscritos().map((a) => a.estudianteId),
+				// Con salón elegido el BE ignora en silencio a los alumnos de otro salón: la lista del salón es el único camino.
+				idsInscripcion(
+					this.salonId() === null ? this.inscritos().map((a) => a.estudianteId) : [],
+					this.nuevosDelSalon(),
+				),
+				this.salonId(),
 			),
 		);
 	}

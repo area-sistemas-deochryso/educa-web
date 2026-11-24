@@ -103,6 +103,8 @@
 	[profesorCursos]="vm().profesorCursos"
 	[cursosDisponibles]="vm().cursosDisponibles"
 	[profesorCursosLoading]="vm().profesorCursosLoading"
+	[matriculaOferta]="matriculaOferta()"
+	(ofertaTerminada)="onOfertaTerminada($event)"
 	(visibleChange)="onDialogVisibleChange($event)"
 	(fieldChange)="onFormFieldChange($event)"
 	(save)="onSaveUsuario()"

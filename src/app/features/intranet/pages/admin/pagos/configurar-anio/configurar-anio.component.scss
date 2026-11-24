@@ -45,6 +45,11 @@
 	}
 }
 
+/* `.campo` trae `flex: 1 1 220px`: en una fila es el ancho mínimo, pero dentro de una columna (`.inscripcion`) pasa a ser la ALTURA y deja ~100 px de vacío. */
+.campo--auto {
+	flex: 0 0 auto;
+}
+
 .campo--anio {
 	max-width: 160px;
 	min-width: 120px;

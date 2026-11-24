@@ -70,7 +70,8 @@ export class ClassroomStudentsFacade {
 	// #endregion
 
 	// #region Comandos
-	agregar(salonId: number, estudianteId: number): void {
+	/** `onAgregado` corre solo si el BE confirmó la matrícula académica (P123 F8 ofrece ahí generar el cargo). */
+	agregar(salonId: number, estudianteId: number, onAgregado?: () => void): void {
 		this.store.setActionLoading(true);
 
 		this.api
@@ -82,6 +83,7 @@ export class ClassroomStudentsFacade {
 					this.store.clearDisponibles();
 					this.store.setActionLoading(false);
 					this.cargarEstudiantes(salonId);
+					onAgregado?.();
 				},
 				error: (err) => {
 					logger.error('Error al agregar estudiante al salón:', err);

@@ -17,6 +17,7 @@ import {
 } from '../models';
 import { UsersService } from './usuarios.service';
 import { UsersStore } from './usuarios.store';
+import { UsersMatriculaOfertaService } from './usuarios-matricula-oferta.service';
 import { UsersDataFacade } from './usuarios-data.facade';
 import { buildCrearUsuarioPayload, buildActualizarUsuarioPayload } from './usuarios-payload.builder';
 import {
@@ -40,6 +41,7 @@ export class UsersCrudFacade {
 	private dataFacade = inject(UsersDataFacade);
 	private errorHandler = inject(ErrorHandlerService);
 	private wal = inject(WalFacadeHelper);
+	private matriculaOferta = inject(UsersMatriculaOfertaService);
 	private destroyRef = inject(DestroyRef);
 	private debug = inject(DebugService);
 	private log = this.debug.dbg('FACADE:UsuariosCrud');
@@ -209,6 +211,10 @@ export class UsersCrudFacade {
 		}
 
 		const endpoint = `${this.apiUrl}/crear`;
+		// P123 F8: un Estudiante con salón recibe un paso 2 («Generar matrícula e inscripción») que necesita al alumno ya
+		// creado: ahí se espera al BE (sin cierre optimista) y el diálogo sigue abierto. El resto de las altas, como siempre.
+		const anioOferta = this.matriculaOferta.anioParaOfertar(payload);
+		if (anioOferta !== null) this.store.setLoading(true);
 
 		this.wal.execute({
 			operation: 'CREATE',
@@ -222,8 +228,10 @@ export class UsersCrudFacade {
 				this.store.incrementarEstadistica('totalUsuarios', 1);
 				this.store.incrementarEstadistica('usuariosActivos', 1);
 				this.updateRolEstadistica(payload.rol, 1);
+				if (anioOferta !== null) void this.matriculaOferta.abrir(payload.dni, anioOferta);
 			},
 			onError: (err) => {
+				this.store.setLoading(false);
 				const match = extractDuplicateMatch(err);
 				if (match) {
 					this._pendingDuplicate.set({
@@ -237,20 +245,16 @@ export class UsersCrudFacade {
 					return;
 				}
 				logger.error('Error:', err);
-				this.errorHandler.showError(
-					UI_SUMMARIES.error,
-					UI_ADMIN_ERROR_DETAILS.createUsuario,
-				);
-				this.store.setLoading(false);
+				this.errorHandler.showError(UI_SUMMARIES.error, UI_ADMIN_ERROR_DETAILS.createUsuario);
 			},
-			optimistic: {
-				apply: () => {
-					this.store.closeDialog();
-				},
-				rollback: () => {},
-			},
+			...(anioOferta === null
+				? { optimistic: { apply: () => this.store.closeDialog(), rollback: () => {} } }
+				: { consistencyLevel: 'server-confirmed' as const }),
 		});
 	}
+
+	// #endregion
+	// #region Private Helpers (continuación)
 
 	private updateUsuario(
 		data: Partial<CrearUsuarioRequest & ActualizarUsuarioRequest>,

@@ -12,6 +12,7 @@ import {
 } from './services';
 import { RoleTab } from './models';
 import { UsersService } from './services/usuarios.service';
+import { UsersMatriculaOfertaService } from './services/usuarios-matricula-oferta.service';
 import { UsersHeaderComponent } from './components/usuarios-header/usuarios-header.component';
 import { UsersStatsComponent } from './components/usuarios-stats/usuarios-stats.component';
 import { UsersStatsSkeletonComponent } from './components/usuarios-stats-skeleton/usuarios-stats-skeleton.component';
@@ -44,6 +45,7 @@ import { logger } from '@core/helpers';
 import { ErrorStateComponent } from '@shared/components';
 import { ExcelService, UserPermissionsService } from '@core/services';
 import type { ImportarEstudianteItem } from './services';
+import type { MatriculaOfertaResultado } from '@features/intranet/pages/admin/pagos/matricula-oferta';
 import { validarUsuarios } from './usuarios-validation.helpers';
 import {
 	AutoOpenTarget,
@@ -69,6 +71,9 @@ const USUARIOS_MIGRAR_CONTRASENAS_MANAGE = 'USUARIOS_MIGRAR_CONTRASENAS_MANAGE';
 export class UsersComponent implements AfterViewInit {
 	protected dataFacade = inject(UsersDataFacade);
 	private crudFacade = inject(UsersCrudFacade);
+	private matriculaOfertaService = inject(UsersMatriculaOfertaService);
+	/** Paso 2 del alta de un estudiante (P123 F8). */
+	protected readonly matriculaOferta = this.matriculaOfertaService.oferta;
 	private uiFacade = inject(UsersUiFacade);
 	private confirmationService = inject(EduConfirmationService);
 	private usuariosApi = inject(UsersService);
@@ -265,6 +270,10 @@ export class UsersComponent implements AfterViewInit {
 
 	onSaveUsuario(): void {
 		this.crudFacade.saveUsuario();
+	}
+
+	onOfertaTerminada(resultado: MatriculaOfertaResultado): void {
+		this.matriculaOfertaService.terminar(resultado);
 	}
 
 	onImportar(filas: ImportarEstudianteItem[]): void {

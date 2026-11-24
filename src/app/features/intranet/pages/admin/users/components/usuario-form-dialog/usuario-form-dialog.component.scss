@@ -403,6 +403,17 @@
 // #endregion
 
 // #region Footer
+.paso-matricula {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.paso-matricula__ok {
+	margin: 0;
+	color: var(--green-700, #15803d);
+}
+
 .dialog-footer {
 	display: flex;
 	justify-content: flex-end;

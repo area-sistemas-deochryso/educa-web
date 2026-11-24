@@ -108,12 +108,13 @@ export function armarPayloadGeneracion(
 	anio: number,
 	conceptos: readonly ConceptoGenerable[],
 	inscripcionEstudianteIds: readonly number[],
+	salonId: number | null = null,
 ): GenerarCargosPayload {
 	const incluyeInscripcion = conceptos.includes('INSCRIPCION');
 	return {
 		anio,
 		conceptos: [...conceptos],
-		salonId: null,
+		salonId,
 		inscripcionEstudianteIds: incluyeInscripcion && inscripcionEstudianteIds.length > 0 ? [...inscripcionEstudianteIds] : null,
 	};
 }
@@ -122,12 +123,19 @@ const MOTIVOS_OMISION: Readonly<Record<CargoOmitido['motivo'], string>> = {
 	SIN_CRONOGRAMA: 'Sin cronograma del año: no hay cuotas de pensión que generar.',
 	SIN_MONTO: 'Sin monto definido para el año y nivel.',
 	INSCRIPCION_ALUMNO_NO_MATRICULADO: 'Alumno elegido para inscripción sin matrícula en el año.',
+	SIN_PARAMETROS: 'El año todavía no tiene parámetros de cobranza.',
+	ALUMNO_NO_MATRICULADO: 'El alumno no tiene matrícula activa en un salón de este año.',
 };
 
-export function describirOmision(o: Pick<CargoOmitido, 'motivo' | 'concepto' | 'cantidad'>): string {
+/** El motivo sin la cantidad: para el aviso de un solo alumno, donde «(1)» no aporta. */
+export function describirMotivoOmision(o: Pick<CargoOmitido, 'motivo' | 'concepto'>): string {
 	const motivo = MOTIVOS_OMISION[o.motivo] ?? o.motivo;
 	const concepto = o.concepto ? `${etiquetaConcepto(o.concepto)}: ` : '';
-	return `${concepto}${motivo} (${o.cantidad})`;
+	return `${concepto}${motivo}`;
+}
+
+export function describirOmision(o: Pick<CargoOmitido, 'motivo' | 'concepto' | 'cantidad'>): string {
+	return `${describirMotivoOmision(o)} (${o.cantidad})`;
 }
 // #endregion
 
@@ -211,6 +219,7 @@ const MENSAJES_POR_CODIGO: Readonly<Record<string, string>> = {
 	PAGO_PARAMETRO_ANIO_INEXISTENTE: 'Ese año todavía no tiene parámetros de cobranza. Guárdalos primero.',
 	CARGO_GENERACION_CONCEPTO_INVALIDO: 'Alguno de los conceptos elegidos no se puede generar.',
 	CARGO_GENERACION_UTILES_NO_DISPONIBLE: 'Los cargos de útiles todavía no se generan.',
+	CARGO_GENERACION_ALUMNO_NO_MATRICULADO: 'El alumno no tiene matrícula activa en un salón de este año, así que no se le pueden generar cargos.',
 	CARGO_GENERACION_VISTA_PREVIA_DESACTUALIZADA: 'Los datos cambiaron desde la vista previa. Se recalculó: revisa los números y confirma de nuevo.',
 	CARGO_CONFIRMACION_DESENLACE_INVALIDO: 'Elige si los cargos quedan como «Debe» o «Saldado antes del arranque».',
 	CARGO_CONFIRMACION_SIN_FILTRO: 'Elige al menos un filtro además del año (salón, concepto o cuotas).',

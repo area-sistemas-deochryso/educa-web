@@ -13,12 +13,14 @@ import type {
 	EstadoCuenta,
 	EstudianteBusqueda,
 	FiltroSinDato,
+	GenerarCargosAlumnoPayload,
 	GenerarCargosPayload,
 	GuardarCronogramaAnioPayload,
 	GuardarMontosAnioPayload,
 	GuardarParametroAnioPayload,
 	ImportacionPayload,
 	MatriculadosSinCargo,
+	MatriculaSinCargo,
 	MiembroFamilia,
 	PagoCorte,
 	ParametroAnio,
@@ -193,6 +195,24 @@ export class PagosApiService {
 	/** Genera los cargos (idempotente). `crearEsperados` es el `aCrear` de la vista previa; si ya no coincide, `409`. */
 	generarCargos(payload: GenerarCargosPayload, crearEsperados: number): Observable<ResultadoGeneracion> {
 		return this.http.post<ResultadoGeneracion>(`${this.apiUrl}/cargos/generar`, { ...payload, crearEsperados });
+	}
+
+	/** Cargos de un alumno concreto al matricularlo (P123 F7). No escribe; responde el motivo en `omitidos[]` en vez de lanzar. */
+	vistaPreviaGeneracionAlumno(payload: GenerarCargosAlumnoPayload): Observable<VistaPreviaGeneracion> {
+		return this.http.post<VistaPreviaGeneracion>(`${this.apiUrl}/cargos/generar/alumno/vista-previa`, payload, SIN_TOAST);
+	}
+
+	/** Genera matrícula (e inscripción si es nuevo) de un alumno. Idempotente: repetir da `creados: 0`. */
+	generarCargosAlumno(payload: GenerarCargosAlumnoPayload, crearEsperados: number): Observable<ResultadoGeneracion> {
+		return this.http.post<ResultadoGeneracion>(`${this.apiUrl}/cargos/generar/alumno`, { ...payload, crearEsperados }, SIN_TOAST);
+	}
+
+	/** Aviso suave: ¿matriculado en un salón del año sin cargo de matrícula? Sin `anio`, el de hoy. */
+	matriculaSinCargo(estudianteId: number, anio?: number | null): Observable<MatriculaSinCargo> {
+		return this.http.get<MatriculaSinCargo>(`${this.apiUrl}/estudiantes/${estudianteId}/matricula-sin-cargo`, {
+			...SIN_TOAST,
+			params: this.params({ anio }),
+		});
 	}
 
 	vistaPreviaConfirmacion(filtro: FiltroSinDato): Observable<VistaPreviaConfirmacion> {

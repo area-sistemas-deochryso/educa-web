@@ -33,13 +33,35 @@ export interface GenerarCargosPayload {
 	inscripcionEstudianteIds: number[] | null;
 }
 
+/** Cuerpo de `POST /api/pagos/cargos/generar/alumno[/vista-previa]` (P123 F7): matrícula y, si `esNuevo`, inscripción. Nunca pensión. */
+export interface GenerarCargosAlumnoPayload {
+	anio: number;
+	estudianteId: number;
+	esNuevo: boolean;
+}
+
+/** `GET /api/pagos/estudiantes/{id}/matricula-sin-cargo`: aviso suave, nunca bloquea (P123 F7). */
+export interface MatriculaSinCargo {
+	anio: number;
+	estudianteId: number;
+	matriculado: boolean;
+	tieneCargoMatricula: boolean;
+	sinCargoMatricula: boolean;
+}
+
 export interface ConteoConcepto {
 	concepto: string;
 	aCrear: number;
 	yaExisten: number;
 }
 
-export type MotivoOmision = 'SIN_CRONOGRAMA' | 'SIN_MONTO' | 'INSCRIPCION_ALUMNO_NO_MATRICULADO';
+export type MotivoOmision =
+	| 'SIN_CRONOGRAMA'
+	| 'SIN_MONTO'
+	| 'INSCRIPCION_ALUMNO_NO_MATRICULADO'
+	// Generación por alumno (P123 F7): la vista previa no lanza, explica por qué no hay nada que crear.
+	| 'SIN_PARAMETROS'
+	| 'ALUMNO_NO_MATRICULADO';
 
 export interface CargoOmitido {
 	motivo: MotivoOmision;

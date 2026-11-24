@@ -3,6 +3,8 @@ import { of } from 'rxjs';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { ConceptoGenerable, EstudianteBusqueda, VistaPreviaGeneracion } from '@data/models';
+import { ClassroomsAdminApiService } from '@features/intranet/pages/admin/classrooms/services';
+import { SalonEstudiantesApiService } from '@features/intranet/pages/admin/classrooms/services/salon-estudiantes-api.service';
 import { PagosApiService } from '../services/pagos-api.service';
 import { GenerarCargosComponent } from './generar-cargos.component';
 import { GenerarCargosFacade } from './generar-cargos.facade';
@@ -21,6 +23,8 @@ const vistaPrevia: VistaPreviaGeneracion = {
 interface Handlers {
 	alternar(concepto: ConceptoGenerable, marcado: boolean): void;
 	agregarAlumno(alumno: EstudianteBusqueda): void;
+	cambiarSalon(cambio: { salonId: number | null; nuevos: number[] }): void;
+	calcular(): void;
 }
 
 function crear(api: Record<string, unknown> = {}) {
@@ -28,6 +32,9 @@ function crear(api: Record<string, unknown> = {}) {
 	TestBed.configureTestingModule({
 		imports: [GenerarCargosComponent],
 		providers: [
+			// El filtro por salón (P123 F8) lee de classrooms: sin esto la prueba dispararía HTTP real.
+			{ provide: ClassroomsAdminApiService, useValue: { getSalonesAdmin: () => of([]) } },
+			{ provide: SalonEstudiantesApiService, useValue: { listarPorSalon: () => of([]) } },
 			GenerarCargosFacade,
 			{
 				provide: PagosApiService,
@@ -110,6 +117,90 @@ describe('GenerarCargosComponent — bloqueo y avisos', () => {
 		expect(elemento.querySelector('.vista-previa')).not.toBeNull();
 
 		fixture.componentRef.setInput('bloqueo', 'Tienes cambios sin guardar en los montos.');
+		fixture.detectChanges();
+
+		expect(elemento.querySelector('.vista-previa')).toBeNull();
+	});
+});
+
+describe('GenerarCargosComponent — filtro por salón (P123 F8)', () => {
+	it('con salón elegido viaja su id y solo se inscribe a los marcados en su lista, no a los del buscador', () => {
+		const { fixture, vistaPreviaGeneracion } = crear();
+		const handlers = fixture.componentInstance as unknown as Handlers;
+		handlers.alternar('INSCRIPCION', true);
+		handlers.agregarAlumno({ estudianteId: 6, nombreCompleto: 'Ana Pérez', salon: null });
+
+		handlers.cambiarSalon({ salonId: 9, nuevos: [5, 7] });
+		handlers.calcular();
+
+		expect(vistaPreviaGeneracion).toHaveBeenCalledWith({
+			anio: 2027,
+			conceptos: ['MATRICULA', 'PENSION', 'INSCRIPCION'],
+			salonId: 9,
+			inscripcionEstudianteIds: [5, 7],
+		});
+	});
+
+	it('sin salón, los alumnos del buscador sí viajan; al elegir salón dejan de viajar y vuelven al quitarlo', () => {
+		const { fixture, vistaPreviaGeneracion } = crear();
+		const handlers = fixture.componentInstance as unknown as Handlers;
+		handlers.alternar('INSCRIPCION', true);
+		handlers.agregarAlumno({ estudianteId: 6, nombreCompleto: 'Ana Pérez', salon: null });
+
+		handlers.calcular();
+		expect(vistaPreviaGeneracion).toHaveBeenLastCalledWith(expect.objectContaining({ salonId: null, inscripcionEstudianteIds: [6] }));
+
+		handlers.cambiarSalon({ salonId: 9, nuevos: [] });
+		handlers.calcular();
+		expect(vistaPreviaGeneracion).toHaveBeenLastCalledWith(expect.objectContaining({ salonId: 9, inscripcionEstudianteIds: null }));
+
+		handlers.cambiarSalon({ salonId: null, nuevos: [] });
+		handlers.calcular();
+		expect(vistaPreviaGeneracion).toHaveBeenLastCalledWith(expect.objectContaining({ salonId: null, inscripcionEstudianteIds: [6] }));
+	});
+
+	it('el buscador de alumnos nuevos solo se ve sin salón elegido; con salón y alumnos ya elegidos se avisa que no se inscribirán', () => {
+		const { fixture, elemento } = crear();
+		const handlers = fixture.componentInstance as unknown as Handlers;
+		handlers.alternar('INSCRIPCION', true);
+		handlers.agregarAlumno({ estudianteId: 6, nombreCompleto: 'Ana Pérez', salon: null });
+		fixture.detectChanges();
+		expect(elemento.querySelector('edu-autocomplete')).not.toBeNull();
+		expect(elemento.querySelector('[data-testid="aviso-buscador-ignorado"]')).toBeNull();
+
+		handlers.cambiarSalon({ salonId: 9, nuevos: [] });
+		fixture.detectChanges();
+
+		expect(elemento.querySelector('edu-autocomplete')).toBeNull();
+		expect(elemento.querySelector('[data-testid="aviso-buscador-ignorado"]')?.textContent).toContain('no se');
+	});
+
+	// jsdom no calcula CSS: esto solo fija la clase (ver alumnos-salon.component.spec.ts).
+	it('el campo del buscador de alumnos nuevos usa `campo--auto` para no estirarse en altura', () => {
+		const { fixture, elemento } = crear();
+		(fixture.componentInstance as unknown as Handlers).alternar('INSCRIPCION', true);
+		fixture.detectChanges();
+
+		expect(elemento.querySelector('.inscripcion label.campo')?.classList.contains('campo--auto')).toBe(true);
+	});
+
+	it('sin salón elegido el payload sigue siendo de todo el año', () => {
+		const { fixture, vistaPreviaGeneracion } = crear();
+		const handlers = fixture.componentInstance as unknown as Handlers;
+
+		handlers.calcular();
+
+		expect(vistaPreviaGeneracion).toHaveBeenCalledWith(expect.objectContaining({ salonId: null, inscripcionEstudianteIds: null }));
+	});
+
+	it('cambiar de salón deja sin efecto la vista previa ya calculada', () => {
+		const { fixture, elemento } = crear();
+		const handlers = fixture.componentInstance as unknown as Handlers;
+		clic(elemento, SELECTOR_CALCULAR);
+		fixture.detectChanges();
+		expect(elemento.querySelector('.vista-previa')).not.toBeNull();
+
+		handlers.cambiarSalon({ salonId: 9, nuevos: [] });
 		fixture.detectChanges();
 
 		expect(elemento.querySelector('.vista-previa')).toBeNull();

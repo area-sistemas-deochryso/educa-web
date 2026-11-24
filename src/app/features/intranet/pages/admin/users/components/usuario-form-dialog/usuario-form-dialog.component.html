@@ -9,6 +9,18 @@
 	[resizable]="false"
 	class="edit-usuario-dialog"
 >
+	@if (matriculaOferta(); as oferta) {
+		<!-- Paso 2 del alta de un estudiante (P123 F8): el alumno ya existe; se ofrece generar su matrícula e inscripción. -->
+		<div class="paso-matricula">
+			<p class="paso-matricula__ok"><i class="pi pi-check-circle" aria-hidden="true"></i> Estudiante creado: <strong>{{ oferta.nombre }}</strong></p>
+			<app-matricula-oferta
+				[estudianteId]="oferta.estudianteId"
+				[anio]="oferta.anio"
+				[nombre]="oferta.nombre"
+				(terminado)="ofertaTerminada.emit($event)"
+			/>
+		</div>
+	} @else {
 	<edu-tabs [value]="activeFormTab()" (valueChange)="onTabChange($event)">
 		
 			<edu-tab value="datos" data-info-anchor="tab-switch">
@@ -505,8 +517,10 @@
 		}
 		<!-- #endregion -->
 	</edu-tabs>
+	}
 
 	<ng-template #footer>
+		@if (!matriculaOferta()) {
 		<div class="dialog-footer">
 			<edu-button
 				label="Cancelar"
@@ -526,6 +540,7 @@
 				[pt]="{ root: { 'aria-label': 'Guardar' } }"
 			/>
 		</div>
+		}
 	</ng-template>
 </edu-dialog>
 <!-- #endregion -->

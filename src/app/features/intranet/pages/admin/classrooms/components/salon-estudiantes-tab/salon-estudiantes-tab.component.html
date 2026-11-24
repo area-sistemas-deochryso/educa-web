@@ -22,6 +22,14 @@
 </div>
 <!-- #endregion -->
 
+<!-- #region Ofrecer matrícula e inscripción (P123 F8) -->
+@if (oferta(); as o) {
+	<div class="oferta-matricula">
+		<app-matricula-oferta [estudianteId]="o.estudianteId" [anio]="anio()" [nombre]="o.nombre" (terminado)="onOfertaTerminada($event)" />
+	</div>
+}
+<!-- #endregion -->
+
 @if (vm().error) {
 	<div class="error-banner">
 		<i class="pi pi-exclamation-triangle"></i>
