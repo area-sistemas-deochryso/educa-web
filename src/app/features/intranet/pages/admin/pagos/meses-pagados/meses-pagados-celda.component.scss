@@ -1,0 +1,58 @@
+// El texto siempre usa `--text-color` (contraste en claro y oscuro); el color del estado va en el borde, el icono y un tinte suave.
+.celda {
+	--celda-color: var(--surface-500);
+	display: inline-flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.125rem;
+	min-width: 4.5rem;
+	padding: 0.25rem 0.375rem;
+	border: 1px solid var(--celda-color);
+	border-radius: 8px;
+	background: color-mix(in srgb, var(--celda-color) 14%, transparent);
+	color: var(--text-color);
+	font-size: 0.75rem;
+	font-weight: 600;
+	line-height: 1.2;
+	white-space: nowrap;
+
+	i {
+		color: var(--celda-color);
+		font-size: 0.9375rem;
+	}
+
+	&__saldo {
+		font-variant-numeric: tabular-nums;
+		font-weight: 700;
+	}
+
+	&--pagado {
+		--celda-color: var(--green-500);
+	}
+
+	&--vencida {
+		--celda-color: var(--red-500);
+	}
+
+	&--en-plazo {
+		--celda-color: var(--blue-500);
+	}
+
+	&--pendiente {
+		--celda-color: var(--yellow-600, #ca8a04);
+	}
+
+	// «Sin dato» no es deuda ni pago: borde punteado para que no se confunda con ninguno.
+	&--sin-dato {
+		--celda-color: var(--purple-500);
+		border-style: dashed;
+	}
+
+	&--sin-cargo,
+	&--no-aplica {
+		--celda-color: var(--surface-400);
+		background: transparent;
+		color: var(--text-color-secondary);
+		font-weight: 500;
+	}
+}

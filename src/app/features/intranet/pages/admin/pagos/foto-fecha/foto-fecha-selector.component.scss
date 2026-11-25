@@ -1,0 +1,24 @@
+@use '../styles/pagos' as pagos;
+
+:host {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-end;
+	gap: 1rem;
+}
+
+.foto {
+	&__field {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+		font-size: 0.8125rem;
+		font-weight: 600;
+	}
+
+	&__fecha {
+		@include pagos.hint;
+		align-self: center;
+		font-size: 0.875rem;
+	}
+}

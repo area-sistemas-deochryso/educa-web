@@ -25,4 +25,5 @@ export * from './rol-lookup.token';
 export * from './user.models';
 export * from './pagos.models';
 export * from './pagos-carga-inicial.models';
+export * from './pagos-meses-pagados.models';
 export * from './pagos-importacion.models';

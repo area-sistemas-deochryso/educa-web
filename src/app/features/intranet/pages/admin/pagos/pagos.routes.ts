@@ -21,6 +21,12 @@ export default [
 		title: 'Intranet - Pagos: Registrar pago',
 	},
 	{
+		path: 'meses-pagados',
+		loadComponent: () =>
+			import('./meses-pagados/meses-pagados.component').then((m) => m.MesesPagadosComponent),
+		title: 'Intranet - Pagos: Meses pagados',
+	},
+	{
 		path: 'estado-cuenta',
 		loadComponent: () => import('./estado-cuenta/estado-cuenta.component').then((m) => m.EstadoCuentaComponent),
 		title: 'Intranet - Pagos: Estado de cuenta',

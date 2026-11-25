@@ -11,12 +11,6 @@
 	flex-wrap: wrap;
 	align-items: flex-end;
 	gap: 1rem;
-
-	&__fecha {
-		@include pagos.hint;
-		align-self: center;
-		font-size: 0.875rem;
-	}
 }
 
 .field {

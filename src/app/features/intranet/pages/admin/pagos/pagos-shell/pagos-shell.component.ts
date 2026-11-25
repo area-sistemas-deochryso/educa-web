@@ -9,7 +9,7 @@ import { EduTab, EduTabs } from '@edu-ui';
 // #endregion
 
 interface ShellTab {
-	value: 'panel' | 'registrar' | 'estado-cuenta' | 'sin-dato' | 'consistencia' | 'configurar-anio' | 'importar';
+	value: 'panel' | 'registrar' | 'meses-pagados' | 'estado-cuenta' | 'sin-dato' | 'consistencia' | 'configurar-anio' | 'importar';
 	label: string;
 	icon: string;
 }
@@ -17,6 +17,7 @@ interface ShellTab {
 const TABS: ShellTab[] = [
 	{ value: 'panel', label: 'Panel de cobranza', icon: 'pi pi-chart-pie' },
 	{ value: 'registrar', label: 'Registrar pago', icon: 'pi pi-plus-circle' },
+	{ value: 'meses-pagados', label: 'Meses pagados', icon: 'pi pi-table' },
 	{ value: 'estado-cuenta', label: 'Estado de cuenta', icon: 'pi pi-file' },
 	{ value: 'sin-dato', label: 'Sin dato', icon: 'pi pi-question-circle' },
 	{ value: 'consistencia', label: 'Consistencia', icon: 'pi pi-exclamation-triangle' },
@@ -41,6 +42,11 @@ const HEADERS: Record<ShellTab['value'], ShellHeader> = {
 		icon: 'pi pi-plus-circle',
 		title: 'Registrar pago',
 		subtitle: 'Para anotar un pago hecho en el banco, por transferencia o en el colegio',
+	},
+	'meses-pagados': {
+		icon: 'pi pi-table',
+		title: 'Meses pagados',
+		subtitle: 'Qué cuotas pagó cada alumno de un salón, a hoy o a un corte',
 	},
 	'estado-cuenta': {
 		icon: 'pi pi-file',

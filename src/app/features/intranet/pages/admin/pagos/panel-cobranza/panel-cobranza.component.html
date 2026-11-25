@@ -1,39 +1,6 @@
 <div class="panel">
 	<section class="toolbar" aria-label="Fecha de la foto">
-		<edu-select-button
-			class="toolbar__modo"
-			[options]="modoOpciones"
-			optionLabel="label"
-			optionValue="value"
-			[allowEmpty]="false"
-			[ngModel]="modo()"
-			(ngModelChange)="onModo($event)"
-			aria-label="Tipo de foto"
-		/>
-
-		@if (modo() === 'corte') {
-			<label class="field">
-				<span>Corte</span>
-				<select
-					data-testid="selector-foto"
-					[value]="seleccion()"
-					(change)="onSelect($any($event.target).value)"
-				>
-					@for (c of cortesOrdenados(); track c.mes) {
-						<option [value]="c.fecha.slice(0, 10)" [disabled]="esFutura(c.fecha)">
-							Corte de {{ nombreMes(c.mes) }}: {{ formatFecha(c.fecha) }}{{ esFutura(c.fecha) ? ' (aún no llega)' : '' }}
-						</option>
-					}
-				</select>
-			</label>
-		}
-
-		<p class="toolbar__fecha" data-testid="fecha-foto">
-			Foto al <strong>{{ formatFecha(fechaVisible()) }}</strong>
-			@if (seleccion() === hoyValue) {
-				(hoy)
-			}
-		</p>
+		<app-foto-fecha-selector [seleccion]="seleccion()" [cortes]="cortes()" [hoy]="hoy" (seleccionChange)="onSelect($event)" />
 
 		<details class="edit">
 			<summary>Editar fecha de corte</summary>

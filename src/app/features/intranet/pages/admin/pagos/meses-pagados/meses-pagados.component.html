@@ -1,0 +1,67 @@
+<div class="meses">
+	<section class="meses__toolbar" aria-label="Filtros">
+		<label class="field">
+			<span>Salón</span>
+			<select data-testid="selector-salon" [value]="facade.salonId() ?? ''" (change)="onSalon($event)">
+				@for (op of facade.opciones(); track op.salonId) {
+					<option [value]="op.salonId">{{ op.nombre }}</option>
+				}
+			</select>
+		</label>
+
+		<app-foto-fecha-selector
+			[seleccion]="facade.seleccion()"
+			[cortes]="facade.cortes()"
+			[hoy]="facade.hoy"
+			(seleccionChange)="facade.setSeleccion($event)"
+		/>
+
+		<label class="field">
+			<span>Buscar alumno</span>
+			<input type="search" placeholder="Nombre o DNI" (input)="onSearch($event)" />
+		</label>
+
+		<edu-button
+			label="Exportar a Excel"
+			icon="pi pi-file-excel"
+			severity="success"
+			size="small"
+			[loading]="facade.exporting()"
+			[disabled]="!facade.data()"
+			(click)="facade.exportExcel()"
+		/>
+	</section>
+
+	@if (facade.exportError()) {
+		<p class="error" role="alert">No se pudo exportar a Excel. Inténtalo de nuevo.</p>
+	}
+
+	@if (facade.salonesError()) {
+		<div class="error-box" role="alert">
+			<p>No se pudieron cargar los salones del año.</p>
+		</div>
+	} @else if (facade.error()) {
+		<div class="error-box" role="alert">
+			<p>No se pudo cargar la matriz de meses pagados.</p>
+			<edu-button label="Reintentar" icon="pi pi-refresh" size="small" severity="secondary" (click)="facade.reload()" />
+		</div>
+	} @else if (facade.loading() && !facade.data()) {
+		<edu-skeleton height="16rem" />
+	} @else if (facade.sinAlumnos()) {
+		<p class="empty" data-testid="sin-alumnos">Este salón no tiene alumnos matriculados este año.</p>
+	} @else if (facade.data(); as data) {
+		@if (data.anioSinParametros) {
+			<p class="banner" role="note">El año no tiene parámetros de cobranza configurados: las cifras pueden estar incompletas.</p>
+		}
+		@if (data.anioSinCronograma) {
+			<p class="banner" role="note" data-testid="sin-cronograma">
+				El año no tiene cronograma de cuotas: no hay columnas de pensión que mostrar.
+			</p>
+		} @else if (data.filas.length === 0) {
+			<p class="empty" data-testid="sin-resultados">Ningún alumno coincide con la búsqueda.</p>
+		} @else {
+			<app-meses-pagados-tabla [data]="data" [class.cargando]="facade.loading()" />
+		}
+		<app-meses-pagados-leyenda />
+	}
+</div>

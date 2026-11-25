@@ -20,6 +20,8 @@ import type {
 	GuardarParametroAnioPayload,
 	ImportacionPayload,
 	MatriculadosSinCargo,
+	MesesPagados,
+	MesesPagadosFiltros,
 	MatriculaSinCargo,
 	MiembroFamilia,
 	PagoCorte,
@@ -81,6 +83,22 @@ export class PagosApiService {
 				observe: 'response',
 			})
 			.pipe(map((res) => ({ blob: res.body as Blob, fileName: this.fileNameOf(res) })));
+	}
+
+	/** Matriz alumno × cuota de un salón a hoy o a un corte; sin paginar. Política `reports`: el llamador aplica debounce. */
+	mesesPagados(filtros: MesesPagadosFiltros): Observable<MesesPagados> {
+		return this.http.get<MesesPagados>(`${this.apiUrl}/meses-pagados`, { params: this.mesesPagadosParams(filtros) });
+	}
+
+	/** Mismas filas, orden y totales que la pantalla; el nombre del archivo viene del servidor. */
+	mesesPagadosExcel(filtros: MesesPagadosFiltros): Observable<PagosArchivo> {
+		return this.http
+			.get(`${this.apiUrl}/meses-pagados/excel`, {
+				params: this.mesesPagadosParams(filtros),
+				responseType: 'blob',
+				observe: 'response',
+			})
+			.pipe(map((res) => ({ blob: res.body as Blob, fileName: this.fileNameOf(res, 'Meses_Pagados.xlsx') })));
 	}
 
 	cortes(anio: number): Observable<PagoCorte[]> {
@@ -271,6 +289,10 @@ export class PagosApiService {
 		});
 	}
 
+	private mesesPagadosParams(f: MesesPagadosFiltros): HttpParams {
+		return this.params({ salonId: f.salonId, fecha: f.fecha, buscar: f.buscar?.trim() });
+	}
+
 	private params(values: Record<string, string | number | boolean | null | undefined>): HttpParams {
 		let params = new HttpParams();
 		for (const [key, value] of Object.entries(values)) {
@@ -280,11 +302,11 @@ export class PagosApiService {
 		return params;
 	}
 
-	private fileNameOf(res: HttpResponse<Blob>): string {
+	private fileNameOf(res: HttpResponse<Blob>, fallback = 'Quienes_Deben.xlsx'): string {
 		const header = res.headers.get('Content-Disposition') ?? '';
 		const utf8 = /filename\*=UTF-8''([^;]+)/i.exec(header)?.[1];
 		const plain = /filename="?([^";]+)"?/i.exec(header)?.[1];
-		return decodeURIComponent(utf8 ?? plain ?? 'Quienes_Deben.xlsx');
+		return decodeURIComponent(utf8 ?? plain ?? fallback);
 	}
 	// #endregion
 }
