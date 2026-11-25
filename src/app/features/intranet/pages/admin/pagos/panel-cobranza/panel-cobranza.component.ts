@@ -5,9 +5,9 @@ import { catchError, map, of, startWith, switchMap } from 'rxjs';
 import { logger } from '@core/helpers';
 import type { PagoCorte, PanelCobranza } from '@data/models';
 import { FormsModule } from '@angular/forms';
-import { EduButton, EduSelectButton, EduSkeleton } from '@edu-ui';
+import { EduButton, EduSkeleton } from '@edu-ui';
 import { PanelCobranzaFacade } from './panel-cobranza.facade';
-import { formatFechaConDia } from '../utils/pagos-format.util';
+import { FotoFechaSelectorComponent } from '../foto-fecha/foto-fecha-selector.component';
 import { QuienesDebenComponent } from '../quienes-deben/quienes-deben.component';
 import { CobranzaCalculoComponent } from './cobranza-calculo.component';
 import { CobranzaConteosComponent } from './cobranza-conteos.component';
@@ -15,7 +15,6 @@ import { CobranzaDesgloseComponent } from './cobranza-desglose.component';
 import { CobranzaKpisComponent } from './cobranza-kpis.component';
 import {
 	HOY,
-	esFechaFutura,
 	nombreMes,
 	ordenarCortes,
 	toIsoLocal,
@@ -39,7 +38,7 @@ const MESES = Array.from({ length: 12 }, (_, i) => i + 1);
 	imports: [
 		FormsModule,
 		EduButton,
-		EduSelectButton,
+		FotoFechaSelectorComponent,
 		EduSkeleton,
 		CobranzaKpisComponent,
 		CobranzaConteosComponent,
@@ -56,26 +55,15 @@ export class PanelCobranzaComponent {
 
 	protected readonly meses = MESES;
 	protected readonly nombreMes = nombreMes;
-	protected readonly formatFecha = formatFechaConDia;
 	protected readonly hoy = toIsoLocal(new Date());
 	protected readonly anio = Number(this.hoy.slice(0, 4));
-	protected readonly hoyValue = HOY;
-
-	protected readonly modoOpciones = [
-		{ label: 'Al corte', value: 'corte' },
-		{ label: 'A hoy', value: 'hoy' },
-	];
 
 	protected readonly seleccion = signal<string>(HOY);
-	/** Último corte mirado: «Al corte» vuelve a él tras pasar por «A hoy». */
-	private readonly ultimoCorte = signal<string | null>(null);
-	protected readonly modo = computed(() => (this.seleccion() === HOY ? 'hoy' : 'corte'));
 	protected readonly cortes = signal<PagoCorte[]>([]);
 	private readonly reload = signal(0);
 
 	/** Fecha de la foto; `null` = hoy. También se la pasamos a «Quiénes deben». */
 	readonly fechaFoto = computed<string | null>(() => (this.seleccion() === HOY ? null : this.seleccion()));
-	protected readonly fechaVisible = computed(() => this.fechaFoto() ?? this.hoy);
 
 	// Edición de corte
 	protected readonly editMes = signal(Number(this.hoy.slice(5, 7)));
@@ -99,31 +87,12 @@ export class PanelCobranzaComponent {
 		{ initialValue: { status: 'loading' } as PanelState },
 	);
 
-	protected readonly cortesOrdenados = computed(() => ordenarCortes(this.cortes()));
-
 	constructor() {
 		this.loadCortes();
 	}
 
-	protected esFutura(fecha: string): boolean {
-		return esFechaFutura(fecha, this.hoy);
-	}
-
 	protected onSelect(value: string): void {
-		if (value !== HOY && this.esFutura(value)) return;
 		this.seleccion.set(value);
-		if (value !== HOY) this.ultimoCorte.set(value);
-	}
-
-	/** «A hoy» = sin fecha; «Al corte» = el último corte mirado o, si no hay, el más reciente que ya llegó. */
-	protected onModo(modo: string): void {
-		if (modo === 'hoy') {
-			this.seleccion.set(HOY);
-			return;
-		}
-		const alcanzados = this.cortesOrdenados().filter((c) => !this.esFutura(c.fecha));
-		const destino = this.ultimoCorte() ?? alcanzados.map((c) => c.fecha.slice(0, 10)).sort().at(-1);
-		if (destino) this.onSelect(destino);
 	}
 
 	protected retry(): void {

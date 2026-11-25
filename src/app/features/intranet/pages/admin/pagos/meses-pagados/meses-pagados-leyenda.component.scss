@@ -1,0 +1,28 @@
+@use '../styles/pagos' as pagos;
+
+.leyenda {
+	@include pagos.card;
+
+	&__titulo {
+		@include pagos.card-title;
+	}
+
+	&__lista {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+		gap: 0.625rem 1rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	&__item {
+		display: flex;
+		align-items: center;
+		gap: 0.625rem;
+	}
+
+	&__desc {
+		@include pagos.hint;
+	}
+}

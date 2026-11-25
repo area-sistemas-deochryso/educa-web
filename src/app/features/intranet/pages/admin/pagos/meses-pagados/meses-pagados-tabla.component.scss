@@ -1,0 +1,66 @@
+@use '../styles/pagos' as pagos;
+
+.matriz {
+	@include pagos.card-flush;
+	overflow-x: auto;
+
+	&:focus-visible {
+		outline: 2px solid var(--primary-color);
+		outline-offset: -2px;
+	}
+
+	&__tabla {
+		@include pagos.tabla;
+		width: max-content;
+		min-width: 100%;
+	}
+}
+
+// Columna del alumno fija: al desplazar en móvil el nombre sigue a la vista.
+.matriz__tabla .col-alumno {
+	position: sticky;
+	left: 0;
+	z-index: 1;
+	min-width: 10rem;
+	max-width: 14rem;
+	background: var(--surface-ground, var(--surface-0));
+	font-weight: 600;
+	text-transform: none;
+	letter-spacing: 0;
+	white-space: normal;
+	border-right: 1px solid var(--surface-300);
+}
+
+// En móvil la columna fija cede ancho: con 14rem quedaba una sola celda visible al lado del nombre.
+@media (max-width: 600px) {
+	.matriz__tabla .col-alumno {
+		min-width: 7rem;
+		max-width: 7.5rem;
+		padding-inline: 0.5rem;
+		font-size: 0.8125rem;
+	}
+}
+
+.matriz__tabla thead .col-alumno {
+	z-index: 2;
+	background: var(--surface-100);
+	text-transform: uppercase;
+}
+
+.celda-col {
+	text-align: center;
+}
+
+.grupo {
+	text-align: center;
+}
+
+.grupo-inicio {
+	border-left: 2px solid var(--surface-300);
+}
+
+tfoot th,
+tfoot td {
+	background: var(--surface-100);
+	border-top: 1px solid var(--surface-300);
+}
