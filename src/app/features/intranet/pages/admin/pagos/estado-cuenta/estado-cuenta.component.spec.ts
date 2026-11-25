@@ -1,10 +1,11 @@
 import { TestBed } from '@angular/core/testing';
-import { ActivatedRoute, Router, convertToParamMap } from '@angular/router';
+import { ActivatedRoute, Router, convertToParamMap, provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { CuentaAjuste, CuentaCargo, CuentaPago, EstadoCuenta } from '@data/models';
 import { PagosApiService } from '../services/pagos-api.service';
+import { formatSoles as sol } from '../utils/pagos-format.util';
 import { EstadoCuentaComponent } from './estado-cuenta.component';
 
 function cargo(parcial: Partial<CuentaCargo>): CuentaCargo {
@@ -100,16 +101,16 @@ const ajusteVigente: CuentaAjuste = {
 type ApiAcciones = Partial<Record<'anularPago' | 'registrarAjuste' | 'anularAjuste', unknown>>;
 
 function crear(estudianteId: string | null = '280', api: ApiAcciones = {}, datos: EstadoCuenta = cuenta) {
-	const navigate = vi.fn(() => Promise.resolve(true));
 	const estadoCuenta = vi.fn(() => of(datos));
 	TestBed.configureTestingModule({
 		imports: [EstadoCuentaComponent],
 		providers: [
+			provideRouter([]),
 			{ provide: ActivatedRoute, useValue: { paramMap: of(convertToParamMap(estudianteId ? { estudianteId } : {})) } },
-			{ provide: Router, useValue: { navigate } },
 			{ provide: PagosApiService, useValue: { estadoCuenta, buscarEstudiantes: () => of([]), ...api } },
 		],
 	});
+	const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
 	const fixture = TestBed.createComponent(EstadoCuentaComponent);
 	fixture.detectChanges();
 	return { fixture, navigate, estadoCuenta, texto: () => (fixture.nativeElement as HTMLElement).textContent ?? '' };
@@ -119,6 +120,19 @@ function celdasDeConcepto(root: HTMLElement): string[] {
 	const tabla = root.querySelector('table[aria-label], table') as HTMLTableElement;
 	return Array.from(tabla.querySelectorAll('tbody tr')).map((tr) => tr.querySelector('td')?.textContent?.trim() ?? '');
 }
+
+/** Un pago de familia: de S/ 425 pagados, S/ 325 fueron a cargos de este alumno y S/ 100 a otro. */
+const cuentaConPagoDeFamilia: EstadoCuenta = {
+	...cuenta,
+	pagos: [
+		pago({
+			pagoId: 21,
+			monto: 425,
+			montoAplicadoAlumno: 325,
+			aplicaciones: [{ cargoId: 1, montoBase: 320, montoRecargo: 5 }],
+		}),
+	],
+};
 
 describe('EstadoCuentaComponent', () => {
 	it('carga la cuenta del alumno de la ruta y muestra su categoría y sin matrícula', () => {
@@ -138,6 +152,42 @@ describe('EstadoCuentaComponent', () => {
 		expect(sinDato.textContent).toContain('Sin dato');
 		expect(sinDato.textContent).not.toContain('S/ 0.00');
 		expect(texto()).toContain('1 cargo(s) sin dato confirmado');
+	});
+
+	it('el aviso de «sin dato» lleva a esa pestaña ya filtrada por el nombre del alumno', () => {
+		const { fixture } = crear();
+		const enlace = (fixture.nativeElement as HTMLElement).querySelector('[data-testid="ir-sin-dato"]') as HTMLAnchorElement | null;
+
+		expect(enlace, 'falta el enlace a «Sin dato»').toBeTruthy();
+		const url = new URL(enlace?.getAttribute('href') ?? '', 'http://localhost');
+		expect(url.pathname).toBe('/intranet/admin/pagos/sin-dato');
+		expect(url.searchParams.get('buscar')).toBe('REVISION, ESTUDIANTE-PRUEBA');
+	});
+
+	it('sin cargos «sin dato» no hay aviso ni enlace', () => {
+		const sinAviso: EstadoCuenta = { ...cuenta, tieneDatosSinConfirmar: false, cargosSinDato: 0 };
+		const { fixture } = crear('280', {}, sinAviso);
+
+		expect((fixture.nativeElement as HTMLElement).querySelector('[data-testid="ir-sin-dato"]')).toBeNull();
+	});
+
+	it('cada pago dice qué cargos de este alumno cubrió y cuánto fue a otro alumno', () => {
+		const { texto } = crear('280', {}, cuentaConPagoDeFamilia);
+
+		expect(texto()).toContain(`Cubrió: Pensión · Marzo ${sol(320)} + ${sol(5)} de recargo.`);
+		expect(texto()).toContain(`El resto (${sol(100)}) cubrió a otro alumno.`);
+	});
+
+	it('un pago que no es de familia no habla de «otro alumno»', () => {
+		const soloPropio: EstadoCuenta = {
+			...cuenta,
+			pagos: [pago({ pagoId: 22, monto: 320, montoAplicadoAlumno: 320, aplicaciones: [{ cargoId: 1, montoBase: 320, montoRecargo: 0 }] })],
+		};
+		const { texto } = crear('280', {}, soloPropio);
+
+		expect(texto()).toContain(`Cubrió: Pensión · Marzo ${sol(320)}.`);
+		expect(texto()).not.toContain('otro alumno');
+		expect(texto()).not.toContain('de recargo.');
 	});
 
 	it('el pago anulado sigue en la lista con quién, cuándo y por qué', () => {
@@ -197,6 +247,19 @@ describe('EstadoCuentaComponent', () => {
 
 			expect(botones(vigente, 'Anular')).toHaveLength(1);
 			expect(botones(anulado, 'Anular')).toHaveLength(0);
+		});
+
+		it('el diálogo de anular un pago dice qué cubrió, para no anular a ciegas', () => {
+			const { fixture } = crear('280', {}, cuentaConPagoDeFamilia);
+			const root = fixture.nativeElement as HTMLElement;
+
+			botones(root, 'Anular')[0].click();
+			fixture.detectChanges();
+
+			const dialogo = document.body.querySelector('[role="dialog"]')?.textContent ?? '';
+			expect(dialogo).toContain(`Cubrió: Pensión · Marzo ${sol(320)} + ${sol(5)} de recargo.`);
+			expect(dialogo).toContain(`El resto (${sol(100)}) cubrió a otro alumno.`);
+			expect(dialogo).toContain('Al anularlo se liberan también los cargos de ellos.');
 		});
 
 		it('anular un pago: pide motivo, llama al servidor y recarga la cuenta completa', () => {

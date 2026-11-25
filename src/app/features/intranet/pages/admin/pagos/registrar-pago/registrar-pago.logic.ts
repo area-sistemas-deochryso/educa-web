@@ -33,11 +33,44 @@ export function repartoCuadra(monto: number, aplicaciones: readonly RepartoAplic
 // #endregion
 
 // #region Validación del formulario
-/** Obligatorios del contrato que aún faltan, redactados para «Falta completar: …». Vacío = se puede enviar. */
-export function camposFaltantes(datos: { monto: number; comprobante: string; fechaValida: boolean }): string[] {
+/** Qué campos de identificación del pago pasan a ser obligatorios según el medio y el N.º de operación. */
+export interface RequisitosPago {
+	banco: boolean;
+	hora: boolean;
+}
+
+/**
+ * INV-PG03: sin N.º de operación (y fuera de efectivo) el pago se identifica por fecha, hora, monto y banco de origen,
+ * así que banco y hora son obligatorios. Vale igual para Transferencia, Depósito, Yape, Plin y Otro (el BE no distingue
+ * entre ellos); en efectivo no aplica. Sin medio elegido todavía no se exige nada: ya falta «el medio de pago».
+ */
+export function requisitosPago(medio: PagoMedio | null, numeroOperacion: string): RequisitosPago {
+	const seIdentificaPorBancoYHora = medio !== null && medio !== 'EFECTIVO' && numeroOperacion.trim() === '';
+	return { banco: seIdentificaPorBancoYHora, hora: seIdentificaPorBancoYHora };
+}
+
+export interface DatosParaValidar {
+	monto: number;
+	fechaValida: boolean;
+	medio: PagoMedio | null;
+	hora: string | null;
+	banco: string;
+	numeroOperacion: string;
+	comprobante: string;
+}
+
+/**
+ * Obligatorios del contrato que aún faltan, redactados para «Falta completar: …». Vacío = se puede enviar.
+ * El orden es el del formulario: monto, fecha, medio, hora, banco, comprobante.
+ */
+export function camposFaltantes(datos: DatosParaValidar): string[] {
 	const faltan: string[] = [];
+	const requisitos = requisitosPago(datos.medio, datos.numeroOperacion);
 	if (toCentavos(datos.monto) <= 0) faltan.push('el monto');
 	if (!datos.fechaValida) faltan.push('la fecha');
+	if (datos.medio === null) faltan.push('el medio de pago');
+	if (requisitos.hora && !datos.hora) faltan.push('la hora');
+	if (requisitos.banco && !datos.banco.trim()) faltan.push('el banco de origen');
 	if (!datos.comprobante.trim()) faltan.push('el comprobante');
 	return faltan;
 }
@@ -189,13 +222,14 @@ const MENSAJES_POR_CODIGO: Readonly<Record<string, string>> = {
 	PAGO_MEDIO_INVALIDO: 'El medio de pago no es válido.',
 	PAGO_OPERACION_DUPLICADA: 'Ya hay un pago activo con ese número de operación en el mismo banco.',
 	PAGO_IDENTIFICACION_INCOMPLETA:
-		'Faltan datos para identificar el pago: sin número de operación, indica fecha, hora, monto y banco de origen.',
+		'Sin número de operación, el pago se identifica por su banco de origen y su hora: indica ambos.',
 	PAGO_APLICACION_SIN_CARGOS: 'El reparto no tiene cargos a los que aplicar el pago.',
 	PAGO_APLICACION_SUMA_INVALIDA: 'La suma del reparto debe ser igual al monto del pago.',
 	PAGO_APLICACION_EXCEDE_SALDO: 'Un cargo recibe más de lo que le queda pendiente.',
 	PAGO_CARGO_NO_APLICABLE: 'Un cargo no se puede pagar todavía: tiene datos sin confirmar.',
-	PAGO_MINIMO_NO_ALCANZADO: 'El monto no alcanza el mínimo que exige la regla de pago.',
-	PAGO_PARAMETRO_ANIO_INEXISTENTE: 'Falta la configuración del año de este pago. Pedila a administración.',
+	PAGO_MINIMO_NO_ALCANZADO:
+		'Un pago parcial debe superar el mínimo que el colegio fijó para el año. Sube el monto o cancela la cuota completa.',
+	PAGO_PARAMETRO_ANIO_INEXISTENTE: 'Falta la configuración del año de este pago. Pídela a administración.',
 	PAGO_CLAVE_IDEMPOTENCIA_REQUERIDA: 'Falta la clave del intento. Vuelve a enviar el formulario.',
 };
 

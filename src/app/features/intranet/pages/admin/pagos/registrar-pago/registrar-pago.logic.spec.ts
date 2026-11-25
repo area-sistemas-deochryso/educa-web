@@ -17,10 +17,12 @@ import {
 	huellaDe,
 	mensajeDeError,
 	repartoCuadra,
+	requisitosPago,
 	teclaPermitidaEnMonto,
 	toCentavos,
 	totalCentavos,
 } from './registrar-pago.logic';
+import type { DatosParaValidar } from './registrar-pago.logic';
 
 const app = (montoBase: number, montoRecargo = 0): RepartoAplicacion => ({
 	cargoId: 1,
@@ -189,10 +191,38 @@ describe('registrar-pago.logic — clave de idempotencia por intento', () => {
 	});
 });
 
-describe('camposFaltantes', () => {
-	const completo = { monto: 100, comprobante: 'B001-123', fechaValida: true };
+describe('requisitosPago (INV-PG03)', () => {
+	it('en efectivo no se exige banco ni hora, haya o no N.º de operación', () => {
+		expect(requisitosPago('EFECTIVO', '')).toEqual({ banco: false, hora: false });
+		expect(requisitosPago('EFECTIVO', '123')).toEqual({ banco: false, hora: false });
+	});
 
-	it('no reporta nada cuando monto, fecha y comprobante están completos', () => {
+	it.each(['TRANSFERENCIA', 'DEPOSITO', 'YAPE', 'PLIN', 'OTRO'] as const)(
+		'%s sin N.º de operación exige banco y hora; con N.º de operación no',
+		(medio) => {
+			expect(requisitosPago(medio, '')).toEqual({ banco: true, hora: true });
+			expect(requisitosPago(medio, '   ')).toEqual({ banco: true, hora: true });
+			expect(requisitosPago(medio, '0012345')).toEqual({ banco: false, hora: false });
+		},
+	);
+
+	it('sin medio elegido no exige nada (ya falta «el medio de pago»)', () => {
+		expect(requisitosPago(null, '')).toEqual({ banco: false, hora: false });
+	});
+});
+
+describe('camposFaltantes', () => {
+	const completo: DatosParaValidar = {
+		monto: 100,
+		comprobante: 'B001-123',
+		fechaValida: true,
+		medio: 'EFECTIVO',
+		hora: null,
+		banco: '',
+		numeroOperacion: '',
+	};
+
+	it('no reporta nada cuando todo lo obligatorio está completo (efectivo no pide banco ni hora)', () => {
 		expect(camposFaltantes(completo)).toEqual([]);
 	});
 
@@ -205,12 +235,59 @@ describe('camposFaltantes', () => {
 		expect(camposFaltantes({ ...completo, comprobante: '   ' })).toEqual(['el comprobante']);
 	});
 
+	it('sin medio elegido falta «el medio de pago»', () => {
+		expect(camposFaltantes({ ...completo, medio: null })).toEqual(['el medio de pago']);
+	});
+
+	it('transferencia sin N.º de operación pide hora y banco; con N.º de operación no', () => {
+		const transferencia = { ...completo, medio: 'TRANSFERENCIA' as const };
+		expect(camposFaltantes(transferencia)).toEqual(['la hora', 'el banco de origen']);
+		expect(camposFaltantes({ ...transferencia, hora: '10:30', banco: 'BCP' })).toEqual([]);
+		expect(camposFaltantes({ ...transferencia, numeroOperacion: '0012345' })).toEqual([]);
+	});
+
+	it('un banco solo de espacios cuenta como faltante', () => {
+		const yape = { ...completo, medio: 'YAPE' as const, hora: '10:30', banco: '   ' };
+		expect(camposFaltantes(yape)).toEqual(['el banco de origen']);
+	});
+
 	it('reporta varios faltantes en el orden en que aparecen en el formulario', () => {
-		expect(camposFaltantes({ monto: 0, comprobante: '', fechaValida: false })).toEqual([
-			'el monto',
-			'la fecha',
-			'el comprobante',
-		]);
+		expect(
+			camposFaltantes({
+				monto: 0,
+				comprobante: '',
+				fechaValida: false,
+				medio: 'DEPOSITO',
+				hora: null,
+				banco: '',
+				numeroOperacion: '',
+			}),
+		).toEqual(['el monto', 'la fecha', 'la hora', 'el banco de origen', 'el comprobante']);
+	});
+});
+
+describe('registrar-pago.logic — textos de rechazo sin código interno', () => {
+	it.each([
+		'PAGO_COMPROBANTE_REQUERIDO',
+		'PAGO_IDENTIFICACION_INCOMPLETA',
+		'PAGO_MINIMO_NO_ALCANZADO',
+		'PAGO_PARAMETRO_ANIO_INEXISTENTE',
+	])('%s se muestra en lenguaje de caja, sin «INV-»', (errorCode) => {
+		const msg = mensajeDeError({ status: 422, error: { errorCode } });
+		expect(msg).not.toMatch(/INV-/);
+		expect(msg).not.toContain('No se pudo registrar');
+	});
+
+	it('el rechazo por pago mínimo dice qué hacer', () => {
+		const msg = mensajeDeError({ status: 422, error: { errorCode: 'PAGO_MINIMO_NO_ALCANZADO' } });
+		expect(msg).toContain('mínimo');
+		expect(msg).toContain('cuota completa');
+	});
+
+	it('el texto de administración usa tuteo, no voseo', () => {
+		const msg = mensajeDeError({ status: 422, error: { errorCode: 'PAGO_PARAMETRO_ANIO_INEXISTENTE' } });
+		expect(msg).toContain('Pídela');
+		expect(msg).not.toContain('Pedila');
 	});
 });
 

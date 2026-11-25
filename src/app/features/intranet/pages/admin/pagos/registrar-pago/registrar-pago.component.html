@@ -42,6 +42,13 @@
 				<edu-button label="Siguiente alumno" icon="pi pi-arrow-right" [outlined]="true" (click)="siguienteAlumno()" />
 				<edu-button label="Registrar otro pago" icon="pi pi-plus" [outlined]="true" (click)="facade.nuevoPago()" />
 			</div>
+			@if (facade.estudiante(); as pagador) {
+				<p class="ayuda">
+					<a [routerLink]="['/intranet/admin/pagos/estado-cuenta', pagador.id]" data-testid="ver-estado-cuenta">
+						Ver estado de cuenta de {{ pagador.nombre }}
+					</a>
+				</p>
+			}
 		} @else {
 			@if (facade.loadingPrecarga()) {
 				<p class="ayuda" role="status">Leyendo el estado de cuenta…</p>
@@ -109,15 +116,13 @@
 			@if (facade.reparto().length > 0) {
 				<h3 class="card__title card__title--sub">Reparto propuesto (la cuota más antigua primero)</h3>
 				<div class="tabla-wrap">
-					<table class="tabla">
+					<table class="tabla tabla--reparto">
 						<caption>
 							Reparto del pago entre los cargos de los alumnos
 						</caption>
 						<thead>
 							<tr>
-								<th scope="col">Alumno</th>
-								<th scope="col">Concepto</th>
-								<th scope="col">Vencimiento</th>
+								<th scope="col">Cargo</th>
 								<th scope="col" class="num">Base (S/)</th>
 								<th scope="col" class="num">Recargo (S/)</th>
 							</tr>
@@ -125,14 +130,34 @@
 						<tbody>
 							@for (a of facade.reparto(); track a.cargoId; let i = $index) {
 								<tr>
-									<td>{{ a.estudiante }}</td>
-									<td>{{ a.concepto }}{{ a.cuota ? ' · cuota ' + a.cuota : '' }}</td>
-									<td>{{ a.vencimiento ? fechaConDia(a.vencimiento) : '—' }}</td>
-									<td class="num">
-										<input type="number" min="0" step="0.01" class="importe" [value]="a.montoBase" (input)="editar(i, 'montoBase', $event)" />
+									<td class="cargo">
+										<strong class="cargo__alumno">{{ a.estudiante }}</strong>
+										<span class="cargo__concepto">{{ a.concepto }}{{ a.cuota ? ' · cuota ' + a.cuota : '' }}</span>
+										@if (a.vencimiento) {
+											<span class="cargo__vence">Vence {{ fechaConDia(a.vencimiento) }}</span>
+										}
 									</td>
-									<td class="num">
-										<input type="number" min="0" step="0.01" class="importe" [value]="a.montoRecargo" (input)="editar(i, 'montoRecargo', $event)" />
+									<td class="num" data-label="Base (S/)">
+										<input
+											type="number"
+											min="0"
+											step="0.01"
+											class="importe"
+											[attr.aria-label]="'Base de ' + a.concepto + ' de ' + a.estudiante"
+											[value]="a.montoBase"
+											(input)="editar(i, 'montoBase', $event)"
+										/>
+									</td>
+									<td class="num" data-label="Recargo (S/)">
+										<input
+											type="number"
+											min="0"
+											step="0.01"
+											class="importe"
+											[attr.aria-label]="'Recargo de ' + a.concepto + ' de ' + a.estudiante"
+											[value]="a.montoRecargo"
+											(input)="editar(i, 'montoRecargo', $event)"
+										/>
 									</td>
 								</tr>
 							}
@@ -185,19 +210,47 @@
 					<edu-datepicker [ngModel]="fecha()" (ngModelChange)="fecha.set($event)" [maxDate]="hoy" />
 				</label>
 				<label class="campo">
-					<span>Medio</span>
-					<edu-select [options]="medios" [ngModel]="medio()" (ngModelChange)="cambiarMedio($event)" optionLabel="label" optionValue="value" />
+					<span>Medio <span aria-hidden="true">*</span></span>
+					<edu-select
+						[options]="medios"
+						[ngModel]="medio()"
+						(ngModelChange)="cambiarMedio($event)"
+						optionLabel="label"
+						optionValue="value"
+						placeholder="Elige el medio de pago"
+					/>
 				</label>
 				<label class="campo">
-					<span>Hora (opcional)</span>
+					<span>
+						Hora
+						@if (requisitos().hora) {
+							<span aria-hidden="true">*</span>
+						} @else {
+							(opcional)
+						}
+					</span>
 					<input type="time" [value]="hora() ?? ''" (input)="hora.set($any($event.target).value || null)" />
 				</label>
 				<label class="campo">
-					<span>Banco de origen (opcional)</span>
+					<span>
+						Banco de origen
+						@if (requisitos().banco) {
+							<span aria-hidden="true">*</span>
+						} @else {
+							(opcional)
+						}
+					</span>
 					<input type="text" [value]="banco()" (input)="banco.set($any($event.target).value)" />
 				</label>
 				<label class="campo">
-					<span>N.º de operación (opcional)</span>
+					<span>
+						N.º de operación
+						@if (medio() && medio() !== 'EFECTIVO') {
+							(opcional si indicas banco y hora)
+						} @else {
+							(opcional)
+						}
+					</span>
 					<input type="text" [value]="operacion()" (input)="operacion.set($any($event.target).value)" />
 				</label>
 				<label class="campo">

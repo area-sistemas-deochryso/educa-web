@@ -1,6 +1,6 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, inject, OnInit, viewChild } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import { getPersonInitials } from '@core/helpers';
 import { EduAvatar, EduButton, EduPaginator } from '@edu-ui';
@@ -29,6 +29,7 @@ import { SinDatoFacade } from './sin-dato.facade';
 })
 export class SinDatoComponent implements OnInit {
 	protected readonly facade = inject(SinDatoFacade);
+	private readonly route = inject(ActivatedRoute);
 
 	private readonly dialogoLote = viewChild.required(ConfirmarLoteDialogComponent);
 
@@ -44,7 +45,13 @@ export class SinDatoComponent implements OnInit {
 		{ width: '130px', cellType: 'text' },
 	];
 
+	/**
+	 * `?buscar=` llega desde el aviso del estado de cuenta («Confirmar los de <alumno>»): la lista abre ya filtrada
+	 * por ese nombre. La lista filtra por texto, no por id, así que un homónimo exacto aparecería también.
+	 */
 	ngOnInit(): void {
+		const buscar = this.route.snapshot.queryParamMap.get('buscar')?.trim();
+		if (buscar) this.facade.buscar.set(buscar);
 		this.facade.reload();
 	}
 

@@ -153,10 +153,14 @@ export class PagosApiService {
 		return this.http.get<MiembroFamilia[]>(`${this.apiUrl}/estudiantes/${estudianteId}/familia`);
 	}
 
-	/** Registra el pago. La clave de idempotencia la decide el llamador (un intento = una clave). */
+	/**
+	 * Registra el pago. La clave de idempotencia la decide el llamador (un intento = una clave).
+	 * Sin toast global: el error se muestra una sola vez, en línea, con el texto por `errorCode` (no el del servidor,
+	 * que cita la `INV-PG..`). Los 5xx y los status 0 se siguen reportando.
+	 */
 	registrarPago(payload: RegistrarPagoPayload, claveIdempotencia: string): Observable<{ id: number }> {
 		return this.http.post<{ id: number }>(this.apiUrl, payload, {
-			headers: { 'X-Idempotency-Key': claveIdempotencia },
+			headers: SIN_TOAST.headers.set('X-Idempotency-Key', claveIdempotencia),
 		});
 	}
 	// #endregion

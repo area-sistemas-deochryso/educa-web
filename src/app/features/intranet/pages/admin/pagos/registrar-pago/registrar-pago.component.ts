@@ -1,5 +1,5 @@
 // #region Imports
-import { ChangeDetectionStrategy, Component, DestroyRef, computed, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, computed, effect, inject, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -13,6 +13,7 @@ import {
 	comprobanteSugerido,
 	conceptoDeRuta,
 	diferenciaCentavos,
+	requisitosPago,
 	teclaPermitidaEnMonto,
 } from './registrar-pago.logic';
 // #endregion
@@ -63,7 +64,8 @@ export class RegistrarPagoComponent {
 	protected readonly monto = signal<number | null>(null);
 	protected readonly fecha = signal<Date | null>(new Date());
 	protected readonly hora = signal<string | null>(null);
-	protected readonly medio = signal<PagoMedio>('TRANSFERENCIA');
+	/** Sin medio por defecto: la persona lo elige siempre (el cobro rápido de matrícula solo sugiere efectivo). */
+	protected readonly medio = signal<PagoMedio | null>(null);
 	protected readonly banco = signal('');
 	protected readonly operacion = signal('');
 	protected readonly comprobante = signal('');
@@ -92,11 +94,34 @@ export class RegistrarPagoComponent {
 			const precarga = this.facade.precarga();
 			if (precarga && precarga.cobrables.length > 0) this.monto.set(precarga.monto);
 		});
+
+		// El error del intento anterior deja de aplicar en cuanto cambia cualquier dato del pago (el monto lo hace aparte).
+		effect(() => {
+			this.fecha();
+			this.medio();
+			this.hora();
+			this.banco();
+			this.operacion();
+			this.comprobante();
+			this.observaciones();
+			untracked(() => this.facade.descartarErrorRegistro());
+		});
 	}
+
+	/** Banco y hora pasan a ser obligatorios según el medio y el N.º de operación (INV-PG03). */
+	protected readonly requisitos = computed(() => requisitosPago(this.medio(), this.operacion()));
 
 	/** Obligatorios del contrato que faltan. Se muestra junto al botón y bloquea el registro. */
 	protected readonly faltantes = computed(() =>
-		camposFaltantes({ monto: this.monto() ?? 0, comprobante: this.comprobante(), fechaValida: this.fecha() !== null }),
+		camposFaltantes({
+			monto: this.monto() ?? 0,
+			fechaValida: this.fecha() !== null,
+			medio: this.medio(),
+			hora: this.hora(),
+			banco: this.banco(),
+			numeroOperacion: this.operacion(),
+			comprobante: this.comprobante(),
+		}),
 	);
 
 	/** Por qué «Registrar pago» está deshabilitado. `null` = habilitado o guardando. */
@@ -141,7 +166,8 @@ export class RegistrarPagoComponent {
 	/** Cobro rápido: efectivo salvo que ya se haya elegido otro medio, con «S/N» sugerido en efectivo. */
 	private iniciarCobroRapido(estudiante: { id: number; nombre: string }, concepto: 'MATRICULA' | 'INSCRIPCION'): void {
 		if (!this.medioElegido) this.medio.set('EFECTIVO');
-		this.comprobante.update((actual) => comprobanteSugerido(this.medio(), actual));
+		const medio = this.medio();
+		if (medio) this.comprobante.update((actual) => comprobanteSugerido(medio, actual));
 		this.facade.precargar(estudiante, [concepto], this.fechaIso());
 	}
 
@@ -177,7 +203,8 @@ export class RegistrarPagoComponent {
 		this.banco.set('');
 		this.operacion.set('');
 		this.observaciones.set('');
-		this.comprobante.set(comprobanteSugerido(this.medio(), ''));
+		const medio = this.medio();
+		this.comprobante.set(medio ? comprobanteSugerido(medio, '') : '');
 	}
 
 	protected elegirEstudiante(estudiante: EstudianteBusqueda): void {
@@ -202,12 +229,13 @@ export class RegistrarPagoComponent {
 
 	protected registrar(): void {
 		const fecha = this.fecha();
-		if (!fecha || !this.puedeRegistrar()) return;
+		const medio = this.medio();
+		if (!fecha || !medio || !this.puedeRegistrar()) return;
 		this.facade.registrar({
 			monto: this.montoValor(),
 			fechaPago: isoLocal(fecha),
 			horaPago: this.hora(),
-			medio: this.medio(),
+			medio,
 			bancoOrigen: this.banco().trim() || null,
 			numeroOperacion: this.operacion().trim() || null,
 			comprobante: this.comprobante(),

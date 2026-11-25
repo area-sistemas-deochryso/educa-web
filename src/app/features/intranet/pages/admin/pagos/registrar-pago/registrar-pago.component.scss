@@ -108,6 +108,8 @@
 .tabla-wrap {
 	@include pagos.card-flush;
 	overflow-x: auto;
+	// El `.card` no fija color de texto: en modo oscuro la tabla heredaba negro sobre fondo oscuro.
+	color: var(--text-color);
 }
 
 .tabla {
@@ -118,6 +120,81 @@
 	@include pagos.input-nativo;
 	width: 6.5rem;
 	text-align: right;
+}
+
+// «Cargo» apila alumno, concepto y vencimiento en una sola celda: con 3 columnas el reparto cabe sin desplazar.
+.cargo {
+	min-width: 11rem;
+
+	&__alumno,
+	&__concepto,
+	&__vence {
+		display: block;
+	}
+
+	&__concepto {
+		font-size: 0.875rem;
+	}
+
+	&__vence {
+		@include pagos.hint;
+	}
+}
+
+// Móvil: cada cargo pasa a tarjeta (cargo arriba, base y recargo en dos columnas debajo) sin scroll horizontal.
+@media (max-width: 640px) {
+	.tabla--reparto {
+		thead {
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			overflow: hidden;
+			clip: rect(0 0 0 0);
+		}
+
+		tbody,
+		tr {
+			display: block;
+		}
+
+		tr {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 0.5rem 0.75rem;
+			padding: 0.75rem 1rem;
+			border-bottom: 1px solid var(--surface-200);
+		}
+
+		tbody tr:last-child {
+			border-bottom: 0;
+		}
+
+		// `td.num` (no solo `td`): la regla `.tabla .num` del mixin alinea a la derecha y ganaría por especificidad.
+		td,
+		td.num {
+			display: block;
+			padding: 0;
+			border: 0;
+			text-align: left;
+		}
+
+		td.cargo {
+			grid-column: 1 / -1;
+			min-width: 0;
+		}
+
+		td[data-label]::before {
+			content: attr(data-label);
+			display: block;
+			margin-bottom: 0.25rem;
+			@include pagos.hint;
+		}
+
+		.importe {
+			width: 100%;
+			text-align: left;
+		}
+	}
 }
 
 .diferencia {

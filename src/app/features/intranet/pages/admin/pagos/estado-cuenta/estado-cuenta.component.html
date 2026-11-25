@@ -91,6 +91,16 @@
 					severity="info"
 					[text]="cuenta.cargosSinDato + ' cargo(s) sin dato confirmado: no se cuentan como deuda ni admiten pagos.'"
 				/>
+				<p class="cuenta__ayuda">
+					Se confirman desde la pestaña «Sin dato».
+					<a
+						routerLink="/intranet/admin/pagos/sin-dato"
+						[queryParams]="{ buscar: cuenta.estudiante }"
+						data-testid="ir-sin-dato"
+					>
+						Confirmar los de {{ cuenta.estudiante }}
+					</a>
+				</p>
 			}
 
 			<section class="bloque" aria-labelledby="h-cargos">

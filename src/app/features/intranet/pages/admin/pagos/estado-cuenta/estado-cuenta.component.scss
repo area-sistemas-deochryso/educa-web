@@ -114,3 +114,7 @@
 .sr-only {
 	@include pagos.sr-only;
 }
+
+.cuenta__ayuda {
+	@include pagos.hint;
+}

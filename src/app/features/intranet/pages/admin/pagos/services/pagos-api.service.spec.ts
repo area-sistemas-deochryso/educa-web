@@ -10,6 +10,7 @@ import type {
 	GuardarCronogramaAnioPayload,
 	GuardarMontosAnioPayload,
 	GuardarParametroAnioPayload,
+	RegistrarPagoPayload,
 } from '@data/models';
 
 import { PagosApiService } from './pagos-api.service';
@@ -137,5 +138,41 @@ describe('PagosApiService · configuración del año (P123 F2)', () => {
 		service.generarCargos(payload, 10).subscribe();
 		const generar = http.expectOne(`${API}/cargos/generar`);
 		expect(generar.request.headers.has(SIN_TOAST)).toBe(false);
+	});
+});
+
+describe('PagosApiService · registrar pago (P119 F8)', () => {
+	let service: PagosApiService;
+	let http: HttpTestingController;
+
+	beforeEach(() => {
+		TestBed.configureTestingModule({
+			providers: [provideHttpClient(), provideHttpClientTesting()],
+		});
+		service = TestBed.inject(PagosApiService);
+		http = TestBed.inject(HttpTestingController);
+	});
+
+	afterEach(() => http.verify());
+
+	it('registrarPago envía la clave de idempotencia y evita el toast global (el error sale una sola vez, en línea)', () => {
+		const payload: RegistrarPagoPayload = {
+			monto: 100,
+			fechaPago: '2026-11-25',
+			horaPago: null,
+			medio: 'EFECTIVO',
+			bancoOrigen: null,
+			numeroOperacion: null,
+			comprobante: 'S/N',
+			observaciones: null,
+			aplicaciones: [{ cargoId: 1, montoBase: 100, montoRecargo: 0 }],
+		};
+		service.registrarPago(payload, 'clave-1').subscribe();
+
+		const req = http.expectOne(API);
+		expect(req.request.method).toBe('POST');
+		expect(req.request.headers.get('X-Idempotency-Key')).toBe('clave-1');
+		expect(req.request.headers.get(SIN_TOAST)).toBe('true');
+		req.flush({ id: 16 });
 	});
 });

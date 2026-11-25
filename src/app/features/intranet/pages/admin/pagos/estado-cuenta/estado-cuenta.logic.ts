@@ -97,6 +97,48 @@ export function detalleAnulacion(r: {
 	const motivo = r.motivoAnulacion ? `: ${r.motivoAnulacion}` : '';
 	return `Anulado${quien}${cuando}${motivo}`;
 }
+
+/** «Pensión · Marzo» (o solo «Pensión» si el cargo no tiene cuota). */
+export const conceptoDe = (c: Pick<CuentaCargo, 'concepto' | 'cuota'>): string => (c.cuota ? `${c.concepto} · ${c.cuota}` : c.concepto);
+
+const aCentavos = (soles: number): number => Math.round(soles * 100);
+
+/**
+ * Qué cubrió un pago, en líneas legibles: primero los cargos **de este alumno** (nombrados desde su propia cuenta,
+ * con el recargo aparte) y, si el pago fue de familia, cuánto del total fue a otro alumno.
+ *
+ * El servidor solo manda las aplicaciones a cargos de este alumno (`EstadoCuentaService`), así que los cargos de los
+ * hermanos no se pueden nombrar desde aquí: se cuantifican como «el resto».
+ */
+export function coberturaDePago(
+	pago: Pick<CuentaPago, 'monto' | 'montoAplicadoAlumno' | 'aplicaciones'>,
+	cargos: readonly Pick<CuentaCargo, 'cargoId' | 'concepto' | 'cuota'>[],
+): string[] {
+	const lineas: string[] = [];
+
+	if (pago.aplicaciones.length > 0) {
+		const partes = pago.aplicaciones.map((a) => {
+			const cargo = cargos.find((c) => c.cargoId === a.cargoId);
+			const nombre = cargo ? conceptoDe(cargo) : `Cargo ${a.cargoId}`;
+			const recargo = aCentavos(a.montoRecargo) > 0 ? ` + ${formatSoles(a.montoRecargo)} de recargo` : '';
+			return `${nombre} ${formatSoles(a.montoBase)}${recargo}`;
+		});
+		lineas.push(`Cubrió: ${partes.join('; ')}.`);
+	}
+
+	const resto = aCentavos(pago.monto) - aCentavos(pago.montoAplicadoAlumno);
+	if (resto > 0) lineas.push(`El resto (${formatSoles(resto / 100)}) cubrió a otro alumno.`);
+
+	return lineas;
+}
+
+/** Texto bajo la fila de un pago: qué cubrió y, si está anulado, quién y por qué. Vacío = nada que aclarar. */
+export function detalleDePago(
+	pago: CuentaPago,
+	cargos: readonly Pick<CuentaCargo, 'cargoId' | 'concepto' | 'cuota'>[],
+): string {
+	return [...coberturaDePago(pago, cargos), detalleAnulacion(pago)].filter(Boolean).join(' ');
+}
 // #endregion
 
 // #region Orden en cliente

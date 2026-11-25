@@ -2,7 +2,7 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { getPersonInitials } from '@core/helpers';
 import type { CuentaAjuste, CuentaCargo, CuentaPago, EstudianteBusqueda, RegistrarAjustePayload } from '@data/models';
@@ -18,7 +18,10 @@ import { EstadoCuentaFacade } from './estado-cuenta.facade';
 import {
 	CATEGORIAS,
 	ESTADOS_CARGO,
+	coberturaDePago,
+	conceptoDe,
 	detalleAnulacion,
+	detalleDePago,
 	etiquetaCargo,
 	etiquetaVigencia,
 	fechaOVacio,
@@ -45,8 +48,6 @@ const TIPOS_AJUSTE: Record<string, string> = {
 	SALDADO_PREVIO: 'Saldado antes del arranque',
 };
 
-const conceptoDe = (c: Pick<CuentaCargo, 'concepto' | 'cuota'>): string => (c.cuota ? `${c.concepto} · ${c.cuota}` : c.concepto);
-
 /**
  * «Estado de cuenta»: el alumno se elige con el buscador o llega por `/estado-cuenta/:estudianteId`
  * (desde «¿Quiénes deben?», «Sin dato» o el aviso de un pago en curso). Muestra cargos, pagos y ajustes, anulados incluidos.
@@ -56,6 +57,7 @@ const conceptoDe = (c: Pick<CuentaCargo, 'concepto' | 'cuota'>): string => (c.cu
 	standalone: true,
 	imports: [
 		FormsModule,
+		RouterLink,
 		AjusteDialogComponent,
 		AnularDialogComponent,
 		EduAutoComplete,
@@ -143,7 +145,8 @@ export class EstadoCuentaComponent {
 
 	protected readonly pagoAnulado = (p: CuentaPago): boolean => !p.vigente;
 	protected readonly ajusteAnulado = (a: CuentaAjuste): boolean => !a.vigente;
-	protected readonly detallePago = (p: CuentaPago): string => detalleAnulacion(p);
+	/** Bajo cada pago: qué cargos de este alumno cubrió (y cuánto fue a otro alumno) y, si está anulado, el motivo. */
+	protected readonly detallePago = (p: CuentaPago): string => detalleDePago(p, this.facade.cuenta()?.cargos ?? []);
 	protected readonly detalleAjuste = (a: CuentaAjuste): string => detalleAnulacion(a);
 	protected readonly admiteAjuste = admiteAjuste;
 
@@ -165,7 +168,12 @@ export class EstadoCuentaComponent {
 		this.pendiente = { tipo: 'pago', id: pago.pagoId };
 		this.anularDialog().open({
 			titulo: `Anular pago N.º ${pago.pagoId}`,
-			resumen: [`${fechaPagoDe(pago)} · ${MEDIOS[pago.medio] ?? pago.medio}`, `Monto: ${montoPagoDe(pago)}`, `Comprobante: ${pago.comprobante}`],
+			resumen: [
+				`${fechaPagoDe(pago)} · ${MEDIOS[pago.medio] ?? pago.medio}`,
+				`Monto: ${montoPagoDe(pago)}`,
+				`Comprobante: ${pago.comprobante}`,
+				...coberturaDePago(pago, this.facade.cuenta()?.cargos ?? []),
+			],
 			aviso: avisoAnularPago(pago),
 		});
 	}
