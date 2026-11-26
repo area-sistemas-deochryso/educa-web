@@ -10,6 +10,7 @@ import { EduAutoComplete, EduAvatar, EduButton, EduMessage, EduTag, EduTemplate 
 import { ErrorStateComponent } from '@shared/components';
 import { esConcepto } from '../registrar-pago/registrar-pago.logic';
 import { formatSoles } from '../utils/pagos-format.util';
+import { ConstanciaPagoFacade } from '../services/constancia-pago.facade';
 import { AccionesCuentaFacade, type ResultadoAccion } from './acciones-cuenta.facade';
 import { admiteAjuste, avisoAnularPago, topeAjuste } from './acciones-cuenta.logic';
 import { AjusteDialogComponent } from './ajuste-dialog.component';
@@ -69,7 +70,7 @@ const TIPOS_AJUSTE: Record<string, string> = {
 		ErrorStateComponent,
 		EstadoCuentaTablaComponent,
 	],
-	providers: [EstadoCuentaFacade, AccionesCuentaFacade],
+	providers: [EstadoCuentaFacade, AccionesCuentaFacade, ConstanciaPagoFacade],
 	templateUrl: './estado-cuenta.component.html',
 	styleUrl: './estado-cuenta.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -77,6 +78,7 @@ const TIPOS_AJUSTE: Record<string, string> = {
 export class EstadoCuentaComponent {
 	protected readonly facade = inject(EstadoCuentaFacade);
 	protected readonly acciones = inject(AccionesCuentaFacade);
+	protected readonly constancia = inject(ConstanciaPagoFacade);
 	private readonly route = inject(ActivatedRoute);
 	private readonly router = inject(Router);
 	private readonly destroyRef = inject(DestroyRef);

@@ -35,12 +35,24 @@
 			<edu-message severity="info" text="Busca al alumno que paga, o elígelo desde «Quiénes deben»." />
 		} @else if (facade.pagoRegistrado(); as pagoId) {
 			<edu-message severity="success" [text]="'Pago registrado (N.º ' + pagoId + ').'" />
+			@if (constancia.error(); as errorConstancia) {
+				<edu-message severity="danger" [text]="errorConstancia" data-testid="error-constancia" />
+			}
 			<div class="acciones">
+				<edu-button
+					label="Descargar constancia"
+					icon="pi pi-file-pdf"
+					[outlined]="true"
+					[loading]="constancia.descargando() === pagoId"
+					[disabled]="constancia.descargando() !== null"
+					data-testid="constancia-pago"
+					(click)="constancia.descargar(pagoId)"
+				/>
 				@if (facade.ofrecerInscripcion()) {
 					<edu-button label="Cobrar inscripción" icon="pi pi-wallet" severity="success" (click)="cobrarInscripcion()" />
 				}
 				<edu-button label="Siguiente alumno" icon="pi pi-arrow-right" [outlined]="true" (click)="siguienteAlumno()" />
-				<edu-button label="Registrar otro pago" icon="pi pi-plus" [outlined]="true" (click)="facade.nuevoPago()" />
+				<edu-button label="Registrar otro pago" icon="pi pi-plus" [outlined]="true" (click)="nuevoPago()" />
 			</div>
 			@if (facade.estudiante(); as pagador) {
 				<p class="ayuda">

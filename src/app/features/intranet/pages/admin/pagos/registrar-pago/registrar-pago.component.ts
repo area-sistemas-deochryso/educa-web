@@ -7,6 +7,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import type { EstudianteBusqueda, PagoMedio } from '@data/models';
 import { EduAutoComplete, EduButton, EduDatePicker, EduInputNumber, EduMessage, EduSelect, EduTemplate } from '@edu-ui';
 import { formatFechaConDia, formatSoles } from '../utils/pagos-format.util';
+import { ConstanciaPagoFacade } from '../services/constancia-pago.facade';
 import { RegistrarPagoFacade } from './registrar-pago.facade';
 import {
 	camposFaltantes,
@@ -43,13 +44,14 @@ function isoLocal(fecha: Date): string {
 	selector: 'app-registrar-pago',
 	standalone: true,
 	imports: [FormsModule, RouterLink, EduAutoComplete, EduButton, EduDatePicker, EduInputNumber, EduMessage, EduSelect, EduTemplate],
-	providers: [RegistrarPagoFacade],
+	providers: [RegistrarPagoFacade, ConstanciaPagoFacade],
 	templateUrl: './registrar-pago.component.html',
 	styleUrl: './registrar-pago.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RegistrarPagoComponent {
 	protected readonly facade = inject(RegistrarPagoFacade);
+	protected readonly constancia = inject(ConstanciaPagoFacade);
 	private readonly route = inject(ActivatedRoute);
 	private readonly destroyRef = inject(DestroyRef);
 
@@ -193,7 +195,13 @@ export class RegistrarPagoComponent {
 	protected siguienteAlumno(): void {
 		this.seleccionado.set(null);
 		this.limpiarDatosDelPago();
+		this.constancia.limpiarError();
 		this.facade.siguienteAlumno();
+	}
+
+	protected nuevoPago(): void {
+		this.constancia.limpiarError();
+		this.facade.nuevoPago();
 	}
 
 	/** Deja el formulario listo para otro cobro; el medio se conserva (la caja suele cobrar varios seguidos igual). */

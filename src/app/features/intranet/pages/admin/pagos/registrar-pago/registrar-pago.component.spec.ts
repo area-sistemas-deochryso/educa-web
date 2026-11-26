@@ -47,6 +47,7 @@ function crearComponente(
 	registrarPago = vi.fn(() => of({ id: 5 })),
 	familia = vi.fn((_id: number) => of([])),
 	query: Record<string, string> = {},
+	constancia = vi.fn((_id: number) => of({ blob: new Blob(['%PDF']), fileName: 'Constancia_Pago_5.pdf' })),
 ) {
 	TestBed.configureTestingModule({
 		imports: [RegistrarPagoComponent],
@@ -63,13 +64,14 @@ function crearComponente(
 					proponerReparto: () => of({ aplicaciones: [aplicacion], sobrante: 0 }),
 					estadoCuenta: () => of(cuentaConMatricula),
 					registrarPago,
+					constancia,
 				},
 			},
 		],
 	});
 	const fixture = TestBed.createComponent(RegistrarPagoComponent);
 	fixture.detectChanges();
-	return { fixture, registrarPago, familia, estado: fixture.componentInstance as unknown as EstadoFormulario };
+	return { fixture, registrarPago, familia, constancia, estado: fixture.componentInstance as unknown as EstadoFormulario };
 }
 
 /**
@@ -329,6 +331,56 @@ describe('RegistrarPagoComponent — buscador de alumnos', () => {
 
 		expect(familia).toHaveBeenLastCalledWith(77);
 		expect(fixture.nativeElement.textContent).toContain('Alumno que paga: Díaz, Luis');
+	});
+});
+
+const downloadBlob = vi.hoisted(() => vi.fn());
+vi.mock('@core/helpers', async (importOriginal) => ({
+	...(await importOriginal<typeof import('@core/helpers')>()),
+	downloadBlob,
+}));
+
+function registrarUnPago(fixture: { nativeElement: HTMLElement; detectChanges: () => void }, estado: EstadoFormulario): void {
+	estado.monto.set(100);
+	estado.medio.set('EFECTIVO');
+	estado.comprobante.set('B001-123');
+	fixture.detectChanges();
+	clic(fixture, 'edu-button[label="Proponer reparto"]');
+	clic(fixture, 'edu-button[label="Registrar pago"]');
+}
+
+describe('RegistrarPagoComponent — constancia tras registrar (P124 F4)', () => {
+	it('antes de registrar no ofrece la constancia', () => {
+		const { fixture } = crearComponente();
+		expect(fixture.nativeElement.querySelector('[data-testid="constancia-pago"]')).toBeNull();
+	});
+
+	it('tras registrar permite descargar la constancia del pago recién creado', () => {
+		downloadBlob.mockReset();
+		const { fixture, estado, constancia } = crearComponente();
+		registrarUnPago(fixture, estado);
+
+		clic(fixture, '[data-testid="constancia-pago"]');
+
+		expect(constancia).toHaveBeenCalledWith(5);
+		expect(downloadBlob).toHaveBeenCalledWith(expect.any(Blob), 'Constancia_Pago_5.pdf');
+	});
+
+	it('si falla la descarga muestra el error y el pago sigue registrado', () => {
+		downloadBlob.mockReset();
+		const { fixture, estado } = crearComponente(
+			undefined,
+			undefined,
+			{},
+			vi.fn(() => throwError(() => ({ status: 403 }))),
+		);
+		registrarUnPago(fixture, estado);
+
+		clic(fixture, '[data-testid="constancia-pago"]');
+
+		expect(fixture.nativeElement.querySelector('[data-testid="error-constancia"]')?.textContent).toContain('No tienes permiso');
+		expect(fixture.nativeElement.textContent).toContain('Pago registrado (N.º 5)');
+		expect(downloadBlob).not.toHaveBeenCalled();
 	});
 });
 

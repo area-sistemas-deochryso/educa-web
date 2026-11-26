@@ -117,6 +117,9 @@
 			<div class="duo">
 				<section class="bloque" aria-labelledby="h-pagos">
 					<h3 id="h-pagos" class="bloque__titulo">Pagos</h3>
+					@if (constancia.error(); as errorConstancia) {
+						<edu-message severity="danger" [text]="errorConstancia" data-testid="error-constancia" />
+					}
 					<app-estado-cuenta-tabla
 						caption="Pagos que tocaron cargos del alumno, vigentes y anulados"
 						[columnas]="columnasPagos"
@@ -161,6 +164,18 @@
 	</ng-template>
 
 	<ng-template #accionesPago let-pago>
+		<edu-button
+			label="Constancia"
+			icon="pi pi-file-pdf"
+			size="small"
+			[text]="true"
+			[loading]="constancia.descargando() === pago.pagoId"
+			[disabled]="constancia.descargando() !== null"
+			data-testid="constancia-pago"
+			(click)="constancia.descargar(pago.pagoId)"
+		>
+			<span class="sr-only"> del pago N.º {{ pago.pagoId }}{{ pago.vigente ? '' : ' (anulado)' }}</span>
+		</edu-button>
 		@if (pago.vigente) {
 			<edu-button
 				label="Anular"

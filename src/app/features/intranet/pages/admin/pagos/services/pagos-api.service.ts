@@ -184,6 +184,16 @@ export class PagosApiService {
 	// #endregion
 
 	// #region Acciones sobre la cuenta
+	/**
+	 * Constancia de pago en PDF (`INV-PG15`): una por pago, también de los anulados (sale con la marca «ANULADO»).
+	 * Un error de 4xx/status 0 se muestra en línea, no como toast global.
+	 */
+	constancia(pagoId: number): Observable<PagosArchivo> {
+		return this.http
+			.get(`${this.apiUrl}/${pagoId}/constancia`, { responseType: 'blob', observe: 'response', ...SIN_TOAST })
+			.pipe(map((res) => ({ blob: res.body as Blob, fileName: this.fileNameOf(res, `Constancia_Pago_${pagoId}.pdf`) })));
+	}
+
 	/** Anula un pago con motivo. Libera el recargo que ese pago congeló. */
 	anularPago(pagoId: number, motivo: string): Observable<unknown> {
 		return this.http.post(`${this.apiUrl}/${pagoId}/anular`, { motivo });

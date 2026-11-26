@@ -176,3 +176,36 @@ describe('PagosApiService · registrar pago (P119 F8)', () => {
 		req.flush({ id: 16 });
 	});
 });
+
+describe('PagosApiService · constancia de pago (P124 F4)', () => {
+	let service: PagosApiService;
+	let http: HttpTestingController;
+
+	beforeEach(() => {
+		TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting()] });
+		service = TestBed.inject(PagosApiService);
+		http = TestBed.inject(HttpTestingController);
+	});
+
+	afterEach(() => http.verify());
+
+	it('pide el PDF como blob, sin toast global, y toma el nombre de Content-Disposition', () => {
+		let archivo: { blob: Blob; fileName: string } | undefined;
+		service.constancia(42).subscribe((a) => (archivo = a));
+
+		const req = http.expectOne(`${API}/42/constancia`);
+		expect(req.request.method).toBe('GET');
+		expect(req.request.responseType).toBe('blob');
+		expect(req.request.headers.get(SIN_TOAST)).toBe('true');
+		req.flush(new Blob(['%PDF']), { headers: { 'Content-Disposition': 'attachment; filename="Constancia_Pago_42.pdf"' } });
+
+		expect(archivo?.fileName).toBe('Constancia_Pago_42.pdf');
+	});
+
+	it('sin Content-Disposition usa un nombre por defecto con el número del pago', () => {
+		let fileName = '';
+		service.constancia(7).subscribe((a) => (fileName = a.fileName));
+		http.expectOne(`${API}/7/constancia`).flush(new Blob(['%PDF']));
+		expect(fileName).toBe('Constancia_Pago_7.pdf');
+	});
+});

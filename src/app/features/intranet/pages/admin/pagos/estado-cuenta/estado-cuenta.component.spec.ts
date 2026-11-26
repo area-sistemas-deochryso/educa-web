@@ -8,6 +8,12 @@ import { PagosApiService } from '../services/pagos-api.service';
 import { formatSoles as sol } from '../utils/pagos-format.util';
 import { EstadoCuentaComponent } from './estado-cuenta.component';
 
+const downloadBlob = vi.hoisted(() => vi.fn());
+vi.mock('@core/helpers', async (importOriginal) => ({
+	...(await importOriginal<typeof import('@core/helpers')>()),
+	downloadBlob,
+}));
+
 function cargo(parcial: Partial<CuentaCargo>): CuentaCargo {
 	return {
 		cargoId: 1,
@@ -98,7 +104,7 @@ const ajusteVigente: CuentaAjuste = {
 	fechaReg: '2026-11-04T10:00:00',
 };
 
-type ApiAcciones = Partial<Record<'anularPago' | 'registrarAjuste' | 'anularAjuste', unknown>>;
+type ApiAcciones = Partial<Record<'anularPago' | 'registrarAjuste' | 'anularAjuste' | 'constancia', unknown>>;
 
 function crear(estudianteId: string | null = '280', api: ApiAcciones = {}, datos: EstadoCuenta = cuenta) {
 	const estadoCuenta = vi.fn(() => of(datos));
@@ -336,6 +342,51 @@ describe('EstadoCuentaComponent', () => {
 
 			expect(registrarAjuste).toHaveBeenCalledWith({ cargoId: 1, tipo: 'DESCUENTO', monto: 25.5, motivo: 'Hermano' });
 			expect(estadoCuenta).toHaveBeenCalledTimes(2);
+		});
+	});
+
+	describe('constancia de pago (P124 F4)', () => {
+		const botonConstancia = (root: ParentNode): HTMLButtonElement[] =>
+			Array.from(root.querySelectorAll('button')).filter((b) => b.textContent?.trim().startsWith('Constancia'));
+
+		it('ofrece la constancia en cada pago, también en el anulado', () => {
+			const { fixture } = crear();
+			const filas = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('tbody tr'));
+			const anulado = filas.find((tr) => tr.classList.contains('anulada')) as HTMLElement;
+			const vigente = filas.find((tr) => tr.textContent?.includes('Vigente')) as HTMLElement;
+
+			expect(botonConstancia(vigente)).toHaveLength(1);
+			expect(botonConstancia(anulado)).toHaveLength(1);
+			expect(botonConstancia(anulado)[0].textContent).toContain('(anulado)');
+		});
+
+		it('al pulsarla pide la constancia de ese pago y descarga el PDF', () => {
+			downloadBlob.mockReset();
+			const constancia = vi.fn(() => of({ blob: new Blob(['%PDF']), fileName: 'Constancia_Pago_11.pdf' }));
+			const { fixture } = crear('280', { constancia });
+			const filas = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('tbody tr'));
+			const vigente = filas.find((tr) => tr.textContent?.includes('Vigente')) as HTMLElement;
+
+			botonConstancia(vigente)[0].click();
+			fixture.detectChanges();
+
+			expect(constancia).toHaveBeenCalledWith(11);
+			expect(downloadBlob).toHaveBeenCalledWith(expect.any(Blob), 'Constancia_Pago_11.pdf');
+		});
+
+		it('sin conexión muestra el error en línea y no descarga', () => {
+			downloadBlob.mockReset();
+			const constancia = vi.fn(() => throwError(() => ({ status: 0 })));
+			const { fixture } = crear('280', { constancia });
+			const filas = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('tbody tr'));
+			const vigente = filas.find((tr) => tr.textContent?.includes('Vigente')) as HTMLElement;
+
+			botonConstancia(vigente)[0].click();
+			fixture.detectChanges();
+
+			const error = (fixture.nativeElement as HTMLElement).querySelector('[data-testid="error-constancia"]');
+			expect(error?.textContent).toContain('No hay conexión');
+			expect(downloadBlob).not.toHaveBeenCalled();
 		});
 	});
 });
