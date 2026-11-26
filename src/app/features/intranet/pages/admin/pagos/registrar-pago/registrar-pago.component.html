@@ -38,6 +38,7 @@
 			@if (constancia.error(); as errorConstancia) {
 				<edu-message severity="danger" [text]="errorConstancia" data-testid="error-constancia" />
 			}
+			<app-pago-adjuntos [pagoId]="pagoId" data-testid="adjuntos-registro" />
 			<div class="acciones">
 				<edu-button
 					label="Descargar constancia"

@@ -7,6 +7,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import type { EstudianteBusqueda, PagoMedio } from '@data/models';
 import { EduAutoComplete, EduButton, EduDatePicker, EduInputNumber, EduMessage, EduSelect, EduTemplate } from '@edu-ui';
 import { formatFechaConDia, formatSoles } from '../utils/pagos-format.util';
+import { PagoAdjuntosComponent } from '../pago-adjuntos/pago-adjuntos.component';
 import { ConstanciaPagoFacade } from '../services/constancia-pago.facade';
 import { RegistrarPagoFacade } from './registrar-pago.facade';
 import {
@@ -43,7 +44,18 @@ function isoLocal(fecha: Date): string {
 @Component({
 	selector: 'app-registrar-pago',
 	standalone: true,
-	imports: [FormsModule, RouterLink, EduAutoComplete, EduButton, EduDatePicker, EduInputNumber, EduMessage, EduSelect, EduTemplate],
+	imports: [
+		FormsModule,
+		RouterLink,
+		EduAutoComplete,
+		EduButton,
+		EduDatePicker,
+		EduInputNumber,
+		EduMessage,
+		EduSelect,
+		EduTemplate,
+		PagoAdjuntosComponent,
+	],
 	providers: [RegistrarPagoFacade, ConstanciaPagoFacade],
 	templateUrl: './registrar-pago.component.html',
 	styleUrl: './registrar-pago.component.scss',

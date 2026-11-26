@@ -1,0 +1,172 @@
+<section class="adjuntos" [attr.aria-labelledby]="'h-voucher-' + pagoId()">
+	<h4 [id]="'h-voucher-' + pagoId()" class="adjuntos__titulo">Voucher del pago N.º {{ pagoId() }}</h4>
+
+	@if (facade.sinConexion()) {
+		<edu-message severity="warn" [text]="facade.textoSinConexion" data-testid="adjuntos-sin-conexion" />
+	}
+	@if (facade.error(); as error) {
+		<edu-message severity="danger" [text]="error" data-testid="adjuntos-error" />
+	}
+
+	@if (facade.cargando()) {
+		<p class="adjuntos__estado" role="status">Leyendo los vouchers…</p>
+	} @else {
+		@if (facade.activos().length === 0) {
+			<p class="adjuntos__estado" data-testid="adjuntos-vacio">Este pago no tiene voucher adjunto.</p>
+		} @else {
+			<ul class="adjuntos__lista" aria-label="Vouchers adjuntos">
+				@for (a of facade.activos(); track a.id) {
+					<li class="adjunto" data-testid="adjunto">
+						<div class="adjunto__datos">
+							<span class="adjunto__nombre">{{ a.nombreOriginal }}</span>
+							<span class="adjunto__meta">{{ formatFileSize(a.tamanoBytes) }} · {{ fecha(a) }} · {{ a.usuarioReg }}</span>
+						</div>
+						@if (bajaDe() === a.id) {
+							<div class="adjunto__baja">
+								<label class="adjunto__campo">
+									<span>Motivo de la baja <span aria-hidden="true">*</span></span>
+									<textarea
+										eduTextarea
+										rows="2"
+										maxlength="500"
+										[ngModel]="motivo()"
+										(ngModelChange)="motivo.set($event)"
+										placeholder="Por qué se da de baja este voucher"
+										data-testid="motivo-baja"
+									></textarea>
+								</label>
+								<p class="adjuntos__estado">El archivo no se borra: queda registrado quién y cuándo lo dio de baja.</p>
+								<div class="adjunto__acciones">
+									<edu-button label="Cancelar" severity="secondary" [text]="true" [disabled]="facade.ocupado()" (click)="cancelarBaja()" />
+									<edu-button
+										label="Dar de baja"
+										icon="pi pi-trash"
+										severity="danger"
+										[loading]="facade.procesandoId() === a.id"
+										[disabled]="!motivo().trim() || facade.ocupado() || facade.sinConexion()"
+										data-testid="confirmar-baja"
+										(click)="confirmarBaja(a)"
+									/>
+								</div>
+							</div>
+						} @else {
+							<div class="adjunto__acciones">
+								<edu-button
+									label="Ver"
+									icon="pi pi-eye"
+									size="small"
+									[text]="true"
+									[loading]="facade.procesandoId() === a.id"
+									[disabled]="facade.ocupado() || facade.sinConexion()"
+									data-testid="ver-adjunto"
+									(click)="facade.ver(a)"
+								>
+									<span class="sr-only"> {{ a.nombreOriginal }}</span>
+								</edu-button>
+								<edu-button
+									label="Descargar"
+									icon="pi pi-download"
+									size="small"
+									[text]="true"
+									[disabled]="facade.ocupado() || facade.sinConexion()"
+									data-testid="descargar-adjunto"
+									(click)="facade.descargar(a)"
+								>
+									<span class="sr-only"> {{ a.nombreOriginal }}</span>
+								</edu-button>
+								@if (vigente()) {
+									<edu-button
+										label="Dar de baja"
+										icon="pi pi-trash"
+										severity="danger"
+										size="small"
+										[text]="true"
+										[disabled]="facade.ocupado() || facade.sinConexion()"
+										data-testid="pedir-baja"
+										(click)="pedirBaja(a)"
+									>
+										<span class="sr-only"> {{ a.nombreOriginal }}</span>
+									</edu-button>
+								}
+							</div>
+						}
+					</li>
+				}
+			</ul>
+		}
+
+		@if (facade.dadosDeBaja().length > 0) {
+			<details class="adjuntos__bajas">
+				<summary>Vouchers dados de baja ({{ facade.dadosDeBaja().length }})</summary>
+				<ul class="adjuntos__lista">
+					@for (a of facade.dadosDeBaja(); track a.id) {
+						<li class="adjunto adjunto--baja" data-testid="adjunto-baja">
+							<span class="adjunto__nombre">{{ a.nombreOriginal }}</span>
+							<span class="adjunto__meta">Baja por {{ a.usuarioBaja }} · {{ a.motivoBaja }}</span>
+						</li>
+					}
+				</ul>
+			</details>
+		}
+
+		@if (vigente()) {
+			@if (seleccionado(); as archivo) {
+				<div class="previa" data-testid="adjunto-previa">
+					@if (vistaPrevia(); as url) {
+						<img class="previa__img" [src]="url" alt="Vista previa del voucher elegido" />
+					} @else {
+						<i class="pi pi-file-pdf previa__icono" aria-hidden="true"></i>
+					}
+					<div class="adjunto__datos">
+						<span class="adjunto__nombre">{{ archivo.name }}</span>
+						<span class="adjunto__meta">{{ formatFileSize(archivo.size) }}</span>
+					</div>
+					<div class="adjunto__acciones">
+						<edu-button label="Quitar" severity="secondary" [text]="true" [disabled]="facade.subiendo()" (click)="descartar()" />
+						<edu-button
+							label="Subir voucher"
+							icon="pi pi-upload"
+							[loading]="facade.subiendo()"
+							[disabled]="facade.ocupado() || facade.sinConexion()"
+							data-testid="subir-adjunto"
+							(click)="subir()"
+						/>
+					</div>
+				</div>
+			} @else if (!facade.llegoAlLimite()) {
+				<div class="adjuntos__elegir">
+					<edu-button
+						label="Elegir archivo"
+						icon="pi pi-paperclip"
+						[outlined]="true"
+						[disabled]="facade.ocupado() || facade.sinConexion()"
+						data-testid="elegir-archivo"
+						(click)="selector.click()"
+					/>
+					@if (esTactil) {
+						<edu-button
+							label="Tomar foto"
+							icon="pi pi-camera"
+							[outlined]="true"
+							[disabled]="facade.ocupado() || facade.sinConexion()"
+							data-testid="tomar-foto"
+							(click)="camara.click()"
+						/>
+					}
+					<small class="adjuntos__estado">PDF, JPG o PNG · hasta 10 MB · hasta 3 por pago</small>
+				</div>
+			} @else {
+				<p class="adjuntos__estado" data-testid="adjuntos-limite">
+					Este pago ya tiene 3 vouchers. Da de baja uno para adjuntar otro.
+				</p>
+			}
+		} @else {
+			<p class="adjuntos__estado" data-testid="adjuntos-anulado">
+				El pago está anulado: sus vouchers se conservan como evidencia y no se pueden agregar nuevos.
+			</p>
+		}
+	}
+
+	<input #selector class="sr-only" type="file" accept="application/pdf,image/jpeg,image/png" tabindex="-1" aria-hidden="true" (change)="elegir($event)" />
+	<input #camara class="sr-only" type="file" accept="image/*" capture="environment" tabindex="-1" aria-hidden="true" (change)="elegir($event)" />
+</section>

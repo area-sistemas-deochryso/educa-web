@@ -176,6 +176,16 @@
 		>
 			<span class="sr-only"> del pago N.º {{ pago.pagoId }}{{ pago.vigente ? '' : ' (anulado)' }}</span>
 		</edu-button>
+		<edu-button
+			label="Voucher"
+			icon="pi pi-paperclip"
+			size="small"
+			[text]="true"
+			data-testid="voucher-pago"
+			(click)="abrirAdjuntos(pago)"
+		>
+			<span class="sr-only"> del pago N.º {{ pago.pagoId }}{{ pago.vigente ? '' : ' (anulado)' }}</span>
+		</edu-button>
 		@if (pago.vigente) {
 			<edu-button
 				label="Anular"
@@ -211,6 +221,7 @@
 		(confirmar)="confirmarAnulacion($event)"
 		(cancelar)="cancelarAccion()"
 	/>
+	<app-pago-adjuntos-dialog />
 	<app-ajuste-dialog
 		[guardando]="acciones.guardando()"
 		[error]="acciones.error()"

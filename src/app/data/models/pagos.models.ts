@@ -360,3 +360,20 @@ export interface ConsistenciaFiltros {
 	pageSize?: number;
 }
 // #endregion
+
+// #region Voucher adjunto (P124 F6, INV-PG16)
+/** Voucher de un pago. De baja trae su rastro; el servidor no expone el nombre interno del blob. */
+export interface PagoAdjunto {
+	id: number;
+	pagoId: number;
+	nombreOriginal: string;
+	tipoContenido: string;
+	tamanoBytes: number;
+	activo: boolean;
+	usuarioReg: string;
+	fechaReg: string;
+	motivoBaja: string | null;
+	usuarioBaja: string | null;
+	fechaBaja: string | null;
+}
+// #endregion

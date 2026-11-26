@@ -10,6 +10,7 @@ import { EduAutoComplete, EduAvatar, EduButton, EduMessage, EduTag, EduTemplate 
 import { ErrorStateComponent } from '@shared/components';
 import { esConcepto } from '../registrar-pago/registrar-pago.logic';
 import { formatSoles } from '../utils/pagos-format.util';
+import { PagoAdjuntosDialogComponent } from '../pago-adjuntos/pago-adjuntos-dialog.component';
 import { ConstanciaPagoFacade } from '../services/constancia-pago.facade';
 import { AccionesCuentaFacade, type ResultadoAccion } from './acciones-cuenta.facade';
 import { admiteAjuste, avisoAnularPago, topeAjuste } from './acciones-cuenta.logic';
@@ -69,6 +70,7 @@ const TIPOS_AJUSTE: Record<string, string> = {
 		EduTemplate,
 		ErrorStateComponent,
 		EstadoCuentaTablaComponent,
+		PagoAdjuntosDialogComponent,
 	],
 	providers: [EstadoCuentaFacade, AccionesCuentaFacade, ConstanciaPagoFacade],
 	templateUrl: './estado-cuenta.component.html',
@@ -88,6 +90,7 @@ export class EstadoCuentaComponent {
 
 	private readonly anularDialog = viewChild.required(AnularDialogComponent);
 	private readonly ajusteDialog = viewChild.required(AjusteDialogComponent);
+	private readonly adjuntosDialog = viewChild.required(PagoAdjuntosDialogComponent);
 	/** Qué se está anulando mientras el diálogo de anulación está abierto. */
 	private pendiente: { tipo: 'pago' | 'ajuste'; id: number } | null = null;
 
@@ -165,6 +168,10 @@ export class EstadoCuentaComponent {
 	}
 
 	// #region Acciones sobre la cuenta
+	protected abrirAdjuntos(pago: CuentaPago): void {
+		this.adjuntosDialog().open({ pagoId: pago.pagoId, vigente: pago.vigente });
+	}
+
 	protected abrirAnularPago(pago: CuentaPago): void {
 		this.acciones.limpiarError();
 		this.pendiente = { tipo: 'pago', id: pago.pagoId };

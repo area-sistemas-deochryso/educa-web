@@ -7,6 +7,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import type { PagoMedio, RepartoAplicacion } from '@data/models';
 import { EduAutoComplete } from '@edu-ui';
+import { PagoAdjuntosApiService } from '../services/pago-adjuntos-api.service';
 import { PagosApiService } from '../services/pagos-api.service';
 import { RegistrarPagoComponent } from './registrar-pago.component';
 
@@ -48,6 +49,7 @@ function crearComponente(
 	familia = vi.fn((_id: number) => of([])),
 	query: Record<string, string> = {},
 	constancia = vi.fn((_id: number) => of({ blob: new Blob(['%PDF']), fileName: 'Constancia_Pago_5.pdf' })),
+	adjuntosListar = vi.fn((_id: number) => of([])),
 ) {
 	TestBed.configureTestingModule({
 		imports: [RegistrarPagoComponent],
@@ -67,11 +69,12 @@ function crearComponente(
 					constancia,
 				},
 			},
+			{ provide: PagoAdjuntosApiService, useValue: { listar: adjuntosListar } },
 		],
 	});
 	const fixture = TestBed.createComponent(RegistrarPagoComponent);
 	fixture.detectChanges();
-	return { fixture, registrarPago, familia, constancia, estado: fixture.componentInstance as unknown as EstadoFormulario };
+	return { fixture, registrarPago, familia, constancia, adjuntosListar, estado: fixture.componentInstance as unknown as EstadoFormulario };
 }
 
 /**
@@ -348,6 +351,23 @@ function registrarUnPago(fixture: { nativeElement: HTMLElement; detectChanges: (
 	clic(fixture, 'edu-button[label="Proponer reparto"]');
 	clic(fixture, 'edu-button[label="Registrar pago"]');
 }
+
+describe('RegistrarPagoComponent — voucher tras registrar (P124 F6)', () => {
+	it('antes de registrar no ofrece adjuntar ni lee vouchers', () => {
+		const { fixture, adjuntosListar } = crearComponente();
+		expect(fixture.nativeElement.querySelector('app-pago-adjuntos')).toBeNull();
+		expect(adjuntosListar).not.toHaveBeenCalled();
+	});
+
+	it('tras registrar muestra el panel del voucher del pago recién creado, sin alterar el registro', () => {
+		const { fixture, estado, registrarPago, adjuntosListar } = crearComponente();
+		registrarUnPago(fixture, estado);
+		fixture.detectChanges();
+		expect(fixture.nativeElement.querySelector('app-pago-adjuntos')).not.toBeNull();
+		expect(adjuntosListar).toHaveBeenCalledWith(5);
+		expect(registrarPago).toHaveBeenCalledTimes(1);
+	});
+});
 
 describe('RegistrarPagoComponent — constancia tras registrar (P124 F4)', () => {
 	it('antes de registrar no ofrece la constancia', () => {
