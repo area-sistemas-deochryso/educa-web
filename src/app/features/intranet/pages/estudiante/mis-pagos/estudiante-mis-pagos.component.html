@@ -1,0 +1,132 @@
+<app-page-header icon="pi pi-wallet" title="Mis pagos" />
+
+<!-- #region Estados de la vista -->
+@if (facade.loading()) {
+	<div class="mp-skeleton" aria-busy="true" aria-label="Cargando tus pagos">
+		<app-skeleton-loader variant="rect" width="100%" height="88px" />
+		<app-skeleton-loader variant="card" height="160px" />
+		<app-skeleton-loader variant="card" height="160px" />
+	</div>
+} @else if (facade.error(); as err) {
+	<div class="mp-estado" role="alert">
+		<i [class]="err.icono + ' mp-estado-icono'" aria-hidden="true"></i>
+		<p class="mp-estado-titulo">{{ err.titulo }}</p>
+		<p class="mp-estado-detalle">{{ err.detalle }}</p>
+		@if (err.reintentable) {
+			<edu-button label="Reintentar" icon="pi pi-refresh" [outlined]="true" (click)="onRetry()" />
+		}
+	</div>
+} @else if (facade.cuenta(); as cuenta) {
+	@if (vacio()) {
+		<app-empty-state
+			icon="pi pi-wallet"
+			title="Mis pagos"
+			subtitle="Cuando el colegio registre tus cuotas y pagos, los verás aquí"
+			message="Aún no hay información de pagos"
+		/>
+	} @else {
+		<!-- #endregion -->
+
+		<!-- #region Resumen -->
+		<section class="mp-resumen" aria-label="Resumen de tu cuenta">
+			<p class="mp-alumno">
+				<strong>{{ cuenta.estudiante }}</strong>
+				@if (cuenta.salon) {
+					<span class="mp-salon"> · {{ cuenta.salon }}</span>
+				}
+			</p>
+			<dl class="mp-totales">
+				<div class="mp-total" [class.mp-total--alerta]="cuenta.deudaVencida > 0">
+					<dt>Deuda vencida</dt>
+					<dd>{{ soles(cuenta.deudaVencida) }}</dd>
+				</div>
+				<div class="mp-total">
+					<dt>Pendiente total</dt>
+					<dd>{{ soles(cuenta.pendienteTotal) }}</dd>
+				</div>
+			</dl>
+			<p class="mp-fecha-corte">Información al {{ fecha(cuenta.fecha) }}</p>
+			@if (cuenta.tieneCargosEnRevision) {
+				<p class="mp-aviso" role="note">
+					<i class="pi pi-info-circle" aria-hidden="true"></i>
+					Hay cuotas en revisión por el colegio. Si tienes dudas, consulta en secretaría.
+				</p>
+			}
+		</section>
+		<!-- #endregion -->
+
+		<!-- #region Cuotas -->
+		<section aria-labelledby="mp-cuotas-titulo">
+			<h2 id="mp-cuotas-titulo" class="mp-seccion">Mis cuotas</h2>
+			@if (cuenta.cargos.length === 0) {
+				<p class="mp-vacio">Aún no tienes cuotas registradas.</p>
+			} @else {
+				<ul class="mp-lista">
+					@for (cargo of cuenta.cargos; track $index) {
+						<li class="mp-tarjeta">
+							<div class="mp-tarjeta-cabecera">
+								<span class="mp-tarjeta-titulo">{{ titulo(cargo) }}</span>
+								<edu-tag [value]="estado(cargo).label" [severity]="estado(cargo).severity" />
+							</div>
+							@if (enRevision(cargo)) {
+								<p class="mp-revision">{{ textoRevision(cargo) }}</p>
+							} @else if (cargo.detalle; as d) {
+								<dl class="mp-detalle">
+									@if (d.vencimiento) {
+										<div><dt>Vence</dt><dd>{{ fecha(d.vencimiento) }}</dd></div>
+									}
+									<div><dt>Monto a pagar</dt><dd>{{ soles(d.montoAPagar) }}</dd></div>
+									<div><dt>Pagado</dt><dd>{{ soles(d.pagado) }}</dd></div>
+									@if (d.recargo > 0) {
+										<div><dt>Recargo por mora</dt><dd>{{ soles(d.recargo) }}</dd></div>
+									}
+									<div class="mp-detalle-saldo"><dt>Saldo</dt><dd>{{ soles(d.saldo) }}</dd></div>
+								</dl>
+							}
+						</li>
+					}
+				</ul>
+			}
+		</section>
+		<!-- #endregion -->
+
+		<!-- #region Pagos -->
+		<section aria-labelledby="mp-pagos-titulo">
+			<h2 id="mp-pagos-titulo" class="mp-seccion">Mis pagos registrados</h2>
+			@if (cuenta.pagos.length === 0) {
+				<p class="mp-vacio">Aún no hay pagos registrados.</p>
+			} @else {
+				<ul class="mp-lista">
+					@for (pago of cuenta.pagos; track $index) {
+						<li class="mp-tarjeta" [class.mp-tarjeta--anulada]="!pago.vigente">
+							<div class="mp-tarjeta-cabecera">
+								<span class="mp-tarjeta-titulo">
+									{{ fecha(pago.fechaPago) }}
+									@if (hora(pago.horaPago); as h) {
+										<span class="mp-hora">{{ h }}</span>
+									}
+								</span>
+								<edu-tag [value]="vigencia(pago).label" [severity]="vigencia(pago).severity" />
+							</div>
+							<p class="mp-pago-linea">
+								<span>{{ medio(pago.medio) }} · Comprobante {{ pago.comprobante }}</span>
+								<strong class="mp-pago-monto">{{ soles(pago.montoAplicado) }}</strong>
+							</p>
+							@if (pago.aplicaciones.length > 0) {
+								<ul class="mp-aplicaciones">
+									@for (ap of pago.aplicaciones; track $index) {
+										<li>
+											<span>{{ titulo(ap) }}</span>
+											<span>{{ soles(ap.monto) }}</span>
+										</li>
+									}
+								</ul>
+							}
+						</li>
+					}
+				</ul>
+			}
+		</section>
+		<!-- #endregion -->
+	}
+}

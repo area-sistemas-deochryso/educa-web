@@ -264,6 +264,16 @@ const ESTUDIANTE_ROUTES_RAW: Route[] = [
 			),
 		title: 'Intranet - Mis Salones (Estudiante)',
 	},
+	{
+		// Página independiente con capability propia (`PAGOS_ESTUDIANTE_PAGE_API_VIEW`, solo Estudiante, INV-PG17/INV-PG18):
+		// su `CAP_Ruta` es esta misma ruta, sin `permissionPath` compartido.
+		path: 'estudiante/mis-pagos',
+		loadComponent: () =>
+			import('./pages/estudiante/mis-pagos/estudiante-mis-pagos.component').then(
+				(m) => m.EstudianteMisPagosComponent,
+			),
+		title: 'Intranet - Mis Pagos',
+	},
 ];
 const ESTUDIANTE_ROUTES: Route[] = withViewAsGate('Estudiante', ESTUDIANTE_ROUTES_RAW);
 // #endregion
